@@ -1,26 +1,58 @@
 @import "tailwindcss";
 
+@theme {
+  --color-mystic-dark: var(--mystic-dark);
+  --color-mystic-surface: var(--mystic-surface);
+  --color-mystic-surface-light: var(--mystic-surface-light);
+  --color-mystic-primary: var(--mystic-primary);
+  --color-mystic-accent: var(--mystic-accent);
+  --color-mystic-text: var(--mystic-text);
+  --color-mystic-text-muted: var(--mystic-text-muted);
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fdfdfd;
+  --foreground: #111111;
+  --mystic-dark: #f0f0f0;
+  --mystic-surface: #ffffff;
+  --mystic-surface-light: #e5e5e5;
+  --mystic-primary: #B8860B;
+  --mystic-accent: #D4AF37;
+  --mystic-text: #111111;
+  --mystic-text-muted: #6b7280;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+.dark {
+  --background: #000000;
+  --foreground: #ffffff;
+  --mystic-dark: #000000;
+  --mystic-surface: #0a0a0a;
+  --mystic-surface-light: #1f1f1f;
+  --mystic-primary: #D4AF37;
+  --mystic-accent: #E5C158;
+  --mystic-text: #ffffff;
+  --mystic-text-muted: #a3a3a3;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: 'Inter', sans-serif;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  /* Custom scrollbar for mystical feel */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--background);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-mystic-surface-light);
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-mystic-primary);
+  }
 }

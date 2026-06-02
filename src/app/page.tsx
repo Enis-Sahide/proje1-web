@@ -1,114 +1,127 @@
 "use client";
 
-import React, { useState } from 'react';
-import HumanDesignBodygraph from '@/components/HumanDesignBodygraph';
-import { Loader2 } from 'lucide-react';
-import { HumanDesignChart } from '@/utils/HumanDesignEngine';
+import React from 'react';
+import ExploreSection from '@/components/ExploreSection';
+import { DAILY_AFFIRMATIONS } from '@/data/affirmations';
+import PlanetaryHourWidget from '@/components/PlanetaryHourWidget';
+import { ChevronDown, Quote } from 'lucide-react';
+import Link from 'next/link';
+
+export const CHAKRA_MODULES = [
+  { id: 1, title: 'Kök Çakra', subtitle: 'Temel Bilgiler', color: '#FF3B30', top: '82%' },
+  { id: 2, title: 'Sakral Çakra', subtitle: 'Bağlar ve Yaratım', color: '#FF9500', top: '72%' },
+  { id: 3, title: 'Solar Pleksus', subtitle: 'İrade ve Güç', color: '#FFCC00', top: '62%' },
+  { id: 4, title: 'Kalp Çakrası', subtitle: 'Sevgi ve Denge', color: '#34C759', top: '52%' },
+  { id: 5, title: 'Boğaz Çakrası', subtitle: 'İfade ve Gerçek', color: '#00C7BE', top: '37%' },
+  { id: 6, title: 'Üçüncü Göz', subtitle: 'Sezgi ve İdrak', color: '#003399', top: '25%' },
+  { id: 7, title: 'Tepe Çakra', subtitle: 'Kozmik Bağlantı', color: '#AF52DE', top: '15%' },
+];
+
+const DAY_NAMES = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
 
 export default function Home() {
-  const [date, setDate] = useState('1990-01-01');
-  const [time, setTime] = useState('12:00');
-  const [city, setCity] = useState('Istanbul');
-  const [loading, setLoading] = useState(false);
-  const [chart, setChart] = useState<HumanDesignChart | null>(null);
-  const [error, setError] = useState('');
+  const [affirmation, setAffirmation] = React.useState<any>(null);
+  const [dayName, setDayName] = React.useState<string>('');
 
-  const calculateChart = async () => {
-    setLoading(true);
-    setError('');
-    setChart(null);
-    try {
-      const [year, month, day] = date.split('-').map(Number);
-      const [hour, minute] = time.split(':').map(Number);
-      
-      const res = await fetch('/api/human-design', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          year, month, day, hour, minute,
-          lat: 41.0082, // Şimdilik varsayılan İstanbul
-          lon: 28.9784,
-          tz: 'Europe/Istanbul'
-        })
-      });
-
-      if (!res.ok) throw new Error('Hesaplama hatası');
-      const data = await res.json();
-      setChart(data);
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  React.useEffect(() => {
+    const day = new Date().getDay();
+    setAffirmation(DAILY_AFFIRMATIONS[day]);
+    setDayName(DAY_NAMES[day]);
+  }, []);
 
   return (
-    <main className="min-h-screen bg-slate-900 text-slate-100 flex flex-col items-center py-12 px-4 relative overflow-hidden">
-      {/* Arka plan efekti */}
-      <div className="absolute top-0 left-0 w-full h-full bg-[url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=2094&auto=format&fit=crop')] bg-cover opacity-20 blur-xl -z-10" />
-      
-      <div className="max-w-5xl w-full z-10">
-        <h1 className="text-4xl font-bold text-sky-400 text-center mb-2">İnsan Tasarımı Haritası</h1>
-        <p className="text-slate-400 text-center mb-10 italic">Gerçek Astronomik Ephemeris Motoru (Web API)</p>
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
+      <div className="fixed inset-0 bg-[url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=2094&auto=format&fit=crop')] bg-cover bg-center opacity-10 mix-blend-screen pointer-events-none -z-10" />
+      <div className="fixed inset-0 bg-gradient-to-b from-mystic-dark/80 via-mystic-dark to-mystic-dark -z-10 pointer-events-none" />
 
-        {!chart ? (
-          <div className="bg-slate-900/60 backdrop-blur-md p-8 rounded-2xl border border-slate-700/50 shadow-2xl max-w-md mx-auto">
-            <h2 className="text-xl font-semibold mb-6">Doğum Bilgilerinizi Girin</h2>
-            
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Tarih</label>
-                <input type="date" value={date} onChange={e => setDate(e.target.value)} className="w-full bg-slate-800/50 border border-slate-600 rounded-lg p-3 text-white outline-none focus:border-sky-500" />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Saat</label>
-                <input type="time" value={time} onChange={e => setTime(e.target.value)} className="w-full bg-slate-800/50 border border-slate-600 rounded-lg p-3 text-white outline-none focus:border-sky-500" />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-300 mb-1">Şehir</label>
-                <input type="text" value={city} onChange={e => setCity(e.target.value)} className="w-full bg-slate-800/50 border border-slate-600 rounded-lg p-3 text-white outline-none focus:border-sky-500" placeholder="Örn: Istanbul" />
-              </div>
-
-              {error && <div className="text-red-400 text-sm mt-2">{error}</div>}
-
-              <button 
-                onClick={calculateChart}
-                disabled={loading}
-                className="w-full bg-sky-500 hover:bg-sky-400 text-slate-900 font-bold py-3 rounded-lg mt-6 transition-all flex justify-center items-center"
-              >
-                {loading ? <Loader2 className="animate-spin mr-2" /> : 'Haritayı Hesapla (API)'}
-              </button>
-            </div>
+      {/* Hero Section & Chakras */}
+      <section className="flex-grow flex flex-col justify-center items-center py-12 md:py-24 px-4 relative z-10 min-h-screen">
+        <div className="max-w-7xl w-full">
+          <div className="text-center mb-12">
+            <h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-mystic-accent via-mystic-text to-mystic-primary mb-4 tracking-tight drop-shadow-lg py-2">
+              İçsel Uyanış
+            </h1>
+            <p className="text-mystic-text-muted text-lg md:text-xl max-w-2xl mx-auto">
+              Gerçek katman katmandır ve yapman gereken unuttuklarını hatırlayarak katmanları açmaktır.
+            </p>
           </div>
-        ) : (
-          <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <button onClick={() => setChart(null)} className="text-sky-400 hover:text-sky-300 mb-6 flex items-center font-medium">
-              ← Yeni Hesaplama
-            </button>
+
+          <h2 className="text-2xl font-bold text-mystic-accent text-center mb-12">7 İnisiyasyon Katmanı</h2>
+
+          {/* Main Layout Grid */}
+          <div className="mb-20 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 w-full">
             
-            <div className="flex flex-col lg:flex-row gap-8 items-start">
-              <div className="w-full lg:w-3/4">
-                {/* SVG Grafiği buraya gelecek */}
-                <HumanDesignBodygraph chart={chart} />
-              </div>
-              
-              <div className="w-full lg:w-1/4 bg-slate-900/60 backdrop-blur-md p-6 rounded-2xl border border-slate-700/50">
-                <h3 className="text-lg font-bold text-sky-400 mb-4 border-b border-slate-700 pb-2">Analiz Özeti</h3>
-                <div className="space-y-3">
-                  <div><span className="text-slate-400 text-sm block">Profil:</span><span className="font-semibold">{chart.profile}</span></div>
-                  <div><span className="text-slate-400 text-sm block">Tür:</span><span className="font-semibold text-rose-400">{chart.type}</span></div>
-                  <div><span className="text-slate-400 text-sm block">Strateji:</span><span className="font-semibold">{chart.strategy}</span></div>
-                  <div><span className="text-slate-400 text-sm block">İç Otorite:</span><span className="font-semibold">{chart.authority}</span></div>
-                  <div><span className="text-slate-400 text-sm block">İmza:</span><span className="font-semibold">{chart.signature}</span></div>
-                  <div><span className="text-slate-400 text-sm block">Benlik Olmayan Tema:</span><span className="font-semibold">{chart.notSelfTheme}</span></div>
+            {/* Left: Günün Mesajı */}
+            <div className="w-full lg:w-1/3 flex flex-col items-center lg:items-end order-2 lg:order-1">
+              {affirmation && (
+                <div className="bg-mystic-surface/50 backdrop-blur-md rounded-2xl p-6 border border-mystic-surface-light w-full max-w-sm shadow-xl text-center lg:text-right relative overflow-hidden">
+                  <div className="absolute -top-4 -left-4 text-mystic-primary/20">
+                    <Quote size={80} />
+                  </div>
+                  <h3 className="text-mystic-primary text-sm font-bold uppercase tracking-widest mb-1">Günün Mesajı</h3>
+                  <div className="text-mystic-text-muted text-xs mb-4">{dayName}</div>
+                  <p className="text-mystic-text text-base italic leading-relaxed relative z-10 mb-4">
+                    "{affirmation.text}"
+                  </p>
+                  <p className="text-mystic-accent font-semibold text-sm">— {affirmation.author}</p>
                 </div>
+              )}
+            </div>
+
+            {/* Center: Anatomical View */}
+            <div className="relative w-full max-w-[320px] md:max-w-[400px] bg-black/20 backdrop-blur-md rounded-[3rem] border border-mystic-surface-light shadow-2xl overflow-hidden order-1 lg:order-2 shrink-0">
+              <div className="relative w-full">
+                {/* Silhouette Image */}
+                <img 
+                  src="https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/human_silhouette.png" 
+                  alt="Human Silhouette"
+                  className="w-full h-auto opacity-80 mix-blend-screen block"
+                />
+
+                {CHAKRA_MODULES.map((mod) => (
+                  <div 
+                    key={mod.id} 
+                    className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 group flex flex-col items-center cursor-pointer w-64 z-10"
+                    style={{ top: mod.top }}
+                  >
+                    <div 
+                      className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 flex items-center justify-center shadow-lg transition-all duration-300 group-hover:scale-125 group-hover:z-20 bg-black/80 backdrop-blur-md"
+                      style={{ borderColor: mod.color, boxShadow: `0 0 15px ${mod.color}90` }}
+                    >
+                      <span className="text-sm md:text-base font-bold drop-shadow-md" style={{ color: mod.color }}>{mod.id}</span>
+                    </div>
+                    
+                    <div className="absolute top-1/2 -translate-y-1/2 left-[calc(50%+25px)] md:left-[calc(50%+30px)] bg-mystic-dark/95 px-4 py-2 rounded-xl border border-mystic-surface-light opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap shadow-xl pointer-events-none transform -translate-x-4 group-hover:translate-x-0">
+                      <span className="font-bold text-sm block" style={{ color: mod.color }}>{mod.title}</span>
+                      <span className="text-xs text-mystic-text-muted block">{mod.subtitle}</span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
+
+            {/* Right: Gezegen Saati */}
+            <div className="w-full lg:w-1/3 flex flex-col items-center lg:items-start order-3 lg:order-3">
+              <PlanetaryHourWidget />
+            </div>
+
           </div>
-        )}
-      </div>
-    </main>
+
+            <div className="mt-12 flex justify-center w-full">
+               <Link href="/dashboard/tests" className="inline-flex items-center gap-2 text-mystic-text hover:text-mystic-accent font-medium bg-mystic-surface/50 px-6 py-3 rounded-full border border-mystic-surface-light hover:border-mystic-accent transition-all">
+                 Aura Analizi ve Çakra Testleri için Giriş Yapın →
+               </Link>
+            </div>
+          </div>
+
+        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-mystic-text-muted hidden md:block">
+          <ChevronDown size={32} />
+        </div>
+      </section>
+
+      <ExploreSection />
+      
+    </div>
   );
 }
+
