@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Sparkles, User, LogIn } from 'lucide-react';
+import { Menu, X, Sparkles, User, LogIn, ShoppingCart, Store, Shield } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ThemeToggle } from './ThemeToggle';
 
@@ -29,7 +29,8 @@ export default function Navigation() {
     { name: 'Keşfet', href: '/explore' },
     { name: 'Meditasyon', href: '/meditation' },
     { name: 'Nefes', href: '/breathwork' },
-    { name: 'Kadim Dersler', href: '/kadim-dersler' },
+    { name: 'Analiz', href: '/analysis' },
+    { name: 'Dersler', href: '/kadim-dersler' },
   ];
 
   return (
@@ -66,6 +67,17 @@ export default function Navigation() {
 
         {/* Auth / Profile (Desktop) */}
         <div className="hidden md:flex items-center gap-4">
+          <Link href="/explore" className="text-mystic-text hover:text-mystic-primary transition-colors relative">
+            <ShoppingCart size={20} />
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full">0</span>
+          </Link>
+          <Link href="/vendor/dashboard" className="text-mystic-text hover:text-mystic-primary transition-colors" title="Satıcı Paneli">
+            <Store size={20} />
+          </Link>
+          <Link href="/admin/dashboard" className="text-mystic-text hover:text-mystic-primary transition-colors" title="Admin Paneli">
+            <Shield size={20} />
+          </Link>
+
           {isLoggedIn ? (
             <Link href="/dashboard" className="flex items-center gap-2 text-mystic-text hover:text-mystic-primary transition-colors">
               <User size={20} />

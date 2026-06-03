@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function KadimDerslerPage() {
   return (
     <div className="min-h-screen pt-24 px-4 pb-12 relative flex flex-col items-center">
@@ -20,14 +22,16 @@ export default function KadimDerslerPage() {
             { id: 'tarot', title: 'Tarot ve Arkana' },
             { id: 'yoga', title: 'Yoga Asanaları' }
           ].map((item, index) => (
-            <div key={index} className="bg-mystic-surface/80 backdrop-blur-md border border-mystic-surface-light rounded-2xl p-6 hover:border-mystic-primary transition-all group cursor-pointer flex items-center justify-between shadow-lg">
-              <div>
-                <h3 className="text-xl font-semibold text-mystic-text group-hover:text-mystic-accent transition-colors">{item.title}</h3>
+            <Link href={`/kadim-dersler/${item.id}`} key={index} className="block">
+              <div className="bg-mystic-surface/80 backdrop-blur-md border border-mystic-surface-light rounded-2xl p-6 hover:border-mystic-primary transition-all group cursor-pointer flex items-center justify-between shadow-lg">
+                <div>
+                  <h3 className="text-xl font-semibold text-mystic-text group-hover:text-mystic-accent transition-colors">{item.title}</h3>
+                </div>
+                <div className="text-mystic-primary opacity-50 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
+                  →
+                </div>
               </div>
-              <div className="text-mystic-primary opacity-50 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
-                →
-              </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

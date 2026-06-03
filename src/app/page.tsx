@@ -41,9 +41,11 @@ export default function Home() {
             <h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-mystic-accent via-mystic-text to-mystic-primary mb-4 tracking-tight drop-shadow-lg py-2">
               İçsel Uyanış
             </h1>
-            <p className="text-mystic-text-muted text-lg md:text-xl max-w-2xl mx-auto">
-              Gerçek katman katmandır ve yapman gereken unuttuklarını hatırlayarak katmanları açmaktır.
-            </p>
+            <div className="w-full max-w-4xl mx-auto overflow-hidden relative h-8 mt-2">
+              <p className="text-mystic-text-muted text-lg md:text-xl whitespace-nowrap absolute animate-marquee w-full text-center">
+                Gerçek katman katmandır ve yapman gereken unuttuklarını hatırlayarak katmanları açmaktır. Hatırladıkça aydınlık artacak ve ışığın kaynağını bulacaksın...
+              </p>
+            </div>
           </div>
 
           <h2 className="text-2xl font-bold text-mystic-accent text-center mb-12">7 İnisiyasyon Katmanı</h2>
@@ -79,7 +81,8 @@ export default function Home() {
                 />
 
                 {CHAKRA_MODULES.map((mod) => (
-                  <div 
+                  <Link 
+                    href={`/chakra/${mod.id}`}
                     key={mod.id} 
                     className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 group flex flex-col items-center cursor-pointer w-64 z-10"
                     style={{ top: mod.top }}
@@ -91,11 +94,12 @@ export default function Home() {
                       <span className="text-sm md:text-base font-bold drop-shadow-md" style={{ color: mod.color }}>{mod.id}</span>
                     </div>
                     
-                    <div className="absolute top-1/2 -translate-y-1/2 left-[calc(50%+25px)] md:left-[calc(50%+30px)] bg-mystic-dark/95 px-4 py-2 rounded-xl border border-mystic-surface-light opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap shadow-xl pointer-events-none transform -translate-x-4 group-hover:translate-x-0">
+                    <div className="absolute top-1/2 -translate-y-1/2 left-[calc(50%+25px)] md:left-[calc(50%+30px)] bg-mystic-dark/95 px-4 py-2 rounded-xl border border-mystic-surface-light opacity-0 group-hover:opacity-100 transition-all duration-300 whitespace-nowrap shadow-xl transform -translate-x-4 group-hover:translate-x-0">
                       <span className="font-bold text-sm block" style={{ color: mod.color }}>{mod.title}</span>
                       <span className="text-xs text-mystic-text-muted block">{mod.subtitle}</span>
+                      <span className="text-[10px] text-mystic-primary mt-1 opacity-80 block">İncele →</span>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
             </div>

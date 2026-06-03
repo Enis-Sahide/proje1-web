@@ -2,22 +2,41 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Mail, Lock, Loader2, Sparkles } from 'lucide-react';
-// import { supabase } from '@/utils/supabaseClient'; // TODO: Setup Supabase Client
+import { useRouter } from 'next/navigation';
+import { Mail, Lock, Loader2, Sparkles, AlertCircle } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // TODO: Supabase login logic
-    setTimeout(() => {
+    setError(null);
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        setError("Giriş başarısız. Lütfen e-posta ve şifrenizi kontrol edin.");
+        setLoading(false);
+        return;
+      }
+
+      if (data.user) {
+        router.push('/');
+      }
+    } catch (err) {
+      setError("Beklenmeyen bir hata oluştu.");
       setLoading(false);
-      alert("Giriş işlemi başarılı (Demo)");
-    }, 1500);
+    }
   };
 
   return (
@@ -34,6 +53,13 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-mystic-text mb-2">Hoş Geldiniz</h1>
           <p className="text-mystic-text-muted">Kozmik yolculuğunuza devam etmek için giriş yapın.</p>
         </div>
+
+        {error && (
+          <div className="mb-6 bg-red-500/10 border border-red-500/50 rounded-xl p-4 flex items-center gap-3">
+            <AlertCircle className="text-red-500 shrink-0" size={20} />
+            <p className="text-sm text-red-500 font-medium">{error}</p>
+          </div>
+        )}
 
         <form onSubmit={handleLogin} className="space-y-5">
           <div>
