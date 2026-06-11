@@ -1,4 +1,4 @@
-import { SearchRiseSet, Body, Observer } from 'astronomy-engine';
+import SunCalc from 'suncalc';
 
 export interface PlanetaryHour {
   index: number;
@@ -52,27 +52,22 @@ const PLANET_SYMBOLS: Record<string, string> = {
 };
 
 export const getPlanetaryHours = (date: Date, lat: number, lon: number) => {
-  const observer = new Observer(lat, lon, 0);
-  
-  // To find the astrological day for a given date/time, we find the most recent sunrise.
-  // We'll search backwards from the current time.
-  const timeDate = new Date(date);
-  
-  let currentSunrise = SearchRiseSet(Body.Sun, observer, +1, timeDate, -1);
-  if (!currentSunrise) {
-    // If not found backwards within limit, try a bit later
-    currentSunrise = SearchRiseSet(Body.Sun, observer, +1, new Date(timeDate.getTime() + 24 * 3600 * 1000), -1);
-  }
-  
-  const sunriseDate = currentSunrise!.date;
-  
-  // Find the next sunset after this sunrise
-  const currentSunset = SearchRiseSet(Body.Sun, observer, -1, new Date(sunriseDate.getTime() + 1000), 1);
-  const sunsetDate = currentSunset!.date;
+  const times = SunCalc.getTimes(date, lat, lon);
+  let sunriseDate = times.sunrise;
+  let sunsetDate = times.sunset;
 
-  // Find the next sunrise after the sunset
-  const nextSunrise = SearchRiseSet(Body.Sun, observer, +1, new Date(sunsetDate.getTime() + 1000), 1);
-  const nextSunriseDate = nextSunrise!.date;
+  // If the given time is before sunrise, we are technically in the previous astrological day
+  if (date < sunriseDate) {
+    const prevDay = new Date(date.getTime() - 24 * 60 * 60 * 1000);
+    const prevTimes = SunCalc.getTimes(prevDay, lat, lon);
+    sunriseDate = prevTimes.sunrise;
+    sunsetDate = prevTimes.sunset;
+  }
+
+  // Get the next sunrise for the night hours
+  const nextDay = new Date(sunriseDate.getTime() + 24 * 60 * 60 * 1000);
+  const nextTimes = SunCalc.getTimes(nextDay, lat, lon);
+  const nextSunriseDate = nextTimes.sunrise;
 
   const dayLengthMs = sunsetDate.getTime() - sunriseDate.getTime();
   const nightLengthMs = nextSunriseDate.getTime() - sunsetDate.getTime();
@@ -80,14 +75,12 @@ export const getPlanetaryHours = (date: Date, lat: number, lon: number) => {
   const dayHourMs = dayLengthMs / 12;
   const nightHourMs = nightLengthMs / 12;
 
-  // Calculate the local day of the week of the sunrise location
   const localSunriseTime = sunriseDate.getTime() + (lon / 15) * 3600 * 1000;
   const dayOfWeek = new Date(localSunriseTime).getUTCDay();
   let currentPlanetIndex = DAY_RULERS[dayOfWeek];
 
   const hours: PlanetaryHour[] = [];
 
-  // Calculate 12 Day Hours
   for (let i = 0; i < 12; i++) {
     const startTime = new Date(sunriseDate.getTime() + i * dayHourMs);
     const endTime = new Date(sunriseDate.getTime() + (i + 1) * dayHourMs);
@@ -101,7 +94,6 @@ export const getPlanetaryHours = (date: Date, lat: number, lon: number) => {
     currentPlanetIndex = (currentPlanetIndex + 1) % 7;
   }
 
-  // Calculate 12 Night Hours
   for (let i = 0; i < 12; i++) {
     const startTime = new Date(sunsetDate.getTime() + i * nightHourMs);
     const endTime = new Date(sunsetDate.getTime() + (i + 1) * nightHourMs);

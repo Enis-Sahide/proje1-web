@@ -1,9 +1,9 @@
 "use client";
 
 import React from 'react';
-import ExploreSection from '@/components/ExploreSection';
+import ExploreSection from '@/features/astrology/components/ExploreSection';
 import { DAILY_AFFIRMATIONS } from '@/data/affirmations';
-import PlanetaryHourWidget from '@/components/PlanetaryHourWidget';
+import PlanetaryHourWidget from '@/features/astrology/components/PlanetaryHourWidget';
 import { ChevronDown, Quote } from 'lucide-react';
 import Link from 'next/link';
 
@@ -42,7 +42,7 @@ export default function Home() {
               İçsel Uyanış
             </h1>
             <div className="w-full max-w-4xl mx-auto overflow-hidden relative h-8 mt-2">
-              <p className="text-mystic-text-muted text-lg md:text-xl whitespace-nowrap absolute animate-marquee w-full text-center">
+              <p className="text-mystic-text-muted text-lg md:text-xl whitespace-nowrap absolute animate-marquee w-max">
                 Gerçek katman katmandır ve yapman gereken unuttuklarını hatırlayarak katmanları açmaktır. Hatırladıkça aydınlık artacak ve ışığın kaynağını bulacaksın...
               </p>
             </div>
@@ -110,13 +110,7 @@ export default function Home() {
             </div>
 
           </div>
-
-            <div className="mt-12 flex justify-center w-full">
-               <Link href="/dashboard/tests" className="inline-flex items-center gap-2 text-mystic-text hover:text-mystic-accent font-medium bg-mystic-surface/50 px-6 py-3 rounded-full border border-mystic-surface-light hover:border-mystic-accent transition-all">
-                 Aura Analizi ve Çakra Testleri için Giriş Yapın →
-               </Link>
-            </div>
-          </div>
+        </div>
 
         <div className="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-mystic-text-muted hidden md:block">
           <ChevronDown size={32} />

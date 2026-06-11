@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import Navigation from "@/components/Navigation";
-import { ThemeProvider } from "@/components/ThemeProvider";
+import Navigation from "@/core/ui/Navigation";
+import { ThemeProvider } from "@/core/ui/ThemeProvider";
+import { AuthProvider } from "@/context/AuthContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -25,11 +26,13 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className={`${inter.className} min-h-full flex flex-col`}>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          <Navigation />
-          <main className="flex-grow flex flex-col">
-            {children}
-          </main>
+        <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false}>
+          <AuthProvider>
+            <Navigation />
+            <main className="flex-grow flex flex-col">
+              {children}
+            </main>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

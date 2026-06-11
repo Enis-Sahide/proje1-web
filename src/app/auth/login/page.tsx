@@ -1,17 +1,25 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Mail, Lock, Loader2, Sparkles, AlertCircle } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Mail, Lock, Loader2, Sparkles, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (searchParams.get('registered') === 'true') {
+      setSuccess("Kayıt işlemi başarılı. Lütfen giriş yapın.");
+    }
+  }, [searchParams]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,6 +61,13 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-mystic-text mb-2">Hoş Geldiniz</h1>
           <p className="text-mystic-text-muted">Kozmik yolculuğunuza devam etmek için giriş yapın.</p>
         </div>
+
+        {success && (
+          <div className="mb-6 bg-green-500/10 border border-green-500/50 rounded-xl p-4 flex items-center gap-3">
+            <CheckCircle2 className="text-green-500 shrink-0" size={20} />
+            <p className="text-sm text-green-200 font-medium">{success}</p>
+          </div>
+        )}
 
         {error && (
           <div className="mb-6 bg-red-500/10 border border-red-500/50 rounded-xl p-4 flex items-center gap-3">

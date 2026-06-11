@@ -2,22 +2,43 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Mail, Lock, User, Loader2, Sparkles } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Mail, Lock, User, Loader2, Sparkles, AlertCircle } from 'lucide-react';
+import { supabase } from '@/lib/supabase';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    // TODO: Supabase register logic
-    setTimeout(() => {
+    setError(null);
+    
+    try {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: name,
+            role: 'free' // Default role
+          }
+        }
+      });
+
+      if (signUpError) throw signUpError;
+      
+      router.push('/auth/login?registered=true');
+    } catch (err: any) {
+      setError(err.message || 'Kayıt sırasında bir hata oluştu.');
+    } finally {
       setLoading(false);
-      alert("Kayıt işlemi başarılı (Demo)");
-    }, 1500);
+    }
   };
 
   return (
@@ -34,6 +55,13 @@ export default function RegisterPage() {
           <h1 className="text-3xl font-bold text-mystic-text mb-2">Aramıza Katılın</h1>
           <p className="text-mystic-text-muted">Kişisel analizleriniz ve ruhsal gelişiminiz için ilk adımı atın.</p>
         </div>
+
+        {error && (
+          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/50 rounded-xl flex items-start gap-3">
+            <AlertCircle className="text-red-500 shrink-0 mt-0.5" size={18} />
+            <p className="text-sm text-red-200">{error}</p>
+          </div>
+        )}
 
         <form onSubmit={handleRegister} className="space-y-5">
           <div>

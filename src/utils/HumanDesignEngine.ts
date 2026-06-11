@@ -1,10 +1,12 @@
-import { GeoVector, Ecliptic, MakeTime, Body, SearchRelativeLongitude } from 'astronomy-engine';
+import { GeoVector, Ecliptic, MakeTime, Body, SearchRelativeLongitude, GeoMoonState, Vector } from 'astronomy-engine';
 
-export type PlanetCode = 'Sun' | 'Earth' | 'Moon' | 'Mercury' | 'Venus' | 'Mars' | 'Jupiter' | 'Saturn' | 'Uranus' | 'Neptune' | 'Pluto';
+export type PlanetCode = 'Sun' | 'Earth' | 'NorthNode' | 'SouthNode' | 'Moon' | 'Mercury' | 'Venus' | 'Mars' | 'Jupiter' | 'Saturn' | 'Uranus' | 'Neptune' | 'Pluto';
 
 export const PLANET_SYMBOLS: Record<PlanetCode, string> = {
   Sun: '☉',
   Earth: '⊕',
+  NorthNode: '☊',
+  SouthNode: '☋',
   Moon: '☽',
   Mercury: '☿',
   Venus: '♀',
@@ -164,8 +166,31 @@ function calculatePlanets(date: Date): PlanetActivation[] {
   const earthGL = getGateAndLine(earthLon);
   results.push({ planet: 'Earth', gate: earthGL.gate, line: earthGL.line, longitude: earthLon });
 
-  // İnsan Tasarımı geleneksel dizilimi
-  const order: PlanetCode[] = ['Sun', 'Earth', 'Moon', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto'];
+  // Kuzey ve Güney Ay Düğümleri (True Node - Gerçek Ay Düğümü)
+  const moonState = GeoMoonState(time);
+  
+  // h = r x v (Açısal Momentum Vektörü)
+  const hx = moonState.y * moonState.vz - moonState.z * moonState.vy;
+  const hy = moonState.z * moonState.vx - moonState.x * moonState.vz;
+  const hz = moonState.x * moonState.vy - moonState.y * moonState.vx;
+  
+  const h_eq = new Vector(hx, hy, hz, time);
+  const ecl = Ecliptic(h_eq);
+  
+  // Çıkan düğüm (North Node), açısal momentum vektöründen 90 derece ileridedir
+  let trueNode = ecl.elon + 90;
+  if (trueNode >= 360) trueNode -= 360;
+
+  const nnGL = getGateAndLine(trueNode);
+  results.push({ planet: 'NorthNode', gate: nnGL.gate, line: nnGL.line, longitude: trueNode });
+
+  let snLon = trueNode + 180;
+  if (snLon >= 360) snLon -= 360;
+  const snGL = getGateAndLine(snLon);
+  results.push({ planet: 'SouthNode', gate: snGL.gate, line: snGL.line, longitude: snLon });
+
+  // İnsan Tasarımı geleneksel dizilimi (Güneş, Dünya, Ay, Kuzey Düğüm, Güney Düğüm...)
+  const order: PlanetCode[] = ['Sun', 'Earth', 'Moon', 'NorthNode', 'SouthNode', 'Mercury', 'Venus', 'Mars', 'Jupiter', 'Saturn', 'Uranus', 'Neptune', 'Pluto'];
   results.sort((a, b) => order.indexOf(a.planet) - order.indexOf(b.planet));
 
   return results;

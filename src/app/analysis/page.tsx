@@ -24,8 +24,8 @@ export default function AnalysisPage() {
     },
     {
       id: 'numerology',
-      title: 'Numeroloji Analizi',
-      description: 'İsminiz ve doğum tarihinizle Kader Sayınızı, Yaşam Yolunuzu ve ruhsal potansiyelinizi öğrenin.',
+      title: 'Numeroloji',
+      description: 'Doğum tarihinizle Kader Sayınızı, Yaşam Yolunuzu ve ruhsal potansiyelinizi öğrenin.',
       icon: <Hexagon size={32} />,
       color: '#AF52DE',
       link: '/analysis/numerology'
@@ -37,6 +37,14 @@ export default function AnalysisPage() {
       icon: <Fingerprint size={32} />,
       color: '#34C759',
       link: '/analysis/human-design'
+    },
+    {
+      id: 'chakra',
+      title: 'Çakra',
+      description: 'Anlık olarak çakra durumunuzu analiz edin.',
+      icon: <Sparkles size={32} />,
+      color: '#FF2D55',
+      link: '/analysis/chakra'
     }
   ];
 

@@ -67,7 +67,7 @@ interface Props {
 export default function HumanDesignBodygraph({ chart }: Props) {
   const drawChannels = () => {
     if (!chart) return null;
-    const elements: JSX.Element[] = [];
+    const elements: React.ReactNode[] = [];
 
     CHANNELS.forEach(ch => {
        const g1 = ch.gates[0];
