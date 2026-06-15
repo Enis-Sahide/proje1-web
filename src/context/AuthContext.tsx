@@ -39,7 +39,18 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (mounted) {
           setSession(session);
           setUser(session?.user ?? null);
-          setRole(session?.user?.user_metadata?.role || 'free');
+          
+          if (session?.user) {
+            try {
+              const { data } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
+              setRole(data?.role || 'free');
+            } catch (e) {
+              setRole('free');
+            }
+          } else {
+            setRole('free');
+          }
+          
           setIsLoading(false);
         }
       } catch (error) {
@@ -51,10 +62,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     getInitialSession();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+      async (_event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
-        setRole(session?.user?.user_metadata?.role || 'free');
+        
+        if (session?.user) {
+          try {
+            const { data } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
+            setRole(data?.role || 'free');
+          } catch (e) {
+            setRole('free');
+          }
+        } else {
+          setRole('free');
+        }
+        
         setIsLoading(false);
       }
     );

@@ -78,11 +78,10 @@ export default function VIPHubPage() {
   const router = useRouter();
 
   return (
-    <div className="min-h-screen pt-24 pb-24 px-6 relative bg-black selection:bg-[#D4AF37] selection:text-black">
+    <div className="min-h-screen pt-24 pb-24 px-6 relative bg-transparent selection:bg-[#D4AF37] selection:text-black">
       {/* Deep premium background */}
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#110022] via-black to-black -z-20" />
-      <div className="fixed inset-0 bg-[url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-[0.03] mix-blend-screen pointer-events-none -z-10" />
-
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#110022] via-black to-black -z-60" />
+      
       <div className="max-w-6xl mx-auto relative">
         <button onClick={() => router.back()} className="mb-12 flex items-center text-white/50 hover:text-[#D4AF37] transition-colors">
           <ArrowLeft size={20} className="mr-2" /> Merkez Tapınağa Dön

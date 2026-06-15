@@ -51,9 +51,7 @@ export default function AnalysisPage() {
   return (
     <div className="min-h-screen pt-32 pb-24 px-6 relative">
       {/* Backgrounds */}
-      <div className="fixed inset-0 bg-mystic-dark -z-20" />
-      <div className="fixed inset-0 bg-[url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=2094&auto=format&fit=crop')] bg-cover bg-center opacity-10 mix-blend-screen pointer-events-none -z-10" />
-
+            
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center p-3 rounded-full bg-mystic-primary/10 border border-mystic-primary/30 text-mystic-primary mb-6">

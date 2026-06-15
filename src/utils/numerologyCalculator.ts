@@ -89,3 +89,71 @@ export const getBirthdayNumber = (dateStr: string) => {
   const parts = dateStr.split('-');
   return parseInt(parts[2]);
 };
+
+const LETTER_VALUES: Record<string, number> = {
+  A: 1, J: 1, S: 1, Ş: 1,
+  B: 2, K: 2, T: 2,
+  C: 3, Ç: 3, L: 3, U: 3, Ü: 3,
+  D: 4, M: 4, V: 4,
+  E: 5, N: 5, W: 5,
+  F: 6, O: 6, Ö: 6, X: 6,
+  G: 7, Ğ: 7, P: 7, Y: 7,
+  H: 8, Q: 8, Z: 8,
+  I: 9, İ: 9, R: 9
+};
+
+const VOWELS = ['A', 'E', 'I', 'İ', 'O', 'Ö', 'U', 'Ü'];
+
+const isMaster = (num: number) => num === 11 || num === 22 || num === 33;
+
+const reduceNumber = (num: number): number => {
+  if (isMaster(num)) return num;
+  let sum = num;
+  while (sum > 9 && !isMaster(sum)) {
+    sum = sum.toString().split('').reduce((a, b) => a + parseInt(b), 0);
+  }
+  return sum;
+};
+
+export const calculateNameAnalysis = (name: string) => {
+  const upperName = name.toLocaleUpperCase('tr-TR').replace(/[^A-ZÇĞİÖŞÜ]/g, '');
+  let destinySum = 0;
+  let soulUrgeSum = 0;
+  let personalitySum = 0;
+  
+  const matrix = [0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+  for (let char of upperName) {
+    const val = LETTER_VALUES[char];
+    if (val) {
+      destinySum += val;
+      matrix[val - 1]++;
+      
+      if (VOWELS.includes(char)) {
+        soulUrgeSum += val;
+      } else {
+        personalitySum += val;
+      }
+    }
+  }
+
+  const destiny = reduceNumber(destinySum);
+  const soulUrge = reduceNumber(soulUrgeSum);
+  const personality = reduceNumber(personalitySum);
+  const purpose = reduceNumber(destiny + soulUrge);
+
+  const missing: number[] = [];
+  matrix.forEach((count, idx) => {
+    if (count === 0) missing.push(idx + 1);
+  });
+  const challenges = missing.length > 0 ? missing.join('-') : 'Yok';
+
+  return {
+    destiny,
+    soulUrge,
+    personality,
+    purpose,
+    challenges,
+    chakraMatrix: matrix
+  };
+};

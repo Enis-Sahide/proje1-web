@@ -119,10 +119,9 @@ export default function MicrocosmicOrbitPage() {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-24 px-6 relative bg-black selection:bg-blue-500 selection:text-white">
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-black to-black -z-20" />
-      <div className="fixed inset-0 bg-[url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=2094&auto=format&fit=crop')] bg-cover bg-center opacity-5 mix-blend-screen pointer-events-none -z-10" />
-
+    <div className="min-h-screen pt-24 pb-24 px-6 relative bg-transparent selection:bg-blue-500 selection:text-white">
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-blue-900/20 via-black to-black -z-60" />
+      
       <div className="max-w-4xl mx-auto relative">
         <div className="flex justify-between items-center mb-12">
           <button onClick={() => router.back()} className="flex items-center text-white/50 hover:text-blue-400 transition-colors">

@@ -6,10 +6,9 @@ import { ArrowLeft, Construction } from 'lucide-react';
 export default function Page() {
   const router = useRouter();
   return (
-    <div className="min-h-screen pt-32 px-6 bg-black text-center selection:bg-[#D4AF37] selection:text-black">
-      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#110022] via-black to-black -z-20" />
-      <div className="fixed inset-0 bg-[url('https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-[0.03] mix-blend-screen pointer-events-none -z-10" />
-
+    <div className="min-h-screen pt-32 px-6 bg-transparent text-center selection:bg-[#D4AF37] selection:text-black">
+      <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#110022] via-black to-black -z-60" />
+      
       <div className="max-w-2xl mx-auto relative animate-in fade-in slide-in-from-bottom-8 duration-700">
         <button onClick={() => router.back()} className="mb-12 flex items-center text-white/50 hover:text-white transition-colors mx-auto">
           <ArrowLeft size={20} className="mr-2" /> VIP Merkeze Dön

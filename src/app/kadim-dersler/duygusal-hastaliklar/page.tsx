@@ -10,7 +10,7 @@ export default function DuygusalHastaliklarPage() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedId, setExpandedId] = useState<number | null>(null);
-  
+
   const { user } = useAuth();
   const isLoggedIn = !!user;
 
@@ -70,7 +70,7 @@ export default function DuygusalHastaliklarPage() {
                 Kadim öğretilere ve modern psikolojiye göre, bedenimiz aslında bilinçaltımızın bir yansımasıdır. Yaşadığımız, ancak ifade edemediğimiz veya çözemediğimiz duygusal tıkanıklıklar zamanla fiziksel bedende "hastalık" olarak tezahür eder.
               </p>
               <p>
-                Bir ağrı veya semptom ortaya çıktığında, bu aslında bedenin bir <strong className="text-mystic-primary font-medium">yardım çağrısıdır</strong>. Kadim şifa sanatlarına göre, her organın ve bedensel bölgenin temsil ettiği spesifik duygusal ve zihinsel kalıplar vardır. Örneğin; mide genellikle "yeni deneyimleri sindirememe" hissini, dizler "esnek olamama ve gururu", boğaz ise "kendini ifade edememe ve yutkunulan sözleri" temsil eder.
+                Bir ağrı veya semptom ortaya çıktığında, bu aslında bedenin bir <strong className="text-mystic-primary font-medium">yardım çağrısıdır</strong>. Kadim şifa sanatlarına göre, her organın ve bedensel bölgenin temsil ettiği spesifik duygusal ve zihinsel kalıplar vardır.
               </p>
               <p>
                 Bu kütüphane, fiziksel semptomlarınızın altında yatan olası <strong className="text-mystic-accent font-medium">zihinsel kök inançları</strong> bulmanız için tasarlanmıştır. Şifa süreci, semptomu sadece fiziksel olarak bastırmakla değil, onun size ne anlatmaya çalıştığını anlamakla başlar. Mesajı alıp o kök duyguyu sevgiyle serbest bıraktığınızda, bedenin kendi kendini iyileştirme mekanizması devreye girer.
@@ -117,43 +117,43 @@ export default function DuygusalHastaliklarPage() {
               </div>
             </div>
           ) : filteredDiseases.length > 0 ? (
-            filteredDiseases.map((disease, index) => {
-              const isExpanded = expandedId === index;
-              return (
-                <div key={index} className="bg-mystic-surface/80 border border-mystic-surface-light rounded-2xl overflow-hidden backdrop-blur-md shadow-lg transition-all duration-300">
-                  <button 
-                    onClick={() => toggleExpand(index)}
-                    className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-mystic-surface transition-colors"
-                  >
-                    <h3 className="text-lg font-semibold text-mystic-text pr-4">{disease.name}</h3>
-                    {isExpanded ? (
-                      <ChevronUp className="text-mystic-primary shrink-0" size={20} />
-                    ) : (
-                      <ChevronDown className="text-mystic-primary shrink-0" size={20} />
+              filteredDiseases.map((disease, index) => {
+                const isExpanded = expandedId === index;
+                return (
+                  <div key={index} className="bg-mystic-surface/80 border border-mystic-surface-light rounded-2xl overflow-hidden backdrop-blur-md shadow-lg transition-all duration-300">
+                    <button 
+                      onClick={() => toggleExpand(index)}
+                      className="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-mystic-surface transition-colors"
+                    >
+                      <h3 className="text-lg font-semibold text-mystic-text pr-4">{disease.name}</h3>
+                      {isExpanded ? (
+                        <ChevronUp className="text-mystic-primary shrink-0" size={20} />
+                      ) : (
+                        <ChevronDown className="text-mystic-primary shrink-0" size={20} />
+                      )}
+                    </button>
+                    
+                    {isExpanded && (
+                      <div className="px-6 pb-6 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                        <div className="mb-4">
+                          <h4 className="text-sm font-bold text-mystic-primary uppercase tracking-wider mb-2">Duygusal Nedeni</h4>
+                          <p className="text-mystic-text-muted leading-relaxed">{disease.cause}</p>
+                        </div>
+                        <div className="bg-mystic-dark/50 p-4 rounded-xl border border-mystic-surface-light/50">
+                          <h4 className="text-sm font-bold text-mystic-accent uppercase tracking-wider mb-2">Yeni Düşünce Modeli (Telkin)</h4>
+                          <p className="text-mystic-text italic">"{disease.affirmation}"</p>
+                        </div>
+                      </div>
                     )}
-                  </button>
-                  
-                  {isExpanded && (
-                    <div className="px-6 pb-6 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                      <div className="mb-4">
-                        <h4 className="text-sm font-bold text-mystic-primary uppercase tracking-wider mb-2">Duygusal Nedeni</h4>
-                        <p className="text-mystic-text-muted leading-relaxed">{disease.cause}</p>
-                      </div>
-                      <div className="bg-mystic-dark/50 p-4 rounded-xl border border-mystic-surface-light/50">
-                        <h4 className="text-sm font-bold text-mystic-accent uppercase tracking-wider mb-2">Yeni Düşünce Modeli (Telkin)</h4>
-                        <p className="text-mystic-text italic">"{disease.affirmation}"</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })
-          ) : (
-            <div className="text-center py-12 bg-mystic-surface/30 rounded-2xl border border-mystic-surface-light">
-              <p className="text-mystic-text-muted">Aramanıza uygun bir hastalık bulunamadı.</p>
-            </div>
-          )}
-        </div>
+                  </div>
+                );
+              })
+            ) : (
+              <div className="text-center py-12 bg-mystic-surface/30 rounded-2xl border border-mystic-surface-light">
+                <p className="text-mystic-text-muted">Aramanıza uygun bir hastalık bulunamadı.</p>
+              </div>
+            )}
+          </div>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Sparkles, Activity, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CHAKRA_TEST_QUESTIONS, CHAKRA_INFO, ChakraId } from '@/data/chakraTestQuestions';
+import RequireRole from '@/core/ui/RequireRole';
 
 type Step = 'intro' | 'quiz' | 'result';
 
@@ -14,8 +15,12 @@ export default function ChakraAnalysisPage() {
   const [scores, setScores] = useState<Record<ChakraId, number>>({
     root: 0, sacral: 0, solar: 0, heart: 0, throat: 0, thirdEye: 0, crown: 0
   });
+  const isTransitioning = React.useRef(false);
 
   const handleAnswer = (points: number) => {
+    if (isTransitioning.current) return;
+    isTransitioning.current = true;
+
     const question = CHAKRA_TEST_QUESTIONS[currentQuestion];
     setScores(prev => ({
       ...prev,
@@ -24,6 +29,9 @@ export default function ChakraAnalysisPage() {
 
     if (currentQuestion < CHAKRA_TEST_QUESTIONS.length - 1) {
       setCurrentQuestion(prev => prev + 1);
+      setTimeout(() => {
+        isTransitioning.current = false;
+      }, 350); // Prevent double clicks during animation
     } else {
       setStep('result');
     }
@@ -64,6 +72,11 @@ export default function ChakraAnalysisPage() {
   );
 
   const renderQuiz = () => {
+    // Safety check just in case
+    if (currentQuestion >= CHAKRA_TEST_QUESTIONS.length) {
+      return null;
+    }
+
     const question = CHAKRA_TEST_QUESTIONS[currentQuestion];
     const progress = ((currentQuestion) / CHAKRA_TEST_QUESTIONS.length) * 100;
 
@@ -214,29 +227,29 @@ export default function ChakraAnalysisPage() {
   return (
     <div className="min-h-screen pt-24 px-4 pb-12 relative flex flex-col items-center">
       {/* Background */}
-      <div className="fixed inset-0 bg-mystic-dark -z-20" />
-      <div className="fixed inset-0 bg-[url('https://images.unsplash.com/photo-1518531933037-91b2f5f229cc?q=80&w=2000&auto=format&fit=crop')] bg-cover bg-center opacity-5 mix-blend-screen pointer-events-none -z-10" />
-
+            
       <div className="max-w-4xl w-full">
-        {/* Header (Only show in intro or quiz) */}
-        {step !== 'result' && (
-          <div className="mb-12 flex items-center">
-            <Link href="/analysis" className="mr-4 p-2 rounded-full hover:bg-mystic-surface-light transition-colors">
-              <ArrowLeft className="text-mystic-text" size={24} />
-            </Link>
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-mystic-text flex items-center gap-3">
-                Çakra Analizi
-                <Sparkles className="text-mystic-primary" size={32} />
-              </h1>
-              <p className="text-mystic-text-muted mt-2">Enerji merkezlerinizdeki tıkanıklıkları keşfedin.</p>
+        <RequireRole minimumRole="free">
+          {/* Header (Only show in intro or quiz) */}
+          {step !== 'result' && (
+            <div className="mb-12 flex items-center">
+              <Link href="/analysis" className="mr-4 p-2 rounded-full hover:bg-mystic-surface-light transition-colors">
+                <ArrowLeft className="text-mystic-text" size={24} />
+              </Link>
+              <div>
+                <h1 className="text-3xl md:text-4xl font-bold text-mystic-text flex items-center gap-3">
+                  Çakra Analizi
+                  <Sparkles className="text-mystic-primary" size={32} />
+                </h1>
+                <p className="text-mystic-text-muted mt-2">Enerji merkezlerinizdeki tıkanıklıkları keşfedin.</p>
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {step === 'intro' && renderIntro()}
-        {step === 'quiz' && renderQuiz()}
-        {step === 'result' && renderResult()}
+          {step === 'intro' && renderIntro()}
+          {step === 'quiz' && renderQuiz()}
+          {step === 'result' && renderResult()}
+        </RequireRole>
       </div>
     </div>
   );

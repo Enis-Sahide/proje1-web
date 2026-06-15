@@ -51,18 +51,17 @@ const exploreItems = [
     icon: Sparkles,
     href: '/analysis/chakra',
     color: 'from-rose-500 to-pink-500',
-    requiresAuth: false,
+    requiresAuth: true,
     status: 'ACTIVE'
   },
   {
     title: 'Kabalistik 4 Alem',
     description: 'Sefirot ağacındaki kadersel sıçrama noktalarınızı bulun.',
     icon: MoonStar,
-    href: '#',
+    href: '/analysis/kabbalah',
     color: 'from-yellow-600 to-amber-400',
     requiresAuth: true,
-    status: 'LOCKED',
-    lockMessage: 'Kalfa Seviyesi Mührü Gerekiyor'
+    status: 'ACTIVE'
   }
 ];
 

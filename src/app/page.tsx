@@ -5,6 +5,7 @@ import ExploreSection from '@/features/astrology/components/ExploreSection';
 import { DAILY_AFFIRMATIONS } from '@/data/affirmations';
 import PlanetaryHourWidget from '@/features/astrology/components/PlanetaryHourWidget';
 import { ChevronDown, Quote } from 'lucide-react';
+import MoonCyclesWidget from '@/features/astrology/components/MoonCyclesWidget';
 import Link from 'next/link';
 
 export const CHAKRA_MODULES = [
@@ -31,8 +32,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
-      <div className="fixed inset-0 bg-[url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=2094&auto=format&fit=crop')] bg-cover bg-center opacity-10 mix-blend-screen pointer-events-none -z-10" />
-      <div className="fixed inset-0 bg-gradient-to-b from-mystic-dark/80 via-mystic-dark to-mystic-dark -z-10 pointer-events-none" />
+      
+      
 
       {/* Hero Section & Chakras */}
       <section className="flex-grow flex flex-col justify-center items-center py-12 md:py-24 px-4 relative z-10 min-h-screen">
@@ -54,7 +55,7 @@ export default function Home() {
           <div className="mb-20 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 w-full">
             
             {/* Left: Günün Mesajı */}
-            <div className="w-full lg:w-1/3 flex flex-col items-center lg:items-end order-2 lg:order-1">
+            <div className="w-full lg:w-1/3 flex flex-col items-center lg:items-end order-2 lg:order-1 gap-6">
               {affirmation && (
                 <div className="bg-mystic-surface/50 backdrop-blur-md rounded-2xl p-6 border border-mystic-surface-light w-full max-w-sm shadow-xl text-center lg:text-right relative overflow-hidden">
                   <div className="absolute -top-4 -left-4 text-mystic-primary/20">
@@ -68,6 +69,7 @@ export default function Home() {
                   <p className="text-mystic-accent font-semibold text-sm">— {affirmation.author}</p>
                 </div>
               )}
+              <MoonCyclesWidget />
             </div>
 
             {/* Center: Anatomical View */}

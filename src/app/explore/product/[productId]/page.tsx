@@ -36,9 +36,7 @@ export default function ProductDetailPage() {
   return (
     <div className="min-h-screen pb-24">
       {/* Background */}
-      <div className="fixed inset-0 bg-mystic-dark -z-20" />
-      <div className="fixed inset-0 bg-[url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=2094&auto=format&fit=crop')] bg-cover bg-center opacity-5 mix-blend-screen pointer-events-none -z-10" />
-
+            
       {/* Header */}
       <header className="pt-24 pb-6 px-6 border-b border-white/5 bg-mystic-dark/50 backdrop-blur-md sticky top-0 z-40">
         <div className="max-w-5xl mx-auto flex items-center">

@@ -8,6 +8,7 @@ import { getKabbalahAnalysis } from '@/features/astrology/engine/KabbalahInterpr
 import { getEsotericPlanetInterpretation } from '@/features/astrology/engine/KabbalahPlanetInterpretations';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { X } from 'lucide-react';
+import RequireRole from '@/core/ui/RequireRole';
 
 const ZODIAC_COLORS: Record<string, string> = {
   'Koç': '#FF453A', 'Aslan': '#FF453A', 'Yay': '#FF453A',
@@ -248,312 +249,314 @@ export default function KabbalahAnalysisPage() {
           </p>
         </div>
 
-        {!chartData && (
-          <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-md shadow-2xl max-w-3xl mx-auto">
-            <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
-              <Search className="mr-3 text-[#D4AF37]" /> Kimlik ve Doğum Bilgileri
-            </h2>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-mystic-text-muted mb-2">Doğum Tarihi</label>
-                <input 
-                  required 
-                  type="date" 
-                  min="1900-01-01"
-                  max="2100-12-31"
-                  value={dateStr} onChange={e => setDateStr(e.target.value)}
-                  className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
-                />
-              </div>
+        <RequireRole minimumRole="apprentice">
+          {!chartData && (
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-md shadow-2xl max-w-3xl mx-auto">
+              <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
+                <Search className="mr-3 text-[#D4AF37]" /> Kimlik ve Doğum Bilgileri
+              </h2>
               
-              <div>
-                <label className="block text-sm font-medium text-mystic-text-muted mb-2">Doğum Saati</label>
-                <input 
-                  type="time" 
-                  value={timeStr} onChange={e => setTimeStr(e.target.value)}
-                  className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-white/70 mb-2">Şehir *</label>
-                <LocationAutocomplete
-                  onSelect={(c) => setCityKey(c)}
-                  defaultDisplay={cityKey ? cityKey.name : ''}
-                  className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
-                />
-              </div>
-            </div>
-
-            {errorStr && (
-              <div className="mt-6 p-4 bg-red-500/20 border border-red-500/30 rounded-xl text-red-200 text-sm flex items-center">
-                <span className="mr-2">⚠️</span> {errorStr}
-              </div>
-            )}
-
-            <div className="mt-8">
-              <button 
-                onClick={handleCalculate}
-                disabled={isLoading}
-                className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-4 px-6 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center text-lg shadow-lg shadow-[#D4AF37]/20 hover:shadow-[#D4AF37]/40"
-              >
-                {isLoading ? (
-                  <><Loader2 className="animate-spin mr-2" /> 4 Alem Hesaplanıyor...</>
-                ) : (
-                  <>Sefirot Kapılarını Aç</>
-                )}
-              </button>
-            </div>
-          </div>
-        )}
-
-        {chartData && kabbalahAnalysis && (
-          <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
-            
-            <div className="flex flex-col items-center justify-center p-6 bg-gradient-to-b from-[#111] to-black border border-white/10 rounded-2xl max-w-3xl mx-auto">
-              <div className="text-[#D4AF37] mb-2"><MoonStar size={32} /></div>
-              <h2 className="text-2xl font-bold text-white mb-2">1. Beden Haritası Yönetici Analizi</h2>
-              <div className="flex flex-col gap-1 text-sm">
-                <p className="text-[#D4AF37] flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#D4AF37]"></span>
-                  {cityKey ? cityKey.name : ''} • {dateStr.split('-').reverse().join('.')} {timeStr}
-                </p>
-              </div>
-              <p className="text-mystic-text-muted text-center max-w-xl mt-4">
-                Yükselen Burcunuz: <strong className="text-white">{chartData.assiah.ascendant.sign}</strong>
-              </p>
-            </div>
-
-            <div className={`p-8 rounded-2xl border max-w-3xl mx-auto ${kabbalahAnalysis.shortcutLevel > 0 ? 'bg-[#D4AF37]/10 border-[#D4AF37]/30' : 'bg-white/5 border-white/10'} backdrop-blur-sm relative overflow-hidden`}>
-              {kabbalahAnalysis.shortcutLevel > 0 && (
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37] opacity-20 blur-[50px] pointer-events-none"></div>
-              )}
-              
-              <div className="flex items-start gap-4">
-                <div className={`p-3 rounded-xl ${kabbalahAnalysis.shortcutLevel > 0 ? 'bg-[#D4AF37] text-black' : 'bg-white/10 text-white'}`}>
-                  <Star size={24} />
-                </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 <div>
-                  <h3 className={`text-xl font-bold mb-2 ${kabbalahAnalysis.shortcutLevel > 0 ? 'text-[#D4AF37]' : 'text-white'}`}>
-                    Kozmik Kestirme Yolunuz (Shortcut)
-                  </h3>
-                  <p className="text-white/90 leading-relaxed text-lg">
-                    {kabbalahAnalysis.shortcutMessage}
+                  <label className="block text-sm font-medium text-mystic-text-muted mb-2">Doğum Tarihi</label>
+                  <input 
+                    required 
+                    type="date" 
+                    min="1900-01-01"
+                    max="2100-12-31"
+                    value={dateStr} onChange={e => setDateStr(e.target.value)}
+                    className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
+                  />
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-mystic-text-muted mb-2">Doğum Saati</label>
+                  <input 
+                    type="time" 
+                    value={timeStr} onChange={e => setTimeStr(e.target.value)}
+                    className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-white/70 mb-2">Şehir *</label>
+                  <LocationAutocomplete
+                    onSelect={(c) => setCityKey(c)}
+                    defaultDisplay={cityKey ? cityKey.name : ''}
+                    className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
+                  />
+                </div>
+              </div>
+
+              {errorStr && (
+                <div className="mt-6 p-4 bg-red-500/20 border border-red-500/30 rounded-xl text-red-200 text-sm flex items-center">
+                  <span className="mr-2">⚠️</span> {errorStr}
+                </div>
+              )}
+
+              <div className="mt-8">
+                <button 
+                  onClick={handleCalculate}
+                  disabled={isLoading}
+                  className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-4 px-6 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center text-lg shadow-lg shadow-[#D4AF37]/20 hover:shadow-[#D4AF37]/40"
+                >
+                  {isLoading ? (
+                    <><Loader2 className="animate-spin mr-2" /> 4 Alem Hesaplanıyor...</>
+                  ) : (
+                    <>Sefirot Kapılarını Aç</>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {chartData && kabbalahAnalysis && (
+            <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
+              
+              <div className="flex flex-col items-center justify-center p-6 bg-gradient-to-b from-[#111] to-black border border-white/10 rounded-2xl max-w-3xl mx-auto">
+                <div className="text-[#D4AF37] mb-2"><MoonStar size={32} /></div>
+                <h2 className="text-2xl font-bold text-white mb-2">1. Beden Haritası Yönetici Analizi</h2>
+                <div className="flex flex-col gap-1 text-sm">
+                  <p className="text-[#D4AF37] flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#D4AF37]"></span>
+                    {cityKey ? cityKey.name : ''} • {dateStr.split('-').reverse().join('.')} {timeStr}
                   </p>
                 </div>
+                <p className="text-mystic-text-muted text-center max-w-xl mt-4">
+                  Yükselen Burcunuz: <strong className="text-white">{chartData.assiah.ascendant.sign}</strong>
+                </p>
               </div>
-            </div>
 
-            {chartData[selectedWorld]?.esoteric && (
-              <div className="p-8 rounded-2xl border bg-[#6A0DAD]/10 border-[#6A0DAD]/30 max-w-3xl mx-auto backdrop-blur-sm relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-[#6A0DAD] opacity-20 blur-[50px] pointer-events-none"></div>
+              <div className={`p-8 rounded-2xl border max-w-3xl mx-auto ${kabbalahAnalysis.shortcutLevel > 0 ? 'bg-[#D4AF37]/10 border-[#D4AF37]/30' : 'bg-white/5 border-white/10'} backdrop-blur-sm relative overflow-hidden`}>
+                {kabbalahAnalysis.shortcutLevel > 0 && (
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#D4AF37] opacity-20 blur-[50px] pointer-events-none"></div>
+                )}
                 
-                <h3 className="text-2xl font-bold mb-6 text-[#E0B0FF] flex items-center">
-                  <MoonStar className="mr-3" /> Ezoterik Sırlar (Karmik Kilitler ve İlerletimler)
-                </h3>
-                
-                <div className="space-y-6">
-                  {selectedWorld === 'assiah' && chartData.assiah.esoteric.progressedSunSign && (
+                <div className="flex items-start gap-4">
+                  <div className={`p-3 rounded-xl ${kabbalahAnalysis.shortcutLevel > 0 ? 'bg-[#D4AF37] text-black' : 'bg-white/10 text-white'}`}>
+                    <Star size={24} />
+                  </div>
+                  <div>
+                    <h3 className={`text-xl font-bold mb-2 ${kabbalahAnalysis.shortcutLevel > 0 ? 'text-[#D4AF37]' : 'text-white'}`}>
+                      Kozmik Kestirme Yolunuz (Shortcut)
+                    </h3>
+                    <p className="text-white/90 leading-relaxed text-lg">
+                      {kabbalahAnalysis.shortcutMessage}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {chartData[selectedWorld]?.esoteric && (
+                <div className="p-8 rounded-2xl border bg-[#6A0DAD]/10 border-[#6A0DAD]/30 max-w-3xl mx-auto backdrop-blur-sm relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#6A0DAD] opacity-20 blur-[50px] pointer-events-none"></div>
+                  
+                  <h3 className="text-2xl font-bold mb-6 text-[#E0B0FF] flex items-center">
+                    <MoonStar className="mr-3" /> Ezoterik Sırlar (Karmik Kilitler ve İlerletimler)
+                  </h3>
+                  
+                  <div className="space-y-6">
+                    {selectedWorld === 'assiah' && chartData.assiah.esoteric.progressedSunSign && (
+                      <div className="bg-black/40 p-5 rounded-xl border border-white/5">
+                        <h4 className="text-lg font-semibold text-white mb-2">İkincil İlerletilmiş Güneş (Progressed Sun)</h4>
+                        {chartData.assiah.esoteric.progressedSunSign === chartData.assiah.planets.find((p: any) => p.name === 'Güneş')?.sign ? (
+                          <p className="text-white/80">
+                            Ruhsal Güneşiniz henüz burç değiştirmemiştir. Ancak <strong>{chartData.assiah.esoteric.progressedSunAge} yaşına</strong> geldiğinizde Güneşiniz sınırları aşarak yepyeni bir tekamül aşamasına geçecektir.
+                          </p>
+                        ) : (
+                          <p className="text-white/80">
+                            Natal Güneşiniz <strong>{chartData.assiah.planets.find((p: any) => p.name === 'Güneş')?.sign}</strong> olsa da, ruhunuz <strong>{chartData.assiah.esoteric.progressedSunAge} yaşından sonra</strong> uyanış yaşayarak sınırları aşmış ve <strong>{chartData.assiah.esoteric.progressedSunSign}</strong> burcuna (Progressed) evrilmiştir! Şu an hayata {chartData.assiah.esoteric.progressedSunSign} frekansından yaklaşıyor ve kararlarınızı bu enerjiyle alıyorsunuz.
+                          </p>
+                        )}
+                      </div>
+                    )}
+
                     <div className="bg-black/40 p-5 rounded-xl border border-white/5">
-                      <h4 className="text-lg font-semibold text-white mb-2">İkincil İlerletilmiş Güneş (Progressed Sun)</h4>
-                      {chartData.assiah.esoteric.progressedSunSign === chartData.assiah.planets.find((p: any) => p.name === 'Güneş')?.sign ? (
+                      <h4 className="text-lg font-semibold text-white mb-2">
+                        {selectedWorld === 'assiah' ? '1. Katman (Assiah)' : selectedWorld === 'yetzirah' ? '2. Katman (Yetzirah)' : selectedWorld === 'beriyah' ? '3. Katman (Beriyah)' : '4. Katman (Atzilut)'} Kıstırılmış (Intercepted) Burçlar
+                      </h4>
+                      {chartData[selectedWorld].esoteric.interceptedSigns && chartData[selectedWorld].esoteric.interceptedSigns.length > 0 ? (
                         <p className="text-white/80">
-                          Ruhsal Güneşiniz henüz burç değiştirmemiştir. Ancak <strong>{chartData.assiah.esoteric.progressedSunAge} yaşına</strong> geldiğinizde Güneşiniz sınırları aşarak yepyeni bir tekamül aşamasına geçecektir.
+                          Bu harita katmanınızda <strong>{chartData[selectedWorld].esoteric.interceptedSigns.join(' ve ')}</strong> burçları kıstırılmıştır! Ev çizgilerinde görünmeyen bu burçlar, bu alemdeki en derin ve kilitli karmik potansiyellerinizi işaret eder.
                         </p>
                       ) : (
                         <p className="text-white/80">
-                          Natal Güneşiniz <strong>{chartData.assiah.planets.find((p: any) => p.name === 'Güneş')?.sign}</strong> olsa da, ruhunuz <strong>{chartData.assiah.esoteric.progressedSunAge} yaşından sonra</strong> uyanış yaşayarak sınırları aşmış ve <strong>{chartData.assiah.esoteric.progressedSunSign}</strong> burcuna (Progressed) evrilmiştir! Şu an hayata {chartData.assiah.esoteric.progressedSunSign} frekansından yaklaşıyor ve kararlarınızı bu enerjiyle alıyorsunuz.
+                          Bu harita katmanınızda kıstırılmış burç (Intercepted Sign) bulunmamaktadır. İlgili alemdeki tüm enerjiler doğrudan ev alanlarınıza akmaktadır.
                         </p>
                       )}
                     </div>
-                  )}
+                  </div>
+                </div>
+              )}
 
-                  <div className="bg-black/40 p-5 rounded-xl border border-white/5">
-                    <h4 className="text-lg font-semibold text-white mb-2">
-                      {selectedWorld === 'assiah' ? '1. Katman (Assiah)' : selectedWorld === 'yetzirah' ? '2. Katman (Yetzirah)' : selectedWorld === 'beriyah' ? '3. Katman (Beriyah)' : '4. Katman (Atzilut)'} Kıstırılmış (Intercepted) Burçlar
+              <div className="mt-16 bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-md">
+                <h3 className="text-3xl font-bold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#D4AF37] to-white">
+                  4 Alem Harita Görüntüleyici
+                </h3>
+
+                <div className="flex flex-wrap justify-center gap-4 mb-8">
+                  {[
+                    { id: 'assiah', label: '1. Assiah (Fiziksel)', tech: 'Tropikal' },
+                    { id: 'yetzirah', label: '2. Yetzirah (Duygusal)', tech: 'Drakonik' },
+                    { id: 'beriyah', label: '3. Beriyah (Zihinsel)', tech: '9. Harmonik' },
+                    { id: 'atzilut', label: '4. Atzilut (Kudret)', tech: 'Güneş Merkezli' }
+                  ].map((world) => (
+                    <button
+                      key={world.id}
+                      onClick={() => setSelectedWorld(world.id as any)}
+                      className={`flex flex-col items-center px-6 py-3 rounded-xl border transition-all ${
+                        selectedWorld === world.id 
+                          ? 'bg-[#D4AF37]/20 border-[#D4AF37] text-white shadow-[0_0_20px_rgba(212,175,55,0.2)]' 
+                          : 'bg-black/40 border-white/10 text-mystic-text-muted hover:bg-white/10 hover:text-white'
+                      }`}
+                    >
+                      <span className="font-bold">{world.label}</span>
+                      <span className="text-xs opacity-70">{world.tech}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                  <div className="lg:col-span-2 flex justify-center items-center bg-black/40 rounded-2xl p-4 border border-white/5">
+                    {renderSvgWheel(chartData[selectedWorld])}
+                  </div>
+
+                  <div className="bg-black/40 rounded-2xl p-6 border border-white/5 max-h-[650px] overflow-y-auto custom-scrollbar">
+                    <h4 className="text-xl font-bold mb-4 text-[#D4AF37] flex items-center gap-2">
+                      <Star size={18} /> Gezegen Yerleşimleri
                     </h4>
-                    {chartData[selectedWorld].esoteric.interceptedSigns && chartData[selectedWorld].esoteric.interceptedSigns.length > 0 ? (
-                      <p className="text-white/80">
-                        Bu harita katmanınızda <strong>{chartData[selectedWorld].esoteric.interceptedSigns.join(' ve ')}</strong> burçları kıstırılmıştır! Ev çizgilerinde görünmeyen bu burçlar, bu alemdeki en derin ve kilitli karmik potansiyellerinizi işaret eder.
-                      </p>
-                    ) : (
-                      <p className="text-white/80">
-                        Bu harita katmanınızda kıstırılmış burç (Intercepted Sign) bulunmamaktadır. İlgili alemdeki tüm enerjiler doğrudan ev alanlarınıza akmaktadır.
-                      </p>
-                    )}
+                    <div className="space-y-3">
+                      {chartData[selectedWorld].planets.map((p: AstroPoint, idx: number) => (
+                        <div 
+                          key={idx} 
+                          className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:border-[#D4AF37]/50 cursor-pointer transition-colors"
+                          onClick={() => setSelectedInterp(getEsotericPlanetInterpretation(p.name, p.sign, p.house, selectedWorld === 'yetzirah', selectedWorld === 'beriyah', selectedWorld === 'atzilut', p.isRetrograde))}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="w-8 h-8 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] text-lg font-bold">
+                              {PLANET_SYMBOLS[p.name] || p.name[0]}
+                            </span>
+                            <span className="font-medium text-white text-sm">{p.name}</span>
+                          </div>
+                          <div className="text-right flex flex-col">
+                            <span className="text-mystic-text-muted text-xs">
+                              <span style={{color: ZODIAC_COLORS[p.sign]}}>{ZODIAC_SYMBOLS[p.sign]} {p.sign}</span> 
+                            </span>
+                            <span className="text-white font-mono text-xs">
+                              {p.degreeInSign}°{String(p.minutes).padStart(2, '0')}'
+                              {p.isRetrograde && <span className="text-red-500 ml-1">Rx</span>}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
+
+                  {/* Ev Yerleşimleri Listesi */}
+                  <div className="bg-black/40 rounded-2xl p-6 border border-white/5 max-h-[650px] overflow-y-auto custom-scrollbar">
+                    <h4 className="text-xl font-bold mb-4 text-[#D4AF37] flex items-center gap-2">
+                      <Triangle size={18} className="rotate-180" /> Ev Yerleşimleri
+                    </h4>
+                    <div className="space-y-3">
+                      {chartData[selectedWorld].houses.map((h: AstroPoint, idx: number) => (
+                        <div 
+                          key={`house-list-${idx}`} 
+                          className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 transition-colors"
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white text-sm font-bold">
+                              {h.house}
+                            </span>
+                            <span className="font-medium text-white text-sm">. Ev {h.house === 1 ? '(ASC)' : h.house === 10 ? '(MC)' : ''}</span>
+                          </div>
+                          <div className="text-right flex flex-col">
+                            <span className="text-mystic-text-muted text-xs">
+                              <span style={{color: ZODIAC_COLORS[h.sign]}}>{ZODIAC_SYMBOLS[h.sign]} {h.sign}</span> 
+                            </span>
+                            <span className="text-white font-mono text-xs">
+                              {h.degreeInSign}°{String(h.minutes).padStart(2, '0')}'
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                 </div>
               </div>
-            )}
 
-            <div className="mt-16 bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-md">
-              <h3 className="text-3xl font-bold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-[#D4AF37] to-white">
-                4 Alem Harita Görüntüleyici
-              </h3>
-
-              <div className="flex flex-wrap justify-center gap-4 mb-8">
-                {[
-                  { id: 'assiah', label: '1. Assiah (Fiziksel)', tech: 'Tropikal' },
-                  { id: 'yetzirah', label: '2. Yetzirah (Duygusal)', tech: 'Drakonik' },
-                  { id: 'beriyah', label: '3. Beriyah (Zihinsel)', tech: '9. Harmonik' },
-                  { id: 'atzilut', label: '4. Atzilut (Kudret)', tech: 'Güneş Merkezli' }
-                ].map((world) => (
-                  <button
-                    key={world.id}
-                    onClick={() => setSelectedWorld(world.id as any)}
-                    className={`flex flex-col items-center px-6 py-3 rounded-xl border transition-all ${
-                      selectedWorld === world.id 
-                        ? 'bg-[#D4AF37]/20 border-[#D4AF37] text-white shadow-[0_0_20px_rgba(212,175,55,0.2)]' 
-                        : 'bg-black/40 border-white/10 text-mystic-text-muted hover:bg-white/10 hover:text-white'
-                    }`}
-                  >
-                    <span className="font-bold">{world.label}</span>
-                    <span className="text-xs opacity-70">{world.tech}</span>
-                  </button>
-                ))}
-              </div>
-
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                <div className="lg:col-span-2 flex justify-center items-center bg-black/40 rounded-2xl p-4 border border-white/5">
-                  {renderSvgWheel(chartData[selectedWorld])}
-                </div>
-
-                <div className="bg-black/40 rounded-2xl p-6 border border-white/5 max-h-[650px] overflow-y-auto custom-scrollbar">
-                  <h4 className="text-xl font-bold mb-4 text-[#D4AF37] flex items-center gap-2">
-                    <Star size={18} /> Gezegen Yerleşimleri
-                  </h4>
-                  <div className="space-y-3">
-                    {chartData[selectedWorld].planets.map((p: AstroPoint, idx: number) => (
-                      <div 
-                        key={idx} 
-                        className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:border-[#D4AF37]/50 cursor-pointer transition-colors"
-                        onClick={() => setSelectedInterp(getEsotericPlanetInterpretation(p.name, p.sign, p.house, selectedWorld === 'yetzirah', selectedWorld === 'beriyah', selectedWorld === 'atzilut', p.isRetrograde))}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="w-8 h-8 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] text-lg font-bold">
-                            {PLANET_SYMBOLS[p.name] || p.name[0]}
-                          </span>
-                          <span className="font-medium text-white text-sm">{p.name}</span>
-                        </div>
-                        <div className="text-right flex flex-col">
-                          <span className="text-mystic-text-muted text-xs">
-                            <span style={{color: ZODIAC_COLORS[p.sign]}}>{ZODIAC_SYMBOLS[p.sign]} {p.sign}</span> 
-                          </span>
-                          <span className="text-white font-mono text-xs">
-                            {p.degreeInSign}°{String(p.minutes).padStart(2, '0')}'
-                            {p.isRetrograde && <span className="text-red-500 ml-1">Rx</span>}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Ev Yerleşimleri Listesi */}
-                <div className="bg-black/40 rounded-2xl p-6 border border-white/5 max-h-[650px] overflow-y-auto custom-scrollbar">
-                  <h4 className="text-xl font-bold mb-4 text-[#D4AF37] flex items-center gap-2">
-                    <Triangle size={18} className="rotate-180" /> Ev Yerleşimleri
-                  </h4>
-                  <div className="space-y-3">
-                    {chartData[selectedWorld].houses.map((h: AstroPoint, idx: number) => (
-                      <div 
-                        key={`house-list-${idx}`} 
-                        className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 transition-colors"
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white text-sm font-bold">
-                            {h.house}
-                          </span>
-                          <span className="font-medium text-white text-sm">. Ev {h.house === 1 ? '(ASC)' : h.house === 10 ? '(MC)' : ''}</span>
-                        </div>
-                        <div className="text-right flex flex-col">
-                          <span className="text-mystic-text-muted text-xs">
-                            <span style={{color: ZODIAC_COLORS[h.sign]}}>{ZODIAC_SYMBOLS[h.sign]} {h.sign}</span> 
-                          </span>
-                          <span className="text-white font-mono text-xs">
-                            {h.degreeInSign}°{String(h.minutes).padStart(2, '0')}'
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-              </div>
-            </div>
-
-            {/* Detailed Description of The 4 Worlds */}
-            <div className="space-y-6 pt-12">
-              <h3 className="text-3xl font-bold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-gray-200 to-gray-500">
-                Alem Analizleri
-              </h3>
-              
-              {kabbalahAnalysis.worlds.map((world, index) => {
-                const isMatch = (index + 1) === kabbalahAnalysis.shortcutLevel;
+              {/* Detailed Description of The 4 Worlds */}
+              <div className="space-y-6 pt-12">
+                <h3 className="text-3xl font-bold text-center mb-8 bg-clip-text text-transparent bg-gradient-to-r from-gray-200 to-gray-500">
+                  Alem Analizleri
+                </h3>
                 
-                return (
-                  <div 
-                    key={world.name}
-                    className={`p-6 rounded-2xl border transition-all ${isMatch ? 'bg-[#D4AF37]/5 border-[#D4AF37] shadow-[0_0_30px_rgba(212,175,55,0.15)] scale-[1.02]' : 'bg-white/5 border-white/10 hover:border-white/20'}`}
-                  >
-                    <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
-                      <div>
-                        <div className="flex items-center gap-3 mb-1">
-                          <span className="text-sm font-bold text-mystic-text-muted tracking-widest uppercase">
-                            {index + 1}. Katman
-                          </span>
-                          {isMatch && <span className="bg-[#D4AF37] text-black text-xs font-bold px-2 py-0.5 rounded-full">Rezonans Noktanız</span>}
+                {kabbalahAnalysis.worlds.map((world, index) => {
+                  const isMatch = (index + 1) === kabbalahAnalysis.shortcutLevel;
+                  
+                  return (
+                    <div 
+                      key={world.name}
+                      className={`p-6 rounded-2xl border transition-all ${isMatch ? 'bg-[#D4AF37]/5 border-[#D4AF37] shadow-[0_0_30px_rgba(212,175,55,0.15)] scale-[1.02]' : 'bg-white/5 border-white/10 hover:border-white/20'}`}
+                    >
+                      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
+                        <div>
+                          <div className="flex items-center gap-3 mb-1">
+                            <span className="text-sm font-bold text-mystic-text-muted tracking-widest uppercase">
+                              {index + 1}. Katman
+                            </span>
+                            {isMatch && <span className="bg-[#D4AF37] text-black text-xs font-bold px-2 py-0.5 rounded-full">Rezonans Noktanız</span>}
+                          </div>
+                          <h4 className="text-3xl font-bold text-white">
+                            {world.name} <span className="text-gray-500 font-serif font-normal ml-2">{world.hebrewName}</span>
+                          </h4>
+                          <p className="text-[#D4AF37] font-medium">{world.title}</p>
                         </div>
-                        <h4 className="text-3xl font-bold text-white">
-                          {world.name} <span className="text-gray-500 font-serif font-normal ml-2">{world.hebrewName}</span>
-                        </h4>
-                        <p className="text-[#D4AF37] font-medium">{world.title}</p>
+                        
+                        <div className="mt-4 md:mt-0 text-left md:text-right">
+                          <div className="text-sm text-mystic-text-muted mb-1">Doğal Yönetici</div>
+                          <div className="text-xl font-bold text-white bg-white/10 px-4 py-1 rounded-lg inline-block border border-white/5">
+                            {world.naturalRuler}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="space-y-2">
+                          <h5 className="text-sm text-mystic-text-muted uppercase tracking-wider">Alem Tanımı</h5>
+                          <p className="text-white/80 leading-relaxed text-sm">
+                            {world.description}
+                          </p>
+                        </div>
+                        <div className="space-y-2">
+                          <h5 className="text-sm text-mystic-text-muted uppercase tracking-wider">Ezoterik Şifre</h5>
+                          <p className="text-white/80 leading-relaxed text-sm italic">
+                            {world.thothInfo}
+                          </p>
+                        </div>
                       </div>
                       
-                      <div className="mt-4 md:mt-0 text-left md:text-right">
-                        <div className="text-sm text-mystic-text-muted mb-1">Doğal Yönetici</div>
-                        <div className="text-xl font-bold text-white bg-white/10 px-4 py-1 rounded-lg inline-block border border-white/5">
-                          {world.naturalRuler}
-                        </div>
+                      <div className="mt-6 pt-4 border-t border-white/10 flex gap-6 text-sm">
+                        <div><span className="text-mystic-text-muted mr-2">Element:</span><span className="text-white">{world.element}</span></div>
+                        <div><span className="text-mystic-text-muted mr-2">Sefirot:</span><span className="text-white">{world.sephirot}</span></div>
                       </div>
                     </div>
+                  );
+                })}
+              </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                      <div className="space-y-2">
-                        <h5 className="text-sm text-mystic-text-muted uppercase tracking-wider">Alem Tanımı</h5>
-                        <p className="text-white/80 leading-relaxed text-sm">
-                          {world.description}
-                        </p>
-                      </div>
-                      <div className="space-y-2">
-                        <h5 className="text-sm text-mystic-text-muted uppercase tracking-wider">Ezoterik Şifre</h5>
-                        <p className="text-white/80 leading-relaxed text-sm italic">
-                          {world.thothInfo}
-                        </p>
-                      </div>
-                    </div>
-                    
-                    <div className="mt-6 pt-4 border-t border-white/10 flex gap-6 text-sm">
-                      <div><span className="text-mystic-text-muted mr-2">Element:</span><span className="text-white">{world.element}</span></div>
-                      <div><span className="text-mystic-text-muted mr-2">Sefirot:</span><span className="text-white">{world.sephirot}</span></div>
-                    </div>
-                  </div>
-                );
-              })}
+              <div className="pt-8 pb-12 flex justify-center">
+                <button 
+                  onClick={() => {setChartData(null); setDateStr(''); setTimeStr('');}}
+                  className="px-6 py-3 border border-white/20 rounded-xl text-white hover:bg-white/10 transition-colors"
+                >
+                  Yeni Bir Ruh İçin Sorgula
+                </button>
+              </div>
+              
             </div>
-
-            <div className="pt-8 pb-12 flex justify-center">
-              <button 
-                onClick={() => {setChartData(null); setDateStr(''); setTimeStr('');}}
-                className="px-6 py-3 border border-white/20 rounded-xl text-white hover:bg-white/10 transition-colors"
-              >
-                Yeni Bir Ruh İçin Sorgula
-              </button>
-            </div>
-            
-          </div>
-        )}
+          )}
+        </RequireRole>
       </div>
 
       {/* Modal - Interpretation Popup */}

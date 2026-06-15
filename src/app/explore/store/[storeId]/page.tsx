@@ -26,9 +26,7 @@ export default function StoreProfilePage() {
   return (
     <div className="min-h-screen pb-24">
       {/* Background */}
-      <div className="fixed inset-0 bg-mystic-dark -z-20" />
-      <div className="fixed inset-0 bg-[url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=2094&auto=format&fit=crop')] bg-cover bg-center opacity-5 mix-blend-screen pointer-events-none -z-10" />
-
+            
       {/* Header Banner */}
       <div className="h-64 relative">
         <img src={vendor.avatar} alt="Banner" className="w-full h-full object-cover opacity-40 blur-sm" />

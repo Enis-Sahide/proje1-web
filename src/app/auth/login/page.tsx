@@ -33,24 +33,30 @@ export default function LoginPage() {
       });
 
       if (error) {
-        setError("Giriş başarısız. Lütfen e-posta ve şifrenizi kontrol edin.");
+        setError(error.message || "Giriş başarısız. Bilgilerinizi kontrol edin.");
         setLoading(false);
         return;
       }
 
-      if (data.user) {
-        router.push('/');
+      if (data?.session) {
+        const redirectTo = searchParams.get('redirect') || '/';
+        window.location.href = redirectTo;
+      } else if (data?.user) {
+        setError("Lütfen e-posta adresinize gelen onay linkine tıklayın.");
+        setLoading(false);
+      } else {
+        setError("Beklenmeyen bir durum oluştu, lütfen tekrar deneyin.");
+        setLoading(false);
       }
-    } catch (err) {
-      setError("Beklenmeyen bir hata oluştu.");
+    } catch (err: any) {
+      setError(err?.message || "Beklenmeyen bir hata oluştu.");
       setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 relative pt-20">
-      <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=2094&auto=format&fit=crop')] bg-cover bg-center opacity-5 mix-blend-screen -z-10 pointer-events-none" />
-      
+            
       <div className="max-w-md w-full bg-mystic-surface/80 backdrop-blur-xl p-8 rounded-3xl border border-mystic-primary/30 shadow-2xl">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">

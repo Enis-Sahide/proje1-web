@@ -74,8 +74,7 @@ export default function BreathworkPage() {
 
   return (
     <div className="min-h-screen pt-24 px-4 pb-12 relative flex flex-col items-center">
-      <div className="fixed inset-0 bg-[url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=2094&auto=format&fit=crop')] bg-cover bg-center opacity-10 mix-blend-screen pointer-events-none -z-10" />
-      
+            
       <div className="max-w-4xl w-full relative z-10">
         <h1 className="text-4xl font-bold text-mystic-primary mb-6 drop-shadow-md text-center md:text-left">Nefes Egzersizleri</h1>
         <p className="text-mystic-text-muted text-lg mb-8 text-center md:text-left">

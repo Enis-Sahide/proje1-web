@@ -30,6 +30,7 @@ export default function Navigation() {
     { name: 'Nefes', href: '/breathwork' },
     { name: 'Analiz', href: '/analysis' },
     { name: 'Dersler', href: '/kadim-dersler', requiresAuth: true },
+    { name: 'VIP Seviyeler', href: '/membership' },
   ];
 
   return (
