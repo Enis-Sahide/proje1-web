@@ -152,10 +152,7 @@ export default function PlanetaryHourWidget() {
               </div>
             </div>
           </div>
-          <h4 className="text-lg font-bold mb-2 text-mystic-text">{currentHour.info.name} Saati</h4>
-          <p className="text-mystic-text-muted text-sm leading-relaxed mb-4">
-            {currentHour.info.description}
-          </p>
+          <h4 className="text-lg font-bold mb-3 text-mystic-text">{currentHour.info.name} Saati</h4>
 
           <div className="border-t border-mystic-surface-light pt-3 mt-1">
             <h5 className="text-[10px] font-bold text-mystic-text-muted uppercase tracking-wider mb-2">Günün Tüm Saatleri</h5>

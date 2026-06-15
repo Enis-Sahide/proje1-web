@@ -54,7 +54,7 @@ export default function Home() {
           {/* Main Layout Grid */}
           <div className="mb-20 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 w-full">
             
-            {/* Left: Günün Mesajı */}
+            {/* Left: Günün Mesajı & Gezegen Saati */}
             <div className="w-full lg:w-1/3 flex flex-col items-center lg:items-end order-2 lg:order-1 gap-6">
               {affirmation && (
                 <div className="bg-mystic-surface/50 backdrop-blur-md rounded-2xl p-6 border border-mystic-surface-light w-full max-w-sm shadow-xl text-center lg:text-right relative overflow-hidden">
@@ -69,7 +69,7 @@ export default function Home() {
                   <p className="text-mystic-accent font-semibold text-sm">— {affirmation.author}</p>
                 </div>
               )}
-              <MoonCyclesWidget />
+              <PlanetaryHourWidget />
             </div>
 
             {/* Center: Anatomical View */}
@@ -106,9 +106,9 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right: Gezegen Saati */}
+            {/* Right: Yıllık Ay Döngüleri */}
             <div className="w-full lg:w-1/3 flex flex-col items-center lg:items-start order-3 lg:order-3">
-              <PlanetaryHourWidget />
+              <MoonCyclesWidget />
             </div>
 
           </div>
