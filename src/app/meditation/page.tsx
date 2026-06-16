@@ -204,17 +204,7 @@ export default function MeditationScreen() {
   };
 
   return (
-    <div className="min-h-screen relative flex flex-col pb-20">
-            
-      {/* Header */}
-      <header className="flex items-center pt-8 md:pt-12 px-6 pb-6 border-b border-mystic-primary/30 bg-mystic-dark/50 backdrop-blur-md sticky top-0 z-30">
-        <button onClick={() => router.back()} className="mr-4 p-2 hover:bg-white/5 rounded-full transition">
-          <ArrowLeft size={28} className="text-mystic-text" />
-        </button>
-        <h1 className="text-3xl font-bold text-mystic-primary drop-shadow-md">
-          Frekans Odası
-        </h1>
-      </header>
+    <div className="min-h-screen relative flex flex-col pt-24 pb-20">
 
       <main className="flex-1 max-w-2xl w-full mx-auto p-4 mt-4 space-y-8">
         
