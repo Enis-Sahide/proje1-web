@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Moon, Wind, BookOpen, Sparkles, Lock, MoonStar } from 'lucide-react';
+import { Moon, Wind, BookOpen, Sparkles, Lock, MoonStar, Wrench } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -34,7 +34,7 @@ const exploreItems = [
     color: 'from-amber-500 to-orange-500',
     requiresAuth: true,
     status: 'LOCKED',
-    lockMessage: 'Üyelik Gerektirir'
+    lockMessage: 'Yapım Aşamasında'
   },
   {
     title: 'Hastalıkların Duygusal Nedenleri',
@@ -124,7 +124,7 @@ export default function ExploreSection() {
                 )}
                 {item.status === 'LOCKED' && (
                   <div className="absolute -top-2 -right-2 bg-mystic-dark p-1 rounded-full border border-mystic-surface-light text-mystic-text-muted">
-                    <Lock size={12} />
+                    {item.lockMessage === 'Yapım Aşamasında' ? <Wrench size={12} /> : <Lock size={12} />}
                   </div>
                 )}
               </div>
@@ -134,7 +134,7 @@ export default function ExploreSection() {
               
               {item.status === 'LOCKED' && (
                 <div className="mt-4 pt-4 border-t border-white/5 w-full flex items-center justify-center text-xs font-bold text-mystic-text-muted/80">
-                  <Lock size={12} className="mr-2" /> {item.lockMessage}
+                  {item.lockMessage === 'Yapım Aşamasında' ? <Wrench size={12} className="mr-2" /> : <Lock size={12} className="mr-2" />} {item.lockMessage}
                 </div>
               )}
             </motion.div>

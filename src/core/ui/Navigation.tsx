@@ -25,12 +25,12 @@ export default function Navigation() {
 
   const navLinks = [
     { name: 'Ana Sayfa', href: '/' },
-    { name: 'Keşfet', href: '/explore', isUnderConstruction: true },
     { name: 'Frekans Odası', href: '/meditation' },
     { name: 'Nefes', href: '/breathwork' },
     { name: 'Analiz', href: '/analysis' },
-    { name: 'Dersler', href: '/kadim-dersler', requiresAuth: true },
-    { name: 'VIP Seviyeler', href: '/membership' },
+    { name: 'Keşfet', href: '/explore', isUnderConstruction: true },
+    { name: 'Dersler', href: '/kadim-dersler', requiresAuth: true, isUnderConstruction: true },
+    { name: 'VIP Seviyeler', href: '/membership', isUnderConstruction: true },
   ];
 
   return (

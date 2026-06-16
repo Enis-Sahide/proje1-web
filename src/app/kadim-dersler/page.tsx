@@ -1,39 +1,36 @@
+"use client";
+
+import React from 'react';
 import Link from 'next/link';
+import { Wrench, ArrowLeft, BookOpen } from 'lucide-react';
 
 export default function KadimDerslerPage() {
   return (
-    <div className="min-h-screen pt-24 px-4 pb-12 relative flex flex-col items-center">
-      <div className="max-w-4xl w-full">
-        <h1 className="text-4xl font-bold text-mystic-text mb-6">Kadim Dersler</h1>
-        <p className="text-mystic-text-muted text-lg mb-8">
-          Astroloji, İnsan Tasarımı, Çakra Sistemi ve daha birçok spiritüel konuyu derinlemesine öğrenebileceğiniz kapsamlı rehberler.
+    <div className="min-h-screen pt-32 pb-24 px-4 bg-transparent flex flex-col items-center justify-center">
+      <div className="max-w-md w-full bg-mystic-surface/60 backdrop-blur-md border border-mystic-primary/20 rounded-3xl p-8 text-center shadow-[0_0_30px_rgba(212,175,55,0.05)] relative overflow-hidden">
+        {/* Glow effect */}
+        <div className="absolute -top-20 -left-20 w-40 h-40 bg-mystic-primary/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-mystic-accent/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="w-20 h-20 rounded-full bg-mystic-dark border border-mystic-primary/30 flex items-center justify-center mx-auto mb-6 shadow-[0_0_20px_rgba(212,175,55,0.15)] relative">
+          <BookOpen className="text-mystic-primary/40 absolute" size={40} />
+          <Wrench className="text-mystic-accent animate-pulse relative z-10" size={28} />
+        </div>
+
+        <h1 className="text-3xl font-bold text-white mb-3 tracking-tight">Kadim Dersler</h1>
+        <p className="text-mystic-accent text-sm font-semibold uppercase tracking-wider mb-4">Yapım Aşamasında</p>
+        
+        <p className="text-mystic-text-muted text-sm leading-relaxed mb-8">
+          Bu alan şu an hazırlanmaktadır. Çok yakında spiritüel rehberler, derinlemesine öğretiler ve kadim derslerle ruhsal yolculuğunuzu aydınlatacağız.
         </p>
 
-        <div className="space-y-6">
-          {[
-            { id: 'duygusal-hastaliklar', title: 'Hastalıkların Duygusal Nedenleri' },
-            { id: 'akupunktur', title: 'Akupunktur ve Meridyenler' },
-            { id: 'kabbalah', title: 'Evrensel Kabbalah' },
-            { id: 'astroloji', title: 'Ezoterik Astroloji' },
-            { id: 'human', title: 'Human Design' },
-            { id: 'sembolizm', title: 'Kadim Sembolizm' },
-            { id: 'numeroloji', title: 'Numeroloji' },
-            { id: 'rune', title: 'Rune Tılsımları' },
-            { id: 'tarot', title: 'Tarot ve Arkana' },
-            { id: 'yoga', title: 'Yoga Asanaları' }
-          ].map((item, index) => (
-            <Link href={`/kadim-dersler/${item.id}`} key={index} className="block">
-              <div className="bg-mystic-surface/80 backdrop-blur-md border border-mystic-surface-light rounded-2xl p-6 hover:border-mystic-primary transition-all group cursor-pointer flex items-center justify-between shadow-lg">
-                <div>
-                  <h3 className="text-xl font-semibold text-mystic-text group-hover:text-mystic-accent transition-colors">{item.title}</h3>
-                </div>
-                <div className="text-mystic-primary opacity-50 group-hover:opacity-100 transition-all transform translate-x-2 group-hover:translate-x-0">
-                  →
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
+        <Link 
+          href="/" 
+          className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-mystic-primary to-mystic-accent text-black font-bold px-8 py-3 rounded-full hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-300 w-full"
+        >
+          <ArrowLeft size={16} />
+          <span>Ana Sayfaya Dön</span>
+        </Link>
       </div>
     </div>
   );
