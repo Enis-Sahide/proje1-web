@@ -11,7 +11,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Proje1 - Kadim Bilgiler ve Analizler",
+  title: "7Layers - Kadim Bilgiler ve Analizler",
   description: "İnsan tasarımı, çakra analizi, meditasyon ve kadim dersler.",
 };
 
