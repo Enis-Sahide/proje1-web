@@ -192,24 +192,35 @@ export default function AstrologyPage() {
           <circle cx={CENTER} cy={CENTER} r={R_ZODIAC_OUTER} stroke="rgba(212,175,55,0.3)" strokeWidth="1.5" fill="none" />
           <circle cx={CENTER} cy={CENTER} r={R_TICKS_OUTER} stroke="rgba(212,175,55,0.3)" strokeWidth="1" fill="none" />
 
-          {/* 360 Degree Ticks */}
-          {Array.from({ length: 360 }).map((_, i) => {
-            const isTen = i % 10 === 0;
-            const isFive = i % 5 === 0;
-            let length = 2;
-            if (isTen) length = 6;
-            else if (isFive) length = 4;
-            
+          {/* 360 Degree Ticks as paths for optimized rendering performance */}
+          {(() => {
+            let majorPath = "";
+            let minorPath = "";
+            for (let i = 0; i < 360; i++) {
+              const isTen = i % 10 === 0;
+              const isFive = i % 5 === 0;
+              let length = 2;
+              if (isTen) length = 6;
+              else if (isFive) length = 4;
+
+              const x1 = getX(i, R_TICKS_OUTER);
+              const y1 = getY(i, R_TICKS_OUTER);
+              const x2 = getX(i, R_TICKS_OUTER - length);
+              const y2 = getY(i, R_TICKS_OUTER - length);
+
+              if (isTen) {
+                majorPath += `M ${x1.toFixed(2)} ${y1.toFixed(2)} L ${x2.toFixed(2)} ${y2.toFixed(2)} `;
+              } else {
+                minorPath += `M ${x1.toFixed(2)} ${y1.toFixed(2)} L ${x2.toFixed(2)} ${y2.toFixed(2)} `;
+              }
+            }
             return (
-              <line 
-                key={`tick-${i}`} 
-                x1={getX(i, R_TICKS_OUTER)} y1={getY(i, R_TICKS_OUTER)} 
-                x2={getX(i, R_TICKS_OUTER - length)} y2={getY(i, R_TICKS_OUTER - length)} 
-                stroke={isTen ? "#D4AF37" : "rgba(212,175,55,0.3)"} 
-                strokeWidth={isTen ? "1" : "0.5"} 
-              />
+              <g>
+                <path d={majorPath} stroke="#D4AF37" strokeWidth="1" fill="none" />
+                <path d={minorPath} stroke="rgba(212,175,55,0.3)" strokeWidth="0.5" fill="none" />
+              </g>
             );
-          })}
+          })()}
 
           {/* Zodiac Signs */}
           {Array.from({ length: 12 }).map((_, i) => {
@@ -247,7 +258,7 @@ export default function AstrologyPage() {
             );
           })}
 
-          {/* Planets */}
+          {/* Planets (Removed click modal handlers to prevent lag and accidental mobile clicks) */}
           {chartData.planets.map((p, i) => {
             let rOffset = 0;
             for(let j=0; j<i; j++) {
@@ -257,9 +268,9 @@ export default function AstrologyPage() {
             const py = getY(p.longitude, R_PLANETS - rOffset);
             
             return (
-              <g key={`planet-${i}`} className="cursor-pointer" onClick={() => setSelectedInterp(getFullPlanetInterpretation(p.name, p.sign, p.house))}>
+              <g key={`planet-${i}`}>
                 <line x1={getX(p.longitude, R_ZODIAC_INNER)} y1={getY(p.longitude, R_ZODIAC_INNER)} x2={px} y2={py} stroke="rgba(212,175,55,0.3)" strokeWidth="0.5" strokeDasharray="1, 2" />
-                <circle cx={px} cy={py} r="12" fill="#0F172A" stroke="#D4AF37" strokeWidth="1" className="hover:fill-[#D4AF37]/20 transition-colors" />
+                <circle cx={px} cy={py} r="12" fill="#0F172A" stroke="#D4AF37" strokeWidth="1" />
                 <text x={px} y={py + 5} fontSize="14" fill="#D4AF37" textAnchor="middle" fontWeight="bold">
                   {PLANET_SYMBOLS[p.name]}
                 </text>
@@ -451,23 +462,23 @@ export default function AstrologyPage() {
                 </button>
                 <div className={`transition-all duration-700 ease-in-out origin-top flex flex-col overflow-hidden ${showPlanets ? 'opacity-100 max-h-[4000px] mt-6' : 'opacity-0 max-h-0'}`}>
                   <div className="flex text-mystic-text-muted text-sm px-4 py-2 border-b border-white/5 mb-2 shrink-0">
-                    <div className="w-1/3">Gezegen</div>
-                    <div className="w-1/3 text-center">Burç</div>
-                    <div className="w-1/3 text-right">Derece & Ev</div>
+                    <div className="w-[45%]">Gezegen</div>
+                    <div className="w-[20%] text-center">Burç</div>
+                    <div className="w-[35%] text-right">Derece & Ev</div>
                   </div>
                   <div className="flex-1 space-y-2 overflow-y-auto max-h-[600px] pr-2 custom-scrollbar">
                   {[...chartData.planets, chartData.ascendant, chartData.midheaven].map((p, i) => (
                     <button 
                       key={i} 
                       onClick={() => setSelectedInterp(getFullPlanetInterpretation(p.name, p.sign, p.house))}
-                      className="w-full flex items-center text-left hover:bg-white/5 transition-colors p-4 rounded-xl border border-transparent hover:border-white/10 group"
+                      className="w-full flex items-center text-left hover:bg-white/5 transition-colors p-3 sm:p-4 rounded-xl border border-transparent hover:border-white/10 group"
                     >
-                      <div className="w-1/3 flex items-center gap-3">
-                        <span className="text-2xl text-[#D4AF37] font-bold w-12 shrink-0 text-center">{PLANET_SYMBOLS[p.name] || ''}</span>
-                        <span className="text-white font-medium group-hover:text-[#D4AF37] transition-colors">{p.name}</span>
+                      <div className="w-[45%] flex items-center gap-2 sm:gap-3 min-w-0">
+                        <span className="text-xl sm:text-2xl text-[#D4AF37] font-bold w-8 sm:w-12 shrink-0 text-center">{PLANET_SYMBOLS[p.name] || ''}</span>
+                        <span className="text-white font-medium group-hover:text-[#D4AF37] transition-colors truncate sm:whitespace-normal" title={p.name}>{p.name}</span>
                       </div>
-                      <div className="w-1/3 text-center font-bold" style={{ color: ZODIAC_COLORS[p.sign] }}>{p.sign}</div>
-                      <div className="w-1/3 text-right text-mystic-text-muted">
+                      <div className="w-[20%] text-center font-bold text-sm sm:text-base" style={{ color: ZODIAC_COLORS[p.sign] }}>{p.sign}</div>
+                      <div className="w-[35%] text-right text-mystic-text-muted text-xs sm:text-sm">
                         {p.degreeInSign}° {String(p.minutes).padStart(2, '0')}' {p.isRetrograde && <span className="text-red-400 font-bold ml-1">Rx</span>}
                         <br />
                         <span className="text-xs">{p.house}. Ev</span>

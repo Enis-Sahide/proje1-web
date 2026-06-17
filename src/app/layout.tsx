@@ -4,6 +4,7 @@ import "./globals.css";
 import Navigation from "@/core/ui/Navigation";
 import { ThemeProvider } from "@/core/ui/ThemeProvider";
 import { AuthProvider } from "@/context/AuthContext";
+import RouteGuard from "@/core/ui/RouteGuard";
 import AnimatedBackground from "@/core/ui/AnimatedBackground";
 
 const inter = Inter({
@@ -31,10 +32,12 @@ export default function RootLayout({
         <AnimatedBackground />
         <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false}>
           <AuthProvider>
-            <Navigation />
-            <main className="flex-grow flex flex-col">
-              {children}
-            </main>
+            <RouteGuard>
+              <Navigation />
+              <main className="flex-grow flex flex-col">
+                {children}
+              </main>
+            </RouteGuard>
           </AuthProvider>
         </ThemeProvider>
       </body>

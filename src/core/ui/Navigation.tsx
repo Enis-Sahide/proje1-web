@@ -12,8 +12,9 @@ export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-  const { user, logout } = useAuth();
+  const { user, role, logout } = useAuth();
   const isLoggedIn = !!user;
+  const isAdmin = role === 'admin';
 
   useEffect(() => {
     const handleScroll = () => {
@@ -23,7 +24,7 @@ export default function Navigation() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navLinks = [
+  const baseLinks = [
     { name: 'Ana Sayfa', href: '/' },
     { name: 'Frekans Odası', href: '/meditation' },
     { name: 'Nefes', href: '/breathwork' },
@@ -33,6 +34,13 @@ export default function Navigation() {
     { name: 'VIP Seviyeler', href: '/membership', isUnderConstruction: true },
   ];
 
+  const navLinks = isAdmin 
+    ? [
+        { name: 'Admin Paneli', href: '/admin/dashboard' },
+        ...baseLinks
+      ]
+    : baseLinks;
+
   return (
     <header 
       className={`fixed top-0 w-full z-50 transition-all duration-300 ${
@@ -41,7 +49,7 @@ export default function Navigation() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-3 group">
+        <Link href={isAdmin ? "/admin/dashboard" : "/"} className="flex items-center gap-3 group">
           <div className="relative rounded-full p-[2px] bg-gradient-to-tr from-mystic-primary via-mystic-accent to-mystic-primary shadow-[0_0_8px_rgba(212,175,55,0.9),0_0_16px_rgba(212,175,55,0.5),0_0_32px_rgba(212,175,55,0.15)] group-hover:shadow-[0_0_12px_rgba(212,175,55,1),0_0_24px_rgba(212,175,55,0.7),0_0_40px_rgba(212,175,55,0.3)] transition-all duration-500">
             <Image src="/logo.png" alt="7Layers Logo" width={32} height={32} className="rounded-full bg-mystic-dark block" />
           </div>
@@ -97,9 +105,14 @@ export default function Navigation() {
         <div className="hidden md:flex items-center gap-4">
             {isLoggedIn ? (
               <div className="flex items-center gap-4">
-                <span className="text-mystic-text-muted text-sm hidden lg:block">
-                  {user.user_metadata?.full_name || user.email}
-                </span>
+                <Link 
+                  href="/profile"
+                  className="text-mystic-text-muted hover:text-mystic-accent text-sm hidden lg:flex items-center gap-1.5 transition-colors cursor-pointer group"
+                  title="Profil Ayarları"
+                >
+                  <User size={14} className="opacity-70 group-hover:text-mystic-accent" />
+                  <span>{user.user_metadata?.full_name || user.email}</span>
+                </Link>
                 <button 
                   onClick={() => logout()}
                   className="flex items-center gap-2 bg-white/5 hover:bg-white/10 px-4 py-2 rounded-full border border-white/10 transition-colors text-sm font-medium"
@@ -180,9 +193,14 @@ export default function Navigation() {
             <div className="mt-6">
               {isLoggedIn ? (
                   <div className="pt-4 border-t border-mystic-surface-light flex flex-col gap-4">
-                    <span className="text-mystic-text-muted text-sm text-center">
-                      {user.user_metadata?.full_name || user.email}
-                    </span>
+                    <Link 
+                      href="/profile"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-mystic-text-muted hover:text-mystic-accent text-sm text-center flex items-center justify-center gap-2 transition-colors cursor-pointer"
+                    >
+                      <User size={16} />
+                      <span>{user.user_metadata?.full_name || user.email}</span>
+                    </Link>
                     <button 
                       onClick={() => {
                         logout();

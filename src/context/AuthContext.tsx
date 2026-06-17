@@ -28,6 +28,56 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [role, setRole] = useState('free');
   const router = useRouter();
 
+  const getUserRole = async (currentUser: User | null): Promise<string> => {
+    if (!currentUser) return 'free';
+    
+    try {
+      // enissahide.kesik@outlook.com e-posta adresini otomatik olarak admin yap
+      if (currentUser.email === 'enissahide.kesik@outlook.com') {
+        const { data: profile, error } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', currentUser.id)
+          .single();
+        
+        if (error || profile?.role !== 'admin') {
+          // Profil yoksa veya rolü admin değilse güncelle/ekle
+          await supabase
+            .from('profiles')
+            .upsert({ 
+              id: currentUser.id, 
+              role: 'admin', 
+              full_name: currentUser.user_metadata?.full_name || 'Admin Sahide' 
+            });
+        }
+        return 'admin';
+      }
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', currentUser.id)
+        .single();
+      
+      if (error || !data) {
+        // Profil veritabanında yoksa otomatik oluştur (Self-healing)
+        await supabase
+          .from('profiles')
+          .insert({
+            id: currentUser.id,
+            role: 'free',
+            full_name: currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'Yeni Üye'
+          });
+        return 'free';
+      }
+      
+      return data.role || 'free';
+    } catch (e) {
+      console.error("Error getting user role:", e);
+      return 'free';
+    }
+  };
+
   useEffect(() => {
     let mounted = true;
 
@@ -41,12 +91,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           setUser(session?.user ?? null);
           
           if (session?.user) {
-            try {
-              const { data } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
-              setRole(data?.role || 'free');
-            } catch (e) {
-              setRole('free');
-            }
+            const userRole = await getUserRole(session.user);
+            setRole(userRole);
           } else {
             setRole('free');
           }
@@ -67,12 +113,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          try {
-            const { data } = await supabase.from('profiles').select('role').eq('id', session.user.id).single();
-            setRole(data?.role || 'free');
-          } catch (e) {
-            setRole('free');
-          }
+          const userRole = await getUserRole(session.user);
+          setRole(userRole);
         } else {
           setRole('free');
         }
@@ -89,10 +131,26 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      await supabase.auth.signOut();
-      router.push('/');
+      // Clear all Supabase related local storage keys immediately to force local logged out state
+      try {
+        for (const key in localStorage) {
+          if (key.startsWith('sb-') || key.includes('supabase.auth')) {
+            localStorage.removeItem(key);
+          }
+        }
+      } catch (e) {
+        console.error("Error clearing localStorage:", e);
+      }
+
+      // Fire server signOut in the background without blocking the client redirect
+      supabase.auth.signOut().catch((error) => {
+        console.error("Background signout error:", error);
+      });
     } catch (error) {
       console.error("Logout error:", error);
+    } finally {
+      // Immediately redirect to homepage to reload the app in a logged out state
+      window.location.href = '/';
     }
   };
 

@@ -7,4 +7,13 @@ if (!supabaseUrl || !supabaseAnonKey) {
   console.warn('Supabase credentials are not set in environment variables.');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    // Custom no-op lock to completely bypass navigator.locks.
+    // This prevents authentication processes from hanging indefinitely in development (due to HMR/Fast Refresh)
+    // or when Chrome/browser suspends background locks.
+    lock: async (_name, _acquireTimeout, fn) => {
+      return await fn();
+    },
+  }
+});
