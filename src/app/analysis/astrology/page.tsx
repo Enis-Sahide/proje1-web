@@ -178,10 +178,8 @@ export default function AstrologyPage() {
 
     const svgContent = (
       <svg 
-        width={CHART_SIZE} 
-        height={CHART_SIZE} 
         viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`} 
-        className={isPrintMode ? "max-w-full h-auto" : "w-[640px] h-[640px] shrink-0 mx-auto"}
+        className={isPrintMode ? "max-w-full h-auto" : "w-full h-full absolute inset-0"}
       >
           {/* Aspect Lines */}
           <circle cx={CENTER} cy={CENTER} r={R_ASPECTS} stroke="rgba(212,175,55,0.3)" strokeWidth="1" fill="rgba(0,0,0,0.4)" />
@@ -304,7 +302,7 @@ export default function AstrologyPage() {
     if (isPrintMode) return svgContent;
 
     return (
-      <div className="w-full overflow-x-auto overflow-y-visible flex justify-start md:justify-center py-6 sm:py-12 bg-black/40 rounded-3xl border border-white/5 shadow-[inset_0_0_50px_rgba(0,0,0,0.5)] custom-scrollbar">
+      <div className="w-full max-w-[640px] aspect-square relative mx-auto">
         {svgContent}
       </div>
     );
