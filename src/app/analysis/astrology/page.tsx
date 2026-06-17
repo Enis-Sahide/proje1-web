@@ -167,7 +167,12 @@ export default function AstrologyPage() {
     const R_ASPECTS = RADIUS - 40;
 
     const svgContent = (
-      <svg width={CHART_SIZE} height={CHART_SIZE} viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`} overflow="visible" className="max-w-full h-auto">
+      <svg 
+        width={CHART_SIZE} 
+        height={CHART_SIZE} 
+        viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`} 
+        className={isPrintMode ? "max-w-full h-auto" : "w-[640px] h-[640px] shrink-0 mx-auto"}
+      >
           {/* Aspect Lines */}
           <circle cx={CENTER} cy={CENTER} r={R_ASPECTS} stroke="rgba(212,175,55,0.3)" strokeWidth="1" fill="rgba(0,0,0,0.4)" />
           {chartData.aspects.filter(a => a.type !== 'Kavuşum').map((a, i) => {
@@ -289,7 +294,7 @@ export default function AstrologyPage() {
     if (isPrintMode) return svgContent;
 
     return (
-      <div className="w-full overflow-x-auto overflow-y-visible flex justify-center py-12 bg-black/40 rounded-3xl border border-white/5 shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
+      <div className="w-full overflow-x-auto overflow-y-visible flex justify-start md:justify-center py-6 sm:py-12 bg-black/40 rounded-3xl border border-white/5 shadow-[inset_0_0_50px_rgba(0,0,0,0.5)] custom-scrollbar">
         {svgContent}
       </div>
     );
@@ -386,7 +391,7 @@ export default function AstrologyPage() {
         )}
 
         {!chartData ? (
-          <div className="bg-black/50 backdrop-blur-md border border-white/10 p-8 rounded-3xl shadow-2xl relative overflow-hidden max-w-4xl mx-auto">
+          <div className="bg-black/50 backdrop-blur-md border border-white/10 p-4 sm:p-8 rounded-3xl shadow-2xl relative overflow-hidden max-w-4xl mx-auto">
             {isAnalyzing && (
               <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center text-[#D4AF37]">
                 <Loader2 size={48} className="animate-spin mb-4" />
@@ -422,7 +427,7 @@ export default function AstrologyPage() {
         ) : (
           <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
             {/* Visual SVG Wheel */}
-            <div className="bg-black/50 backdrop-blur-md border border-[#D4AF37]/30 p-8 rounded-3xl shadow-2xl flex flex-col items-center">
+            <div className="bg-black/50 backdrop-blur-md border border-[#D4AF37]/30 p-4 sm:p-8 rounded-3xl shadow-2xl flex flex-col items-center w-full">
               <div className="flex w-full flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-6 mb-8 gap-4">
                  <div>
                    <h2 className="text-2xl font-bold text-white flex items-center gap-3 mb-2">
@@ -432,12 +437,12 @@ export default function AstrologyPage() {
                      {cityKey ? cityKey.name : ''} • {dateStr.split('-').reverse().join('.')} {timeStr}
                    </p>
                  </div>
-                 <div className="flex items-center gap-3">
-                   <button disabled={isDownloading} onClick={handleDownloadImage} className="text-sm px-4 py-2 bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 rounded-full text-[#D4AF37] transition-colors border border-[#D4AF37]/30 whitespace-nowrap flex items-center gap-2 disabled:opacity-50">
+                 <div className="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto">
+                   <button disabled={isDownloading} onClick={handleDownloadImage} className="flex-1 sm:flex-initial text-xs sm:text-sm px-4 py-2 bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 rounded-full text-[#D4AF37] transition-colors border border-[#D4AF37]/30 whitespace-nowrap flex items-center justify-center gap-2 disabled:opacity-50">
                      {isDownloading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />} 
                      {isDownloading ? "Görsel Hazırlanıyor..." : "Haritayı İndir (PNG)"}
                    </button>
-                   <button onClick={() => setChartData(null)} className="text-sm px-4 py-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap">
+                   <button onClick={() => setChartData(null)} className="flex-1 sm:flex-initial text-xs sm:text-sm px-4 py-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap text-center">
                      Yeni Harita
                    </button>
                  </div>
@@ -452,7 +457,7 @@ export default function AstrologyPage() {
               <div className="flex flex-col gap-8 h-fit">
                 
                 {/* Gezegen Yerleşimleri */}
-                <div className="bg-black/50 backdrop-blur-md border border-[#D4AF37]/30 p-6 md:p-8 rounded-3xl shadow-2xl flex flex-col h-fit">
+                <div className="bg-black/50 backdrop-blur-md border border-[#D4AF37]/30 p-4 sm:p-8 rounded-3xl shadow-2xl flex flex-col h-fit">
                 <button 
                   onClick={() => setShowPlanets(!showPlanets)}
                   className="w-full flex items-center justify-between text-xl font-bold text-white border-b border-white/10 pb-4 focus:outline-none"
@@ -490,7 +495,7 @@ export default function AstrologyPage() {
               </div>
 
                 {/* Evler ve Kapsadığı Burçlar */}
-                <div className="bg-black/50 backdrop-blur-md border border-[#D4AF37]/30 p-6 md:p-8 rounded-3xl shadow-2xl flex flex-col h-fit">
+                <div className="bg-black/50 backdrop-blur-md border border-[#D4AF37]/30 p-4 sm:p-8 rounded-3xl shadow-2xl flex flex-col h-fit">
                 <button 
                   onClick={() => setShowHouses(!showHouses)}
                   className="w-full flex items-center justify-between text-xl font-bold text-white border-b border-white/10 pb-4 focus:outline-none"
@@ -550,7 +555,7 @@ export default function AstrologyPage() {
               <div className="flex flex-col gap-8 h-fit">
                 
                 {/* Aspect Grid */}
-                <div className="bg-black/50 backdrop-blur-md border border-[#D4AF37]/30 p-6 md:p-8 rounded-3xl shadow-2xl flex flex-col overflow-hidden h-fit">
+                <div className="bg-black/50 backdrop-blur-md border border-[#D4AF37]/30 p-4 sm:p-8 rounded-3xl shadow-2xl flex flex-col overflow-hidden h-fit">
                   <button 
                     onClick={() => setShowAspectGrid(!showAspectGrid)}
                     className="w-full flex items-center justify-between text-xl font-bold text-white border-b border-white/10 pb-4 focus:outline-none"
@@ -566,7 +571,7 @@ export default function AstrologyPage() {
                 </div>
 
                 {/* Aspect List (Without Grid) */}
-                <div className="bg-black/50 backdrop-blur-md border border-[#D4AF37]/30 p-6 md:p-8 rounded-3xl shadow-2xl flex flex-col h-fit">
+                <div className="bg-black/50 backdrop-blur-md border border-[#D4AF37]/30 p-4 sm:p-8 rounded-3xl shadow-2xl flex flex-col h-fit">
                   <button 
                     onClick={() => setShowAspectList(!showAspectList)}
                     className="w-full flex items-center justify-between text-xl font-bold text-white border-b border-white/10 pb-4 focus:outline-none"
