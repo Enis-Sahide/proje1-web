@@ -639,8 +639,8 @@ export default function AstrologyPage() {
           </div>
         )}
 
-        {/* Printable Chart (Hidden from screen - conditionally rendered to avoid DOM memory leakage/overlaps on mobile GPU) */}
-        <div className="fixed top-0 left-[-9999px] z-[-9999] opacity-0 pointer-events-none">
+        {/* Printable Chart (Hidden in a 0x0 container to prevent GPU layer composition glitches on mobile browser engines) */}
+        <div style={{ width: 0, height: 0, overflow: 'hidden', position: 'fixed', left: -9999, top: -9999, pointerEvents: 'none', opacity: 0 }}>
           {chartData && renderPrintable && (
             <PrintableChart 
               ref={printRef}
