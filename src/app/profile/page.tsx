@@ -15,7 +15,7 @@ const ROLE_LABELS: Record<string, { label: string; style: string }> = {
 };
 
 export default function ProfilePage() {
-  const { user, role } = useAuth();
+  const { user, role, session } = useAuth();
   const router = useRouter();
   
   const [name, setName] = useState('');
@@ -46,6 +46,13 @@ export default function ProfilePage() {
     setLoading(true);
     setError(null);
     setSuccess(false);
+
+    if (session) {
+      await supabase.auth.setSession({
+        access_token: session.access_token,
+        refresh_token: session.refresh_token
+      });
+    }
 
     console.log("Saving started...", { id: user.id, name, email: user.email });
     try {
@@ -102,6 +109,13 @@ export default function ProfilePage() {
     setPwdLoading(true);
     setPwdError(null);
     setPwdSuccess(false);
+
+    if (session) {
+      await supabase.auth.setSession({
+        access_token: session.access_token,
+        refresh_token: session.refresh_token
+      });
+    }
 
     try {
       const { error } = await supabase.auth.updateUser({
