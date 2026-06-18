@@ -103,6 +103,22 @@ export default function AdminDashboard() {
 
   // Change user role directly in Supabase profiles database
   const handleUpdateRole = async (userId: string, newRole: string) => {
+    const profile = profiles.find(p => p.id === userId);
+    const userName = profile?.full_name || 'İsimsiz Üye';
+    
+    const roleLabels: Record<string, string> = {
+      free: 'Ücretsiz Üye',
+      apprentice: 'Çırak (Seviye 1)',
+      journeyman: 'Kalfa (Seviye 2)',
+      master: 'Usta (Seviye 3)',
+      admin: 'Yönetici (Admin)'
+    };
+    
+    const targetRoleLabel = roleLabels[newRole] || newRole;
+    
+    const confirmChange = window.confirm(`"${userName}" isimli üyenin yetki seviyesini "${targetRoleLabel}" olarak değiştirmek istediğinize emin misiniz?`);
+    if (!confirmChange) return;
+
     setUpdatingUserId(userId);
     try {
       const { error } = await supabase
