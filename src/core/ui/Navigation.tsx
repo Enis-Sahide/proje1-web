@@ -58,77 +58,80 @@ export default function Navigation() {
           </span>
         </Link>
 
-        {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-2 lg:gap-4 xl:gap-6">
-          {navLinks.map((link) => {
-            const isLocked = link.requiresAuth && !isLoggedIn;
-            const isConstruction = link.isUnderConstruction && !isAdmin;
-            
-            if (isConstruction) {
-              return (
-                <div 
+        {/* Right side container */}
+        <div className="hidden md:flex items-center gap-6 lg:gap-8 xl:gap-12 ml-auto">
+          {/* Desktop Nav */}
+          <nav className="flex items-center gap-2 lg:gap-4 xl:gap-6">
+            {navLinks.map((link) => {
+              const isLocked = link.requiresAuth && !isLoggedIn;
+              const isConstruction = link.isUnderConstruction && !isAdmin;
+              
+              if (isConstruction) {
+                return (
+                  <div 
+                    key={link.name} 
+                    className={`text-sm uppercase tracking-wider font-medium text-mystic-text-muted/40 flex items-center gap-1.5 cursor-not-allowed whitespace-nowrap`}
+                    title="Yapım Aşamasında"
+                  >
+                    {link.name}
+                    <Wrench size={12} className="opacity-70" />
+                  </div>
+                );
+              }
+
+              return isLocked ? (
+                <Link 
                   key={link.name} 
-                  className={`text-sm uppercase tracking-wider font-medium text-mystic-text-muted/40 flex items-center gap-1.5 cursor-not-allowed whitespace-nowrap`}
-                  title="Yapım Aşamasında"
+                  href="/auth/login"
+                  className={`text-sm uppercase tracking-wider font-medium transition-colors hover:text-mystic-accent text-mystic-text-muted/50 flex items-center gap-1.5 whitespace-nowrap`}
+                  title="Üyelik Gerektirir"
                 >
                   {link.name}
-                  <Wrench size={12} className="opacity-70" />
-                </div>
-              );
-            }
-
-            return isLocked ? (
-              <Link 
-                key={link.name} 
-                href="/auth/login"
-                className={`text-sm uppercase tracking-wider font-medium transition-colors hover:text-mystic-accent text-mystic-text-muted/50 flex items-center gap-1.5 whitespace-nowrap`}
-                title="Üyelik Gerektirir"
-              >
-                {link.name}
-                <Lock size={12} className="opacity-70" />
-              </Link>
-            ) : (
-              <Link 
-                key={link.name} 
-                href={link.href}
-                className={`text-sm uppercase tracking-wider font-medium transition-colors hover:text-mystic-accent whitespace-nowrap ${
-                  pathname === link.href ? 'text-mystic-accent border-b border-mystic-accent pb-1' : 'text-mystic-text-muted'
-                }`}
-              >
-                {link.name}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Auth / Profile (Desktop) */}
-        <div className="hidden md:flex items-center gap-4">
-            {isLoggedIn ? (
-              <div className="flex items-center gap-4">
-                <Link 
-                  href="/profile"
-                  className="text-mystic-text-muted hover:text-mystic-accent text-sm flex items-center gap-1.5 transition-colors cursor-pointer group"
-                  title={user.user_metadata?.full_name || user.email}
-                >
-                  <User size={14} className="opacity-70 group-hover:text-mystic-accent shrink-0" />
-                  <span className="hidden xl:inline truncate max-w-[120px]">{user.user_metadata?.full_name || user.email}</span>
+                  <Lock size={12} className="opacity-70" />
                 </Link>
-                <button 
-                  onClick={() => logout()}
-                  className="flex items-center gap-2 bg-white/5 hover:bg-white/10 px-4 py-2 rounded-full border border-white/10 transition-colors text-sm font-medium"
+              ) : (
+                <Link 
+                  key={link.name} 
+                  href={link.href}
+                  className={`text-sm uppercase tracking-wider font-medium transition-colors hover:text-mystic-accent whitespace-nowrap ${
+                    pathname === link.href ? 'text-mystic-accent border-b border-mystic-accent pb-1' : 'text-mystic-text-muted'
+                  }`}
                 >
-                  <LogOut size={16} /> Çıkış Yap
-                </button>
-              </div>
-            ) : (
-            <Link 
-              href="/auth/login" 
-              className="flex items-center gap-2 px-5 py-2 rounded-full border border-mystic-primary text-mystic-primary hover:bg-mystic-primary hover:text-white transition-all"
-            >
-              <LogIn size={18} />
-              <span>Giriş Yap</span>
-            </Link>
-          )}
+                  {link.name}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* Auth / Profile (Desktop) */}
+          <div className="flex items-center gap-4">
+              {isLoggedIn ? (
+                <div className="flex items-center gap-4">
+                  <Link 
+                    href="/profile"
+                    className="text-mystic-text-muted hover:text-mystic-accent text-sm flex items-center gap-1.5 transition-colors cursor-pointer group"
+                    title={user.user_metadata?.full_name || user.email}
+                  >
+                    <User size={14} className="opacity-70 group-hover:text-mystic-accent shrink-0" />
+                    <span className="hidden xl:inline truncate max-w-[120px]">{user.user_metadata?.full_name || user.email}</span>
+                  </Link>
+                  <button 
+                    onClick={() => logout()}
+                    className="flex items-center gap-2 bg-white/5 hover:bg-white/10 px-4 py-2 rounded-full border border-white/10 transition-colors text-sm font-medium"
+                  >
+                    <LogOut size={16} /> Çıkış Yap
+                  </button>
+                </div>
+              ) : (
+              <Link 
+                href="/auth/login" 
+                className="flex items-center gap-2 px-5 py-2 rounded-full border border-mystic-primary text-mystic-primary hover:bg-mystic-primary hover:text-white transition-all"
+              >
+                <LogIn size={18} />
+                <span>Giriş Yap</span>
+              </Link>
+            )}
+          </div>
         </div>
 
         {/* Mobile Menu Button */}
