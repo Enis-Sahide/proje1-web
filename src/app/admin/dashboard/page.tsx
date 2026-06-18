@@ -188,7 +188,7 @@ export default function AdminDashboard() {
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto p-6 mt-6">
+      <main className="max-w-6xl mx-auto p-6 mt-6 w-full max-w-full">
         
         {/* Global Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
@@ -265,7 +265,7 @@ export default function AdminDashboard() {
 
         {/* Tab Content 1: Stores */}
         {activeTab === 'stores' && (
-          <div>
+          <div className="w-full max-w-full overflow-hidden">
             <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
               <Store className="text-mystic-primary" size={20} /> Kayıtlı Mağazalar ({vendors.length})
             </h2>
@@ -324,7 +324,7 @@ export default function AdminDashboard() {
 
         {/* Tab Content 2: Members */}
         {activeTab === 'members' && (
-          <div>
+          <div className="w-full max-w-full overflow-hidden">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
               <h2 className="text-lg font-bold text-white flex items-center gap-2">
                 <Users className="text-mystic-primary" size={20} /> Kayıtlı Üyeler ({filteredProfiles.length})
