@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, User, Mail, Check, Loader2, Award } from 'lucide-react';
+import { ArrowLeft, User, Mail, Check, Loader2, Award, Lock } from 'lucide-react';
 
 const ROLE_LABELS: Record<string, { label: string; style: string }> = {
   free: { label: 'Ücretsiz Üyelik', style: 'border-white/10 text-mystic-text-muted bg-white/5' },
@@ -22,6 +22,14 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Password change states
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [pwdLoading, setPwdLoading] = useState(false);
+  const [pwdSuccess, setPwdSuccess] = useState(false);
+  const [pwdError, setPwdError] = useState<string | null>(null);
+  const [showPwdSection, setShowPwdSection] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -77,6 +85,39 @@ export default function ProfilePage() {
     } finally {
       console.log("finally block: Setting loading to false.");
       setLoading(false);
+    }
+  };
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      setPwdError("Şifreler uyuşmuyor.");
+      return;
+    }
+    if (password.length < 6) {
+      setPwdError("Şifre en az 6 karakter olmalıdır.");
+      return;
+    }
+
+    setPwdLoading(true);
+    setPwdError(null);
+    setPwdSuccess(false);
+
+    try {
+      const { error } = await supabase.auth.updateUser({
+        password: password
+      });
+
+      if (error) throw error;
+
+      setPwdSuccess(true);
+      setPassword('');
+      setConfirmPassword('');
+      setTimeout(() => setPwdSuccess(false), 3000);
+    } catch (err: any) {
+      setPwdError(err.message || 'Şifre güncellenirken bir hata oluştu.');
+    } finally {
+      setPwdLoading(false);
     }
   };
 
@@ -178,6 +219,79 @@ export default function ProfilePage() {
             {loading ? <Loader2 className="animate-spin mr-2" size={16} /> : 'Değişiklikleri Kaydet'}
           </button>
         </form>
+
+        <hr className="my-6 border-white/10" />
+
+        {/* Change Password Collapsible Section */}
+        <div className="space-y-4">
+          <button
+            type="button"
+            onClick={() => setShowPwdSection(!showPwdSection)}
+            className="w-full text-left text-xs font-semibold text-mystic-primary hover:text-white transition-colors uppercase tracking-wider flex items-center justify-between cursor-pointer"
+          >
+            <span>Şifre Değiştir</span>
+            <span className="text-[10px]">{showPwdSection ? '▲' : '▼'}</span>
+          </button>
+
+          {showPwdSection && (
+            <form onSubmit={handleUpdatePassword} className="space-y-5 mt-4">
+              {pwdError && (
+                <div className="p-3 bg-red-500/10 border border-red-500/35 rounded-xl text-center">
+                  <p className="text-[11px] text-red-200">{pwdError}</p>
+                </div>
+              )}
+
+              {pwdSuccess && (
+                <div className="p-3 bg-green-500/10 border border-green-500/35 rounded-xl text-center flex items-center justify-center gap-2">
+                  <Check className="text-green-400" size={14} />
+                  <p className="text-[11px] text-green-200">Şifreniz başarıyla güncellendi!</p>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-[11px] font-semibold text-mystic-text-muted mb-2 uppercase tracking-wider">Yeni Şifre</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-mystic-text-muted">
+                    <Lock size={16} />
+                  </div>
+                  <input
+                    type="password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-10 pr-3 py-3 bg-mystic-dark/80 border border-mystic-surface-light rounded-xl text-mystic-text focus:border-mystic-primary focus:ring-1 focus:ring-mystic-primary transition-all outline-none text-sm"
+                    placeholder="Yeni Şifreniz"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-[11px] font-semibold text-mystic-text-muted mb-2 uppercase tracking-wider">Şifre Tekrar</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-mystic-text-muted">
+                    <Lock size={16} />
+                  </div>
+                  <input
+                    type="password"
+                    required
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    className="w-full pl-10 pr-3 py-3 bg-mystic-dark/80 border border-mystic-surface-light rounded-xl text-mystic-text focus:border-mystic-primary focus:ring-1 focus:ring-mystic-primary transition-all outline-none text-sm"
+                    placeholder="Yeni Şifreniz (Tekrar)"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={pwdLoading}
+                className="w-full bg-[#D4AF37]/20 border border-[#D4AF37]/50 hover:bg-[#D4AF37]/30 text-[#D4AF37] hover:text-white font-bold py-3 rounded-xl mt-4 transition-all flex justify-center items-center cursor-pointer text-xs"
+              >
+                {pwdLoading ? <Loader2 className="animate-spin mr-2" size={14} /> : 'Şifreyi Güncelle'}
+              </button>
+            </form>
+          )}
+        </div>
       </div>
     </div>
   );
