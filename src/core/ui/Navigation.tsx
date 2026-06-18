@@ -62,7 +62,7 @@ export default function Navigation() {
         <nav className="hidden md:flex items-center gap-4 lg:gap-6 xl:gap-8">
           {navLinks.map((link) => {
             const isLocked = link.requiresAuth && !isLoggedIn;
-            const isConstruction = link.isUnderConstruction;
+            const isConstruction = link.isUnderConstruction && !isAdmin;
             
             if (isConstruction) {
               return (
@@ -151,7 +151,7 @@ export default function Navigation() {
           >
             {navLinks.map((link) => {
               const isLocked = link.requiresAuth && !isLoggedIn;
-              const isConstruction = link.isUnderConstruction;
+              const isConstruction = link.isUnderConstruction && !isAdmin;
 
               if (isConstruction) {
                 return (

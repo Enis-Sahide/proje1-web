@@ -59,6 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         .eq('id', currentUser.id)
         .single();
       
+      let dbRole = 'free';
       if (error || !data) {
         // Profil veritabanında yoksa otomatik oluştur (Self-healing)
         await supabase
@@ -68,10 +69,43 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             role: 'free',
             full_name: currentUser.user_metadata?.full_name || currentUser.email?.split('@')[0] || 'Yeni Üye'
           });
-        return 'free';
+        dbRole = 'free';
+      } else {
+        dbRole = data.role || 'free';
+      }
+
+      // Determine role from unlockedTiers metadata (synced from mobile app)
+      const metadataTiers = currentUser.user_metadata?.unlockedTiers || [];
+      let metadataRole = 'free';
+      if (metadataTiers.length > 0) {
+        const hasMaster = metadataTiers.some((t: string) => t.includes('master') || t.endsWith('_3') || t.includes('Final'));
+        const hasJourneyman = metadataTiers.some((t: string) => t.includes('_2') || t.endsWith('_2'));
+        
+        if (hasMaster) {
+          metadataRole = 'master';
+        } else if (hasJourneyman) {
+          metadataRole = 'journeyman';
+        } else {
+          metadataRole = 'apprentice';
+        }
+      }
+
+      const roleLevels: Record<string, number> = {
+        free: 0,
+        apprentice: 1,
+        journeyman: 2,
+        master: 3
+      };
+
+      if (roleLevels[metadataRole] > roleLevels[dbRole]) {
+        dbRole = metadataRole;
+        await supabase
+          .from('profiles')
+          .update({ role: dbRole })
+          .eq('id', currentUser.id);
       }
       
-      return data.role || 'free';
+      return dbRole;
     } catch (e) {
       console.error("Error getting user role:", e);
       return 'free';

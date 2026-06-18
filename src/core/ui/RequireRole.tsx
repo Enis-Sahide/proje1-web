@@ -28,7 +28,7 @@ export default function RequireRole({ children, minimumRole, fallback }: Require
   const currentLevel = user ? (roleLevels[role] ?? 0) : -1;
   const requiredLevel = roleLevels[minimumRole] ?? 0;
 
-  if (currentLevel >= requiredLevel) {
+  if (currentLevel >= requiredLevel || role === 'admin') {
     return <>{children}</>;
   }
 
