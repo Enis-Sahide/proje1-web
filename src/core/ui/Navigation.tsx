@@ -30,7 +30,8 @@ export default function Navigation() {
     { name: 'Nefes', href: '/breathwork' },
     { name: 'Analiz', href: '/analysis' },
     { name: 'Keşfet', href: '/explore', isUnderConstruction: true },
-    { name: 'Dersler', href: '/kadim-dersler', requiresAuth: true, isUnderConstruction: true },
+    { name: 'Dersler', href: '/kadim-dersler', requiresAuth: true },
+    { name: 'Sınavlar', href: '/tests', requiresAuth: true },
     { name: 'VIP Seviyeler', href: '/membership', isUnderConstruction: true },
   ];
 

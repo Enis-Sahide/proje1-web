@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { usePathname, useRouter } from 'next/navigation';
 
-const GUEST_PROTECTED_ROUTES = ['/profile', '/kadim-dersler'];
+const GUEST_PROTECTED_ROUTES = ['/profile', '/kadim-dersler', '/tests'];
 
 export default function RouteGuard({ children }: { children: React.ReactNode }) {
   const { user, role, isLoading } = useAuth();

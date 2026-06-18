@@ -10,6 +10,9 @@ interface AuthContextType {
   session: Session | null;
   isLoading: boolean;
   role: string;
+  unlockedTiers: string[];
+  unlockTier: (tierId: string) => Promise<void>;
+  hasAccess: (tierId: string) => boolean;
   logout: () => Promise<void>;
 }
 
@@ -18,6 +21,9 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   isLoading: true,
   role: 'free',
+  unlockedTiers: [],
+  unlockTier: async () => {},
+  hasAccess: () => false,
   logout: async () => {},
 });
 
@@ -26,6 +32,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [role, setRole] = useState('free');
+  const [unlockedTiers, setUnlockedTiers] = useState<string[]>([]);
   const router = useRouter();
 
   const getUserRole = async (currentUser: User | null): Promise<string> => {
@@ -127,8 +134,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (session?.user) {
             const userRole = await getUserRole(session.user);
             setRole(userRole);
+            setUnlockedTiers(session.user.user_metadata?.unlockedTiers || []);
           } else {
             setRole('free');
+            setUnlockedTiers([]);
           }
           
           setIsLoading(false);
@@ -149,8 +158,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (session?.user) {
           const userRole = await getUserRole(session.user);
           setRole(userRole);
+          setUnlockedTiers(session.user.user_metadata?.unlockedTiers || []);
         } else {
           setRole('free');
+          setUnlockedTiers([]);
         }
         
         setIsLoading(false);
@@ -162,6 +173,68 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       subscription.unsubscribe();
     };
   }, []);
+
+  const unlockTier = async (tierId: string) => {
+    if (!user) return;
+    try {
+      const currentTiers = user.user_metadata?.unlockedTiers || [];
+      if (!currentTiers.includes(tierId)) {
+        const newTiers = [...currentTiers, tierId];
+        setUnlockedTiers(newTiers);
+        
+        // 1. Sync to Supabase Auth user_metadata
+        const { data, error } = await supabase.auth.updateUser({
+          data: { unlockedTiers: newTiers }
+        });
+        
+        if (error) throw error;
+
+        // Immediately update local user state if successful
+        if (data?.user) {
+          setUser(data.user);
+        }
+
+        // 2. Determine overall role level and sync to public.profiles table
+        const hasMaster = newTiers.some((t: string) => t.includes('master') || t.endsWith('_3') || t.includes('Final'));
+        const hasJourneyman = newTiers.some((t: string) => t.includes('_2') || t.endsWith('_2'));
+        
+        let newRole = 'free';
+        if (hasMaster) {
+          newRole = 'master';
+        } else if (hasJourneyman) {
+          newRole = 'journeyman';
+        } else if (newTiers.length > 0) {
+          newRole = 'apprentice';
+        }
+
+        const roleLevels: Record<string, number> = {
+          free: 0,
+          apprentice: 1,
+          journeyman: 2,
+          master: 3,
+          admin: 999
+        };
+
+        const currentRole = role || 'free';
+        if (roleLevels[newRole] > roleLevels[currentRole]) {
+          setRole(newRole);
+          await supabase
+            .from('profiles')
+            .update({ role: newRole })
+            .eq('id', user.id);
+        }
+      }
+    } catch (error) {
+      console.error('Progress update failed:', error);
+    }
+  };
+
+  const hasAccess = (tierId: string) => {
+    if (role === 'admin') return true;
+    if (!tierId) return true;
+    if (tierId.endsWith('_1')) return true;
+    return unlockedTiers.includes(tierId);
+  };
 
   const logout = async () => {
     try {
@@ -189,7 +262,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, isLoading, role, logout }}>
+    <AuthContext.Provider value={{ user, session, isLoading, role, unlockedTiers, unlockTier, hasAccess, logout }}>
       {children}
     </AuthContext.Provider>
   );
