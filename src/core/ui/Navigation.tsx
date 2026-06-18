@@ -49,17 +49,17 @@ export default function Navigation() {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         {/* Logo */}
-        <Link href={isAdmin ? "/admin/dashboard" : "/"} className="flex items-center gap-3 group">
+        <Link href={isAdmin ? "/admin/dashboard" : "/"} className="flex items-center gap-3 group shrink-0 mr-6 md:mr-8 lg:mr-12">
           <div className="relative rounded-full p-[2px] bg-gradient-to-tr from-mystic-primary via-mystic-accent to-mystic-primary shadow-[0_0_8px_rgba(212,175,55,0.9),0_0_16px_rgba(212,175,55,0.5),0_0_32px_rgba(212,175,55,0.15)] group-hover:shadow-[0_0_12px_rgba(212,175,55,1),0_0_24px_rgba(212,175,55,0.7),0_0_40px_rgba(212,175,55,0.3)] transition-all duration-500">
             <Image src="/logo.png" alt="7Layers Logo" width={32} height={32} className="rounded-full bg-mystic-dark block" />
           </div>
-          <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-mystic-primary to-mystic-accent">
+          <span className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-mystic-primary to-mystic-accent whitespace-nowrap">
             7Layers
           </span>
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-8">
+        <nav className="hidden md:flex items-center gap-4 lg:gap-6 xl:gap-8">
           {navLinks.map((link) => {
             const isLocked = link.requiresAuth && !isLoggedIn;
             const isConstruction = link.isUnderConstruction;
@@ -68,7 +68,7 @@ export default function Navigation() {
               return (
                 <div 
                   key={link.name} 
-                  className={`text-sm uppercase tracking-wider font-medium text-mystic-text-muted/40 flex items-center gap-1.5 cursor-not-allowed`}
+                  className={`text-sm uppercase tracking-wider font-medium text-mystic-text-muted/40 flex items-center gap-1.5 cursor-not-allowed whitespace-nowrap`}
                   title="Yapım Aşamasında"
                 >
                   {link.name}
@@ -81,7 +81,7 @@ export default function Navigation() {
               <Link 
                 key={link.name} 
                 href="/auth/login"
-                className={`text-sm uppercase tracking-wider font-medium transition-colors hover:text-mystic-accent text-mystic-text-muted/50 flex items-center gap-1.5`}
+                className={`text-sm uppercase tracking-wider font-medium transition-colors hover:text-mystic-accent text-mystic-text-muted/50 flex items-center gap-1.5 whitespace-nowrap`}
                 title="Üyelik Gerektirir"
               >
                 {link.name}
@@ -91,7 +91,7 @@ export default function Navigation() {
               <Link 
                 key={link.name} 
                 href={link.href}
-                className={`text-sm uppercase tracking-wider font-medium transition-colors hover:text-mystic-accent ${
+                className={`text-sm uppercase tracking-wider font-medium transition-colors hover:text-mystic-accent whitespace-nowrap ${
                   pathname === link.href ? 'text-mystic-accent border-b border-mystic-accent pb-1' : 'text-mystic-text-muted'
                 }`}
               >
