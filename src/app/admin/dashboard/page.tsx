@@ -93,6 +93,14 @@ export default function AdminDashboard() {
   }, []);
 
   const handleToggleStatus = (id: string) => {
+    const vendor = vendors.find(v => v.id === id);
+    if (!vendor) return;
+
+    if (vendor.status === 'approved') {
+      const confirmClose = window.confirm(`"${vendor.name}" isimli mağazayı kapatmak istediğinize emin misiniz?`);
+      if (!confirmClose) return;
+    }
+
     setVendors(vendors.map(v => {
       if (v.id === id) {
         return { ...v, status: v.status === 'approved' ? 'banned' : 'approved' };
