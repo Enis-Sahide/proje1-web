@@ -59,7 +59,7 @@ export default function Navigation() {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-4 lg:gap-6 xl:gap-8">
+        <nav className="hidden md:flex items-center gap-2 lg:gap-4 xl:gap-6">
           {navLinks.map((link) => {
             const isLocked = link.requiresAuth && !isLoggedIn;
             const isConstruction = link.isUnderConstruction && !isAdmin;
@@ -107,11 +107,11 @@ export default function Navigation() {
               <div className="flex items-center gap-4">
                 <Link 
                   href="/profile"
-                  className="text-mystic-text-muted hover:text-mystic-accent text-sm hidden lg:flex items-center gap-1.5 transition-colors cursor-pointer group"
-                  title="Profil Ayarları"
+                  className="text-mystic-text-muted hover:text-mystic-accent text-sm flex items-center gap-1.5 transition-colors cursor-pointer group"
+                  title={user.user_metadata?.full_name || user.email}
                 >
-                  <User size={14} className="opacity-70 group-hover:text-mystic-accent" />
-                  <span>{user.user_metadata?.full_name || user.email}</span>
+                  <User size={14} className="opacity-70 group-hover:text-mystic-accent shrink-0" />
+                  <span className="hidden xl:inline truncate max-w-[120px]">{user.user_metadata?.full_name || user.email}</span>
                 </Link>
                 <button 
                   onClick={() => logout()}
