@@ -169,9 +169,9 @@ export default function AdminDashboard() {
   });
 
   return (
-    <div className="min-h-screen bg-mystic-dark pb-24" style={{ transform: 'translate3d(0,0,0)' }}>
+    <div className="min-h-screen bg-mystic-dark pb-24">
       {/* Header */}
-      <header className="bg-black/50 border-b border-mystic-primary/20 p-6 pt-28 relative md:sticky md:top-0 z-40">
+      <header className="bg-black/50 border-b border-mystic-primary/20 p-6 pt-28 relative md:sticky md:top-0 z-40" style={{ transform: 'translate3d(0,0,0)' }}>
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button onClick={() => router.push('/')} className="p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors">
@@ -340,7 +340,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Filter controls */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6" style={{ transform: 'translate3d(0,0,0)' }}>
               {/* Search input */}
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-mystic-text-muted">
