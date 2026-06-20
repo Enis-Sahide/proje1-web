@@ -11,7 +11,7 @@ async function getSwe(): Promise<SwissEph> {
   if (sweInstance) return sweInstance;
   
   // Wasm modülünü yükle
-  const wasmPath = path.join(process.cwd(), 'node_modules', '@fusionstrings', 'swisseph-wasi', 'wasm', 'libswephe.wasm');
+  const wasmPath = path.join(process.cwd(), 'public', 'wasm', 'libswephe.wasm');
   const wasmBuffer = fs.readFileSync(wasmPath);
   const module = new WebAssembly.Module(wasmBuffer);
   sweInstance = new SwissEph(module);
