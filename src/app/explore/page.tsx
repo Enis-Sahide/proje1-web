@@ -2,12 +2,14 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ShoppingBag, Star, TrendingUp, Search, ChevronRight } from 'lucide-react';
+import { ShoppingBag, Star, TrendingUp, Search, ChevronRight, HeartPulse, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { CATEGORIES, VENDORS, PRODUCTS } from '@/data/marketplaceData';
 
 export default function ExplorePage() {
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isImeceModalOpen, setIsImeceModalOpen] = useState(false);
 
   const featuredVendors = VENDORS.filter(v => v.isFeatured);
   
@@ -62,6 +64,33 @@ export default function ExplorePage() {
                 {cat.name}
               </button>
             ))}
+          </div>
+        </section>
+
+        {/* Highlighted Banner for Imece */}
+        <section className="bg-gradient-to-r from-emerald-950/40 via-teal-950/20 to-black/40 border border-emerald-500/20 hover:border-emerald-500/40 rounded-3xl p-6 md:p-8 transition-all duration-300 relative overflow-hidden group shadow-[0_0_30px_rgba(16,185,129,0.05)]">
+          {/* Decorative glows */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-10 -left-10 w-48 h-48 bg-teal-500/5 rounded-full blur-3xl pointer-events-none" />
+          
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 relative z-10">
+            <div className="flex items-center gap-4">
+              <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center shrink-0 shadow-[0_0_15px_rgba(16,185,129,0.15)]">
+                <HeartPulse size={32} className="text-emerald-400" />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white tracking-wide">İmece ile Sağlığı Destekle</h2>
+                <p className="text-sm text-mystic-text-muted mt-1 max-w-xl">
+                  Beden ve zihin dengenizi doğal, temiz ve güvenilir ürünlerle desteklemeye hazır mısınız? İmece sisteminin özel seçkisini inceleyin.
+                </p>
+              </div>
+            </div>
+            <button 
+              onClick={() => setIsImeceModalOpen(true)}
+              className="px-6 py-3.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-bold transition-all duration-300 transform hover:scale-[1.02] shadow-[0_0_15px_rgba(16,185,129,0.2)] hover:shadow-[0_0_25px_rgba(16,185,129,0.4)] whitespace-nowrap cursor-pointer"
+            >
+              Tercihli Müşteri Ol & Alışverişe Başla
+            </button>
           </div>
         </section>
 
@@ -140,6 +169,118 @@ export default function ExplorePage() {
         </section>
 
       </main>
+
+      <AnimatePresence>
+        {isImeceModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsImeceModalOpen(false)}
+              className="absolute inset-0 bg-black/70 backdrop-blur-md"
+            />
+            
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+              className="relative w-full max-w-lg bg-mystic-dark/95 border border-mystic-surface-light rounded-3xl p-6 md:p-8 shadow-[0_0_50px_rgba(16,185,129,0.15)] overflow-hidden z-10"
+            >
+              {/* Decorative glows */}
+              <div className="absolute -top-24 -left-24 w-48 h-48 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+              <div className="absolute -bottom-24 -right-24 w-48 h-48 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+
+              {/* Close Button */}
+              <button 
+                onClick={() => setIsImeceModalOpen(false)}
+                className="absolute top-4 right-4 text-mystic-text-muted hover:text-white hover:bg-white/5 p-2 rounded-full transition-colors z-20"
+                aria-label="Kapat"
+              >
+                <X size={20} />
+              </button>
+
+              {/* Header Icon */}
+              <div className="flex flex-col items-center text-center mt-2 mb-6">
+                <div className="w-16 h-16 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mb-4 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                  <HeartPulse size={32} className="text-emerald-400" />
+                </div>
+                <h3 className="text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-mystic-text to-emerald-400">
+                  İmece ile Sağlığını Destekle
+                </h3>
+              </div>
+
+              {/* Body */}
+              <div className="space-y-5 text-mystic-text-muted text-sm md:text-base leading-relaxed">
+                <p className="text-center font-medium text-mystic-text">
+                  Beden ve zihin dengenizi doğal, temiz ve güvenilir ürünlerle desteklemeye hazır mısınız?
+                </p>
+                
+                <div className="bg-white/5 rounded-2xl p-4 border border-white/5 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <span className="text-emerald-400 mt-0.5">🌿</span>
+                    <div>
+                      <h4 className="font-bold text-mystic-text text-sm">Doğal & Güvenilir İçerikler</h4>
+                      <p className="text-xs text-mystic-text-muted mt-0.5">Katkısız, temiz ve doğanın gücünü yansıtan formüller.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-emerald-400 mt-0.5">🤝</span>
+                    <div>
+                      <h4 className="font-bold text-mystic-text text-sm">İmece Paylaşım Ruhu</h4>
+                      <p className="text-xs text-mystic-text-muted mt-0.5">Sağlığınızı desteklerken toplumsal yardımlaşmaya katkı sağlayın.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <span className="text-emerald-400 mt-0.5">🎯</span>
+                    <div>
+                      <h4 className="font-bold text-mystic-text text-sm">Bütünsel Şifa Yaklaşımı</h4>
+                      <p className="text-xs text-mystic-text-muted mt-0.5">Yaşam kalitenizi artırmaya yönelik özel ürün seçkisi.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <p className="text-xs text-center text-mystic-text-muted/60 px-4 mt-2">
+                  Aşağıdaki buton sizi güvenli bir şekilde İmece Sistem tercihli müşteri sayfasına yönlendirir.
+                </p>
+              </div>
+
+              {/* Action Button */}
+              <div className="mt-6 flex flex-col gap-3">
+                <a 
+                  href="https://imecesistem.com.tr/davet/TM/BT90000000114"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setIsImeceModalOpen(false)}
+                  className="w-full py-4 px-6 rounded-2xl font-bold text-center text-white bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:shadow-[0_0_30px_rgba(16,185,129,0.5)] transition-all duration-300 transform hover:scale-[1.02] flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <HeartPulse size={18} className="animate-pulse" />
+                  <span>Tercihli Müşteri Ol & Alışverişe Başla</span>
+                </a>
+
+                <Link 
+                  href="/explore/imece-health"
+                  onClick={() => setIsImeceModalOpen(false)}
+                  className="w-full py-3.5 px-6 rounded-2xl font-bold text-center text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 hover:border-emerald-500/40 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>Sağlık Teknolojisini & Ürünleri İncele</span>
+                </Link>
+                
+                <button 
+                  onClick={() => setIsImeceModalOpen(false)}
+                  className="w-full py-3 text-sm font-semibold text-mystic-text-muted hover:text-white transition-colors"
+                >
+                  Daha Sonra
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
     </div>
   );
 }

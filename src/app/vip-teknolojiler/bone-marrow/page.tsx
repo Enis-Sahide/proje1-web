@@ -11,7 +11,7 @@ export default function Page() {
       
       <div className="max-w-2xl mx-auto relative animate-in fade-in slide-in-from-bottom-8 duration-700">
         <button onClick={() => router.back()} className="mb-12 flex items-center text-white/50 hover:text-white transition-colors mx-auto">
-          <ArrowLeft size={20} className="mr-2" /> VIP Merkeze Dön
+          <ArrowLeft size={20} className="mr-2" /> Kadim Uygulamalara Dön
         </button>
         
         <Construction size={64} className="text-red-500 mx-auto mb-6 animate-pulse" />

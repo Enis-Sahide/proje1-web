@@ -125,7 +125,7 @@ export default function MicrocosmicOrbitPage() {
       <div className="max-w-4xl mx-auto relative">
         <div className="flex justify-between items-center mb-12">
           <button onClick={() => router.back()} className="flex items-center text-white/50 hover:text-blue-400 transition-colors">
-            <ArrowLeft size={20} className="mr-2" /> VIP Merkeze Dön
+            <ArrowLeft size={20} className="mr-2" /> Kadim Uygulamalara Dön
           </button>
           
           <button onClick={() => setSoundEnabled(!soundEnabled)} className="text-white/50 hover:text-white p-3 bg-white/5 rounded-full backdrop-blur-md">

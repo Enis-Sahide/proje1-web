@@ -38,6 +38,7 @@ export default function Navigation() {
   const navLinks = isAdmin 
     ? [
         { name: 'Admin Paneli', href: '/admin/dashboard' },
+        { name: 'Kadim Uygulamalar', href: '/vip-teknolojiler' },
         ...baseLinks
       ]
     : baseLinks;
