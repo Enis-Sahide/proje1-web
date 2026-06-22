@@ -3,16 +3,25 @@
 import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Star, ShoppingBag, Award, MapPin } from 'lucide-react';
-import { VENDORS, PRODUCTS } from '@/data/marketplaceData';
+import { ArrowLeft, Star, ShoppingBag, Award, MapPin, Loader2 } from 'lucide-react';
+import { useMarketplace } from '@/lib/useContent';
 
 export default function StoreProfilePage() {
   const params = useParams();
   const router = useRouter();
   const storeId = params.storeId as string;
 
+  const { vendors: VENDORS, products: PRODUCTS, loading } = useMarketplace();
   const vendor = VENDORS.find(v => v.id === storeId);
   const vendorProducts = PRODUCTS.filter(p => p.vendorId === storeId);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-mystic-dark">
+        <Loader2 className="animate-spin text-mystic-primary" size={36} />
+      </div>
+    );
+  }
 
   if (!vendor) {
     return (

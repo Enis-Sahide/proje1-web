@@ -4,7 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Lock, Loader2, Sparkles, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { apiFetch } from '@/lib/apiClient';
 
 function LoginContent() {
   const router = useRouter();
@@ -27,29 +27,14 @@ function LoginContent() {
     setError(null);
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
+      await apiFetch('/api/auth/login', {
+        method: 'POST',
+        body: JSON.stringify({ email, password }),
       });
-
-      if (error) {
-        setError(error.message || "Giriş başarısız. Bilgilerinizi kontrol edin.");
-        setLoading(false);
-        return;
-      }
-
-      if (data?.session) {
-        const redirectTo = searchParams.get('redirect') || '/';
-        window.location.href = redirectTo;
-      } else if (data?.user) {
-        setError("Lütfen e-posta adresinize gelen onay linkine tıklayın.");
-        setLoading(false);
-      } else {
-        setError("Beklenmeyen bir durum oluştu, lütfen tekrar deneyin.");
-        setLoading(false);
-      }
+      const redirectTo = searchParams.get('redirect') || '/';
+      window.location.href = redirectTo;
     } catch (err: any) {
-      setError(err?.message || "Beklenmeyen bir hata oluştu.");
+      setError(err?.message || "Giriş başarısız. Bilgilerinizi kontrol edin.");
       setLoading(false);
     }
   };

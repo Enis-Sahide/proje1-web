@@ -2,14 +2,24 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { Package, TrendingUp, DollarSign, PlusCircle, Bell, ArrowLeft } from 'lucide-react';
-import { VENDORS, PRODUCTS } from '@/data/marketplaceData';
+import { Package, TrendingUp, DollarSign, PlusCircle, Bell, ArrowLeft, Loader2 } from 'lucide-react';
+import { useMarketplace } from '@/lib/useContent';
 
 export default function VendorDashboard() {
   const router = useRouter();
-  
+
+  const { vendors: VENDORS, products: PRODUCTS, loading } = useMarketplace();
   // Mock login as the first vendor
-  const vendor = VENDORS[0]; 
+  const vendor = VENDORS[0];
+
+  if (loading || !vendor) {
+    return (
+      <div className="min-h-screen bg-mystic-dark flex items-center justify-center">
+        <Loader2 className="animate-spin text-mystic-primary" size={36} />
+      </div>
+    );
+  }
+
   const vendorProducts = PRODUCTS.filter(p => p.vendorId === vendor.id);
 
   const mockSales = 24;

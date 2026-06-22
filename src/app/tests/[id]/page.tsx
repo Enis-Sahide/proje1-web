@@ -15,9 +15,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/lib/supabase';
-import { allQuizzes } from '@/data/allQuizzes';
-import { FINAL_QUIZ_QUESTIONS } from '@/data/finalQuiz';
+import { apiFetch } from '@/lib/apiClient';
 
 // Fisher-Yates shuffle algorithm
 const shuffleArray = (array: any[]) => {
@@ -65,86 +63,54 @@ export default function ExamTakingPage() {
         return;
       }
 
+      // 1-3. Tek-cihaz + günlük limit kontrolü + aktif oturum kaydı (sunucu tarafı)
       try {
-        const metadata = user.user_metadata || {};
-        const activeExam = metadata.activeExam;
-        const examAttempts = metadata.examAttempts || {};
-
-        // 1. Check if another device (mobile) has an active session
-        if (activeExam && activeExam.examId) {
-          const startTime = new Date(activeExam.startTime).getTime();
-          const now = new Date().getTime();
-          const diffInMinutes = (now - startTime) / (1000 * 60);
-
-          // If session is on another device (not web) and started less than 60 minutes ago
-          if (activeExam.device !== 'web' && diffInMinutes < 60) {
-            setBlockedReason(
-              "Bu sınava şu anda mobil cihazınızdan giriş yapılmış durumda! Güvenlik nedeniyle aynı anda hem webden hem de telefondan sınava girilemez."
-            );
-            setIsLoadingCheck(false);
-            return;
-          }
-        }
-
-        // 2. Check if already taken today
-        const today = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-        if (examAttempts[id as string] === today) {
-          setBlockedReason(
-            "Bu sınava bugün zaten girdiniz! Bir sınava aynı gün içerisinde en fazla 1 kez girebilirsiniz. Lütfen yarın tekrar deneyin."
-          );
-          setIsLoadingCheck(false);
-          return;
-        }
-
-        // 3. Register active session & record attempt
-        const updatedAttempts = { ...examAttempts, [id as string]: today };
-        const { error } = await supabase.auth.updateUser({
-          data: {
-            ...metadata,
-            activeExam: { examId: id, startTime: new Date().toISOString(), device: 'web' },
-            examAttempts: updatedAttempts
-          }
+        await apiFetch('/api/progress/exam/start', {
+          method: 'POST',
+          body: JSON.stringify({ quizId: id, device: 'web' }),
         });
+      } catch (err: any) {
+        setBlockedReason(err?.message || "Sınav doğrulaması sırasında bir hata oluştu.");
+        setIsLoadingCheck(false);
+        return;
+      }
 
-        if (error) throw error;
-
-        // Initialize quiz questions
+      // İçeriği API'den yükle
+      try {
         if (id === 'aura') {
+          const finalQs = await apiFetch<any[]>('/api/content/final-quiz');
           setQuizTitle("Aura & Çakra Sınavı");
-          // Shuffle questions and options for Aura final exam
-          const shuffled = shuffleArray(FINAL_QUIZ_QUESTIONS).map((q) => {
-            const shuffledOptions = shuffleArray(q.options);
-            return {
-              id: String(q.id),
-              question: q.question,
-              options: shuffledOptions,
-              correctText: q.correctAnswer,
-              explanation: "Aura ve Çakra enerji katmanları, dirimsel gücünüzün (prana) bedeninizle kurduğu köprülerdir."
-            };
-          });
+          const shuffled = shuffleArray(finalQs).map((q) => ({
+            id: String(q.id),
+            question: q.question,
+            options: shuffleArray(q.options),
+            correctText: q.correctAnswer,
+            explanation:
+              "Aura ve Çakra enerji katmanları, dirimsel gücünüzün (prana) bedeninizle kurduğu köprülerdir.",
+          }));
           setQuestions(shuffled);
         } else {
-          const quizData = allQuizzes[id as string];
+          const quizData = await apiFetch<any>(`/api/content/quizzes/${id}`).catch(() => null);
           if (!quizData) {
             setBlockedReason("Sınav bulunamadı veya geçerli değil.");
             setIsLoadingCheck(false);
             return;
           }
           setQuizTitle(quizData.title);
-          const mapped = quizData.questions.map((q) => ({
-            id: q.id,
-            question: q.question,
-            options: q.options,
-            correctText: q.options[q.correctAnswerIndex],
-            explanation: q.explanation
-          }));
-          setQuestions(mapped);
+          setQuestions(
+            quizData.questions.map((q: any) => ({
+              id: q.id,
+              question: q.question,
+              options: q.options,
+              correctText: q.options[q.correctAnswerIndex],
+              explanation: q.explanation,
+            })),
+          );
         }
-
         setIsLoadingCheck(false);
       } catch (err) {
-        console.error("Exam access verification error:", err);
-        setBlockedReason("Sınav doğrulaması sırasında bir hata oluştu.");
+        console.error("Exam content load error:", err);
+        setBlockedReason("Sınav içeriği yüklenemedi.");
         setIsLoadingCheck(false);
       }
     }
@@ -162,16 +128,11 @@ export default function ExamTakingPage() {
 
   const clearActiveSession = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const metadata = session.user.user_metadata || {};
-        await supabase.auth.updateUser({
-          data: {
-            ...metadata,
-            activeExam: null
-          }
-        });
-      }
+      // score yok → sadece aktif sınav oturumunu temizler (unlock yapmaz)
+      await apiFetch('/api/progress/exam/finish', {
+        method: 'POST',
+        body: JSON.stringify({ quizId: id }),
+      });
     } catch (e) {
       console.error("Failed to clear active exam session:", e);
     }
@@ -184,52 +145,18 @@ export default function ExamTakingPage() {
       const score = (correctCount / totalQuestions) * 100;
 
       const triggerUnlock = async () => {
-        // Unlock Logic based on exam ID and score
-        if (score === 100) {
-          if (id === 'numeroloji_1') await unlockTier('numeroloji_2');
-          if (id === 'numeroloji_2') await unlockTier('numeroloji_3');
-          if (id === 'numeroloji_3') await unlockTier('numeroloji_master');
-          
-          if (id === 'rune1') await unlockTier('rune_2');
-          if (id === 'rune2') await unlockTier('rune_master');
-          
-          if (id === 'yoga_1') await unlockTier('yoga_2');
-          if (id === 'yoga_2') await unlockTier('yoga_master');
-          
-          if (id === 'human_1') await unlockTier('human_2');
-          if (id === 'human_2') await unlockTier('human_master');
-
-          if (id === 'astroloji_1') await unlockTier('astroloji_2');
-          if (id === 'astroloji_2') await unlockTier('astroloji_master');
-
-          if (id === 'akupunktur_1') await unlockTier('akupunktur_2');
-          if (id === 'akupunktur_2') await unlockTier('akupunktur_master');
-        }
-
-        if (score >= 85) {
-          if (id === 'duygusal_hastaliklar_50') {
-            await unlockTier('duygusal_hastaliklar_access');
-          }
-          if (id === 'aura') {
+        try {
+          // Standart derece kilitleri sunucuda (quizzes.unlock_tier + pass_threshold) açılır.
+          await apiFetch('/api/progress/exam/finish', {
+            method: 'POST',
+            body: JSON.stringify({ quizId: id, score }),
+          });
+          // 'aura' DB'de quiz değil (final-quiz içeriği) → kadim dersler erişimini ayrıca aç.
+          if (id === 'aura' && score >= 85) {
             await unlockTier('kadim_dersler_access');
-            
-            // Save spiritual title & score for Aura final exam
-            let title = "Uyanış Yolcusu";
-            if (score >= 90) title = "Üstat";
-            else if (score >= 70) title = "Işık İşçisi";
-
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session?.user) {
-              const currentMetadata = session.user.user_metadata || {};
-              await supabase.auth.updateUser({
-                data: {
-                  ...currentMetadata,
-                  spiritual_title: title,
-                  spiritual_score: Math.round(score)
-                }
-              });
-            }
           }
+        } catch (e) {
+          console.error('Unlock error:', e);
         }
       };
 

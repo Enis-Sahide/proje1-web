@@ -2,33 +2,30 @@
 
 import React from 'react';
 import ExploreSection from '@/features/astrology/components/ExploreSection';
-import { DAILY_AFFIRMATIONS } from '@/data/affirmations';
+import { useContent } from '@/lib/useContent';
 import PlanetaryHourWidget from '@/features/astrology/components/PlanetaryHourWidget';
 import { ChevronDown, Quote } from 'lucide-react';
 import MoonCyclesWidget from '@/features/astrology/components/MoonCyclesWidget';
 import Link from 'next/link';
 
-export const CHAKRA_MODULES = [
-  { id: 1, title: 'Kök Çakra', subtitle: 'Temel Bilgiler', color: '#FF3B30', top: '82%' },
-  { id: 2, title: 'Sakral Çakra', subtitle: 'Bağlar ve Yaratım', color: '#FF9500', top: '72%' },
-  { id: 3, title: 'Solar Pleksus', subtitle: 'İrade ve Güç', color: '#FFCC00', top: '62%' },
-  { id: 4, title: 'Kalp Çakrası', subtitle: 'Sevgi ve Denge', color: '#34C759', top: '52%' },
-  { id: 5, title: 'Boğaz Çakrası', subtitle: 'İfade ve Gerçek', color: '#00C7BE', top: '37%' },
-  { id: 6, title: 'Üçüncü Göz', subtitle: 'Sezgi ve İdrak', color: '#003399', top: '25%' },
-  { id: 7, title: 'Tepe Çakra', subtitle: 'Kozmik Bağlantı', color: '#AF52DE', top: '15%' },
-];
+// CHAKRA_MODULES içeriği DB'den gelir (/api/content/chakras → modules)
 
 const DAY_NAMES = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
 
 export default function Home() {
   const [affirmation, setAffirmation] = React.useState<any>(null);
   const [dayName, setDayName] = React.useState<string>('');
+  const { data: affirmations } = useContent<Record<number, { text: string; author: string }>>(
+    '/api/content/affirmations',
+  );
+  const { data: chakraData } = useContent<{ modules: any[] }>('/api/content/chakras');
+  const CHAKRA_MODULES = chakraData?.modules ?? [];
 
   React.useEffect(() => {
     const day = new Date().getDay();
-    setAffirmation(DAILY_AFFIRMATIONS[day]);
     setDayName(DAY_NAMES[day]);
-  }, []);
+    if (affirmations) setAffirmation(affirmations[day]);
+  }, [affirmations]);
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">

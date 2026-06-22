@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, CheckCircle2, Loader2, Zap, Search, X } from 'lucide-react';
 import moment from 'moment-timezone';
 import { generateChart, HumanDesignChart, CenterCode, PLANET_SYMBOLS, CHANNELS } from '@/utils/HumanDesignEngine';
-import gatesData from '@/data/gates.json';
+import { useContent } from '@/lib/useContent';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 
@@ -79,8 +79,10 @@ export default function HumanDesignPage() {
   
   const [city, setCity] = useState<AstroCity | null>(null);
   const [activeGateId, setActiveGateId] = useState<number | null>(null);
-  
-  const activeGateData = activeGateId ? gatesData.find((g: any) => g.id === activeGateId) : null;
+
+  const { data: gatesData } = useContent<any[]>('/api/content/hd-gates');
+  const activeGateData =
+    activeGateId && gatesData ? gatesData.find((g: any) => g.id === activeGateId) : null;
   
   const [chart, setChart] = useState<HumanDesignChart | null>(null);
 

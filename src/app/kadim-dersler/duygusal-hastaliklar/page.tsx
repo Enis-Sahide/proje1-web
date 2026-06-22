@@ -3,8 +3,14 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Search, ChevronDown, ChevronUp, BookOpen, Lock } from 'lucide-react';
-import { EMOTIONAL_DISEASES, EmotionalDisease } from '@/data/emotionalDiseases';
+import { useContent } from '@/lib/useContent';
 import { useAuth } from '@/context/AuthContext';
+
+interface EmotionalDisease {
+  name: string;
+  cause: string;
+  affirmation: string;
+}
 
 export default function DuygusalHastaliklarPage() {
   const router = useRouter();
@@ -13,19 +19,21 @@ export default function DuygusalHastaliklarPage() {
 
   const { user } = useAuth();
   const isLoggedIn = !!user;
+  const { data: diseases } = useContent<EmotionalDisease[]>('/api/content/emotional-diseases');
+  const allDiseases = diseases ?? [];
 
   let filteredDiseases: EmotionalDisease[] = [];
-  
+
   if (isLoggedIn) {
-    filteredDiseases = EMOTIONAL_DISEASES.filter(d => 
-      d.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+    filteredDiseases = allDiseases.filter(d =>
+      d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       d.cause.toLowerCase().includes(searchQuery.toLowerCase())
     );
   } else {
     // Non-members only see results if they search with >= 2 characters
     if (searchQuery.length >= 2) {
-      filteredDiseases = EMOTIONAL_DISEASES.filter(d => 
-        d.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      filteredDiseases = allDiseases.filter(d =>
+        d.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         d.cause.toLowerCase().includes(searchQuery.toLowerCase())
       );
     }

@@ -3,37 +3,38 @@
 import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { Mail, Loader2, Sparkles, AlertCircle, CheckCircle2, ArrowLeft } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { apiFetch } from '@/lib/apiClient';
 
 function ForgotPasswordContent() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [resetLink, setResetLink] = useState<string | null>(null);
 
   const handleResetRequest = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setSuccess(null);
+    setResetLink(null);
 
     try {
-      const redirectTo = typeof window !== 'undefined' 
-        ? `${window.location.origin}/auth/reset-password`
-        : '';
-
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo,
-      });
-
-      if (error) {
-        setError(error.message || "Sıfırlama isteği gönderilemedi.");
-      } else {
-        setSuccess("Şifre sıfırlama e-postası başarıyla gönderildi. Lütfen gelen kutunuzu (ve spam klasörünü) kontrol edin.");
-        setEmail('');
+      const res = await apiFetch<{ message?: string; resetToken?: string }>(
+        '/api/auth/forgot-password',
+        { method: 'POST', body: JSON.stringify({ email }) },
+      );
+      setSuccess(
+        res.message ||
+          'Eğer bu e-posta kayıtlıysa, şifre sıfırlama talimatı gönderildi.',
+      );
+      // E-posta gönderimi henüz bağlı değil: geliştirmede doğrudan bağlantı göster.
+      if (res.resetToken) {
+        setResetLink(`/auth/reset-password?token=${encodeURIComponent(res.resetToken)}`);
       }
+      setEmail('');
     } catch (err: any) {
-      setError(err?.message || "Beklenmeyen bir hata oluştu.");
+      setError(err?.message || 'Sıfırlama isteği gönderilemedi.');
     } finally {
       setLoading(false);
     }
@@ -56,6 +57,17 @@ function ForgotPasswordContent() {
           <div className="mb-6 bg-green-500/10 border border-green-500/50 rounded-xl p-4 flex items-start gap-3">
             <CheckCircle2 className="text-green-500 shrink-0 mt-0.5" size={20} />
             <p className="text-sm text-green-200 font-medium leading-relaxed">{success}</p>
+          </div>
+        )}
+
+        {resetLink && (
+          <div className="mb-6 bg-amber-500/10 border border-amber-500/40 rounded-xl p-4">
+            <p className="text-xs text-amber-200/90 mb-2">
+              (Geliştirme) E-posta gönderimi henüz bağlı değil. Sıfırlama bağlantısı:
+            </p>
+            <Link href={resetLink} className="text-sm text-mystic-accent break-all underline">
+              {resetLink}
+            </Link>
           </div>
         )}
 

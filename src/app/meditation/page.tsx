@@ -3,29 +3,15 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Play, Square, Plus, Minus, ChevronDown, ChevronUp } from 'lucide-react';
+import { useContent } from '@/lib/useContent';
 
-const FREQUENCIES = [
-  { id: '1', hz: 396, name: 'Korku ve Suçluluk', desc: 'Kök çakrayı temizler, engelleri kaldırır.', intent: 'Tüm eski korkularımı ve suçluluk duygularımı sevgiyle serbest bırakıyorum.', color: '#FF3B30' },
-  { id: '2', hz: 417, name: 'Değişimi Kolaylaştırma', desc: 'Sakral çakrayı arındırır, negatif enerjiyi temizler.', intent: 'Geçmişin yüklerinden özgürleşiyorum.', color: '#FF9500' },
-  { id: '3', hz: 528, name: 'DNA Onarımı ve Mucize', desc: 'Solar pleksus çakrasını dengeler, yaşam enerjisini artırır.', intent: 'Hücrelerim evrenin sevgi frekansıyla yenileniyor.', color: '#FFCC00' },
-  { id: '4', hz: 639, name: 'İlişkiler ve Bağlantı', desc: 'Kalp çakrasını açar, evrensel uyum getirir.', intent: 'Kendimi ve tüm varoluşu şefkatle kucaklıyorum.', color: '#34C759' },
-  { id: '5', hz: 741, name: 'Sezgi ve Uyanış', desc: 'Boğaz çakrasını açar, içgüdüleri güçlendirir.', intent: 'İçsel rehberliğimi net bir şekilde duyuyorum.', color: '#00C7BE' },
-  { id: '6', hz: 852, name: 'Kozmik Bağlantı', desc: 'Üçüncü göz çakrasını dengeler, ruhani uyanış.', intent: 'Yüksek bilincimle tam bir bütünlük içindeyim.', color: '#003399' },
-  { id: '7', hz: 963, name: 'İlahi Bütünlük', desc: 'Tepe çakrayı açar, evrensel bilinçle tam bağlantı sağlar.', intent: 'Ben evrenin ta kendisiyim.', color: '#AF52DE' },
-];
-
-const ORGAN_FREQUENCIES = [
-  { id: 'org_1', hz: 110.0, name: 'Mide Şifası', desc: 'Mide sağlığını destekler.', intent: 'Sindirimi sevgiyle kabul ediyorum.', color: '#FFCC00' },
-  { id: 'org_2', hz: 117.3, name: 'Pankreas Şifası', desc: 'Pankreası dengeler.', intent: 'Pankreasım sağlıklı ve dengede.', color: '#FFCC00' },
-  { id: 'org_3', hz: 220.0, name: 'Akciğer Şifası', desc: 'Akciğer kapasitesini artırır.', intent: 'Hayatın nefesini tam ve derinden içime çekiyorum.', color: '#34C759' },
-  { id: 'org_4', hz: 315.8, name: 'Beyin Şifası', desc: 'Zihinsel yorgunluğu giderir.', intent: 'Zihnim berrak ve sakin.', color: '#AF52DE' },
-  { id: 'org_5', hz: 317.8, name: 'Karaciğer Şifası', desc: 'Karaciğerin arınmasını destekler.', intent: 'Tüm toksinlerden arınıyorum.', color: '#FFCC00' },
-  { id: 'org_6', hz: 319.9, name: 'Böbrek Şifası', desc: 'Böbrek sağlığını destekler.', intent: 'Korkuyu serbest bırakıyorum.', color: '#FF9500' },
-  { id: 'org_7', hz: 321.9, name: 'Kan ve Dolaşım', desc: 'Dolaşımı rahatlatır.', intent: 'Yaşam enerjisi bedenimde özgürce dolaşıyor.', color: '#FF3B30' },
-];
+// FREQUENCIES / ORGAN_FREQUENCIES içeriği DB'den gelir (/api/content/meditation)
 
 export default function MeditationScreen() {
   const router = useRouter();
+  const { data: medData } = useContent<{ chakra: any[]; organ: any[] }>('/api/content/meditation');
+  const FREQUENCIES = medData?.chakra ?? [];
+  const ORGAN_FREQUENCIES = medData?.organ ?? [];
 
   const [activeFreq, setActiveFreq] = useState<any>(null);
   const [isPlaying, setIsPlaying] = useState(false);

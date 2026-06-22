@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { apiFetch } from '@/lib/apiClient';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, User, Mail, Check, Loader2, Award, Lock } from 'lucide-react';
 
@@ -15,7 +15,7 @@ const ROLE_LABELS: Record<string, { label: string; style: string }> = {
 };
 
 export default function ProfilePage() {
-  const { user, role, session } = useAuth();
+  const { user, role, refresh } = useAuth();
   const router = useRouter();
   
   const [name, setName] = useState('');
@@ -47,50 +47,17 @@ export default function ProfilePage() {
     setError(null);
     setSuccess(false);
 
-    if (session) {
-      await supabase.auth.setSession({
-        access_token: session.access_token,
-        refresh_token: session.refresh_token
-      });
-    }
-
-    console.log("Saving started...", { id: user.id, name, email: user.email });
     try {
-      // 1. Update Auth user metadata (Updates the Next.js session cache instantly)
-      console.log("1. Calling supabase.auth.updateUser...");
-      const { error: authError } = await supabase.auth.updateUser({
-        data: { full_name: name }
+      await apiFetch('/api/auth/profile', {
+        method: 'PATCH',
+        body: JSON.stringify({ fullName: name }),
       });
-
-      if (authError) {
-        console.error("Auth update error:", authError);
-        throw authError;
-      }
-      console.log("Auth update successful.");
-
-      // 2. Upsert profiles table (inserts if missing, updates if exists)
-      console.log("2. Calling supabase.from('profiles').upsert...");
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert({ 
-          id: user.id, 
-          full_name: name,
-          role: role || 'free'
-        });
-
-      if (profileError) {
-        console.error("Profile upsert error:", profileError);
-        throw profileError;
-      }
-      console.log("Profile upsert successful.");
-
+      await refresh();
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err: any) {
-      console.error("Catch block triggered:", err);
       setError(err.message || 'Profil güncellenirken hata oluştu.');
     } finally {
-      console.log("finally block: Setting loading to false.");
       setLoading(false);
     }
   };
@@ -110,20 +77,11 @@ export default function ProfilePage() {
     setPwdError(null);
     setPwdSuccess(false);
 
-    if (session) {
-      await supabase.auth.setSession({
-        access_token: session.access_token,
-        refresh_token: session.refresh_token
-      });
-    }
-
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: password
+      await apiFetch('/api/auth/change-password', {
+        method: 'POST',
+        body: JSON.stringify({ password }),
       });
-
-      if (error) throw error;
-
       setPwdSuccess(true);
       setPassword('');
       setConfirmPassword('');

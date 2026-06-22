@@ -1,12 +1,14 @@
 "use client";
 
 import React, { useState, Suspense } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Lock, Loader2, Sparkles, AlertCircle, CheckCircle2 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { apiFetch } from '@/lib/apiClient';
 
 function ResetPasswordContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -15,6 +17,11 @@ function ResetPasswordContent() {
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!token) {
+      setError("Geçersiz veya eksik sıfırlama bağlantısı. Lütfen e-postadaki bağlantıyı kullanın.");
+      return;
+    }
 
     if (password.length < 6) {
       setError("Şifre en az 6 karakter olmalıdır.");
@@ -31,23 +38,18 @@ function ResetPasswordContent() {
     setSuccess(null);
 
     try {
-      const { error } = await supabase.auth.updateUser({
-        password: password,
+      await apiFetch('/api/auth/reset-password', {
+        method: 'POST',
+        body: JSON.stringify({ token, password }),
       });
-
-      if (error) {
-        setError(error.message || "Şifre güncellenemedi.");
-      } else {
-        setSuccess("Şifreniz başarıyla güncellendi! Giriş ekranına yönlendiriliyorsunuz...");
-        setPassword('');
-        setConfirmPassword('');
-        // Wait 3 seconds and redirect to login page
-        setTimeout(() => {
-          router.push('/auth/login');
-        }, 3000);
-      }
+      setSuccess("Şifreniz başarıyla güncellendi! Giriş ekranına yönlendiriliyorsunuz...");
+      setPassword('');
+      setConfirmPassword('');
+      setTimeout(() => {
+        router.push('/auth/login');
+      }, 3000);
     } catch (err: any) {
-      setError(err?.message || "Beklenmeyen bir hata oluştu.");
+      setError(err?.message || "Şifre güncellenemedi.");
     } finally {
       setLoading(false);
     }

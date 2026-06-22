@@ -4,9 +4,10 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { ShoppingBag, Star, TrendingUp, Search, ChevronRight, HeartPulse, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CATEGORIES, VENDORS, PRODUCTS } from '@/data/marketplaceData';
+import { useMarketplace } from '@/lib/useContent';
 
 export default function ExplorePage() {
+  const { categories: CATEGORIES, vendors: VENDORS, products: PRODUCTS } = useMarketplace();
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [isImeceModalOpen, setIsImeceModalOpen] = useState(false);

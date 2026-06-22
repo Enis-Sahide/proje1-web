@@ -2,10 +2,8 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { ChevronDown, ChevronUp, ArrowLeft, Play, Info, Leaf, BookOpen, Activity, Square, AlertTriangle } from 'lucide-react';
-import { CHAKRAS, TOPICS } from '@/data/chakraData';
-import { LESSONS } from '@/data/chakraLessons';
-import { GUIDELINES } from '@/data/guidelinesData';
+import { ChevronDown, ChevronUp, ArrowLeft, Play, Info, Leaf, BookOpen, Activity, Square, AlertTriangle, Loader2 } from 'lucide-react';
+import { useContent } from '@/lib/useContent';
 
 export default function ChakraDetail() {
   const params = useParams();
@@ -20,6 +18,17 @@ export default function ChakraDetail() {
   const audioCtxRef = useRef<AudioContext | null>(null);
   const oscRef = useRef<OscillatorNode | null>(null);
   const gainRef = useRef<GainNode | null>(null);
+
+  const { data: chakraData } = useContent<{ chakras: Record<string, any>; topics: any[] }>(
+    '/api/content/chakras',
+  );
+  const { data: lessonsData } = useContent<Record<string, any>>('/api/content/chakra-lessons');
+  const { data: guidelinesData } = useContent<any[]>('/api/content/guidelines');
+
+  const CHAKRAS = chakraData?.chakras ?? {};
+  const TOPICS = chakraData?.topics ?? [];
+  const LESSONS = lessonsData ?? {};
+  const GUIDELINES = guidelinesData ?? [];
 
   const chakra = CHAKRAS[id];
 
@@ -90,6 +99,14 @@ export default function ChakraDetail() {
       setIsPlaying(true);
     }
   };
+
+  if (!chakraData) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white bg-mystic-dark">
+        <Loader2 className="animate-spin text-mystic-primary" size={36} />
+      </div>
+    );
+  }
 
   if (!chakra) {
     return (

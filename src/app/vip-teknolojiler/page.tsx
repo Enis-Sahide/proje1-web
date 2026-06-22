@@ -4,78 +4,16 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Shield, Sparkles, Lock, Droplet, Flame, Brain, Fingerprint, Activity, Hexagon, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { useContent } from '@/lib/useContent';
 
-const VIP_MODULES = [
-  {
-    id: 'mikrokozmik',
-    title: 'Mikrokozmik Yörünge',
-    desc: 'Bedenin enerji meridyenlerinde ışığı dolaştırın ve şifayı hedefleyin.',
-    icon: <Activity size={32} />,
-    color: 'from-blue-500/20 to-purple-500/20',
-    borderColor: 'border-blue-500/50',
-    textColor: 'text-blue-400',
-    status: 'ACTIVE',
-    path: '/vip-teknolojiler/mikrokozmik'
-  },
-  {
-    id: 'bone-marrow',
-    title: 'Kemik İliği Nefesi',
-    desc: 'Kök hücre aktivasyonunu zihinsel ve nefes kombinasyonuyla yönlendirin.',
-    icon: <Droplet size={32} />,
-    color: 'from-red-500/20 to-orange-500/20',
-    borderColor: 'border-red-500/50',
-    textColor: 'text-red-400',
-    status: 'ACTIVE',
-    path: '/vip-teknolojiler/bone-marrow'
-  },
-  {
-    id: 'tummo',
-    title: 'Tummo (İçsel Ateş)',
-    desc: 'Göbek deliğinin altındaki ateşi uyandırarak bağışıklığı ve iradeyi çelikleştirin.',
-    icon: <Flame size={32} />,
-    color: 'from-orange-500/20 to-yellow-500/20',
-    borderColor: 'border-orange-500/50',
-    textColor: 'text-orange-400',
-    status: 'ACTIVE',
-    path: '/vip-teknolojiler/tummo'
-  },
-  {
-    id: 'silva',
-    title: 'Silva Teta Ekranı',
-    desc: 'Zihinsel lazer ile hastalıklı hücreleri silin ve yenilerini programlayın.',
-    icon: <Brain size={32} />,
-    color: 'from-green-500/20 to-emerald-500/20',
-    borderColor: 'border-green-500/50',
-    textColor: 'text-green-400',
-    status: 'ACTIVE',
-    path: '/vip-teknolojiler/silva'
-  },
-  {
-    id: 'merkaba',
-    title: 'Merkaba Uyanışı',
-    desc: 'İç içe geçmiş tetrahedronları çevirerek boyutlar arası kuantum sıçraması yapın.',
-    icon: <Hexagon size={32} />,
-    color: 'from-cyan-500/20 to-blue-500/20',
-    borderColor: 'border-cyan-500/50',
-    textColor: 'text-cyan-400',
-    status: 'ACTIVE',
-    path: '/vip-teknolojiler/merkaba'
-  },
-  {
-    id: 'rahmani',
-    title: 'Kimatik Zikir',
-    desc: 'Sufi nefesiyle esmaları titreştirerek hücrelerin geometrisini düzenleyin.',
-    icon: <Fingerprint size={32} />,
-    color: 'from-[#D4AF37]/20 to-yellow-600/20',
-    borderColor: 'border-[#D4AF37]/50',
-    textColor: 'text-[#D4AF37]',
-    status: 'ACTIVE',
-    path: '/vip-teknolojiler/rahmani'
-  }
-];
+// VIP modül listesi DB'den gelir (/api/content/vip-technologies).
+// icon ALANI lucide ikon ADIdır → aşağıdaki harita ile component'e çevrilir.
+const ICON_MAP: Record<string, any> = { Activity, Droplet, Flame, Brain, Hexagon, Fingerprint };
 
 export default function VIPHubPage() {
   const router = useRouter();
+  const { data: vipData } = useContent<any[]>('/api/content/vip-technologies');
+  const VIP_MODULES = vipData ?? [];
 
   return (
     <div className="min-h-screen pt-24 pb-24 px-6 relative bg-transparent selection:bg-[#D4AF37] selection:text-black">
@@ -119,7 +57,9 @@ export default function VIPHubPage() {
               <div className={`relative h-full bg-black/90 backdrop-blur-xl rounded-3xl p-8 border ${mod.borderColor} flex flex-col justify-between`}>
                 <div>
                   <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${mod.color} flex items-center justify-center mb-6 shadow-inner`}>
-                    <div className={mod.textColor}>{mod.icon}</div>
+                    <div className={mod.textColor}>
+                      {ICON_MAP[mod.icon] ? React.createElement(ICON_MAP[mod.icon], { size: 32 }) : null}
+                    </div>
                   </div>
                   <h3 className={`text-2xl font-bold mb-3 ${mod.status === 'ACTIVE' ? 'text-white' : 'text-white/50'}`}>
                     {mod.title}

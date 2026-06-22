@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Shield, Users, DollarSign, Store, CheckCircle, XCircle, ArrowLeft, Star, Search, Filter, RefreshCw, Award, UserCheck } from 'lucide-react';
-import { VENDORS } from '@/data/marketplaceData';
-import { supabase } from '@/lib/supabase';
+import { useMarketplace } from '@/lib/useContent';
+import { apiFetch } from '@/lib/apiClient';
 
 // Mock mapping of users who own stores based on their Supabase IDs or names
 const MOCK_USER_STORES: Record<string, { id: string; name: string }> = {
@@ -47,13 +47,21 @@ export default function AdminDashboard() {
   // Active tab state: 'stores' | 'members'
   const [activeTab, setActiveTab] = useState<'stores' | 'members'>('stores');
 
+  // Marketplace (mağazalar) içeriği API'den
+  const { vendors: VENDORS } = useMarketplace();
+
   // Global platform statistics (mocked)
   const totalPlatformSales = 45000;
   const platformCommission = totalPlatformSales * 0.10; // 10%
   const activeStores = VENDORS.length;
 
   // Vendors state
-  const [vendors, setVendors] = useState(VENDORS.map(v => ({...v, status: 'approved'})));
+  const [vendors, setVendors] = useState<any[]>([]);
+  useEffect(() => {
+    if (VENDORS.length > 0) {
+      setVendors(VENDORS.map(v => ({ ...v, status: 'approved' })));
+    }
+  }, [VENDORS]);
 
   // Profiles (members) state
   const [profiles, setProfiles] = useState<any[]>([]);
@@ -73,12 +81,7 @@ export default function AdminDashboard() {
     setIsLoadingProfiles(true);
     setProfilesError(null);
     try {
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
+      const data = await apiFetch<any[]>('/api/admin/profiles');
       setProfiles(data || []);
     } catch (err: any) {
       console.error("Profiles fetch error:", err);
@@ -129,12 +132,10 @@ export default function AdminDashboard() {
 
     setUpdatingUserId(userId);
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ role: newRole })
-        .eq('id', userId);
-
-      if (error) throw error;
+      await apiFetch(`/api/admin/profiles/${userId}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ role: newRole }),
+      });
 
       // Update local profiles state
       setProfiles(profiles.map(p => {

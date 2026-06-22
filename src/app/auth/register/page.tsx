@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Mail, Lock, User, Loader2, Sparkles, AlertCircle } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
+import { apiFetch } from '@/lib/apiClient';
 
 export default function RegisterPage() {
   const [name, setName] = useState('');
@@ -20,23 +20,14 @@ export default function RegisterPage() {
     setError(null);
     
     try {
-      const { data, error: signUpError } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            full_name: name,
-            role: 'free' // Default role
-          }
-        }
+      await apiFetch('/api/auth/register', {
+        method: 'POST',
+        body: JSON.stringify({ email, password, fullName: name }),
       });
-
-      if (signUpError) throw signUpError;
-      
-      router.push('/auth/login?registered=true');
+      // Kayıt başarılı: oturum cookie'leri ayarlandı, ana sayfaya yönlendir.
+      window.location.href = '/';
     } catch (err: any) {
       setError(err.message || 'Kayıt sırasında bir hata oluştu.');
-    } finally {
       setLoading(false);
     }
   };

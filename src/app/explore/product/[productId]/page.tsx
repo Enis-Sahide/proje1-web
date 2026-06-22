@@ -3,19 +3,28 @@
 import React, { useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Star, ShoppingCart, Info, Minus, Plus, CheckCircle2 } from 'lucide-react';
-import { PRODUCTS, VENDORS } from '@/data/marketplaceData';
+import { ArrowLeft, Star, ShoppingCart, Info, Minus, Plus, CheckCircle2, Loader2 } from 'lucide-react';
+import { useMarketplace } from '@/lib/useContent';
 
 export default function ProductDetailPage() {
   const params = useParams();
   const router = useRouter();
   const productId = params.productId as string;
 
+  const { vendors: VENDORS, products: PRODUCTS, loading } = useMarketplace();
   const [quantity, setQuantity] = useState(1);
   const [isAdded, setIsAdded] = useState(false);
 
   const product = PRODUCTS.find(p => p.id === productId);
-  
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-mystic-dark">
+        <Loader2 className="animate-spin text-mystic-primary" size={36} />
+      </div>
+    );
+  }
+
   if (!product) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-mystic-dark">

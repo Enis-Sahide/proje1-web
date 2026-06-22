@@ -4,10 +4,24 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Sparkles, Activity, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CHAKRA_TEST_QUESTIONS, CHAKRA_INFO, ChakraId } from '@/data/chakraTestQuestions';
+import { useContent } from '@/lib/useContent';
 import RequireRole from '@/core/ui/RequireRole';
 
 type Step = 'intro' | 'quiz' | 'result';
+
+// Presentational çakra meta (sorular DB'den gelir).
+type ChakraId = 'root' | 'sacral' | 'solar' | 'heart' | 'throat' | 'thirdEye' | 'crown';
+const CHAKRA_INFO: Record<ChakraId, { name: string; color: string; meaning: string; pathId: string }> = {
+  root: { name: 'Kök Çakra', color: '#EF4444', meaning: 'Güven, Hayatta Kalma, Köklenme', pathId: '1' },
+  sacral: { name: 'Sakral Çakra', color: '#F97316', meaning: 'Duygular, Yaratıcılık, Haz', pathId: '2' },
+  solar: { name: 'Solar Pleksus', color: '#EAB308', meaning: 'İrade, Özgüven, Güç', pathId: '3' },
+  heart: { name: 'Kalp Çakrası', color: '#22C55E', meaning: 'Sevgi, Şefkat, Affetme', pathId: '4' },
+  throat: { name: 'Boğaz Çakrası', color: '#06B6D4', meaning: 'İletişim, Gerçeklik, İfade', pathId: '5' },
+  thirdEye: { name: 'Üçüncü Göz', color: '#3B82F6', meaning: 'Sezgi, Vizyon, İçgörü', pathId: '6' },
+  crown: { name: 'Taç Çakra', color: '#A855F7', meaning: 'Spiritüellik, Bütünlük, Bilinç', pathId: '7' },
+};
+
+interface ChakraQuestion { id: number; chakraId: ChakraId; text: string; }
 
 export default function ChakraAnalysisPage() {
   const [step, setStep] = useState<Step>('intro');
@@ -15,6 +29,8 @@ export default function ChakraAnalysisPage() {
   const [scores, setScores] = useState<Record<ChakraId, number>>({
     root: 0, sacral: 0, solar: 0, heart: 0, throat: 0, thirdEye: 0, crown: 0
   });
+  const { data: questionsData } = useContent<ChakraQuestion[]>('/api/content/chakra-test');
+  const CHAKRA_TEST_QUESTIONS = questionsData ?? [];
   const isTransitioning = React.useRef(false);
 
   const handleAnswer = (points: number) => {
@@ -62,16 +78,23 @@ export default function ChakraAnalysisPage() {
         <b> içgüdüsel ve dürüst </b> yanıtlar verin.
       </p>
       
-      <button 
+      <button
         onClick={() => setStep('quiz')}
-        className="inline-flex items-center gap-2 text-mystic-dark font-bold bg-gradient-to-r from-mystic-primary to-mystic-accent px-8 py-4 rounded-full hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all transform hover:scale-105"
+        disabled={CHAKRA_TEST_QUESTIONS.length === 0}
+        className="inline-flex items-center gap-2 text-mystic-dark font-bold bg-gradient-to-r from-mystic-primary to-mystic-accent px-8 py-4 rounded-full hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Analize Başla <Activity size={20} />
+        {CHAKRA_TEST_QUESTIONS.length === 0 ? 'Sorular yükleniyor...' : 'Analize Başla'} <Activity size={20} />
       </button>
     </motion.div>
   );
 
   const renderQuiz = () => {
+    // Sorular henüz yüklenmediyse bekleme göster
+    if (CHAKRA_TEST_QUESTIONS.length === 0) {
+      return (
+        <div className="text-center text-mystic-text-muted py-20">Sorular yükleniyor...</div>
+      );
+    }
     // Safety check just in case
     if (currentQuestion >= CHAKRA_TEST_QUESTIONS.length) {
       return null;
