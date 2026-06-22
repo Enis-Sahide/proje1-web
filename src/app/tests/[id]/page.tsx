@@ -31,7 +31,7 @@ interface Question {
   id: string;
   question: string;
   options: string[];
-  correctText: string;
+  correctText?: string;
   explanation?: string;
 }
 
@@ -47,6 +47,8 @@ export default function ExamTakingPage() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [correctCount, setCorrectCount] = useState(0);
   const [isFinished, setIsFinished] = useState(false);
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const [reveal, setReveal] = useState<{ correctText: string | null; explanation: string | null } | null>(null);
   
   // Guard states
   const [isLoadingCheck, setIsLoadingCheck] = useState(true);
@@ -84,7 +86,6 @@ export default function ExamTakingPage() {
             id: String(q.id),
             question: q.question,
             options: shuffleArray(q.options),
-            correctText: q.correctAnswer,
             explanation:
               "Aura ve Çakra enerji katmanları, dirimsel gücünüzün (prana) bedeninizle kurduğu köprülerdir.",
           }));
@@ -102,8 +103,7 @@ export default function ExamTakingPage() {
               id: q.id,
               question: q.question,
               options: q.options,
-              correctText: q.options[q.correctAnswerIndex],
-              explanation: q.explanation,
+              // doğru cevap & açıklama sunucudan (exam/check) gelir
             })),
           );
         }
@@ -138,39 +138,38 @@ export default function ExamTakingPage() {
     }
   };
 
-  // Trigger unlock when finished
+  // Sınav bitince cevapları SUNUCUYA gönder; skoru ve kilidi sunucu belirler.
   useEffect(() => {
     if (isFinished && questions.length > 0) {
-      const totalQuestions = questions.length;
-      const score = (correctCount / totalQuestions) * 100;
-
-      const triggerUnlock = async () => {
+      const submit = async () => {
         try {
-          // Standart derece kilitleri sunucuda (quizzes.unlock_tier + pass_threshold) açılır.
           await apiFetch('/api/progress/exam/finish', {
             method: 'POST',
-            body: JSON.stringify({ quizId: id, score }),
+            body: JSON.stringify({ quizId: id, answers }),
           });
-          // 'aura' DB'de quiz değil (final-quiz içeriği) → kadim dersler erişimini ayrıca aç.
-          if (id === 'aura' && score >= 85) {
-            await unlockTier('kadim_dersler_access');
-          }
         } catch (e) {
-          console.error('Unlock error:', e);
+          console.error('Sınav gönderim hatası:', e);
         }
       };
-
-      triggerUnlock();
+      submit();
     }
-  }, [isFinished, correctCount, questions, id, unlockTier]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFinished]);
 
-  const handleOptionSelect = (optionText: string) => {
+  const handleOptionSelect = async (optionText: string) => {
     if (selectedOption !== null) return;
+    const q = questions[currentIndex];
     setSelectedOption(optionText);
-
-    const isCorrect = optionText === questions[currentIndex].correctText;
-    if (isCorrect) {
-      setCorrectCount(prev => prev + 1);
+    setAnswers(prev => ({ ...prev, [q.id]: optionText }));
+    try {
+      const res = await apiFetch<{ correct: boolean; correctAnswer: string | null; explanation: string | null }>(
+        '/api/exam/check',
+        { method: 'POST', body: JSON.stringify({ quizId: id, qKey: q.id, answer: optionText }) },
+      );
+      setReveal({ correctText: res.correctAnswer, explanation: res.explanation });
+      if (res.correct) setCorrectCount(prev => prev + 1);
+    } catch {
+      setReveal({ correctText: null, explanation: null });
     }
   };
 
@@ -178,6 +177,7 @@ export default function ExamTakingPage() {
     if (currentIndex < questions.length - 1) {
       setCurrentIndex(prev => prev + 1);
       setSelectedOption(null);
+      setReveal(null);
     } else {
       setIsFinished(true);
     }
@@ -345,7 +345,7 @@ export default function ExamTakingPage() {
         <div className="space-y-4">
           {currentQuestion.options.map((option, idx) => {
             const isOptSelected = selectedOption === option;
-            const isCorrectOption = option === currentQuestion.correctText;
+            const isCorrectOption = option === reveal?.correctText;
             const showCorrect = isSelected && isCorrectOption;
             const showWrong = isSelected && isOptSelected && !isCorrectOption;
 
@@ -382,7 +382,7 @@ export default function ExamTakingPage() {
               <span className="font-bold text-sm tracking-wider uppercase">Kadim Bilgi</span>
             </div>
             <p className="text-white/80 text-sm leading-relaxed font-serif italic">
-              {currentQuestion.explanation}
+              {reveal?.explanation || currentQuestion.explanation}
             </p>
 
             <button

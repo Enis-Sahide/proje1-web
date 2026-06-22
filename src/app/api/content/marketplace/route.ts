@@ -1,11 +1,14 @@
 import { db } from '@/db/client';
 import { productCategories, vendors, products } from '@/db/schema';
-import { json, preflight } from '@/lib/http/cors';
+import { json, errorJson, preflight } from '@/lib/http/cors';
+import { getAuthPayload } from '@/lib/auth/session';
 
 export const dynamic = 'force-dynamic';
 
-// { CATEGORIES, VENDORS, PRODUCTS } şekillerini orijinaliyle döndürür.
-export async function GET() {
+// Keşfet (Mağaza) → giriş zorunlu.
+export async function GET(request: Request) {
+  const payload = await getAuthPayload(request);
+  if (!payload) return errorJson('Yetkisiz', 401);
   const [categories, vendorRows, productRows] = await Promise.all([
     db.select().from(productCategories),
     db.select().from(vendors),

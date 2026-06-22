@@ -1,12 +1,16 @@
 import { asc, eq } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { quizQuestions } from '@/db/schema';
-import { json, preflight } from '@/lib/http/cors';
+import { json, errorJson, preflight } from '@/lib/http/cors';
+import { getAuthPayload } from '@/lib/auth/session';
 
 export const dynamic = 'force-dynamic';
 
-// FINAL_QUIZ_QUESTIONS şeklini ({ id, question, options, correctAnswer }) yeniden kurar.
-export async function GET() {
+// FINAL_QUIZ_QUESTIONS şekli — ANCAK correctAnswer DÖNMEZ. Giriş zorunlu.
+export async function GET(request: Request) {
+  const payload = await getAuthPayload(request);
+  if (!payload) return errorJson('Yetkisiz', 401);
+
   const rows = await db
     .select()
     .from(quizQuestions)
@@ -20,7 +24,7 @@ export async function GET() {
         id: Number.isNaN(numericId) ? r.qKey : numericId,
         question: r.question,
         options,
-        correctAnswer: options[r.correctIndex] ?? null,
+        // correctAnswer GÖNDERİLMEZ
       };
     }),
   );
