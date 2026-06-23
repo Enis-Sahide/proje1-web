@@ -21,6 +21,7 @@ interface AuthContextType {
   isLoading: boolean;
   role: string;
   unlockedTiers: string[];
+  passedExams: string[];
   unlockTier: (tierId: string) => Promise<void>;
   hasAccess: (tierId: string) => boolean;
   logout: () => Promise<void>;
@@ -33,6 +34,7 @@ const AuthContext = createContext<AuthContextType>({
   isLoading: true,
   role: 'free',
   unlockedTiers: [],
+  passedExams: [],
   unlockTier: async () => {},
   hasAccess: () => false,
   logout: async () => {},
@@ -43,6 +45,7 @@ interface MeResponse {
   user: { id: string; email: string; fullName: string | null; role: string };
   role: string;
   unlockedTiers: string[];
+  passedExams?: string[];
 }
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -50,6 +53,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [role, setRole] = useState('free');
   const [unlockedTiers, setUnlockedTiers] = useState<string[]>([]);
+  const [passedExams, setPassedExams] = useState<string[]>([]);
 
   const applyMe = (me: MeResponse | null) => {
     if (me?.user) {
@@ -64,10 +68,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
       setRole(me.role || 'free');
       setUnlockedTiers(me.unlockedTiers || []);
+      setPassedExams(me.passedExams || []);
     } else {
       setUser(null);
       setRole('free');
       setUnlockedTiers([]);
+      setPassedExams([]);
     }
   };
 
@@ -104,11 +110,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // Seviye-bazlı erişim: tierId'nin derecesi (1/2/3) kullanıcının rol seviyesini geçmemeli.
   const hasAccess = (tierId: string) => {
     if (role === 'admin') return true;
     if (!tierId) return true;
-    if (tierId.endsWith('_1')) return true;
-    return unlockedTiers.includes(tierId);
+    const ROLE_LEVELS: Record<string, number> = { free: 0, apprentice: 1, journeyman: 2, master: 3, admin: 999 };
+    const lvl = tierId.includes('master') || /3$/.test(tierId)
+      ? 3
+      : /2$/.test(tierId)
+        ? 2
+        : /1$/.test(tierId)
+          ? 1
+          : 0;
+    return (ROLE_LEVELS[role] ?? 0) >= lvl;
   };
 
   const logout = async () => {
@@ -129,6 +143,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         isLoading,
         role,
         unlockedTiers,
+        passedExams,
         unlockTier,
         hasAccess,
         logout,

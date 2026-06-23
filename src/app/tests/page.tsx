@@ -45,7 +45,7 @@ interface TestCategory {
 
 export default function TestsHubPage() {
   const router = useRouter();
-  const { user, role, hasAccess, unlockedTiers } = useAuth();
+  const { user, role, hasAccess, passedExams } = useAuth();
   const isAdmin = role === 'admin';
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedUnderConstruction, setSelectedUnderConstruction] = useState<TestCategory | null>(null);
@@ -152,9 +152,10 @@ export default function TestsHubPage() {
   };
 
   const handleSubTestClick = (sub: TestSubQuiz) => {
-    const isLocked = isAdmin ? false : (sub.requiredUnlock ? !hasAccess(sub.requiredUnlock) : false);
+    // Seviye-bazlı: sınavın derecesi kullanıcının seviyesini geçmemeli.
+    const isLocked = isAdmin ? false : !hasAccess(sub.id);
     if (isLocked) {
-      alert("Bu sınava girmek için önceki derecenin sınavını başarıyla geçmelisin!");
+      alert("Bu sınava girmek için önceki dereceyi (tüm sınavlarını) tamamlamış olmalısın!");
       return;
     }
     router.push(`/tests/${sub.id}`);
@@ -231,9 +232,9 @@ export default function TestsHubPage() {
                 {isExpanded && cat.subTests && (
                   <div className="border-t border-white/5 bg-black/40 px-6 py-4 space-y-2">
                     {cat.subTests.map((sub, index) => {
-                      const isLocked = isAdmin ? false : (sub.requiredUnlock ? !hasAccess(sub.requiredUnlock) : false);
+                      const isLocked = isAdmin ? false : !hasAccess(sub.id);
                       const isUnlocked = !isLocked;
-                      const hasPassed = unlockedTiers.includes(sub.id) || (sub.id === 'numeroloji_3' && unlockedTiers.includes('numeroloji_master')) || (sub.id === 'runeFinal' && unlockedTiers.includes('rune_master')) || (sub.id === 'yoga_3' && unlockedTiers.includes('yoga_master')) || (sub.id === 'human_3' && unlockedTiers.includes('human_master')) || (sub.id === 'astroloji_3' && unlockedTiers.includes('astroloji_master')) || (sub.id === 'akupunktur_3' && unlockedTiers.includes('akupunktur_master'));
+                      const hasPassed = passedExams.includes(sub.id);
 
                       return (
                         <div 

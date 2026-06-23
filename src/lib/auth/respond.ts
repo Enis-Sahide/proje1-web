@@ -30,7 +30,9 @@ export async function buildAuthResponse(userId: string, request: Request) {
   const res = json({
     user: publicUser(account),
     role: account.role,
+    level: account.level,
     unlockedTiers: account.unlockedTiers,
+    passedExams: account.passedExams,
     examAttempts: account.examAttempts,
     activeExam: account.activeExam,
     accessToken,

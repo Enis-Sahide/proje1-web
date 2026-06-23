@@ -3,15 +3,24 @@ import { db } from '@/db/client';
 import { userProgress } from '@/db/schema';
 import { json, errorJson, preflight } from '@/lib/http/cors';
 import { getAuthPayload } from '@/lib/auth/session';
+import { getAccount } from '@/lib/auth/account';
+import { examLevel, roleLevel } from '@/lib/levels';
 
 export const dynamic = 'force-dynamic';
 
-// Tek-cihaz + günlük 1 sınav kuralını sunucuda uygular (eski test/[id].tsx mantığı).
+// Seviye kapısı + tek-cihaz + günlük 1 sınav kuralını sunucuda uygular.
 export async function POST(request: Request) {
   const payload = await getAuthPayload(request);
   if (!payload) return errorJson('Yetkisiz', 401);
   const { quizId, device = 'web' } = await request.json().catch(() => ({}));
   if (!quizId) return errorJson('quizId gerekli');
+
+  // 0. SEVİYE KAPISI: kullanıcı sadece kendi seviyesindeki (veya altındaki) sınava girebilir.
+  const account = await getAccount(payload.sub);
+  const requiredLevel = await examLevel(String(quizId));
+  if (account && account.role !== 'admin' && roleLevel(account.role) < requiredLevel) {
+    return errorJson('Bu sınava girmek için yeterli seviyede değilsiniz.', 403);
+  }
 
   const [pr] = await db.select().from(userProgress).where(eq(userProgress.userId, payload.sub));
   const examAttempts = (pr?.examAttempts as Record<string, string>) ?? {};

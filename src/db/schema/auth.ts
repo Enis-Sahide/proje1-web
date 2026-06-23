@@ -30,6 +30,11 @@ export const userProgress = pgTable('user_progress', {
     .array()
     .notNull()
     .default(sql`'{}'::text[]`),
+  // Seviye-bazlı model: kullanıcının ≥%80 GEÇTİĞİ sınav id'leri. Rol bundan hesaplanır.
+  passedExams: text('passed_exams')
+    .array()
+    .notNull()
+    .default(sql`'{}'::text[]`),
   examAttempts: jsonb('exam_attempts').notNull().default({}), // { "<quizId>": "YYYY-MM-DD" }
   activeExam: jsonb('active_exam'), // { examId, startTime, device } | null
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

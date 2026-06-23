@@ -13,7 +13,9 @@ export async function GET(request: Request) {
   return json({
     user: publicUser(account),
     role: account.role,
+    level: account.level,
     unlockedTiers: account.unlockedTiers,
+    passedExams: account.passedExams,
     examAttempts: account.examAttempts,
     activeExam: account.activeExam,
   });

@@ -3,12 +3,14 @@ import { db } from '@/db/client';
 import { userProgress } from '@/db/schema';
 import { json, errorJson, preflight } from '@/lib/http/cors';
 import { getAuthPayload } from '@/lib/auth/session';
-import { getAccount, syncRoleFromTiers } from '@/lib/auth/account';
-import { loadExamQuestions, loadQuizMeta, resolveUnlock, correctTextOf } from '@/lib/exam';
+import { getAccount } from '@/lib/auth/account';
+import { loadExamQuestions, correctTextOf } from '@/lib/exam';
+import { PASS_THRESHOLD } from '@/lib/levels';
 
 export const dynamic = 'force-dynamic';
 
-// Sınavı SUNUCUDA puanlar. İstemci skor GÖNDERMEZ; seçtiği cevapları gönderir.
+// Sınavı SUNUCUDA puanlar. Geçilirse (≥%80) sınavı passed_exams'a ekler;
+// rol GEÇİLEN sınavlardan yeniden hesaplanır (seviye-bazlı model).
 // answers = { [qKey]: seçilenSeçenekMetni }. answers yoksa sadece aktif oturum temizlenir.
 export async function POST(request: Request) {
   const payload = await getAuthPayload(request);
@@ -17,7 +19,7 @@ export async function POST(request: Request) {
   const { quizId, answers } = await request.json().catch(() => ({}));
   if (!quizId) return errorJson('quizId gerekli');
 
-  // İptal/çıkış: sadece aktif sınav oturumunu temizle
+  // İptal/çıkış
   if (!answers || typeof answers !== 'object') {
     await db
       .update(userProgress)
@@ -35,35 +37,34 @@ export async function POST(request: Request) {
     if (sel != null && String(sel) === correctTextOf(q)) correct++;
   }
   const score = total > 0 ? (correct / total) * 100 : 0;
+  const passed = score >= PASS_THRESHOLD;
 
-  const quizMeta = await loadQuizMeta(String(quizId));
-  const threshold = String(quizId) === 'aura' ? 85 : (quizMeta?.passThreshold ?? 100);
-  const newlyUnlock = resolveUnlock(String(quizId), quizMeta, score);
-
+  // Geçtiyse passed_exams'a ekle (idempotent)
   const [pr] = await db.select().from(userProgress).where(eq(userProgress.userId, payload.sub));
-  let unlocked = pr?.unlockedTiers ?? [];
-  let unlockedTier: string | null = null;
-  if (newlyUnlock && !unlocked.includes(newlyUnlock)) {
-    unlocked = [...unlocked, newlyUnlock];
-    unlockedTier = newlyUnlock;
+  let passedExams = pr?.passedExams ?? [];
+  let newlyPassed = false;
+  if (passed && !passedExams.includes(String(quizId))) {
+    passedExams = [...passedExams, String(quizId)];
+    newlyPassed = true;
   }
 
   await db
     .update(userProgress)
-    .set({ unlockedTiers: unlocked, activeExam: null, updatedAt: new Date() })
+    .set({ passedExams, activeExam: null, updatedAt: new Date() })
     .where(eq(userProgress.userId, payload.sub));
 
-  if (unlockedTier) await syncRoleFromTiers(payload.sub, payload.email, unlocked);
-
+  // Rol passed_exams'tan yeniden hesaplanır (getAccount içinde)
   const account = await getAccount(payload.sub);
+
   return json({
     score,
     total,
     correct,
-    passed: score >= threshold,
-    unlockedTier,
-    unlockedTiers: account?.unlockedTiers ?? [],
+    passed,
+    newlyPassed,
     role: account?.role ?? 'free',
+    level: account?.level ?? 0,
+    passedExams: account?.passedExams ?? [],
   });
 }
 

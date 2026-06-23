@@ -11,9 +11,11 @@ export async function GET(request: Request) {
   if (!account) return errorJson('Kullanıcı bulunamadı', 404);
   return json({
     unlockedTiers: account.unlockedTiers,
+    passedExams: account.passedExams,
     examAttempts: account.examAttempts,
     activeExam: account.activeExam,
     role: account.role,
+    level: account.level,
   });
 }
 

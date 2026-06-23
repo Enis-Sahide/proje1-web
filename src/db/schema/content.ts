@@ -56,7 +56,9 @@ export const quizzes = pgTable('quizzes', {
   discipline: text('discipline'),
   tier: text('tier'),
   passThreshold: integer('pass_threshold').notNull().default(100),
-  unlockTier: text('unlock_tier'), // sınav geçilince açılan tier
+  unlockTier: text('unlock_tier'), // (legacy) eski tek-tek kilit modeli
+  // Seviye-bazlı model: 1=çıraklık, 2=kalfalık, 3=ustalık sınavı; null=seviyeye saymaz (giriş/özel).
+  level: smallint('level'),
 });
 
 export const quizQuestions = pgTable('quiz_questions', {

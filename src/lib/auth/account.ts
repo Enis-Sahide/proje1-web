@@ -2,15 +2,18 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { users, profiles, userProgress } from '@/db/schema';
 import { deriveRole, ROLE_LEVELS, ADMIN_EMAIL } from './roles';
+import { computeRole, roleLevel } from '@/lib/levels';
 
 export interface Account {
   id: string;
   email: string;
   fullName: string | null;
   role: string;
+  level: number;
   race: string | null;
   avatarUrl: string | null;
   unlockedTiers: string[];
+  passedExams: string[];
   examAttempts: Record<string, string>;
   activeExam: unknown;
 }
@@ -31,16 +34,28 @@ export async function getAccount(userId: string): Promise<Account | null> {
   await ensureProfileAndProgress(userId, u.email);
   const [p] = await db.select().from(profiles).where(eq(profiles.userId, userId));
   const [pr] = await db.select().from(userProgress).where(eq(userProgress.userId, userId));
-  let role = p?.role || 'free';
-  if (u.email.toLowerCase() === ADMIN_EMAIL) role = 'admin';
+  const passedExams = pr?.passedExams ?? [];
+
+  // Rol artık GEÇİLEN sınavlardan hesaplanır. Admin (e-posta veya elle verilmiş) korunur.
+  const computed = await computeRole(passedExams, u.email);
+  const role =
+    p?.role === 'admin' || u.email.toLowerCase() === ADMIN_EMAIL ? 'admin' : computed;
+
+  // Admin panelinde doğru görünmesi için profiles.role'ü güncel tut.
+  if (p && p.role !== role) {
+    await db.update(profiles).set({ role }).where(eq(profiles.userId, userId));
+  }
+
   return {
     id: u.id,
     email: u.email,
     fullName: u.fullName,
     role,
+    level: roleLevel(role),
     race: p?.race ?? null,
     avatarUrl: p?.avatarUrl ?? null,
     unlockedTiers: pr?.unlockedTiers ?? [],
+    passedExams,
     examAttempts: (pr?.examAttempts as Record<string, string>) ?? {},
     activeExam: pr?.activeExam ?? null,
   };

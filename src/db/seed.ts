@@ -89,6 +89,25 @@ function deriveTier(id: string): string | null {
   return m ? m[1] : null;
 }
 
+// Seviyeye sayan dersler (menüde olanlar). ruh_beden hariç.
+const LEVEL_DISCIPLINES = [
+  'numeroloji',
+  'rune',
+  'yoga',
+  'human_design',
+  'astroloji',
+  'akupunktur',
+  'kabbalah',
+];
+
+function deriveLevel(id: string): number | null {
+  const d = deriveDiscipline(id);
+  if (!LEVEL_DISCIPLINES.includes(d)) return null;
+  const t = deriveTier(id);
+  if (t === '1' || t === '2' || t === '3') return Number(t);
+  return null;
+}
+
 async function chunkedInsert(tx: any, table: any, rows: any[], size = 300) {
   for (let i = 0; i < rows.length; i += size) {
     await tx.insert(table).values(rows.slice(i, i + size));
@@ -170,8 +189,9 @@ async function main() {
       description: quiz.description ?? null,
       discipline: deriveDiscipline(id),
       tier: deriveTier(id),
-      passThreshold: id === 'duygusal_hastaliklar_50' ? 85 : 100,
-      unlockTier: UNLOCK_MAP[id] ?? null,
+      passThreshold: 80, // seviye modeli: tüm sınavlar ≥%80
+      unlockTier: UNLOCK_MAP[id] ?? null, // (legacy)
+      level: deriveLevel(id),
     });
     quiz.questions.forEach((q, idx) => {
       questionRows.push({
@@ -192,8 +212,9 @@ async function main() {
     description: 'Tüm öğretileri kapsayan kapsamlı final sınavı',
     discipline: 'final',
     tier: 'final',
-    passThreshold: 100,
+    passThreshold: 80,
     unlockTier: null,
+    level: null, // giriş/özel — seviyeye saymaz
   });
   FINAL_QUIZ_QUESTIONS.forEach((q: any, idx: number) => {
     const ci = q.options.indexOf(q.correctAnswer);

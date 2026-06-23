@@ -33,7 +33,7 @@ const ROLE_LEVELS: Record<string, number> = {
 //   '/vip-teknolojiler': 'master',
 //   '/analysis/kabbalah': 'journeyman',
 const ROUTE_MIN_ROLE: Record<string, 'apprentice' | 'journeyman' | 'master'> = {
-  // '/vip-teknolojiler': 'master',
+  '/vip-teknolojiler': 'master', // Kadim Uygulamalar — sadece Usta
 };
 
 function requiredRoleFor(pathname: string): string | null {

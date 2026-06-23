@@ -249,7 +249,7 @@ export default function KabbalahAnalysisPage() {
           </p>
         </div>
 
-        <RequireRole minimumRole="apprentice">
+        <RequireRole minimumRole="master">
           {!chartData && (
             <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-md shadow-2xl max-w-3xl mx-auto">
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
