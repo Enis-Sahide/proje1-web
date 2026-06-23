@@ -139,7 +139,7 @@ export default function KadimDerslerPage() {
 
         {/* Header */}
         <div className="text-center mb-16 animate-in fade-in duration-1000">
-          <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-yellow-200 to-[#D4AF37] mb-4 tracking-wider uppercase">
+          <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-yellow-200 to-[#D4AF37] py-4 mb-4 tracking-wider uppercase leading-normal">
             Okült İlimler Kütüphanesi
           </h1>
           <p className="text-lg text-white/60 max-w-2xl mx-auto leading-relaxed">

@@ -437,7 +437,8 @@ export default function AdminDashboard() {
                               </div>
                               <div>
                                 <span className="font-bold block">{p.full_name || 'İsimsiz Üye'}</span>
-                                <span className="text-[10px] text-mystic-text-muted block font-mono">ID: {p.id}</span>
+                                <span className="text-xs text-white/70 block mt-0.5">{p.email}</span>
+                                <span className="text-[10px] text-mystic-text-muted block font-mono mt-0.5">ID: {p.id}</span>
                               </div>
                             </td>
                             

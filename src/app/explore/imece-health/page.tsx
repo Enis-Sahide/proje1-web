@@ -51,7 +51,7 @@ export default function ImeceHealthPage() {
             <span className="px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-widest inline-block mb-4 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
               Bütünsel Şifa & Teknoloji
             </span>
-            <h1 className="text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-mystic-text to-emerald-400 mb-6 drop-shadow-md py-1">
+            <h1 className="text-4xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-white via-mystic-text to-emerald-400 py-4 mb-6 drop-shadow-md leading-normal">
               İmece Sağlık Teknolojisi
             </h1>
             <p className="text-lg text-mystic-text-muted max-w-2xl leading-relaxed">

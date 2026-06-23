@@ -307,7 +307,7 @@ export default function BreathworkPage() {
 
                 <div className="mt-auto">
                   <div className="flex flex-wrap gap-2">
-                    {tech.phases.map((phase, idx) => (
+                    {tech.phases.map((phase: any, idx: number) => (
                       <div key={idx} className="bg-mystic-surface-light/50 px-3 py-1.5 rounded-lg border border-mystic-surface-light text-xs font-medium text-mystic-text flex items-center gap-2">
                         <span className="text-mystic-accent">{phase.name}</span>
                         <span className="text-mystic-text-muted">{phase.time}s</span>

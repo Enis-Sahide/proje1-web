@@ -134,7 +134,7 @@ export default function MicrocosmicOrbitPage() {
         </div>
 
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-300 to-blue-400 mb-4 tracking-wider uppercase">
+          <h1 className="text-3xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 via-purple-300 to-blue-400 py-4 mb-4 tracking-wider uppercase leading-normal">
             Mikrokozmik Yörünge
           </h1>
           <p className="text-blue-200/60 max-w-2xl mx-auto text-sm md:text-base">
