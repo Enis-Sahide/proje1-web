@@ -8,6 +8,22 @@ import { Menu, X, Sparkles, User, LogIn, ShoppingCart, Store, Shield, Lock, Wren
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 
+const ROLE_SHORT_LABELS: Record<string, string> = {
+  free: 'Ücretsiz',
+  apprentice: 'Çırak',
+  journeyman: 'Kalfa',
+  master: 'Usta',
+  admin: 'Admin',
+};
+
+const ROLE_BADGE_STYLES: Record<string, string> = {
+  free: 'bg-white/5 border-white/10 text-mystic-text-muted',
+  apprentice: 'bg-amber-500/10 border-amber-500/30 text-amber-400 border-amber-500/20',
+  journeyman: 'bg-blue-500/10 border-blue-500/30 text-blue-400 border-blue-500/20',
+  master: 'bg-mystic-primary/10 border-mystic-primary/30 text-mystic-primary border-mystic-primary/20',
+  admin: 'bg-red-500/10 border-red-500/30 text-red-400 border-red-500/20',
+};
+
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -68,6 +84,36 @@ export default function Navigation() {
             7Layers
           </span>
         </Link>
+
+        {/* Mobile Profile / Auth (Mobile Viewports) */}
+        <div className={`items-center gap-2 ml-auto ${
+          isAdmin ? 'flex xl:hidden' : 'flex lg:hidden'
+        }`}>
+          {isLoggedIn ? (
+            <Link 
+              href="/profile"
+              className="flex items-center gap-2 text-mystic-text-muted hover:text-mystic-accent transition-colors"
+            >
+              <div className="flex flex-col items-end leading-none">
+                <span className="text-[11px] font-semibold text-white truncate max-w-[70px] mb-0.5">{getDisplayName()}</span>
+                <span className={`px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-widest scale-90 origin-right ${ROLE_BADGE_STYLES[role] || ROLE_BADGE_STYLES.free}`}>
+                  {ROLE_SHORT_LABELS[role] || 'Üye'}
+                </span>
+              </div>
+              <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-mystic-primary shadow-inner shrink-0">
+                <User size={14} />
+              </div>
+            </Link>
+          ) : (
+            <Link 
+              href="/auth/login" 
+              className="flex items-center gap-1 px-2.5 py-1.5 rounded-full border border-mystic-primary text-mystic-primary hover:bg-mystic-primary hover:text-white transition-all text-[10px] font-bold uppercase tracking-wider"
+            >
+              <LogIn size={11} />
+              <span>Giriş</span>
+            </Link>
+          )}
+        </div>
 
         {/* Right side container */}
         <div className={`items-center gap-2 xl:gap-3 2xl:gap-6 ml-auto ${
