@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Sparkles, User, LogIn, ShoppingCart, Store, Shield, Lock, Wrench, LogOut } from 'lucide-react';
+import { Menu, X, Sparkles, User, LogIn, ShoppingCart, Store, Shield, Lock, Wrench, LogOut, Home, Compass, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 
@@ -147,71 +147,147 @@ export default function Navigation() {
           </div>
         </div>
 
-        {/* Mobile Menu Button */}
-        <button 
-          className={`text-mystic-text ${
-            isAdmin ? 'xl:hidden' : 'lg:hidden'
+      </div>
+
+      {/* Mobile Bottom Navigation Bar (Footer Bar) */}
+      <div className={`fixed bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md bg-mystic-dark/95 backdrop-blur-xl border border-white/10 rounded-2xl py-2 px-3 shadow-[0_10px_35px_rgba(0,0,0,0.8),0_0_20px_rgba(212,175,55,0.05)] z-50 justify-between items-center ${
+        isAdmin ? 'flex xl:hidden' : 'flex lg:hidden'
+      }`}>
+        <Link 
+          href="/" 
+          onClick={() => setMobileMenuOpen(false)}
+          className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors ${
+            pathname === '/' ? 'text-mystic-accent' : 'text-mystic-text-muted hover:text-white'
           }`}
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
-          {mobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+          <Home size={18} />
+          <span className="text-[9px] mt-1 font-semibold uppercase tracking-wider">Ana Sayfa</span>
+        </Link>
+        
+        <Link 
+          href="/meditation" 
+          onClick={() => setMobileMenuOpen(false)}
+          className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors ${
+            pathname === '/meditation' ? 'text-mystic-accent' : 'text-mystic-text-muted hover:text-white'
+          }`}
+        >
+          <Sparkles size={18} />
+          <span className="text-[9px] mt-1 font-semibold uppercase tracking-wider">Frekans</span>
+        </Link>
+        
+        <Link 
+          href="/breathwork" 
+          onClick={() => setMobileMenuOpen(false)}
+          className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors ${
+            pathname === '/breathwork' ? 'text-mystic-accent' : 'text-mystic-text-muted hover:text-white'
+          }`}
+        >
+          <Activity size={18} />
+          <span className="text-[9px] mt-1 font-semibold uppercase tracking-wider">Nefes</span>
+        </Link>
+        
+        <Link 
+          href="/analysis" 
+          onClick={() => setMobileMenuOpen(false)}
+          className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors ${
+            pathname === '/analysis' ? 'text-mystic-accent' : 'text-mystic-text-muted hover:text-white'
+          }`}
+        >
+          <Compass size={18} />
+          <span className="text-[9px] mt-1 font-semibold uppercase tracking-wider">Analiz</span>
+        </Link>
+        
+        <button 
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors ${
+            mobileMenuOpen ? 'text-mystic-accent' : 'text-mystic-text-muted hover:text-white'
+          }`}
+        >
+          {mobileMenuOpen ? <X size={18} /> : <Menu size={18} />}
+          <span className="text-[9px] mt-1 font-semibold uppercase tracking-wider">Menü</span>
         </button>
       </div>
 
-      {/* Mobile Nav */}
+      {/* Mobile Nav Slide-Up Drawer */}
       <AnimatePresence>
         {mobileMenuOpen && (
-          <motion.div 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className={`absolute top-full left-0 w-full bg-mystic-surface border-b border-mystic-surface-light flex flex-col px-4 py-6 shadow-2xl ${
-              isAdmin ? 'xl:hidden' : 'lg:hidden'
-            }`}
-          >
-            {navLinks.map((link) => {
-              const isLocked = link.requiresAuth && !isLoggedIn;
-              const isConstruction = link.isUnderConstruction && !isAdmin;
-
-              if (isConstruction) {
-                return (
-                  <div 
-                    key={link.name} 
-                    className="text-lg py-3 border-b border-mystic-dark/50 text-mystic-text-muted/40 flex items-center justify-between cursor-not-allowed"
-                    title="Yapım Aşamasında"
-                  >
-                    <span>{link.name}</span>
-                    <Wrench size={16} className="opacity-70" />
-                  </div>
-                );
-              }
-
-              return isLocked ? (
-                <Link 
-                  key={link.name} 
-                  href="/auth/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="text-lg py-3 border-b border-mystic-dark/50 text-mystic-text-muted/60 flex items-center justify-between"
-                >
-                  <span>{link.name}</span>
-                  <Lock size={16} className="opacity-70" />
-                </Link>
-              ) : (
-                <Link 
-                  key={link.name} 
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={`text-lg py-3 border-b border-mystic-dark/50 ${
-                    pathname === link.href ? 'text-mystic-accent' : 'text-mystic-text'
-                  }`}
-                >
-                  {link.name}
-                </Link>
-              );
-            })}
+          <>
+            {/* Backdrop Overlay */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setMobileMenuOpen(false)}
+              className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-40 ${
+                isAdmin ? 'xl:hidden' : 'lg:hidden'
+              }`}
+            />
             
-            <div className="mt-6">
-              {isLoggedIn ? (
+            {/* Drawer Container */}
+            <motion.div 
+              initial={{ y: "100%" }}
+              animate={{ y: 0 }}
+              exit={{ y: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 220 }}
+              className={`fixed bottom-0 left-0 w-full bg-mystic-surface border-t border-mystic-surface-light rounded-t-[2.5rem] flex flex-col px-6 pt-6 pb-28 shadow-2xl z-40 max-h-[80vh] overflow-y-auto ${
+                isAdmin ? 'xl:hidden' : 'lg:hidden'
+              }`}
+            >
+              {/* Drag Handle Indicator */}
+              <div className="w-12 h-1 bg-white/20 rounded-full mx-auto mb-6 shrink-0" />
+              
+              <div className="flex justify-between items-center mb-6 shrink-0">
+                <span className="text-sm font-bold text-mystic-primary uppercase tracking-wider">Hızlı Navigasyon</span>
+                <button onClick={() => setMobileMenuOpen(false)} className="text-white/40 hover:text-white">
+                  <X size={20} />
+                </button>
+              </div>
+
+              <div className="flex flex-col gap-1 overflow-y-auto">
+                {navLinks.map((link) => {
+                  const isLocked = link.requiresAuth && !isLoggedIn;
+                  const isConstruction = link.isUnderConstruction && !isAdmin;
+
+                  if (isConstruction) {
+                    return (
+                      <div 
+                        key={link.name} 
+                        className="text-base py-3 border-b border-mystic-dark/30 text-mystic-text-muted/40 flex items-center justify-between cursor-not-allowed"
+                        title="Yapım Aşamasında"
+                      >
+                        <span>{link.name}</span>
+                        <Wrench size={14} className="opacity-70" />
+                      </div>
+                    );
+                  }
+
+                  return isLocked ? (
+                    <Link 
+                      key={link.name} 
+                      href="/auth/login"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="text-base py-3 border-b border-mystic-dark/30 text-mystic-text-muted/60 flex items-center justify-between"
+                    >
+                      <span>{link.name}</span>
+                      <Lock size={14} className="opacity-70" />
+                    </Link>
+                  ) : (
+                    <Link 
+                      key={link.name} 
+                      href={link.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className={`text-base py-3 border-b border-mystic-dark/30 ${
+                        pathname === link.href ? 'text-mystic-accent font-semibold' : 'text-mystic-text'
+                      }`}
+                    >
+                      {link.name}
+                    </Link>
+                  );
+                })}
+              </div>
+              
+              <div className="mt-6 shrink-0">
+                {isLoggedIn ? (
                   <div className="pt-4 border-t border-mystic-surface-light flex flex-col gap-4">
                     <Link 
                       href="/profile"
@@ -232,17 +308,18 @@ export default function Navigation() {
                     </button>
                   </div>
                 ) : (
-                <Link 
-                  href="/auth/login" 
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 w-full py-3 bg-mystic-primary rounded-lg text-white font-medium"
-                >
-                  <LogIn size={20} />
-                  <span>Giriş Yap / Üye Ol</span>
-                </Link>
-              )}
-            </div>
-          </motion.div>
+                  <Link 
+                    href="/auth/login" 
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-center gap-2 w-full py-3 bg-mystic-primary rounded-lg text-white font-medium"
+                  >
+                    <LogIn size={18} />
+                    <span>Giriş Yap / Üye Ol</span>
+                  </Link>
+                )}
+              </div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </header>
