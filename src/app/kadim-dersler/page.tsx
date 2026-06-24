@@ -119,6 +119,12 @@ export default function KadimDerslerPage() {
   ];
 
   const handlePress = (cat: LessonCategory) => {
+    const isApprenticeOrHigher = role && role !== 'free';
+    if (cat.id !== 'duygusal-hastaliklar' && !isApprenticeOrHigher && role !== 'admin') {
+      alert("Dersleri açabilmeniz için en az Çıraklık seviyesine ulaşmış olmanız lazım.");
+      return;
+    }
+
     if (cat.isUnderConstruction) {
       setSelectedConstruction(cat);
       return;

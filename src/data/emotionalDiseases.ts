@@ -1607,8 +1607,8 @@ export const EMOTIONAL_DISEASES: EmotionalDisease[] = [
   },
   {
     "name": "Tiroidin aşırı çalışması",
-    "cause": "Dışarıda (hariç",
-    "affirmation": "bırakıldığı için şiddetli öfke, gazap.) Ben hayatın merkezindeyim ve kendimi ve gördüğüm her şeyi beğeniyor ve onaylıyorum."
+    "cause": "Dışarıda (hariç) bırakıldığı için şiddetli öfke, gazap.",
+    "affirmation": "Ben hayatın merkezindeyim ve kendimi ve gördüğüm her şeyi beğeniyor ve onaylıyorum."
   },
   {
     "name": "Tiroidin az çalışması",

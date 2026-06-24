@@ -42,6 +42,10 @@ export async function POST(request: Request) {
   // Geçtiyse passed_exams'a ekle (idempotent)
   const [pr] = await db.select().from(userProgress).where(eq(userProgress.userId, payload.sub));
   let passedExams = pr?.passedExams ?? [];
+  let examAttempts = (pr?.examAttempts as Record<string, string>) ?? {};
+  const today = new Date().toISOString().split('T')[0];
+  const updatedAttempts = { ...examAttempts, [quizId]: today };
+
   let newlyPassed = false;
   if (passed && !passedExams.includes(String(quizId))) {
     passedExams = [...passedExams, String(quizId)];
@@ -50,7 +54,7 @@ export async function POST(request: Request) {
 
   await db
     .update(userProgress)
-    .set({ passedExams, activeExam: null, updatedAt: new Date() })
+    .set({ passedExams, examAttempts: updatedAttempts, activeExam: null, updatedAt: new Date() })
     .where(eq(userProgress.userId, payload.sub));
 
   // Rol passed_exams'tan yeniden hesaplanır (getAccount içinde)

@@ -26,21 +26,13 @@ export async function POST(request: Request) {
   const examAttempts = (pr?.examAttempts as Record<string, string>) ?? {};
   const activeExam = pr?.activeExam as { examId?: string; startTime?: string; device?: string } | null;
 
-  // 1. Başka cihazda aktif (60 dk içinde) sınav var mı?
-  if (activeExam?.examId && activeExam.startTime) {
-    const diffMin = (Date.now() - new Date(activeExam.startTime).getTime()) / 60000;
-    if (activeExam.device !== device && diffMin < 60) {
-      return errorJson('Bu sınava şu anda başka bir cihazdan giriş yapılmış.', 409);
-    }
-  }
-
-  // 2. Bugün zaten girilmiş mi?
+  // 2. Bugün zaten tamamlanmış mı?
   const today = new Date().toISOString().split('T')[0];
   if (examAttempts[quizId] === today) {
     return errorJson('Bu sınava bugün zaten girdiniz. Günde en fazla 1 kez girilebilir.', 429);
   }
 
-  // 3. Aktif oturumu kaydet + denemeyi işaretle
+  // 3. Aktif oturumu kaydet ve günlük deneme hakkını hemen tüket (examAttempts'e ekle)
   const updatedAttempts = { ...examAttempts, [quizId]: today };
   await db
     .update(userProgress)

@@ -62,7 +62,6 @@ export default function TestsHubPage() {
       id: 'akupunktur', 
       title: 'Akupunktur ve Meridyenler', 
       icon: Activity, 
-      isUnderConstruction: true,
       subTests: [
         { title: '1. Derece: Çıraklık', id: 'akupunktur_1' },
         { title: '2. Derece: Kalfalık', id: 'akupunktur_2', requiredUnlock: 'akupunktur_2' },
@@ -73,7 +72,6 @@ export default function TestsHubPage() {
       id: 'kabbalah', 
       title: 'Evrensel Kabbalah', 
       icon: Network, 
-      isUnderConstruction: true,
       subTests: [
         { title: '1. Derece: Çıraklık (50 Soru)', id: 'kabbalah_1' },
         { title: '2. Derece: Kalfalık (50 Soru)', id: 'kabbalah_2' },
@@ -83,7 +81,6 @@ export default function TestsHubPage() {
       id: 'astroloji', 
       title: 'Ezoterik Astroloji', 
       icon: Compass, 
-      isUnderConstruction: true,
       subTests: [
         { title: '1. Derece: Çıraklık', id: 'astroloji_1' },
         { title: '2. Derece: Kalfalık', id: 'astroloji_2', requiredUnlock: 'astroloji_2' },
@@ -94,7 +91,6 @@ export default function TestsHubPage() {
       id: 'human', 
       title: 'Human Design', 
       icon: Fingerprint, 
-      isUnderConstruction: true,
       subTests: [
         { title: '1. Derece: Çıraklık', id: 'human_1' },
         { title: '2. Derece: Kalfalık', id: 'human_2', requiredUnlock: 'human_2' },
@@ -106,18 +102,16 @@ export default function TestsHubPage() {
       id: 'numeroloji', 
       title: 'Numeroloji', 
       icon: Calculator, 
-      isUnderConstruction: true,
       subTests: [
         { title: '1. Derece: Çıraklık', id: 'numeroloji_1' },
         { title: '2. Derece: Kalfalık', id: 'numeroloji_2', requiredUnlock: 'numeroloji_2' },
         { title: '3. Derece: Üstatlık', id: 'numeroloji_3', requiredUnlock: 'numeroloji_3', isHighlight: true },
       ]
     },
-    {
-      id: 'rune',
-      title: 'Rune',
-      icon: Gem,
-      isUnderConstruction: true,
+    { 
+      id: 'rune', 
+      title: 'Rune', 
+      icon: Gem, 
       subTests: [
         { title: '1. Kademe: Semboller', id: 'rune1' },
         { title: '2. Kademe: Bağlamalar', id: 'rune2', requiredUnlock: 'rune_2' },
@@ -129,7 +123,6 @@ export default function TestsHubPage() {
       id: 'yoga', 
       title: 'Yoga Asanaları', 
       icon: Flame, 
-      isUnderConstruction: true,
       subTests: [
         { title: '1. Derece: Çıraklık', id: 'yoga_1' },
         { title: '2. Derece: Kalfalık', id: 'yoga_2', requiredUnlock: 'yoga_2' },

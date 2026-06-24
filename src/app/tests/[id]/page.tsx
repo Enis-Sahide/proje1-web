@@ -53,9 +53,11 @@ export default function ExamTakingPage() {
   // Guard states
   const [isLoadingCheck, setIsLoadingCheck] = useState(true);
   const [blockedReason, setBlockedReason] = useState<string | null>(null);
+  const [showExitConfirm, setShowExitConfirm] = useState(false);
 
   // To prevent multiple cleanups
   const activeSessionCleaned = useRef(false);
+  const examStarted = useRef(false);
 
   useEffect(() => {
     async function checkExamAccess() {
@@ -71,6 +73,7 @@ export default function ExamTakingPage() {
           method: 'POST',
           body: JSON.stringify({ quizId: id, device: 'web' }),
         });
+        examStarted.current = true;
       } catch (err: any) {
         setBlockedReason(err?.message || "Sınav doğrulaması sırasında bir hata oluştu.");
         setIsLoadingCheck(false);
@@ -121,10 +124,23 @@ export default function ExamTakingPage() {
     return () => {
       if (!activeSessionCleaned.current) {
         activeSessionCleaned.current = true;
-        clearActiveSession();
+        if (examStarted.current) {
+          clearActiveSession();
+        }
       }
     };
   }, [id, user]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, []);
 
   const clearActiveSession = async () => {
     try {
@@ -171,25 +187,20 @@ export default function ExamTakingPage() {
     } catch {
       setReveal({ correctText: null, explanation: null });
     }
-  };
 
-  const handleNextQuestion = () => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex(prev => prev + 1);
-      setSelectedOption(null);
-      setReveal(null);
-    } else {
-      setIsFinished(true);
-    }
+    setTimeout(() => {
+      if (currentIndex < questions.length - 1) {
+        setCurrentIndex(prev => prev + 1);
+        setSelectedOption(null);
+        setReveal(null);
+      } else {
+        setIsFinished(true);
+      }
+    }, 1200);
   };
 
   const handleBackPress = () => {
-    const confirmExit = window.confirm(
-      "Testten çıkmak istediğinize emin misiniz? Mevcut ilerlemeniz kaydedilmeyecektir."
-    );
-    if (confirmExit) {
-      router.push('/tests');
-    }
+    setShowExitConfirm(true);
   };
 
   // --- LOADING CHECK ---
@@ -345,11 +356,12 @@ export default function ExamTakingPage() {
         <div className="space-y-4">
           {currentQuestion.options.map((option, idx) => {
             const isOptSelected = selectedOption === option;
-            const isCorrectOption = option === reveal?.correctText;
-            const showCorrect = isSelected && isCorrectOption;
-            const showWrong = isSelected && isOptSelected && !isCorrectOption;
+            const isCorrectOption = reveal ? option === reveal.correctText : false;
+            const showCorrect = reveal !== null && isCorrectOption;
+            const showWrong = reveal !== null && isOptSelected && !isCorrectOption;
+            const isPending = reveal === null && isOptSelected;
 
-            let btnClass = "border-white/10 bg-white/[0.03] hover:border-[#D4AF37]/30 hover:bg-white/[0.06] text-white/80";
+            let btnClass = "border-white/10 bg-white/[0.03] text-white/80";
             let iconComponent = <div className="w-5 h-5 rounded-full border border-white/30 shrink-0" />;
 
             if (showCorrect) {
@@ -358,6 +370,13 @@ export default function ExamTakingPage() {
             } else if (showWrong) {
               btnClass = "border-red-500/40 bg-red-500/10 text-red-400 font-semibold shadow-[0_0_15px_rgba(239,68,68,0.15)]";
               iconComponent = <XCircle className="text-red-400 shrink-0" size={20} />;
+            } else if (isPending) {
+              btnClass = "border-[#D4AF37]/40 bg-[#D4AF37]/10 text-[#D4AF37] font-semibold shadow-[0_0_15px_rgba(212,175,55,0.15)] animate-pulse";
+              iconComponent = <Loader2 className="text-[#D4AF37] animate-spin shrink-0" size={20} />;
+            } else if (isSelected) {
+              btnClass = "border-white/5 bg-white/[0.01] text-white/30 cursor-not-allowed";
+            } else {
+              btnClass += " hover:border-[#D4AF37]/30 hover:bg-white/[0.06] cursor-pointer";
             }
 
             return (
@@ -374,36 +393,39 @@ export default function ExamTakingPage() {
           })}
         </div>
 
-        {/* Explanation & Next Button */}
-        {isSelected && (
-          <div className="mt-10 p-6 rounded-2xl border border-[#D4AF37]/20 bg-[#D4AF37]/5 space-y-4 animate-in fade-in duration-300">
-            <div className="flex items-center gap-2 text-[#D4AF37]">
-              <Info size={18} />
-              <span className="font-bold text-sm tracking-wider uppercase">Kadim Bilgi</span>
-            </div>
-            <p className="text-white/80 text-sm leading-relaxed font-serif italic">
-              {reveal?.explanation || currentQuestion.explanation}
-            </p>
 
-            <button
-              onClick={handleNextQuestion}
-              className="w-full mt-6 py-4 rounded-xl bg-[#D4AF37] hover:bg-amber-400 text-black font-bold flex items-center justify-center gap-2 hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-300 uppercase tracking-wider text-xs"
-            >
-              {currentIndex < totalQuestions - 1 ? (
-                <>
-                  Sonraki Soru
-                  <ArrowRight size={16} />
-                </>
-              ) : (
-                <>
-                  Sonucu Gör
-                  <Sparkles size={16} />
-                </>
-              )}
-            </button>
-          </div>
-        )}
       </div>
+
+      {showExitConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
+          <div className="max-w-md w-full bg-[#0c0314] border border-[#D4AF37]/20 p-8 rounded-3xl text-center shadow-[0_0_50px_rgba(212,175,55,0.1)]">
+            <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="text-red-500" size={32} />
+            </div>
+            <h3 className="text-2xl font-bold text-white mb-4">Sınavdan Çıkış</h3>
+            <p className="text-white/60 text-sm leading-relaxed mb-8">
+              Sınavdan çıkmak istediğinize emin misiniz? Çıkış yaparsanız bugünkü sınav hakkınız yanacaktır ve bugün tekrar giremezsiniz.
+            </p>
+            <div className="flex gap-4">
+              <button 
+                onClick={() => setShowExitConfirm(false)}
+                className="flex-1 py-3 px-6 rounded-xl border border-white/10 text-white hover:bg-white/5 transition-all text-sm font-semibold cursor-pointer"
+              >
+                İptal
+              </button>
+              <button 
+                onClick={() => {
+                  setShowExitConfirm(false);
+                  router.push('/tests');
+                }}
+                className="flex-1 py-3 px-6 rounded-xl bg-red-600 hover:bg-red-700 text-white transition-all text-sm font-semibold cursor-pointer"
+              >
+                Çıkış Yap
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

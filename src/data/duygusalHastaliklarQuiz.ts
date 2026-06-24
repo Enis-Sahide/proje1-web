@@ -175,7 +175,7 @@ export const duygusalHastaliklarQuiz: Quiz = {
   },
   {
     "id": "dh_50_15",
-    "question": "Ezoterik öğretilere göre aşağıdaki rahatsızlıklardan hangisinin zihinsel nedeni şudur: \"Dışarıda (hariç\"?",
+    "question": "Ezoterik öğretilere göre aşağıdaki rahatsızlıklardan hangisinin zihinsel nedeni şudur: \"Dışarıda (hariç) bırakıldığı için şiddetli öfke, gazap.\"?",
     "options": [
       "Tiroidin aşırı çalışması",
       "Lenf Bezleri",
@@ -183,7 +183,7 @@ export const duygusalHastaliklarQuiz: Quiz = {
       "Anksiyete kaygı"
     ],
     "correctAnswerIndex": 0,
-    "explanation": "Doğru cevap Tiroidin aşırı çalışması. Olumlama Cümlesi: \"bırakıldığı için şiddetli öfke, gazap.) Ben hayatın merkezindeyim ve kendimi ve gördüğüm her şeyi beğeniyor ve onaylıyorum.\""
+    "explanation": "Doğru cevap Tiroidin aşırı çalışması. Olumlama Cümlesi: \"Ben hayatın merkezindeyim ve kendimi ve gördüğüm her şeyi beğeniyor ve onaylıyorum.\""
   },
   {
     "id": "dh_50_16",
