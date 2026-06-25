@@ -1,5 +1,9 @@
-import { NextResponse } from 'next/server';
 import { calculateLifePath, calculatePersonalYear, calculateArrows, getBirthdayNumber, calculateNameAnalysis } from '@/utils/numerologyCalculator';
+import { json, errorJson, preflight } from '@/lib/http/cors';
+
+export async function OPTIONS() {
+  return preflight();
+}
 
 export async function POST(request: Request) {
   try {
@@ -7,7 +11,7 @@ export async function POST(request: Request) {
     const { birthDate, name } = body;
 
     if (!birthDate) {
-      return NextResponse.json({ error: 'Eksik parametreler.' }, { status: 400 });
+      return errorJson('Eksik parametreler.', 400);
     }
 
     const lifePath = calculateLifePath(birthDate);
@@ -20,7 +24,7 @@ export async function POST(request: Request) {
       nameAnalysis = calculateNameAnalysis(name);
     }
 
-    return NextResponse.json({
+    return json({
       lifePath,
       birthday,
       arrows,
@@ -29,6 +33,6 @@ export async function POST(request: Request) {
     });
   } catch (error: any) {
     console.error('Numerology API Error:', error);
-    return NextResponse.json({ error: 'Hesaplama sırasında bir hata oluştu.' }, { status: 500 });
+    return errorJson('Hesaplama sırasında bir hata oluştu.', 500);
   }
 }

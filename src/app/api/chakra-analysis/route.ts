@@ -1,13 +1,13 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { asc } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { chakraTestQuestions } from '@/db/schema';
+import { json, errorJson, preflight } from '@/lib/http/cors';
 
 export const dynamic = 'force-dynamic';
 
 type ChakraId = 'root' | 'sacral' | 'solar' | 'heart' | 'throat' | 'thirdEye' | 'crown';
 
-// Mobil ve web çakraları arasındaki renk ve ID eşleştirmeleri
 const CHAKRA_MAP: Record<ChakraId, { numericId: number; color: string }> = {
   root: { numericId: 1, color: '#FF3B30' },
   sacral: { numericId: 2, color: '#FF9500' },
@@ -33,16 +33,17 @@ async function loadQuestions(): Promise<{ id: number; chakraId: ChakraId; text: 
   return rows.map((r) => ({ id: r.id, chakraId: r.chakraKey as ChakraId, text: r.text }));
 }
 
+export async function OPTIONS() {
+  return preflight();
+}
+
 export async function GET() {
   try {
     const questions = await loadQuestions();
-    return NextResponse.json({ success: true, questions });
+    return json({ success: true, questions });
   } catch (error: any) {
     console.error('Chakra API GET Error:', error);
-    return NextResponse.json(
-      { success: false, error: 'Sorular yüklenirken hata oluştu.' },
-      { status: 500 },
-    );
+    return errorJson('Sorular yüklenirken hata oluştu.', 500);
   }
 }
 
@@ -52,20 +53,15 @@ export async function POST(req: NextRequest) {
     const { answers } = body as { answers: { questionId: number; score: number }[] };
 
     if (!answers || !Array.isArray(answers)) {
-      return NextResponse.json(
-        { success: false, error: 'Cevaplar geçersiz veya eksik.' },
-        { status: 400 },
-      );
+      return errorJson('Cevaplar geçersiz veya eksik.', 400);
     }
 
     const questions = await loadQuestions();
 
-    // Skorları hesapla
     const chakraScores: Record<ChakraId, number> = {
       root: 0, sacral: 0, solar: 0, heart: 0, throat: 0, thirdEye: 0, crown: 0,
     };
 
-    // Her soru için score (1, 2, veya 3) ekle
     answers.forEach((ans) => {
       const q = questions.find((item) => item.id === ans.questionId);
       if (q) {
@@ -73,7 +69,6 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    // Her çakranın yüzdesini hesapla (tıkanıklık = 100 - açıklık)
     const results = Object.keys(chakraScores).map((key) => {
       const chakraId = key as ChakraId;
       const rawScore = chakraScores[chakraId];
@@ -93,15 +88,11 @@ export async function POST(req: NextRequest) {
       };
     });
 
-    // En çok tıkalı olandan en aza doğru sırala
     results.sort((a, b) => b.percent - a.percent);
 
-    return NextResponse.json({ success: true, results });
+    return json({ success: true, results });
   } catch (error: any) {
     console.error('Chakra API POST Error:', error);
-    return NextResponse.json(
-      { success: false, error: error.message || 'Hesaplama sırasında hata oluştu.' },
-      { status: 500 },
-    );
+    return errorJson(error.message || 'Hesaplama sırasında hata oluştu.', 500);
   }
 }
