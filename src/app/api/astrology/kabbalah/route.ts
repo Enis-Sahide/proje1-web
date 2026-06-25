@@ -4,6 +4,7 @@ import { getKabbalahAnalysis } from '@/features/astrology/engine/KabbalahInterpr
 import { getEsotericPlanetInterpretation } from '@/features/astrology/engine/KabbalahPlanetInterpretations';
 import { json, errorJson, preflight } from '@/lib/http/cors';
 import moment from 'moment-timezone';
+import { getAuthPayload } from '@/lib/auth/session';
 
 export async function OPTIONS() {
   return preflight();
@@ -11,6 +12,19 @@ export async function OPTIONS() {
 
 export async function POST(req: NextRequest) {
   try {
+    const payload = await getAuthPayload(req);
+    if (!payload) {
+      return errorJson('Yetkisiz - Giriş yapılması gereklidir', 401);
+    }
+    
+    const role = payload.role ?? 'free';
+    const ROLE_LEVELS: Record<string, number> = { free: 0, apprentice: 1, journeyman: 2, master: 3, admin: 999 };
+    const userLevel = ROLE_LEVELS[role] ?? 0;
+
+    if (userLevel < 3 && role !== 'admin') {
+      return errorJson('Yetkisiz - En az Ustalık seviyesi gereklidir', 403);
+    }
+
     const body = await req.json();
     const { localDate, localTime, cityData } = body;
 
