@@ -4,8 +4,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, Loader2, Search, Triangle, Star, Compass, AlertCircle, ChevronDown, CheckCircle2, Moon, Sun, MoonStar } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ASTRO_CITIES, AstroPoint, NatalChartData, AstroCity } from '@/features/astrology/engine/AstrologyConstants';
-import { getKabbalahAnalysis } from '@/features/astrology/engine/KabbalahInterpretations';
-import { getEsotericPlanetInterpretation } from '@/features/astrology/engine/KabbalahPlanetInterpretations';
+// Interpretations are fetched from the backend API.
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { X } from 'lucide-react';
 import RequireRole from '@/core/ui/RequireRole';
@@ -54,6 +53,8 @@ export default function KabbalahAnalysisPage() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [chartData, setChartData] = useState<any>(null);
+  const [kabbalahAnalysis, setKabbalahAnalysis] = useState<any>(null);
+  const [interpretations, setInterpretations] = useState<any>(null);
   const [errorStr, setErrorStr] = useState('');
   const [selectedWorld, setSelectedWorld] = useState<'assiah' | 'yetzirah' | 'beriyah' | 'atzilut'>('assiah');
   const [selectedInterp, setSelectedInterp] = useState<{title: string, content: string} | null>(null);
@@ -67,14 +68,13 @@ export default function KabbalahAnalysisPage() {
         throw new Error("Lütfen tüm tarih, saat ve şehir alanlarını doldurunuz.");
       }
 
-      const res = await fetch('/api/astrology/calculate', {
+      const res = await fetch('/api/astrology/kabbalah', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           localDate: dateStr,
           localTime: timeStr,
-          cityData: cityKey,
-          calcAllWorlds: true
+          cityData: cityKey
         })
       });
 
@@ -83,7 +83,9 @@ export default function KabbalahAnalysisPage() {
         throw new Error(data.error || "Hesaplama hatası");
       }
 
-      setChartData(data.data);
+      setChartData(data.data.charts);
+      setKabbalahAnalysis(data.data.kabbalahAnalysis);
+      setInterpretations(data.data.interpretations);
       setSelectedWorld('assiah');
     } catch (error: any) {
       console.error('Kabalistik hesaplama hatası:', error);
@@ -92,8 +94,6 @@ export default function KabbalahAnalysisPage() {
       setIsLoading(false);
     }
   };
-
-  const kabbalahAnalysis = chartData?.assiah ? getKabbalahAnalysis(dateStr) : null;
 
   const renderSvgWheel = (currentChart: NatalChartData | null) => {
     if (!currentChart) return null;
@@ -201,7 +201,7 @@ export default function KabbalahAnalysisPage() {
             const py = getY(p.longitude, R_PLANETS - rOffset);
             
             return (
-              <g key={`planet-${i}`} className="cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setSelectedInterp(getEsotericPlanetInterpretation(p.name, p.sign, p.house, selectedWorld === 'yetzirah', selectedWorld === 'beriyah', selectedWorld === 'atzilut', p.isRetrograde))}>
+              <g key={`planet-${i}`} className="cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setSelectedInterp(interpretations?.[selectedWorld]?.[p.name] || null)}>
                 <line x1={getX(p.longitude, R_ZODIAC_INNER)} y1={getY(p.longitude, R_ZODIAC_INNER)} x2={px} y2={py} stroke="rgba(212,175,55,0.3)" strokeWidth="0.5" strokeDasharray="1, 2" />
                 <circle cx={px} cy={py} r="12" fill="#0F172A" stroke="#D4AF37" strokeWidth="1" className="hover:fill-[#D4AF37]/20 transition-colors" />
                 <text x={px} y={py + 5} fontSize="14" fill="#D4AF37" textAnchor="middle" fontWeight="bold">
@@ -430,7 +430,7 @@ export default function KabbalahAnalysisPage() {
                         <div 
                           key={idx} 
                           className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:border-[#D4AF37]/50 cursor-pointer transition-colors"
-                          onClick={() => setSelectedInterp(getEsotericPlanetInterpretation(p.name, p.sign, p.house, selectedWorld === 'yetzirah', selectedWorld === 'beriyah', selectedWorld === 'atzilut', p.isRetrograde))}
+                          onClick={() => setSelectedInterp(interpretations?.[selectedWorld]?.[p.name] || null)}
                         >
                           <div className="flex items-center gap-3">
                             <span className="w-8 h-8 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] text-lg font-bold">
@@ -547,7 +547,7 @@ export default function KabbalahAnalysisPage() {
 
               <div className="pt-8 pb-12 flex justify-center">
                 <button 
-                  onClick={() => {setChartData(null); setDateStr(''); setTimeStr('');}}
+                  onClick={() => {setChartData(null); setKabbalahAnalysis(null); setInterpretations(null); setDateStr(''); setTimeStr('');}}
                   className="px-6 py-3 border border-white/20 rounded-xl text-white hover:bg-white/10 transition-colors"
                 >
                   Yeni Bir Ruh İçin Sorgula

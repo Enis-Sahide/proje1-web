@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar } from 'lucide-react';
+import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Lock } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 export default function AnalysisPage() {
@@ -10,14 +10,15 @@ export default function AnalysisPage() {
   const isMasterOrAdmin = role === 'master' || role === 'admin';
 
   const tools = [
-    ...(isMasterOrAdmin ? [{
+    {
       id: 'kabbalah',
       title: 'Kabalistik 4 Alem',
       description: 'Sefirot ağacındaki kadersel sıçrama noktalarınızı bulun.',
       icon: <MoonStar size={32} />,
       color: '#D4AF37',
-      link: '/analysis/kabbalah'
-    }] : []),
+      link: '/analysis/kabbalah',
+      isLocked: !isMasterOrAdmin
+    },
     {
       id: 'astrology',
       title: 'Doğum Haritası',
@@ -91,6 +92,11 @@ export default function AnalysisPage() {
                 e.currentTarget.style.borderColor = `rgba(255,255,255,0.1)`;
               }}
             >
+              {tool.isLocked && (
+                <div className="absolute top-6 right-6 bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5 backdrop-blur-sm z-10 animate-pulse">
+                  <Lock size={12} /> Usta Seviyesi
+                </div>
+              )}
               <div 
                 className="absolute top-0 right-0 w-48 h-48 rounded-full blur-3xl -mr-20 -mt-20 opacity-20 transition-opacity duration-500 group-hover:opacity-40"
                 style={{ backgroundColor: tool.color }}
