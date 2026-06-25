@@ -42,9 +42,9 @@ export async function POST(request: Request) {
   // Geçtiyse passed_exams'a ekle (idempotent)
   const [pr] = await db.select().from(userProgress).where(eq(userProgress.userId, payload.sub));
   let passedExams = pr?.passedExams ?? [];
-  let examAttempts = (pr?.examAttempts as Record<string, string>) ?? {};
+  let examAttempts = (pr?.examAttempts as Record<string, any>) ?? {};
   const today = new Date().toISOString().split('T')[0];
-  const updatedAttempts = { ...examAttempts, [quizId]: today };
+  const updatedAttempts = { ...examAttempts, [quizId]: { date: today, score: Math.round(score) } };
 
   let newlyPassed = false;
   if (passed && !passedExams.includes(String(quizId))) {

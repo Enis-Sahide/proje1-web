@@ -14,7 +14,7 @@ export interface Account {
   avatarUrl: string | null;
   unlockedTiers: string[];
   passedExams: string[];
-  examAttempts: Record<string, string>;
+  examAttempts: Record<string, any>;
   activeExam: unknown;
 }
 
@@ -56,7 +56,7 @@ export async function getAccount(userId: string): Promise<Account | null> {
     avatarUrl: p?.avatarUrl ?? null,
     unlockedTiers: pr?.unlockedTiers ?? [],
     passedExams,
-    examAttempts: (pr?.examAttempts as Record<string, string>) ?? {},
+    examAttempts: (pr?.examAttempts as Record<string, any>) ?? {},
     activeExam: pr?.activeExam ?? null,
   };
 }

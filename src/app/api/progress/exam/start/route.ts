@@ -23,12 +23,14 @@ export async function POST(request: Request) {
   }
 
   const [pr] = await db.select().from(userProgress).where(eq(userProgress.userId, payload.sub));
-  const examAttempts = (pr?.examAttempts as Record<string, string>) ?? {};
+  const examAttempts = (pr?.examAttempts as Record<string, any>) ?? {};
   const activeExam = pr?.activeExam as { examId?: string; startTime?: string; device?: string } | null;
 
   // 2. Bugün zaten tamamlanmış mı?
   const today = new Date().toISOString().split('T')[0];
-  if (examAttempts[quizId] === today) {
+  const attempt = examAttempts[quizId];
+  const attemptDate = typeof attempt === 'string' ? attempt : (attempt as any)?.date;
+  if (attemptDate === today) {
     return errorJson('Bu sınava bugün zaten girdiniz. Günde en fazla 1 kez girilebilir.', 429);
   }
 
