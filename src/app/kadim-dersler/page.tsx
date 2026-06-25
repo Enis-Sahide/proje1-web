@@ -35,7 +35,6 @@ export default function KadimDerslerPage() {
   const { role } = useAuth();
   const isAdmin = role === 'admin';
   const [selectedConstruction, setSelectedConstruction] = useState<LessonCategory | null>(null);
-  const [showLockModal, setShowLockModal] = useState(false);
 
   const categories: LessonCategory[] = [
     { 
@@ -116,7 +115,6 @@ export default function KadimDerslerPage() {
     const isApprenticeOrHigher = role && role !== 'free';
     console.log("Web handlePress click:", { catId: cat.id, role, isApprenticeOrHigher });
     if (cat.id !== 'duygusal-hastaliklar' && !isApprenticeOrHigher && role !== 'admin') {
-      setShowLockModal(true);
       return;
     }
 
@@ -152,12 +150,14 @@ export default function KadimDerslerPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {categories.map((cat, i) => {
             const showConstruction = cat.isUnderConstruction && !isAdmin;
+            const isApprenticeOrHigher = role && role !== 'free';
+            const isLocked = cat.id !== 'duygusal-hastaliklar' && !isApprenticeOrHigher && !isAdmin;
             return (
               <div 
                 key={cat.id} 
                 onClick={() => handlePress(cat)}
                 className={`relative group overflow-hidden rounded-3xl p-[1px] cursor-pointer transition-all duration-500 hover:scale-[1.02] ${
-                  showConstruction ? 'opacity-75 hover:opacity-100' : 'shadow-2xl hover:shadow-[#D4AF37]/15'
+                  showConstruction || isLocked ? 'opacity-75 hover:opacity-100' : 'shadow-2xl hover:shadow-[#D4AF37]/15'
                 }`}
                 style={{ animationDelay: `${i * 80}ms` }}
               >
@@ -185,6 +185,10 @@ export default function KadimDerslerPage() {
                     {cat.isUnderConstruction ? (
                       <span className="text-xs font-semibold text-mystic-accent flex items-center">
                         {isAdmin ? 'Erişime Açık (Admin) →' : 'Dersi İncele 🔒'}
+                      </span>
+                    ) : isLocked ? (
+                      <span className="text-xs font-semibold text-red-400 flex items-center">
+                        Derece Kilitli 🔒
                       </span>
                     ) : (
                       <span className="text-xs font-semibold text-[#D4AF37] flex items-center group-hover:translate-x-1 transition-transform">
@@ -232,42 +236,6 @@ export default function KadimDerslerPage() {
             </button>
           </div>
         </div>
-      )}
-
-      {/* Lock Popup Modal */}
-      {showLockModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-mystic-surface border border-mystic-primary/30 rounded-3xl p-8 max-w-md w-full text-center relative overflow-hidden shadow-[0_0_50px_rgba(212,175,55,0.15)]">
-            {/* Glow */}
-            <div className="absolute -top-20 -left-20 w-40 h-40 bg-mystic-primary/10 rounded-full blur-3xl pointer-events-none" />
-            
-            <button 
-              onClick={() => setShowLockModal(false)}
-              className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors"
-            >
-              <X size={24} />
-            </button>
-
-            <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-6">
-              <Layers className="text-red-500" size={32} />
-            </div>
-
-            <h3 className="text-2xl font-bold text-white mb-2">Derece Kilitli</h3>
-            <p className="text-red-400 text-xs font-bold uppercase tracking-wider mb-4">Erişim Engellendi</p>
-            
-            <p className="text-mystic-text-muted text-sm leading-relaxed mb-6">
-              Dersleri açabilmeniz için en az Çıraklık seviyesine ulaşmış olmanız lazım.
-            </p>
-
-            <button 
-              onClick={() => setShowLockModal(false)}
-              className="bg-gradient-to-r from-[#D4AF37] to-yellow-500 text-black font-bold px-8 py-3 rounded-full hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-300 w-full"
-            >
-              Anladım
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+      )}    </div>
   );
 }

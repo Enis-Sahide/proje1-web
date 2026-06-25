@@ -83,8 +83,6 @@ export default function YogaPage() {
 
   const [activeTab, setActiveTab] = useState<'cirak' | 'kalfa' | 'ustat'>('cirak');
   const [expandedLesson, setExpandedLesson] = useState<string | null>(null);
-  const [showLockModal, setShowLockModal] = useState(false);
-  const [requiredRoleName, setRequiredRoleName] = useState('');
 
   const { data: lessonsData, loading, error } = useContent<Record<string, any>>('/api/content/lessons?discipline=yoga');
 
@@ -93,13 +91,9 @@ export default function YogaPage() {
 
   const handleTabPress = (tab: 'cirak' | 'kalfa' | 'ustat') => {
     if (tab === 'kalfa' && !isKalfaUnlocked) {
-      setRequiredRoleName('2. Derece (Kalfalık)');
-      setShowLockModal(true);
       return;
     }
     if (tab === 'ustat' && !isUstatUnlocked) {
-      setRequiredRoleName('3. Derece (Üstatlık)');
-      setShowLockModal(true);
       return;
     }
     setActiveTab(tab);
@@ -232,40 +226,6 @@ export default function YogaPage() {
           </div>
         )}
       </div>
-
-      {/* Lock Popup Modal */}
-      {showLockModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="bg-mystic-surface border border-mystic-primary/30 rounded-3xl p-8 max-w-md w-full text-center relative overflow-hidden shadow-[0_0_50px_rgba(212,175,55,0.15)]">
-            <div className="absolute -top-20 -left-20 w-40 h-40 bg-mystic-primary/10 rounded-full blur-3xl pointer-events-none" />
-            
-            <button 
-              onClick={() => setShowLockModal(false)}
-              className="absolute top-4 right-4 text-white/40 hover:text-white transition-colors"
-            >
-              <X size={24} />
-            </button>
-
-            <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-6">
-              <Lock className="text-red-500" size={32} />
-            </div>
-
-            <h3 className="text-2xl font-bold text-white mb-2">Derece Kilitli</h3>
-            <p className="text-red-400 text-xs font-bold uppercase tracking-wider mb-4">Erişim Engellendi</p>
-            
-            <p className="text-mystic-text-muted text-sm leading-relaxed mb-6">
-              Bu dersi/dereceyi açabilmeniz için en az <strong className="text-mystic-primary">{requiredRoleName}</strong> seviyesine ulaşmış olmanız gerekmektedir.
-            </p>
-
-            <button 
-              onClick={() => setShowLockModal(false)}
-              className="bg-gradient-to-r from-mystic-primary to-yellow-500 text-black font-bold px-8 py-3 rounded-full hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-300 w-full"
-            >
-              Anladım
-            </button>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
