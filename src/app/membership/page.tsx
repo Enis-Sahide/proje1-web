@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { 
   Wrench, 
   ArrowLeft, 
@@ -12,7 +13,8 @@ import {
   Check, 
   X, 
   Save, 
-  ShieldCheck 
+  ShieldCheck,
+  AlertCircle
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -38,12 +40,16 @@ const ROLE_LEVELS: Record<string, number> = {
   admin: 999,
 };
 
+const LEVEL_1_EXAMS = ['akupunktur_1', 'kabbalah_1', 'astroloji_1', 'human_1', 'numeroloji_1', 'rune1', 'yoga_1'];
+const LEVEL_2_EXAMS = ['akupunktur_2', 'kabbalah_2', 'astroloji_2', 'human_2', 'numeroloji_2', 'rune2', 'yoga_2'];
+const ENTRY_EXAMS = ['aura', 'duygusal_hastaliklar_50'];
+
 const INITIAL_TIERS: Tier[] = [
   {
     id: 'apprentice',
     level: 1,
     title: 'Çırak Seviyesi',
-    price: '99 TL / Ay',
+    price: '396 TL / Ay',
     description: 'Ezoterik yolculuğa ilk adımınızı atın. Temel dersler ve başlangıç analizleri.',
     benefits: [
       '1. Derece Derslere Erişim',
@@ -59,7 +65,7 @@ const INITIAL_TIERS: Tier[] = [
     id: 'journeyman',
     level: 2,
     title: 'Kalfa Seviyesi',
-    price: '199 TL / Ay',
+    price: '639 TL / Ay',
     description: 'Bilginizi derinleştirin. 2. Derece dersler, detaylı numeroloji ve astroloji.',
     benefits: [
       '1. ve 2. Derece Derslere Erişim',
@@ -76,7 +82,7 @@ const INITIAL_TIERS: Tier[] = [
     id: 'master',
     level: 3,
     title: 'Usta Seviyesi',
-    price: '399 TL / Ay',
+    price: '999 TL / Ay',
     description: 'Sırları çözün ve üstatlığa yükselin. Kadim Uygulamalar ve özel nefes çalışmaları.',
     benefits: [
       'Tüm Derecelere Sınırsız Erişim',
@@ -93,9 +99,15 @@ const INITIAL_TIERS: Tier[] = [
 ];
 
 export default function MembershipPage() {
-  const { role, user } = useAuth();
+  const router = useRouter();
+  const { role, user, passedExams } = useAuth();
   const isAdmin = role === 'admin';
   const userLevel = ROLE_LEVELS[role] ?? 0;
+
+  // Determine exam completion status
+  const hasPassedEntry = ENTRY_EXAMS.every(id => passedExams.includes(id));
+  const hasPassedLevel1 = LEVEL_1_EXAMS.every(id => passedExams.includes(id));
+  const hasPassedLevel2 = LEVEL_2_EXAMS.every(id => passedExams.includes(id));
 
   // Load from localStorage or default
   const [tiers, setTiers] = useState<Tier[]>(() => {
@@ -150,6 +162,49 @@ export default function MembershipPage() {
     });
   };
 
+  // Filter visible tiers based on current role and passing status
+  const getVisibleTiers = () => {
+    if (isAdmin) return tiers;
+
+    const visible: Tier[] = [];
+
+    if (userLevel === 0) {
+      // Free: show Çırak card if entry exams are passed
+      if (hasPassedEntry) {
+        const apprenticeTier = tiers.find(t => t.id === 'apprentice');
+        if (apprenticeTier) visible.push(apprenticeTier);
+      }
+    } else if (userLevel === 1) {
+      // Apprentice: show Çırak card (as Current)
+      const apprenticeTier = tiers.find(t => t.id === 'apprentice');
+      if (apprenticeTier) visible.push(apprenticeTier);
+
+      // Show Kalfa card (with Upgrade action) only if all Level 1 exams are passed
+      if (hasPassedLevel1) {
+        const journeymanTier = tiers.find(t => t.id === 'journeyman');
+        if (journeymanTier) visible.push(journeymanTier);
+      }
+    } else if (userLevel === 2) {
+      // Journeyman: show Kalfa card (as Current)
+      const journeymanTier = tiers.find(t => t.id === 'journeyman');
+      if (journeymanTier) visible.push(journeymanTier);
+
+      // Show Usta card (with Upgrade action) only if all Level 2 exams are passed
+      if (hasPassedLevel2) {
+        const masterTier = tiers.find(t => t.id === 'master');
+        if (masterTier) visible.push(masterTier);
+      }
+    } else if (userLevel === 3) {
+      // Master: show Usta card (as Current)
+      const masterTier = tiers.find(t => t.id === 'master');
+      if (masterTier) visible.push(masterTier);
+    }
+
+    return visible;
+  };
+
+  const visibleTiers = getVisibleTiers();
+
   return (
     <div className="min-h-screen pt-32 pb-24 px-6 relative bg-transparent">
       {/* Background radial gradient */}
@@ -196,22 +251,41 @@ export default function MembershipPage() {
           )}
         </div>
 
+        {/* Empty state for free users who haven't passed entry exams */}
+        {!isAdmin && userLevel === 0 && !hasPassedEntry && (
+          <div className="max-w-2xl mx-auto bg-black/40 backdrop-blur-md border border-[#D4AF37]/20 rounded-3xl p-8 text-center shadow-lg">
+            <div className="w-16 h-16 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 flex items-center justify-center mx-auto mb-6">
+              <AlertCircle className="text-[#D4AF37]" size={32} />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-3">Seviyeler Henüz Açılmadı</h3>
+            <p className="text-white/60 text-sm leading-relaxed mb-8">
+              Üyelik seviyelerine (Çırak, Kalfa, Usta) katılabilmek için öncelikle Giriş Sınavlarını (Aura & Çakra Sınavı ve Hastalıkların Duygusal Nedenleri Sınavı) başarıyla tamamlamanız gerekmektedir.
+            </p>
+            <Link 
+              href="/tests"
+              className="inline-flex bg-gradient-to-r from-[#D4AF37] to-amber-500 text-black font-bold px-8 py-3 rounded-full hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all uppercase tracking-wider text-xs"
+            >
+              Sınav Merkezine Git
+            </Link>
+          </div>
+        )}
+
         {/* Tiers Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {tiers.map((tier) => {
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 justify-center">
+          {visibleTiers.map((tier) => {
             const tierLevel = tier.level;
             let buttonText = "Yükselt";
             let isCurrent = false;
             let isUnlocked = false;
 
             if (userLevel === tierLevel) {
-              buttonText = "Mevcut Seviyeniz";
+              buttonText = "MEVCUT SEVİYENİZ";
               isCurrent = true;
             } else if (userLevel > tierLevel) {
-              buttonText = "Erişime Açık";
+              buttonText = "ERİŞİME AÇIK";
               isUnlocked = true;
             } else {
-              buttonText = `${tier.title.split(' ')[0]} Ol`;
+              buttonText = `${tier.title.split(' ')[0].toUpperCase()} OL`;
             }
 
             return (
@@ -266,12 +340,13 @@ export default function MembershipPage() {
                     {!isAdmin && (
                       <button 
                         disabled={isCurrent || isUnlocked}
+                        onClick={() => router.push(`/membership/payment?tier=${tier.id}`)}
                         className={`w-full mt-8 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 border ${
                           isCurrent 
                             ? 'bg-white/10 text-white/40 border-white/5 cursor-default'
                             : isUnlocked
                               ? 'bg-green-500/10 text-green-400 border-green-500/20 cursor-default'
-                              : `${tier.textColor === 'text-[#D4AF37]' ? 'bg-[#D4AF37] hover:bg-yellow-500 text-black border-[#D4AF37]' : tier.textColor.includes('blue') ? 'bg-blue-600 hover:bg-blue-500 text-white border-blue-600' : 'bg-amber-600 hover:bg-amber-500 text-white border-amber-600'} hover:shadow-xl hover:scale-[1.02] cursor-pointer`
+                              : 'bg-blue-600 hover:bg-blue-500 text-white border-blue-600 hover:shadow-xl hover:scale-[1.02] cursor-pointer'
                         }`}
                       >
                         {buttonText}
