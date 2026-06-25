@@ -81,7 +81,7 @@ export default function Navigation() {
             <Image src="/logo.png" alt="7Layers Logo" width={32} height={32} className="rounded-full bg-mystic-dark block" />
           </div>
           <span className="text-xl xl:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-mystic-primary to-mystic-accent whitespace-nowrap">
-            7Layers
+            7LAYERS
           </span>
         </Link>
 
