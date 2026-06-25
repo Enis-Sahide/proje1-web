@@ -29,6 +29,8 @@ import { CATEGORIES, VENDORS, PRODUCTS } from '../data/marketplaceData';
 import { ASTROLOGY_LESSONS } from '../data/astrologyLessons';
 import { HUMAN_DESIGN_LESSONS } from '../data/humanDesignLessons';
 import { KABBALAH_LESSONS } from '../data/kabbalahLessons';
+import { YOGA_LESSONS } from '../data/yogaLessons';
+import { AKUPUNKTUR_LESSONS } from '../data/akupunkturLessons';
 import { runeSymbols, runeBindings } from '../data/runeLessons';
 import { numerologyData } from '../data/numerologyData';
 import {
@@ -158,6 +160,8 @@ async function main() {
     ['astrology', ASTROLOGY_LESSONS],
     ['human_design', HUMAN_DESIGN_LESSONS],
     ['kabbalah', KABBALAH_LESSONS],
+    ['yoga', YOGA_LESSONS],
+    ['akupunktur', AKUPUNKTUR_LESSONS],
   ];
   const lessonRows: any[] = [];
   for (const [discipline, rec] of lessonSources) {
