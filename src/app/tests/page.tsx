@@ -117,7 +117,16 @@ export default function TestsHubPage() {
         { title: '3. Derece: Üstatlık', id: 'human_3', requiredUnlock: 'human_master', isHighlight: true },
       ]
     },
-    { id: 'sembolizm', title: 'Kadim Sembolizm', icon: Shapes, isUnderConstruction: true, route: '#' },
+    { 
+      id: 'sembolizm', 
+      title: 'Kadim Sembolizm', 
+      icon: Shapes, 
+      subTests: [
+        { title: '1. Derece: Çıraklık', id: 'sembolizm_1' },
+        { title: '2. Derece: Kalfalık', id: 'sembolizm_2', requiredUnlock: 'sembolizm_2' },
+        { title: '3. Derece: Üstatlık', id: 'sembolizm_3', requiredUnlock: 'sembolizm_master', isHighlight: true },
+      ]
+    },
     { 
       id: 'numeroloji', 
       title: 'Numeroloji', 
@@ -138,7 +147,16 @@ export default function TestsHubPage() {
         { title: 'Büyük Final Sınavı', id: 'runeFinal', requiredUnlock: 'rune_master', isHighlight: true },
       ]
     },
-    { id: 'tarot', title: 'Tarot ve Arkana', icon: Layers, isUnderConstruction: true, route: '#' },
+    { 
+      id: 'tarot', 
+      title: 'Tarot ve Arkana', 
+      icon: Layers, 
+      subTests: [
+        { title: '1. Derece: Çıraklık', id: 'tarot_1' },
+        { title: '2. Derece: Kalfalık', id: 'tarot_2', requiredUnlock: 'tarot_2' },
+        { title: '3. Derece: Üstatlık', id: 'tarot_3', requiredUnlock: 'tarot_master', isHighlight: true },
+      ]
+    },
     { 
       id: 'yoga', 
       title: 'Yoga Asanaları', 

@@ -98,16 +98,14 @@ export default function KadimDerslerPage() {
       title: 'Kadim Sembolizm', 
       desc: 'Ezoterik semboller, geometriler ve evrensel arketiplerin taşıdığı gizli frekanslar.',
       icon: <Shapes size={28} className="text-orange-400" />, 
-      route: '#',
-      isUnderConstruction: true 
+      route: '/kadim-dersler/sembolizm'
     },
     { 
       id: 'tarot', 
       title: 'Tarot ve Büyük Arkana', 
       desc: '78 kartın taşıdığı arketipsel enerjiler, açılım şablonları ve kadersel yol göstericiler.',
       icon: <Layers size={28} className="text-pink-400" />, 
-      route: '#',
-      isUnderConstruction: true 
+      route: '/kadim-dersler/tarot'
     },
   ];
 
