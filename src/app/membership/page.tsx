@@ -30,6 +30,14 @@ interface Tier {
   glowColor: string;
 }
 
+const ROLE_LEVELS: Record<string, number> = {
+  free: 0,
+  apprentice: 1,
+  journeyman: 2,
+  master: 3,
+  admin: 999,
+};
+
 const INITIAL_TIERS: Tier[] = [
   {
     id: 'apprentice',
@@ -87,6 +95,7 @@ const INITIAL_TIERS: Tier[] = [
 export default function MembershipPage() {
   const { role, user } = useAuth();
   const isAdmin = role === 'admin';
+  const userLevel = ROLE_LEVELS[role] ?? 0;
 
   // Load from localStorage or default
   const [tiers, setTiers] = useState<Tier[]>(() => {
@@ -141,40 +150,6 @@ export default function MembershipPage() {
     });
   };
 
-  // If not admin, show the "Yapım Aşamasında" screen
-  if (!isAdmin) {
-    return (
-      <div className="min-h-screen pt-32 pb-24 px-4 bg-transparent flex flex-col items-center justify-center">
-        <div className="max-w-md w-full bg-mystic-surface/60 backdrop-blur-md border border-mystic-primary/20 rounded-3xl p-8 text-center shadow-[0_0_30px_rgba(212,175,55,0.05)] relative overflow-hidden">
-          {/* Glow effect */}
-          <div className="absolute -top-20 -left-20 w-40 h-40 bg-mystic-primary/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-mystic-accent/10 rounded-full blur-3xl pointer-events-none" />
-
-          <div className="w-20 h-20 rounded-full bg-mystic-dark border border-mystic-primary/30 flex items-center justify-center mx-auto mb-6 shadow-[0_0_20px_rgba(212,175,55,0.15)] relative">
-            <Crown className="text-mystic-primary/40 absolute" size={40} />
-            <Wrench className="text-mystic-accent animate-pulse relative z-10" size={28} />
-          </div>
-
-          <h1 className="text-3xl font-bold text-white mb-3 tracking-tight">VIP Seviyeler</h1>
-          <p className="text-mystic-accent text-sm font-semibold uppercase tracking-wider mb-4">Yapım Aşamasında</p>
-          
-          <p className="text-mystic-text-muted text-sm leading-relaxed mb-8">
-            Bu sayfa üzerinde çalışmalarımız devam ediyor. Çok yakında yeni vip seviyeleri, üyelik paketleri ve özel ayrıcalıklar hizmetinize sunulacaktır.
-          </p>
-
-          <Link 
-            href="/" 
-            className="inline-flex items-center justify-center gap-2 bg-gradient-to-r from-mystic-primary to-mystic-accent text-black font-bold px-8 py-3 rounded-full hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all duration-300 w-full"
-          >
-            <ArrowLeft size={16} />
-            <span>Ana Sayfaya Dön</span>
-          </Link>
-        </div>
-      </div>
-    );
-  }
-
-  // Admin design and editor view
   return (
     <div className="min-h-screen pt-32 pb-24 px-6 relative bg-transparent">
       {/* Background radial gradient */}
@@ -184,80 +159,129 @@ export default function MembershipPage() {
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-12 gap-6">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-red-500/30 bg-red-500/5 text-red-400 text-xs font-semibold uppercase tracking-wider mb-4">
-              <ShieldCheck size={14} /> Admin Düzenleme Modu
-            </div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-wider uppercase leading-none">
-              VIP Seviyeler Yönetimi
-            </h1>
-            <p className="text-sm text-white/50 mt-2">
-              Seviye kartlarını düzenleyin ve kaydedin. Değişiklikler tarayıcıda kalıcı olarak saklanır.
-            </p>
+            {isAdmin ? (
+              <>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-red-500/30 bg-red-500/5 text-red-400 text-xs font-semibold uppercase tracking-wider mb-4">
+                  <ShieldCheck size={14} /> Admin Düzenleme Modu
+                </div>
+                <h1 className="text-3xl md:text-4xl font-extrabold text-white tracking-wider uppercase leading-none">
+                  Seviyeler Yönetimi
+                </h1>
+                <p className="text-sm text-white/50 mt-2">
+                  Seviye kartlarını düzenleyin ve kaydedin. Değişiklikler tarayıcıda kalıcı olarak saklanır.
+                </p>
+              </>
+            ) : (
+              <>
+                <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-mystic-primary to-mystic-accent tracking-wider uppercase leading-none pb-2">
+                  Üyelik Seviyeleri
+                </h1>
+                <p className="text-sm text-white/50 mt-2">
+                  Ruhsal yolculuğunuzda yükselmek ve ezoterik kapıları açmak için size en uygun seviyeyi seçin.
+                </p>
+              </>
+            )}
           </div>
-          <button 
-            onClick={() => {
-              if (confirm("VIP seviyeleri varsayılan ayarlara sıfırlamak istiyor musunuz?")) {
-                saveTiersToStorage(INITIAL_TIERS);
-              }
-            }}
-            className="px-5 py-2.5 rounded-full border border-white/10 hover:border-red-500/30 hover:bg-red-500/5 text-white/70 hover:text-red-400 transition-all text-xs font-bold uppercase tracking-wider cursor-pointer"
-          >
-            Varsayılana Sıfırla
-          </button>
+          {isAdmin && (
+            <button 
+              onClick={() => {
+                if (confirm("Seviyeleri varsayılan ayarlara sıfırlamak istiyor musunuz?")) {
+                  saveTiersToStorage(INITIAL_TIERS);
+                }
+              }}
+              className="px-5 py-2.5 rounded-full border border-white/10 hover:border-red-500/30 hover:bg-red-500/5 text-white/70 hover:text-red-400 transition-all text-xs font-bold uppercase tracking-wider cursor-pointer"
+            >
+              Varsayılana Sıfırla
+            </button>
+          )}
         </div>
 
         {/* Tiers Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {tiers.map((tier) => (
-            <div 
-              key={tier.id}
-              className={`relative overflow-hidden rounded-3xl p-[1px] group transition-all duration-300 hover:-translate-y-2`}
-              style={{
-                background: `linear-gradient(135deg, ${tier.textColor === 'text-[#D4AF37]' ? '#D4AF37' : tier.textColor.includes('blue') ? '#3B82F6' : '#F59E0B'}30, rgba(255,255,255,0.05))`
-              }}
-            >
-              {/* Card Body */}
-              <div className="relative h-full bg-black/80 backdrop-blur-xl rounded-3xl p-8 flex flex-col justify-between min-h-[500px]">
-                <div 
-                  className="absolute inset-0 opacity-10 pointer-events-none blur-3xl rounded-3xl"
-                  style={{ backgroundColor: tier.glowColor }}
-                />
+          {tiers.map((tier) => {
+            const tierLevel = tier.level;
+            let buttonText = "Yükselt";
+            let isCurrent = false;
+            let isUnlocked = false;
 
-                {/* Edit Badge */}
-                <button 
-                  onClick={() => handleEditClick(tier)}
-                  className="absolute top-6 right-6 p-2 rounded-full bg-white/5 border border-white/10 text-white/60 hover:text-[#D4AF37] hover:border-[#D4AF37]/30 hover:bg-[#D4AF37]/5 transition-all cursor-pointer z-10 animate-pulse"
-                  title="Düzenle"
-                >
-                  <Edit3 size={16} />
-                </button>
+            if (userLevel === tierLevel) {
+              buttonText = "Mevcut Seviyeniz";
+              isCurrent = true;
+            } else if (userLevel > tierLevel) {
+              buttonText = "Erişime Açık";
+              isUnlocked = true;
+            } else {
+              buttonText = `${tier.title.split(' ')[0]} Ol`;
+            }
 
-                <div>
-                  <div className={`inline-flex items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 mb-6 ${tier.textColor}`}>
-                    <Crown size={24} />
+            return (
+              <div 
+                key={tier.id}
+                className={`relative overflow-hidden rounded-3xl p-[1px] group transition-all duration-300 ${!isAdmin ? 'hover:-translate-y-2' : ''}`}
+                style={{
+                  background: `linear-gradient(135deg, ${tier.textColor === 'text-[#D4AF37]' ? '#D4AF37' : tier.textColor.includes('blue') ? '#3B82F6' : '#F59E0B'}30, rgba(255,255,255,0.05))`
+                }}
+              >
+                {/* Card Body */}
+                <div className="relative h-full bg-black/80 backdrop-blur-xl rounded-3xl p-8 flex flex-col justify-between min-h-[500px]">
+                  <div 
+                    className="absolute inset-0 opacity-10 pointer-events-none blur-3xl rounded-3xl"
+                    style={{ backgroundColor: tier.glowColor }}
+                  />
+
+                  {/* Edit Badge */}
+                  {isAdmin && (
+                    <button 
+                      onClick={() => handleEditClick(tier)}
+                      className="absolute top-6 right-6 p-2 rounded-full bg-white/5 border border-white/10 text-white/60 hover:text-[#D4AF37] hover:border-[#D4AF37]/30 hover:bg-[#D4AF37]/5 transition-all cursor-pointer z-10 animate-pulse"
+                      title="Düzenle"
+                    >
+                      <Edit3 size={16} />
+                    </button>
+                  )}
+
+                  <div>
+                    <div className={`inline-flex items-center justify-center p-3 rounded-2xl bg-white/5 border border-white/10 mb-6 ${tier.textColor}`}>
+                      <Crown size={24} />
+                    </div>
+                    
+                    <h3 className="text-2xl font-bold text-white mb-2">{tier.title}</h3>
+                    <div className={`text-xl font-extrabold mb-4 ${tier.textColor}`}>{tier.price}</div>
+                    
+                    <p className="text-white/60 text-sm leading-relaxed mb-6">
+                      {tier.description}
+                    </p>
                   </div>
-                  
-                  <h3 className="text-2xl font-bold text-white mb-2">{tier.title}</h3>
-                  <div className={`text-xl font-extrabold mb-4 ${tier.textColor}`}>{tier.price}</div>
-                  
-                  <p className="text-white/60 text-sm leading-relaxed mb-6">
-                    {tier.description}
-                  </p>
-                </div>
 
-                <div>
-                  <div className="border-t border-white/5 pt-6 space-y-3">
-                    {tier.benefits.map((benefit, idx) => (
-                      <div key={idx} className="flex items-start gap-3 text-xs text-white/80">
-                        <Check size={14} className={`mt-0.5 shrink-0 ${tier.textColor}`} />
-                        <span>{benefit}</span>
-                      </div>
-                    ))}
+                  <div>
+                    <div className="border-t border-white/5 pt-6 space-y-3">
+                      {tier.benefits.map((benefit, idx) => (
+                        <div key={idx} className="flex items-start gap-3 text-xs text-white/80">
+                          <Check size={14} className={`mt-0.5 shrink-0 ${tier.textColor}`} />
+                          <span>{benefit}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    {!isAdmin && (
+                      <button 
+                        disabled={isCurrent || isUnlocked}
+                        className={`w-full mt-8 py-3 rounded-xl font-bold text-xs uppercase tracking-wider transition-all duration-300 border ${
+                          isCurrent 
+                            ? 'bg-white/10 text-white/40 border-white/5 cursor-default'
+                            : isUnlocked
+                              ? 'bg-green-500/10 text-green-400 border-green-500/20 cursor-default'
+                              : `${tier.textColor === 'text-[#D4AF37]' ? 'bg-[#D4AF37] hover:bg-yellow-500 text-black border-[#D4AF37]' : tier.textColor.includes('blue') ? 'bg-blue-600 hover:bg-blue-500 text-white border-blue-600' : 'bg-amber-600 hover:bg-amber-500 text-white border-amber-600'} hover:shadow-xl hover:scale-[1.02] cursor-pointer`
+                        }`}
+                      >
+                        {buttonText}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Edit Modal */}
