@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/apiClient';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, User, Mail, Check, Loader2, Award, Lock } from 'lucide-react';
+import { ArrowLeft, User, Mail, Check, Loader2, Award, Lock, LogOut } from 'lucide-react';
 
 const ROLE_LABELS: Record<string, { label: string; style: string }> = {
   free: { label: 'Ücretsiz Üyelik', style: 'border-white/10 text-mystic-text-muted bg-white/5' },
@@ -15,7 +15,7 @@ const ROLE_LABELS: Record<string, { label: string; style: string }> = {
 };
 
 export default function ProfilePage() {
-  const { user, role, refresh } = useAuth();
+  const { user, role, refresh, logout } = useAuth();
   const router = useRouter();
   
   const [name, setName] = useState('');
@@ -90,6 +90,14 @@ export default function ProfilePage() {
       setPwdError(err.message || 'Şifre güncellenirken bir hata oluştu.');
     } finally {
       setPwdLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (err: any) {
+      console.error('Çıkış hatası:', err);
     }
   };
 
@@ -264,6 +272,18 @@ export default function ProfilePage() {
             </form>
           )}
         </div>
+
+        <hr className="my-6 border-white/10" />
+
+        {/* Çıkış Yap Butonu */}
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="w-full bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 text-red-400 hover:text-red-300 hover:shadow-[0_0_15px_rgba(239,68,68,0.15)] font-bold py-3.5 rounded-xl transition-all flex justify-center items-center gap-2 cursor-pointer text-sm shadow-sm"
+        >
+          <LogOut size={16} />
+          Çıkış Yap
+        </button>
       </div>
     </div>
   );
