@@ -177,13 +177,7 @@ export default function KadimDerslerPage() {
                       <div className="w-14 h-14 rounded-2xl bg-white/5 flex items-center justify-center border border-white/10">
                         {cat.icon}
                       </div>
-                      
-                      {cat.isUnderConstruction && (
-                        <span className="flex items-center gap-1 text-[11px] font-bold uppercase tracking-wider text-mystic-accent bg-mystic-accent/10 px-3 py-1 rounded-full border border-mystic-accent/20">
-                          <Wrench size={10} />
-                          {isAdmin ? 'Admin Erişimi' : 'Hazırlanıyor'}
-                        </span>
-                      )}
+
                     </div>
 
                     <h3 className="text-xl font-bold text-white mb-3 group-hover:text-[#D4AF37] transition-colors">
