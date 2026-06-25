@@ -62,7 +62,7 @@ export default function RunePage() {
                 : 'text-mystic-text-muted hover:text-white'
             }`}
           >
-            I. Çırak (Semboller)
+            1. Derece
           </button>
           
           <button 
@@ -74,7 +74,7 @@ export default function RunePage() {
             } ${!isKalfaUnlocked && 'opacity-60'}`}
           >
             {!isKalfaUnlocked && <Lock size={14} className="text-mystic-primary" />}
-            II. Kalfa (Bağlamalar)
+            2. Derece
           </button>
 
           <button 
@@ -85,7 +85,7 @@ export default function RunePage() {
                 : 'text-mystic-text-muted hover:text-white'
             }`}
           >
-            III. Üstat
+            3. Derece
           </button>
         </div>
 

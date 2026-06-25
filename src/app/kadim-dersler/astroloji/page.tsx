@@ -139,7 +139,7 @@ export default function AstrolojiPage() {
                 : 'text-mystic-text-muted hover:text-white'
             }`}
           >
-            I. Çıraklık
+            1. Derece
           </button>
           
           <button 
@@ -151,7 +151,7 @@ export default function AstrolojiPage() {
             } ${!isAdeptUnlocked && 'opacity-60'}`}
           >
             {!isAdeptUnlocked && <Lock size={14} className="text-mystic-primary" />}
-            II. Kalfalık
+            2. Derece
           </button>
 
           <button 
@@ -163,7 +163,7 @@ export default function AstrolojiPage() {
             } ${!isMasterUnlocked && 'opacity-60'}`}
           >
             {!isMasterUnlocked && <Lock size={14} className="text-mystic-primary" />}
-            III. Üstatlık
+            3. Derece
           </button>
         </div>
 

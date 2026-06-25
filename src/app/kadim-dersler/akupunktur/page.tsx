@@ -1,9 +1,44 @@
 "use client";
 
 import React, { useState } from 'react';
+import { ArrowLeft, Lock, Sparkles, X, Activity, HelpCircle, ChevronDown, ChevronUp } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Lock, Sparkles, X, Activity } from 'lucide-react';
+import { useContent } from '@/lib/useContent';
 import { useAuth } from '@/context/AuthContext';
+
+interface AccordionItemProps {
+  lessonKey: string;
+  isExpanded: boolean;
+  onToggle: () => void;
+  lessonsData: Record<string, any> | null;
+}
+
+const AccordionItem = ({ lessonKey, isExpanded, onToggle, lessonsData }: AccordionItemProps) => {
+  const lesson = lessonsData?.[lessonKey];
+  if (!lesson) return null;
+
+  return (
+    <div className="mb-4 bg-mystic-surface/85 border border-mystic-primary/20 rounded-2xl overflow-hidden backdrop-blur-md shadow-lg transition-all duration-300">
+      <button 
+        onClick={onToggle}
+        className="w-full px-6 py-5 flex items-center justify-between text-left hover:bg-mystic-surface transition-colors"
+      >
+        <span className="text-lg font-bold text-mystic-primary">{lesson.title}</span>
+        {isExpanded ? <ChevronUp size={20} className="text-mystic-primary" /> : <ChevronDown size={20} className="text-mystic-primary" />}
+      </button>
+      
+      {isExpanded && (
+        <div className="px-6 pb-6 pt-2 border-t border-white/5 animate-in fade-in duration-300">
+          {lesson.content && (
+            <p className="text-mystic-text leading-relaxed text-sm md:text-base whitespace-pre-line">
+              {lesson.content}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default function AkupunkturPage() {
   const router = useRouter();
@@ -11,24 +46,32 @@ export default function AkupunkturPage() {
   const isAdmin = role === 'admin';
 
   const [activeTab, setActiveTab] = useState<'cirak' | 'kalfa' | 'ustat'>('cirak');
+  const [expandedLesson, setExpandedLesson] = useState<string | null>(null);
   const [showLockModal, setShowLockModal] = useState(false);
   const [requiredRoleName, setRequiredRoleName] = useState('');
+
+  const { data: lessonsData, loading, error } = useContent<Record<string, any>>('/api/content/lessons?discipline=akupunktur');
 
   const isKalfaUnlocked = hasAccess('akupunktur_2') || isAdmin;
   const isUstatUnlocked = hasAccess('akupunktur_3') || isAdmin;
 
   const handleTabPress = (tab: 'cirak' | 'kalfa' | 'ustat') => {
     if (tab === 'kalfa' && !isKalfaUnlocked) {
-      setRequiredRoleName('Kalfalık');
+      setRequiredRoleName('2. Derece (Kalfalık)');
       setShowLockModal(true);
       return;
     }
     if (tab === 'ustat' && !isUstatUnlocked) {
-      setRequiredRoleName('Üstatlık');
+      setRequiredRoleName('3. Derece (Üstatlık)');
       setShowLockModal(true);
       return;
     }
     setActiveTab(tab);
+    setExpandedLesson(null);
+  };
+
+  const handleToggle = (key: string) => {
+    setExpandedLesson(prev => prev === key ? null : key);
   };
 
   return (
@@ -60,7 +103,7 @@ export default function AkupunkturPage() {
                 : 'text-mystic-text-muted hover:text-white'
             }`}
           >
-            I. Çıraklık
+            1. Derece
           </button>
           
           <button 
@@ -72,7 +115,7 @@ export default function AkupunkturPage() {
             } ${!isKalfaUnlocked && 'opacity-60'}`}
           >
             {!isKalfaUnlocked && <Lock size={14} className="text-mystic-primary" />}
-            II. Kalfalık
+            2. Derece
           </button>
 
           <button 
@@ -84,12 +127,12 @@ export default function AkupunkturPage() {
             } ${!isUstatUnlocked && 'opacity-60'}`}
           >
             {!isUstatUnlocked && <Lock size={14} className="text-mystic-primary" />}
-            III. Üstatlık
+            3. Derece
           </button>
         </div>
 
         {/* Tanıtım Kartı */}
-        <div className="mb-8 p-6 md:p-8 bg-mystic-surface/40 border border-mystic-primary/20 rounded-3xl backdrop-blur-md shadow-lg text-center flex flex-col items-center animate-in fade-in duration-500">
+        <div className="mb-8 p-6 md:p-8 bg-mystic-surface/40 border border-mystic-primary/20 rounded-3xl backdrop-blur-md shadow-lg text-center flex flex-col items-center">
           <Activity className="text-emerald-400 mb-4" size={40} />
           <h2 className="text-xl md:text-2xl font-bold text-mystic-text mb-3">Enerji Kanalları (Chi)</h2>
           <p className="text-mystic-text-muted leading-relaxed text-sm md:text-base max-w-2xl">
@@ -97,56 +140,38 @@ export default function AkupunkturPage() {
           </p>
         </div>
 
-        {/* I. ÇIRAK SEKME İÇERİĞİ */}
-        {activeTab === 'cirak' && (
-          <div className="animate-in fade-in duration-500 space-y-6">
-            <div className="bg-mystic-surface/50 p-6 border-l-4 border-mystic-primary rounded-r-2xl border-y border-r border-white/10 backdrop-blur-md">
-              <h3 className="text-lg font-bold text-mystic-primary mb-3">Çıraklık: Temel Şifa Enerjisi</h3>
-              <p className="text-sm text-mystic-text leading-relaxed mb-4">
-                Akupunktur, bedenin yaşam enerjisi (Chi veya Prana) akışını dengelemeye dayanan binlerce yıllık kadim bir şifa yöntemidir.
-              </p>
-              <div className="bg-black/30 p-4 rounded-xl text-sm text-mystic-text-muted leading-relaxed space-y-3">
-                <p>• <strong className="text-mystic-primary">Chi (Yaşam Enerjisi):</strong> Evreni ve bedeni canlı tutan evrensel frekanstır.</p>
-                <p>• <strong className="text-mystic-primary">Yin ve Yang:</strong> Bedenimizdeki organlar zıt kutupların (Eril/Dişil, Ateş/Su, Sıcak/Soğuk) dengesiyle çalışır. Hastalık, bu dengenin bozulmasıdır.</p>
-                <p>• <strong className="text-mystic-primary">Meridyenler:</strong> Chi enerjisinin içinde aktığı nehirlerdir.</p>
-              </div>
-            </div>
+        {loading ? (
+          <div className="text-center py-20">
+            <Activity className="animate-spin text-mystic-primary mx-auto mb-4" size={48} />
+            <p className="text-mystic-text-muted">Meridyen haritaları yükleniyor...</p>
           </div>
-        )}
-
-        {/* II. KALFA SEKME İÇERİĞİ */}
-        {activeTab === 'kalfa' && isKalfaUnlocked && (
-          <div className="animate-in fade-in duration-500 space-y-6">
-            <div className="bg-mystic-surface/50 p-6 border-l-4 border-mystic-primary rounded-r-2xl border-y border-r border-white/10 backdrop-blur-md">
-              <h3 className="text-lg font-bold text-mystic-primary mb-3">Kalfalık: 12 Ana Meridyen</h3>
-              <p className="text-sm text-mystic-text leading-relaxed mb-4">
-                Ezoterik anatomiye göre bedenimizde organlara bağlı 12 Ana Meridyen bulunur. Her organ sadece kan pompalamaz, aynı zamanda bir duyguyu da depolar.
-              </p>
-              <div className="bg-black/30 p-4 rounded-xl text-sm text-mystic-text-muted leading-relaxed space-y-3">
-                <p>• <strong className="text-mystic-primary">Akciğer Meridyeni:</strong> Keder, yas ve üzüntüyü barındırır.</p>
-                <p>• <strong className="text-mystic-primary">Karaciğer Meridyeni:</strong> Öfke, nefret ve hayal kırıklığının merkezidir.</p>
-                <p>• <strong className="text-mystic-primary">Böbrek Meridyeni:</strong> Derin korkuları ve fobileri depolar. Yaşam enerjisinin bataryasıdır.</p>
-                <p>• <strong className="text-mystic-primary">Mide Meridyeni:</strong> Yeni olayları, durumları ve fikirleri sindirememe, uzun süreli endişeleri tutar.</p>
-                <p>• <strong className="text-mystic-primary">Kalp Meridyeni:</strong> Neşe, sevgi ve ruhun (Shen) tahtıdır. Katılaşmış kalp, kriz yaratır.</p>
-              </div>
-            </div>
+        ) : error ? (
+          <div className="text-center py-20 bg-mystic-surface/30 rounded-2xl border border-red-500/20">
+            <HelpCircle className="text-red-500 mx-auto mb-4" size={48} />
+            <p className="text-red-400">İçerik yüklenirken bir hata oluştu: {error}</p>
           </div>
-        )}
-
-        {/* III. ÜSTAT SEKME İÇERİĞİ */}
-        {activeTab === 'ustat' && isUstatUnlocked && (
-          <div className="animate-in fade-in duration-500 space-y-6">
-            <div className="bg-mystic-surface/50 p-6 border-l-4 border-mystic-primary rounded-r-2xl border-y border-r border-white/10 backdrop-blur-md">
-              <h3 className="text-lg font-bold text-mystic-primary mb-3">Üstatlık: Düğümleri Çözmek</h3>
-              <p className="text-sm text-mystic-text leading-relaxed mb-4">
-                Hastalıklar, enerjinin (Chi) kanallarda duygusal travmalarla tıkanması sonucu oluşur. Akupunktur noktaları, bu tıkanıklıkların açıldığı, nehrin akışının tekrar sağlandığı enerji düğümleridir.
-              </p>
-              <div className="bg-black/30 p-4 rounded-xl text-sm text-mystic-text-muted leading-relaxed space-y-3">
-                <p>• <strong className="text-mystic-primary">Yönetici Meridyenler:</strong> Ren Mai (Kavrama) ve Du Mai (Yönetme) kanalları omurga ve ön hattan geçerek tüm çakraları birbirine bağlar.</p>
-                <p>• <strong className="text-mystic-primary">İğnelerin Sırrı:</strong> İğneler (veya akupresür noktalarına yapılan niyetli basılar), sinir sistemine şok vererek biriken öfke ve kederi serbest bırakır.</p>
-                <p>• <strong className="text-mystic-primary">Hücresel Hafıza:</strong> Bedene atılan kördüğümler, bilinçli yüzleşme ve affetme ritüeli ile fiziksel olarak çözülür. Şifa, organın frekansının tekrar evrenle uyumlanmasıdır.</p>
+        ) : (
+          <div>
+            {/* 1. Derece */}
+            {activeTab === 'cirak' && (
+              <div className="animate-in fade-in duration-500">
+                <AccordionItem lessonKey="1_temel_sifa" isExpanded={expandedLesson === '1_temel_sifa'} onToggle={() => handleToggle('1_temel_sifa')} lessonsData={lessonsData} />
               </div>
-            </div>
+            )}
+
+            {/* 2. Derece */}
+            {activeTab === 'kalfa' && isKalfaUnlocked && (
+              <div className="animate-in fade-in duration-500">
+                <AccordionItem lessonKey="2_12_meridyen" isExpanded={expandedLesson === '2_12_meridyen'} onToggle={() => handleToggle('2_12_meridyen')} lessonsData={lessonsData} />
+              </div>
+            )}
+
+            {/* 3. Derece */}
+            {activeTab === 'ustat' && isUstatUnlocked && (
+              <div className="animate-in fade-in duration-500">
+                <AccordionItem lessonKey="3_dugumler_cozmek" isExpanded={expandedLesson === '3_dugumler_cozmek'} onToggle={() => handleToggle('3_dugumler_cozmek')} lessonsData={lessonsData} />
+              </div>
+            )}
           </div>
         )}
       </div>

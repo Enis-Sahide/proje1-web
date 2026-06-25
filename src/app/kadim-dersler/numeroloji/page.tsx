@@ -68,7 +68,7 @@ export default function NumerolojiPage() {
                 : 'text-mystic-text-muted hover:text-white'
             }`}
           >
-            I. Çırak
+            1. Derece
           </button>
           
           <button 
@@ -80,7 +80,7 @@ export default function NumerolojiPage() {
             } ${!isKalfaUnlocked && 'opacity-60'}`}
           >
             {!isKalfaUnlocked && <Lock size={14} className="text-mystic-primary" />}
-            II. Kalfa
+            2. Derece
           </button>
 
           <button 
@@ -92,7 +92,7 @@ export default function NumerolojiPage() {
             } ${!isUstatUnlocked && 'opacity-60'}`}
           >
             {!isUstatUnlocked && <Lock size={14} className="text-mystic-primary" />}
-            III. Üstat
+            3. Derece
           </button>
         </div>
 

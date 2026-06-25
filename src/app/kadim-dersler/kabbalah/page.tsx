@@ -268,7 +268,7 @@ export default function KabbalahPage() {
                 : 'text-mystic-text-muted hover:text-white'
             }`}
           >
-            I. Çıraklık
+            1. Derece
           </button>
           
           <button 
@@ -280,7 +280,7 @@ export default function KabbalahPage() {
             } ${!isKalfaUnlocked && 'opacity-60'}`}
           >
             {!isKalfaUnlocked && <Lock size={14} className="text-mystic-primary" />}
-            II. Kalfalık
+            2. Derece
           </button>
 
           <button 
@@ -291,7 +291,7 @@ export default function KabbalahPage() {
                 : 'text-mystic-text-muted hover:text-white'
             }`}
           >
-            III. Üstatlık
+            3. Derece
           </button>
         </div>
 
