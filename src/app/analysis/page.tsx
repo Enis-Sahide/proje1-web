@@ -5,11 +5,21 @@ import Link from 'next/link';
 import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Lock } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
+interface ToolItem {
+  id: string;
+  title: string;
+  description: string;
+  icon: React.ReactNode;
+  color: string;
+  link: string;
+  isLocked?: boolean;
+}
+
 export default function AnalysisPage() {
   const { role } = useAuth();
   const isMasterOrAdmin = role === 'master' || role === 'admin';
 
-  const tools = [
+  const tools: ToolItem[] = [
     ...(isMasterOrAdmin ? [{
       id: 'kabbalah',
       title: 'Kabalistik 4 Alem',
