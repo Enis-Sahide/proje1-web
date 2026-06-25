@@ -60,13 +60,13 @@ export default function Navigation() {
     { name: 'VIP Seviyeler', href: '/membership', isUnderConstruction: true },
   ];
 
-  const navLinks = isAdmin 
-    ? [
-        { name: 'Admin Paneli', href: '/admin/dashboard' },
-        { name: 'Kadim Uygulamalar', href: '/vip-teknolojiler' },
-        ...baseLinks
-      ]
-    : baseLinks;
+  const isMaster = role === 'master';
+
+  const navLinks = [
+    ...(isAdmin ? [{ name: 'Admin Paneli', href: '/admin/dashboard' }] : []),
+    ...((isAdmin || isMaster) ? [{ name: 'Kadim Uygulamalar', href: '/vip-teknolojiler' }] : []),
+    ...baseLinks
+  ];
 
   return (
     <header 
