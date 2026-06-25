@@ -36,15 +36,10 @@ export async function getAccount(userId: string): Promise<Account | null> {
   const [pr] = await db.select().from(userProgress).where(eq(userProgress.userId, userId));
   const passedExams = pr?.passedExams ?? [];
 
-  // Rol artık GEÇİLEN sınavlardan hesaplanır. Admin (e-posta veya elle verilmiş) korunur.
-  const computed = await computeRole(passedExams, u.email);
+  // Rolü doğrudan profiles tablosundan oku (sınavlardan otomatik yükseltme kaldırıldı).
+  // Admin rolü korunur.
   const role =
-    p?.role === 'admin' || u.email.toLowerCase() === ADMIN_EMAIL ? 'admin' : computed;
-
-  // Admin panelinde doğru görünmesi için profiles.role'ü güncel tut.
-  if (p && p.role !== role) {
-    await db.update(profiles).set({ role }).where(eq(profiles.userId, userId));
-  }
+    p?.role === 'admin' || u.email.toLowerCase() === ADMIN_EMAIL ? 'admin' : (p?.role || 'free');
 
   return {
     id: u.id,
