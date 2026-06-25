@@ -22,6 +22,7 @@ interface AuthContextType {
   role: string;
   unlockedTiers: string[];
   passedExams: string[];
+  examAttempts: Record<string, any>;
   unlockTier: (tierId: string) => Promise<void>;
   hasAccess: (tierId: string) => boolean;
   logout: () => Promise<void>;
@@ -35,6 +36,7 @@ const AuthContext = createContext<AuthContextType>({
   role: 'free',
   unlockedTiers: [],
   passedExams: [],
+  examAttempts: {},
   unlockTier: async () => {},
   hasAccess: () => false,
   logout: async () => {},
@@ -46,6 +48,7 @@ interface MeResponse {
   role: string;
   unlockedTiers: string[];
   passedExams?: string[];
+  examAttempts?: Record<string, any>;
 }
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -54,6 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [role, setRole] = useState('free');
   const [unlockedTiers, setUnlockedTiers] = useState<string[]>([]);
   const [passedExams, setPassedExams] = useState<string[]>([]);
+  const [examAttempts, setExamAttempts] = useState<Record<string, any>>({});
 
   const applyMe = (me: MeResponse | null) => {
     if (me?.user) {
@@ -69,11 +73,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setRole(me.role || 'free');
       setUnlockedTiers(me.unlockedTiers || []);
       setPassedExams(me.passedExams || []);
+      setExamAttempts(me.examAttempts || {});
     } else {
       setUser(null);
       setRole('free');
       setUnlockedTiers([]);
       setPassedExams([]);
+      setExamAttempts({});
     }
   };
 
@@ -144,6 +150,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         role,
         unlockedTiers,
         passedExams,
+        examAttempts,
         unlockTier,
         hasAccess,
         logout,

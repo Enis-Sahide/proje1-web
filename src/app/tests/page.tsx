@@ -65,7 +65,7 @@ const getTestId = (routePath: string): string => {
 
 export default function TestsHubPage() {
   const router = useRouter();
-  const { user, role, hasAccess, passedExams } = useAuth();
+  const { user, role, hasAccess, passedExams, examAttempts } = useAuth();
   const isAdmin = role === 'admin';
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedUnderConstruction, setSelectedUnderConstruction] = useState<TestCategory | null>(null);
@@ -168,6 +168,22 @@ export default function TestsHubPage() {
       ]
     },
   ];
+
+  const getTestDisplayName = (quizId: string): string => {
+    if (quizId === 'aura') return 'Aura & Çakra Sınavı';
+    if (quizId === 'duygusal_hastaliklar_50') return 'Hastalıkların Duygusal Nedenleri';
+    
+    for (const cat of testCategories) {
+      if (cat.subTests) {
+        for (const sub of cat.subTests) {
+          if (sub.id === quizId) {
+            return `${cat.title} - ${sub.title.replace(/\s*\(.*?\)\s*/g, '')}`;
+          }
+        }
+      }
+    }
+    return quizId;
+  };
 
   const ROLE_LEVELS: Record<string, number> = {
     free: 0,
@@ -355,6 +371,55 @@ export default function TestsHubPage() {
           })}
         </div>
 
+        {/* Sınav Sonuçları Tablosu */}
+        {Object.keys(examAttempts || {}).length > 0 && (
+          <div className="mt-16 bg-black/60 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-xl shadow-black/40 animate-in fade-in slide-in-from-bottom-8 duration-700">
+            <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] to-white mb-6 border-b border-[#D4AF37]/20 pb-4">
+              Geçmiş Sınav Sonuçlarınız
+            </h2>
+            
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-white/10 text-left">
+                <thead>
+                  <tr className="text-xs uppercase tracking-wider text-white/50 font-bold">
+                    <th className="py-4 px-4">Sınav Adı</th>
+                    <th className="py-4 px-4 text-center">Tarih</th>
+                    <th className="py-4 px-4 text-right">Durum / Skor</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/5 text-sm">
+                  {Object.entries(examAttempts || {}).map(([quizId, val]) => {
+                    const date = typeof val === 'string' ? val : val?.date ?? '';
+                    const score = typeof val === 'object' && val ? val.score : null;
+                    const hasPassed = score !== null && score >= 80;
+
+                    return (
+                      <tr key={quizId} className="hover:bg-white/[0.02] transition-colors">
+                        <td className="py-4 px-4 font-semibold text-white">
+                          {getTestDisplayName(quizId)}
+                        </td>
+                        <td className="py-4 px-4 text-center text-white/60 font-mono text-xs">
+                          {date ? date.split('-').reverse().join('.') : '-'}
+                        </td>
+                        <td className="py-4 px-4 text-right">
+                          <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold ${
+                            score === null 
+                              ? 'bg-white/10 text-white/60 border border-white/10' 
+                              : hasPassed 
+                                ? 'bg-green-500/10 text-green-400 border border-green-500/20' 
+                                : 'bg-red-500/10 text-red-400 border border-red-500/20'
+                          }`}>
+                            {score !== null ? `%${score}` : 'Skor Yok'}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
 
       </div>
 
