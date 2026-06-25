@@ -125,9 +125,10 @@ export default function AdminDashboard() {
       admin: 'Yönetici (Admin)'
     };
     
-    const targetRoleLabel = roleLabels[newRole] || newRole;
-    
-    const confirmChange = window.confirm(`"${userName}" isimli üyenin yetki seviyesini "${targetRoleLabel}" olarak değiştirmek istediğinize emin misiniz?`);
+    const confirmChange = window.confirm(
+      `"${userName}" isimli üyenin yetki seviyesini "${targetRoleLabel}" olarak değiştirmek istediğinize emin misiniz?\n\n` +
+      `Not: Bu işlem, üyenin bu seviye için vermesi gereken tüm sınavları otomatik olarak "geçti" olarak işaretleyecektir.`
+    );
     if (!confirmChange) return;
 
     setUpdatingUserId(userId);
