@@ -182,13 +182,13 @@ export default function KadimDerslerPage() {
                   </div>
 
                   <div className="flex items-center justify-between border-t border-white/5 pt-4">
-                    {cat.isUnderConstruction ? (
-                      <span className="text-xs font-semibold text-mystic-accent flex items-center">
-                        {isAdmin ? 'Erişime Açık (Admin) →' : 'Dersi İncele 🔒'}
-                      </span>
-                    ) : isLocked ? (
+                    {isLocked ? (
                       <span className="text-xs font-semibold text-red-400 flex items-center">
                         Derece Kilitli 🔒
+                      </span>
+                    ) : cat.isUnderConstruction ? (
+                      <span className="text-xs font-semibold text-mystic-accent flex items-center">
+                        {isAdmin ? 'Erişime Açık (Admin) →' : 'Dersi İncele 🔒'}
                       </span>
                     ) : (
                       <span className="text-xs font-semibold text-[#D4AF37] flex items-center group-hover:translate-x-1 transition-transform">
