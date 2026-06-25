@@ -120,6 +120,7 @@ export default function KadimDerslerPage() {
 
   const handlePress = (cat: LessonCategory) => {
     const isApprenticeOrHigher = role && role !== 'free';
+    console.log("Web handlePress click:", { catId: cat.id, role, isApprenticeOrHigher });
     if (cat.id !== 'duygusal-hastaliklar' && !isApprenticeOrHigher && role !== 'admin') {
       alert("Dersleri açabilmeniz için en az Çıraklık seviyesine ulaşmış olmanız lazım.");
       return;
