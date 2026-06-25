@@ -50,56 +50,49 @@ export default function KadimDerslerPage() {
       title: 'Numeroloji ve Sayıların Sırrı', 
       desc: 'Pisagor ve Keldani ekolleriyle kader sayılarınızı, ruh güdülerinizi ve yaşam döngülerinizi hesaplamayı öğrenin.',
       icon: <Calculator size={28} className="text-yellow-400" />, 
-      route: '#',
-      isUnderConstruction: true 
+      route: '/kadim-dersler/numeroloji'
     },
     { 
       id: 'astroloji', 
       title: 'Ezoterik Astroloji', 
       desc: '4 katmanlı ruhsal doğum haritası okuma sanatı. Gezegenler, evler ve burçların derin ezoterik anlamları.',
       icon: <Compass size={28} className="text-blue-400" />, 
-      route: '#',
-      isUnderConstruction: true 
+      route: '/kadim-dersler/astroloji'
     },
     { 
       id: 'human', 
       title: 'Human Design (Kozmik Tasarım)', 
       desc: 'Genetik şifrelerinizi ve orijinal tasarımınızı keşfedin. Tipler, otoriteler ve 9 enerji merkezinin mekaniği.',
       icon: <Fingerprint size={28} className="text-purple-400" />, 
-      route: '#',
-      isUnderConstruction: true 
+      route: '/kadim-dersler/human-design'
     },
     { 
       id: 'rune', 
       title: 'Rune Tılsımları', 
       desc: '24 Elder Futhark sembolünün kozmik enerjileri, tılsımlı bağlamalar oluşturma ve ritüel yöntemleri.',
       icon: <Gem size={28} className="text-emerald-400" />, 
-      route: '#',
-      isUnderConstruction: true 
+      route: '/kadim-dersler/rune'
     },
     { 
       id: 'yoga', 
       title: 'Yoga Asanaları ve Nadiler', 
       desc: 'Ashtanga 8 basamaklı yol, asanalar, enerji kilitleri (bandhalar) ve pranayama nefes kontrol yöntemleri.',
       icon: <Sparkles size={28} className="text-cyan-400" />, 
-      route: '#',
-      isUnderConstruction: true 
+      route: '/kadim-dersler/yoga'
     },
     { 
       id: 'kabbalah', 
       title: 'Evrensel Kabbalah', 
       desc: 'Hayat ağacı (Sephiroth), 10 ilahi küre, kozmik enerjiler ve tekamül yollarının sırları.',
       icon: <Network size={28} className="text-indigo-400" />, 
-      route: '#',
-      isUnderConstruction: true 
+      route: '/kadim-dersler/kabbalah'
     },
     { 
       id: 'akupunktur', 
       title: 'Akupunktur ve Meridyenler', 
       desc: 'Bedenimizdeki enerji kanalları (meridyenler), akupresür noktaları ve element dengeleri.',
       icon: <Activity size={28} className="text-teal-400" />, 
-      route: '#',
-      isUnderConstruction: true 
+      route: '/kadim-dersler/akupunktur'
     },
     { 
       id: 'sembolizm', 
