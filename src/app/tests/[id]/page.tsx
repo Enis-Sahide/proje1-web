@@ -219,7 +219,7 @@ export default function ExamTakingPage() {
   if (blockedReason) {
     return (
       <div className="min-h-screen pt-32 pb-24 px-4 relative flex items-center justify-center">
-        <div className="fixed inset-0 bg-[#0c0314] -z-50" />
+        <div className="fixed inset-0 bg-transparent -z-50" />
         <div className="max-w-md w-full bg-black/80 backdrop-blur-xl border border-red-500/20 p-8 rounded-3xl text-center shadow-[0_0_50px_rgba(239,68,68,0.1)]">
           <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-6">
             <AlertCircle className="text-red-500" size={32} />
@@ -273,7 +273,7 @@ export default function ExamTakingPage() {
 
     return (
       <div className="min-h-screen pt-32 pb-24 px-4 relative flex items-center justify-center">
-        <div className="fixed inset-0 bg-[#080210] -z-50" />
+        <div className="fixed inset-0 bg-transparent -z-50" />
         <div className="max-w-lg w-full bg-black/70 backdrop-blur-xl border border-[#D4AF37]/20 p-8 md:p-12 rounded-3xl text-center shadow-[0_0_60px_rgba(212,175,55,0.15)] flex flex-col items-center">
           <Trophy className="text-[#D4AF37] animate-bounce mb-6" size={72} />
           
@@ -398,7 +398,7 @@ export default function ExamTakingPage() {
 
       {showExitConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-300">
-          <div className="max-w-md w-full bg-[#0c0314] border border-[#D4AF37]/20 p-8 rounded-3xl text-center shadow-[0_0_50px_rgba(212,175,55,0.1)]">
+          <div className="max-w-md w-full bg-black/80 backdrop-blur-xl border border-[#D4AF37]/20 p-8 rounded-3xl text-center shadow-[0_0_50px_rgba(212,175,55,0.1)]">
             <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mx-auto mb-6">
               <AlertCircle className="text-red-500" size={32} />
             </div>
