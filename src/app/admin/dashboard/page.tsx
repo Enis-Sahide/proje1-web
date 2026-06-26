@@ -126,7 +126,7 @@ export default function AdminDashboard() {
     };
     
     const confirmChange = window.confirm(
-      `"${userName}" isimli üyenin yetki seviyesini "${targetRoleLabel}" olarak değiştirmek istediğinize emin misiniz?\n\n` +
+      `"${userName}" isimli üyenin yetki seviyesini "${roleLabels[newRole]}" olarak değiştirmek istediğinize emin misiniz?\n\n` +
       `Not: Bu işlem, üyenin bu seviye için vermesi gereken tüm sınavları otomatik olarak "geçti" olarak işaretleyecektir.`
     );
     if (!confirmChange) return;
