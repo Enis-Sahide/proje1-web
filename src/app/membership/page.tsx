@@ -52,9 +52,10 @@ const INITIAL_TIERS: Tier[] = [
     price: '396 TL / Ay',
     description: 'Ezoterik yolculuğa ilk adımınızı atın. Temel dersler ve başlangıç analizleri.',
     benefits: [
-      '1. Derece Derslere Erişim',
-      'Aura ve Çakra Sınavları',
-      'Temel Frekans Odası Meditasyonları'
+      'Her dersin çıraklık seviyesi',
+      'Çıraklık dersi sınavları',
+      'Arayış derecesi içeriklerinin tamamı (sınavlar hariç)',
+      'Seviyeye uygun kaynak önerileri'
     ],
     color: 'from-amber-500/20 to-orange-500/20',
     borderColor: 'border-amber-500/30',
@@ -68,10 +69,11 @@ const INITIAL_TIERS: Tier[] = [
     price: '639 TL / Ay',
     description: 'Bilginizi derinleştirin. 2. Derece dersler, detaylı numeroloji ve astroloji.',
     benefits: [
-      '1. ve 2. Derece Derslere Erişim',
-      'Detaylı Astroloji & Transitler',
-      'Zenginleştirilmiş Frekans Seçenekleri',
-      'Gelişmiş Ezoterik Sınavlar'
+      'Her dersin çıraklık ve kalfa seviyesi',
+      'Kalfa dersi sınavları',
+      'İnsan tasarımı detaylı analiz',
+      'Arayış derecesi içeriklerinin tamamı (sınavlar hariç)',
+      'Seviyeye uygun kaynak önerileri'
     ],
     color: 'from-blue-500/20 to-indigo-500/20',
     borderColor: 'border-blue-500/30',
@@ -85,11 +87,12 @@ const INITIAL_TIERS: Tier[] = [
     price: '999 TL / Ay',
     description: 'Sırları çözün ve üstatlığa yükselin. Kadim Uygulamalar ve özel nefes çalışmaları.',
     benefits: [
-      'Tüm Derecelere Sınırsız Erişim',
-      'Kadim Uygulamalar Laboratuvarı',
-      'Kabalistik 4 Alem Analizi',
-      'Özel Simya & Nefes Seansları',
-      'Birebir Rehberlik Mührü'
+      '4 katmanlı harita analizi',
+      'Kadim uygulamalar',
+      'Her dersin çıraklık, kalfa ve ustalık seviyesi',
+      'Ustalık dersi sınavları',
+      'Alt derecelerin tüm içerikleri (sınavlar hariç)',
+      'Seviyeye uygun kaynak önerileri'
     ],
     color: 'from-[#D4AF37]/20 to-yellow-600/20',
     borderColor: 'border-[#D4AF37]/30',
@@ -109,9 +112,15 @@ export default function MembershipPage() {
   const hasPassedLevel1 = LEVEL_1_EXAMS.every(id => passedExams.includes(id));
   const hasPassedLevel2 = LEVEL_2_EXAMS.every(id => passedExams.includes(id));
 
-  // Load from localStorage or default
+  // Load from localStorage or default (with version control to override stale cache)
   const [tiers, setTiers] = useState<Tier[]>(() => {
     if (typeof window !== 'undefined') {
+      const version = localStorage.getItem('membership_tiers_version');
+      if (version !== 'v2') {
+        localStorage.removeItem('membership_tiers');
+        localStorage.setItem('membership_tiers_version', 'v2');
+        return INITIAL_TIERS;
+      }
       const saved = localStorage.getItem('membership_tiers');
       if (saved) {
         try {
