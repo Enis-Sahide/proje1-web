@@ -491,7 +491,7 @@ export default function KabbalahAnalysisPage() {
                   Alem Analizleri
                 </h3>
                 
-                {kabbalahAnalysis.worlds.map((world, index) => {
+                {kabbalahAnalysis.worlds.map((world: any, index: number) => {
                   const isMatch = (index + 1) === kabbalahAnalysis.shortcutLevel;
                   
                   return (
