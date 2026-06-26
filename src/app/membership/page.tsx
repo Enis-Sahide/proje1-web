@@ -57,10 +57,10 @@ const INITIAL_TIERS: Tier[] = [
       'Arayış derecesi içeriklerinin tamamı (sınavlar hariç)',
       'Seviyeye uygun kaynak önerileri'
     ],
-    color: 'from-amber-500/20 to-orange-500/20',
-    borderColor: 'border-amber-500/30',
-    textColor: 'text-amber-400',
-    glowColor: 'rgba(245,158,11,0.15)'
+    color: 'from-red-500/20 to-rose-500/20',
+    borderColor: 'border-red-500/30',
+    textColor: 'text-red-400',
+    glowColor: 'rgba(239,68,68,0.15)'
   },
   {
     id: 'journeyman',
@@ -75,10 +75,10 @@ const INITIAL_TIERS: Tier[] = [
       'Arayış derecesi içeriklerinin tamamı (sınavlar hariç)',
       'Seviyeye uygun kaynak önerileri'
     ],
-    color: 'from-blue-500/20 to-indigo-500/20',
-    borderColor: 'border-blue-500/30',
-    textColor: 'text-blue-400',
-    glowColor: 'rgba(59,130,246,0.15)'
+    color: 'from-green-500/20 to-emerald-500/20',
+    borderColor: 'border-green-500/30',
+    textColor: 'text-green-400',
+    glowColor: 'rgba(34,197,94,0.15)'
   },
   {
     id: 'master',
@@ -94,12 +94,21 @@ const INITIAL_TIERS: Tier[] = [
       'Alt derecelerin tüm içerikleri (sınavlar hariç)',
       'Seviyeye uygun kaynak önerileri'
     ],
-    color: 'from-[#D4AF37]/20 to-yellow-600/20',
-    borderColor: 'border-[#D4AF37]/30',
-    textColor: 'text-[#D4AF37]',
-    glowColor: 'rgba(212,175,55,0.15)'
+    color: 'from-purple-500/20 to-fuchsia-500/20',
+    borderColor: 'border-purple-500/30',
+    textColor: 'text-purple-400',
+    glowColor: 'rgba(168,85,247,0.15)'
   }
 ];
+
+const getTierHexColor = (textColor: string) => {
+  if (textColor.includes('red')) return '#EF4444';
+  if (textColor.includes('green')) return '#22C55E';
+  if (textColor.includes('purple')) return '#A855F7';
+  if (textColor.includes('#D4AF37')) return '#D4AF37';
+  if (textColor.includes('blue')) return '#3B82F6';
+  return '#F59E0B'; // default amber/yellow
+};
 
 export default function MembershipPage() {
   const router = useRouter();
@@ -116,9 +125,9 @@ export default function MembershipPage() {
   const [tiers, setTiers] = useState<Tier[]>(() => {
     if (typeof window !== 'undefined') {
       const version = localStorage.getItem('membership_tiers_version');
-      if (version !== 'v2') {
+      if (version !== 'v3') {
         localStorage.removeItem('membership_tiers');
-        localStorage.setItem('membership_tiers_version', 'v2');
+        localStorage.setItem('membership_tiers_version', 'v3');
         return INITIAL_TIERS;
       }
       const saved = localStorage.getItem('membership_tiers');
@@ -302,7 +311,7 @@ export default function MembershipPage() {
                 key={tier.id}
                 className={`relative overflow-hidden rounded-3xl p-[1px] group transition-all duration-300 ${!isAdmin ? 'hover:-translate-y-2' : ''}`}
                 style={{
-                  background: `linear-gradient(135deg, ${tier.textColor === 'text-[#D4AF37]' ? '#D4AF37' : tier.textColor.includes('blue') ? '#3B82F6' : '#F59E0B'}30, rgba(255,255,255,0.05))`
+                  background: `linear-gradient(135deg, ${getTierHexColor(tier.textColor)}30, rgba(255,255,255,0.05))`
                 }}
               >
                 {/* Card Body */}
