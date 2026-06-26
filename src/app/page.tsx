@@ -4,7 +4,7 @@ import React from 'react';
 import ExploreSection from '@/features/astrology/components/ExploreSection';
 import { useContent } from '@/lib/useContent';
 import PlanetaryHourWidget from '@/features/astrology/components/PlanetaryHourWidget';
-import { ChevronDown, Quote } from 'lucide-react';
+import { ChevronDown, Quote, Loader2 } from 'lucide-react';
 import MoonCyclesWidget from '@/features/astrology/components/MoonCyclesWidget';
 import Link from 'next/link';
 
@@ -15,6 +15,7 @@ const DAY_NAMES = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cu
 export default function Home() {
   const [affirmation, setAffirmation] = React.useState<any>(null);
   const [dayName, setDayName] = React.useState<string>('');
+  const [isNavigating, setIsNavigating] = React.useState<string | null>(null);
   const { data: affirmations } = useContent<Record<number, { text: string; author: string }>>(
     '/api/content/affirmations',
   );
@@ -83,6 +84,7 @@ export default function Home() {
                   <Link 
                     href={`/chakra/${mod.id}`}
                     key={mod.id} 
+                    onClick={() => setIsNavigating(mod.title)}
                     className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 group flex flex-col items-center cursor-pointer w-64 z-10"
                     style={{ top: mod.top }}
                   >
@@ -118,6 +120,19 @@ export default function Home() {
 
       <ExploreSection />
       
+      {isNavigating && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex flex-col items-center justify-center text-white transition-opacity duration-300 animate-fadeIn">
+          <div className="flex flex-col items-center p-8 rounded-3xl bg-mystic-dark/80 border border-mystic-primary/20 shadow-2xl max-w-sm w-full mx-4 text-center">
+            <Loader2 className="animate-spin text-mystic-primary mb-6" size={48} />
+            <h3 className="text-xl font-bold text-mystic-accent mb-2">
+              {isNavigating}
+            </h3>
+            <p className="text-sm text-mystic-text-muted">
+              Kadim katmanlar açılıyor, lütfen bekleyin...
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

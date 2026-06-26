@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Sparkles, Activity, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Sparkles, Activity, CheckCircle2, Loader2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useContent } from '@/lib/useContent';
 import RequireRole from '@/core/ui/RequireRole';
@@ -29,6 +29,7 @@ export default function ChakraAnalysisPage() {
   const [scores, setScores] = useState<Record<ChakraId, number>>({
     root: 0, sacral: 0, solar: 0, heart: 0, throat: 0, thirdEye: 0, crown: 0
   });
+  const [isNavigating, setIsNavigating] = useState<string | null>(null);
   const { data: questionsData } = useContent<ChakraQuestion[]>('/api/content/chakra-test');
   const CHAKRA_TEST_QUESTIONS = questionsData ?? [];
   const isTransitioning = React.useRef(false);
@@ -215,14 +216,14 @@ export default function ChakraAnalysisPage() {
                     {isUrgent ? (
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4">
                         <p className="text-red-400">Bu çakranızda ciddi blokajlar görünüyor. Enerji akışı zayıf. Acil şifalanması gerekiyor.</p>
-                        <Link href={`/chakra/${info.pathId}`} className="shrink-0 text-sm font-bold px-5 py-2 bg-red-500/10 text-red-400 border border-red-500/30 rounded-full hover:bg-red-500/20 transition-colors flex items-center gap-2">
+                        <Link href={`/chakra/${info.pathId}`} onClick={() => setIsNavigating(info.name)} className="shrink-0 text-sm font-bold px-5 py-2 bg-red-500/10 text-red-400 border border-red-500/30 rounded-full hover:bg-red-500/20 transition-colors flex items-center gap-2">
                           {info.name} Şifası <ArrowLeft className="rotate-180" size={16} />
                         </Link>
                       </div>
                     ) : pct < 70 ? (
                       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-4">
                         <p className="text-yellow-400">Bu çakranız dengesiz çalışıyor. Zaman zaman tıkanıklıklar yaşıyorsunuz. Şifalanmaya ihtiyacı var.</p>
-                        <Link href={`/chakra/${info.pathId}`} className="shrink-0 text-sm font-bold px-5 py-2 bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 rounded-full hover:bg-yellow-500/20 transition-colors flex items-center gap-2">
+                        <Link href={`/chakra/${info.pathId}`} onClick={() => setIsNavigating(info.name)} className="shrink-0 text-sm font-bold px-5 py-2 bg-yellow-500/10 text-yellow-400 border border-yellow-500/30 rounded-full hover:bg-yellow-500/20 transition-colors flex items-center gap-2">
                           Dengele <ArrowLeft className="rotate-180" size={16} />
                         </Link>
                       </div>
@@ -274,6 +275,20 @@ export default function ChakraAnalysisPage() {
           {step === 'result' && renderResult()}
         </RequireRole>
       </div>
+
+      {isNavigating && (
+        <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex flex-col items-center justify-center text-white transition-opacity duration-300">
+          <div className="flex flex-col items-center p-8 rounded-3xl bg-mystic-dark/80 border border-mystic-primary/20 shadow-2xl max-w-sm w-full mx-4 text-center">
+            <Loader2 className="animate-spin text-mystic-primary mb-6" size={48} />
+            <h3 className="text-xl font-bold text-mystic-accent mb-2">
+              {isNavigating}
+            </h3>
+            <p className="text-sm text-mystic-text-muted">
+              Kadim katmanlar açılıyor, lütfen bekleyin...
+            </p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
