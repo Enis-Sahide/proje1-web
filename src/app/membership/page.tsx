@@ -14,7 +14,8 @@ import {
   X, 
   Save, 
   ShieldCheck,
-  AlertCircle
+  AlertCircle,
+  Loader2
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -112,7 +113,7 @@ const getTierHexColor = (textColor: string) => {
 
 export default function MembershipPage() {
   const router = useRouter();
-  const { role, user, passedExams } = useAuth();
+  const { role, user, passedExams, isLoading } = useAuth();
   const isAdmin = role === 'admin';
   const userLevel = ROLE_LEVELS[role] ?? 0;
 
@@ -222,6 +223,44 @@ export default function MembershipPage() {
   };
 
   const visibleTiers = getVisibleTiers();
+
+  // Lock the page for everyone except admin
+  React.useEffect(() => {
+    if (!isLoading && role !== 'admin') {
+      router.push('/');
+    }
+  }, [role, isLoading, router]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-white bg-mystic-dark">
+        <Loader2 className="animate-spin text-mystic-primary" size={36} />
+      </div>
+    );
+  }
+
+  if (role !== 'admin') {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center text-white bg-mystic-dark p-6 text-center">
+        {/* Background radial gradient */}
+        <div className="fixed inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-[#0f0724] via-black to-black -z-50" />
+        
+        <div className="max-w-md bg-black/60 backdrop-blur-md border border-red-500/20 rounded-3xl p-8 shadow-2xl">
+          <AlertCircle className="text-red-500 mx-auto mb-4" size={48} />
+          <h1 className="text-2xl font-bold mb-3 text-white">Erişim Engellendi</h1>
+          <p className="text-white/60 text-sm leading-relaxed mb-6">
+            Bu sayfa geçici olarak bakımdadır ve yalnızca yöneticilerin erişimine açıktır.
+          </p>
+          <button 
+            onClick={() => router.push('/')} 
+            className="w-full bg-gradient-to-r from-red-600 to-rose-600 hover:from-rose-600 hover:to-red-600 text-white font-bold py-3.5 rounded-xl transition-all flex justify-center items-center shadow-lg cursor-pointer text-xs uppercase tracking-wider"
+          >
+            Ana Sayfaya Dön
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-32 pb-24 px-6 relative bg-transparent">
