@@ -57,7 +57,7 @@ export default function Navigation() {
     { name: 'Keşfet', href: '/explore', isUnderConstruction: true },
     { name: 'Dersler', href: '/kadim-dersler', requiresAuth: true },
     { name: 'Sınavlar', href: '/tests', requiresAuth: true },
-    { name: 'Seviyeler', href: '/membership', requiresAuth: true },
+    { name: 'Seviyeler', href: '/membership', requiresAuth: true, isLockedForNonAdmin: true },
   ];
 
   const isMaster = role === 'master';
@@ -124,6 +124,7 @@ export default function Navigation() {
             {navLinks.map((link) => {
               const isLocked = link.requiresAuth && !isLoggedIn;
               const isConstruction = link.isUnderConstruction && !isAdmin;
+              const isLockedForNonAdmin = link.isLockedForNonAdmin && !isAdmin;
               
               if (isConstruction) {
                 return (
@@ -134,6 +135,19 @@ export default function Navigation() {
                   >
                     {link.name}
                     <Wrench size={9} className="opacity-70" />
+                  </div>
+                );
+              }
+
+              if (isLockedForNonAdmin) {
+                return (
+                  <div 
+                    key={link.name} 
+                    className={`text-[10px] xl:text-[11px] 2xl:text-xs uppercase tracking-wider font-medium text-mystic-text-muted/40 flex items-center gap-0.5 cursor-not-allowed whitespace-nowrap`}
+                    title="Geçici Olarak Kapalı"
+                  >
+                    {link.name}
+                    <Lock size={9} className="opacity-70" />
                   </div>
                 );
               }
@@ -293,6 +307,7 @@ export default function Navigation() {
                 {navLinks.map((link) => {
                   const isLocked = link.requiresAuth && !isLoggedIn;
                   const isConstruction = link.isUnderConstruction && !isAdmin;
+                  const isLockedForNonAdmin = link.isLockedForNonAdmin && !isAdmin;
 
                   if (isConstruction) {
                     return (
@@ -303,6 +318,19 @@ export default function Navigation() {
                       >
                         <span>{link.name}</span>
                         <Wrench size={14} className="opacity-70" />
+                      </div>
+                    );
+                  }
+
+                  if (isLockedForNonAdmin) {
+                    return (
+                      <div 
+                        key={link.name} 
+                        className="text-base py-3 border-b border-mystic-dark/30 text-mystic-text-muted/40 flex items-center justify-between cursor-not-allowed"
+                        title="Geçici Olarak Kapalı"
+                      >
+                        <span>{link.name}</span>
+                        <Lock size={14} className="opacity-70" />
                       </div>
                     );
                   }
