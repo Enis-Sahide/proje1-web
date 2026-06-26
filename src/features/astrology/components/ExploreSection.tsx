@@ -30,11 +30,10 @@ const exploreItems = [
     title: 'Kadim Dersler',
     description: 'Geçmişin bilgeliğiyle geleceğinizi aydınlatın.',
     icon: BookOpen,
-    href: '#',
+    href: '/kadim-dersler',
     color: 'from-amber-500 to-orange-500',
     requiresAuth: true,
-    status: 'LOCKED',
-    lockMessage: 'Yapım Aşamasında'
+    status: 'ACTIVE'
   },
   {
     title: 'Hastalıkların Duygusal Nedenleri',
