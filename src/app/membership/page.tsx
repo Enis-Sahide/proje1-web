@@ -254,7 +254,7 @@ export default function MembershipPage() {
                 </p>
               </>
             )}
-          
+          </div>
         </div>
 
         {/* Empty state for free users who haven't passed entry exams */}
