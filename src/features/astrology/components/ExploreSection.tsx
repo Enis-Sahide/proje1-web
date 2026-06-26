@@ -7,7 +7,18 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 
-const exploreItems = [
+interface ExploreItem {
+  title: string;
+  description: string;
+  icon: React.ComponentType<any>;
+  href: string;
+  color: string;
+  requiresAuth: boolean;
+  status: 'ACTIVE' | 'LOCKED';
+  lockMessage?: string;
+}
+
+const exploreItems: ExploreItem[] = [
   {
     title: 'Meditasyon',
     description: 'Zihninizi dinlendirin ve içsel huzuru bulun.',
