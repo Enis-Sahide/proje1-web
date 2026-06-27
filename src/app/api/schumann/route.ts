@@ -7,43 +7,43 @@ export async function OPTIONS() {
 function getStatusInfo(kp: number) {
   if (kp < 3) {
     return {
-      label: 'Sakin',
-      desc: 'Manyetik alan sakin. Zihinsel odaklanma, gevşeme, topraklanma ve meditasyon için oldukça dengeli ve huzurlu bir ortam.'
+      label: 'Dengeli Akış (Sakin)',
+      desc: 'Manyetik alan oldukça dingin ve dengeli. İç gözlem, zihinsel odaklanma, derin gevşeme ve kök çakra topraklama çalışmaları için mükemmel bir zemin. Zihnin gürültüsünü yatıştırmak ve sessizlik meditasyonları yapmak için ideal bir dönem.'
     };
   } else if (kp < 4) {
     return {
-      label: 'Kararsız',
-      desc: 'Hafif bir elektromanyetik kıpırdanma var. Enerji seviyelerinde dalgalanma ve hafif bir içsel huzursuzluk hissedilebilir.'
+      label: 'Enerjisel Kıpırdanma (Kararsız)',
+      desc: 'Elektromanyetik alanda hafif bir uyanış ve hareketlilik var. Aura alanında genişleme ve hafif bir duyarlılık hissedilebilir. Prana akışını dengeleyici nefes egzersizleri ve hafif esneme hareketleri için harika bir zaman dilimi.'
     };
   } else if (kp < 5) {
     return {
-      label: 'Aktif',
-      desc: 'Aktif bir manyetik alan. Hassas kişilerde rüyaların berraklaşması, sezgilerin güçlenmesi veya hafif uykusuzluk görülebilir.'
+      label: 'Yüksek Titreşim (Aktif)',
+      desc: 'Aktif bir manyetik alan mevcut. Bilinçaltı kapıları aralanıyor; rüyaların berraklaşması, sezgilerin ve psişik duyarlılığın güçlenmesi olasıdır. Üçüncü göz çalışmaları, rüya günlükleri tutma ve durugörü meditasyonları için çok elverişli bir süreç.'
     };
   } else if (kp < 6) {
     return {
-      label: 'G1 Fırtına (Küçük)',
-      desc: 'Küçük çaplı jeomanyetik fırtına. Baş ağrısı, yorgunluk ve içsel gerilim yaşanması olasıdır. Doğada topraklanma tavsiye edilir.'
+      label: 'Işık Kapısı (G1 Manyetik Aktivite)',
+      desc: 'Güneş\'ten gelen yüksek frekanslı kozmik bilgi paketlerinin iyonosfere ulaştığı özel bir uyanış penceresi. Zihinde uykusuzluk veya fiziksel duyarlılık olarak yansıyan bu etki, aslında derin çakra çalışmaları, DNA aktivasyonu meditasyonları ve yüksek benlikle bağ kurmak için olağanüstü bir fırsattır.'
     };
   } else if (kp < 7) {
     return {
-      label: 'G2 Fırtına (Orta)',
-      desc: 'Orta şiddetli manyetik fırtına. Biyolojik sistemleriniz bu kozmik fırtınaya adapte olmaya çalışırken dinlenmeye özen gösterin.'
+      label: 'Kozmik Entegrasyon (G2 Manyetik Aktivite)',
+      desc: 'Orta şiddette manyetik uyarım. Evrensel enerjinin hücresel düzeyde entegrasyonu gerçekleşiyor. Işık beden aktivasyonu, DNA şablonunun güncellenmesi ve yüksek boyutlu frekanslara uyumlanmak için bu zaman dilimini niyet çalışmaları ve sessiz tefekkür ile değerlendirebilirsiniz.'
     };
   } else if (kp < 8) {
     return {
-      label: 'G3 Fırtına (Güçlü)',
-      desc: 'Güçlü jeomanyetik fırtına. Yoğun enerjisel uyarım, duygusal iniş çıkışlar, rüyalarda artış ve uykuya dalma zorluğu yaşanabilir.'
+      label: 'Portal Geçişi (G3 Manyetik Aktivite)',
+      desc: 'Güçlü bir manyetik aktivite dalgası. Aura alanınız yoğun kozmik ışık kodlarıyla yıkanıyor. Duygusal dalgalanmalar ve uykuya dalışta zorlanmalar, eski kalıpların salınımına işaret eder. Çakra dengeleme, kalp kapısını açma ve kristal şifa meditasyonları için zirve noktası.'
     };
   } else if (kp < 9) {
     return {
-      label: 'G4 Fırtına (Ağır)',
-      desc: 'Şiddetli manyetik fırtına. Küresel boyutta çok güçlü enerjisel uyarım mevcuttur. Derin nefes egzersizleri ve sakinlik önerilir.'
+      label: 'Hücresel Dönüşüm (G4 Manyetik Aktivite)',
+      desc: 'Şiddetli manyetik uyarım ve kozmik akış. Hücreleriniz ve DNA iplikçikleriniz yüksek güneş kodlarını soğuruyor. Bu yoğun enerji altında kendinizi zorlamadan sessizce uzanarak meditasyon yapabilir, aura temizliği ve uyanış niyetlerinize odaklanarak kozmik akışla bütünleşebilirsiniz.'
     };
   } else {
     return {
-      label: 'G5 Fırtına (Ekstrem)',
-      desc: 'Olağanüstü fırtına! Küresel elektromanyetik dengede ekstrem dalgalanma. Zihni dinginleştirmek ve içe dönmek en doğrusudur.'
+      label: 'Ekstrem Kozmik Portal (G5 Manyetik Aktivite)',
+      desc: 'Zirve seviyede elektromanyetik uyanış ve ışık portalı! Kolektif bilinçte muazzam bir vites değişimi. Bu olağanüstü kozmik akışı sessizce oturup taç ve kalp çakralarınızdan tüm bedeninize akan beyaz ışığı imgeleyerek, derin frekans meditasyonları ve DNA aktivasyon niyetleriyle taçlandırın.'
     };
   }
 }
