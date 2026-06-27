@@ -133,9 +133,14 @@ export default function SchumannPage() {
     ctx.fillStyle = '#030308';
     ctx.fillRect(0, graphTop, width, graphHeight);
 
-    const cols = data.history; // Exactly 24 blocks representing the last 72 hours (48h past, 24h forecast)
-    const transitionIndex = cols.findIndex(item => item.predicted); // Where forecast starts
-    const transitionX = transitionIndex !== -1 ? (transitionIndex / cols.length) * width : width;
+    const cols = data.history; // Exactly 24 blocks representing the last 72 hours
+    
+    // Precise current time (ŞİMDİ) X placement based on the user's browser time
+    const startTimeMs = new Date(cols[0].time + 'Z').getTime();
+    const totalDurationMs = cols.length * 3 * 60 * 60 * 1000; // 72 hours in ms
+    const currentMs = Date.now();
+    const nowPct = (currentMs - startTimeMs) / totalDurationMs;
+    const nowX = nowPct * width;
 
     // 1. Draw Spectrogram Data Column by Column
     for (let x = 0; x < width; x++) {
@@ -150,7 +155,8 @@ export default function SchumannPage() {
       const kpHigh = cols[indexHigh].kp;
       const kp = kpLow + (kpHigh - kpLow) * weight;
 
-      const isPredicted = x >= transitionX;
+      // Determine if this pixel column is in the future relative to the actual current time
+      const isPredicted = x >= nowX;
 
       // Base background color (blends smoothly to solid white if Kp is high)
       let baseR = 3;
@@ -316,14 +322,14 @@ export default function SchumannPage() {
       }
     }
 
-    // 5. Draw "ŞİMDİ" (NOW) Vertical Dashed Divider Line
-    if (transitionIndex !== -1) {
+    // 5. Draw "ŞİMDİ" (NOW) Vertical Dashed Line at the ACTUAL current local time coordinate
+    if (nowPct >= 0 && nowPct <= 1) {
       ctx.strokeStyle = '#00E5FF';
       ctx.lineWidth = 1.5;
-      ctx.setLineDash([4, 4]); // Dashed scan line
+      ctx.setLineDash([4, 4]); // Dashed line
       ctx.beginPath();
-      ctx.moveTo(transitionX, graphTop);
-      ctx.lineTo(transitionX, graphBottom);
+      ctx.moveTo(nowX, graphTop);
+      ctx.lineTo(nowX, graphBottom);
       ctx.stroke();
       ctx.setLineDash([]); // Reset dash state
       
@@ -331,7 +337,7 @@ export default function SchumannPage() {
       ctx.fillStyle = '#00E5FF';
       ctx.font = 'bold 8px sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('ŞİMDİ', transitionX, graphTop + 12);
+      ctx.fillText('ŞİMDİ', nowX, graphTop + 12);
     }
 
     // 6. Draw horizontal grid lines and frequency labels (overlay)
