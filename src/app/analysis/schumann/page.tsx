@@ -866,6 +866,11 @@ export default function SchumannPage() {
                 <br />
                 Bölgesel gözlemevi grafikleri genellikle istasyonun kurulu olduğu ülkenin veya şehrin yerel saat dilimine göre çizilir (örneğin Asya/Sibirya gözlemevleri kendi yerel saat dilimini kullanır). Bu gösterge paneli ise uluslararası uzay havası verilerini <strong>tamamen sizin cihazınızın yerel saat dilimine (örneğin Türkiye saati UTC+3)</strong> dönüştürerek gösterir. Bu nedenle yabancı grafiklerle aranızda saat farkı bulunması tamamen normaldir; buradaki saatler doğrudan kendi gününüzdeki anı temsil eder.
               </p>
+              <p>
+                <strong>Kozmik Hava Tahmini: Gelecek 24 Saat Nasıl Hesaplanır?</strong>
+                <br />
+                Dünya ile Güneş arasında (L1 noktasında) konumlanmış gelişmiş uzay uyduları (DSCOVR ve ACE), Güneş patlamalarıyla fırlayan yüklü parçacıkları yola çıktıkları anda ölçer. Bu kozmik rüzgarların Dünya'ya ulaşması fiziksel olarak 15 saat ile 3 gün arasında sürer. Sistemimiz, uyduların yolda yakaladığı bu verileri işleyerek henüz gezegenimize ulaşmamış olan bu "kozmik bilgi paketçiklerini" saatlik modellemeler halinde önceden sunar. Böylece önümüzdeki 24 saatin uyanış portallarını (grafikteki kesikli tahmin alanlarını) önceden görerek meditasyon, niyet ve çakra dengeleme çalışmalarınızı en yüksek farkındalıkla planlayabilirsiniz.
+              </p>
             </div>
           </div>
           <div className="mt-8 pt-6 border-t border-white/10 text-xs text-center text-mystic-text-muted">
