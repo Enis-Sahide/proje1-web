@@ -91,11 +91,14 @@ export default function SchumannPage() {
 
     const width = canvas.width;
     const height = canvas.height;
-    const graphHeight = height - 25; // Reserve 25px for bottom hour bar
+    
+    const graphTop = 25; // Top date bar height
+    const graphBottom = height - 25; // Bottom time bar height
+    const graphHeight = graphBottom - graphTop; // Active graph height
 
     // Draw solid space background for graph area
     ctx.fillStyle = '#030308';
-    ctx.fillRect(0, 0, width, graphHeight);
+    ctx.fillRect(0, graphTop, width, graphHeight);
 
     const cols = data.history; // Exactly 24 blocks representing the last 72 hours
 
@@ -112,9 +115,9 @@ export default function SchumannPage() {
       const kpHigh = cols[indexHigh].kp;
       const kp = kpLow + (kpHigh - kpLow) * weight;
 
-      // Draw the column pixel-by-pixel up to graphHeight
-      for (let y = 0; y < graphHeight; y++) {
-        const freqPct = (graphHeight - y) / graphHeight; // 0 at bottom, 1 at top
+      // Draw the column pixel-by-pixel inside the graph limits
+      for (let y = graphTop; y < graphBottom; y++) {
+        const freqPct = (graphBottom - y) / graphHeight; // 0 at bottom, 1 at top
         const freqHz = freqPct * 40; // Scale 0 to 40 Hz
 
         // Base noise background
@@ -194,52 +197,78 @@ export default function SchumannPage() {
       }
     }
 
-    // 2. Draw Bottom Time Bar
+    // 2. Draw Top Date Bar
     ctx.fillStyle = '#08080c';
-    ctx.fillRect(0, graphHeight, width, 25);
+    ctx.fillRect(0, 0, width, 25);
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
     ctx.beginPath();
-    ctx.moveTo(0, graphHeight);
-    ctx.lineTo(width, graphHeight);
+    ctx.moveTo(0, 25);
+    ctx.lineTo(width, 25);
     ctx.stroke();
 
-    // 3. Draw Vertical Hour Grid Lines & Labels centered on each 3-hour block
-    for (let h = 0; h <= cols.length; h++) {
-      const x = (h / cols.length) * width;
-      
-      // Draw vertical grid line (dashed/subtle)
-      ctx.strokeStyle = h % 8 === 0 ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255, 255, 255, 0.08)';
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, graphHeight);
-      ctx.stroke();
-
-      if (h < cols.length) {
-        // Calculate the exact hour label
-        const date = new Date(cols[h].time + 'Z');
-        const hourLabel = String(date.getHours()).padStart(2, '0');
-        
-        ctx.fillStyle = h % 8 === 0 ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.4)';
-        ctx.font = h % 8 === 0 ? 'bold 8px monospace' : '8px monospace';
-        ctx.textAlign = 'center';
-        // Center text in the middle of each block segment
-        ctx.fillText(hourLabel, x + (width / cols.length) / 2, height - 8);
-      }
-    }
-
-    // 4. Draw Date Labels at the top of the canvas (centered for each day of 8 segments)
+    // Draw date labels centered on each day section (8 segments per day)
     if (cols.length >= 24) {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
-      ctx.font = 'bold 9px sans-serif';
+      ctx.fillStyle = '#00E5FF'; // High visibility Cyan for dates
+      ctx.font = 'bold 9px monospace';
       ctx.textAlign = 'center';
       
       const date1 = new Date(cols[0].time + 'Z');
       const date2 = new Date(cols[8].time + 'Z');
       const date3 = new Date(cols[16].time + 'Z');
 
-      ctx.fillText(date1.toLocaleDateString('tr-TR'), (4 / 24) * width, 18);
-      ctx.fillText(date2.toLocaleDateString('tr-TR'), (12 / 24) * width, 18);
-      ctx.fillText(date3.toLocaleDateString('tr-TR'), (20 / 24) * width, 18);
+      const dayNames = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+
+      const label1 = `${dayNames[date1.getDay()]} (${date1.toLocaleDateString('tr-TR')})`;
+      const label2 = `${dayNames[date2.getDay()]} (${date2.toLocaleDateString('tr-TR')})`;
+      const label3 = `${dayNames[date3.getDay()]} (${date3.toLocaleDateString('tr-TR')})`;
+
+      ctx.fillText(label1, (4 / 24) * width, 16);
+      ctx.fillText(label2, (12 / 24) * width, 16);
+      ctx.fillText(label3, (20 / 24) * width, 16);
+    }
+
+    // 3. Draw Bottom Time Bar
+    ctx.fillStyle = '#08080c';
+    ctx.fillRect(0, graphBottom, width, 25);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.beginPath();
+    ctx.moveTo(0, graphBottom);
+    ctx.lineTo(width, graphBottom);
+    ctx.stroke();
+
+    // 4. Draw Vertical Hour Grid Lines & Labels centered on each 3-hour block
+    for (let h = 0; h <= cols.length; h++) {
+      const x = (h / cols.length) * width;
+      
+      // Draw vertical grid line (dashed/subtle)
+      ctx.strokeStyle = h % 8 === 0 ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255, 255, 255, 0.08)';
+      ctx.beginPath();
+      ctx.moveTo(x, graphTop);
+      ctx.lineTo(x, graphBottom);
+      ctx.stroke();
+
+      if (h < cols.length) {
+        // Calculate the exact hour label
+        const date = new Date(cols[h].time + 'Z');
+        let hourLabel = String(date.getHours()).padStart(2, '0');
+        
+        const isDayTransition = hourLabel === '00';
+        
+        ctx.fillStyle = h % 8 === 0 ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.4)';
+        ctx.font = h % 8 === 0 ? 'bold 8px monospace' : '8px monospace';
+        ctx.textAlign = 'center';
+        
+        if (isDayTransition) {
+          const dayNamesShort = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
+          const dayName = dayNamesShort[date.getDay()];
+          hourLabel = `${dayName} ${hourLabel}`;
+          ctx.fillStyle = '#00E5FF'; // Cyan highlight for date boundary
+          ctx.font = 'bold 8px monospace';
+        }
+        
+        // Center text in the middle of each block segment
+        ctx.fillText(hourLabel, x + (width / cols.length) / 2, height - 8);
+      }
     }
 
     // 5. Draw horizontal grid lines and frequency labels (overlay)
@@ -247,7 +276,7 @@ export default function SchumannPage() {
     ctx.lineWidth = 1;
     const labelResonances = [7.83, 14, 20, 26, 32];
     labelResonances.forEach(res => {
-      const y = graphHeight - (res / 40) * graphHeight;
+      const y = graphBottom - (res / 40) * graphHeight;
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(width, y);
@@ -494,7 +523,7 @@ export default function SchumannPage() {
                 <canvas 
                   ref={canvasRef} 
                   width={800} 
-                  height={240}
+                  height={270}
                   className="rounded-lg border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)]"
                 />
               </div>
@@ -624,7 +653,7 @@ export default function SchumannPage() {
                 <strong>Planetary K-Index (Kp Endeksi)</strong>, Dünya genelindeki manyetometre ölçüm istasyonlarından gelen verilerin birleştirilmesiyle oluşturulan ve gezegenimizin manyetik alanındaki düzensizlikleri ölçen küresel bir endekstir.
               </p>
               <p>
-                0 ile 9 arasında logaritmik bir skala kullanan bu endeks, kozmik rüzgarların ve güneş patlamalarının Dünya manyetosferinde oluşturduğu baskıyı temsil eder. Kp değerinin 5 ve üzeri olması resmi olarak bir **Jeomanyetik Fırtına (Geomagnetic Storm)** durumuna işaret eder.
+                0 ile 9 arasında logaritmik bir skala kullanan this endeks, kozmik rüzgarların ve güneş patlamalarının Dünya manyetosferinde oluşturduğu baskıyı temsil eder. Kp değerinin 5 ve üzeri olması resmi olarak bir **Jeomanyetik Fırtına (Geomagnetic Storm)** durumuna işaret eder.
               </p>
               <p>
                 Bu veri akışı, Amerika Birleşik Devletleri Ulusal Okyanus ve Atmosfer Dairesi (NOAA) tarafından **tamamen açık, resmi ve telifsiz** olarak sağlanmaktadır.
