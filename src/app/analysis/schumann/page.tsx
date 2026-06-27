@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Activity, Zap, Compass, BookOpen, AlertCircle, Info, RefreshCw, Lock, Bell, BellOff, Sun, Waves } from 'lucide-react';
+import { ArrowLeft, Activity, Zap, Compass, BookOpen, AlertCircle, Info, RefreshCw, Lock, Bell, BellOff, Sun, Waves, ChevronDown, ChevronUp } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { ROLE_LEVELS } from '@/lib/auth/roles';
@@ -44,6 +44,9 @@ export default function SchumannPage() {
   // Interactive Hover Spectrogram State
   const [hoveredX, setHoveredX] = useState<number | null>(null);
   const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null);
+  
+  // Accordion Guide State
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   // Load notification state from localStorage
   useEffect(() => {
@@ -836,48 +839,61 @@ export default function SchumannPage() {
           </div>
         )}
 
-        {/* Bilgilendirme Bölümü */}
-        <div className="bg-black/40 border border-white/10 rounded-3xl p-8 backdrop-blur-md">
-          <h3 className="text-2xl font-bold mb-6 text-white flex items-center gap-2">
-            <Info size={22} className="text-[#00E5FF]" />
-            Jeomanyetik Rezonans Kılavuzu
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm text-mystic-text-muted">
-            <div className="space-y-4">
-              <p>
-                <strong>Planetary K-Index (Kp Endeksi) Nedir?</strong>
-                <br />
-                Dünya genelindeki manyetometre ölçüm istasyonlarından gelen verilerin birleştirilmesiyle oluşturulan ve gezegenimizin manyetik alanındaki düzensizlikleri 0 ile 9 arasında ölçen resmi bir küresel endekstir. Kp değerinin 5 ve üzeri olması, küresel çapta bir <strong>Jeomanyetik Fırtına (Geomagnetic Storm)</strong> durumunu gösterir. Bu veriler NOAA tarafından yasal ve telifsiz sunulmaktadır.
-              </p>
-              <p>
-                <strong>Küresel Güneş Fırtınası vs. Yerel Atmosferik Gürültü:</strong>
-                <br />
-                Tekil ve bölgesel gözlemevi grafikleri (örneğin sadece belirli bir bölgedeki ölçüm istasyonları), o bölgedeki <em>yerel yıldırım, şimşek veya hava olayları</em> nedeniyle de yüksek genlikli beyaz patlamalar gösterebilir. Ancak bu lokal olaylar küresel insan bilincini ve biyolojisini etkilemez. Bizim kullandığımız küresel Kp endeksi ise yerel gürültüleri filtreleyerek sadece Dünya'nın tamamını ve insan biyo-alanını doğrudan etkileyen <strong>gerçek jeomanyetik güneş fıntınası hareketlerini</strong> gösterir.
-              </p>
+        {/* Bilgilendirme Bölümü (Açılır/Kapanır) */}
+        <div className="bg-black/40 border border-white/10 rounded-3xl p-6 md:p-8 backdrop-blur-md transition-all duration-300">
+          <button 
+            onClick={() => setIsGuideOpen(!isGuideOpen)}
+            className="w-full flex items-center justify-between text-left focus:outline-none group cursor-pointer"
+          >
+            <h3 className="text-xl md:text-2xl font-bold text-white flex items-center gap-3">
+              <Info size={24} className="text-[#00E5FF] group-hover:rotate-12 transition-transform" />
+              Jeomanyetik Rezonans Kılavuzu
+            </h3>
+            <div className="p-2 rounded-xl bg-white/5 border border-white/10 text-mystic-text-muted group-hover:text-white transition-colors">
+              {isGuideOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
             </div>
-            <div className="space-y-4">
-              <p>
-                <strong>Güneş Fırtınası ve Biyolojik Etkiler:</strong>
-                <br />
-                Dünya'nın elektromanyetik kalkanı ile insan kalp ritmi, sinir sistemi dengesi ve melatonin salgısı doğrudan senkronizedir. Kp endeksinin yükseldiği (grafikte sarı, turuncu ve beyaz patlama olarak gösterilen) günlerde baş ağrısı, yorgunluk, rüyalarda aşırı berraklık veya uyku bozuklukları gibi kozmik adaptasyon semptomları yaşanması bilimsel olarak oldukça yaygındır.
-              </p>
-              <p>
-                <strong>Saat Dilimi ve Yerel Saat Dönüşümü:</strong>
-                <br />
-                Bölgesel gözlemevi grafikleri genellikle istasyonun kurulu olduğu ülkenin veya şehrin yerel saat dilimine göre çizilir (örneğin Asya/Sibirya gözlemevleri kendi yerel saat dilimini kullanır). Bu gösterge paneli ise uluslararası uzay havası verilerini <strong>tamamen sizin cihazınızın yerel saat dilimine (örneğin Türkiye saati UTC+3)</strong> dönüştürerek gösterir. Bu nedenle yabancı grafiklerle aranızda saat farkı bulunması tamamen normaldir; buradaki saatler doğrudan kendi gününüzdeki anı temsil eder.
-              </p>
-              <p>
-                <strong>Kozmik Hava Tahmini: Gelecek 24 Saat Nasıl Hesaplanır?</strong>
-                <br />
-                Dünya ile Güneş arasında (L1 noktasında) konumlanmış gelişmiş uzay uyduları (DSCOVR ve ACE), Güneş patlamalarıyla fırlayan yüklü parçacıkları yola çıktıkları anda ölçer. Bu kozmik rüzgarların Dünya'ya ulaşması fiziksel olarak 15 saat ile 3 gün arasında sürer. Sistemimiz, uyduların yolda yakaladığı bu verileri işleyerek henüz gezegenimize ulaşmamış olan bu "kozmik bilgi paketçiklerini" saatlik modellemeler halinde önceden sunar. Böylece önümüzdeki 24 saatin uyanış portallarını (grafikteki kesikli tahmin alanlarını) önceden görerek meditasyon, niyet ve çakra dengeleme çalışmalarınızı en yüksek farkındalıkla planlayabilirsiniz.
-              </p>
+          </button>
+
+          {isGuideOpen && (
+            <div className="mt-8 pt-6 border-t border-white/10 animate-in fade-in slide-in-from-top-4 duration-300">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm text-mystic-text-muted">
+                <div className="space-y-4">
+                  <p>
+                    <strong>Planetary K-Index (Kp Endeksi) Nedir?</strong>
+                    <br />
+                    Dünya genelindeki manyetometre ölçüm istasyonlarından gelen verilerin birleştirilmesiyle oluşturulan ve gezegenimizin manyetik alanındaki düzensizlikleri 0 ile 9 arasında ölçen resmi bir küresel endekstir. Kp değerinin 5 ve üzeri olması, küresel çapta bir <strong>Jeomanyetik Fırtına (Geomagnetic Storm)</strong> durumunu gösterir. Bu veriler NOAA tarafından yasal ve telifsiz sunulmaktadır.
+                  </p>
+                  <p>
+                    <strong>Küresel Güneş Fırtınası vs. Yerel Atmosferik Gürültü:</strong>
+                    <br />
+                    Tekil ve bölgesel gözlemevi grafikleri (örneğin sadece belirli bir bölgedeki ölçüm istasyonları), o bölgedeki <em>yerel yıldırım, şimşek veya hava olayları</em> nedeniyle de yüksek genlikli beyaz patlamalar gösterebilir. Ancak bu lokal olaylar küresel insan bilincini ve biyolojisini etkilemez. Bizim kullandığımız küresel Kp endeksi ise yerel gürültüleri filtreleyerek sadece Dünya'nın tamamını ve insan biyo-alanını doğrudan etkileyen <strong>gerçek jeomanyetik güneş fırtınası hareketlerini</strong> gösterir.
+                  </p>
+                </div>
+                <div className="space-y-4">
+                  <p>
+                    <strong>Güneş Fırtınası ve Biyolojik Etkiler:</strong>
+                    <br />
+                    Dünya'nın elektromanyetik kalkanı ile insan kalp ritmi, sinir sistema dengesi ve melatonin salgısı doğrudan senkronizedir. Kp endeksinin yükseldiği (grafikte sarı, turuncu ve beyaz patlama olarak gösterilen) günlerde baş ağrısı, yorgunluk, rüyalarda aşırı berraklık veya uyku bozuklukları gibi kozmik adaptasyon semptomları yaşanması bilimsel olarak oldukça yaygındır.
+                  </p>
+                  <p>
+                    <strong>Saat Dilimi ve Yerel Saat Dönüşümü:</strong>
+                    <br />
+                    Bölgesel gözlemevi grafikleri genellikle istasyonun kurulu olduğu ülkenin veya şehrin yerel saat dilimine göre çizilir (örneğin Asya/Sibirya gözlemevleri kendi yerel saat dilimini kullanır). Bu gösterge paneli ise uluslararası uzay havası verilerini <strong>tamamen sizin cihazınızın yerel saat dilimine (örneğin Türkiye saati UTC+3)</strong> dönüştürerek gösterir. Bu nedenle yabancı grafiklerle aranızda saat farkı bulunması tamamen normaldir; buradaki saatler doğrudan kendi gününüzdeki anı temsil eder.
+                  </p>
+                  <p>
+                    <strong>Kozmik Hava Tahmini: Gelecek 24 Saat Nasıl Hesaplanır?</strong>
+                    <br />
+                    Dünya ile Güneş arasında (L1 noktasında) konumlanmış gelişmiş uzay uyduları (DSCOVR ve ACE), Güneş patlamalarıyla fırlayan yüklü parçacıkları yola çıktıkları anda ölçer. Bu kozmik rüzgarların Dünya'ya ulaşması fiziksel olarak 15 saat ile 3 gün arasında sürer. Sistemimiz, uyduların yolda yakaladığı bu verileri işleyerek henüz gezegenimize ulaşmamış olan bu "kozmik bilgi paketçiklerini" saatlik modellemeler halinde önceden sunar. Böylece önümüzdeki 24 saatin uyanış portallarını (grafikteki kesikli tahmin alanlarını) önceden görerek meditasyon, niyet ve çakra dengeleme çalışmalarınızı en yüksek farkındalıkla planlayabilirsiniz.
+                  </p>
+                </div>
+              </div>
+              <div className="mt-8 pt-6 border-t border-white/10 text-xs text-center text-mystic-text-muted">
+                <p>
+                  Veriler Amerika Birleşik Devletleri Ulusal Okyanus ve Atmosfer Dairesi (NOAA) Space Weather Prediction Center kaynaklarından anlık ve yasal olarak çekilmektedir.
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="mt-8 pt-6 border-t border-white/10 text-xs text-center text-mystic-text-muted">
-            <p>
-              Veriler Amerika Birleşik Devletleri Ulusal Okyanus ve Atmosfer Dairesi (NOAA) Space Weather Prediction Center kaynaklarından anlık ve yasal olarak çekilmektedir.
-            </p>
-          </div>
+          )}
         </div>
 
       </div>
