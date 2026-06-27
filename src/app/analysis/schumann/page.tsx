@@ -1,8 +1,10 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, RotateCw, Activity, Zap, Waves, Compass, BookOpen, AlertCircle, Info, RefreshCw } from 'lucide-react';
+import { ArrowLeft, RotateCw, Activity, Zap, Waves, Compass, BookOpen, AlertCircle, Info, RefreshCw, Lock, Bell, BellOff } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
+import { ROLE_LEVELS } from '@/lib/auth/roles';
 
 interface SchumannData {
   activity_index: number;
@@ -21,11 +23,36 @@ interface SchumannData {
 
 export default function SchumannPage() {
   const router = useRouter();
+  const { role } = useAuth();
   const [data, setData] = useState<SchumannData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'sonogram' | 'frequency' | 'amplitude' | 'quality'>('sonogram');
   const [timestamp, setTimestamp] = useState<number>(Date.now());
+  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notificationMsg, setNotificationMsg] = useState<string | null>(null);
+
+  // Load notification state from localStorage
+  useEffect(() => {
+    const saved = localStorage.getItem('schumann_notifications');
+    if (saved === 'true') {
+      setNotificationsEnabled(true);
+    }
+  }, []);
+
+  const isApprenticeOrAbove = role && (ROLE_LEVELS[role] >= 1 || role === 'admin');
+
+  const toggleNotifications = () => {
+    if (!isApprenticeOrAbove) return;
+    const newState = !notificationsEnabled;
+    setNotificationsEnabled(newState);
+    localStorage.setItem('schumann_notifications', String(newState));
+    
+    if (newState) {
+      setNotificationMsg("Jeomanyetik fırtına (Kp ≥ 5) ve anormal Schumann patlamalarında cihazınıza bildirim gönderilecektir.");
+      setTimeout(() => setNotificationMsg(null), 5000);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -219,7 +246,7 @@ export default function SchumannPage() {
 
         </div>
 
-        {/* Veri Durumu ve Güncelleme Butonu */}
+        {/* Veri Durumu ve Güncelleme Zamanı */}
         <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-white/5 border border-white/10 rounded-2xl mb-8 backdrop-blur-sm gap-4">
           <div className="flex items-center gap-3 text-sm text-mystic-text-muted text-center sm:text-left">
             <Info size={18} className="text-[#00E5FF]" />
@@ -238,6 +265,58 @@ export default function SchumannPage() {
             <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
             {isLoading ? 'Veriler Alınıyor...' : 'Verileri Yenile'}
           </button>
+        </div>
+
+        {/* Kozmik Rezonans Bildirimleri Kartı */}
+        <div className="bg-black/40 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8 relative overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <div className={`p-3 rounded-2xl ${isApprenticeOrAbove ? 'bg-[#00E5FF]/10 text-[#00E5FF] border border-[#00E5FF]/20' : 'bg-white/5 text-mystic-text-muted border border-white/5'}`}>
+                {notificationsEnabled && isApprenticeOrAbove ? <Bell className="animate-bounce" size={24} /> : <BellOff size={24} />}
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  Kozmik Rezonans Bildirimleri
+                  {!isApprenticeOrAbove && (
+                    <span className="bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <Lock size={10} /> Çırak Seviyesi
+                    </span>
+                  )}
+                </h3>
+                <p className="text-xs text-mystic-text-muted mt-1 max-w-xl">
+                  {isApprenticeOrAbove 
+                    ? "Jeomanyetik fırtınaları (Kp ≥ 5) ve yoğun iyonosferik enerji patlamalarını anlık bildirim olarak alın."
+                    : "Bu özellik Çırak seviyesi ve üzeri üyelerimiz içindir. Seviyenizi yükselterek bildirimleri aktif edebilirsiniz."}
+                </p>
+              </div>
+            </div>
+            
+            <div>
+              {isApprenticeOrAbove ? (
+                <button
+                  onClick={toggleNotifications}
+                  className={`px-5 py-2.5 rounded-xl font-bold text-sm border transition-all cursor-pointer flex items-center gap-2 ${
+                    notificationsEnabled
+                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
+                      : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
+                  }`}
+                >
+                  {notificationsEnabled ? 'Bildirimler Açık' : 'Bildirimleri Aç'}
+                </button>
+              ) : (
+                <div className="flex items-center gap-2 bg-[#D4AF37]/5 border border-[#D4AF37]/20 text-[#D4AF37] text-xs font-semibold px-4 py-2.5 rounded-xl backdrop-blur-sm select-none">
+                  <Lock size={14} /> Kilitli
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {notificationMsg && (
+            <div className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-300 text-xs flex items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              {notificationMsg}
+            </div>
+          )}
         </div>
 
         {error && (
