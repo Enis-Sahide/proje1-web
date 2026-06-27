@@ -67,6 +67,25 @@ export default function SchumannPage() {
     if (newState) {
       setNotificationMsg("Jeomanyetik fırtına (Kp ≥ 5) ve yoğun kozmik enerji dalgalanmalarında cihazınıza bildirim gönderilecektir.");
       setTimeout(() => setNotificationMsg(null), 5000);
+
+      // Web Notification API integration for direct browser notifications
+      if (typeof window !== 'undefined' && 'Notification' in window) {
+        if (Notification.permission === 'default') {
+          Notification.requestPermission().then(permission => {
+            if (permission === 'granted') {
+              new Notification("Kozmik Rezonans Bildirimleri Aktif!", {
+                body: "Jeomanyetik fırtına (Kp ≥ 5) ve güçlü uyanış portallarında tarayıcınıza anlık bildirim gönderilecektir.",
+                icon: "/sun.png"
+              });
+            }
+          });
+        } else if (Notification.permission === 'granted') {
+          new Notification("Kozmik Rezonans Bildirimleri Aktif!", {
+            body: "Bildirim ayarlarınız başarıyla doğrulandı.",
+            icon: "/sun.png"
+          });
+        }
+      }
     }
   };
 
