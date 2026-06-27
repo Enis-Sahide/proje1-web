@@ -91,13 +91,15 @@ export default function SchumannPage() {
 
     const width = canvas.width;
     const height = canvas.height;
+    const graphHeight = height - 25; // Reserve 25px for bottom hour bar
 
-    // Draw solid space background
+    // Draw solid space background for graph area
     ctx.fillStyle = '#030308';
-    ctx.fillRect(0, 0, width, height);
+    ctx.fillRect(0, 0, width, graphHeight);
 
     const cols = data.history; // Exactly 8 blocks representing the last 24 hours
 
+    // 1. Draw Spectrogram Data Column by Column
     for (let x = 0; x < width; x++) {
       // Linear interpolation between the 3-hour Kp blocks
       const pct = x / width;
@@ -110,9 +112,9 @@ export default function SchumannPage() {
       const kpHigh = cols[indexHigh].kp;
       const kp = kpLow + (kpHigh - kpLow) * weight;
 
-      // Draw the column pixel-by-pixel
-      for (let y = 0; y < height; y++) {
-        const freqPct = (height - y) / height; // 0 at bottom, 1 at top
+      // Draw the column pixel-by-pixel up to graphHeight
+      for (let y = 0; y < graphHeight; y++) {
+        const freqPct = (graphHeight - y) / graphHeight; // 0 at bottom, 1 at top
         const freqHz = freqPct * 40; // Scale 0 to 40 Hz
 
         // Base noise background
@@ -161,17 +163,25 @@ export default function SchumannPage() {
           }
         }
 
-        // Simulating vertical lightning/fırtına white-out spikes when Kp is high
-        if (kp >= 4) {
-          const spikeChance = (kp - 3) * 0.18; // higher Kp = more intense whiteouts
-          // Check if we trigger a spike at this X coordinate
-          const isSpikeCol = Math.sin(x * 0.8) * Math.cos(x * 0.2) > (2.1 - kp * 0.3);
+        // Simulating vertical lightning/fırtına white-out spikes when Kp is high (>= 4.5)
+        if (kp >= 4.5) {
+          // If Kp is high, make it a strong, continuous white-out block with vertical noise lines
+          const blendFactor = Math.min(1, (kp - 4.5) / 1.5); // 0 at 4.5, 1 at 6.0
           
-          if (isSpikeCol && Math.random() < spikeChance) {
-            const intensity = (kp / 9) * 190 * (0.7 + Math.random() * 0.5);
+          // Generate a noise texture that runs vertically (constant or slightly varying per x/y)
+          const verticalNoise = Math.sin(y * 0.15) * Math.cos(x * 0.05) * 15;
+          const randomNoise = (Math.random() - 0.5) * 20;
+          
+          r = r + (255 - r) * blendFactor + verticalNoise + randomNoise;
+          g = g + (255 - g) * blendFactor + verticalNoise + randomNoise;
+          b = b + (240 - b) * blendFactor + verticalNoise + randomNoise;
+        } else if (kp >= 4.0) {
+          // Active level: orange-ish noise spikes
+          if (Math.random() < 0.25) {
+            const intensity = 80;
             r += intensity;
-            g += intensity * 0.9;
-            b += intensity * 0.7;
+            g += intensity * 0.6;
+            b += intensity * 0.2;
           }
         }
 
@@ -184,12 +194,47 @@ export default function SchumannPage() {
       }
     }
 
-    // Draw horizontal grid lines and frequency labels
+    // 2. Draw Bottom Time Bar
+    ctx.fillStyle = '#08080c';
+    ctx.fillRect(0, graphHeight, width, 25);
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+    ctx.beginPath();
+    ctx.moveTo(0, graphHeight);
+    ctx.lineTo(width, graphHeight);
+    ctx.stroke();
+
+    // 3. Draw Vertical Hour Grid Lines & Labels centered on each hour
+    const startDateTime = new Date(cols[0].time + 'Z');
+    
+    for (let h = 0; h <= 24; h++) {
+      const x = (h / 24) * width;
+      
+      // Draw vertical grid line (dashed/subtle)
+      ctx.strokeStyle = h % 3 === 0 ? 'rgba(255, 255, 255, 0.18)' : 'rgba(255, 255, 255, 0.06)';
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, graphHeight);
+      ctx.stroke();
+
+      if (h < 24) {
+        // Calculate the exact hour label
+        const date = new Date(startDateTime.getTime() + h * 3600 * 1000);
+        const hourLabel = String(date.getHours()).padStart(2, '0');
+        
+        ctx.fillStyle = h % 3 === 0 ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.3)';
+        ctx.font = h % 3 === 0 ? 'bold 8px monospace' : '8px monospace';
+        ctx.textAlign = 'center';
+        // Center text on the grid line
+        ctx.fillText(hourLabel, x, height - 8);
+      }
+    }
+
+    // 4. Draw horizontal grid lines and frequency labels (overlay)
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
     ctx.lineWidth = 1;
     const labelResonances = [7.83, 14, 20, 26, 32];
     labelResonances.forEach(res => {
-      const y = height - (res / 40) * height;
+      const y = graphHeight - (res / 40) * graphHeight;
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(width, y);
@@ -413,7 +458,7 @@ export default function SchumannPage() {
           <div className="border-b border-white/10 pb-4 mb-6">
             <h2 className="text-xl font-bold flex items-center gap-2 text-white">
               <Waves size={22} className="text-[#00E5FF]" />
-              Canlı Kozmik Enerji Spektrogramı (Son Son 24 Saat)
+              Canlı Kozmik Enerji Spektrogramı (Son 24 Saat)
             </h2>
             <p className="text-xs text-mystic-text-muted mt-1">
               Frekans dalgalanmalarını ve Kp Index kaynaklı enerjisel fırtına (beyaz patlamalar) durumunu izleyin.
@@ -439,15 +484,6 @@ export default function SchumannPage() {
                   height={240}
                   className="rounded-lg border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)]"
                 />
-
-                {/* Spectrogram X-axis hours */}
-                <div className="w-[800px] max-w-full flex justify-between text-[10px] text-mystic-text-muted font-mono mt-3 px-2">
-                  {data?.history.map((item, index) => (
-                    <span key={index} className="text-center w-16">
-                      {formatTime(item.time).split(' ')[1]}
-                    </span>
-                  ))}
-                </div>
               </div>
 
               <p className="text-center text-xs text-mystic-text-muted max-w-xl mt-6 px-4">
