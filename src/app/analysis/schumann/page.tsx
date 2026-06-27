@@ -359,21 +359,28 @@ export default function SchumannPage() {
           </div>
 
           <div className="w-full flex flex-col justify-center items-center py-6 bg-black/40 rounded-2xl border border-white/5 relative overflow-hidden group">
-            {/* Live Indicator overlay */}
-            <div className="absolute top-4 right-4 bg-red-600 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1.5 backdrop-blur-sm z-10 shadow-lg tracking-wider uppercase animate-pulse">
-              <span className="w-1.5 h-1.5 rounded-full bg-white"></span> Canlı İzleme
-            </div>
             
-            {/* The Image */}
-            <img 
-              src={getTabImageUrl()} 
-              alt={getTabTitle()}
-              className="max-w-full h-auto rounded-lg border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)] transition-all duration-300 group-hover:scale-[1.01]"
-              onError={(e) => {
-                // Handle fallback if image loading fails
-                (e.target as HTMLImageElement).src = "/placeholder-chart.png";
-              }}
-            />
+            {/* Image Wrapper for precise watermark masking */}
+            <div className="relative max-w-full">
+              {/* Cover the "S 70 O S" logo in the top-right corner of the graph */}
+              <div className="absolute top-[2%] right-[1%] w-[10%] h-[12%] bg-black z-10 pointer-events-none"></div>
+              
+              {/* Live Indicator overlay placed over the covered area */}
+              <div className="absolute top-[3%] right-[2%] bg-red-600 text-white text-[9px] md:text-[10px] font-extrabold px-2 py-0.5 md:px-2.5 md:py-1 rounded-full flex items-center gap-1.5 backdrop-blur-sm z-20 shadow-lg tracking-wider uppercase animate-pulse">
+                <span className="w-1 md:w-1.5 md:h-1.5 rounded-full bg-white"></span> Canlı İzleme
+              </div>
+
+              {/* The Image */}
+              <img 
+                src={getTabImageUrl()} 
+                alt={getTabTitle()}
+                className="max-w-full h-auto rounded-lg border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)] transition-all duration-300 group-hover:scale-[1.01]"
+                onError={(e) => {
+                  // Handle fallback if image loading fails
+                  (e.target as HTMLImageElement).src = "/placeholder-chart.png";
+                }}
+              />
+            </div>
 
             <p className="text-center text-xs text-mystic-text-muted max-w-xl mt-6 px-4">
               * Tomsk Uzay Gözlem İstasyonu verileri anlık olarak çizilmektedir. Grafikteki dikey eksen frekansı (0-40 Hz), yatay eksen ise son 3 günün saatlik değişimini (Tomsk yerel saatiyle) gösterir.
