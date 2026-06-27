@@ -494,6 +494,27 @@ export default function SchumannPage() {
     }
   };
 
+  const formatTimeRange = (timeStr: string) => {
+    try {
+      const dStart = new Date(timeStr);
+      const dEnd = new Date(dStart.getTime() + 3 * 60 * 60 * 1000);
+      const dayNames = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
+      
+      const startDay = dayNames[dStart.getDay()];
+      const startHours = String(dStart.getHours()).padStart(2, '0');
+      
+      const endDay = dayNames[dEnd.getDay()];
+      const endHours = String(dEnd.getHours()).padStart(2, '0');
+      
+      if (startDay !== endDay) {
+        return `${startDay} ${startHours}:00 - ${endDay} ${endHours}:00`;
+      }
+      return `${startDay} ${startHours}:00 - ${endHours}:00`;
+    } catch (e) {
+      return timeStr;
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#05050A] text-white overflow-hidden relative font-sans">
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay pointer-events-none z-0"></div>
@@ -771,7 +792,7 @@ export default function SchumannPage() {
                 {hoveredBar ? (
                   <div className="inline-flex items-center gap-3 text-xs bg-white/5 border border-white/10 px-3 py-1.5 rounded-full animate-in fade-in duration-200">
                     <span className="text-mystic-text-muted">Zaman (UTC):</span>
-                    <strong className="text-white">{formatTime(hoveredBar.time)}</strong>
+                    <strong className="text-white">{formatTimeRange(hoveredBar.time)}</strong>
                     <span className="text-mystic-text-muted">|</span>
                     <span className="text-mystic-text-muted">Fırtına Seviyesi:</span>
                     <strong className="text-white">
