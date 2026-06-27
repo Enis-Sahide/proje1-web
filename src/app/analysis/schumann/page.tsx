@@ -516,7 +516,7 @@ export default function SchumannPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#05050A] text-white overflow-hidden relative font-sans">
+    <div className="min-h-screen bg-[#05050A] text-white overflow-hidden relative font-sans pt-24">
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay pointer-events-none z-0"></div>
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#00E5FF] opacity-5 blur-[150px] rounded-full pointer-events-none"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#4F46E5] opacity-10 blur-[150px] rounded-full pointer-events-none"></div>
