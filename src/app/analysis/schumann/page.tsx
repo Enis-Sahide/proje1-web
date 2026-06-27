@@ -81,6 +81,37 @@ export default function SchumannPage() {
     fetchData();
   }, []);
 
+  // Helper for smooth continuous resonance color stops based on Kp index
+  const getResonanceColor = (kp: number) => {
+    const stops = [
+      { kp: 0.0, r: 0, g: 130, b: 150 },   // Deep green-blue (quiet)
+      { kp: 2.0, r: 16, g: 185, b: 129 },  // Emerald green (normal)
+      { kp: 3.5, r: 245, g: 158, b: 11 },  // Amber/yellow (unsettled)
+      { kp: 4.8, r: 239, g: 68, b: 68 },   // Bright red (active)
+      { kp: 6.0, r: 255, g: 255, b: 255 }  // Solid white (storm)
+    ];
+
+    let low = stops[0];
+    let high = stops[stops.length - 1];
+
+    for (let i = 0; i < stops.length - 1; i++) {
+      if (kp >= stops[i].kp && kp <= stops[i + 1].kp) {
+        low = stops[i];
+        high = stops[i + 1];
+        break;
+      }
+    }
+
+    const range = high.kp - low.kp;
+    const factor = range === 0 ? 0 : (kp - low.kp) / range;
+
+    return {
+      r: low.r + (high.r - low.r) * factor,
+      g: low.g + (high.g - low.g) * factor,
+      b: low.b + (high.b - low.b) * factor
+    };
+  };
+
   // Spectrogram rendering effect
   useEffect(() => {
     if (!canvasRef.current || !data || !data.history || data.history.length === 0) return;
@@ -115,15 +146,27 @@ export default function SchumannPage() {
       const kpHigh = cols[indexHigh].kp;
       const kp = kpLow + (kpHigh - kpLow) * weight;
 
+      // Base background color (fades smoothly to white glow if Kp is high)
+      let baseR = 3;
+      let baseG = 3;
+      let baseB = 12;
+
+      if (kp >= 4.0) {
+        // Continuous fading white-out background glow
+        const stormGlowFactor = Math.min(1, (kp - 4.0) / 1.8);
+        const glowIntensity = stormGlowFactor * 190;
+        baseR += glowIntensity;
+        baseG += glowIntensity * 0.95;
+        baseB += glowIntensity * 0.85;
+      }
+
+      // Smooth resonance color calculation
+      const resColor = getResonanceColor(kp);
+
       // Draw the column pixel-by-pixel inside the graph limits
       for (let y = graphTop; y < graphBottom; y++) {
         const freqPct = (graphBottom - y) / graphHeight; // 0 at bottom, 1 at top
         const freqHz = freqPct * 40; // Scale 0 to 40 Hz
-
-        // Base noise background
-        let r = 5;
-        let g = 5;
-        let b = 15;
 
         // Schumann resonances (7.83, 14.1, 20.3, 26.4, 32.4 Hz)
         const resonances = [7.83, 14.1, 20.3, 26.4, 32.4];
@@ -132,59 +175,37 @@ export default function SchumannPage() {
 
         resonances.forEach(res => {
           const dist = Math.abs(freqHz - res);
-          if (dist < 1.8) {
+          if (dist < 2.0) {
             onResonance = true;
             resonanceDist = Math.min(resonanceDist, dist);
           }
         });
 
-        // Add some organic noise to make it look like a sensor sonogram
-        const noise = (Math.random() - 0.5) * 10;
+        // Add soft organic noise
+        const noise = (Math.random() - 0.5) * 12;
+
+        let r = baseR;
+        let g = baseG;
+        let b = baseB;
 
         if (onResonance) {
-          const strength = Math.max(0, 1 - resonanceDist / 1.8);
+          // Quadratic falloff for smooth glowing edges on the horizontal lines
+          const strength = Math.pow(Math.max(0, 1 - resonanceDist / 2.0), 2.2);
           
-          if (kp < 3) {
-            // Quiet: Green/Teal bands
-            g += strength * 130 + noise;
-            b += strength * 100;
-          } else if (kp < 4) {
-            // Unsettled: Yellow/Amber bands
-            r += strength * 180 + noise;
-            g += strength * 150;
-            b += strength * 20;
-          } else if (kp < 5) {
-            // Active: Orange bands
-            r += strength * 230 + noise;
-            g += strength * 110;
-            b += strength * 10;
-          } else {
-            // Storm: Bright Red/Magenta bands
-            r += strength * 255 + noise;
-            g += strength * 40;
-            b += strength * 40;
-          }
+          r += resColor.r * strength + noise;
+          g += resColor.g * strength + noise;
+          b += resColor.b * strength;
         }
 
-        // Simulating vertical lightning/fırtına white-out spikes when Kp is high (>= 4.5)
-        if (kp >= 4.5) {
-          // If Kp is high, make it a strong, continuous white-out block with vertical noise lines
-          const blendFactor = Math.min(1, (kp - 4.5) / 1.5); // 0 at 4.5, 1 at 6.0
-          
-          // Generate a noise texture that runs vertically (constant or slightly varying per x/y)
-          const verticalNoise = Math.sin(y * 0.15) * Math.cos(x * 0.05) * 15;
-          const randomNoise = (Math.random() - 0.5) * 20;
-          
-          r = r + (255 - r) * blendFactor + verticalNoise + randomNoise;
-          g = g + (255 - g) * blendFactor + verticalNoise + randomNoise;
-          b = b + (240 - b) * blendFactor + verticalNoise + randomNoise;
-        } else if (kp >= 4.0) {
-          // Active level: orange-ish noise spikes
-          if (Math.random() < 0.25) {
-            const intensity = 80;
-            r += intensity;
-            g += intensity * 0.6;
-            b += intensity * 0.2;
+        // Add vertical scanline noise during active/storm states
+        if (kp >= 4.0) {
+          // Vertical scanning lines frequency
+          const verticalPattern = Math.sin(y * 0.1) * Math.cos(x * 0.05);
+          if (verticalPattern > 0.3) {
+            const scanStrength = (kp / 9) * 35;
+            r += scanStrength;
+            g += scanStrength * 0.9;
+            b += scanStrength * 0.8;
           }
         }
 
@@ -653,7 +674,7 @@ export default function SchumannPage() {
                 <strong>Planetary K-Index (Kp Endeksi)</strong>, Dünya genelindeki manyetometre ölçüm istasyonlarından gelen verilerin birleştirilmesiyle oluşturulan ve gezegenimizin manyetik alanındaki düzensizlikleri ölçen küresel bir endekstir.
               </p>
               <p>
-                0 ile 9 arasında logaritmik bir skala kullanan this endeks, kozmik rüzgarların ve güneş patlamalarının Dünya manyetosferinde oluşturduğu baskıyı temsil eder. Kp değerinin 5 ve üzeri olması resmi olarak bir **Jeomanyetik Fırtına (Geomagnetic Storm)** durumuna işaret eder.
+                0 ile 9 arasında logaritmik bir skala kullanan bu endeks, kozmik rüzgarların ve güneş patlamalarının Dünya manyetosferinde oluşturduğu baskıyı temsil eder. Kp değerinin 5 ve üzeri olması resmi olarak bir **Jeomanyetik Fırtına (Geomagnetic Storm)** durumuna işaret eder.
               </p>
               <p>
                 Bu veri akışı, Amerika Birleşik Devletleri Ulusal Okyanus ve Atmosfer Dairesi (NOAA) tarafından **tamamen açık, resmi ve telifsiz** olarak sağlanmaktadır.
