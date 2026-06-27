@@ -812,7 +812,7 @@ export default function SchumannPage() {
                   if (index % 4 === 0) {
                     return (
                       <span key={index} className="text-center w-12 font-mono">
-                        {formatTime(item.time).split(' ')[1]}
+                        {formatTime(item.time)}
                       </span>
                     );
                   }
