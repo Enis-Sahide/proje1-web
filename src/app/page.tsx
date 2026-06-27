@@ -6,6 +6,7 @@ import { useContent } from '@/lib/useContent';
 import PlanetaryHourWidget from '@/features/astrology/components/PlanetaryHourWidget';
 import { ChevronDown, Quote, Loader2 } from 'lucide-react';
 import MoonCyclesWidget from '@/features/astrology/components/MoonCyclesWidget';
+import SchumannMiniWidget from '@/features/astrology/components/SchumannMiniWidget';
 import Link from 'next/link';
 
 // CHAKRA_MODULES içeriği DB'den gelir (/api/content/chakras → modules)
@@ -105,8 +106,9 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right: Yıllık Ay Döngüleri */}
-            <div className="w-full lg:w-1/3 flex flex-col items-center lg:items-start order-3 lg:order-3">
+            {/* Right: Yıllık Ay Döngüleri & Schumann Mini */}
+            <div className="w-full lg:w-1/3 flex flex-col items-center lg:items-start order-3 lg:order-3 gap-6">
+              <SchumannMiniWidget />
               <MoonCyclesWidget />
             </div>
 
