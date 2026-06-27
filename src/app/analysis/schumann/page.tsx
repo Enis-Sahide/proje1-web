@@ -9,6 +9,7 @@ import { ROLE_LEVELS } from '@/lib/auth/roles';
 interface KpHistoryItem {
   time: string;
   kp: number;
+  predicted?: boolean;
 }
 
 interface KpData {
@@ -132,7 +133,9 @@ export default function SchumannPage() {
     ctx.fillStyle = '#030308';
     ctx.fillRect(0, graphTop, width, graphHeight);
 
-    const cols = data.history; // Exactly 24 blocks representing the last 72 hours
+    const cols = data.history; // Exactly 24 blocks representing the last 72 hours (48h past, 24h forecast)
+    const transitionIndex = cols.findIndex(item => item.predicted); // Where forecast starts
+    const transitionX = transitionIndex !== -1 ? (transitionIndex / cols.length) * width : width;
 
     // 1. Draw Spectrogram Data Column by Column
     for (let x = 0; x < width; x++) {
@@ -146,6 +149,8 @@ export default function SchumannPage() {
       const kpLow = cols[indexLow].kp;
       const kpHigh = cols[indexHigh].kp;
       const kp = kpLow + (kpHigh - kpLow) * weight;
+
+      const isPredicted = x >= transitionX;
 
       // Base background color (blends smoothly to solid white if Kp is high)
       let baseR = 3;
@@ -214,6 +219,13 @@ export default function SchumannPage() {
         g += sensorNoise;
         b += sensorNoise;
 
+        // If it's a predicted (future) segment, dim the colors slightly for visual contrast
+        if (isPredicted) {
+          r *= 0.65;
+          g *= 0.65;
+          b *= 0.70;
+        }
+
         r = Math.min(255, Math.max(0, r));
         g = Math.min(255, Math.max(0, g));
         b = Math.min(255, Math.max(0, b));
@@ -246,10 +258,13 @@ export default function SchumannPage() {
 
       const label1 = `${dayNames[date1.getDay()]} (${date1.toLocaleDateString('tr-TR')})`;
       const label2 = `${dayNames[date2.getDay()]} (${date2.toLocaleDateString('tr-TR')})`;
-      const label3 = `${dayNames[date3.getDay()]} (${date3.toLocaleDateString('tr-TR')})`;
+      // Mark Day 3 as Forecast since it represents future data
+      const label3 = `${dayNames[date3.getDay()]} (${date3.toLocaleDateString('tr-TR')}) - [TAHMİN]`;
 
       ctx.fillText(label1, (4 / 24) * width, 16);
       ctx.fillText(label2, (12 / 24) * width, 16);
+      
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.6)'; // slightly dim forecast day header
       ctx.fillText(label3, (20 / 24) * width, 16);
     }
 
@@ -279,8 +294,12 @@ export default function SchumannPage() {
         let hourLabel = String(date.getHours()).padStart(2, '0');
         
         const isDayTransition = hourLabel === '00';
+        const isPredicted = cols[h].predicted;
         
-        ctx.fillStyle = h % 8 === 0 ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.4)';
+        ctx.fillStyle = isPredicted 
+          ? 'rgba(255, 255, 255, 0.3)' 
+          : h % 8 === 0 ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.4)';
+        
         ctx.font = h % 8 === 0 ? 'bold 8px monospace' : '8px monospace';
         ctx.textAlign = 'center';
         
@@ -288,7 +307,7 @@ export default function SchumannPage() {
           const dayNamesShort = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
           const dayName = dayNamesShort[date.getDay()];
           hourLabel = `${dayName} ${hourLabel}`;
-          ctx.fillStyle = '#00E5FF'; // Cyan highlight for date boundary
+          ctx.fillStyle = isPredicted ? '#00e5ff80' : '#00E5FF'; // Cyan highlight for date boundary
           ctx.font = 'bold 8px monospace';
         }
         
@@ -297,7 +316,25 @@ export default function SchumannPage() {
       }
     }
 
-    // 5. Draw horizontal grid lines and frequency labels (overlay) - Fixed X position to prevent clipping
+    // 5. Draw "ŞİMDİ" (NOW) Vertical Dashed Divider Line
+    if (transitionIndex !== -1) {
+      ctx.strokeStyle = '#00E5FF';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]); // Dashed scan line
+      ctx.beginPath();
+      ctx.moveTo(transitionX, graphTop);
+      ctx.lineTo(transitionX, graphBottom);
+      ctx.stroke();
+      ctx.setLineDash([]); // Reset dash state
+      
+      // Draw a sleek indicator badge
+      ctx.fillStyle = '#00E5FF';
+      ctx.font = 'bold 8px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('ŞİMDİ', transitionX, graphTop + 12);
+    }
+
+    // 6. Draw horizontal grid lines and frequency labels (overlay)
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
     ctx.lineWidth = 1;
     const labelResonances = [7.83, 14, 20, 26, 32];
@@ -311,8 +348,6 @@ export default function SchumannPage() {
       ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
       ctx.font = '9px monospace';
       ctx.textAlign = 'left';
-      
-      // Draw text at x = 18px instead of 8px to completely avoid boundary clipping
       ctx.fillText(`${res} Hz`, 18, y - 4);
     });
 
@@ -322,11 +357,11 @@ export default function SchumannPage() {
     fetchData();
   };
 
-  const getKpColorClass = (kp: number) => {
-    if (kp < 3) return 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)] hover:bg-emerald-400';
-    if (kp < 4) return 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.3)] hover:bg-amber-400';
-    if (kp < 5) return 'bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.3)] hover:bg-orange-400';
-    return 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)] hover:bg-red-400';
+  const getKpColorClass = (kp: number, predicted?: boolean) => {
+    if (kp < 3) return predicted ? 'bg-emerald-500/40 border border-dashed border-emerald-500' : 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)] hover:bg-emerald-400';
+    if (kp < 4) return predicted ? 'bg-amber-500/40 border border-dashed border-amber-500' : 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.3)] hover:bg-amber-400';
+    if (kp < 5) return predicted ? 'bg-orange-500/40 border border-dashed border-orange-500' : 'bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.3)] hover:bg-orange-400';
+    return predicted ? 'bg-red-500/40 border border-dashed border-red-500' : 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)] hover:bg-red-400';
   };
 
   const formatTime = (timeStr: string) => {
@@ -572,7 +607,7 @@ export default function SchumannPage() {
               Jeomanyetik Kp Eğilim Grafiği (Son 72 Saat)
             </h2>
             <p className="text-xs text-mystic-text-muted mt-1">
-              Ölçülen jeomanyetik fırtına değerlerinin son 3 günlük (72 saat) saatlik blok gösterimi.
+              Ölçülen jeomanyetik fırtına değerlerinin son 3 günlük (72 saat) saatlik blok gösterimi (Düz çizgiler geçmişi, kesikli çizgiler 24 saatlik tahmini gösterir).
             </p>
           </div>
 
@@ -591,7 +626,9 @@ export default function SchumannPage() {
                     <strong className="text-white">{formatTime(hoveredBar.time)}</strong>
                     <span className="text-mystic-text-muted">|</span>
                     <span className="text-mystic-text-muted">Fırtına Seviyesi:</span>
-                    <strong className="text-white">{hoveredBar.kp} Kp</strong>
+                    <strong className="text-white">
+                      {hoveredBar.kp} Kp {hoveredBar.predicted ? '(Tahmin)' : ''}
+                    </strong>
                   </div>
                 ) : (
                   <span className="text-xs text-mystic-text-muted">
@@ -611,7 +648,7 @@ export default function SchumannPage() {
                   >
                     {/* The colored bar */}
                     <div 
-                      className={`w-full max-w-[14px] rounded-t transition-all duration-300 ${getKpColorClass(item.kp)}`}
+                      className={`w-full max-w-[14px] rounded-t transition-all duration-300 ${getKpColorClass(item.kp, item.predicted)}`}
                       style={{ height: `${Math.max((item.kp / 9) * 100, 6)}%` }}
                     />
                   </div>
@@ -649,6 +686,10 @@ export default function SchumannPage() {
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded bg-red-500"></span>
                   <span className="text-mystic-text-muted">Fırtına (5+)</span>
+                </div>
+                <div className="flex items-center gap-1.5 border-l border-white/10 pl-4">
+                  <span className="w-2.5 h-2.5 rounded border border-dashed border-cyan-400 bg-cyan-400/20"></span>
+                  <span className="text-cyan-300 font-semibold">[Dashed] Tahmin Blokları (Önümüzdeki 24s)</span>
                 </div>
               </div>
 
