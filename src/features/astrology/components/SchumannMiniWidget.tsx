@@ -76,7 +76,7 @@ export default function SchumannMiniWidget() {
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="text-mystic-primary text-[10px] font-bold uppercase tracking-widest">Kozmik Rezonans</span>
+              <span className="text-mystic-primary text-[10px] font-bold uppercase tracking-widest">Schumann Rezonansı</span>
               <span className={`w-1.5 h-1.5 rounded-full ${getGlowingIndicator(kpVal)}`} />
             </div>
             <h4 className="text-white font-extrabold text-sm mt-0.5 tracking-tight group-hover/schumann:text-mystic-accent transition-colors">

@@ -114,6 +114,7 @@ export default function SchumannPage() {
   };
 
   useEffect(() => {
+    document.title = "Schumann Rezonansı & Kozmik Enerji Portalı | İçsel Uyanış";
     fetchData();
 
     // Set up automatic background polling every 5 minutes (300,000 ms)
@@ -514,10 +515,10 @@ export default function SchumannPage() {
             <Sun size={48} className="animate-pulse" />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#00E5FF] via-white to-[#4F46E5] tracking-tight mb-4">
-            Kozmik Enerji ve Rezonans
+            Schumann Rezonansı & Kozmik Enerji
           </h1>
           <p className="text-mystic-text-muted text-lg max-w-2xl mx-auto">
-            Gezegenimizin manyetik kalkanındaki dalgalanmaları (NOAA Küresel Kp Endeksi) ve uzay havasının iyonosfer üzerindeki enerjisel etkilerini takip edin.
+            Gezegenimizin manyetik kalkanındaki dalgalanmaları (NOAA Küresel Kp Endeksi), Schumann rezonans frekanslarını ve uzay havasının iyonosfer üzerindeki enerjisel etkilerini canlı takip edin.
           </p>
         </div>
 
