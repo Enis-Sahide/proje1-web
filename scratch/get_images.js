@@ -1,16 +1,17 @@
 const https = require('https');
 
-https.get('https://sos70.ru/?page_id=48', (res) => {
+https.get('https://resonanceone.app/api/now', (res) => {
   let data = '';
   res.on('data', (chunk) => {
     data += chunk;
   });
   res.on('end', () => {
-    const regex = /<img[^>]+src="([^">]+)"/g;
-    let match;
-    console.log("Found images on page 48:");
-    while ((match = regex.exec(data)) !== null) {
-      console.log(match[1]);
+    try {
+      const json = JSON.parse(data);
+      console.log(JSON.stringify(json, null, 2));
+    } catch (e) {
+      console.log("Error parsing JSON:", e.message);
+      console.log("Raw response:", data);
     }
   });
 }).on('error', (err) => {
