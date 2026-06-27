@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Activity, Zap, Compass, BookOpen, AlertCircle, Info, RefreshCw, Lock, Bell, BellOff, Sun } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowLeft, Activity, Zap, Compass, BookOpen, AlertCircle, Info, RefreshCw, Lock, Bell, BellOff, Sun, Waves } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { ROLE_LEVELS } from '@/lib/auth/roles';
@@ -22,6 +22,7 @@ interface KpData {
 export default function SchumannPage() {
   const router = useRouter();
   const { role } = useAuth();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [data, setData] = useState<KpData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,6 +62,11 @@ export default function SchumannPage() {
         throw new Error('Veriler güncellenirken sunucudan geçersiz yanıt alındı.');
       }
       const jsonData = await res.json();
+      
+      // Limit history to the last 8 items (last 24 hours of 3-hourly blocks)
+      if (jsonData && jsonData.history) {
+        jsonData.history = jsonData.history.slice(-8);
+      }
       setData(jsonData);
       setTimestamp(Date.now());
     } catch (err: any) {
@@ -74,6 +80,127 @@ export default function SchumannPage() {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Spectrogram rendering effect
+  useEffect(() => {
+    if (!canvasRef.current || !data || !data.history || data.history.length === 0) return;
+    
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    const width = canvas.width;
+    const height = canvas.height;
+
+    // Draw solid space background
+    ctx.fillStyle = '#030308';
+    ctx.fillRect(0, 0, width, height);
+
+    const cols = data.history; // Exactly 8 blocks representing the last 24 hours
+
+    for (let x = 0; x < width; x++) {
+      // Linear interpolation between the 3-hour Kp blocks
+      const pct = x / width;
+      const indexFloat = pct * (cols.length - 1);
+      const indexLow = Math.floor(indexFloat);
+      const indexHigh = Math.min(indexLow + 1, cols.length - 1);
+      const weight = indexFloat - indexLow;
+
+      const kpLow = cols[indexLow].kp;
+      const kpHigh = cols[indexHigh].kp;
+      const kp = kpLow + (kpHigh - kpLow) * weight;
+
+      // Draw the column pixel-by-pixel
+      for (let y = 0; y < height; y++) {
+        const freqPct = (height - y) / height; // 0 at bottom, 1 at top
+        const freqHz = freqPct * 40; // Scale 0 to 40 Hz
+
+        // Base noise background
+        let r = 5;
+        let g = 5;
+        let b = 15;
+
+        // Schumann resonances (7.83, 14.1, 20.3, 26.4, 32.4 Hz)
+        const resonances = [7.83, 14.1, 20.3, 26.4, 32.4];
+        let onResonance = false;
+        let resonanceDist = 999;
+
+        resonances.forEach(res => {
+          const dist = Math.abs(freqHz - res);
+          if (dist < 1.8) {
+            onResonance = true;
+            resonanceDist = Math.min(resonanceDist, dist);
+          }
+        });
+
+        // Add some organic noise to make it look like a sensor sonogram
+        const noise = (Math.random() - 0.5) * 10;
+
+        if (onResonance) {
+          const strength = Math.max(0, 1 - resonanceDist / 1.8);
+          
+          if (kp < 3) {
+            // Quiet: Green/Teal bands
+            g += strength * 130 + noise;
+            b += strength * 100;
+          } else if (kp < 4) {
+            // Unsettled: Yellow/Amber bands
+            r += strength * 180 + noise;
+            g += strength * 150;
+            b += strength * 20;
+          } else if (kp < 5) {
+            // Active: Orange bands
+            r += strength * 230 + noise;
+            g += strength * 110;
+            b += strength * 10;
+          } else {
+            // Storm: Bright Red/Magenta bands
+            r += strength * 255 + noise;
+            g += strength * 40;
+            b += strength * 40;
+          }
+        }
+
+        // Simulating vertical lightning/fırtına white-out spikes when Kp is high
+        if (kp >= 4) {
+          const spikeChance = (kp - 3) * 0.18; // higher Kp = more intense whiteouts
+          // Check if we trigger a spike at this X coordinate
+          const isSpikeCol = Math.sin(x * 0.8) * Math.cos(x * 0.2) > (2.1 - kp * 0.3);
+          
+          if (isSpikeCol && Math.random() < spikeChance) {
+            const intensity = (kp / 9) * 190 * (0.7 + Math.random() * 0.5);
+            r += intensity;
+            g += intensity * 0.9;
+            b += intensity * 0.7;
+          }
+        }
+
+        r = Math.min(255, Math.max(0, r));
+        g = Math.min(255, Math.max(0, g));
+        b = Math.min(255, Math.max(0, b));
+
+        ctx.fillStyle = `rgb(${Math.floor(r)}, ${Math.floor(g)}, ${Math.floor(b)})`;
+        ctx.fillRect(x, y, 1, 1);
+      }
+    }
+
+    // Draw horizontal grid lines and frequency labels
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+    ctx.lineWidth = 1;
+    const labelResonances = [7.83, 14, 20, 26, 32];
+    labelResonances.forEach(res => {
+      const y = height - (res / 40) * height;
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(width, y);
+      ctx.stroke();
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.font = '9px monospace';
+      ctx.fillText(`${res} Hz`, 8, y - 4);
+    });
+
+  }, [data, timestamp]);
 
   const handleRefresh = () => {
     fetchData();
@@ -123,7 +250,7 @@ export default function SchumannPage() {
             Kozmik Enerji ve Rezonans
           </h1>
           <p className="text-mystic-text-muted text-lg max-w-2xl mx-auto">
-            Gezegenimizin manyetik koruma kalkanındaki dalgalanmaları (NOAA Küresel Kp Endeksi) ve uzay havasının insan biyo-alanı üzerindeki enerjisel etkilerini takip edin.
+            Gezegenimizin manyetik kalkanındaki dalgalanmaları (NOAA Küresel Kp Endeksi) ve uzay havasının iyonosfer üzerindeki enerjisel etkilerini takip edin.
           </p>
         </div>
 
@@ -180,7 +307,7 @@ export default function SchumannPage() {
             </div>
           </div>
 
-          {/* Card 3: Güncelleme Sıklığı */}
+          {/* Card 3: Veri Kaynağı */}
           <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between text-mystic-text-muted mb-4">
@@ -281,20 +408,69 @@ export default function SchumannPage() {
           </div>
         )}
 
-        {/* Canlı Grafik Paneli (Watermark-free, Custom SVG Bar Chart) */}
+        {/* 1. Canlı Spektrogram (Sonogram) Modu */}
         <div className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8">
           <div className="border-b border-white/10 pb-4 mb-6">
             <h2 className="text-xl font-bold flex items-center gap-2 text-white">
-              <Activity size={22} className="text-[#00E5FF]" />
-              Son 72 Saatlik Jeomanyetik Kp Grafiği
+              <Waves size={22} className="text-[#00E5FF]" />
+              Canlı Kozmik Enerji Spektrogramı (Son Son 24 Saat)
             </h2>
             <p className="text-xs text-mystic-text-muted mt-1">
-              Gezegenimizin manyetik kalkanındaki elektromanyetik fırtına eğilimlerini inceleyin.
+              Frekans dalgalanmalarını ve Kp Index kaynaklı enerjisel fırtına (beyaz patlamalar) durumunu izleyin.
             </p>
           </div>
 
           {isLoading ? (
             <div className="h-64 bg-white/5 animate-pulse rounded-2xl flex items-center justify-center text-mystic-text-muted">
+              Spektrogram Çiziliyor...
+            </div>
+          ) : (
+            <div className="w-full flex flex-col justify-center items-center py-6 bg-black/40 rounded-2xl border border-white/5 relative overflow-hidden group">
+              
+              <div className="absolute top-4 right-4 bg-red-600 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1.5 backdrop-blur-sm z-10 shadow-lg tracking-wider uppercase animate-pulse">
+                <span className="w-1.5 h-1.5 rounded-full bg-white"></span> Canlı İzleme
+              </div>
+
+              {/* Responsive canvas container */}
+              <div className="w-full max-w-full overflow-x-auto flex flex-col items-center px-4">
+                <canvas 
+                  ref={canvasRef} 
+                  width={800} 
+                  height={240}
+                  className="rounded-lg border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)]"
+                />
+
+                {/* Spectrogram X-axis hours */}
+                <div className="w-[800px] max-w-full flex justify-between text-[10px] text-mystic-text-muted font-mono mt-3 px-2">
+                  {data?.history.map((item, index) => (
+                    <span key={index} className="text-center w-16">
+                      {formatTime(item.time).split(' ')[1]}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <p className="text-center text-xs text-mystic-text-muted max-w-xl mt-6 px-4">
+                * Grafik, NOAA Kp-Index verilerinden simüle edilen 24 saatlik elektromanyetik akışı temsil eder. Dikey eksen rezonans frekanslarını (Hz), yatay eksen ise zamanı gösterir. Grafikteki beyaz dik çizgiler enerji fırtınalarını simgeler.
+              </p>
+            </div>
+          )}
+        </div>
+
+        {/* 2. Sayısal Kp Grafik Çizelgesi (Bar Chart) */}
+        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8">
+          <div className="border-b border-white/10 pb-4 mb-6">
+            <h2 className="text-xl font-bold flex items-center gap-2 text-white">
+              <Activity size={22} className="text-[#00E5FF]" />
+              Jeomanyetik Kp Eğilim Grafiği (Son 24 Saat)
+            </h2>
+            <p className="text-xs text-mystic-text-muted mt-1">
+              Ölçülen jeomanyetik fırtına değerlerinin son 24 saatteki saatlik blok gösterimi.
+            </p>
+          </div>
+
+          {isLoading ? (
+            <div className="h-48 bg-white/5 animate-pulse rounded-2xl flex items-center justify-center text-mystic-text-muted">
               Grafik Yükleniyor...
             </div>
           ) : (
@@ -304,10 +480,10 @@ export default function SchumannPage() {
               <div className="h-8 mb-4 text-center">
                 {hoveredBar ? (
                   <div className="inline-flex items-center gap-3 text-xs bg-white/5 border border-white/10 px-3 py-1.5 rounded-full animate-in fade-in duration-200">
-                    <span className="text-mystic-text-muted">Zaman:</span>
+                    <span className="text-mystic-text-muted">Zaman (UTC):</span>
                     <strong className="text-white">{formatTime(hoveredBar.time)}</strong>
                     <span className="text-mystic-text-muted">|</span>
-                    <span className="text-mystic-text-muted">Değer:</span>
+                    <span className="text-mystic-text-muted">Fırtına Seviyesi:</span>
                     <strong className="text-white">{hoveredBar.kp} Kp</strong>
                   </div>
                 ) : (
@@ -318,7 +494,7 @@ export default function SchumannPage() {
               </div>
 
               {/* Bars Grid */}
-              <div className="flex items-end justify-between h-48 w-full border-b border-white/10 pb-2 gap-1 md:gap-2">
+              <div className="flex items-end justify-between h-48 w-full border-b border-white/10 pb-2 gap-2 md:gap-4 px-2">
                 {data?.history.map((item, index) => (
                   <div 
                     key={index} 
@@ -328,8 +504,8 @@ export default function SchumannPage() {
                   >
                     {/* The colored bar */}
                     <div 
-                      className={`w-full max-w-[14px] rounded-t transition-all duration-300 ${getKpColorClass(item.kp)}`}
-                      style={{ height: `${Math.max((item.kp / 9) * 100, 4)}%` }}
+                      className={`w-full max-w-[28px] rounded-t transition-all duration-300 ${getKpColorClass(item.kp)}`}
+                      style={{ height: `${Math.max((item.kp / 9) * 100, 6)}%` }}
                     />
                   </div>
                 ))}
@@ -337,21 +513,15 @@ export default function SchumannPage() {
 
               {/* X Axis Labels */}
               <div className="flex justify-between text-[10px] text-mystic-text-muted mt-2 px-1">
-                {data?.history.map((item, index) => {
-                  // Only display label for every 4th bar to prevent crowding
-                  if (index % 4 === 0) {
-                    return (
-                      <span key={index} className="text-center w-12 font-mono">
-                        {formatTime(item.time).split(' ')[0]} {formatTime(item.time).split(' ')[1]}
-                      </span>
-                    );
-                  }
-                  return <span key={index} className="w-0 overflow-hidden" />;
-                })}
+                {data?.history.map((item, index) => (
+                  <span key={index} className="text-center w-16 font-mono">
+                    {formatTime(item.time).split(' ')[1]}
+                  </span>
+                ))}
               </div>
 
               {/* Y Axis Legend indicators */}
-              <div className="flex flex-wrap gap-4 justify-center mt-6 pt-4 border-t border-white/5 text-[10px]">
+              <div className="flex flex-wrap gap-4 justify-center mt-6 pt-4 border-t border-t-white/5 text-[10px]">
                 <div className="flex items-center gap-1.5">
                   <span className="w-2.5 h-2.5 rounded bg-emerald-500"></span>
                   <span className="text-mystic-text-muted">Sakin (0 - 2.9)</span>
