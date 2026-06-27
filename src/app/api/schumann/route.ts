@@ -52,7 +52,7 @@ export async function GET() {
   try {
     // Fetch from the combined observed + forecast endpoint
     const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json', {
-      next: { revalidate: 3600 } // cache for 1 hour
+      next: { revalidate: 300 } // cache for 5 minutes (300 seconds) to get near real-time updates
     });
     if (!res.ok) {
       throw new Error(`NOAA API responded with status: ${res.status}`);
