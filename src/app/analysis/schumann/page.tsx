@@ -1,36 +1,34 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, RotateCw, Activity, Zap, Waves, Compass, BookOpen, AlertCircle, Info, RefreshCw, Lock, Bell, BellOff } from 'lucide-react';
+import { ArrowLeft, Activity, Zap, Compass, BookOpen, AlertCircle, Info, RefreshCw, Lock, Bell, BellOff, Sun } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { ROLE_LEVELS } from '@/lib/auth/roles';
 
-interface SchumannData {
-  activity_index: number;
-  activity_index_label: string;
-  schumann_index: number;
-  schumann_frequency_hz: number;
-  kp_index: number;
-  kp_label: string;
-  solar_flare_index: number;
-  solar_flare_class: string;
-  geomagnetic_status: string;
-  summary: string;
-  tip: string;
+interface KpHistoryItem {
+  time: string;
+  kp: number;
+}
+
+interface KpData {
+  current_kp: number;
+  status_label: string;
+  status_desc: string;
   updated_at: string;
+  history: KpHistoryItem[];
 }
 
 export default function SchumannPage() {
   const router = useRouter();
   const { role } = useAuth();
-  const [data, setData] = useState<SchumannData | null>(null);
+  const [data, setData] = useState<KpData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'sonogram' | 'frequency' | 'amplitude' | 'quality'>('sonogram');
   const [timestamp, setTimestamp] = useState<number>(Date.now());
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState<string | null>(null);
+  const [hoveredBar, setHoveredBar] = useState<KpHistoryItem | null>(null);
 
   // Load notification state from localStorage
   useEffect(() => {
@@ -49,7 +47,7 @@ export default function SchumannPage() {
     localStorage.setItem('schumann_notifications', String(newState));
     
     if (newState) {
-      setNotificationMsg("Jeomanyetik fırtına (Kp ≥ 5) ve anormal Schumann patlamalarında cihazınıza bildirim gönderilecektir.");
+      setNotificationMsg("Jeomanyetik fırtına (Kp ≥ 5) ve yoğun kozmik enerji dalgalanmalarında cihazınıza bildirim gönderilecektir.");
       setTimeout(() => setNotificationMsg(null), 5000);
     }
   };
@@ -66,7 +64,7 @@ export default function SchumannPage() {
       setData(jsonData);
       setTimestamp(Date.now());
     } catch (err: any) {
-      console.error('Schumann API fetch error:', err);
+      console.error('Kp API fetch error:', err);
       setError(err.message || 'Veriler yüklenirken bir hata oluştu.');
     } finally {
       setIsLoading(false);
@@ -81,47 +79,23 @@ export default function SchumannPage() {
     fetchData();
   };
 
-  // Helper to translate activity labels to Turkish
-  const getActivityLabelTr = (label: string) => {
-    switch (label?.toLowerCase()) {
-      case 'calm': return 'Sakin';
-      case 'moderate': return 'Orta Derece';
-      case 'active': return 'Aktif';
-      case 'very_active': return 'Çok Aktif';
-      case 'extreme': return 'Olağanüstü Aktif';
-      default: return label || 'Bilinmiyor';
-    }
+  const getKpColorClass = (kp: number) => {
+    if (kp < 3) return 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.3)] hover:bg-emerald-400';
+    if (kp < 4) return 'bg-amber-500 shadow-[0_0_10px_rgba(245,158,11,0.3)] hover:bg-amber-400';
+    if (kp < 5) return 'bg-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.3)] hover:bg-orange-400';
+    return 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)] hover:bg-red-400';
   };
 
-  const getGeomagneticLabelTr = (label: string) => {
-    switch (label?.toLowerCase()) {
-      case 'quiet': return 'Sakin';
-      case 'unsettled': return 'Kararsız';
-      case 'active': return 'Aktif';
-      case 'storm': return 'Fırtına';
-      default: return label || 'Bilinmiyor';
-    }
-  };
-
-  const getTabImageUrl = () => {
-    switch (activeTab) {
-      case 'sonogram':
-        return `https://sos70.ru/provider.php?file=shm.jpg&t=${timestamp}`;
-      case 'frequency':
-        return `https://sos70.ru/provider.php?file=srf.jpg&t=${timestamp}`;
-      case 'amplitude':
-        return `https://sos70.ru/provider.php?file=sra.jpg&t=${timestamp}`;
-      case 'quality':
-        return `https://sos70.ru/provider.php?file=srq.jpg&t=${timestamp}`;
-    }
-  };
-
-  const getTabTitle = () => {
-    switch (activeTab) {
-      case 'sonogram': return 'Canlı Spektrogram (Sonogram)';
-      case 'frequency': return 'Frekans Modları (Hz)';
-      case 'amplitude': return 'Genlik (Güç) Modları';
-      case 'quality': return 'Q-Faktörü (Kalite)';
+  const formatTime = (timeStr: string) => {
+    try {
+      const d = new Date(timeStr);
+      const dayNames = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
+      const day = dayNames[d.getDay()];
+      const hours = String(d.getHours()).padStart(2, '0');
+      const minutes = String(d.getMinutes()).padStart(2, '0');
+      return `${day} ${hours}:${minutes}`;
+    } catch (e) {
+      return timeStr;
     }
   };
 
@@ -143,44 +117,45 @@ export default function SchumannPage() {
 
         <div className="mb-12 text-center">
           <div className="flex justify-center mb-4 text-[#00E5FF]">
-            <Waves size={48} className="animate-pulse" />
+            <Sun size={48} className="animate-pulse" />
           </div>
           <h1 className="text-4xl md:text-5xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-[#00E5FF] via-white to-[#4F46E5] tracking-tight mb-4">
-            Schumann Rezonansı
+            Kozmik Enerji ve Rezonans
           </h1>
           <p className="text-mystic-text-muted text-lg max-w-2xl mx-auto">
-            Dünya'nın kalp atışlarını, anlık elektromanyetik rezonansını ve uzay havasının iyonosfer üzerindeki enerjisel etkilerini takip edin.
+            Gezegenimizin manyetik koruma kalkanındaki dalgalanmaları (NOAA Küresel Kp Endeksi) ve uzay havasının insan biyo-alanı üzerindeki enerjisel etkilerini takip edin.
           </p>
         </div>
 
-        {/* Gösterge Paneli */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        {/* Gösterge Panelleri */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           
-          {/* Card 1: Schumann Index */}
+          {/* Card 1: Kp Endeksi */}
           <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between text-mystic-text-muted mb-4">
-                <span className="text-xs uppercase tracking-wider font-semibold">Schumann Endeksi</span>
+                <span className="text-xs uppercase tracking-wider font-semibold">Anlık Kp Endeksi</span>
                 <Activity size={16} className="text-[#00E5FF]" />
               </div>
               {isLoading ? (
                 <div className="h-8 w-16 bg-white/5 animate-pulse rounded"></div>
               ) : (
-                <div className="text-3xl font-extrabold text-white">
-                  {data?.schumann_index ?? '7.83'} <span className="text-xs text-mystic-text-muted font-normal">Hz</span>
+                <div className="text-3xl font-extrabold text-white flex items-baseline gap-2">
+                  {data?.current_kp}
+                  <span className="text-xs text-mystic-text-muted font-normal">/ 9 Kp</span>
                 </div>
               )}
             </div>
             <div className="mt-4 text-xs text-mystic-text-muted">
-              Temel frekans: 7.83 Hz rezonans gücü.
+              Jeomanyetik aktivite ölçeği (0 = Sakin, 9 = Ekstrem).
             </div>
           </div>
 
-          {/* Card 2: Aktivite Seviyesi */}
+          {/* Card 2: Durum Seviyesi */}
           <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between text-mystic-text-muted mb-4">
-                <span className="text-xs uppercase tracking-wider font-semibold">Aktivite Seviyesi</span>
+                <span className="text-xs uppercase tracking-wider font-semibold">Manyetik Alan Durumu</span>
                 <Zap size={16} className="text-amber-400" />
               </div>
               {isLoading ? (
@@ -188,59 +163,36 @@ export default function SchumannPage() {
               ) : (
                 <div className="text-xl font-extrabold text-white flex items-center gap-2">
                   <span className={`w-2.5 h-2.5 rounded-full ${
-                    data?.activity_index_label === 'very_active' || data?.activity_index_label === 'extreme'
+                    (data?.current_kp ?? 0) >= 5
                       ? 'bg-red-500 animate-ping'
-                      : data?.activity_index_label === 'active'
+                      : (data?.current_kp ?? 0) >= 4
+                      ? 'bg-orange-400'
+                      : (data?.current_kp ?? 0) >= 3
                       ? 'bg-amber-400'
                       : 'bg-emerald-400'
                   }`}></span>
-                  {getActivityLabelTr(data?.activity_index_label ?? 'calm')}
-                  <span className="text-xs font-normal text-mystic-text-muted">({data?.activity_index ?? 0}/100)</span>
+                  {data?.status_label}
                 </div>
               )}
             </div>
             <div className="mt-4 text-xs text-mystic-text-muted">
-              İyonosferik elektromanyetik aktivite endeksi.
+              Kozmik akışların manyetometrik etki derecesi.
             </div>
           </div>
 
-          {/* Card 3: Jeomanyetik Durum (Kp) */}
+          {/* Card 3: Güncelleme Sıklığı */}
           <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between text-mystic-text-muted mb-4">
-                <span className="text-xs uppercase tracking-wider font-semibold">Jeomanyetik (Kp)</span>
+                <span className="text-xs uppercase tracking-wider font-semibold">Veri Kaynağı</span>
                 <Compass size={16} className="text-indigo-400" />
               </div>
-              {isLoading ? (
-                <div className="h-8 w-24 bg-white/5 animate-pulse rounded"></div>
-              ) : (
-                <div className="text-xl font-extrabold text-white">
-                  Kp {data?.kp_index ?? 0} <span className="text-xs font-normal text-mystic-text-muted">({getGeomagneticLabelTr(data?.kp_label ?? 'quiet')})</span>
-                </div>
-              )}
-            </div>
-            <div className="mt-4 text-xs text-mystic-text-muted">
-              Dünya manyetik alanındaki fırtına endeksi.
-            </div>
-          </div>
-
-          {/* Card 4: Güneş Parlaması */}
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between text-mystic-text-muted mb-4">
-                <span className="text-xs uppercase tracking-wider font-semibold">Güneş Parlaması</span>
-                <Zap size={16} className="text-[#ff5e00]" />
+              <div className="text-lg font-bold text-white">
+                NOAA SWPC
               </div>
-              {isLoading ? (
-                <div className="h-8 w-20 bg-white/5 animate-pulse rounded"></div>
-              ) : (
-                <div className="text-xl font-extrabold text-white">
-                  Sınıf {data?.solar_flare_class ?? 'C1.0'}
-                </div>
-              )}
             </div>
             <div className="mt-4 text-xs text-mystic-text-muted">
-              Radyasyon akışı ve güneş patlama yoğunluğu.
+              Planetary K-Index 3 saatlik bloklarla güncellenir.
             </div>
           </div>
 
@@ -251,9 +203,9 @@ export default function SchumannPage() {
           <div className="flex items-center gap-3 text-sm text-mystic-text-muted text-center sm:text-left">
             <Info size={18} className="text-[#00E5FF]" />
             <div>
-              <span>Veri Güncelleme Zamanı (Yerel): </span>
+              <span>Son Ölçüm Zamanı (UTC): </span>
               <strong className="text-white font-mono">
-                {data?.updated_at ? new Date(data.updated_at).toLocaleString('tr-TR') : '...'}
+                {data?.updated_at ? new Date(data.updated_at + 'Z').toLocaleString('tr-TR') : '...'}
               </strong>
             </div>
           </div>
@@ -329,84 +281,110 @@ export default function SchumannPage() {
           </div>
         )}
 
-        {/* Canlı Görselleştirme Paneli */}
+        {/* Canlı Grafik Paneli (Watermark-free, Custom SVG Bar Chart) */}
         <div className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8">
-          <div className="flex flex-col sm:flex-row items-center justify-between border-b border-white/10 pb-4 mb-6 gap-4">
+          <div className="border-b border-white/10 pb-4 mb-6">
             <h2 className="text-xl font-bold flex items-center gap-2 text-white">
               <Activity size={22} className="text-[#00E5FF]" />
-              {getTabTitle()}
+              Son 72 Saatlik Jeomanyetik Kp Grafiği
             </h2>
-            <div className="flex flex-wrap gap-2">
-              {[
-                { id: 'sonogram', label: 'Spektrogram (Sonogram)' },
-                { id: 'frequency', label: 'Frekans' },
-                { id: 'amplitude', label: 'Genlik' },
-                { id: 'quality', label: 'Kalite' }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as any)}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                    activeTab === tab.id 
-                      ? 'bg-[#00E5FF]/20 border-[#00E5FF] text-white shadow-[0_0_15px_rgba(0,229,255,0.2)]' 
-                      : 'bg-black/40 border-white/10 text-mystic-text-muted hover:bg-white/10 hover:text-white'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="w-full flex flex-col justify-center items-center py-6 bg-black/40 rounded-2xl border border-white/5 relative overflow-hidden group">
-            
-            {/* Image Wrapper for precise watermark masking */}
-            <div className="relative max-w-full">
-              {/* Cover the "S 70 O S" logo in the top-right corner of the graph */}
-              <div className="absolute top-[2%] right-[1%] w-[10%] h-[12%] bg-black z-10 pointer-events-none"></div>
-              
-              {/* Live Indicator overlay placed over the covered area */}
-              <div className="absolute top-[3%] right-[2%] bg-red-600 text-white text-[9px] md:text-[10px] font-extrabold px-2 py-0.5 md:px-2.5 md:py-1 rounded-full flex items-center gap-1.5 backdrop-blur-sm z-20 shadow-lg tracking-wider uppercase animate-pulse">
-                <span className="w-1 md:w-1.5 md:h-1.5 rounded-full bg-white"></span> Canlı İzleme
-              </div>
-
-              {/* The Image */}
-              <img 
-                src={getTabImageUrl()} 
-                alt={getTabTitle()}
-                className="max-w-full h-auto rounded-lg border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)] transition-all duration-300 group-hover:scale-[1.01]"
-                onError={(e) => {
-                  // Handle fallback if image loading fails
-                  (e.target as HTMLImageElement).src = "/placeholder-chart.png";
-                }}
-              />
-            </div>
-
-            <p className="text-center text-xs text-mystic-text-muted max-w-xl mt-6 px-4">
-              * Tomsk Uzay Gözlem İstasyonu verileri anlık olarak çizilmektedir. Grafikteki dikey eksen frekansı (0-40 Hz), yatay eksen ise son 3 günün saatlik değişimini (Tomsk yerel saatiyle) gösterir.
+            <p className="text-xs text-mystic-text-muted mt-1">
+              Gezegenimizin manyetik kalkanındaki elektromanyetik fırtına eğilimlerini inceleyin.
             </p>
           </div>
+
+          {isLoading ? (
+            <div className="h-64 bg-white/5 animate-pulse rounded-2xl flex items-center justify-center text-mystic-text-muted">
+              Grafik Yükleniyor...
+            </div>
+          ) : (
+            <div className="w-full bg-black/40 rounded-2xl border border-white/5 p-6 relative">
+              
+              {/* Tooltip display space */}
+              <div className="h-8 mb-4 text-center">
+                {hoveredBar ? (
+                  <div className="inline-flex items-center gap-3 text-xs bg-white/5 border border-white/10 px-3 py-1.5 rounded-full animate-in fade-in duration-200">
+                    <span className="text-mystic-text-muted">Zaman:</span>
+                    <strong className="text-white">{formatTime(hoveredBar.time)}</strong>
+                    <span className="text-mystic-text-muted">|</span>
+                    <span className="text-mystic-text-muted">Değer:</span>
+                    <strong className="text-white">{hoveredBar.kp} Kp</strong>
+                  </div>
+                ) : (
+                  <span className="text-xs text-mystic-text-muted">
+                    Detayları görmek için sütunların üzerine gelin
+                  </span>
+                )}
+              </div>
+
+              {/* Bars Grid */}
+              <div className="flex items-end justify-between h-48 w-full border-b border-white/10 pb-2 gap-1 md:gap-2">
+                {data?.history.map((item, index) => (
+                  <div 
+                    key={index} 
+                    className="flex-1 flex flex-col items-center h-full justify-end group/bar cursor-pointer"
+                    onMouseEnter={() => setHoveredBar(item)}
+                    onMouseLeave={() => setHoveredBar(null)}
+                  >
+                    {/* The colored bar */}
+                    <div 
+                      className={`w-full max-w-[14px] rounded-t transition-all duration-300 ${getKpColorClass(item.kp)}`}
+                      style={{ height: `${Math.max((item.kp / 9) * 100, 4)}%` }}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {/* X Axis Labels */}
+              <div className="flex justify-between text-[10px] text-mystic-text-muted mt-2 px-1">
+                {data?.history.map((item, index) => {
+                  // Only display label for every 4th bar to prevent crowding
+                  if (index % 4 === 0) {
+                    return (
+                      <span key={index} className="text-center w-12 font-mono">
+                        {formatTime(item.time).split(' ')[0]} {formatTime(item.time).split(' ')[1]}
+                      </span>
+                    );
+                  }
+                  return <span key={index} className="w-0 overflow-hidden" />;
+                })}
+              </div>
+
+              {/* Y Axis Legend indicators */}
+              <div className="flex flex-wrap gap-4 justify-center mt-6 pt-4 border-t border-white/5 text-[10px]">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded bg-emerald-500"></span>
+                  <span className="text-mystic-text-muted">Sakin (0 - 2.9)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded bg-amber-500"></span>
+                  <span className="text-mystic-text-muted">Kararsız (3 - 3.9)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded bg-orange-500"></span>
+                  <span className="text-mystic-text-muted">Aktif (4 - 4.9)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded bg-red-500"></span>
+                  <span className="text-mystic-text-muted">Fırtına (5+)</span>
+                </div>
+              </div>
+
+            </div>
+          )}
         </div>
 
-        {/* Yapay Zeka Günlük Enerji Özeti */}
-        {!isLoading && data?.summary && (
+        {/* Enerji Analizi Durum Kartı */}
+        {!isLoading && data?.status_desc && (
           <div className="bg-gradient-to-r from-[#4F46E5]/10 via-[#00E5FF]/5 to-[#4F46E5]/10 border border-[#00E5FF]/20 rounded-3xl p-8 backdrop-blur-sm mb-8 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-[#00E5FF] opacity-10 blur-[50px] pointer-events-none"></div>
             <h3 className="text-2xl font-bold mb-4 text-[#00E5FF] flex items-center gap-2">
               <BookOpen size={22} />
-              Günün Kozmik Rezonans Analizi
+              Jeomanyetik Enerji Analizi
             </h3>
-            <p className="text-white/90 leading-relaxed text-sm md:text-base mb-6">
-              {data.summary}
+            <p className="text-white/95 leading-relaxed text-sm md:text-base">
+              {data.status_desc}
             </p>
-            {data.tip && (
-              <div className="bg-black/30 p-4 rounded-xl border border-white/5">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">Rezonans Tavsiyesi</h4>
-                <p className="text-xs text-mystic-text-muted leading-relaxed italic">
-                  "{data.tip}"
-                </p>
-              </div>
-            )}
           </div>
         )}
 
@@ -414,40 +392,42 @@ export default function SchumannPage() {
         <div className="bg-black/40 border border-white/10 rounded-3xl p-8 backdrop-blur-md">
           <h3 className="text-2xl font-bold mb-6 text-white flex items-center gap-2">
             <Info size={22} className="text-[#00E5FF]" />
-            Schumann Rezonansı Nedir?
+            Jeomanyetik Kp İndeksi Nedir?
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm text-mystic-text-muted">
             <div className="space-y-4">
               <p>
-                <strong>Schumann Rezonansı (SR)</strong>, Dünya yüzeyi ile iletken iyonosfer tabakası arasında oluşan boşlukta sıkışan son derece düşük frekanslı (ELF) elektromanyetik dalgaların küresel çapta rezonansa girmesiyle oluşan doğal bir fenomendir.
+                <strong>Planetary K-Index (Kp Endeksi)</strong>, Dünya genelindeki manyetometre ölçüm istasyonlarından gelen verilerin birleştirilmesiyle oluşturulan ve gezegenimizin manyetik alanındaki düzensizlikleri ölçen küresel bir endekstir.
               </p>
               <p>
-                Bu rezonanslar, gezegen genelinde saniyede ortalama 50 kez çakan şimşek deşarjları tarafından uyarılır ve beslenir. İyonosfer boşluğunun geometrisi nedeniyle bu dalgalar sürekli olarak Dünya etrafında döner ve belirli harmoniklerde zirve yapar.
+                0 ile 9 arasında logaritmik bir skala kullanan bu endeks, kozmik rüzgarların ve güneş patlamalarının Dünya manyetosferinde oluşturduğu baskıyı temsil eder. Kp değerinin 5 ve üzeri olması resmi olarak bir **Jeomanyetik Fırtına (Geomagnetic Storm)** durumuna işaret eder.
               </p>
               <p>
-                Bu rezonansların en güçlüsü ve temeli yaklaşık olarak <strong>7.83 Hz</strong> frekansındadır ve bu nedenle bilim insanları ve ezoterik çevreler tarafından <em>"Dünya'nın Kalp Atışı"</em> veya <em>"Kozmik Akort Çatalı"</em> olarak nitelendirilir.
+                Bu veri akışı, Amerika Birleşik Devletleri Ulusal Okyanus ve Atmosfer Dairesi (NOAA) tarafından **tamamen açık, resmi ve telifsiz** olarak sağlanmaktadır.
               </p>
             </div>
             <div className="space-y-4">
               <p>
-                <strong>İnsan Biyolojisi Üzerindeki Etkileri:</strong>
+                <strong>Güneş Fırtınası ve Biyolojik Etkiler:</strong>
                 <br />
-                7.83 Hz frekansı, insan beynindeki <strong>Alfa ve Theta beyin dalgalarının sınır çizgisine</strong> denk gelir. Bu durum, insan biyolojisinin gezegenin elektromanyetik nabzıyla evrimsel olarak uyumlandığını gösterir.
+                Dünya'nın manyetik alanı ile insan biyolojisi (özellikle kalp ritmi değişkenliği, sinir sistemi dengesi ve melatonin salgısı) arasında yakın bir ilişki vardır. 
               </p>
               <p>
-                Schumann frekansının normalin üzerine çıktığı (grafikte parlak beyaz görünen) aktif dönemlerde, insanların sezgiselliklerinde artış, rüyalarında berraklık veya tam tersi olarak baş ağrısı, yorgunluk, anksiyete ve uyku bozuklukları gibi fiziksel adaptasyon semptomları yaşayabildiği gözlenmektedir.
-              </p>
-              <p>
-                Bu aktif elektromanyetik günlerde meditasyon yapmak, doğada yürüyerek topraklanmak (grounding), bol su tüketmek ve çakraları dengelemek kozmik uyumlanma sürecinizi kolaylaştırır.
+                Kp endeksinin yükseldiği jeomanyetik fırtına günlerinde, insanların biyolojik manyetik dengeleri etkilenerek şu semptomları yaşaması oldukça yaygındır:
+                <br />
+                * Baş ağrısı ve migren tetiklenmeleri
+                <br />
+                * Aşırı yorgunluk veya tam aksine uykuya dalamama
+                <br />
+                * Duygusal hassasiyet ve ani duygu durum değişiklikleri
+                <br />
+                * Sezgilerin ve rüyaların son derece berraklaşması
               </p>
             </div>
           </div>
           <div className="mt-8 pt-6 border-t border-white/10 text-xs text-center text-mystic-text-muted">
             <p>
-              Veriler Tomsk Uzay Gözlem İstasyonu (TSU, Rusya), GFZ Potsdam ve NOAA Space Weather Center kaynaklarından derlenmektedir.
-            </p>
-            <p className="mt-1">
-              Schumann verilerinin bu şekilde derlenmesi ve kompozit indekslenmesi ResonanceOne projesine atfedilmiştir.
+              Veriler Amerika Birleşik Devletleri Ulusal Okyanus ve Atmosfer Dairesi (NOAA) Space Weather Prediction Center kaynaklarından anlık ve yasal olarak çekilmektedir.
             </p>
           </div>
         </div>
