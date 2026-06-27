@@ -93,6 +93,13 @@ export default function SchumannPage() {
 
   useEffect(() => {
     fetchData();
+
+    // Set up automatic background polling every 5 minutes (300,000 ms)
+    const interval = setInterval(() => {
+      fetchData();
+    }, 5 * 60 * 1000);
+
+    return () => clearInterval(interval);
   }, []);
 
   // Helper for smooth continuous resonance color stops based on Kp index
