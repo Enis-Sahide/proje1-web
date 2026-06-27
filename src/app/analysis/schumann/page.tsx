@@ -297,7 +297,7 @@ export default function SchumannPage() {
       }
     }
 
-    // 5. Draw horizontal grid lines and frequency labels (overlay)
+    // 5. Draw horizontal grid lines and frequency labels (overlay) - Fixed X position to prevent clipping
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
     ctx.lineWidth = 1;
     const labelResonances = [7.83, 14, 20, 26, 32];
@@ -308,9 +308,12 @@ export default function SchumannPage() {
       ctx.lineTo(width, y);
       ctx.stroke();
 
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
       ctx.font = '9px monospace';
-      ctx.fillText(`${res} Hz`, 8, y - 4);
+      ctx.textAlign = 'left';
+      
+      // Draw text at x = 18px instead of 8px to completely avoid boundary clipping
+      ctx.fillText(`${res} Hz`, 18, y - 4);
     });
 
   }, [data, timestamp]);
