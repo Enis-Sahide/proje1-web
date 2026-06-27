@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gezegen Saatleri ve Kozmik Rehber</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #05050a;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --gold: #D4AF37;
+            --text-color: #f3f4f6;
+            --text-muted: #9ca3af;
+            --sun-color: #FFD60A;
+            --moon-color: #a5b4fc;
+            --mars-color: #ff453a;
+            --mercury-color: #30d158;
+            --jupiter-color: #bfdbfe;
+            --venus-color: #ff6489;
+            --saturn-color: #ffd60a;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--gold), #fff, #4f46e5);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 700;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 40px;
+        }
+
+        .section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        h2 {
+            color: var(--gold);
+            font-size: 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+
+        h3 {
+            font-size: 1.2rem;
+            margin-top: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .badge-sun { color: var(--sun-color); }
+        .badge-moon { color: var(--moon-color); }
+        .badge-mars { color: var(--mars-color); }
+        .badge-mercury { color: var(--mercury-color); }
+        .badge-jupiter { color: var(--jupiter-color); }
+        .badge-venus { color: var(--venus-color); }
+        .badge-saturn { color: var(--saturn-color); }
+
+        .rules {
+            display: grid;
+            grid-cols: 1;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .rule-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+        }
+
+        .rule-box strong {
+            color: #fff;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        th, td {
+            border: 1px solid var(--card-border);
+            padding: 12px;
+            text-align: center;
+        }
+
+        th {
+            background-color: rgba(212, 175, 55, 0.1);
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        tr:nth-child(even) {
+            background-color: rgba(255, 255, 255, 0.01);
+        }
+
+        tr:hover {
+            background-color: rgba(255, 255, 255, 0.04);
+        }
+
+        .tips-list {
+            margin-top: 20px;
+        }
+
+        .tip-item {
+            background: rgba(212, 175, 55, 0.05);
+            border-left: 4px solid var(--gold);
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .print-btn {
+            display: block;
+            width: fit-content;
+            margin: 30px auto;
+            padding: 12px 30px;
+            background: var(--gold);
+            color: #000;
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
+        }
+
+        .print-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
+        }
+
+        @media print {
+            body {
+                background-color: #fff;
+                color: #000;
+                padding: 0;
+            }
+            .section {
+                border: none;
+                background: none;
+                padding: 0;
+                margin-bottom: 40px;
+                page-break-inside: avoid;
+            }
+            .print-btn {
+                display: none;
+            }
+            th {
+                background-color: #f3f4f6 !important;
+                color: #000 !important;
+            }
+            td, th {
+                border: 1px solid #d1d5db;
+                color: #000;
+            }
+            h1, h2, h3 {
+                color: #000 !important;
+                background: none !important;
+                -webkit-text-fill-color: initial !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Gezegen Saatleri & Kozmik Yaşam Kılavuzu</h1>
+        <p class="subtitle">Antik Keldani İlmine Göre Günlük İşlerinizi Kozmik Enerjiyle Hizalama Rehberi</p>
+
+        <button class="print-btn" onclick="window.print()">PDF Olarak Kaydet / Yazdır</button>
+
+        <div class="section">
+            <h2>1. Gezegen Saatleri Nedir?</h2>
+            <p>Gezegen Saatleri, günün 24 saatinin klasik astrolojideki 7 gök cismi (Güneş, Ay, Merkür, Venüs, Mars, Jüpiter ve Satürn) tarafından yönetildiği kadim bir zaman bölme sistemidir.</p>
+            <p>Bu sistemde saatler, modern saatler gibi sabit 60 dakika değildir. Gün doğumu ile gün batımı arası 12 eşit parçaya bölünerek <strong>Gündüz Saatleri</strong>, gün batımı ile ertesi sabah gün doğumu arası 12 eşit parçaya bölünerek de <strong>Gece Saatleri</strong> hesaplanır.</p>
+            <p>Sıralama dış gezegenlerden iç gezegenlere doğru Keldani Sırasına göre akar: <strong>Satürn &rarr; Jüpiter &rarr; Mars &rarr; Güneş &rarr; Venüs &rarr; Merkür &rarr; Ay</strong>. Her günün ilk saati, o güne adını veren gezegen ile başlar.</p>
+        </div>
+
+        <div class="section">
+            <h2>2. Gezegen Saatlerinin Enerjileri ve Etkileri</h2>
+            
+            <h3 class="badge-sun">☉ GÜNEŞ SAATİ (Canlılık, Otorite, Başarı)</h3>
+            <div class="rules">
+                <div class="rule-box">
+                    <strong>✓ Neler İçin Uygundur:</strong>
+                    Terfi istemek, yöneticilerle veya otorite figürleriyle önemli görüşmeler yapmak, sunum yapmak, sahneye çıkmak, dikkat çekmek istediğiniz bir işi yayınlamak, özgüven gerektiren projelere başlamak, kişisel gelişim çalışmaları yapmak.
+                </div>
+                <div class="rule-box">
+                    <strong>✗ Neler İçin Uygun Değildir:</strong>
+                    Gizli kalmasını istediğiniz işler yürütmek (Güneş her şeyi aydınlatır, sırlar açığa çıkar), dinlenmek ve inzivaya çekilmek (aktif enerji uykuyu veya huzuru zorlaştırır).
+                </div>
+            </div>
+
+            <h3 class="badge-moon">☽ AY SAATİ (Duygular, Sezgiler, Değişim, Yuva)</h3>
+            <div class="rules">
+                <div class="rule-box">
+                    <strong>✓ Neler İçin Uygundur:</strong>
+                    Sezgisel çalışmalar yapmak, meditasyon, aile ziyaretleri, ev temizliği, yemek pişirmek ve dekorasyon değiştirmek, halkla ilişkiler, pazarlama ve geniş kitlelere hitap eden tanıtımlar yapmak.
+                </div>
+                <div class="rule-box">
+                    <strong>✗ Neler İçin Uygun Değildir:</strong>
+                    Uzun vadeli, istikrar ve kararlılık gerektiren büyük finansal yatırımlara başlamak (Ay hızlı değişir, kararlar çabuk dalgalanabilir), gayrimenkul alım satımı gibi kalıcılık isteyen işler başlatmak.
+                </div>
+            </div>
+
+            <h3 class="badge-mars">♂ MARS SAATİ (Eylem, Mücadele, Güç, Cesaret)</h3>
+            <div class="rules">
+                <div class="rule-box">
+                    <strong>✓ Neler İçin Uygundur:</strong>
+                    Spor yapmak, ağır fiziksel antrenmanlar, zor kararlar almak, cesaret isteyen adımları atmak, rakiplerle mücadele etmek, teknik işler, tamirat yapmak.
+                </div>
+                <div class="rule-box">
+                    <strong>✗ Neler İçin Uygun Değildir:</strong>
+                    İlişki sorunlarını konuşmak veya uzlaşma aramak (Mars öfke ve kavga getirir), ameliyat ve operasyonlar (kanama riskini artırabilir), sakinlik gerektiren meditasyonlar.
+                </div>
+            </div>
+
+            <h3 class="badge-mercury">☿ MERKÜR SAATİ (İletişim, Ticaret, Eğitim, Analiz)</h3>
+            <div class="rules">
+                <div class="rule-box">
+                    <strong>✓ Neler İçin Uygundur:</strong>
+                    Sözleşme imzalamak, anlaşmalar yapmak, e-posta göndermek, ders çalışmak, yeni bir dil öğrenmek, ticari pazarlıklar, reklam yayınlamak, teknolojik aletler satın almak, seyahate çıkmak.
+                </div>
+                <div class="rule-box">
+                    <strong>✗ Neler İçin Uygun Değildir:</strong>
+                    Duygusal derinlik gerektiren konuşmalar yapmak (zihin çok aktiftir, kalpten ziyade mantık konuşur), zihni susturmaya çalışıp uyumak.
+                </div>
+            </div>
+
+            <h3 class="badge-jupiter">♃ JÜPİTER SAATİ (Bolluk, Bereket, Şans, Bilgelik)</h3>
+            <div class="rules">
+                <div class="rule-box">
+                    <strong>✓ Neler İçin Uygundur:</strong>
+                    Yeni bir iş kurmak, finansal yatırımlar yapmak, para konularını görüşmek, hukuki süreçleri başlatmak, ruhsal pratiklere yönelmek, yabancılarla iş ortaklığı kurmak.
+                </div>
+                <div class="rule-box">
+                    <strong>✗ Neler İçin Uygun Değildir:</strong>
+                    <strong>Diyete başlamak</strong> (Jüpiter genişletir ve büyütür, bu saatte başlanan diyet kilo vermeyi zorlaştırıp iştahı açabilir!), gizli tutulması gereken sırları paylaşmak.
+                </div>
+            </div>
+
+            <h3 class="badge-venus">♀ VENÜS SAATİ (Aşk, İlişkiler, Güzellik, Sanat)</h3>
+            <div class="rules">
+                <div class="rule-box">
+                    <strong>✓ Neler İçin Uygundur:</strong>
+                    İlk randevuya çıkmak, evlilik teklif etmek, ilan-ı aşk etmek, kırgınlıkları gidermek, küslerle barışmak, kişisel bakım yaptırmak, saç kestirmek, estetik müdahaleler, sanatsal aktivitelere katılmak.
+                </div>
+                <div class="rule-box">
+                    <strong>✗ Neler İçin Uygun Değildir:</strong>
+                    Sert disiplin gerektiren işlerle uğraşmak (Venüs tembellik ve keyif verir, odaklanmak zordur), soğuk mantıkla kararlar almaya çalışmak.
+                </div>
+            </div>
+
+            <h3 class="badge-saturn">♄ SATÜRN SAATİ (Disiplin, Sınırlar, Sabır, Yapılandırma)</h3>
+            <div class="rules">
+                <div class="rule-box">
+                    <strong>✓ Neler İçin Uygundur:</strong>
+                    Uzun vadeli planlar yapmak, bütçe hazırlamak, sorumluluk almak, temizlik, arşivleme, temel atmak, inşaat başlatmak, yalnız kalıp derin konsantrasyon gerektiren teknik işler yapmak.
+                </div>
+                <div class="rule-box">
+                    <strong>✗ Neler İçin Uygun Değildir:</strong>
+                    Borç para istemek, kredi başvurusu yapmak (Satürn kısıtlar, ret gelebilir), hızlı sonuç beklediğiniz işlere başlamak, eğlence/parti düzenlemek.
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>3. Haftalık Gezegen Saatleri Tablosu</h2>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Not: Gün doğumu yerel saate göre değiştiği için, her günün "Gündüz 1. Saati" o günkü gün doğumu anıdır. Gün batımı anı ise "Gece 1. Saati"nin başlangıcıdır.</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Saat (Gündüz / Gece)</th>
+                        <th>Pazartesi</th>
+                        <th>Salı</th>
+                        <th>Çarşamba</th>
+                        <th>Perşembe</th>
+                        <th>Cuma</th>
+                        <th>Cumartesi</th>
+                        <th>Pazar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Gündüz 1. Saat</strong> (Gün Doğumu)</td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gündüz 2. Saat</strong></td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gündüz 3. Saat</strong></td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gündüz 4. Saat</strong></td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gündüz 5. Saat</strong></td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gündüz 6. Saat</strong></td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gündüz 7. Saat</strong></td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gündüz 8. Saat</strong></td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gündüz 9. Saat</strong></td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gündüz 10. Saat</strong></td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gündüz 11. Saat</strong></td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gündüz 12. Saat</strong></td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gece 1. Saat</strong> (Gün Batımı)</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gece 2. Saat</strong></td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gece 3. Saat</strong></td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gece 4. Saat</strong></td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gece 5. Saat</strong></td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gece 6. Saat</strong></td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gece 7. Saat</strong></td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gece 8. Saat</strong></td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gece 9. Saat</strong></td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gece 10. Saat</strong></td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gece 11. Saat</strong></td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Gece 12. Saat</strong></td>
+                        <td class="badge-jupiter">Jüpiter ♃</td>
+                        <td class="badge-venus">Venüs ♀</td>
+                        <td class="badge-saturn">Satürn ♄</td>
+                        <td class="badge-sun">Güneş ☉</td>
+                        <td class="badge-moon">Ay ☽</td>
+                        <td class="badge-mars">Mars ♂</td>
+                        <td class="badge-mercury">Merkür ☿</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>4. Hayatın İçinden Kozmik Tavsiyeler</h2>
+            <div class="tips-list">
+                <div class="tip-item">
+                    <strong>Zayıflama / Diyet:</strong>
+                    Diyete başlamak için en kötü an <strong>Jüpiter saatidir</strong> (Jüpiter her şeyi büyütür, iştahı artırır). En doğru an, sınırlandırma getiren <strong>Satürn saatidir</strong>.
+                </div>
+                <div class="tip-item">
+                    <strong>Pazarlık ve Finansal Girişimler:</strong>
+                    Zenginlik ve şans getiren <strong>Jüpiter saatini</strong> tercih edin. **Satürn saatinde** borç istemekten veya kredi çekmekten kaçının, süreç uzayabilir veya reddedilebilirsiniz.
+                </div>
+                <div class="tip-item">
+                    <strong>Aşk ve Barışma Konuşmaları:</strong>
+                    Sevdiğiniz kişiyle sorunları çözmek için **Venüs** veya **Ay** saatini seçin. **Mars saatinde** yapılacak bir konuşma ufak bir anlaşmazlığı kavgaya dönüştürebilir.
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
