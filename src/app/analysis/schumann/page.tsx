@@ -787,20 +787,23 @@ export default function SchumannPage() {
 
               {/* Bars Grid */}
               <div className="flex items-end justify-between h-48 w-full border-b border-white/10 pb-2 gap-1 md:gap-2 px-1">
-                {data?.history.map((item, index) => (
-                  <div 
-                    key={index} 
-                    className="flex-1 flex flex-col items-center h-full justify-end group/bar cursor-pointer"
-                    onMouseEnter={() => setHoveredBar(item)}
-                    onMouseLeave={() => setHoveredBar(null)}
-                  >
-                    {/* The colored bar */}
+                {data?.history.map((item, index) => {
+                  const isForecast = new Date(item.time).getTime() > Date.now();
+                  return (
                     <div 
-                      className={`w-full max-w-[14px] rounded-t transition-all duration-300 ${getKpColorClass(item.kp, item.predicted)}`}
-                      style={{ height: `${Math.max((item.kp / 9) * 100, 6)}%` }}
-                    />
-                  </div>
-                ))}
+                      key={index} 
+                      className="flex-1 flex flex-col items-center h-full justify-end group/bar cursor-pointer"
+                      onMouseEnter={() => setHoveredBar(item)}
+                      onMouseLeave={() => setHoveredBar(null)}
+                    >
+                      {/* The colored bar */}
+                      <div 
+                        className={`w-full max-w-[14px] rounded-t transition-all duration-300 ${getKpColorClass(item.kp, isForecast)}`}
+                        style={{ height: `${Math.max((item.kp / 9) * 100, 6)}%` }}
+                      />
+                    </div>
+                  );
+                })}
               </div>
 
               {/* X Axis Labels */}
