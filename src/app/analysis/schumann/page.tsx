@@ -725,9 +725,9 @@ export default function SchumannPage() {
                 Dünya genelindeki manyetometre ölçüm istasyonlarından gelen verilerin birleştirilmesiyle oluşturulan ve gezegenimizin manyetik alanındaki düzensizlikleri 0 ile 9 arasında ölçen resmi bir küresel endekstir. Kp değerinin 5 ve üzeri olması, küresel çapta bir <strong>Jeomanyetik Fırtına (Geomagnetic Storm)</strong> durumunu gösterir. Bu veriler NOAA tarafından yasal ve telifsiz sunulmaktadır.
               </p>
               <p>
-                <strong>Küresel Güneş Fırtınası vs. Yerel Şimşekler (SOS70 Farkı):</strong>
+                <strong>Küresel Güneş Fırtınası vs. Yerel Atmosferik Gürültü:</strong>
                 <br />
-                Tomsk (SOS70) gibi tekil gözlemevi grafikleri, <em>yerel Sibirya yıldırım/şimşek fırtınaları</em> olduğunda da bembeyaz patlamalar gösterir. Ancak bu lokal olaylar tüm insanlığı etkilemez. Bizim kullandığımız küresel Kp endeksi ise sadece Dünya'yı ve insan biyo-alanını doğrudan etkileyen <strong>gerçek küresel güneş fırtınası hareketlerini</strong> filtreleyerek en doğru enerjisel uyarımı gösterir.
+                Tekil ve bölgesel gözlemevi grafikleri (örneğin sadece belirli bir bölgedeki ölçüm istasyonları), o bölgedeki <em>yerel yıldırım, şimşek veya hava olayları</em> nedeniyle de yüksek genlikli beyaz patlamalar gösterebilir. Ancak bu lokal olaylar küresel insan bilincini ve biyolojisini etkilemez. Bizim kullandığımız küresel Kp endeksi ise yerel gürültüleri filtreleyerek sadece Dünya'nın tamamını ve insan biyo-alanını doğrudan etkileyen <strong>gerçek jeomanyetik güneş fırtınası hareketlerini</strong> gösterir.
               </p>
             </div>
             <div className="space-y-4">
@@ -739,7 +739,7 @@ export default function SchumannPage() {
               <p>
                 <strong>Saat Dilimi ve Yerel Saat Dönüşümü:</strong>
                 <br />
-                Tomsk gözlemevi grafiği Sibirya yerel saatine (UTC+7) göre çizilir. Bu gösterge paneli ise NOAA verilerini <strong>tamamen sizin yerel tarayıcı saat diliminize (örneğin Türkiye saati UTC+3)</strong> dönüştürerek gösterir. Bu nedenle iki grafik arasında 4 saatlik bir görsel kayma yaşanması tamamen normaldir; buradaki saatler doğrudan kendi gününüzdeki anı temsil eder.
+                Bölgesel gözlemevi grafikleri genellikle istasyonun kurulu olduğu ülkenin veya şehrin yerel saat dilimine göre çizilir (örneğin Asya/Sibirya gözlemevleri kendi yerel saat dilimini kullanır). Bu gösterge paneli ise uluslararası uzay havası verilerini <strong>tamamen sizin cihazınızın yerel saat dilimine (örneğin Türkiye saati UTC+3)</strong> dönüştürerek gösterir. Bu nedenle yabancı grafiklerle aranızda saat farkı bulunması tamamen normaldir; buradaki saatler doğrudan kendi gününüzdeki anı temsil eder.
               </p>
             </div>
           </div>
