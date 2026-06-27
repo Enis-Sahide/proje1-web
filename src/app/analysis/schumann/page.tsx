@@ -20,6 +20,15 @@ interface KpData {
   history: KpHistoryItem[];
 }
 
+interface HoverInfo {
+  left: number;
+  top: number;
+  timeStr: string;
+  kp: number;
+  isForecast: boolean;
+  spiritualStatus: string;
+}
+
 export default function SchumannPage() {
   const router = useRouter();
   const { role } = useAuth();
@@ -31,6 +40,10 @@ export default function SchumannPage() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
   const [notificationMsg, setNotificationMsg] = useState<string | null>(null);
   const [hoveredBar, setHoveredBar] = useState<KpHistoryItem | null>(null);
+  
+  // Interactive Hover Spectrogram State
+  const [hoveredX, setHoveredX] = useState<number | null>(null);
+  const [hoverInfo, setHoverInfo] = useState<HoverInfo | null>(null);
 
   // Load notification state from localStorage
   useEffect(() => {
@@ -340,7 +353,17 @@ export default function SchumannPage() {
       ctx.fillText('ŞİMDİ', nowX, graphTop + 12);
     }
 
-    // 6. Draw horizontal grid lines and frequency labels (overlay)
+    // 6. Draw interactive hovered scanline guide
+    if (hoveredX !== null) {
+      ctx.strokeStyle = 'rgba(0, 229, 255, 0.5)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(hoveredX, graphTop);
+      ctx.lineTo(hoveredX, graphBottom);
+      ctx.stroke();
+    }
+
+    // 7. Draw horizontal grid lines and frequency labels (overlay)
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
     ctx.lineWidth = 1;
     const labelResonances = [7.83, 14, 20, 26, 32];
@@ -357,10 +380,68 @@ export default function SchumannPage() {
       ctx.fillText(`${res} Hz`, 18, y - 4);
     });
 
-  }, [data, timestamp]);
+  }, [data, timestamp, hoveredX]);
 
   const handleRefresh = () => {
     fetchData();
+  };
+
+  // Handle interactive mouse moves over the spectrogram
+  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
+    const canvas = canvasRef.current;
+    if (!canvas || !data || !data.history || data.history.length === 0) return;
+    
+    const rect = canvas.getBoundingClientRect();
+    const xPct = (e.clientX - rect.left) / rect.width;
+    const xCanvas = xPct * canvas.width;
+
+    const cols = data.history;
+    const startTimeMs = new Date(cols[0].time + 'Z').getTime();
+    const totalDurationMs = cols.length * 3 * 60 * 60 * 1000;
+    const targetTimeMs = startTimeMs + xPct * totalDurationMs;
+    const targetDate = new Date(targetTimeMs);
+
+    const dayNames = ['Pazar', 'Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi'];
+    const monthNames = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+    const timeStr = `${targetDate.getDate()} ${monthNames[targetDate.getMonth()]} ${dayNames[targetDate.getDay()]} ${String(targetDate.getHours()).padStart(2, '0')}:${String(targetDate.getMinutes()).padStart(2, '0')}`;
+
+    // Interpolate Kp index value at hover coordinate
+    const indexFloat = xPct * (cols.length - 1);
+    const indexLow = Math.floor(indexFloat);
+    const indexHigh = Math.min(indexLow + 1, cols.length - 1);
+    const weight = indexFloat - indexLow;
+    
+    const kpLow = cols[indexLow].kp;
+    const kpHigh = cols[indexHigh].kp;
+    const kp = kpLow + (kpHigh - kpLow) * weight;
+
+    const isForecast = targetTimeMs > Date.now();
+
+    // Set spiritual guidance tooltip message
+    let spiritualStatus = 'Dengeli Enerji Akışı';
+    if (kp >= 5.0) spiritualStatus = 'DNA Aktivasyonu & Kozmik Uyanış Portalı';
+    else if (kp >= 4.0) spiritualStatus = 'Yüksek Sezgi ve Hücresel Aktiviteler';
+    else if (kp >= 3.0) spiritualStatus = 'Enerjisel Kıpırdanma ve Yenilenme';
+
+    // absolute positioning inside the relative container
+    const containerRect = canvas.parentElement?.getBoundingClientRect();
+    const left = e.clientX - (containerRect?.left ?? 0);
+    const top = e.clientY - (containerRect?.top ?? 0) - 20;
+
+    setHoverInfo({
+      left,
+      top,
+      timeStr,
+      kp,
+      isForecast,
+      spiritualStatus
+    });
+    setHoveredX(xCanvas);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredX(null);
+    setHoverInfo(null);
   };
 
   const getKpColorClass = (kp: number, predicted?: boolean) => {
@@ -573,7 +654,7 @@ export default function SchumannPage() {
               Canlı Kozmik Enerji Spektrogramı (Son 72 Saat)
             </h2>
             <p className="text-xs text-mystic-text-muted mt-1">
-              Frekans dalgalanmalarını ve Kp Index kaynaklı enerjisel fırtına (beyaz patlamalar) durumunu izleyin.
+              Frekans dalgalanmalarını ve Kp Index kaynaklı enerjisel fırtına (beyaz patlamalar) durumunu izleyin. (Saat bilgisi için grafiğin üzerine gelin)
             </p>
           </div>
 
@@ -588,14 +669,45 @@ export default function SchumannPage() {
                 <span className="w-1.5 h-1.5 rounded-full bg-white"></span> Canlı İzleme
               </div>
 
-              {/* Responsive canvas container */}
-              <div className="w-full max-w-full overflow-x-auto flex flex-col items-center px-4">
+              {/* Interactive Spectrogram Area with HTML Tooltip overlay */}
+              <div className="w-full max-w-full overflow-x-auto flex flex-col items-center px-4 relative">
+                
                 <canvas 
                   ref={canvasRef} 
                   width={800} 
                   height={270}
-                  className="rounded-lg border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)]"
+                  onMouseMove={handleMouseMove}
+                  onMouseLeave={handleMouseLeave}
+                  className="rounded-lg border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)] cursor-crosshair"
                 />
+
+                {/* Floating Interactive Tooltip */}
+                {hoverInfo && (
+                  <div 
+                    className="absolute bg-[#08080C]/95 border border-[#00E5FF]/40 backdrop-blur-md rounded-2xl p-4 text-xs shadow-[0_10px_30px_rgba(0,229,255,0.25)] pointer-events-none z-20 flex flex-col gap-2 text-left animate-in fade-in zoom-in-95 duration-100 min-w-[200px]"
+                    style={{ 
+                      left: `${hoverInfo.left}px`, 
+                      top: `${hoverInfo.top}px`,
+                      transform: 'translate(-50%, -115%)'
+                    }}
+                  >
+                    <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-1.5">
+                      <span className="font-bold text-[#00E5FF] font-mono">{hoverInfo.timeStr}</span>
+                      <span className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wide ${
+                        hoverInfo.isForecast ? 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/20' : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
+                      }`}>
+                        {hoverInfo.isForecast ? 'Tahmin' : 'Ölçüm'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 mt-1">
+                      <span className="text-mystic-text-muted">Manyetik Akış:</span>
+                      <span className="font-extrabold text-white font-mono">{hoverInfo.kp.toFixed(2)} Kp</span>
+                    </div>
+                    <div className="text-[10px] text-cyan-300 font-semibold border-t border-white/5 pt-1.5 mt-0.5">
+                      {hoverInfo.spiritualStatus}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <p className="text-center text-xs text-mystic-text-muted max-w-xl mt-6 px-4">
@@ -733,7 +845,7 @@ export default function SchumannPage() {
               <p>
                 <strong>Küresel Güneş Fırtınası vs. Yerel Atmosferik Gürültü:</strong>
                 <br />
-                Tekil ve bölgesel gözlemevi grafikleri (örneğin sadece belirli bir bölgedeki ölçüm istasyonları), o bölgedeki <em>yerel yıldırım, şimşek veya hava olayları</em> nedeniyle de yüksek genlikli beyaz patlamalar gösterebilir. Ancak bu lokal olaylar küresel insan bilincini ve biyolojisini etkilemez. Bizim kullandığımız küresel Kp endeksi ise yerel gürültüleri filtreleyerek sadece Dünya'nın tamamını ve insan biyo-alanını doğrudan etkileyen <strong>gerçek jeomanyetik güneş fırtınası hareketlerini</strong> gösterir.
+                Tekil ve bölgesel gözlemevi grafikleri (örneğin sadece belirli bir bölgedeki ölçüm istasyonları), o bölgedeki <em>yerel yıldırım, şimşek veya hava olayları</em> nedeniyle de yüksek genlikli beyaz patlamalar gösterebilir. Ancak bu lokal olaylar küresel insan bilincini ve biyolojisini etkilemez. Bizim kullandığımız küresel Kp endeksi ise yerel gürültüleri filtreleyerek sadece Dünya'nın tamamını ve insan biyo-alanını doğrudan etkileyen <strong>gerçek jeomanyetik güneş fıntınası hareketlerini</strong> gösterir.
               </p>
             </div>
             <div className="space-y-4">
