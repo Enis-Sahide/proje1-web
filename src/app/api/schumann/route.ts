@@ -1,5 +1,7 @@
 import { json, errorJson, preflight } from '@/lib/http/cors';
 
+export const dynamic = 'force-dynamic';
+
 export async function OPTIONS() {
   return preflight();
 }
