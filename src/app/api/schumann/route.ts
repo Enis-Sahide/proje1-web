@@ -50,29 +50,63 @@ function getStatusInfo(kp: number) {
 
 export async function GET() {
   try {
-    const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index.json', {
-      next: { revalidate: 3600 } // cache for 1 hour (3600 seconds) since Kp index updates every 3 hours
+    // Fetch from the combined observed + forecast endpoint
+    const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json', {
+      next: { revalidate: 3600 } // cache for 1 hour
     });
     if (!res.ok) {
       throw new Error(`NOAA API responded with status: ${res.status}`);
     }
     const list = await res.json();
     
-    // Sort and clean history (last 24 measurements represents the last 72 hours in 3-hour blocks)
-    const history = list.map((item: any) => ({
-      time: item.time_tag,
-      kp: parseFloat(item.Kp)
-    })).slice(-24);
+    // Find index of the last observed reading
+    const lastObservedIndex = list.map((item: any) => item.observed).lastIndexOf('observed');
+    
+    let past: any[] = [];
+    let future: any[] = [];
+    let currentKp = 0;
+    let lastReadingTime = '';
 
-    const lastReading = list[list.length - 1];
-    const currentKp = parseFloat(lastReading.Kp);
+    if (lastObservedIndex !== -1) {
+      // Get the last 16 observed readings (past 48 hours)
+      const startIdx = Math.max(0, lastObservedIndex - 15);
+      past = list.slice(startIdx, lastObservedIndex + 1);
+      
+      // Get the next 8 predicted readings (future 24 hours)
+      future = list.slice(lastObservedIndex + 1, lastObservedIndex + 9);
+      
+      const lastObserved = list[lastObservedIndex];
+      currentKp = parseFloat(lastObserved.kp);
+      lastReadingTime = lastObserved.time_tag;
+    } else {
+      // Fallback if no 'observed' flag is found (slice last 24)
+      past = list.slice(-24);
+      const lastItem = list[list.length - 1];
+      currentKp = parseFloat(lastItem.kp);
+      lastReadingTime = lastItem.time_tag;
+    }
+
+    // Combine history with a predicted flag
+    const history = [
+      ...past.map((item: any) => ({
+        time: item.time_tag,
+        kp: parseFloat(item.kp),
+        predicted: false
+      })),
+      ...future.map((item: any) => ({
+        time: item.time_tag,
+        kp: parseFloat(item.kp),
+        predicted: true
+      }))
+    ];
+
     const status = getStatusInfo(currentKp);
 
     return json({
       current_kp: currentKp,
       status_label: status.label,
       status_desc: status.desc,
-      updated_at: lastReading.time_tag,
+      updated_at: lastReadingTime,
       history: history
     });
   } catch (error: any) {
