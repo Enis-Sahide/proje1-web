@@ -715,36 +715,31 @@ export default function SchumannPage() {
         <div className="bg-black/40 border border-white/10 rounded-3xl p-8 backdrop-blur-md">
           <h3 className="text-2xl font-bold mb-6 text-white flex items-center gap-2">
             <Info size={22} className="text-[#00E5FF]" />
-            Jeomanyetik Kp İndeksi Nedir?
+            Jeomanyetik Rezonans Kılavuzu
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm text-mystic-text-muted">
             <div className="space-y-4">
               <p>
-                <strong>Planetary K-Index (Kp Endeksi)</strong>, Dünya genelindeki manyetometre ölçüm istasyonlarından gelen verilerin birleştirilmesiyle oluşturulan ve gezegenimizin manyetik alanındaki düzensizlikleri ölçen küresel bir endekstir.
+                <strong>Planetary K-Index (Kp Endeksi) Nedir?</strong>
+                <br />
+                Dünya genelindeki manyetometre ölçüm istasyonlarından gelen verilerin birleştirilmesiyle oluşturulan ve gezegenimizin manyetik alanındaki düzensizlikleri 0 ile 9 arasında ölçen resmi bir küresel endekstir. Kp değerinin 5 ve üzeri olması, küresel çapta bir <strong>Jeomanyetik Fırtına (Geomagnetic Storm)</strong> durumunu gösterir. Bu veriler NOAA tarafından yasal ve telifsiz sunulmaktadır.
               </p>
               <p>
-                0 ile 9 arasında logaritmik bir skala kullanan bu endeks, kozmik rüzgarların ve güneş patlamalarının Dünya manyetosferinde oluşturduğu baskıyı temsil eder. Kp değerinin 5 ve üzeri olması resmi olarak bir **Jeomanyetik Fırtına (Geomagnetic Storm)** durumuna işaret eder.
-              </p>
-              <p>
-                Bu veri akışı, Amerika Birleşik Devletleri Ulusal Okyanus ve Atmosfer Dairesi (NOAA) tarafından **tamamen açık, resmi ve telifsiz** olarak sağlanmaktadır.
+                <strong>Küresel Güneş Fırtınası vs. Yerel Şimşekler (SOS70 Farkı):</strong>
+                <br />
+                Tomsk (SOS70) gibi tekil gözlemevi grafikleri, <em>yerel Sibirya yıldırım/şimşek fırtınaları</em> olduğunda da bembeyaz patlamalar gösterir. Ancak bu lokal olaylar tüm insanlığı etkilemez. Bizim kullandığımız küresel Kp endeksi ise sadece Dünya'yı ve insan biyo-alanını doğrudan etkileyen <strong>gerçek küresel güneş fırtınası hareketlerini</strong> filtreleyerek en doğru enerjisel uyarımı gösterir.
               </p>
             </div>
             <div className="space-y-4">
               <p>
                 <strong>Güneş Fırtınası ve Biyolojik Etkiler:</strong>
                 <br />
-                Dünya'nın manyetik alanı ile insan biyolojisi (özellikle kalp ritmi değişkenliği, sinir sistemi dengesi ve melatonin salgısı) arasında yakın bir ilişki vardır. 
+                Dünya'nın elektromanyetik kalkanı ile insan kalp ritmi, sinir sistemi dengesi ve melatonin salgısı doğrudan senkronizedir. Kp endeksinin yükseldiği (grafikte sarı, turuncu ve beyaz patlama olarak gösterilen) günlerde baş ağrısı, yorgunluk, rüyalarda aşırı berraklık veya uyku bozuklukları gibi kozmik adaptasyon semptomları yaşanması bilimsel olarak oldukça yaygındır.
               </p>
               <p>
-                Kp endeksinin yükseldiği jeomanyetik fırtına günlerinde, insanların biyolojik manyetik dengeleri etkilenerek şu semptomları yaşaması oldukça yaygındır:
+                <strong>Saat Dilimi ve Yerel Saat Dönüşümü:</strong>
                 <br />
-                * Baş ağrısı ve migren tetiklenmeleri
-                <br />
-                * Aşırı yorgunluk veya tam aksine uykuya dalamama
-                <br />
-                * Duygusal hassasiyet ve ani duygu durum değişiklikleri
-                <br />
-                * Sezgilerin ve rüyaların son derece berraklaşması
+                Tomsk gözlemevi grafiği Sibirya yerel saatine (UTC+7) göre çizilir. Bu gösterge paneli ise NOAA verilerini <strong>tamamen sizin yerel tarayıcı saat diliminize (örneğin Türkiye saati UTC+3)</strong> dönüştürerek gösterir. Bu nedenle iki grafik arasında 4 saatlik bir görsel kayma yaşanması tamamen normaldir; buradaki saatler doğrudan kendi gününüzdeki anı temsil eder.
               </p>
             </div>
           </div>
