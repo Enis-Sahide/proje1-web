@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Lock } from 'lucide-react';
+import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Lock, Activity } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 interface ToolItem {
@@ -67,6 +67,14 @@ export default function AnalysisPage() {
       icon: <Sparkles size={32} />,
       color: '#FF2D55',
       link: '/analysis/chakra'
+    },
+    {
+      id: 'schumann',
+      title: 'Schumann Rezonansı',
+      description: 'Dünya\'nın kalp atışlarını ve anlık elektromanyetik alan etkilerini takip edin.',
+      icon: <Activity size={32} />,
+      color: '#00E5FF',
+      link: '/analysis/schumann'
     }
   ];
 
