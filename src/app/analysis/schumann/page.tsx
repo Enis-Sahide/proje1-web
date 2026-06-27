@@ -84,11 +84,12 @@ export default function SchumannPage() {
   // Helper for smooth continuous resonance color stops based on Kp index
   const getResonanceColor = (kp: number) => {
     const stops = [
-      { kp: 0.0, r: 0, g: 130, b: 150 },   // Deep green-blue (quiet)
+      { kp: 0.0, r: 0, g: 110, b: 140 },   // Deep green-blue (quiet)
       { kp: 2.0, r: 16, g: 185, b: 129 },  // Emerald green (normal)
       { kp: 3.5, r: 245, g: 158, b: 11 },  // Amber/yellow (unsettled)
-      { kp: 4.8, r: 239, g: 68, b: 68 },   // Bright red (active)
-      { kp: 6.0, r: 255, g: 255, b: 255 }  // Solid white (storm)
+      { kp: 4.3, r: 249, g: 115, b: 22 },  // Orange (active)
+      { kp: 4.8, r: 239, g: 68, b: 68 },   // Red (high)
+      { kp: 5.2, r: 255, g: 255, b: 255 }  // Solid white (storm)
     ];
 
     let low = stops[0];
@@ -146,18 +147,18 @@ export default function SchumannPage() {
       const kpHigh = cols[indexHigh].kp;
       const kp = kpLow + (kpHigh - kpLow) * weight;
 
-      // Base background color (fades smoothly to white glow if Kp is high)
+      // Base background color (blends smoothly to solid white if Kp is high)
       let baseR = 3;
       let baseG = 3;
-      let baseB = 12;
+      let baseB = 10;
 
-      if (kp >= 4.0) {
+      if (kp >= 4.5) {
         // Continuous fading white-out background glow
-        const stormGlowFactor = Math.min(1, (kp - 4.0) / 1.8);
-        const glowIntensity = stormGlowFactor * 190;
+        const stormGlowFactor = Math.min(1, (kp - 4.5) / 0.7); // Reaches 100% white at Kp = 5.2
+        const glowIntensity = stormGlowFactor * 252;
         baseR += glowIntensity;
-        baseG += glowIntensity * 0.95;
-        baseB += glowIntensity * 0.85;
+        baseG += glowIntensity;
+        baseB += glowIntensity * 0.95;
       }
 
       // Smooth resonance color calculation
@@ -181,8 +182,8 @@ export default function SchumannPage() {
           }
         });
 
-        // Add soft organic noise
-        const noise = (Math.random() - 0.5) * 12;
+        // Add soft organic sensor noise (applied identically to RGB to keep it greyscale/natural)
+        const sensorNoise = (Math.random() - 0.5) * 8;
 
         let r = baseR;
         let g = baseG;
@@ -192,22 +193,26 @@ export default function SchumannPage() {
           // Quadratic falloff for smooth glowing edges on the horizontal lines
           const strength = Math.pow(Math.max(0, 1 - resonanceDist / 2.0), 2.2);
           
-          r += resColor.r * strength + noise;
-          g += resColor.g * strength + noise;
+          r += resColor.r * strength;
+          g += resColor.g * strength;
           b += resColor.b * strength;
         }
 
-        // Add vertical scanline noise during active/storm states
+        // Add vertical scanline noise during active/storm states (Kp >= 4.0)
         if (kp >= 4.0) {
-          // Vertical scanning lines frequency
-          const verticalPattern = Math.sin(y * 0.1) * Math.cos(x * 0.05);
-          if (verticalPattern > 0.3) {
-            const scanStrength = (kp / 9) * 35;
+          const scanPattern = Math.sin(y * 0.1) * Math.cos(x * 0.05);
+          if (scanPattern > 0.4) {
+            const scanStrength = (kp / 9) * 20;
             r += scanStrength;
-            g += scanStrength * 0.9;
-            b += scanStrength * 0.8;
+            g += scanStrength;
+            b += scanStrength;
           }
         }
+
+        // Apply sensor noise
+        r += sensorNoise;
+        g += sensorNoise;
+        b += sensorNoise;
 
         r = Math.min(255, Math.max(0, r));
         g = Math.min(255, Math.max(0, g));
