@@ -63,9 +63,9 @@ export default function SchumannPage() {
       }
       const jsonData = await res.json();
       
-      // Limit history to the last 8 items (last 24 hours of 3-hourly blocks)
+      // Limit history to the last 24 items (last 72 hours of 3-hourly blocks)
       if (jsonData && jsonData.history) {
-        jsonData.history = jsonData.history.slice(-8);
+        jsonData.history = jsonData.history.slice(-24);
       }
       setData(jsonData);
       setTimestamp(Date.now());
@@ -97,7 +97,7 @@ export default function SchumannPage() {
     ctx.fillStyle = '#030308';
     ctx.fillRect(0, 0, width, graphHeight);
 
-    const cols = data.history; // Exactly 8 blocks representing the last 24 hours
+    const cols = data.history; // Exactly 24 blocks representing the last 72 hours
 
     // 1. Draw Spectrogram Data Column by Column
     for (let x = 0; x < width; x++) {
@@ -203,33 +203,46 @@ export default function SchumannPage() {
     ctx.lineTo(width, graphHeight);
     ctx.stroke();
 
-    // 3. Draw Vertical Hour Grid Lines & Labels centered on each hour
-    const startDateTime = new Date(cols[0].time + 'Z');
-    
-    for (let h = 0; h <= 24; h++) {
-      const x = (h / 24) * width;
+    // 3. Draw Vertical Hour Grid Lines & Labels centered on each 3-hour block
+    for (let h = 0; h <= cols.length; h++) {
+      const x = (h / cols.length) * width;
       
       // Draw vertical grid line (dashed/subtle)
-      ctx.strokeStyle = h % 3 === 0 ? 'rgba(255, 255, 255, 0.18)' : 'rgba(255, 255, 255, 0.06)';
+      ctx.strokeStyle = h % 8 === 0 ? 'rgba(255, 255, 255, 0.25)' : 'rgba(255, 255, 255, 0.08)';
       ctx.beginPath();
       ctx.moveTo(x, 0);
       ctx.lineTo(x, graphHeight);
       ctx.stroke();
 
-      if (h < 24) {
+      if (h < cols.length) {
         // Calculate the exact hour label
-        const date = new Date(startDateTime.getTime() + h * 3600 * 1000);
+        const date = new Date(cols[h].time + 'Z');
         const hourLabel = String(date.getHours()).padStart(2, '0');
         
-        ctx.fillStyle = h % 3 === 0 ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.3)';
-        ctx.font = h % 3 === 0 ? 'bold 8px monospace' : '8px monospace';
+        ctx.fillStyle = h % 8 === 0 ? 'rgba(255, 255, 255, 0.8)' : 'rgba(255, 255, 255, 0.4)';
+        ctx.font = h % 8 === 0 ? 'bold 8px monospace' : '8px monospace';
         ctx.textAlign = 'center';
-        // Center text on the grid line
-        ctx.fillText(hourLabel, x, height - 8);
+        // Center text in the middle of each block segment
+        ctx.fillText(hourLabel, x + (width / cols.length) / 2, height - 8);
       }
     }
 
-    // 4. Draw horizontal grid lines and frequency labels (overlay)
+    // 4. Draw Date Labels at the top of the canvas (centered for each day of 8 segments)
+    if (cols.length >= 24) {
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+      ctx.font = 'bold 9px sans-serif';
+      ctx.textAlign = 'center';
+      
+      const date1 = new Date(cols[0].time + 'Z');
+      const date2 = new Date(cols[8].time + 'Z');
+      const date3 = new Date(cols[16].time + 'Z');
+
+      ctx.fillText(date1.toLocaleDateString('tr-TR'), (4 / 24) * width, 18);
+      ctx.fillText(date2.toLocaleDateString('tr-TR'), (12 / 24) * width, 18);
+      ctx.fillText(date3.toLocaleDateString('tr-TR'), (20 / 24) * width, 18);
+    }
+
+    // 5. Draw horizontal grid lines and frequency labels (overlay)
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
     ctx.lineWidth = 1;
     const labelResonances = [7.83, 14, 20, 26, 32];
@@ -458,7 +471,7 @@ export default function SchumannPage() {
           <div className="border-b border-white/10 pb-4 mb-6">
             <h2 className="text-xl font-bold flex items-center gap-2 text-white">
               <Waves size={22} className="text-[#00E5FF]" />
-              Canlı Kozmik Enerji Spektrogramı (Son 24 Saat)
+              Canlı Kozmik Enerji Spektrogramı (Son 72 Saat)
             </h2>
             <p className="text-xs text-mystic-text-muted mt-1">
               Frekans dalgalanmalarını ve Kp Index kaynaklı enerjisel fırtına (beyaz patlamalar) durumunu izleyin.
@@ -487,7 +500,7 @@ export default function SchumannPage() {
               </div>
 
               <p className="text-center text-xs text-mystic-text-muted max-w-xl mt-6 px-4">
-                * Grafik, NOAA Kp-Index verilerinden simüle edilen 24 saatlik elektromanyetik akışı temsil eder. Dikey eksen rezonans frekanslarını (Hz), yatay eksen ise zamanı gösterir. Grafikteki beyaz dik çizgiler enerji fırtınalarını simgeler.
+                * Grafik, NOAA Kp-Index verilerinden simüle edilen 72 saatlik elektromanyetik akışı temsil eder. Dikey eksen rezonans frekanslarını (Hz), yatay eksen ise zamanı gösterir. Grafikteki beyaz dik çizgiler enerji fırtınalarını simgeler.
               </p>
             </div>
           )}
@@ -498,10 +511,10 @@ export default function SchumannPage() {
           <div className="border-b border-white/10 pb-4 mb-6">
             <h2 className="text-xl font-bold flex items-center gap-2 text-white">
               <Activity size={22} className="text-[#00E5FF]" />
-              Jeomanyetik Kp Eğilim Grafiği (Son 24 Saat)
+              Jeomanyetik Kp Eğilim Grafiği (Son 72 Saat)
             </h2>
             <p className="text-xs text-mystic-text-muted mt-1">
-              Ölçülen jeomanyetik fırtına değerlerinin son 24 saatteki saatlik blok gösterimi.
+              Ölçülen jeomanyetik fırtına değerlerinin son 3 günlük (72 saat) saatlik blok gösterimi.
             </p>
           </div>
 
@@ -530,7 +543,7 @@ export default function SchumannPage() {
               </div>
 
               {/* Bars Grid */}
-              <div className="flex items-end justify-between h-48 w-full border-b border-white/10 pb-2 gap-2 md:gap-4 px-2">
+              <div className="flex items-end justify-between h-48 w-full border-b border-white/10 pb-2 gap-1 md:gap-2 px-1">
                 {data?.history.map((item, index) => (
                   <div 
                     key={index} 
@@ -540,7 +553,7 @@ export default function SchumannPage() {
                   >
                     {/* The colored bar */}
                     <div 
-                      className={`w-full max-w-[28px] rounded-t transition-all duration-300 ${getKpColorClass(item.kp)}`}
+                      className={`w-full max-w-[14px] rounded-t transition-all duration-300 ${getKpColorClass(item.kp)}`}
                       style={{ height: `${Math.max((item.kp / 9) * 100, 6)}%` }}
                     />
                   </div>
@@ -548,12 +561,17 @@ export default function SchumannPage() {
               </div>
 
               {/* X Axis Labels */}
-              <div className="flex justify-between text-[10px] text-mystic-text-muted mt-2 px-1">
-                {data?.history.map((item, index) => (
-                  <span key={index} className="text-center w-16 font-mono">
-                    {formatTime(item.time).split(' ')[1]}
-                  </span>
-                ))}
+              <div className="flex justify-between text-[9px] text-mystic-text-muted mt-2 px-1">
+                {data?.history.map((item, index) => {
+                  if (index % 4 === 0) {
+                    return (
+                      <span key={index} className="text-center w-12 font-mono">
+                        {formatTime(item.time).split(' ')[1]}
+                      </span>
+                    );
+                  }
+                  return <span key={index} className="w-0 overflow-hidden" />;
+                })}
               </div>
 
               {/* Y Axis Legend indicators */}
