@@ -6,12 +6,18 @@ import { useEffect, useState } from 'react';
 // sayfa ömrü boyunca tek fetch). Dinamik güncelleme için sayfa yenilenmesi yeterli.
 const cache = new Map<string, unknown>();
 
-export function useContent<T = any>(path: string) {
-  const [data, setData] = useState<T | null>((cache.get(path) as T) ?? null);
-  const [loading, setLoading] = useState(!cache.has(path));
+export function useContent<T = any>(path: string | null) {
+  const [data, setData] = useState<T | null>(path ? (cache.get(path) as T) ?? null : null);
+  const [loading, setLoading] = useState(path ? !cache.has(path) : false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!path) {
+      setData(null);
+      setLoading(false);
+      setError(null);
+      return;
+    }
     let active = true;
     if (cache.has(path)) {
       setData(cache.get(path) as T);

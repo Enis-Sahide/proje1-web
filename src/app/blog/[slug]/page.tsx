@@ -7,10 +7,12 @@ import { useContent } from '@/lib/useContent';
 
 export default function BlogDetailPage() {
   const router = useRouter();
-  const { slug } = useParams();
+  const params = useParams();
+  const slug = params?.slug;
+  const slugStr = typeof slug === 'string' ? slug : Array.isArray(slug) ? slug[0] : null;
 
   // Fetch blog detail by slug
-  const { data: post, error, loading } = useContent<any>(slug ? `/api/content/blog/${slug}` : null);
+  const { data: post, error, loading } = useContent<any>(slugStr ? `/api/content/blog/${slugStr}` : null);
 
   if (loading) {
     return (
