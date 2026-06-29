@@ -483,7 +483,7 @@ export default function SchumannPage() {
 
   const formatTime = (timeStr: string) => {
     try {
-      const d = new Date(timeStr);
+      const d = new Date(timeStr.endsWith('Z') ? timeStr : timeStr + 'Z');
       const dayNames = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
       const day = dayNames[d.getDay()];
       const hours = String(d.getHours()).padStart(2, '0');
@@ -496,7 +496,7 @@ export default function SchumannPage() {
 
   const formatTimeRange = (timeStr: string) => {
     try {
-      const dStart = new Date(timeStr);
+      const dStart = new Date(timeStr.endsWith('Z') ? timeStr : timeStr + 'Z');
       const dEnd = new Date(dStart.getTime() + 3 * 60 * 60 * 1000);
       const dayNames = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
       
@@ -809,7 +809,7 @@ export default function SchumannPage() {
               {/* Bars Grid */}
               <div className="flex items-end justify-between h-48 w-full border-b border-white/10 pb-2 gap-1 md:gap-2 px-1">
                 {data?.history.map((item, index) => {
-                  const isForecast = new Date(item.time).getTime() > Date.now();
+                  const isForecast = new Date(item.time.endsWith('Z') ? item.time : item.time + 'Z').getTime() > Date.now();
                   return (
                     <div 
                       key={index} 
