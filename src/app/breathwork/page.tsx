@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Play, Square, X, Wind, Lock, Sparkles, ShieldAlert } from 'lucide-react';
+import { Play, Square, X, Wind, Lock, Sparkles, ShieldAlert, Info, ChevronDown } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useContent } from '@/lib/useContent';
 import { useRouter } from 'next/navigation';
@@ -22,6 +22,7 @@ export default function BreathworkPage() {
   const { data: techData } = useContent<any[]>('/api/content/breathwork');
   const TECHNIQUES = techData ?? [];
   const [activeTech, setActiveTech] = useState<any>(null);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
@@ -163,6 +164,29 @@ export default function BreathworkPage() {
         <p className="text-mystic-text-muted text-lg mb-8 text-center md:text-left">
           Yaşam enerjisini (Prana) doğru kullanarak bedeninizi ve zihninizi şifalandırın.
         </p>
+
+        {/* Collapsible Guidelines */}
+        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 mb-8 backdrop-blur-md relative overflow-hidden transition-all duration-300">
+          <button 
+            onClick={() => setIsGuideOpen(!isGuideOpen)}
+            className="w-full flex items-center justify-between font-bold text-white text-base text-left focus:outline-none cursor-pointer"
+          >
+            <span className="flex items-center gap-3 text-mystic-accent">
+              <Info className="text-mystic-accent animate-pulse" size={20} />
+              Nefes Çalışmalarında Dikkat Edilmesi Gerekenler
+            </span>
+            <ChevronDown className={`text-mystic-text-muted transition-transform duration-300 ${isGuideOpen ? 'rotate-180 text-white' : ''}`} size={20} />
+          </button>
+          {isGuideOpen && (
+            <div className="mt-5 pt-5 border-t border-white/10 text-sm text-mystic-text-muted space-y-3.5 leading-relaxed animate-in fade-in slide-in-from-top-4 duration-300">
+              <p>• <strong className="text-white">Ortam ve Havalandırma:</strong> Egzersizleri sessiz, temiz ve önceden iyice havalandırılmış bir odada yapın.</p>
+              <p>• <strong className="text-white">Duruş:</strong> Enerji kanallarının (nadi) rahatça açılması için omurganız mutlaka dik olmalıdır. Rahatça oturabilir veya gerekiyorsa düz uzanabilirsiniz.</p>
+              <p>• <strong className="text-white">Zorlamama:</strong> Nefesinizi tutarken veya akciğerleri boşaltırken kendinizi asla aşırı zorlamayın. Doğal kapasitenizin sınırlarında kalın.</p>
+              <p>• <strong className="text-white">Açlık Durumu:</strong> Egzersizlerin aç karnına ya da hafif bir yemekten en az 2 saat sonra yapılması tavsiye edilir.</p>
+              <p>• <strong className="text-white">Vücut Tepkileri:</strong> Hafif baş dönmesi, karıncalanma veya sıcaklık artışı normaldir. Ancak aşırı rahatsızlık hissederseniz egzersizi durdurup normal nefesinize geçin.</p>
+            </div>
+          )}
+        </div>
 
         {/* Breathing Player UI */}
         {activeTech && (
