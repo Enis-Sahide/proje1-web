@@ -40,7 +40,7 @@ export default function BlogDetailPage() {
             onClick={() => router.push('/blog')}
             className="flex items-center justify-center gap-2 bg-mystic-primary text-black font-bold text-sm px-6 py-2.5 rounded-xl hover:bg-[#D4AF37] transition-all w-full cursor-pointer"
           >
-            <ArrowLeft size={16} /> Kütüphaneye Geri Dön
+            <ArrowLeft size={16} /> Blog'a Geri Dön
           </button>
         </div>
       </div>
@@ -58,7 +58,7 @@ export default function BlogDetailPage() {
           className="mb-8 flex items-center gap-2 text-mystic-text-muted hover:text-white transition-colors text-sm font-bold cursor-pointer group"
         >
           <ArrowLeft size={16} className="transition-transform duration-300 group-hover:-translate-x-1" />
-          Kütüphaneye Dön
+          Blog'a Dön
         </button>
 
         {/* Cover Image banner */}
@@ -72,7 +72,7 @@ export default function BlogDetailPage() {
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center gap-3 text-mystic-text-muted">
               <BookOpen size={48} className="text-mystic-primary/20" />
-              <span className="text-sm">7Layers Bilgelik Kütüphanesi</span>
+              <span className="text-sm">7Layers Blog</span>
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-transparent" />

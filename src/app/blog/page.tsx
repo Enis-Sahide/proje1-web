@@ -35,7 +35,7 @@ export default function BlogListPage() {
         <div className="text-center md:text-left mb-10 flex flex-col md:flex-row justify-between items-center gap-6">
           <div>
             <h1 className="text-4xl font-bold text-mystic-primary mb-3 drop-shadow-md flex items-center justify-center md:justify-start gap-2">
-              <BookOpen className="text-mystic-primary" /> Bilgi Kütüphanesi
+              <BookOpen className="text-mystic-primary" /> Blog
             </h1>
             <p className="text-mystic-text-muted text-base">
               Kadim sırlar, astrolojik rehberler ve zihinsel gelişim üzerine makaleler.
@@ -82,7 +82,7 @@ export default function BlogListPage() {
               <div className="absolute inset-0 rounded-full border-2 border-mystic-primary/10"></div>
               <div className="absolute inset-0 rounded-full border-2 border-t-mystic-primary border-r-mystic-accent animate-spin"></div>
             </div>
-            <p className="text-sm">Bilgelik kütüphanesi açılıyor...</p>
+            <p className="text-sm">Blog yükleniyor...</p>
           </div>
         ) : filteredPosts.length === 0 ? (
           <div className="py-24 text-center bg-white/5 border border-white/5 rounded-3xl backdrop-blur-sm">
@@ -111,7 +111,7 @@ export default function BlogListPage() {
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-mystic-text-muted">
                         <Sparkles size={24} className="text-mystic-primary/30" />
-                        <span className="text-xs">7Layers Bilgelik Kütüphanesi</span>
+                        <span className="text-xs">7Layers Blog</span>
                       </div>
                     )}
                     <span className="absolute top-4 left-4 bg-black/60 border border-white/10 backdrop-blur-md text-mystic-primary text-[10px] uppercase tracking-wider font-extrabold px-3 py-1 rounded-full">
