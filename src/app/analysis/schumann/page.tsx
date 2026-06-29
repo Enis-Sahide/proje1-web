@@ -745,7 +745,7 @@ export default function SchumannPage() {
                     <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-1.5">
                       <span className="font-bold text-[#00E5FF] font-mono">{hoverInfo.timeStr}</span>
                       <span className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wide ${
-                        hoverInfo.isForecast ? 'bg-cyan-500/10 text-cyan-300 border border-cyan-500/20' : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
+                        hoverInfo.isForecast ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
                       }`}>
                         {hoverInfo.isForecast ? 'Tahmin' : 'Ölçüm'}
                       </span>
@@ -757,6 +757,15 @@ export default function SchumannPage() {
                     <div className="text-[10px] text-cyan-300 font-semibold border-t border-white/5 pt-1.5 mt-0.5">
                       {hoverInfo.spiritualStatus}
                     </div>
+                    {hoverInfo.isForecast ? (
+                      <div className="text-[9px] text-amber-400 font-medium italic mt-1 border-t border-white/5 pt-1">
+                        * İleri Dönük Tahmin (Gerçek ölçümler geldiğinde güncellenecektir)
+                      </div>
+                    ) : (
+                      <div className="text-[9px] text-emerald-400 font-medium italic mt-1 border-t border-white/5 pt-1">
+                        ✓ Kesinleşmiş Ölçüm
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -796,8 +805,13 @@ export default function SchumannPage() {
                     <span className="text-mystic-text-muted">|</span>
                     <span className="text-mystic-text-muted">Fırtına Seviyesi:</span>
                     <strong className="text-white">
-                      {hoveredBar.kp} Kp {hoveredBar.predicted ? '(Tahmin)' : ''}
+                      {hoveredBar.kp} Kp
                     </strong>
+                    <span className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase ${
+                      hoveredBar.predicted ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
+                    }`}>
+                      {hoveredBar.predicted ? '⚠️ Tahmin (Değişebilir)' : '✅ Kesinleşmiş Ölçüm'}
+                    </span>
                   </div>
                 ) : (
                   <span className="text-xs text-mystic-text-muted">
