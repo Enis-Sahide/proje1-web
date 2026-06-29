@@ -248,7 +248,7 @@ export default function BreathworkPage() {
             {/* Dynamic Instruction Context */}
             <div className="mt-8 w-full max-w-xl bg-black/45 border border-white/5 rounded-2xl p-4 text-center">
               <p className="text-mystic-accent text-sm font-bold uppercase tracking-wider mb-1">Talimat</p>
-              <p className="text-white/90 text-sm leading-relaxed">
+              <p className="text-white/90 text-sm leading-relaxed whitespace-pre-line">
                 {getInstructionText()}
               </p>
             </div>
@@ -299,7 +299,7 @@ export default function BreathworkPage() {
                   </div>
                   
                   <div className="bg-mystic-dark/60 p-4 rounded-xl border border-mystic-surface-light/50 mb-4">
-                    <p className="text-mystic-text-muted text-sm leading-relaxed italic">
+                    <p className="text-mystic-text-muted text-sm leading-relaxed italic whitespace-pre-line">
                       {tech.instruction}
                     </p>
                   </div>
