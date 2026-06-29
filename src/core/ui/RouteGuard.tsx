@@ -49,7 +49,7 @@ export default function RouteGuard({ children }: { children: React.ReactNode }) 
   useEffect(() => {
     if (isLoading) return;
 
-    const isAdminRoute = pathname.startsWith('/admin');
+    const isAdminRoute = pathname.startsWith('/admin') || pathname.startsWith('/blog');
     const isAuthRoute = pathname.startsWith('/auth');
     const isGuestProtectedRoute = GUEST_PROTECTED_ROUTES.some(route => pathname.startsWith(route));
     const minRole = requiredRoleFor(pathname);
@@ -87,7 +87,7 @@ export default function RouteGuard({ children }: { children: React.ReactNode }) 
   }
 
   // Prevent flash of unauthorized content on admin / guest-protected / role-gated routes
-  const isAdminRoute = pathname.startsWith('/admin');
+  const isAdminRoute = pathname.startsWith('/admin') || pathname.startsWith('/blog');
   const isGuestProtectedRoute = GUEST_PROTECTED_ROUTES.some(route => pathname.startsWith(route));
   const minRole = requiredRoleFor(pathname);
   if (isAdminRoute && (!user || role !== 'admin')) {
