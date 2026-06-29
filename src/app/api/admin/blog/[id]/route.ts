@@ -11,10 +11,10 @@ export const dynamic = 'force-dynamic';
 // Admin: Updates an existing blog post.
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     if (!id) return errorJson('Geçersiz id.', 400);
 
     // 1) Authenticate and authorize admin role
@@ -74,10 +74,10 @@ export async function PUT(
 // Admin: Deletes a blog post.
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const { id } = params;
+    const { id } = await params;
     if (!id) return errorJson('Geçersiz id.', 400);
 
     // 1) Authenticate and authorize admin role

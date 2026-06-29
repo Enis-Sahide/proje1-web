@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { blogPosts } from '@/db/schema';
 import { json, errorJson, preflight } from '@/lib/http/cors';
