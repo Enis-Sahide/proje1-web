@@ -49,6 +49,7 @@ import {
   MOON_PHASES,
   racesWithAvatar,
   chakraHomeFor,
+  BLOG_POSTS,
 } from './seedExtra';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -349,6 +350,7 @@ async function main() {
     await tx.delete(s.imeceProducts);
     await tx.delete(s.moonPhases);
     await tx.delete(s.races);
+    await tx.delete(s.blogPosts);
 
     // insert parents first
     await chunkedInsert(tx, s.chakras, chakraRows);
@@ -376,6 +378,7 @@ async function main() {
     await chunkedInsert(tx, s.imeceProducts, imeceRows);
     await chunkedInsert(tx, s.moonPhases, moonRows);
     await chunkedInsert(tx, s.races, raceRows);
+    await chunkedInsert(tx, s.blogPosts, BLOG_POSTS);
   });
 
   // ── Özet ──────────────────────────────────────────────────────
@@ -405,6 +408,7 @@ async function main() {
     imece_products: imeceRows.length,
     moon_phases: moonRows.length,
     races: raceRows.length,
+    blog_posts: BLOG_POSTS.length,
   });
 
   await pool.end();

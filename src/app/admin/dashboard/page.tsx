@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Shield, Users, DollarSign, Store, CheckCircle, XCircle, ArrowLeft, Star, Search, Filter, RefreshCw, Award, UserCheck } from 'lucide-react';
+import { Shield, Users, DollarSign, Store, CheckCircle, XCircle, ArrowLeft, Star, Search, Filter, RefreshCw, Award, UserCheck, BookOpen, Plus, Trash2, Edit } from 'lucide-react';
 import { useMarketplace } from '@/lib/useContent';
 import { apiFetch } from '@/lib/apiClient';
 
@@ -44,8 +44,26 @@ const ROLE_LABELS: Record<string, { label: string; style: string }> = {
 export default function AdminDashboard() {
   const router = useRouter();
 
-  // Active tab state: 'stores' | 'members'
-  const [activeTab, setActiveTab] = useState<'stores' | 'members'>('stores');
+  // Active tab state: 'stores' | 'members' | 'blog'
+  const [activeTab, setActiveTab] = useState<'stores' | 'members' | 'blog'>('stores');
+
+  // Blog posts states
+  const [blogs, setBlogs] = useState<any[]>([]);
+  const [isLoadingBlogs, setIsLoadingBlogs] = useState(false);
+  const [blogError, setBlogError] = useState<string | null>(null);
+
+  const [isBlogModalOpen, setIsBlogModalOpen] = useState(false);
+  const [editingBlog, setEditingBlog] = useState<any>(null);
+  const [blogForm, setBlogForm] = useState({
+    title: '',
+    slug: '',
+    content: '',
+    category: 'Astroloji',
+    imageUrl: '',
+    published: true
+  });
+  const [isSavingBlog, setIsSavingBlog] = useState(false);
+
 
   // Marketplace (mağazalar) içeriği API'den
   const { vendors: VENDORS } = useMarketplace();
@@ -91,9 +109,97 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchBlogs = async () => {
+    setIsLoadingBlogs(true);
+    setBlogError(null);
+    try {
+      const data = await apiFetch<any[]>('/api/admin/blog');
+      setBlogs(data || []);
+    } catch (err: any) {
+      console.error("Blogs fetch error:", err);
+      setBlogError(err.message || 'Yazılar yüklenirken hata oluştu.');
+    } finally {
+      setIsLoadingBlogs(false);
+    }
+  };
+
   useEffect(() => {
     fetchProfiles();
   }, []);
+
+  useEffect(() => {
+    if (activeTab === 'blog') {
+      fetchBlogs();
+    }
+  }, [activeTab]);
+
+  const handleOpenCreateBlog = () => {
+    setEditingBlog(null);
+    setBlogForm({
+      title: '',
+      slug: '',
+      content: '',
+      category: 'Astroloji',
+      imageUrl: '',
+      published: true
+    });
+    setIsBlogModalOpen(true);
+  };
+
+  const handleOpenEditBlog = (blog: any) => {
+    setEditingBlog(blog);
+    setBlogForm({
+      title: blog.title || '',
+      slug: blog.slug || '',
+      content: blog.content || '',
+      category: blog.category || 'Astroloji',
+      imageUrl: blog.imageUrl || '',
+      published: blog.published !== undefined ? blog.published : true
+    });
+    setIsBlogModalOpen(true);
+  };
+
+  const handleSaveBlog = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSavingBlog(true);
+    try {
+      if (editingBlog) {
+        // Update
+        const updated = await apiFetch<any>(`/api/admin/blog/${editingBlog.id}`, {
+          method: 'PUT',
+          body: JSON.stringify(blogForm)
+        });
+        setBlogs(blogs.map(b => b.id === editingBlog.id ? updated : b));
+      } else {
+        // Create
+        const created = await apiFetch<any>('/api/admin/blog', {
+          method: 'POST',
+          body: JSON.stringify(blogForm)
+        });
+        setBlogs([created, ...blogs]);
+      }
+      setIsBlogModalOpen(false);
+    } catch (err: any) {
+      alert("Yazı kaydedilirken hata oluştu: " + err.message);
+    } finally {
+      setIsSavingBlog(false);
+    }
+  };
+
+  const handleDeleteBlog = async (id: string, title: string) => {
+    const confirmDelete = window.confirm(`"${title}" isimli blog yazısını silmek istediğinize emin misiniz?`);
+    if (!confirmDelete) return;
+
+    try {
+      await apiFetch(`/api/admin/blog/${id}`, {
+        method: 'DELETE'
+      });
+      setBlogs(blogs.filter(b => b.id !== id));
+    } catch (err: any) {
+      alert("Yazı silinirken hata oluştu: " + err.message);
+    }
+  };
+
 
   const handleToggleStatus = (id: string) => {
     const vendor = vendors.find(v => v.id === id);
@@ -263,7 +369,22 @@ export default function AdminDashboard() {
               </span>
             )}
           </button>
+          <button 
+            onClick={() => setActiveTab('blog')}
+            className={`px-6 py-3 font-semibold text-sm transition-all relative flex items-center gap-2 ${
+              activeTab === 'blog' ? 'text-mystic-primary border-b-2 border-mystic-primary' : 'text-mystic-text-muted hover:text-white'
+            }`}
+          >
+            <BookOpen size={16} />
+            Blog Yönetimi
+            {!isLoadingBlogs && (
+              <span className="bg-white/10 text-white text-xs px-2 py-0.5 rounded-full ml-1 font-normal">
+                {blogs.length}
+              </span>
+            )}
+          </button>
         </div>
+
 
         {/* Tab Content 1: Stores */}
         {activeTab === 'stores' && (
@@ -508,7 +629,219 @@ export default function AdminDashboard() {
             </div>
           </div>
         )}
+
+        {/* Tab Content 3: Blog */}
+        {activeTab === 'blog' && (
+          <div className="w-full max-w-full overflow-hidden">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+              <h2 className="text-lg font-bold text-white flex items-center gap-2">
+                <BookOpen className="text-mystic-primary" size={20} /> Blog Kütüphanesi ({blogs.length})
+              </h2>
+              <button
+                onClick={handleOpenCreateBlog}
+                className="flex items-center gap-2 bg-mystic-primary text-black font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-[#D4AF37] transition-all cursor-pointer shadow-[0_0_15px_rgba(212,175,55,0.2)] hover:scale-[1.02]"
+              >
+                <Plus size={16} /> Yeni Yazı Ekle
+              </button>
+            </div>
+            
+            <div className="bg-black/40 border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
+              {isLoadingBlogs ? (
+                <div className="py-24 flex flex-col items-center justify-center gap-4 text-mystic-text-muted">
+                  <div className="relative w-12 h-12">
+                    <div className="absolute inset-0 rounded-full border-2 border-mystic-primary/10"></div>
+                    <div className="absolute inset-0 rounded-full border-2 border-t-mystic-primary border-r-mystic-accent animate-spin"></div>
+                  </div>
+                  <p className="text-xs">Blog yazıları yükleniyor...</p>
+                </div>
+              ) : blogError ? (
+                <div className="py-16 text-center text-red-400 text-sm">
+                  {blogError}
+                </div>
+              ) : blogs.length === 0 ? (
+                <div className="py-20 text-center text-mystic-text-muted text-sm">
+                  Henüz eklenmiş bir blog yazısı bulunmamaktadır.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead className="bg-white/5 text-mystic-text-muted text-xs uppercase tracking-wider border-b border-white/5">
+                      <tr>
+                        <th className="p-4 font-semibold">Görsel / Başlık</th>
+                        <th className="p-4 font-semibold">Kategori</th>
+                        <th className="p-4 font-semibold">Slug (URL)</th>
+                        <th className="p-4 font-semibold">Durum</th>
+                        <th className="p-4 font-semibold text-right">İşlemler</th>
+                      </tr>
+                    </thead>
+                    <tbody className="text-white text-sm divide-y divide-white/5">
+                      {blogs.map(blog => (
+                        <tr key={blog.id} className="hover:bg-white/5 transition-colors">
+                          <td className="p-4">
+                            <div className="flex items-center gap-4">
+                              {blog.imageUrl ? (
+                                <img src={blog.imageUrl} className="w-14 h-10 rounded-lg object-cover border border-white/10" />
+                              ) : (
+                                <div className="w-14 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-[10px] text-mystic-text-muted">Görsel Yok</div>
+                              )}
+                              <div>
+                                <span className="font-bold block text-sm line-clamp-1 max-w-[250px]">{blog.title}</span>
+                                <span className="text-[10px] text-mystic-text-muted block mt-0.5">Oluşturulma: {new Date(blog.createdAt).toLocaleDateString('tr-TR')}</span>
+                              </div>
+                            </div>
+                          </td>
+                          <td className="p-4">
+                            <span className="px-2.5 py-1 bg-white/5 border border-white/10 text-white rounded-full text-xs font-semibold">
+                              {blog.category}
+                            </span>
+                          </td>
+                          <td className="p-4 text-xs font-mono text-mystic-text-muted max-w-[120px] truncate">
+                            {blog.slug}
+                          </td>
+                          <td className="p-4">
+                            {blog.published ? (
+                              <span className="text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full text-xs font-semibold">Yayınlandı</span>
+                            ) : (
+                              <span className="text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full text-xs font-semibold">Taslak</span>
+                            )}
+                          </td>
+                          <td className="p-4 text-right">
+                            <div className="flex items-center justify-end gap-3">
+                              <button
+                                onClick={() => handleOpenEditBlog(blog)}
+                                className="p-2 bg-white/5 text-blue-400 hover:bg-blue-400/10 border border-blue-500/20 rounded-lg transition-colors cursor-pointer"
+                                title="Düzenle"
+                              >
+                                <Edit size={14} />
+                              </button>
+                              <button
+                                onClick={() => handleDeleteBlog(blog.id, blog.title)}
+                                className="p-2 bg-white/5 text-red-400 hover:bg-red-400/10 border border-red-500/20 rounded-lg transition-colors cursor-pointer"
+                                title="Sil"
+                              >
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </main>
+
+      {/* Blog Create/Edit Modal */}
+      {isBlogModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 overflow-y-auto animate-in fade-in duration-300">
+          <div className="bg-mystic-surface border border-mystic-primary/30 w-full max-w-2xl rounded-3xl p-6 shadow-[0_0_50px_rgba(0,0,0,0.8)] relative max-h-[90vh] overflow-y-auto">
+            <h3 className="text-xl font-bold text-white mb-6 pb-4 border-b border-white/5 flex items-center gap-2">
+              <BookOpen size={20} className="text-mystic-primary" />
+              {editingBlog ? 'Blog Yazısını Düzenle' : 'Yeni Blog Yazısı Ekle'}
+            </h3>
+            
+            <form onSubmit={handleSaveBlog} className="space-y-5">
+              <div>
+                <label className="block text-xs font-bold text-mystic-text mb-2 uppercase tracking-wide">Yazı Başlığı <span className="text-red-400">*</span></label>
+                <input 
+                  type="text"
+                  required
+                  value={blogForm.title}
+                  onChange={(e) => {
+                    const titleVal = e.target.value;
+                    const slugVal = titleVal.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
+                    setBlogForm({ ...blogForm, title: titleVal, slug: slugVal });
+                  }}
+                  placeholder="Örn: Diyafram Nefesinin Mucizevi Faydaları"
+                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-mystic-primary transition-colors"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div>
+                  <label className="block text-xs font-bold text-mystic-text mb-2 uppercase tracking-wide">URL Yolu (Slug) <span className="text-red-400">*</span></label>
+                  <input 
+                    type="text"
+                    required
+                    value={blogForm.slug}
+                    onChange={(e) => setBlogForm({ ...blogForm, slug: e.target.value })}
+                    placeholder="diyagram-nefesi-faydalari"
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-mystic-primary transition-colors font-mono"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-mystic-text mb-2 uppercase tracking-wide">Kategori <span className="text-red-400">*</span></label>
+                  <select 
+                    value={blogForm.category}
+                    onChange={(e) => setBlogForm({ ...blogForm, category: e.target.value })}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-mystic-primary transition-colors"
+                  >
+                    <option value="Astroloji" className="bg-mystic-surface">Astroloji</option>
+                    <option value="Nefes" className="bg-mystic-surface">Nefes</option>
+                    <option value="Ritüeller" className="bg-mystic-surface">Ritüeller</option>
+                    <option value="Kişisel Gelişim" className="bg-mystic-surface">Kişisel Gelişim</option>
+                    <option value="Çakra Dengeleme" className="bg-mystic-surface">Çakra Dengeleme</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-mystic-text mb-2 uppercase tracking-wide">Destekleyici Görsel URL'si</label>
+                <input 
+                  type="url"
+                  value={blogForm.imageUrl}
+                  onChange={(e) => setBlogForm({ ...blogForm, imageUrl: e.target.value })}
+                  placeholder="https://example.com/images/blog-image.jpg"
+                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-mystic-primary transition-colors"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-mystic-text mb-2 uppercase tracking-wide">İçerik <span className="text-red-400">*</span></label>
+                <textarea 
+                  required
+                  rows={8}
+                  value={blogForm.content}
+                  onChange={(e) => setBlogForm({ ...blogForm, content: e.target.value })}
+                  placeholder="Blog içeriğini buraya girin (Yeni paragraflar için iki kere enter tuşuna basabilirsiniz)..."
+                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-mystic-primary transition-colors resize-y leading-relaxed"
+                />
+              </div>
+
+              <div className="flex items-center gap-3">
+                <input 
+                  type="checkbox"
+                  id="published_checkbox"
+                  checked={blogForm.published}
+                  onChange={(e) => setBlogForm({ ...blogForm, published: e.target.checked })}
+                  className="w-4 h-4 rounded border-white/10 text-mystic-primary focus:ring-mystic-primary bg-black/40"
+                />
+                <label htmlFor="published_checkbox" className="text-sm text-white font-semibold cursor-pointer select-none">Bu yazıyı hemen yayınla (Ziyaretçilere göster)</label>
+              </div>
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-white/5">
+                <button
+                  type="button"
+                  onClick={() => setIsBlogModalOpen(false)}
+                  className="px-5 py-2.5 bg-white/5 text-white hover:bg-white/10 rounded-xl transition-all cursor-pointer font-bold text-sm"
+                >
+                  Vazgeç
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSavingBlog}
+                  className="px-5 py-2.5 bg-mystic-primary text-black hover:bg-[#D4AF37] disabled:opacity-50 rounded-xl transition-all cursor-pointer font-bold text-sm shadow-[0_0_10px_rgba(212,175,55,0.2)]"
+                >
+                  {isSavingBlog ? 'Kaydediliyor...' : 'Yazıyı Kaydet'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

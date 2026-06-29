@@ -125,3 +125,23 @@ export const chakraHomeFor = (id: number) => ({
   imageIcon: CHAKRA_HOME[id] ? CHAKRA_ICON_BASE + CHAKRA_HOME[id].icon : null,
   homeTop: CHAKRA_HOME[id] ? CHAKRA_HOME[id].top : null,
 });
+
+export const BLOG_POSTS = [
+  {
+    title: 'Schumann Rezonansı ve İnsan Biyolojisi Üzerindeki Etkileri',
+    slug: 'schumann-rezonansi-ve-insan-biyolojisi',
+    content: 'Dünyanın doğal elektromanyetik kalp atışı olan 7.83 Hz Schumann rezonansı, insan beyninin alfa dalgaları ile doğrudan rezonansa girer. Güneş fırtınaları veya yüksek Kp indeksli günlerde bu rezonans frekansı dalgalanır. Bu süreçte uykusuzluk, baş ağrısı veya yüksek durugörü deneyimleri yaşanabilir.\n\nKendinizi dengelemek için toprakla bağ kurmalı ve diyafram nefesi egzersizleri uygulamalısınız.',
+    imageUrl: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/fehu.png',
+    category: 'Nefes',
+    published: true
+  },
+  {
+    title: 'Astrolojik Transitler ve Enerji Kapıları',
+    slug: 'astrolojik-transitler-ve-enerji-kapilari',
+    content: 'Gökyüzündeki gezegen konumları hayatımızın her alanını etkiler. Yeniay ve Dolunay dönemlerinde enerji alanlarımız genişler ve yeni niyet kapıları açılır. Kendi doğum haritanızdaki transitleri takip ederek en doğru zamanda en doğru adımları atabilirsiniz.',
+    imageUrl: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/uruz.png',
+    category: 'Astroloji',
+    published: true
+  }
+];
+
