@@ -57,7 +57,6 @@ export default function Navigation() {
     { name: 'Blog', href: '/blog' },
     { name: 'Keşfet', href: '/explore', isUnderConstruction: true },
     { name: 'Dersler', href: '/kadim-dersler', requiresAuth: true },
-    { name: 'Sınavlar', href: '/tests', requiresAuth: true },
     { name: 'Seviyeler', href: '/membership', requiresAuth: true, isLockedForNonAdmin: true },
   ];
 

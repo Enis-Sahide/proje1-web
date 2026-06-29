@@ -17,7 +17,8 @@ import {
   Wrench, 
   ArrowLeft,
   X,
-  Smartphone
+  Smartphone,
+  Award
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
@@ -198,6 +199,27 @@ export default function KadimDerslerPage() {
               </div>
             );
           })}
+        </div>
+
+        {/* Exams Banner */}
+        <div className="mt-16 bg-gradient-to-r from-mystic-surface/40 via-mystic-primary/5 to-mystic-surface/40 border border-mystic-primary/20 rounded-3xl p-8 backdrop-blur-md flex flex-col md:flex-row justify-between items-center gap-6 shadow-[0_0_30px_rgba(212,175,55,0.05)] hover:border-mystic-primary/40 transition-all duration-300">
+          <div className="flex items-center gap-5 text-center md:text-left flex-col md:flex-row">
+            <div className="w-16 h-16 rounded-full bg-mystic-primary/10 border border-mystic-primary/30 flex items-center justify-center shrink-0">
+              <Award className="text-mystic-primary" size={32} />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-white mb-2">Sınavlar ve Derece Değerlendirmeleri</h2>
+              <p className="text-mystic-text-muted text-sm max-w-xl">
+                Dersleri tamamladıktan sonra seviyenizi test etmek, derece atlamak ve yeni kilitleri açmak için sınavlar merkezini ziyaret edin.
+              </p>
+            </div>
+          </div>
+          <button 
+            onClick={() => router.push('/tests')}
+            className="px-8 py-4 bg-gradient-to-r from-mystic-primary to-mystic-accent text-black font-extrabold text-sm rounded-2xl hover:shadow-[0_0_20px_rgba(212,175,55,0.4)] transition-all shrink-0 cursor-pointer w-full md:w-auto"
+          >
+            Sınavlara Git
+          </button>
         </div>
       </div>
 
