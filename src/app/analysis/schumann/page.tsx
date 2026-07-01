@@ -197,10 +197,8 @@ export default function SchumannPage() {
     const cols = data.history; // Exactly 24 blocks representing the last 72 hours
     
     // Precise current time (ŞİMDİ) X placement based on the user's browser time
-    const startTimeMs = new Date(cols[0].time + 'Z').getTime();
-    const totalDurationMs = cols.length * 3 * 60 * 60 * 1000; // 72 hours in ms
-    const currentMs = Date.now();
-    const nowPct = (currentMs - startTimeMs) / totalDurationMs;
+    const firstForecastIdx = cols.findIndex(item => item.predicted);
+    const nowPct = firstForecastIdx !== -1 ? firstForecastIdx / cols.length : 1.0;
     const nowX = nowPct * width;
 
     // 1. Draw Spectrogram Data Column by Column
@@ -873,7 +871,7 @@ export default function SchumannPage() {
               {/* Bars Grid */}
               <div className="flex items-end justify-between h-48 w-full border-b border-white/10 pb-2 gap-1 md:gap-2 px-1">
                 {data?.history.map((item, index) => {
-                  const isForecast = new Date(item.time.endsWith('Z') ? item.time : item.time + 'Z').getTime() > Date.now();
+                  const isForecast = !!item.predicted;
                   return (
                     <div 
                       key={index} 
