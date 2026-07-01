@@ -380,8 +380,8 @@ export default function SchumannPage() {
           ctx.font = 'bold 8px monospace';
         }
         
-        // Center text in the middle of each block segment
-        ctx.fillText(hourLabel, x + (width / cols.length) / 2, height - 8);
+        // Align text directly under the grid line
+        ctx.fillText(hourLabel, x, height - 8);
       }
     }
 
