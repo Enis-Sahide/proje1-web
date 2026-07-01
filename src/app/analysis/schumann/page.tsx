@@ -29,7 +29,7 @@ interface HoverInfo {
   spiritualStatus: string;
 }
 
-const labelResonances = [7.83, 14, 20, 26, 32];
+const labelResonances = [0, 7.83, 14, 20, 26, 32, 40];
 const graphTop = 25;
 const graphBottom = 245;
 const graphHeight = 220;
@@ -417,11 +417,13 @@ export default function SchumannPage() {
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
     ctx.lineWidth = 1;
     labelResonances.forEach(res => {
-      const y = graphTop + (res / 40) * graphHeight;
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(width, y);
-      ctx.stroke();
+      if (res !== 0 && res !== 40) {
+        const y = graphTop + (res / 40) * graphHeight;
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
     });
 
   }, [data, timestamp, hoveredX]);
@@ -741,7 +743,7 @@ export default function SchumannPage() {
                   <div className="relative">
                     
                     {/* Sticky Hz Scale */}
-                    <div className="sticky left-0 z-10 pointer-events-none h-0 w-0">
+                    <div className="sticky left-4 z-10 pointer-events-none h-0 w-0">
                       <div className="absolute left-0 top-0 h-[270px] w-14 bg-black/85 backdrop-blur-[2px] border-r border-white/10 rounded-l-lg flex flex-col justify-start">
                         {labelResonances.map(res => {
                           const yPct = ((graphTop + (res / 40) * graphHeight) / canvasHeight) * 100;
