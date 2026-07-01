@@ -753,8 +753,8 @@ export default function SchumannPage() {
                         </span>
                       </div>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-mystic-text-muted">Manyetik Akış:</span>
-                        <span className="font-extrabold text-white font-mono">{hoverInfo.kp.toFixed(2)} Kp</span>
+                        <span className="text-mystic-text-muted">Genlik:</span>
+                        <span className="font-extrabold text-white font-mono">{hoverInfo.kp.toFixed(2)}</span>
                       </div>
                       <div className="text-[10px] text-cyan-300 font-semibold border-t border-white/5 pt-1.5 mt-0.5">
                         {hoverInfo.spiritualStatus}
