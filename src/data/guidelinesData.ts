@@ -46,5 +46,11 @@ export const GUIDELINES = [
     title: 'Mobil Uygulama ve Uçak Modu',
     content: 'Web sitemizde dinlediğiniz frekanslardan çok daha derin ve sağlıklı bir şifa verimi alabilmek için, meditasyonlarınızı "7Layers" mobil uygulamamız üzerinden, telefonunuzu uçak moduna alarak ve dikkatinizi dağıtacak tüm bildirimleri kapatarak dinlemenizi önemle tavsiye ederiz.',
     color: '#FFD700'
+  },
+  {
+    icon: 'sync',
+    title: 'Sabah ve Gece Dengeleme Döngüsü',
+    content: 'Özellikle Hakikat yolunda derinleşmek isteyen arayışçılar için en temel önerimiz; çakra dengeleme çalışmalarını her gün sabah güne başlarken ve gece uyumadan önce olmak üzere iki kez disiplinle uygulamaktır. Gün boyunca eskiye oranla çok daha fazla radyasyona, kalabalıkların karmaşık ve düşük frekanslı elektromanyetik alanlarına ve olumsuz dış etkenlere maruz kalıyoruz; bu da çakralarımızın hızla dengesizleşmesine yol açıyor. Sabah yapılan çalışma gün boyu koruyucu bir kalkan vazifesi görürken (yoğun elektromanyetik kirliliğe maruz kalıp bu kalkanın yetersiz kaldığını veya enerjinizin aniden düştüğünü hissettiğiniz anlarda gün içinde de kısa bir dengeleme yapabilirsiniz), gece yapılan çalışma ise gün içinde biriken tüm elektromanyetik tortuyu temizleyerek enerjinizi hizalar ve uyku aşamasını da sağlıklı geçirerek sabah güne çok daha zinde, dengeli ve iyi uyanmanızı sağlar.',
+    color: '#007AFF'
   }
 ];
