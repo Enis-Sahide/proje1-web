@@ -225,7 +225,7 @@ export default function SchumannPage() {
 
       // Draw the column pixel-by-pixel inside the graph limits
       for (let y = graphTop; y < graphBottom; y++) {
-        const freqPct = (graphBottom - y) / graphHeight; // 0 at bottom, 1 at top
+        const freqPct = (y - graphTop) / graphHeight; // 0 at top, 1 at bottom
         const freqHz = freqPct * 40; // Scale 0 to 40 Hz
 
         // Schumann resonances (7.83, 14.1, 20.3, 26.4, 32.4 Hz)
@@ -414,7 +414,7 @@ export default function SchumannPage() {
     ctx.lineWidth = 1;
     const labelResonances = [7.83, 14, 20, 26, 32];
     labelResonances.forEach(res => {
-      const y = graphBottom - (res / 40) * graphHeight;
+      const y = graphTop + (res / 40) * graphHeight;
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(width, y);
