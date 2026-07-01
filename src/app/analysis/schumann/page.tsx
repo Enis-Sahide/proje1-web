@@ -560,7 +560,7 @@ export default function SchumannPage() {
         </div>
 
         {/* Gösterge Panelleri */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
           
           {/* Card 1: Kp Endeksi */}
           <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-between">
@@ -609,22 +609,6 @@ export default function SchumannPage() {
             </div>
             <div className="mt-4 text-xs text-mystic-text-muted">
               Kozmik akışların manyetometrik etki derecesi.
-            </div>
-          </div>
-
-          {/* Card 3: Veri Kaynağı */}
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between text-mystic-text-muted mb-4">
-                <span className="text-xs uppercase tracking-wider font-semibold">Veri Kaynağı</span>
-                <Compass size={16} className="text-indigo-400" />
-              </div>
-              <div className="text-lg font-bold text-white">
-                NOAA SWPC
-              </div>
-            </div>
-            <div className="mt-4 text-xs text-mystic-text-muted">
-              Planetary K-Index 3 saatlik bloklarla güncellenir.
             </div>
           </div>
 
