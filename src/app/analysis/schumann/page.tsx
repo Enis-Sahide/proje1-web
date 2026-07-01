@@ -215,19 +215,10 @@ export default function SchumannPage() {
       // Determine if this pixel column is in the future relative to the actual current time
       const isPredicted = x >= nowX;
 
-      // Base background color (blends smoothly to solid white if Kp is high)
+      // Base background color
       let baseR = 3;
       let baseG = 3;
       let baseB = 10;
-
-      if (kp >= 5.0) {
-        // Continuous fading white-out background glow
-        const stormGlowFactor = Math.min(1, (kp - 5.0) / 0.5); // Reaches 100% white at Kp = 5.5
-        const glowIntensity = stormGlowFactor * 252;
-        baseR += glowIntensity;
-        baseG += glowIntensity;
-        baseB += glowIntensity * 0.95;
-      }
 
       // Smooth resonance color calculation
       const resColor = getResonanceColor(kp);
@@ -256,6 +247,17 @@ export default function SchumannPage() {
         let r = baseR;
         let g = baseG;
         let b = baseB;
+
+        // Apply storm background glow centered at 7.83 Hz
+        if (kp >= 5.0) {
+          const stormGlowFactor = Math.min(1, (kp - 5.0) / 0.5);
+          const dist = Math.abs(freqHz - 7.83);
+          const decay = Math.max(0, 1 - dist / 22.0); // Fades out over 22 Hz range
+          const glowIntensity = stormGlowFactor * 240 * Math.pow(decay, 1.8);
+          r += glowIntensity;
+          g += glowIntensity;
+          b += glowIntensity * 0.95;
+        }
 
         if (onResonance) {
           // Quadratic falloff for smooth glowing edges on the horizontal lines
