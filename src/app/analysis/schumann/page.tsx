@@ -739,7 +739,7 @@ export default function SchumannPage() {
               {/* Interactive Spectrogram Area with HTML Tooltip overlay */}
               {/* Interactive Spectrogram Area with HTML Tooltip overlay */}
               <div className="relative w-full">
-                <div className="w-full max-w-full overflow-x-auto flex flex-col items-center px-4 relative">
+                <div className="w-full max-w-full overflow-x-auto flex flex-col items-start md:items-center px-4 relative">
                   
                   <canvas 
                     ref={canvasRef} 
