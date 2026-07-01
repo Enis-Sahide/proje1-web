@@ -206,9 +206,9 @@ export default function SchumannPage() {
       let baseG = 3;
       let baseB = 10;
 
-      if (kp >= 4.5) {
+      if (kp >= 5.0) {
         // Continuous fading white-out background glow
-        const stormGlowFactor = Math.min(1, (kp - 4.5) / 0.7); // Reaches 100% white at Kp = 5.2
+        const stormGlowFactor = Math.min(1, (kp - 5.0) / 0.5); // Reaches 100% white at Kp = 5.5
         const glowIntensity = stormGlowFactor * 252;
         baseR += glowIntensity;
         baseG += glowIntensity;
@@ -252,11 +252,11 @@ export default function SchumannPage() {
           b += resColor.b * strength;
         }
 
-        // Add vertical scanline noise during active/storm states (Kp >= 4.0)
-        if (kp >= 4.0) {
-          const scanPattern = Math.sin(y * 0.1) * Math.cos(x * 0.05);
-          if (scanPattern > 0.4) {
-            const scanStrength = (kp / 9) * 20;
+        // Add vertical scanline noise during active/storm states (Kp >= 5.0)
+        if (kp >= 5.0) {
+          const scanPattern = Math.cos(x * 0.15);
+          if (scanPattern > 0.6) {
+            const scanStrength = (kp / 9) * 15;
             r += scanStrength;
             g += scanStrength;
             b += scanStrength;
