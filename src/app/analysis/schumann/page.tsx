@@ -560,19 +560,19 @@ export default function SchumannPage() {
         </div>
 
         {/* Gösterge Panelleri */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           
           {/* Card 1: Kp Endeksi */}
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-between">
-            <div>
+          <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-center items-center md:col-span-1">
+            <div className="w-full text-center">
               <div className="flex items-center justify-between text-mystic-text-muted mb-4">
                 <span className="text-xs uppercase tracking-wider font-semibold">Anlık Genlik</span>
                 <Activity size={16} className="text-[#00E5FF]" />
               </div>
               {isLoading ? (
-                <div className="h-8 w-16 bg-white/5 animate-pulse rounded"></div>
+                <div className="h-8 w-16 bg-white/5 animate-pulse rounded mx-auto"></div>
               ) : (
-                <div className="text-3xl font-extrabold text-white flex items-baseline gap-2">
+                <div className="text-4xl font-extrabold text-white my-2">
                   {data?.current_kp}
                 </div>
               )}
@@ -580,7 +580,7 @@ export default function SchumannPage() {
           </div>
 
           {/* Card 2: Durum Seviyesi */}
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-between">
+          <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-between md:col-span-2">
             <div>
               <div className="flex items-center justify-between text-mystic-text-muted mb-4">
                 <span className="text-xs uppercase tracking-wider font-semibold">Manyetik Alan Durumu</span>
@@ -601,6 +601,11 @@ export default function SchumannPage() {
                   }`}></span>
                   {data?.status_label}
                 </div>
+              )}
+              {!isLoading && data?.status_desc && (
+                <p className="text-xs text-mystic-text-muted leading-relaxed border-t border-white/5 pt-3 mt-3 animate-in fade-in duration-300">
+                  {data.status_desc}
+                </p>
               )}
             </div>
           </div>
@@ -908,19 +913,7 @@ export default function SchumannPage() {
           )}
         </div>
 
-        {/* Enerji Analizi Durum Kartı */}
-        {!isLoading && data?.status_desc && (
-          <div className="bg-gradient-to-r from-[#4F46E5]/10 via-[#00E5FF]/5 to-[#4F46E5]/10 border border-[#00E5FF]/20 rounded-3xl p-8 backdrop-blur-sm mb-8 relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-[#00E5FF] opacity-10 blur-[50px] pointer-events-none"></div>
-            <h3 className="text-2xl font-bold mb-4 text-[#00E5FF] flex items-center gap-2">
-              <BookOpen size={22} />
-              Jeomanyetik Enerji Analizi
-            </h3>
-            <p className="text-white/95 leading-relaxed text-sm md:text-base">
-              {data.status_desc}
-            </p>
-          </div>
-        )}
+
 
         {/* Bilgilendirme Bölümü (Açılır/Kapanır) */}
         <div className="bg-black/40 border border-white/10 rounded-3xl p-6 md:p-8 backdrop-blur-md transition-all duration-300">
