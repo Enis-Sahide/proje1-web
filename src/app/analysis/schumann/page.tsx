@@ -29,6 +29,12 @@ interface HoverInfo {
   spiritualStatus: string;
 }
 
+const labelResonances = [7.83, 14, 20, 26, 32];
+const graphTop = 25;
+const graphBottom = 245;
+const graphHeight = 220;
+const canvasHeight = 270;
+
 export default function SchumannPage() {
   const router = useRouter();
   const { role } = useAuth();
@@ -182,9 +188,7 @@ export default function SchumannPage() {
     const width = canvas.width;
     const height = canvas.height;
     
-    const graphTop = 25; // Top date bar height
-    const graphBottom = height - 25; // Bottom time bar height
-    const graphHeight = graphBottom - graphTop; // Active graph height
+
 
     // Draw solid space background for graph area
     ctx.fillStyle = '#030308';
@@ -412,18 +416,12 @@ export default function SchumannPage() {
     // 7. Draw horizontal grid lines and frequency labels (overlay)
     ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
     ctx.lineWidth = 1;
-    const labelResonances = [7.83, 14, 20, 26, 32];
     labelResonances.forEach(res => {
       const y = graphTop + (res / 40) * graphHeight;
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(width, y);
       ctx.stroke();
-
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.55)';
-      ctx.font = '9px monospace';
-      ctx.textAlign = 'left';
-      ctx.fillText(`${res} Hz`, 18, y - 4);
     });
 
   }, [data, timestamp, hoveredX]);
@@ -739,53 +737,73 @@ export default function SchumannPage() {
               {/* Interactive Spectrogram Area with HTML Tooltip overlay */}
               {/* Interactive Spectrogram Area with HTML Tooltip overlay */}
               <div className="relative w-full">
-                <div className="w-full max-w-full overflow-x-auto flex flex-col items-start md:items-center px-4 relative">
-                  
-                  <canvas 
-                    ref={canvasRef} 
-                    width={800} 
-                    height={270}
-                    onMouseMove={handleMouseMove}
-                    onMouseLeave={handleMouseLeave}
-                    className="rounded-lg border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)] cursor-crosshair"
-                  />
-
-                  {/* Floating Interactive Tooltip */}
-                  {hoverInfo && (
-                    <div 
-                      className="absolute bg-[#08080C]/95 border border-[#00E5FF]/40 backdrop-blur-md rounded-2xl p-4 text-xs shadow-[0_10px_30px_rgba(0,229,255,0.25)] pointer-events-none z-20 flex flex-col gap-2 text-left animate-in fade-in zoom-in-95 duration-100 min-w-[200px]"
-                      style={{ 
-                        left: `${hoverInfo.left}px`, 
-                        top: `${hoverInfo.top}px`,
-                        transform: 'translate(-50%, -115%)'
-                      }}
-                    >
-                      <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-1.5">
-                        <span className="font-bold text-[#00E5FF] font-mono">{hoverInfo.timeStr}</span>
-                        <span className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wide ${
-                          hoverInfo.isForecast ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
-                        }`}>
-                          {hoverInfo.isForecast ? 'Tahmin' : 'Ölçüm'}
-                        </span>
+                <div className="w-full max-w-full overflow-x-auto flex justify-start md:justify-center px-4 relative">
+                  <div className="relative">
+                    
+                    {/* Sticky Hz Scale */}
+                    <div className="sticky left-0 z-10 pointer-events-none h-0 w-0">
+                      <div className="absolute left-0 top-0 h-[270px] w-14 bg-black/85 backdrop-blur-[2px] border-r border-white/10 rounded-l-lg flex flex-col justify-start">
+                        {labelResonances.map(res => {
+                          const yPct = ((graphTop + (res / 40) * graphHeight) / canvasHeight) * 100;
+                          return (
+                            <span 
+                              key={res}
+                              className="absolute left-2.5 text-[9px] font-bold font-mono text-white/70 -translate-y-1/2 select-none"
+                              style={{ top: `${yPct}%` }}
+                            >
+                              {res} Hz
+                            </span>
+                          );
+                        })}
                       </div>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-mystic-text-muted">Genlik:</span>
-                        <span className="font-extrabold text-white font-mono">{hoverInfo.kp.toFixed(2)}</span>
-                      </div>
-                      <div className="text-[10px] text-cyan-300 font-semibold border-t border-white/5 pt-1.5 mt-0.5">
-                        {hoverInfo.spiritualStatus}
-                      </div>
-                      {hoverInfo.isForecast ? (
-                        <div className="text-[9px] text-amber-400 font-medium italic mt-1 border-t border-white/5 pt-1">
-                          * İleri Dönük Tahmin (Gerçek ölçümler geldiğinde güncellenecektir)
-                        </div>
-                      ) : (
-                        <div className="text-[9px] text-emerald-400 font-medium italic mt-1 border-t border-white/5 pt-1">
-                          ✓ Kesinleşmiş Ölçüm
-                        </div>
-                      )}
                     </div>
-                  )}
+
+                    <canvas 
+                      ref={canvasRef} 
+                      width={800} 
+                      height={270}
+                      onMouseMove={handleMouseMove}
+                      onMouseLeave={handleMouseLeave}
+                      className="rounded-lg border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)] cursor-crosshair"
+                    />
+
+                    {/* Floating Interactive Tooltip */}
+                    {hoverInfo && (
+                      <div 
+                        className="absolute bg-[#08080C]/95 border border-[#00E5FF]/40 backdrop-blur-md rounded-2xl p-4 text-xs shadow-[0_10px_30px_rgba(0,229,255,0.25)] pointer-events-none z-20 flex flex-col gap-2 text-left animate-in fade-in zoom-in-95 duration-100 min-w-[200px]"
+                        style={{ 
+                          left: `${hoverInfo.left}px`, 
+                          top: `${hoverInfo.top}px`,
+                          transform: 'translate(-50%, -115%)'
+                        }}
+                      >
+                        <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-1.5">
+                          <span className="font-bold text-[#00E5FF] font-mono">{hoverInfo.timeStr}</span>
+                          <span className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wide ${
+                            hoverInfo.isForecast ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
+                          }`}>
+                            {hoverInfo.isForecast ? 'Tahmin' : 'Ölçüm'}
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-1">
+                          <span className="text-mystic-text-muted">Genlik:</span>
+                          <span className="font-extrabold text-white font-mono">{hoverInfo.kp.toFixed(2)}</span>
+                        </div>
+                        <div className="text-[10px] text-cyan-300 font-semibold border-t border-white/5 pt-1.5 mt-0.5">
+                          {hoverInfo.spiritualStatus}
+                        </div>
+                        {hoverInfo.isForecast ? (
+                          <div className="text-[9px] text-amber-400 font-medium italic mt-1 border-t border-white/5 pt-1">
+                            * İleri Dönük Tahmin (Gerçek ölçümler geldiğinde güncellenecektir)
+                          </div>
+                        ) : (
+                          <div className="text-[9px] text-emerald-400 font-medium italic mt-1 border-t border-white/5 pt-1">
+                            ✓ Kesinleşmiş Ölçüm
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {/* Watermark Logo & Text */}
