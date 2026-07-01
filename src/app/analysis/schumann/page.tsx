@@ -102,6 +102,20 @@ export default function SchumannPage() {
       // Limit history to the last 24 items (last 72 hours of 3-hourly blocks)
       if (jsonData && jsonData.history) {
         jsonData.history = jsonData.history.slice(-24);
+        // TEST: mock storm values (Kp >= 5.0) at indexes 12, 13, 20 and 21 for testing
+        if (jsonData.history.length > 22) {
+          // Measurements (Ölçüm)
+          jsonData.history[12].kp = 5.2; // Moderate storm
+          jsonData.history[12].predicted = false;
+          jsonData.history[13].kp = 6.8; // High storm
+          jsonData.history[13].predicted = false;
+          
+          // Forecasts (Tahmin)
+          jsonData.history[20].kp = 5.8; // Moderate storm forecast
+          jsonData.history[20].predicted = true;
+          jsonData.history[21].kp = 7.1; // High storm forecast
+          jsonData.history[21].predicted = true;
+        }
       }
       setData(jsonData);
       setTimestamp(Date.now());
