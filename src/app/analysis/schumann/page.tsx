@@ -39,7 +39,12 @@ export default function SchumannPage() {
   const router = useRouter();
   const { role } = useAuth();
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const hasAutoScrolled = useRef(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [canvasWidth, setCanvasWidth] = useState(800);
   const [data, setData] = useState<KpData | null>(null);
+  const [simulatedKp, setSimulatedKp] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [timestamp, setTimestamp] = useState<number>(Date.now());
@@ -163,9 +168,48 @@ export default function SchumannPage() {
     };
   };
 
+  const getSimulatedStatus = (kpVal: number) => {
+    if (kpVal < 3.0) {
+      return {
+        label: 'Sakin Jeomanyetik Alan',
+        desc: 'Manyetik alan sakin. Enerji akışları dengeli ve entegrasyon için elverişli. İçsel huzur ve meditasyon çalışmaları için uygun bir zaman.'
+      };
+    } else if (kpVal < 4.0) {
+      return {
+        label: 'Aktif Kozmik Enerji',
+        desc: 'Manyetik alanda aktif kıpırdanmalar var. Hücrelerde hafif bir uyarım, rüyalarda canlanma veya geçici uykusuzluk hissedilebilir.'
+      };
+    } else if (kpVal < 5.0) {
+      return {
+        label: 'Yoğun Jeomanyetik Hareketlilik',
+        desc: 'Jeomanyetik hareketlilik yoğunlaşıyor. Baş ağrısı, sezgilerde artış ve enerjisel hassasiyet gözlemlenebilir. Topraklanmaya önem verin.'
+      };
+    } else {
+      return {
+        label: 'JEOMANYETİK FIRTINA AKTİF!',
+        desc: 'Güçlü kozmik enerji fırtınası devrede! Hücresel uyanış portalları açık. Fiziksel yorgunluk, yoğun rüyalar ve yüksek enerjisel titreşim dalgaları olasıdır.'
+      };
+    }
+  };
+
+  const historyToRender = data?.history ? data.history.map((item, idx) => {
+    // Son ölçüm indeksini bul (tahmin/predicted olmayan en son eleman)
+    const lastMeasuredIdx = data.history.reduce((lastIdx, currItem, currIdx) => {
+      if (!currItem.predicted) {
+        return currIdx;
+      }
+      return lastIdx;
+    }, -1);
+
+    if (simulatedKp !== null && idx === lastMeasuredIdx) {
+      return { ...item, kp: simulatedKp };
+    }
+    return item;
+  }) : [];
+
   // Spectrogram rendering effect
   useEffect(() => {
-    if (!canvasRef.current || !data || !data.history || data.history.length === 0) return;
+    if (!canvasRef.current || !data || historyToRender.length === 0) return;
     
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -177,10 +221,10 @@ export default function SchumannPage() {
 
 
     // Draw solid space background for graph area
-    ctx.fillStyle = '#030308';
+    ctx.fillStyle = '#000028';
     ctx.fillRect(0, graphTop, width, graphHeight);
 
-    const cols = data.history; // Exactly 24 blocks representing the last 72 hours
+    const cols = historyToRender; // Use simulated history when actively 24 blocks representing the last 72 hours
     
     // Precise current time (ŞİMDİ) X placement based on the user's browser time
     const startTimeMs = new Date(cols[0].time.endsWith('Z') ? cols[0].time : cols[0].time + 'Z').getTime();
@@ -206,9 +250,9 @@ export default function SchumannPage() {
       const isPredicted = x >= nowX;
 
       // Base background color
-      let baseR = 3;
-      let baseG = 3;
-      let baseB = 10;
+      let baseR = 0;
+      let baseG = 0;
+      let baseB = 40;
 
       // Smooth resonance color calculation
       const resColor = getResonanceColor(kp);
@@ -222,12 +266,16 @@ export default function SchumannPage() {
         const resonances = [7.83, 14.1, 20.3, 26.4, 32.4];
         let onResonance = false;
         let resonanceDist = 999;
+        let resonanceIdx = -1;
 
-        resonances.forEach(res => {
+        resonances.forEach((res, idx) => {
           const dist = Math.abs(freqHz - res);
-          if (dist < 2.0) {
+          if (dist < 3.2) {
             onResonance = true;
-            resonanceDist = Math.min(resonanceDist, dist);
+            if (dist < resonanceDist) {
+              resonanceDist = dist;
+              resonanceIdx = idx;
+            }
           }
         });
 
@@ -251,11 +299,34 @@ export default function SchumannPage() {
 
         if (onResonance) {
           // Quadratic falloff for smooth glowing edges on the horizontal lines
-          const strength = Math.pow(Math.max(0, 1 - resonanceDist / 2.0), 2.2);
+          const strength = Math.pow(Math.max(0, 1 - resonanceDist / 3.2), 2.0);
           
-          r += resColor.r * strength;
-          g += resColor.g * strength;
-          b += resColor.b * strength;
+          // 1. En düşük değer rengini (0, 110, 140) her zaman ve her yerde çiz
+          const baseAlpha = 0.35 * strength;
+          r = r * (1 - baseAlpha) + 0 * baseAlpha;
+          g = g * (1 - baseAlpha) + 110 * baseAlpha;
+          b = b * (1 - baseAlpha) + 140 * baseAlpha;
+
+          // 2. Sadece Genlik (Kp) 0.1 ve üzeri olduğunda üzerine ekstra yarı şeffaf genlik rengi ekle
+          if (kp >= 0.1) {
+            const lineR = resColor.r;
+            const lineG = resColor.g;
+            const lineB = resColor.b;
+
+            // 8Hz'de şeffaflık %0 (opaklık 1.00) olup uzaklaştıkça %20 artacak şekilde (yani opaklığı 1.00'dan başlatıp 0.20 düşürüyoruz)
+            // 8Hz (idx = 0) -> Opaklık = 1.00 (şeffaflık %0 - tam net renk)
+            // 14Hz (idx = 1) -> Opaklık = 0.80 (şeffaflık %20)
+            // 20Hz (idx = 2) -> Opaklık = 0.60 (şeffaflık %40)
+            // 26Hz (idx = 3) -> Opaklık = 0.40 (şeffaflık %60)
+            // 32Hz (idx = 4) -> Opaklık = 0.20 (şeffaflık %80)
+            const alpha = 1.00 - resonanceIdx * 0.20;
+
+            // Rengi doğrudan tam yoğunluğuyla bindiriyoruz
+            const blend = alpha * strength;
+            r = r * (1 - blend) + lineR * blend;
+            g = g * (1 - blend) + lineG * blend;
+            b = b * (1 - blend) + lineB * blend;
+          }
         }
 
         // Add vertical scanline noise during active/storm states (Kp >= 5.0)
@@ -412,7 +483,22 @@ export default function SchumannPage() {
       }
     });
 
-  }, [data, timestamp, hoveredX]);
+    // 8. Auto-scroll container to center the "ŞİMDİ" vertical line on initial load
+    if (!hasAutoScrolled.current && scrollContainerRef.current && nowPct >= 0 && nowPct <= 1) {
+      const container = scrollContainerRef.current;
+      const targetScrollLeft = nowX - container.clientWidth / 2;
+      setTimeout(() => {
+        if (container) {
+          container.scrollTo({
+            left: Math.max(0, targetScrollLeft),
+            behavior: 'smooth'
+          });
+        }
+      }, 300);
+      hasAutoScrolled.current = true;
+    }
+
+  }, [data, timestamp, hoveredX, simulatedKp]);
 
   const handleRefresh = () => {
     fetchData();
@@ -421,13 +507,13 @@ export default function SchumannPage() {
   // Handle interactive mouse moves over the spectrogram
   const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
-    if (!canvas || !data || !data.history || data.history.length === 0) return;
+    if (!canvas || !data || historyToRender.length === 0) return;
     
     const rect = canvas.getBoundingClientRect();
     const xPct = (e.clientX - rect.left) / rect.width;
     const xCanvas = xPct * canvas.width;
 
-    const cols = data.history;
+    const cols = historyToRender;
     const startTimeMs = new Date(cols[0].time + 'Z').getTime();
     const totalDurationMs = cols.length * 3 * 60 * 60 * 1000;
     const targetTimeMs = startTimeMs + xPct * totalDurationMs;
@@ -565,8 +651,8 @@ export default function SchumannPage() {
               {isLoading ? (
                 <div className="h-8 w-16 bg-white/5 animate-pulse rounded mx-auto"></div>
               ) : (
-                <div className={`text-4xl font-extrabold my-2 transition-colors duration-300 ${getKpTextColorClass(data?.current_kp ?? 0)}`}>
-                  {data?.current_kp}
+                <div className={`text-4xl font-extrabold my-2 transition-colors duration-300 ${getKpTextColorClass(simulatedKp !== null ? simulatedKp : (data?.current_kp ?? 0))}`}>
+                  {simulatedKp !== null ? simulatedKp.toFixed(1) : data?.current_kp}
                 </div>
               )}
             </div>
@@ -581,101 +667,88 @@ export default function SchumannPage() {
               </div>
               {isLoading ? (
                 <div className="h-8 w-24 bg-white/5 animate-pulse rounded"></div>
-              ) : (
-                <div className="text-xl font-extrabold text-white flex items-center gap-2">
-                  <span className={`w-2.5 h-2.5 rounded-full ${
-                    (data?.current_kp ?? 0) >= 5
-                      ? 'bg-red-500 animate-ping'
-                      : (data?.current_kp ?? 0) >= 4
-                      ? 'bg-orange-400'
-                      : (data?.current_kp ?? 0) >= 3
-                      ? 'bg-amber-400'
-                      : 'bg-emerald-400'
-                  }`}></span>
-                  {data?.status_label}
-                </div>
-              )}
-              {!isLoading && data?.status_desc && (
-                <p className="text-sm md:text-[14.5px] text-white/90 leading-relaxed border-t border-white/5 pt-3 mt-3 animate-in fade-in duration-300">
-                  {data.status_desc}
-                </p>
-              )}
+              ) : (() => {
+                const activeKp = simulatedKp !== null ? simulatedKp : (data?.current_kp ?? 0);
+                const activeLabel = simulatedKp !== null ? getSimulatedStatus(simulatedKp).label : data?.status_label;
+                const activeDesc = simulatedKp !== null ? getSimulatedStatus(simulatedKp).desc : data?.status_desc;
+                return (
+                  <>
+                    <div className="text-xl font-extrabold text-white flex items-center gap-2">
+                      <span className={`w-2.5 h-2.5 rounded-full ${
+                        activeKp >= 5
+                          ? 'bg-red-500 animate-ping'
+                          : activeKp >= 4
+                          ? 'bg-orange-400'
+                          : activeKp >= 3
+                          ? 'bg-amber-400'
+                          : 'bg-emerald-400'
+                      }`}></span>
+                      {activeLabel}
+                    </div>
+                    {activeDesc && (
+                      <p className="text-sm md:text-[14.5px] text-white/90 leading-relaxed border-t border-white/5 pt-3 mt-3 animate-in fade-in duration-300">
+                        {activeDesc}
+                      </p>
+                    )}
+                  </>
+                );
+              })()}
             </div>
           </div>
 
         </div>
 
-        {/* Veri Durumu ve Güncelleme Zamanı */}
-        <div className="flex flex-col sm:flex-row items-center justify-between p-4 bg-white/5 border border-white/10 rounded-2xl mb-8 backdrop-blur-sm gap-4">
-          <div className="flex items-center gap-3 text-sm text-mystic-text-muted text-center sm:text-left">
-            <Info size={18} className="text-[#00E5FF]" />
-            <div>
-              <span>Son Ölçüm Zamanı (UTC): </span>
-              <strong className="text-white font-mono">
-                {data?.updated_at ? new Date(data.updated_at + 'Z').toLocaleString('tr-TR') : '...'}
-              </strong>
-            </div>
-          </div>
-          <button 
-            onClick={handleRefresh}
-            disabled={isLoading}
-            className="flex items-center gap-2 bg-[#00E5FF]/20 hover:bg-[#00E5FF]/30 border border-[#00E5FF]/40 hover:border-[#00E5FF]/60 text-white font-bold py-2 px-5 rounded-xl transition-all disabled:opacity-50 text-sm cursor-pointer"
-          >
-            <RefreshCw size={16} className={isLoading ? 'animate-spin' : ''} />
-            {isLoading ? 'Veriler Alınıyor...' : 'Verileri Yenile'}
-          </button>
-        </div>
 
-        {/* Kozmik Rezonans Bildirimleri Kartı */}
+
+
+
+        {/* Kozmik Enerji Simülatörü Kartı */}
         <div className="bg-black/40 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8 relative overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-start gap-4">
-              <div className={`p-3 rounded-2xl ${isApprenticeOrAbove ? 'bg-[#00E5FF]/10 text-[#00E5FF] border border-[#00E5FF]/20' : 'bg-white/5 text-mystic-text-muted border border-white/5'}`}>
-                {notificationsEnabled && isApprenticeOrAbove ? <Bell className="animate-bounce" size={24} /> : <BellOff size={24} />}
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  Kozmik Rezonans Bildirimleri
-                  {!isApprenticeOrAbove && (
-                    <span className="bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <Lock size={10} /> Çırak Seviyesi
-                    </span>
-                  )}
-                </h3>
-                <p className="text-xs text-mystic-text-muted mt-1 max-w-xl">
-                  {isApprenticeOrAbove 
-                    ? "Jeomanyetik fırtınaları (Kp ≥ 5) ve yoğun iyonosferik enerji patlamalarını anlık bildirim olarak alın."
-                    : "Bu özellik Çırak seviyesi ve üzeri üyelerimiz içindir. Seviyenizi yükselterek bildirimleri aktif edebilirsiniz."}
-                </p>
-              </div>
-            </div>
-            
+          <div className="flex flex-col gap-4">
             <div>
-              {isApprenticeOrAbove ? (
-                <button
-                  onClick={toggleNotifications}
-                  className={`px-5 py-2.5 rounded-xl font-bold text-sm border transition-all cursor-pointer flex items-center gap-2 ${
-                    notificationsEnabled
-                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
-                      : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
-                  }`}
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                Kozmik Enerji Simülatörü
+                <span className="bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  Test Paneli
+                </span>
+              </h3>
+              <p className="text-xs text-mystic-text-muted mt-1">
+                Farklı Genlik seviyelerinin etkilerini ve renk değişimlerini test edin
+              </p>
+            </div>
+
+            <div className="flex items-center gap-4 mt-2">
+              <span className="text-xs text-mystic-text-muted font-semibold">Genlik 0</span>
+              <input 
+                type="range" 
+                min="0" 
+                max="9" 
+                step="0.1" 
+                value={simulatedKp !== null ? simulatedKp : (data?.current_kp ?? 0)}
+                onChange={(e) => setSimulatedKp(parseFloat(e.target.value))}
+                className="flex-1 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer" 
+                style={{ accentColor: '#D4AF37' }}
+              />
+              <span className="text-xs text-mystic-text-muted font-semibold">Genlik 9</span>
+            </div>
+
+            <div className="flex items-center justify-between mt-2 pt-4 border-t border-white/5">
+              <div className="text-sm text-mystic-text-muted flex items-center gap-2">
+                <span>Simüle Edilen Değer:</span>
+                <strong className={simulatedKp !== null ? "text-[#D4AF37] font-bold text-[15px]" : "text-white font-bold text-[15px]"}>
+                  {simulatedKp !== null ? `Genlik ${simulatedKp.toFixed(1)}` : 'Canlı Akış'}
+                </strong>
+              </div>
+              {simulatedKp !== null && (
+                <button 
+                  onClick={() => setSimulatedKp(null)}
+                  className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold py-1.5 px-4 rounded-xl text-xs transition-all cursor-pointer"
                 >
-                  {notificationsEnabled ? 'Bildirimler Açık' : 'Bildirimleri Aç'}
+                  Canlı Veriye Dön
                 </button>
-              ) : (
-                <div className="flex items-center gap-2 bg-[#D4AF37]/5 border border-[#D4AF37]/20 text-[#D4AF37] text-xs font-semibold px-4 py-2.5 rounded-xl backdrop-blur-sm select-none">
-                  <Lock size={14} /> Kilitli
-                </div>
               )}
             </div>
           </div>
-          
-          {notificationMsg && (
-            <div className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-300 text-xs flex items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-              {notificationMsg}
-            </div>
-          )}
         </div>
 
         {error && (
@@ -708,33 +781,31 @@ export default function SchumannPage() {
             <div className="w-full flex flex-col justify-center items-center py-6 bg-black/40 rounded-2xl border border-white/5 relative overflow-hidden group">
               
               <div className="absolute top-4 right-4 bg-red-600 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1.5 backdrop-blur-sm z-10 shadow-lg tracking-wider uppercase animate-pulse">
-                <span className="w-1.5 h-1.5 rounded-full bg-white"></span> Canlı İzleme
+                <span className="w-1.5 h-1.5 rounded-full bg-white"></span> Canlı
               </div>
 
-              {/* Interactive Spectrogram Area with HTML Tooltip overlay */}
-              {/* Interactive Spectrogram Area with HTML Tooltip overlay */}
-              <div className="relative w-full">
-                <div className="w-full max-w-full overflow-x-auto flex justify-start md:justify-center px-4 relative">
-                  <div className="relative">
-                    
-                    {/* Sticky Hz Scale */}
-                    <div className="sticky left-4 z-10 pointer-events-none h-0 w-0">
-                      <div className="absolute left-0 top-0 h-[270px] w-14 bg-black/85 backdrop-blur-[2px] border-r border-white/10 rounded-l-lg flex flex-col justify-start">
-                        {labelResonances.map(res => {
-                          const yPct = ((graphTop + (res / 40) * graphHeight) / canvasHeight) * 100;
-                          return (
-                            <span 
-                              key={res}
-                              className="absolute left-2.5 text-[9px] font-bold font-mono text-white/70 -translate-y-1/2 select-none"
-                              style={{ top: `${yPct}%` }}
-                            >
-                              {res} Hz
-                            </span>
-                          );
-                        })}
-                      </div>
-                    </div>
+              {/* Flex Container for Static Hz Panel + Horizontal Scroll Canvas */}
+              <div className="flex gap-2 items-start mt-6 w-full px-4 relative">
+                
+                {/* Left Column: Fixed Hz Scale (outside of scroll container) */}
+                <div className="w-12 flex flex-col justify-start relative select-none pointer-events-none shrink-0" style={{ height: '270px' }}>
+                  {labelResonances.map(res => {
+                    const yPct = ((graphTop + (res / 40) * graphHeight) / canvasHeight) * 100;
+                    return (
+                      <span 
+                        key={res}
+                        className="absolute right-1.5 text-[9.5px] font-bold font-mono text-white/50 -translate-y-1/2"
+                        style={{ top: `${yPct}%` }}
+                      >
+                        {res} Hz
+                      </span>
+                    );
+                  })}
+                </div>
 
+                {/* Right Column: Scrollable Canvas Container */}
+                <div ref={scrollContainerRef} className="flex-1 overflow-x-auto relative min-w-0">
+                  <div className="relative">
                     <canvas 
                       ref={canvasRef} 
                       width={800} 
@@ -845,7 +916,7 @@ export default function SchumannPage() {
 
               {/* Bars Grid */}
               <div className="flex items-end justify-between h-48 w-full border-b border-white/10 pb-2 gap-1 md:gap-2 px-1">
-                {data?.history.map((item, index) => {
+                {historyToRender.map((item, index) => {
                   const isForecast = !!item.predicted;
                   return (
                     <div 
@@ -866,7 +937,7 @@ export default function SchumannPage() {
 
               {/* X Axis Labels */}
               <div className="flex justify-between text-[9px] text-mystic-text-muted mt-2 px-1">
-                {data?.history.map((item, index) => {
+                {historyToRender.map((item, index) => {
                   if (index % 4 === 0) {
                     return (
                       <span key={index} className="text-center w-12 font-mono">
@@ -907,6 +978,58 @@ export default function SchumannPage() {
         </div>
 
 
+
+        {/* Kozmik Rezonans Bildirimleri Kartı */}
+        <div className="bg-black/40 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8 relative overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-start gap-4">
+              <div className={`p-3 rounded-2xl ${isApprenticeOrAbove ? 'bg-[#00E5FF]/10 text-[#00E5FF] border border-[#00E5FF]/20' : 'bg-white/5 text-mystic-text-muted border border-white/5'}`}>
+                {notificationsEnabled && isApprenticeOrAbove ? <Bell className="animate-bounce" size={24} /> : <BellOff size={24} />}
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  Kozmik Rezonans Bildirimleri
+                  {!isApprenticeOrAbove && (
+                    <span className="bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <Lock size={10} /> Çırak Seviyesi
+                    </span>
+                  )}
+                </h3>
+                <p className="text-xs text-mystic-text-muted mt-1 max-w-xl">
+                  {isApprenticeOrAbove 
+                    ? "Jeomanyetik fırtınaları (Kp ≥ 5) ve yoğun iyonosferik enerji patlamalarını anlık bildirim olarak alın."
+                    : "Bu özellik Çırak seviyesi ve üzeri üyelerimiz içindir. Seviyenizi yükselterek bildirimleri aktif edebilirsiniz."}
+                </p>
+              </div>
+            </div>
+            
+            <div>
+              {isApprenticeOrAbove ? (
+                <button
+                  onClick={toggleNotifications}
+                  className={`px-5 py-2.5 rounded-xl font-bold text-sm border transition-all cursor-pointer flex items-center gap-2 ${
+                    notificationsEnabled
+                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
+                      : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
+                  }`}
+                >
+                  {notificationsEnabled ? 'Bildirimler Açık' : 'Bildirimleri Aç'}
+                </button>
+              ) : (
+                <div className="flex items-center gap-2 bg-[#D4AF37]/5 border border-[#D4AF37]/20 text-[#D4AF37] text-xs font-semibold px-4 py-2.5 rounded-xl backdrop-blur-sm select-none">
+                  <Lock size={14} /> Kilitli
+                </div>
+              )}
+            </div>
+          </div>
+          
+          {notificationMsg && (
+            <div className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-300 text-xs flex items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+              {notificationMsg}
+            </div>
+          )}
+        </div>
 
         {/* Bilgilendirme Bölümü (Açılır/Kapanır) */}
         <div className="bg-black/40 border border-white/10 rounded-3xl p-6 md:p-8 backdrop-blur-md transition-all duration-300">
