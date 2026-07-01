@@ -197,8 +197,10 @@ export default function SchumannPage() {
     const cols = data.history; // Exactly 24 blocks representing the last 72 hours
     
     // Precise current time (ŞİMDİ) X placement based on the user's browser time
-    const firstForecastIdx = cols.findIndex(item => item.predicted);
-    const nowPct = firstForecastIdx !== -1 ? firstForecastIdx / cols.length : 1.0;
+    const startTimeMs = new Date(cols[0].time.endsWith('Z') ? cols[0].time : cols[0].time + 'Z').getTime();
+    const totalDurationMs = cols.length * 3 * 60 * 60 * 1000; // 72 hours in ms
+    const currentMs = Date.now();
+    const nowPct = (currentMs - startTimeMs) / totalDurationMs;
     const nowX = nowPct * width;
 
     // 1. Draw Spectrogram Data Column by Column
