@@ -1,66 +1,66 @@
 export const RESOURCES = [
   {
-    title: 'Ezoterizm ve Gizem Sanatları',
+    title: 'Gizli Öğreti (The Secret Doctrine) - H. P. Blavatsky',
     type: 'book',
     fileUrl: '',
     level: 0,
-    description: 'Ruhsal arayışın ilk adımları ve ezoterik sembollerin dili üzerine giriş kitabı.',
+    description: 'Ruhsal arayışın ilk adımları, evrenin ve insanın yaradılışının teozofik ve ezoterik temelleri.',
     sort: 1
   },
   {
-    title: 'Schumann Rezonansı ve İnsan Beyni',
+    title: 'Schumann Rezonansı ve İnsan Beyin Dalgaları İlişkisi',
     type: 'research',
-    fileUrl: '',
     level: 0,
-    description: "Dünya'nın kalp atışının insan beyin dalgaları üzerindeki etkilerine dair bilimsel makaleler ve araştırmalar.",
+    fileUrl: '',
+    description: "Dünya'nın doğal frekansı olan 7.83Hz Schumann rezonansının, insan EEG alfa ve theta dalga aktiviteleriyle olan biyolojik uyumunun araştırılması.",
     sort: 2
   },
   {
-    title: 'Enerji Anatomisi ve Çakralar',
+    title: 'Çakralar (The Chakras) - C. W. Leadbeater',
     type: 'book',
     fileUrl: '',
     level: 1,
-    description: 'Çakra merkezlerinin, enerji kanallarının (nadi) ve biyo-alanın detaylı çalışma prensipleri.',
+    description: 'Enerji merkezlerinin (çakralar), nadilerin ve eterik bedenin durugörüyle incelenmiş temel anatomi kitabı.',
     sort: 3
   },
   {
-    title: 'Topraklanma ve Enerji Koruma Kılavuzu',
-    type: 'pdf',
-    fileUrl: '/pdf/topraklanma_rehberi.pdf',
+    title: 'Aura Koruma Teknikleri ve Topraklanma Metotları',
+    type: 'research',
     level: 1,
-    description: 'Enerji çalışmalarından sonra auranızı dış dünyadan korumak için pratik topraklanma ve arınma egzersizleri.',
+    fileUrl: '',
+    description: 'Enerji çalışmalarından sonra auranın sevgi kalkanıyla mühürlenmesi ve toprağa basarak statik yüklerin boşaltılması süreçlerinin araştırılması.',
     sort: 4
   },
   {
-    title: 'Evrensel Kabala ve Hayat Ağacı',
+    title: 'Gül-Haç Kabalası ve Hayat Ağacı - Dion Fortune',
     type: 'book',
     fileUrl: '',
     level: 2,
-    description: 'Sefirotların gizemleri, yansımaları ve evrensel yaratım yasalarının detaylı incelemesi.',
+    description: 'Sefirotların gizemleri, yolları, kozmik enerjiler ve Kabala felsefesinin batı gizem geleneğindeki pratik yansımaları.',
     sort: 5
   },
   {
-    title: 'İlahi Geometri ve Numerolojik Şifreler',
+    title: 'Kutsal Geometri ve Sayıların Ezoterik Dili',
     type: 'research',
-    fileUrl: '',
     level: 2,
-    description: 'Sayıların sembolizmi ve evrenin geometrik örüntülerinin arkasındaki ilahi düzen.',
+    fileUrl: '',
+    description: 'Pisagor ekolü sayı sembolizmi, fibonacci dizilimi ve doğadaki geometrik örüntülerin arkasındaki ilahi frekans düzeninin araştırılması.',
     sort: 6
   },
   {
-    title: 'Üçüncü Göz Aktivasyonu ve Yüksek Farkındalık',
-    type: 'pdf',
-    fileUrl: '/pdf/ucuncu_goz_aktivasyonu.pdf',
+    title: 'Epifiz Bezi ve Üçüncü Göz Aktivasyon Metotları',
+    type: 'research',
     level: 3,
-    description: 'Epifiz bezinin aktivasyonu, durugörü çalışmaları ve astral algının kapılarını aralayan ileri düzey ezoterik teknikler.',
+    fileUrl: '',
+    description: 'Geleneksel meditasyon yöntemlerinin epifiz bezi salgıları, melatonerjik döngüler ve durugörü algısı üzerindeki etkilerinin derinlemesine incelenmesi.',
     sort: 7
   },
   {
-    title: 'Simya ve Hakikat Öğretisi',
+    title: 'Büyük Simya Öğretisi (The Kybalion) - Üç İnisiye',
     type: 'book',
     fileUrl: '',
     level: 3,
-    description: 'Maddi simyanın ötesinde, ruhun olgunlaşma ve Hakikatle bütünleşme (Teklik) aşamaları.',
+    description: 'Hermetik felsefenin 7 evrensel yasası (Zihinsellik, Tekabül, Titreşim, Kutupluluk, Ritim, Sebep-Sonuç, Cinsiyet) ve Hakikate giden yolun temelleri.',
     sort: 8
   }
 ];
