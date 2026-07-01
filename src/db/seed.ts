@@ -24,6 +24,7 @@ import { CHAKRA_TEST_QUESTIONS } from '../data/chakraTestQuestions';
 import gatesData from '../data/gates.json';
 import { DAILY_AFFIRMATIONS } from '../data/affirmations';
 import { GUIDELINES } from '../data/guidelinesData';
+import { RESOURCES } from '../data/resourcesData';
 import { CATEGORIES, VENDORS, PRODUCTS } from '../data/marketplaceData';
 // mobile-only (web'e kopyalandı)
 import { ASTROLOGY_LESSONS } from '../data/astrologyLessons';
@@ -302,6 +303,15 @@ async function main() {
     color: g.color,
   }));
 
+  const resourceRows = RESOURCES.map((r, i) => ({
+    sort: r.sort ?? i,
+    title: r.title,
+    type: r.type,
+    fileUrl: r.fileUrl ?? null,
+    level: r.level,
+    description: r.description ?? null,
+  }));
+
   const categoryRows = CATEGORIES.map((c) => ({ id: c.id, name: c.name, icon: c.icon }));
   const vendorRows = VENDORS.map((v) => ({
     id: v.id,
@@ -343,6 +353,7 @@ async function main() {
     await tx.delete(s.numerologyCalcData);
     await tx.delete(s.affirmations);
     await tx.delete(s.guidelines);
+    await tx.delete(s.resources);
     // Faz 7 inline içerikler
     await tx.delete(s.breathworkTechniques);
     await tx.delete(s.meditationFrequencies);
@@ -371,6 +382,7 @@ async function main() {
     await chunkedInsert(tx, s.vendors, vendorRows);
     await chunkedInsert(tx, s.products, productRows);
     await chunkedInsert(tx, s.guidelines, guidelineRows);
+    await chunkedInsert(tx, s.resources, resourceRows);
     // Faz 7 inline içerikler
     await chunkedInsert(tx, s.breathworkTechniques, breathworkRows);
     await chunkedInsert(tx, s.meditationFrequencies, meditationRows);
@@ -399,6 +411,7 @@ async function main() {
     numerology_calc_data: calcRows.length,
     affirmations: affirmationRows.length,
     guidelines: guidelineRows.length,
+    resources: resourceRows.length,
     product_categories: categoryRows.length,
     vendors: vendorRows.length,
     products: productRows.length,

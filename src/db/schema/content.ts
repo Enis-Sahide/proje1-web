@@ -141,3 +141,13 @@ export const guidelines = pgTable('guidelines', {
   content: text('content'),
   color: text('color'),
 });
+
+export const resources = pgTable('resources', {
+  id: serial('id').primaryKey(),
+  sort: integer('sort').notNull().default(0),
+  title: text('title').notNull(),
+  type: text('type').notNull(), // 'book' | 'pdf' | 'research'
+  fileUrl: text('file_url'),
+  level: smallint('level').notNull().default(0), // 0=seeker, 1=apprentice, 2=journeyman, 3=master
+  description: text('description'),
+});
