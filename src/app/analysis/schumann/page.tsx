@@ -566,7 +566,7 @@ export default function SchumannPage() {
           <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-between">
             <div>
               <div className="flex items-center justify-between text-mystic-text-muted mb-4">
-                <span className="text-xs uppercase tracking-wider font-semibold">Anlık Kp Endeksi</span>
+                <span className="text-xs uppercase tracking-wider font-semibold">Anlık Genlik</span>
                 <Activity size={16} className="text-[#00E5FF]" />
               </div>
               {isLoading ? (
@@ -574,12 +574,12 @@ export default function SchumannPage() {
               ) : (
                 <div className="text-3xl font-extrabold text-white flex items-baseline gap-2">
                   {data?.current_kp}
-                  <span className="text-xs text-mystic-text-muted font-normal">/ 9 Kp</span>
+                  <span className="text-xs text-mystic-text-muted font-normal">/ 9</span>
                 </div>
               )}
             </div>
             <div className="mt-4 text-xs text-mystic-text-muted">
-              Jeomanyetik aktivite ölçeği (0 = Sakin, 9 = Ekstrem).
+              Jeomanyetik aktivite genlik ölçeği (0 = Sakin, 9 = Ekstrem).
             </div>
           </div>
 
@@ -718,7 +718,7 @@ export default function SchumannPage() {
           <div className="border-b border-white/10 pb-4 mb-6">
             <h2 className="text-xl font-bold flex items-center gap-2 text-white">
               <Waves size={22} className="text-[#00E5FF]" />
-              Canlı Kozmik Enerji Spektrogramı (Son 72 Saat)
+              Schumann Rezonans Spektrogramı
             </h2>
             <p className="text-xs text-mystic-text-muted mt-1">
               Frekans dalgalanmalarını ve Kp Index kaynaklı enerjisel fırtına (beyaz patlamalar) durumunu izleyin. (Saat bilgisi için grafiğin üzerine gelin)
@@ -815,9 +815,7 @@ export default function SchumannPage() {
                 </div>
               </div>
 
-              <p className="text-center text-xs text-mystic-text-muted max-w-xl mt-6 px-4">
-                * Grafik, NOAA Kp-Index verilerinden simüle edilen 72 saatlik elektromanyetik akışı temsil eder. Dikey eksen rezonans frekanslarını (Hz), yatay eksen ise zamanı gösterir. Grafikteki beyaz dik çizgiler enerji fırtınalarını simgeler.
-              </p>
+
             </div>
           )}
         </div>
@@ -827,7 +825,7 @@ export default function SchumannPage() {
           <div className="border-b border-white/10 pb-4 mb-6">
             <h2 className="text-xl font-bold flex items-center gap-2 text-white">
               <Activity size={22} className="text-[#00E5FF]" />
-              Jeomanyetik Kp Eğilim Grafiği (Son 72 Saat)
+              Jeomanyetik Genlik Eğilimi (Son 72 Saat)
             </h2>
             <p className="text-xs text-mystic-text-muted mt-1">
               Ölçülen jeomanyetik fırtına değerlerinin son 3 günlük (72 saat) saatlik blok gösterimi (Düz çizgiler geçmişi, kesikli çizgiler 24 saatlik tahmini gösterir).
@@ -853,9 +851,9 @@ export default function SchumannPage() {
                     <span className="text-mystic-text-muted">Zaman (UTC):</span>
                     <strong className="text-white">{formatTimeRange(hoveredBar.time)}</strong>
                     <span className="text-mystic-text-muted">|</span>
-                    <span className="text-mystic-text-muted">Fırtına Seviyesi:</span>
+                    <span className="text-mystic-text-muted">Genlik:</span>
                     <strong className="text-white">
-                      {hoveredBar.kp} Kp
+                      {hoveredBar.kp.toFixed(2)}
                     </strong>
                     <span className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase ${
                       hoveredBar.predicted ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
@@ -966,6 +964,17 @@ export default function SchumannPage() {
             <div className="mt-8 pt-6 border-t border-white/10 animate-in fade-in slide-in-from-top-4 duration-300">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm text-mystic-text-muted">
                 <div className="space-y-4">
+                  <div className="bg-white/5 border border-white/10 p-4 rounded-2xl mb-4">
+                    <strong className="text-white">Grafiklerin Yapısı ve Okunması:</strong>
+                    <div className="mt-2 text-xs leading-relaxed flex flex-col gap-2">
+                      <p>
+                        <strong>• Schumann Rezonans Spektrogramı:</strong> Elektromanyetik alanın dikey eksende frekans (0 - 40 Hz), yatay eksende ise zaman bazlı yoğunluğunu gösterir. Yatay renkli bantlar (7.83, 14, 20 Hz vb.) ana rezonans frekanslarını, dikey beyaz patlamalar ise güneş fırtınası veya manyetik dalgalanma anlarını temsil eder.
+                      </p>
+                      <p>
+                        <strong>• Jeomanyetik Kp Eğilimi:</strong> 72 saatlik zaman diliminde ölçülen ve tahmin edilen jeomanyetik fırtına derecelerini (Kp) gösterir. Düz sütunlar kesinleşmiş geçmiş ölçümleri, kesikli sınırları olan sütunlar ise gelecek 24 saatlik tahmini temsil eder.
+                      </p>
+                    </div>
+                  </div>
                   <p>
                     <strong>Planetary K-Index (Kp Endeksi) Nedir?</strong>
                     <br />
