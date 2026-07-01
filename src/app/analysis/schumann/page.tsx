@@ -560,7 +560,7 @@ export default function SchumannPage() {
         </div>
 
         {/* Gösterge Panelleri */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           
           {/* Card 1: Kp Endeksi */}
           <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-center items-center md:col-span-1">
@@ -580,7 +580,7 @@ export default function SchumannPage() {
           </div>
 
           {/* Card 2: Durum Seviyesi */}
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-between md:col-span-2">
+          <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-between md:col-span-3">
             <div>
               <div className="flex items-center justify-between text-mystic-text-muted mb-4">
                 <span className="text-xs uppercase tracking-wider font-semibold">Manyetik Alan Durumu</span>
@@ -603,7 +603,7 @@ export default function SchumannPage() {
                 </div>
               )}
               {!isLoading && data?.status_desc && (
-                <p className="text-xs text-mystic-text-muted leading-relaxed border-t border-white/5 pt-3 mt-3 animate-in fade-in duration-300">
+                <p className="text-sm md:text-[14.5px] text-white/90 leading-relaxed border-t border-white/5 pt-3 mt-3 animate-in fade-in duration-300">
                   {data.status_desc}
                 </p>
               )}
