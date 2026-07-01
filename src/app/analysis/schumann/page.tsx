@@ -721,59 +721,62 @@ export default function SchumannPage() {
               </div>
 
               {/* Interactive Spectrogram Area with HTML Tooltip overlay */}
-              <div className="w-full max-w-full overflow-x-auto flex flex-col items-center px-4 relative">
-                
-                <canvas 
-                  ref={canvasRef} 
-                  width={800} 
-                  height={270}
-                  onMouseMove={handleMouseMove}
-                  onMouseLeave={handleMouseLeave}
-                  className="rounded-lg border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)] cursor-crosshair"
-                />
+              {/* Interactive Spectrogram Area with HTML Tooltip overlay */}
+              <div className="relative w-full">
+                <div className="w-full max-w-full overflow-x-auto flex flex-col items-center px-4 relative">
+                  
+                  <canvas 
+                    ref={canvasRef} 
+                    width={800} 
+                    height={270}
+                    onMouseMove={handleMouseMove}
+                    onMouseLeave={handleMouseLeave}
+                    className="rounded-lg border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)] cursor-crosshair"
+                  />
+
+                  {/* Floating Interactive Tooltip */}
+                  {hoverInfo && (
+                    <div 
+                      className="absolute bg-[#08080C]/95 border border-[#00E5FF]/40 backdrop-blur-md rounded-2xl p-4 text-xs shadow-[0_10px_30px_rgba(0,229,255,0.25)] pointer-events-none z-20 flex flex-col gap-2 text-left animate-in fade-in zoom-in-95 duration-100 min-w-[200px]"
+                      style={{ 
+                        left: `${hoverInfo.left}px`, 
+                        top: `${hoverInfo.top}px`,
+                        transform: 'translate(-50%, -115%)'
+                      }}
+                    >
+                      <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-1.5">
+                        <span className="font-bold text-[#00E5FF] font-mono">{hoverInfo.timeStr}</span>
+                        <span className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wide ${
+                          hoverInfo.isForecast ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
+                        }`}>
+                          {hoverInfo.isForecast ? 'Tahmin' : 'Ölçüm'}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2 mt-1">
+                        <span className="text-mystic-text-muted">Manyetik Akış:</span>
+                        <span className="font-extrabold text-white font-mono">{hoverInfo.kp.toFixed(2)} Kp</span>
+                      </div>
+                      <div className="text-[10px] text-cyan-300 font-semibold border-t border-white/5 pt-1.5 mt-0.5">
+                        {hoverInfo.spiritualStatus}
+                      </div>
+                      {hoverInfo.isForecast ? (
+                        <div className="text-[9px] text-amber-400 font-medium italic mt-1 border-t border-white/5 pt-1">
+                          * İleri Dönük Tahmin (Gerçek ölçümler geldiğinde güncellenecektir)
+                        </div>
+                      ) : (
+                        <div className="text-[9px] text-emerald-400 font-medium italic mt-1 border-t border-white/5 pt-1">
+                          ✓ Kesinleşmiş Ölçüm
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 {/* Watermark Logo & Text */}
                 <div className="absolute right-8 top-4 flex items-center gap-1.5 bg-black/45 backdrop-blur-sm border border-white/10 px-3 py-1.5 rounded-xl pointer-events-none select-none z-10 opacity-60">
                   <img src="/logo.png" className="w-3.5 h-3.5 rounded-full" alt="7LAYERS Logo" />
                   <span className="text-[10px] font-bold text-white tracking-widest font-mono">7LAYERS</span>
                 </div>
-
-                {/* Floating Interactive Tooltip */}
-                {hoverInfo && (
-                  <div 
-                    className="absolute bg-[#08080C]/95 border border-[#00E5FF]/40 backdrop-blur-md rounded-2xl p-4 text-xs shadow-[0_10px_30px_rgba(0,229,255,0.25)] pointer-events-none z-20 flex flex-col gap-2 text-left animate-in fade-in zoom-in-95 duration-100 min-w-[200px]"
-                    style={{ 
-                      left: `${hoverInfo.left}px`, 
-                      top: `${hoverInfo.top}px`,
-                      transform: 'translate(-50%, -115%)'
-                    }}
-                  >
-                    <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-1.5">
-                      <span className="font-bold text-[#00E5FF] font-mono">{hoverInfo.timeStr}</span>
-                      <span className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase tracking-wide ${
-                        hoverInfo.isForecast ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
-                      }`}>
-                        {hoverInfo.isForecast ? 'Tahmin' : 'Ölçüm'}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-mystic-text-muted">Manyetik Akış:</span>
-                      <span className="font-extrabold text-white font-mono">{hoverInfo.kp.toFixed(2)} Kp</span>
-                    </div>
-                    <div className="text-[10px] text-cyan-300 font-semibold border-t border-white/5 pt-1.5 mt-0.5">
-                      {hoverInfo.spiritualStatus}
-                    </div>
-                    {hoverInfo.isForecast ? (
-                      <div className="text-[9px] text-amber-400 font-medium italic mt-1 border-t border-white/5 pt-1">
-                        * İleri Dönük Tahmin (Gerçek ölçümler geldiğinde güncellenecektir)
-                      </div>
-                    ) : (
-                      <div className="text-[9px] text-emerald-400 font-medium italic mt-1 border-t border-white/5 pt-1">
-                        ✓ Kesinleşmiş Ölçüm
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
 
               <p className="text-center text-xs text-mystic-text-muted max-w-xl mt-6 px-4">
