@@ -574,12 +574,8 @@ export default function SchumannPage() {
               ) : (
                 <div className="text-3xl font-extrabold text-white flex items-baseline gap-2">
                   {data?.current_kp}
-                  <span className="text-xs text-mystic-text-muted font-normal">/ 9</span>
                 </div>
               )}
-            </div>
-            <div className="mt-4 text-xs text-mystic-text-muted">
-              Jeomanyetik aktivite genlik ölçeği (0 = Sakin, 9 = Ekstrem).
             </div>
           </div>
 
@@ -606,9 +602,6 @@ export default function SchumannPage() {
                   {data?.status_label}
                 </div>
               )}
-            </div>
-            <div className="mt-4 text-xs text-mystic-text-muted">
-              Kozmik akışların manyetometrik etki derecesi.
             </div>
           </div>
 
