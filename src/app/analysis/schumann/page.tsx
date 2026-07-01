@@ -732,6 +732,12 @@ export default function SchumannPage() {
                   className="rounded-lg border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)] cursor-crosshair"
                 />
 
+                {/* Watermark Logo & Text */}
+                <div className="absolute right-8 top-4 flex items-center gap-1.5 bg-black/45 backdrop-blur-sm border border-white/10 px-3 py-1.5 rounded-xl pointer-events-none select-none z-10 opacity-60">
+                  <img src="/logo.png" className="w-3.5 h-3.5 rounded-full" alt="7LAYERS Logo" />
+                  <span className="text-[10px] font-bold text-white tracking-widest font-mono">7LAYERS</span>
+                </div>
+
                 {/* Floating Interactive Tooltip */}
                 {hoverInfo && (
                   <div 
@@ -795,7 +801,12 @@ export default function SchumannPage() {
             </div>
           ) : (
             <div className="w-full bg-black/40 rounded-2xl border border-white/5 p-6 relative">
-              
+              {/* Watermark Logo & Text */}
+              <div className="absolute right-6 top-6 flex items-center gap-1.5 bg-black/45 backdrop-blur-sm border border-white/10 px-3 py-1.5 rounded-xl pointer-events-none select-none z-10 opacity-60">
+                <img src="/logo.png" className="w-3.5 h-3.5 rounded-full" alt="7LAYERS Logo" />
+                <span className="text-[10px] font-bold text-white tracking-widest font-mono">7LAYERS</span>
+              </div>
+
               {/* Tooltip display space */}
               <div className="h-8 mb-4 text-center">
                 {hoveredBar ? (
