@@ -497,6 +497,13 @@ export default function SchumannPage() {
     return predicted ? 'bg-red-500/40 border border-dashed border-red-500' : 'bg-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)] hover:bg-red-400';
   };
 
+  const getKpTextColorClass = (kp: number) => {
+    if (kp < 3) return 'text-emerald-400';
+    if (kp < 4) return 'text-amber-400';
+    if (kp < 5) return 'text-orange-400';
+    return 'text-red-400';
+  };
+
   const formatTime = (timeStr: string) => {
     try {
       const d = new Date(timeStr.endsWith('Z') ? timeStr : timeStr + 'Z');
@@ -572,7 +579,7 @@ export default function SchumannPage() {
               {isLoading ? (
                 <div className="h-8 w-16 bg-white/5 animate-pulse rounded mx-auto"></div>
               ) : (
-                <div className="text-4xl font-extrabold text-white my-2">
+                <div className={`text-4xl font-extrabold my-2 transition-colors duration-300 ${getKpTextColorClass(data?.current_kp ?? 0)}`}>
                   {data?.current_kp}
                 </div>
               )}
