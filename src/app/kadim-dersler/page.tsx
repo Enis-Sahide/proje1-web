@@ -218,63 +218,65 @@ export default function KadimDerslerPage() {
         </div>
 
         {/* Seviyeye Uygun Kaynaklar */}
-        <div className="mt-16 bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl p-6 md:p-8">
-          <div className="flex items-center gap-4 mb-6">
-            <div className="w-12 h-12 rounded-2xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37]">
-              <Book size={24} />
+        {isAdmin && (
+          <div className="mt-16 bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl p-6 md:p-8">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-12 h-12 rounded-2xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37]">
+                <Book size={24} />
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold text-white">Seviyeye Uygun Kaynaklar</h2>
+                <p className="text-white/50 text-sm">
+                  Tekamül derecenize göre erişiminize açılan kitaplar, rehberler ve araştırma konuları.
+                </p>
+              </div>
             </div>
-            <div>
-              <h2 className="text-2xl font-bold text-white">Seviyeye Uygun Kaynaklar</h2>
-              <p className="text-white/50 text-sm">
-                Tekamül derecenize göre erişiminize açılan kitaplar, rehberler ve araştırma konuları.
-              </p>
-            </div>
-          </div>
 
-          {filteredResources.length === 0 ? (
-            <p className="text-white/40 text-sm italic">Henüz bu seviyeye uygun bir kaynak tanımlanmamış.</p>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {filteredResources.map((res: any) => {
-                const isPdf = res.type === 'pdf';
-                const isBook = res.type === 'book';
-                return (
-                  <div 
-                    key={res.id} 
-                    className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-[#D4AF37]/30 transition-all flex flex-col justify-between"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full ${
-                          isPdf ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 
-                          isBook ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 
-                          'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                        }`}>
-                          {res.type === 'pdf' ? 'PDF Rehber' : res.type === 'book' ? 'Kitap' : 'Araştırma'}
-                        </span>
-                        <span className="text-[10px] text-white/40">Derece Seviyesi: {res.level}</span>
+            {filteredResources.length === 0 ? (
+              <p className="text-white/40 text-sm italic">Henüz bu seviyeye uygun bir kaynak tanımlanmamış.</p>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {filteredResources.map((res: any) => {
+                  const isPdf = res.type === 'pdf';
+                  const isBook = res.type === 'book';
+                  return (
+                    <div 
+                      key={res.id} 
+                      className="p-5 rounded-2xl bg-white/5 border border-white/5 hover:border-[#D4AF37]/30 transition-all flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="flex items-center justify-between mb-3">
+                          <span className={`text-[10px] uppercase font-bold tracking-wider px-2.5 py-1 rounded-full ${
+                            isPdf ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 
+                            isBook ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20' : 
+                            'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
+                          }`}>
+                            {res.type === 'pdf' ? 'PDF Rehber' : res.type === 'book' ? 'Kitap' : 'Araştırma'}
+                          </span>
+                          <span className="text-[10px] text-white/40">Derece Seviyesi: {res.level}</span>
+                        </div>
+                        <h3 className="text-base font-bold text-white mb-2">{res.title}</h3>
+                        <p className="text-xs text-white/50 leading-relaxed mb-4">{res.description}</p>
                       </div>
-                      <h3 className="text-base font-bold text-white mb-2">{res.title}</h3>
-                      <p className="text-xs text-white/50 leading-relaxed mb-4">{res.description}</p>
+                      {res.fileUrl ? (
+                        <a 
+                          href={res.fileUrl} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-xs font-bold text-[#D4AF37] hover:text-yellow-200 transition-colors flex items-center mt-2 cursor-pointer self-start"
+                        >
+                          {isPdf ? 'Dosyayı İndir' : 'Kaynağa Git'} <ExternalLink size={12} className="ml-1.5" />
+                        </a>
+                      ) : (
+                        <span className="text-xs text-white/30 italic mt-2">Arayış ve Keşif Kaynağı (Bireysel Araştırma)</span>
+                      )}
                     </div>
-                    {res.fileUrl ? (
-                      <a 
-                        href={res.fileUrl} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="text-xs font-bold text-[#D4AF37] hover:text-yellow-200 transition-colors flex items-center mt-2 cursor-pointer self-start"
-                      >
-                        {isPdf ? 'Dosyayı İndir' : 'Kaynağa Git'} <ExternalLink size={12} className="ml-1.5" />
-                      </a>
-                    ) : (
-                      <span className="text-xs text-white/30 italic mt-2">Arayış ve Keşif Kaynağı (Bireysel Araştırma)</span>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Exams Banner */}
         <div className="mt-16 bg-gradient-to-r from-mystic-surface/40 via-mystic-primary/5 to-mystic-surface/40 border border-mystic-primary/20 rounded-3xl p-8 backdrop-blur-md flex flex-col md:flex-row justify-between items-center gap-6 shadow-[0_0_30px_rgba(212,175,55,0.05)] hover:border-mystic-primary/40 transition-all duration-300">
