@@ -267,7 +267,7 @@ export default function KadimDerslerPage() {
                         {isPdf ? 'Dosyayı İndir' : 'Kaynağa Git'} <ExternalLink size={12} className="ml-1.5" />
                       </a>
                     ) : (
-                      <span className="text-xs text-white/30 italic mt-2">Fiziksel / Öneri Kaynak</span>
+                      <span className="text-xs text-white/30 italic mt-2">Arayış ve Keşif Kaynağı (Bireysel Araştırma)</span>
                     )}
                   </div>
                 );
