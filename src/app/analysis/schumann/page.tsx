@@ -523,17 +523,10 @@ export default function SchumannPage() {
     const monthNames = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
     const timeStr = `${targetDate.getDate()} ${monthNames[targetDate.getMonth()]} ${dayNames[targetDate.getDay()]} ${String(targetDate.getHours()).padStart(2, '0')}:${String(targetDate.getMinutes()).padStart(2, '0')}`;
 
-    // Interpolate Kp index value at hover coordinate
-    const indexFloat = xPct * (cols.length - 1);
-    const indexLow = Math.floor(indexFloat);
-    const indexHigh = Math.min(indexLow + 1, cols.length - 1);
-    const weight = indexFloat - indexLow;
-    
-    const kpLow = cols[indexLow].kp;
-    const kpHigh = cols[indexHigh].kp;
-    const kp = kpLow + (kpHigh - kpLow) * weight;
-
-    const isForecast = targetTimeMs > Date.now();
+    // Get the discrete 3-hour block under the cursor
+    const blockIndex = Math.min(cols.length - 1, Math.max(0, Math.floor(xPct * cols.length)));
+    const kp = cols[blockIndex].kp;
+    const isForecast = !!cols[blockIndex].predicted;
 
     // Set spiritual guidance tooltip message
     let spiritualStatus = 'Dengeli Enerji Akışı';
