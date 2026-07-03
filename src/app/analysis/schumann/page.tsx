@@ -759,7 +759,7 @@ export default function SchumannPage() {
           <div className="border-b border-white/10 pb-4 mb-6">
             <h2 className="text-xl font-bold flex items-center gap-2 text-white">
               <Waves size={22} className="text-[#00E5FF]" />
-              Schumann Rezonans Spektrogramı
+              Schumann Rezonansı
             </h2>
             <p className="text-xs text-mystic-text-muted mt-1">
               Frekans dalgalanmalarını ve Kp Index kaynaklı enerjisel fırtına (beyaz patlamalar) durumunu izleyin. (Saat bilgisi için grafiğin üzerine gelin)
