@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 
 export default function TestPage() {
-  const googleGroupUrl = "https://groups.google.com/g/esk7layers-testers";
+  const googleGroupUrl = "https://groups.google.com/g/7layers-test-ekibi";
   const playStoreTestingUrl = "https://play.google.com/apps/testing/com.enissahide.esk7layers";
   const playStoreAppUrl = "https://play.google.com/store/apps/details?id=com.enissahide.esk7layers";
   const apkDownloadUrl = "/esk7layers.apk";
