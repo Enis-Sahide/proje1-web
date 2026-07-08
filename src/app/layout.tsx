@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/core/ui/ThemeProvider";
 import { AuthProvider } from "@/context/AuthContext";
 import RouteGuard from "@/core/ui/RouteGuard";
 import AnimatedBackground from "@/core/ui/AnimatedBackground";
+import AnalyticsTracker from "@/components/AnalyticsTracker";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -38,6 +39,7 @@ export default function RootLayout({
         <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark" enableSystem={false}>
           <AuthProvider>
             <RouteGuard>
+              <AnalyticsTracker />
               <Navigation />
               <main className="flex-grow flex flex-col">
                 {children}

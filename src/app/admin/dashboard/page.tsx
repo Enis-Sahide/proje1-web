@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Shield, Users, DollarSign, Store, CheckCircle, XCircle, ArrowLeft, Star, Search, Filter, RefreshCw, Award, UserCheck, BookOpen, Plus, Trash2, Edit } from 'lucide-react';
+import { Shield, Users, DollarSign, Store, CheckCircle, XCircle, ArrowLeft, Star, Search, Filter, RefreshCw, Award, UserCheck, BookOpen, Plus, Trash2, Edit, Activity, Calendar, TrendingUp, Eye } from 'lucide-react';
 import { useMarketplace } from '@/lib/useContent';
 import { apiFetch } from '@/lib/apiClient';
 
@@ -44,8 +44,8 @@ const ROLE_LABELS: Record<string, { label: string; style: string }> = {
 export default function AdminDashboard() {
   const router = useRouter();
 
-  // Active tab state: 'stores' | 'members' | 'blog'
-  const [activeTab, setActiveTab] = useState<'stores' | 'members' | 'blog'>('stores');
+  // Active tab state: 'stores' | 'members' | 'blog' | 'analytics'
+  const [activeTab, setActiveTab] = useState<'stores' | 'members' | 'blog' | 'analytics'>('stores');
 
   // Blog posts states
   const [blogs, setBlogs] = useState<any[]>([]);
@@ -123,13 +123,36 @@ export default function AdminDashboard() {
     }
   };
 
+  // Analytics state
+  const [analytics, setAnalytics] = useState<any>(null);
+  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
+  const [analyticsError, setAnalyticsError] = useState<string | null>(null);
+
+  const fetchAnalytics = async () => {
+    setIsLoadingAnalytics(true);
+    setAnalyticsError(null);
+    try {
+      const data = await apiFetch<any>('/api/admin/analytics');
+      setAnalytics(data);
+    } catch (err: any) {
+      console.error("Analytics fetch error:", err);
+      setAnalyticsError(err.message || 'Analiz verileri yüklenirken hata oluştu.');
+    } finally {
+      setIsLoadingAnalytics(false);
+    }
+  };
+
   useEffect(() => {
     fetchProfiles();
+    fetchAnalytics();
   }, []);
 
   useEffect(() => {
     if (activeTab === 'blog') {
       fetchBlogs();
+    }
+    if (activeTab === 'analytics') {
+      fetchAnalytics();
     }
   }, [activeTab]);
 
@@ -299,7 +322,7 @@ export default function AdminDashboard() {
       <main className="max-w-6xl mx-auto p-6 mt-6 w-full max-w-full">
         
         {/* Global Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-10">
           <div className="bg-black/40 border border-white/5 p-6 rounded-2xl relative overflow-hidden">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-mystic-text-muted font-medium text-sm">Toplam Ciro</h3>
@@ -342,6 +365,21 @@ export default function AdminDashboard() {
             </p>
             <p className="text-[11px] text-mystic-text-muted mt-2">Platforma kayıtlı ruhlar</p>
           </div>
+
+          <div className="bg-black/40 border border-white/5 p-6 rounded-2xl relative overflow-hidden">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-mystic-text-muted font-medium text-sm">Bugün Tekil Ziyaret</h3>
+              <div className="bg-emerald-500/15 p-2 rounded-lg text-emerald-400"><Activity size={18} /></div>
+            </div>
+            <p className="text-2xl font-bold text-white">
+              {isLoadingAnalytics ? (
+                <span className="inline-block w-8 h-6 bg-white/10 animate-pulse rounded"></span>
+              ) : (
+                analytics?.today?.visitors ?? 0
+              )}
+            </p>
+            <p className="text-[11px] text-mystic-text-muted mt-2">Bugünkü tekil ruh ziyareti</p>
+          </div>
         </div>
 
         {/* Tab Controls */}
@@ -382,6 +420,15 @@ export default function AdminDashboard() {
                 {blogs.length}
               </span>
             )}
+          </button>
+          <button 
+            onClick={() => setActiveTab('analytics')}
+            className={`px-6 py-3 font-semibold text-sm transition-all relative flex items-center gap-2 ${
+              activeTab === 'analytics' ? 'text-mystic-primary border-b-2 border-mystic-primary' : 'text-mystic-text-muted hover:text-white'
+            }`}
+          >
+            <Activity size={16} />
+            Ziyaretçi Analitiği
           </button>
         </div>
 
@@ -729,6 +776,139 @@ export default function AdminDashboard() {
                   </table>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Tab Content 4: Analytics */}
+        {activeTab === 'analytics' && (
+          <div className="space-y-8 animate-in fade-in duration-500">
+            {/* Analytics Header */}
+            <div className="flex justify-between items-center bg-mystic-surface/30 backdrop-blur-md border border-mystic-surface-light p-6 rounded-3xl">
+              <div>
+                <h2 className="text-xl font-bold text-white mb-1">Ziyaretçi Analitiği</h2>
+                <p className="text-xs text-mystic-text-muted">Son 14 günün trafik ve sayfa popülaritesi verileri.</p>
+              </div>
+              <button 
+                onClick={fetchAnalytics}
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white hover:bg-white/10 transition-colors cursor-pointer"
+              >
+                <RefreshCw size={14} className={isLoadingAnalytics ? 'animate-spin' : ''} />
+                Yenile
+              </button>
+            </div>
+
+            {/* Daily stats table and top pages */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              
+              {/* Daily Traffic List (Son 14 Gün) */}
+              <div className="lg:col-span-2 bg-mystic-surface/50 backdrop-blur-md border border-mystic-surface-light rounded-3xl p-6 shadow-xl">
+                <h3 className="text-base font-bold text-white mb-6 flex items-center gap-2 border-b border-white/5 pb-3">
+                  <Calendar size={18} className="text-mystic-primary" />
+                  Günlük Trafik Akışı (Son 14 Gün)
+                </h3>
+
+                {isLoadingAnalytics && !analytics ? (
+                  <div className="flex flex-col items-center justify-center py-20 gap-3">
+                    <RefreshCw className="animate-spin text-mystic-primary" size={32} />
+                    <p className="text-xs text-mystic-text-muted">Veriler yükleniyor...</p>
+                  </div>
+                ) : analyticsError ? (
+                  <div className="text-center py-12 text-red-400 text-sm">
+                    {analyticsError}
+                  </div>
+                ) : (!analytics?.daily || analytics.daily.length === 0) ? (
+                  <div className="text-center py-20 text-mystic-text-muted text-sm">
+                    Henüz trafik verisi bulunmuyor.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                      <thead>
+                        <tr className="border-b border-white/10 text-mystic-text-muted text-xs uppercase font-semibold">
+                          <th className="py-3 px-4">Tarih</th>
+                          <th className="py-3 px-4">Tekil Ziyaretçi</th>
+                          <th className="py-3 px-4">Sayfa Görüntüleme</th>
+                          <th className="py-3 px-4">Yoğunluk Oranı</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5 text-white">
+                        {analytics.daily.map((day: any) => {
+                          const maxViews = Math.max(...analytics.daily.map((d: any) => d.page_views || 1), 1);
+                          const percent = Math.min(100, Math.round(((day.page_views || 0) / maxViews) * 100));
+                          
+                          return (
+                            <tr key={day.date} className="hover:bg-white/5 transition-colors">
+                              <td className="py-3.5 px-4 font-medium">{day.date}</td>
+                              <td className="py-3.5 px-4">{day.unique_visitors}</td>
+                              <td className="py-3.5 px-4 font-semibold text-mystic-accent">{day.page_views}</td>
+                              <td className="py-3.5 px-4 w-48">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
+                                    <div 
+                                      className="bg-gradient-to-r from-mystic-primary to-mystic-accent h-full rounded-full" 
+                                      style={{ width: `${percent}%` }}
+                                    ></div>
+                                  </div>
+                                  <span className="text-[10px] text-mystic-text-muted w-8 text-right">{percent}%</span>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              {/* Popular Pages (En Çok Tıklananlar) */}
+              <div className="bg-mystic-surface/50 backdrop-blur-md border border-mystic-surface-light rounded-3xl p-6 shadow-xl flex flex-col">
+                <h3 className="text-base font-bold text-white mb-6 flex items-center gap-2 border-b border-white/5 pb-3">
+                  <TrendingUp size={18} className="text-mystic-primary" />
+                  En Çok Ziyaret Edilen Sayfalar
+                </h3>
+
+                {isLoadingAnalytics && !analytics ? (
+                  <div className="flex flex-col items-center justify-center py-20 gap-3 my-auto">
+                    <RefreshCw className="animate-spin text-mystic-primary" size={32} />
+                    <p className="text-xs text-mystic-text-muted">Veriler yükleniyor...</p>
+                  </div>
+                ) : analyticsError ? (
+                  <div className="text-center py-12 text-red-400 text-sm my-auto">
+                    {analyticsError}
+                  </div>
+                ) : (!analytics?.topPages || analytics.topPages.length === 0) ? (
+                  <div className="text-center py-20 text-mystic-text-muted text-sm my-auto">
+                    Henüz popüler sayfa verisi bulunmuyor.
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {analytics.topPages.map((page: any) => {
+                      const maxViews = Math.max(...analytics.topPages.map((p: any) => p.views || 1), 1);
+                      const percent = Math.min(100, Math.round(((page.views || 0) / maxViews) * 100));
+
+                      return (
+                        <div key={page.path} className="space-y-1.5 p-3 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-all">
+                          <div className="flex justify-between items-center text-xs">
+                            <span className="font-semibold text-white truncate max-w-[180px]" title={page.path}>
+                              {page.path}
+                            </span>
+                            <span className="text-mystic-accent font-bold">{page.views} tık</span>
+                          </div>
+                          <div className="w-full bg-black/30 h-1.5 rounded-full overflow-hidden">
+                            <div 
+                              className="bg-mystic-accent h-full rounded-full" 
+                              style={{ width: `${percent}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
             </div>
           </div>
         )}
