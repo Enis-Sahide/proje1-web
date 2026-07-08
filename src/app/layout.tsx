@@ -7,6 +7,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import RouteGuard from "@/core/ui/RouteGuard";
 import AnimatedBackground from "@/core/ui/AnimatedBackground";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
+import TestBanner from "@/components/TestBanner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -40,6 +41,7 @@ export default function RootLayout({
           <AuthProvider>
             <RouteGuard>
               <AnalyticsTracker />
+              <TestBanner />
               <Navigation />
               <main className="flex-grow flex flex-col">
                 {children}
