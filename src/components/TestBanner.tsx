@@ -38,7 +38,7 @@ export default function TestBanner() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-6 right-6 left-6 sm:left-auto sm:w-[380px] z-50 animate-in fade-in slide-in-from-bottom-10 duration-500">
+    <div className="fixed bottom-24 right-6 left-6 sm:bottom-6 sm:left-auto sm:w-[380px] z-50 animate-in fade-in slide-in-from-bottom-10 duration-500">
       <div className="bg-mystic-surface/95 backdrop-blur-md border border-mystic-primary/30 rounded-2xl p-5 shadow-[0_10px_40px_rgba(0,0,0,0.5),_0_0_20px_rgba(212,175,55,0.15)] relative overflow-hidden group">
         
         {/* Subtle glowing pulse background */}
