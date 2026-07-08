@@ -160,7 +160,7 @@ export default function TestPage() {
         <div className="mt-10 bg-mystic-surface/40 backdrop-blur-md border border-mystic-surface-light rounded-2xl p-5 flex items-center gap-4">
           <Info className="text-mystic-accent shrink-0" size={24} />
           <p className="text-xs text-white/70 leading-relaxed">
-            Kurulum veya üyelik adımlarında herhangi bir sorunla karşılaşırsanız lütfen WhatsApp grubumuz üzerinden bizimle iletişime geçin. Katkılarınız için şimdiden çok teşekkür ederiz!
+            Kurulum veya üyelik adımlarında herhangi bir sorunla karşılaşırsanız lütfen <a href="https://wa.me/905384623588" target="_blank" rel="noopener noreferrer" className="text-mystic-accent hover:underline font-semibold">WhatsApp destek hattımız</a> üzerinden bizimle iletişime geçin. Katkılarınız için şimdiden çok teşekkür ederiz!
           </p>
         </div>
 
