@@ -11,7 +11,6 @@ import {
   Info,
   ChevronRight,
   ShieldCheck,
-  AlertTriangle,
   Heart
 } from 'lucide-react';
 
@@ -19,7 +18,6 @@ export default function TestPage() {
   const googleGroupUrl = "https://groups.google.com/g/7layers-test-ekibi";
   const playStoreTestingUrl = "https://play.google.com/apps/testing/com.enissahide.esk7layers";
   const playStoreAppUrl = "https://play.google.com/store/apps/details?id=com.enissahide.esk7layers";
-  const apkDownloadUrl = "/esk7layers.apk";
 
   return (
     <div className="min-h-screen pt-24 px-4 pb-20 relative flex flex-col items-center bg-transparent selection:bg-[#D4AF37] selection:text-black">
@@ -157,47 +155,6 @@ export default function TestPage() {
           </div>
         </div>
 
-        {/* Alternative Card (Method 2 - Backup) */}
-        <div className="bg-mystic-surface/50 backdrop-blur-md border border-mystic-surface-light rounded-3xl p-6 md:p-8 shadow-xl transition-all duration-300 hover:border-red-500/10">
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-4 pb-3 border-b border-mystic-surface-light">
-            <h2 className="text-lg md:text-xl font-bold text-white flex items-center gap-2">
-              <Download className="text-mystic-accent" size={22} />
-              Yedek Yöntem: Doğrudan APK İndir
-            </h2>
-            <span className="px-2 py-0.5 text-[9px] font-semibold bg-white/5 border border-white/10 text-mystic-text-muted rounded-full">
-              Sadece Alternatif
-            </span>
-          </div>
-          
-          <p className="text-mystic-text-muted text-xs md:text-sm mb-6 leading-relaxed">
-            Google Play adımlarında veya giriş yaparken teknik bir sorun yaşarsanız, uygulamayı doğrudan APK olarak indirip inceleyebilirsiniz.
-          </p>
-
-          <div className="bg-black/35 border border-red-500/15 rounded-2xl p-4 mb-6">
-            <div className="flex gap-2.5 items-start text-red-400 mb-2">
-              <AlertTriangle size={18} className="shrink-0 mt-0.5" />
-              <span className="text-xs font-bold uppercase tracking-wider">Önemli Not</span>
-            </div>
-            <p className="text-[11px] md:text-xs text-mystic-text-muted leading-relaxed">
-              Bu yöntem ile yapılan kurulumlar Google Play'in **20 kişilik resmi test kotasına dahil edilmez**. Lütfen mecbur kalmadıkça birinci yöntemi (Play Store) kullanın.
-            </p>
-          </div>
-
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
-            <div className="text-center sm:text-left">
-              <p className="text-xs text-white font-medium">Universal Android APK</p>
-              <p className="text-[10px] text-mystic-text-muted">Boyut: ~92.6 MB</p>
-            </div>
-            <a 
-              href={apkDownloadUrl}
-              download="esk7layers-universal.apk"
-              className="w-full sm:w-auto text-center inline-flex justify-center items-center gap-2 px-5 py-2.5 bg-mystic-surface hover:bg-mystic-surface-light text-white font-semibold text-xs md:text-sm rounded-xl border border-white/10 transition-all duration-300"
-            >
-              Yine de APK İndir
-              <Download size={16} />
-            </a>
-          </div>
-        </div>
 
         {/* Support Alert */}
         <div className="mt-10 bg-mystic-surface/40 backdrop-blur-md border border-mystic-surface-light rounded-2xl p-5 flex items-center gap-4">
