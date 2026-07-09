@@ -50,6 +50,35 @@ function getStatusInfo(kp: number) {
   }
 }
 
+function getCosmicImpactStatusInfo(score: number) {
+  if (score < 3.0) {
+    return {
+      label: 'Dengeli & Dingin Akış (Sakin)',
+      desc: 'Uzay havası oldukça sakin ve Dünya manyetik kalkanı koruyucu fazda. Bedenin enerjisel alanı dengeli. Zihinsel odaklanma, iç gözlem ve derin dinlenme çalışmaları için mükemmel bir zemin. Dinginlik meditasyonlarına odaklanabilirsiniz.'
+    };
+  } else if (score < 5.0) {
+    return {
+      label: 'Hafif Enerjisel Dalgalanma (Uyarılmış)',
+      desc: 'Manyetik kalkan veya güneş rüzgarı düzeyinde hafif bir uyanış var. Enerji alanınızda (aura) hafif genişleme ve duyarlılık artışı hissedilebilir. Topraklama, hafif nefes pratikleri ve prana dengeleme çalışmaları için ideal bir geçiş süreci.'
+    };
+  } else if (score < 7.0) {
+    return {
+      label: 'Yüksek Kozmik Uyarılma (Aktif)',
+      desc: 'Dünya manyetik kalkanındaki açılmalar veya hızlanan güneş rüzgarı nedeniyle elektromanyetik alan aktif durumda. Rüyaların berraklaşması, sezgilerin güçlenmesi ve psişik duyarlılık olasıdır. Üçüncü göz çalışmaları ve kristal şifa pratikleri için çok elverişli.'
+    };
+  } else if (score < 8.5) {
+    return {
+      label: 'Yoğun Enerji Portalı (Giriş Aktif)',
+      desc: 'Güneş rüzgarı ve açık manyetik kalkan (Bz Güney yönlü) nedeniyle yüksek frekanslı bilgi paketleri doğrudan iyonosfere akıyor. Uykusuzluk veya fiziksel hassasiyetler olarak yansıyan bu etki; DNA aktivasyon niyetleri ve yüksek benlikle bağ kurmak için olağanüstü bir portaldır.'
+    };
+  } else {
+    return {
+      label: 'Ekstrem Hücresel Entegrasyon (Zirve)',
+      desc: 'Maksimum seviyede elektromanyetik uyarım ve ışık portalı! Kolektif bilinçte yoğun bir vites değişimi. Bu yoğun enerji altında kendinizi zorlamadan sessizce uzanıp taç ve kalp çakralarınızdan akan beyaz ışığı imgeleyerek derin meditasyon yapmanız önerilir.'
+    };
+  }
+}
+
 // Translate English text to Turkish using Google Translate gtx client
 async function translateToTurkish(text: string): Promise<string> {
   if (!text || !text.trim()) return '';
@@ -254,6 +283,31 @@ export async function GET() {
       console.error('Failed to fetch/translate NOAA discussion:', discErr);
     }
 
+    // 4. Calculate custom cosmic impact score (0.0 to 10.0)
+    // Kp weight: up to 4.0 points
+    const kpWeight = (currentKp / 9) * 4.0;
+
+    // Solar Wind speed weight: up to 2.5 points (normal range 300 to 800)
+    const speedVal = solarWind.speed || 350;
+    const speedWeight = Math.max(0, Math.min(2.5, ((speedVal - 300) / 500) * 2.5));
+
+    // Proton density weight: up to 2.0 points (normal range 2 to 17)
+    const densityVal = solarWind.density || 4;
+    const densityWeight = Math.max(0, Math.min(2.0, ((densityVal - 2) / 15) * 2.0));
+
+    // Bt field weight: up to 1.5 points (normal range 5 to 20)
+    const btVal = solarWind.bt || 5;
+    const btWeight = Math.max(0, Math.min(1.5, ((btVal - 5) / 15) * 1.5));
+
+    // Bz orientation multiplier: if Bz < 0 (southward), shield is open, increase impact by up to 25%
+    const bzVal = solarWind.bz || 0;
+    const bzMultiplier = bzVal < 0 ? (1.0 + Math.min(0.25, (Math.abs(bzVal) / 20) * 0.25)) : 1.0;
+
+    const rawImpactScore = kpWeight + speedWeight + densityWeight + btWeight;
+    const finalImpactScore = parseFloat(Math.min(10.0, rawImpactScore * bzMultiplier).toFixed(2));
+
+    const cosmicStatus = getCosmicImpactStatusInfo(finalImpactScore);
+
     return json({
       current_kp: currentKp,
       status_label: status.label,
@@ -261,7 +315,10 @@ export async function GET() {
       updated_at: lastReadingTime,
       history: history,
       solar_wind: solarWind,
-      noaa_discussion: noaaDiscussion
+      noaa_discussion: noaaDiscussion,
+      cosmic_impact_score: finalImpactScore,
+      cosmic_status_label: cosmicStatus.label,
+      cosmic_status_desc: cosmicStatus.desc
     });
   } catch (error: any) {
     console.error('NOAA Kp API Error:', error);

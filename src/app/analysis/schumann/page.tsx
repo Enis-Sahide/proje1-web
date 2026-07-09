@@ -36,6 +36,9 @@ interface KpData {
   history: KpHistoryItem[];
   solar_wind?: SolarWindData;
   noaa_discussion?: NOAADiscussion;
+  cosmic_impact_score?: number;
+  cosmic_status_label?: string;
+  cosmic_status_desc?: string;
 }
 
 interface HoverInfo {
@@ -184,6 +187,56 @@ export default function SchumannPage() {
       g: low.g + (high.g - low.g) * factor,
       b: low.b + (high.b - low.b) * factor
     };
+  };
+
+  const getCalculatedImpact = (kpVal: number) => {
+    if (!data?.solar_wind) return kpVal;
+    
+    const kpWeight = (kpVal / 9) * 4.0;
+    
+    const speedVal = data.solar_wind.speed || 350;
+    const speedWeight = Math.max(0, Math.min(2.5, ((speedVal - 300) / 500) * 2.5));
+    
+    const densityVal = data.solar_wind.density || 4;
+    const densityWeight = Math.max(0, Math.min(2.0, ((densityVal - 2) / 15) * 2.0));
+    
+    const btVal = data.solar_wind.bt || 5;
+    const btWeight = Math.max(0, Math.min(1.5, ((btVal - 5) / 15) * 1.5));
+    
+    const bzVal = data.solar_wind.bz || 0;
+    const bzMultiplier = bzVal < 0 ? (1.0 + Math.min(0.25, (Math.abs(bzVal) / 20) * 0.25)) : 1.0;
+    
+    const rawImpact = kpWeight + speedWeight + densityWeight + btWeight;
+    return parseFloat(Math.min(10.0, rawImpact * bzMultiplier).toFixed(2));
+  };
+
+  const getCosmicStatusInfo = (score: number) => {
+    if (score < 3.0) {
+      return {
+        label: 'Dengeli & Dingin Akış (Sakin)',
+        desc: 'Uzay havası oldukça sakin ve Dünya manyetik kalkanı koruyucu fazda. Bedenin enerjisel alanı dengeli. Zihinsel odaklanma, iç gözlem ve derin dinlenme çalışmaları için mükemmel bir zemin. Dinginlik meditasyonlarına odaklanabilirsiniz.'
+      };
+    } else if (score < 5.0) {
+      return {
+        label: 'Hafif Enerjisel Dalgalanma (Uyarılmış)',
+        desc: 'Manyetik kalkan veya güneş rüzgarı düzeyinde hafif bir uyanış var. Enerji alanınızda (aura) hafif genişleme ve duyarlılık artışı hissedilebilir. Topraklama, hafif nefes pratikleri ve prana dengeleme çalışmaları için ideal bir geçiş süreci.'
+      };
+    } else if (score < 7.0) {
+      return {
+        label: 'Yüksek Kozmik Uyarılma (Aktif)',
+        desc: 'Dünya manyetik kalkanındaki açılmalar veya hızlanan güneş rüzgarı nedeniyle elektromanyetik alan aktif durumda. Rüyaların berraklaşması, sezgilerin güçlenmesi ve psişik duyarlılık olasıdır. Üçüncü göz çalışmaları ve kristal şifa pratikleri için çok elverişli.'
+      };
+    } else if (score < 8.5) {
+      return {
+        label: 'Yoğun Enerji Portalı (Giriş Aktif)',
+        desc: 'Güneş rüzgarı ve açık manyetik kalkan (Bz Güney yönlü) nedeniyle yüksek frekanslı bilgi paketleri doğrudan iyonosfere akıyor. Uykusuzluk veya fiziksel hassasiyetler olarak yansıyan bu etki; DNA aktivasyon niyetleri ve yüksek benlikle bağ kurmak için olağanüstü bir portaldır.'
+      };
+    } else {
+      return {
+        label: 'Ekstrem Hücresel Entegrasyon (Zirve)',
+        desc: 'Maksimum seviyede elektromanyetik uyarım ve ışık portalı! Kolektif bilinçte yoğun bir vites değişimi. Bu yoğun enerji altında kendinizi zorlamadan sessizce uzanıp taç ve kalp çakralarınızdan akan beyaz ışığı imgeleyerek derin meditasyon yapmanız önerilir.'
+      };
+    }
   };
 
   const getSimulatedStatus = (kpVal: number) => {
@@ -650,13 +703,13 @@ export default function SchumannPage() {
         </div>
 
         {/* Gösterge Panelleri */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
           
           {/* Card 1: Kp Endeksi */}
           <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-center items-center md:col-span-1">
             <div className="w-full text-center">
               <div className="flex items-center justify-between text-mystic-text-muted mb-4">
-                <span className="text-xs uppercase tracking-wider font-semibold">Anlık Genlik</span>
+                <span className="text-xs uppercase tracking-wider font-semibold">Küresel Genlik (Kp)</span>
                 <Activity size={16} className="text-[#00E5FF]" />
               </div>
               {isLoading ? (
@@ -669,7 +722,32 @@ export default function SchumannPage() {
             </div>
           </div>
 
-          {/* Card 2: Durum Seviyesi */}
+          {/* Card 2: Kozmik Etki İndeksi (CEI) */}
+          <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-center items-center md:col-span-1">
+            <div className="w-full text-center">
+              <div className="flex items-center justify-between text-mystic-text-muted mb-4">
+                <span className="text-xs uppercase tracking-wider font-semibold flex items-center justify-center gap-1">
+                  Kozmik Etki
+                  <span className="cursor-help text-white/40 hover:text-white" title="Güneş rüzgarı, yoğunluk ve Bz kalkan verileriyle hesaplanan birleşik uyarılma endeksi.">
+                    <Info size={11} />
+                  </span>
+                </span>
+                <Gauge size={16} className="text-[#00E5FF]" />
+              </div>
+              {isLoading ? (
+                <div className="h-8 w-16 bg-white/5 animate-pulse rounded mx-auto"></div>
+              ) : (() => {
+                const activeImpact = simulatedKp !== null ? getCalculatedImpact(simulatedKp) : (data?.cosmic_impact_score ?? 0);
+                return (
+                  <div className={`text-4xl font-extrabold my-2 transition-colors duration-300 ${getKpTextColorClass(activeImpact)}`}>
+                    {activeImpact.toFixed(1)}
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+
+          {/* Card 3: Durum Seviyesi */}
           <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-between md:col-span-3">
             <div>
               <div className="flex items-center justify-between text-mystic-text-muted mb-4">
@@ -680,24 +758,25 @@ export default function SchumannPage() {
                 <div className="h-8 w-24 bg-white/5 animate-pulse rounded"></div>
               ) : (() => {
                 const activeKp = simulatedKp !== null ? simulatedKp : (data?.current_kp ?? 0);
-                const activeLabel = simulatedKp !== null ? getSimulatedStatus(simulatedKp).label : data?.status_label;
-                const activeDesc = simulatedKp !== null ? getSimulatedStatus(simulatedKp).desc : data?.status_desc;
+                const activeImpact = simulatedKp !== null ? getCalculatedImpact(simulatedKp) : (data?.cosmic_impact_score ?? activeKp);
+                const activeLabel = simulatedKp !== null ? getCosmicStatusInfo(activeImpact).label : (data?.cosmic_status_label ?? data?.status_label);
+                const activeDesc = simulatedKp !== null ? getCosmicStatusInfo(activeImpact).desc : (data?.cosmic_status_desc ?? data?.status_desc);
                 return (
                   <>
                     <div className="text-xl font-extrabold text-white flex items-center gap-2">
                       <span className={`w-2.5 h-2.5 rounded-full ${
-                        activeKp >= 5
+                        activeImpact >= 7.0
                           ? 'bg-red-500 animate-ping'
-                          : activeKp >= 4
+                          : activeImpact >= 5.0
                           ? 'bg-orange-400'
-                          : activeKp >= 3
+                          : activeImpact >= 3.0
                           ? 'bg-amber-400'
                           : 'bg-emerald-400'
                       }`}></span>
                       {activeLabel}
                     </div>
                     {activeDesc && (
-                      <p className="text-sm md:text-[14.5px] text-white/90 leading-relaxed border-t border-white/5 pt-3 mt-3 animate-in fade-in duration-300">
+                      <p className="text-sm md:text-[14.5px] text-white/90 leading-relaxed border-t border-white/5 pt-3 mt-3 animate-in fade-in duration-300 text-justify">
                         {activeDesc}
                       </p>
                     )}
