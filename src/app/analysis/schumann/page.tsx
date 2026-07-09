@@ -272,8 +272,10 @@ export default function SchumannPage() {
       return lastIdx;
     }, -1);
 
-    if (simulatedKp !== null && idx === lastMeasuredIdx) {
-      return { ...item, kp: simulatedKp };
+    if (idx === lastMeasuredIdx) {
+      const activeKp = simulatedKp !== null ? simulatedKp : item.kp;
+      const activeImpact = getCalculatedImpact(activeKp);
+      return { ...item, kp: activeImpact };
     }
     return item;
   }) : [];
@@ -1038,10 +1040,10 @@ export default function SchumannPage() {
           <div className="border-b border-white/10 pb-4 mb-6">
             <h2 className="text-xl font-bold flex items-center gap-2 text-white">
               <Activity size={22} className="text-[#00E5FF]" />
-              Jeomanyetik Genlik Eğilimi (Son 72 Saat)
+              Jeomanyetik Kp İndeks Eğilimi (Resmi Altyapı)
             </h2>
             <p className="text-xs text-mystic-text-muted mt-1">
-              Ölçülen jeomanyetik fırtına değerlerinin son 3 günlük (72 saat) saatlik blok gösterimi (Düz çizgiler geçmişi, kesikli çizgiler 24 saatlik tahmini gösterir).
+              Dünya genelindeki gözlemevlerinden ölçülen ham planetary Kp değerlerinin son 3 günlük (72 saat) gösterimi. Bu veriler uyarılma indeksimiz için resmi bilimsel altyapıyı oluşturur.
             </p>
           </div>
 
