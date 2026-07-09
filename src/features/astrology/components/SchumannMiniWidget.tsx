@@ -8,6 +8,7 @@ interface KpData {
   current_kp: number;
   status_label: string;
   status_desc: string;
+  cosmic_impact_score?: number;
 }
 
 export default function SchumannMiniWidget() {
@@ -35,17 +36,17 @@ export default function SchumannMiniWidget() {
     return () => clearInterval(interval);
   }, []);
 
-  const getKpColor = (kp: number) => {
-    if (kp < 3) return 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10 shadow-[0_0_8px_rgba(16,185,129,0.15)]';
-    if (kp < 4) return 'text-amber-400 border-amber-500/30 bg-amber-500/10 shadow-[0_0_8px_rgba(245,158,11,0.15)]';
-    if (kp < 5) return 'text-orange-400 border-orange-500/30 bg-orange-500/10 shadow-[0_0_8px_rgba(249,115,22,0.15)]';
+  const getScoreColor = (score: number) => {
+    if (score < 3.0) return 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10 shadow-[0_0_8px_rgba(16,185,129,0.15)]';
+    if (score < 5.0) return 'text-amber-400 border-amber-500/30 bg-amber-500/10 shadow-[0_0_8px_rgba(245,158,11,0.15)]';
+    if (score < 7.0) return 'text-orange-400 border-orange-500/30 bg-orange-500/10 shadow-[0_0_8px_rgba(249,115,22,0.15)]';
     return 'text-red-400 border-red-500/30 bg-red-500/10 shadow-[0_0_8px_rgba(239,68,68,0.2)] animate-pulse';
   };
 
-  const getGlowingIndicator = (kp: number) => {
-    if (kp < 3) return 'bg-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.5)]';
-    if (kp < 4) return 'bg-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.5)]';
-    if (kp < 5) return 'bg-orange-400 shadow-[0_0_10px_rgba(249,115,22,0.5)]';
+  const getGlowingIndicator = (score: number) => {
+    if (score < 3.0) return 'bg-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.5)]';
+    if (score < 5.0) return 'bg-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.5)]';
+    if (score < 7.0) return 'bg-orange-400 shadow-[0_0_10px_rgba(249,115,22,0.5)]';
     return 'bg-red-400 shadow-[0_0_12px_rgba(239,68,68,0.8)] animate-ping';
   };
 
@@ -58,6 +59,7 @@ export default function SchumannMiniWidget() {
   }
 
   const kpVal = data?.current_kp ?? 0;
+  const scoreVal = data?.cosmic_impact_score ?? kpVal;
 
   return (
     <Link 
@@ -77,18 +79,18 @@ export default function SchumannMiniWidget() {
           <div>
             <div className="flex items-center gap-1.5">
               <span className="text-mystic-primary text-[10px] font-bold uppercase tracking-widest">Schumann Rezonansı</span>
-              <span className={`w-1.5 h-1.5 rounded-full ${getGlowingIndicator(kpVal)}`} />
+              <span className={`w-1.5 h-1.5 rounded-full ${getGlowingIndicator(scoreVal)}`} />
             </div>
             <h4 className="text-white font-extrabold text-sm mt-0.5 tracking-tight group-hover/schumann:text-mystic-accent transition-colors">
-              {data?.status_label.split(' ')[0]}
+              {data?.status_label.split(' ')[0]} <span className="text-xs font-normal text-mystic-text-muted">(Kp {kpVal.toFixed(1)})</span>
             </h4>
           </div>
         </div>
 
         {/* Right: Kp Value Badge */}
-        <div className={`py-1 px-3 rounded-xl border text-xs font-mono font-black flex items-center gap-1.5 ${getKpColor(kpVal)}`}>
-          <span className="text-white font-extrabold">{kpVal.toFixed(2)}</span>
-          <span className="opacity-60 text-[10px]">Kp</span>
+        <div className={`py-1 px-3 rounded-xl border text-xs font-mono font-black flex items-center gap-1.5 ${getScoreColor(scoreVal)}`}>
+          <span className="text-white font-extrabold">{scoreVal.toFixed(2)}</span>
+          <span className="opacity-60 text-[10px]">SR</span>
         </div>
 
       </div>
@@ -96,7 +98,7 @@ export default function SchumannMiniWidget() {
       {/* Footer details */}
       <div className="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-[10px] text-mystic-text-muted">
         <span className="truncate max-w-[200px] italic">
-          {kpVal >= 5.0 ? '🧬 Işık Portalı: DNA Aktivasyonu' : kpVal >= 4.0 ? '👁️ Yüksek Sezgi ve Farkındalık' : '🧘 Dengeli ve Dingin Akış'}
+          {scoreVal >= 7.0 ? '🧬 Işık Portalı: DNA Aktivasyonu' : scoreVal >= 5.0 ? '👁️ Yüksek Sezgi ve Farkındalık' : scoreVal >= 3.0 ? '⚡ Enerjisel Kıpırdanma & Yenilenme' : '🧘 Dengeli ve Dingin Akış'}
         </span>
         <span className="text-mystic-accent font-bold flex items-center gap-1 group-hover/schumann:translate-x-1 transition-transform">
           Canlı İzle <ArrowRight size={10} />
