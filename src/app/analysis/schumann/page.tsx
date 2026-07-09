@@ -1159,7 +1159,7 @@ export default function SchumannPage() {
               Schumann Rezonansı
             </h2>
             <p className="text-xs text-mystic-text-muted mt-1">
-              Frekans dalgalanmalarını ve Schumann Rezonans uyarılma seviyesini canlı izleyin. ŞİMDİ çizgisi anlık güneş rüzgarı birleşik etkisini, diğer zaman dilimleri ise geçmiş ve gelecek tahmini Schumann değerlerini yansıtır. (Saat bilgisi için grafiğin üzerine gelin)
+              Frekans dalgalanmalarını ve Schumann Rezonans uyarılma seviyesini canlı izleyin. Dikey kesikli ŞİMDİ çizgisi anlık zamanı belirtir; bu çizginin sol tarafı kesinleşmiş geçmiş ölçümleri, sağ tarafı ise gelecek 24 saatlik tahmin bloklarını ayırır. (Saat bilgisi için grafiğin üzerine gelin)
             </p>
           </div>
 
@@ -1493,7 +1493,7 @@ export default function SchumannPage() {
                     <strong className="text-white">Grafiklerin Yapısı ve Okunması:</strong>
                     <div className="mt-2 text-xs leading-relaxed flex flex-col gap-2">
                       <p>
-                        <strong>• Schumann Rezonans Spektrogramı:</strong> Elektromanyetik alanın dikey eksende frekans (0 - 40 Hz), yatay eksende ise zaman bazlı yoğunluğunu gösterir. Yatay renkli bantlar (7.83, 14, 20 Hz vb.) ana rezonans frekanslarını temsil eder. Grafik üzerindeki ŞİMDİ çizgisi, anlık güneş rüzgarı uydularından alınan verilere göre hesaplanan <strong>Schumann Rezonans Tahmini</strong> değerini; geçmiş ve gelecek bloklar ise resmi Kp değerlerine dayalı tahminleri gösterir.
+                        <strong>• Schumann Rezonans Spektrogramı:</strong> Elektromanyetik alanın dikey eksende frekans (0 - 40 Hz), yatay eksende ise zaman bazlı yoğunluğunu gösterir. Yatay renkli bantlar (7.83, 14, 20 Hz vb.) ana rezonans frekanslarını temsil eder. Grafik üzerindeki dikey kesikli ŞİMDİ çizgisi ise anlık zamanı belirtir; bu çizginin sol tarafı kesinleşmiş geçmiş ölçümleri, sağ tarafı ise gelecek 24 saatlik tahmin bloklarını birbirinden ayırır.
                       </p>
                       <p>
                         <strong>• Jeomanyetik Kp Eğilimi:</strong> 72 saatlik zaman diliminde ölçülen ve tahmin edilen jeomanyetik fırtına derecelerini (Kp) gösterir. Düz sütunlar kesinleşmiş geçmiş ölçümleri, kesikli sınırları olan sütunlar ise gelecek 24 saatlik tahmini temsil eder.
