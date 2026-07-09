@@ -950,7 +950,7 @@ export default function SchumannPage() {
               Schumann Rezonansı
             </h2>
             <p className="text-xs text-mystic-text-muted mt-1">
-              Frekans dalgalanmalarını ve Kp Index kaynaklı enerjisel fırtına (beyaz patlamalar) durumunu izleyin. (Saat bilgisi için grafiğin üzerine gelin)
+              Frekans dalgalanmalarını ve Kozmik Etki İndeksi kaynaklı uyarılma durumunu canlı izleyin. ŞİMDİ çizgisi gerçek zamanlı güneş rüzgarı birleşik etkisini, diğer alanlar ise jeomanyetik Kp indeksini yansıtır. (Saat bilgisi için grafiğin üzerine gelin)
             </p>
           </div>
 
@@ -972,7 +972,7 @@ export default function SchumannPage() {
                     <span className="text-mystic-text-muted">Zaman:</span>
                     <strong className="text-[#00E5FF] font-mono">{hoverInfo.timeStr}</strong>
                     <span className="text-white/20">|</span>
-                    <span className="text-mystic-text-muted">Genlik:</span>
+                    <span className="text-mystic-text-muted">Değer (Etki/Genlik):</span>
                     <strong className="text-white font-mono">{hoverInfo.kp.toFixed(2)}</strong>
                     <span className="text-white/20">|</span>
                     <span className="text-cyan-300 font-semibold">{hoverInfo.spiritualStatus}</span>
@@ -1284,7 +1284,7 @@ export default function SchumannPage() {
                     <strong className="text-white">Grafiklerin Yapısı ve Okunması:</strong>
                     <div className="mt-2 text-xs leading-relaxed flex flex-col gap-2">
                       <p>
-                        <strong>• Schumann Rezonans Spektrogramı:</strong> Elektromanyetik alanın dikey eksende frekans (0 - 40 Hz), yatay eksende ise zaman bazlı yoğunluğunu gösterir. Yatay renkli bantlar (7.83, 14, 20 Hz vb.) ana rezonans frekanslarını, dikey beyaz patlamalar ise güneş fırtınası veya manyetik dalgalanma anlarını temsil eder.
+                        <strong>• Schumann Rezonans Spektrogramı:</strong> Elektromanyetik alanın dikey eksende frekans (0 - 40 Hz), yatay eksende ise zaman bazlı yoğunluğunu gösterir. Yatay renkli bantlar (7.83, 14, 20 Hz vb.) ana rezonans frekanslarını temsil eder. Grafik üzerindeki ŞİMDİ çizgisi rüzgar hızı, yoğunluk ve Bz kalkan verileriyle hesaplanan anlık <strong>Kozmik Etki İndeksi</strong>'ne göre, geçmiş ve gelecek tahminler ise resmi Kp değerlerine göre şekillenir.
                       </p>
                       <p>
                         <strong>• Jeomanyetik Kp Eğilimi:</strong> 72 saatlik zaman diliminde ölçülen ve tahmin edilen jeomanyetik fırtına derecelerini (Kp) gösterir. Düz sütunlar kesinleşmiş geçmiş ölçümleri, kesikli sınırları olan sütunlar ise gelecek 24 saatlik tahmini temsil eder.
