@@ -47,6 +47,7 @@ interface HoverInfo {
   timeStr: string;
   kp: number;
   isForecast: boolean;
+  isCurrent?: boolean;
   spiritualStatus: string;
 }
 
@@ -272,14 +273,28 @@ export default function SchumannPage() {
       return lastIdx;
     }, -1);
 
+    // Sadece ŞİMDİ sütunu için CEI hesapla (bozulmayı önlemek için geçmiş/tahmin Kp olarak kalır)
     if (idx === lastMeasuredIdx) {
       const activeKp = simulatedKp !== null ? simulatedKp : item.kp;
       const activeImpact = getCalculatedImpact(activeKp);
       return { ...item, kp: activeImpact };
     }
     
-    // Geçmiş ve gelecek tüm diğer Kp bloklarını spektrogram için CEI değerine dönüştür
-    return { ...item, kp: getCalculatedImpact(item.kp) };
+    return item;
+  }) : [];
+
+  const kpHistoryToRender = data?.history ? data.history.map((item, idx) => {
+    const lastMeasuredIdx = data.history.reduce((lastIdx, currItem, currIdx) => {
+      if (!currItem.predicted) {
+        return currIdx;
+      }
+      return lastIdx;
+    }, -1);
+
+    if (simulatedKp !== null && idx === lastMeasuredIdx) {
+      return { ...item, kp: simulatedKp };
+    }
+    return item;
   }) : [];
 
   // Spectrogram rendering effect
@@ -603,6 +618,15 @@ export default function SchumannPage() {
     const kp = cols[blockIndex].kp;
     const isForecast = !!cols[blockIndex].predicted;
 
+    // Find the last measured index representing the current ("ŞİMDİ") slot
+    const lastMeasuredIdx = cols.reduce((lastIdx, currItem, currIdx) => {
+      if (!currItem.predicted) {
+        return currIdx;
+      }
+      return lastIdx;
+    }, -1);
+    const isCurrent = blockIndex === lastMeasuredIdx;
+
     // Set spiritual guidance tooltip message
     let spiritualStatus = 'Dengeli Enerji Akışı';
     if (kp >= 5.0) spiritualStatus = 'DNA Aktivasyonu & Kozmik Uyanış Portalı';
@@ -620,6 +644,7 @@ export default function SchumannPage() {
       timeStr,
       kp,
       isForecast,
+      isCurrent,
       spiritualStatus
     });
     setHoveredX(xCanvas);
@@ -974,7 +999,7 @@ export default function SchumannPage() {
                     <span className="text-mystic-text-muted">Zaman:</span>
                     <strong className="text-[#00E5FF] font-mono">{hoverInfo.timeStr}</strong>
                     <span className="text-white/20">|</span>
-                    <span className="text-mystic-text-muted">Kozmik Etki (CEI):</span>
+                    <span className="text-mystic-text-muted">{hoverInfo.isCurrent ? 'Kozmik Etki (CEI):' : 'Genlik (Kp):'}</span>
                     <strong className="text-white font-mono">{hoverInfo.kp.toFixed(2)}</strong>
                     <span className="text-white/20">|</span>
                     <span className="text-cyan-300 font-semibold">{hoverInfo.spiritualStatus}</span>
@@ -1088,7 +1113,7 @@ export default function SchumannPage() {
 
               {/* Bars Grid */}
               <div className="flex items-end justify-between h-48 w-full border-b border-white/10 pb-2 gap-1 md:gap-2 px-1">
-                {historyToRender.map((item, index) => {
+                {kpHistoryToRender.map((item, index) => {
                   const isForecast = !!item.predicted;
                   return (
                     <div 
@@ -1109,7 +1134,7 @@ export default function SchumannPage() {
 
               {/* X Axis Labels */}
               <div className="flex justify-between text-[9px] text-mystic-text-muted mt-2 px-1">
-                {historyToRender.map((item, index) => {
+                {kpHistoryToRender.map((item, index) => {
                   if (index % 4 === 0) {
                     return (
                       <span key={index} className="text-center w-12 font-mono">
