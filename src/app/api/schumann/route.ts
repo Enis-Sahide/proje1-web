@@ -265,12 +265,12 @@ export async function GET() {
     const history = [
       ...past.map((item: any) => ({
         time: item.time_tag,
-        kp: calculateCEI(parseFloat(item.kp)),
+        kp: parseFloat(item.kp),
         predicted: false
       })),
       ...future.map((item: any) => ({
         time: item.time_tag,
-        kp: calculateCEI(parseFloat(item.kp)),
+        kp: parseFloat(item.kp),
         predicted: true
       }))
     ];

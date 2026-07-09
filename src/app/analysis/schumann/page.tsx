@@ -277,7 +277,9 @@ export default function SchumannPage() {
       const activeImpact = getCalculatedImpact(activeKp);
       return { ...item, kp: activeImpact };
     }
-    return item;
+    
+    // Geçmiş ve gelecek tüm diğer Kp bloklarını spektrogram için CEI değerine dönüştür
+    return { ...item, kp: getCalculatedImpact(item.kp) };
   }) : [];
 
   // Spectrogram rendering effect
@@ -1040,10 +1042,10 @@ export default function SchumannPage() {
           <div className="border-b border-white/10 pb-4 mb-6">
             <h2 className="text-xl font-bold flex items-center gap-2 text-white">
               <Activity size={22} className="text-[#00E5FF]" />
-              Kozmik Etki İndeks Eğilimi (Son 72 Saat)
+              Jeomanyetik Kp İndeks Eğilimi (Resmi Altyapı)
             </h2>
             <p className="text-xs text-mystic-text-muted mt-1">
-              Güneş rüzgarı hızı, parçacık yoğunluğu ve Dünya manyetik kalkanının durumuna göre hesaplanan Kozmik Etki İndeksi'nin (CEI) 3 günlük eğilimi (Düz sütunlar ölçümü, kesikli sütunlar 24 saatlik tahmini gösterir).
+              Dünya genelindeki gözlemevlerinden ölçülen ham planetary Kp değerlerinin son 3 günlük (72 saat) gösterimi. Bu veriler uyarılma indeksimiz için resmi bilimsel altyapıyı oluşturur.
             </p>
           </div>
 
