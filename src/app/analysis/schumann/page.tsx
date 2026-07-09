@@ -740,8 +740,14 @@ export default function SchumannPage() {
               <div className="flex items-center justify-between text-mystic-text-muted mb-4">
                 <span className="text-xs uppercase tracking-wider font-semibold flex items-center justify-center gap-1">
                   Schumann Rezonans Tahmini
-                  <span className="cursor-help text-white/40 hover:text-white" title="Güneş rüzgarı hızı, parçacık yoğunluğu ve kalkan açıklığına göre hesaplanan anlık Schumann Rezonans uyarılma seviyesi tahmini.">
-                    <Info size={11} />
+                  <span className="relative flex items-center justify-center group/tooltip ml-1">
+                    <span className="cursor-pointer text-white/40 hover:text-white transition-colors">
+                      <Info size={13} />
+                    </span>
+                    <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-64 p-3 bg-black/95 border border-white/10 text-[11px] text-white/90 rounded-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
+                      Güneş rüzgarı hızı, parçacık yoğunluğu ve kalkan açıklığına göre hesaplanan anlık Schumann Rezonans uyarılma seviyesi tahmini.
+                      <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
+                    </span>
                   </span>
                 </span>
                 <Gauge size={16} className="text-[#00E5FF]" />
