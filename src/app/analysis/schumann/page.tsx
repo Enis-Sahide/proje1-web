@@ -823,7 +823,18 @@ export default function SchumannPage() {
               {/* 1. Rüzgar Hızı */}
               <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
                 <div className="flex items-center justify-between text-mystic-text-muted mb-2">
-                  <span className="text-[11px] uppercase tracking-wider font-semibold">Güneş Rüzgarı Hızı</span>
+                  <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
+                    Güneş Rüzgarı Hızı
+                    <span className="relative flex items-center justify-center group/tooltip ml-0.5">
+                      <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
+                        <Info size={10} />
+                      </span>
+                      <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
+                        Güneş'ten yayılan plazma akışının hızıdır. Hızlı rüzgarlar Dünya'nın manyetik alanını sıkıştırarak yüksek enerjisel girişlere sebep olur.
+                        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
+                      </span>
+                    </span>
+                  </span>
                   <Wind size={16} className="text-cyan-400" />
                 </div>
                 <div>
@@ -841,7 +852,18 @@ export default function SchumannPage() {
               {/* 2. Proton Yoğunluğu */}
               <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
                 <div className="flex items-center justify-between text-mystic-text-muted mb-2">
-                  <span className="text-[11px] uppercase tracking-wider font-semibold">Proton Yoğunluğu</span>
+                  <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
+                    Proton Yoğunluğu
+                    <span className="relative flex items-center justify-center group/tooltip ml-0.5">
+                      <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
+                        <Info size={10} />
+                      </span>
+                      <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
+                        Güneş rüzgarındaki yüklü parçacıkların (protonlar) cm³ başına yoğunluğudur. Yoğunluğun artması, Dünya atmosferiyle etkileşime giren enerjiyi artırır.
+                        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
+                      </span>
+                    </span>
+                  </span>
                   <Gauge size={16} className="text-purple-400" />
                 </div>
                 <div>
@@ -855,7 +877,18 @@ export default function SchumannPage() {
               {/* 3. Bz Değeri */}
               <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
                 <div className="flex items-center justify-between text-mystic-text-muted mb-2">
-                  <span className="text-[11px] uppercase tracking-wider font-semibold">Bz Değeri (Yön)</span>
+                  <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
+                    Bz Değeri (Yön)
+                    <span className="relative flex items-center justify-center group/tooltip ml-0.5">
+                      <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
+                        <Info size={10} />
+                      </span>
+                      <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
+                        Manyetik alanın kuzey-güney doğrultusudur. Değerin güneye doğru (negatif/-) olması, manyetik kalkanımızda kapılar açarak enerjinin içeri sızmasını sağlar.
+                        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
+                      </span>
+                    </span>
+                  </span>
                   <Shield size={16} className={data.solar_wind.bz < 0 ? "text-red-400" : "text-emerald-400"} />
                 </div>
                 <div>
@@ -871,7 +904,18 @@ export default function SchumannPage() {
               {/* 4. Toplam Manyetik Alan (Bt) */}
               <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
                 <div className="flex items-center justify-between text-mystic-text-muted mb-2">
-                  <span className="text-[11px] uppercase tracking-wider font-semibold">Toplam Alan (Bt)</span>
+                  <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
+                    Toplam Alan (Bt)
+                    <span className="relative flex items-center justify-center group/tooltip ml-0.5">
+                      <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
+                        <Info size={10} />
+                      </span>
+                      <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
+                        Güneşler arası manyetik alanın toplam gücüdür. Yüksek Bt değerleri, Dünya çevresindeki elektromanyetik alan uyarılmasının şiddetini artırır.
+                        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
+                      </span>
+                    </span>
+                  </span>
                   <Activity size={16} className="text-amber-400" />
                 </div>
                 <div>
@@ -885,7 +929,18 @@ export default function SchumannPage() {
               {/* 5. Plazma Sıcaklığı */}
               <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between col-span-2 md:col-span-1">
                 <div className="flex items-center justify-between text-mystic-text-muted mb-2">
-                  <span className="text-[11px] uppercase tracking-wider font-semibold">Sıcaklık</span>
+                  <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
+                    Sıcaklık
+                    <span className="relative flex items-center justify-center group/tooltip ml-0.5">
+                      <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
+                        <Info size={10} />
+                      </span>
+                      <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
+                        Güneş rüzgarı plazmasının termal sıcaklığıdır. Yüksek sıcaklıklar Güneş'teki aktif patlamalardan ve taç küre atılımlarından (CME) kaynaklanan akışları gösterir.
+                        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
+                      </span>
+                    </span>
+                  </span>
                   <Thermometer size={16} className="text-orange-400" />
                 </div>
                 <div>
