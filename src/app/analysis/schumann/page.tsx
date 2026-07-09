@@ -1493,35 +1493,64 @@ export default function SchumannPage() {
                     <strong className="text-white">Grafiklerin Yapısı ve Okunması:</strong>
                     <div className="mt-2 text-xs leading-relaxed flex flex-col gap-2">
                       <p>
-                        <strong>• Schumann Rezonans Spektrogramı:</strong> Elektromanyetik alanın dikey eksende frekans (0 - 40 Hz), yatay eksende ise zaman bazlı yoğunluğunu gösterir. Yatay renkli bantlar (7.83, 14, 20 Hz vb.) ana rezonans frekanslarını temsil eder. Grafik üzerindeki ŞİMDİ çizgisi rüzgar hızı, yoğunluk ve Bz kalkan verileriyle hesaplanan anlık <strong>Kozmik Etki İndeksi</strong>'ne göre, geçmiş ve gelecek tahminler ise resmi Kp değerlerine göre şekillenir.
+                        <strong>• Schumann Rezonans Spektrogramı:</strong> Elektromanyetik alanın dikey eksende frekans (0 - 40 Hz), yatay eksende ise zaman bazlı yoğunluğunu gösterir. Yatay renkli bantlar (7.83, 14, 20 Hz vb.) ana rezonans frekanslarını temsil eder. Grafik üzerindeki ŞİMDİ çizgisi, anlık güneş rüzgarı uydularından alınan verilere göre hesaplanan <strong>Schumann Rezonans Tahmini</strong> değerini; geçmiş ve gelecek bloklar ise resmi Kp değerlerine dayalı tahminleri gösterir.
                       </p>
                       <p>
                         <strong>• Jeomanyetik Kp Eğilimi:</strong> 72 saatlik zaman diliminde ölçülen ve tahmin edilen jeomanyetik fırtına derecelerini (Kp) gösterir. Düz sütunlar kesinleşmiş geçmiş ölçümleri, kesikli sınırları olan sütunlar ise gelecek 24 saatlik tahmini temsil eder.
                       </p>
                     </div>
                   </div>
+
                   <p>
-                    <strong>Planetary K-Index (Kp Endeksi) Nedir?</strong>
+                    <strong>Kozmik Oracle / Durum Raporu Nedir?</strong>
                     <br />
-                    Dünya genelindeki manyetometre ölçüm istasyonlarından gelen verilerin birleştirilmesiyle oluşturulan ve gezegenimizin manyetik alanındaki düzensizlikleri 0 ile 9 arasında ölçen resmi bir küresel endekstir. Kp değerinin 5 ve üzeri olması, küresel çapta bir <strong>Jeomanyetik Fırtına (Geomagnetic Storm)</strong> durumunu gösterir. Bu veriler NOAA tarafından yasal ve telifsiz sunulmaktadır.
+                    Güneş rüzgarı uydularından alınan 6 farklı elektromanyetik parametreyi (Kp Endeksi, Hız, Yoğunluk, Bz kalkan durumu, Bt alan gücü ve Sıcaklık) anlık olarak inceleyen yerel kural motorudur. Bu motor, uzay havasındaki dalgalanmaları yorumlayarak size üç alanda bilgi verir:
+                    <br />
+                    <span className="text-white font-semibold">• 🔬 Bilimsel Teşhis:</span> İyonosfer ve manyetosferde gerçekleşen fiziksel olayların bilimsel açıklaması.
+                    <br />
+                    <span className="text-white font-semibold">• ⚡ Beden Reaksiyonları:</span> Artan kozmik plazmanın sinir sistemi, uyku düzeni ve baş bölgesi üzerindeki olası fiziksel etkileri.
+                    <br />
+                    <span className="text-white font-semibold">• 🧘 Ruhsal Rehberlik:</span> Enerjiyi topraklamak, aura alanını korumak ve uyanış kapılarından faydalanmak için önerilen meditasyon ve nefes pratikleri.
                   </p>
+
                   <p>
-                    <strong>Küresel Güneş Fırtınası vs. Yerel Atmosferik Gürültü:</strong>
+                    <strong>Kozmik Enerji Simülatörü (Test Paneli):</strong>
                     <br />
-                    Tekil ve bölgesel gözlemevi grafikleri (örneğin sadece belirli bir bölgedeki ölçüm istasyonları), o bölgedeki <em>yerel yıldırım, şimşek veya hava olayları</em> nedeniyle de yüksek genlikli beyaz patlamalar gösterebilir. Ancak bu lokal olaylar küresel insan bilincini ve biyolojisini etkilemez. Bizim kullandığımız küresel Kp endeksi ise yerel gürültüleri filtreleyerek sadece Dünya'nın tamamını ve insan biyo-alanını doğrudan etkileyen <strong>gerçek jeomanyetik güneş fırtınası hareketlerini</strong> gösterir.
+                    Uygulamadaki test sürgüsü yardımıyla Kp endeksini (0-9 arası) manuel olarak değiştirebilirsiniz. Sürgüyü oynattığınızda, tüm güneş rüzgarı parametreleri ve Kozmik Oracle teşhisi senkronize bir şekilde güncellenerek olası jeomanyetik fırtınaların ve yüksek enerjisel geçişlerin iyonosfer üzerindeki etkilerini test etmenizi sağlar. "Canlı Veriye Dön" butonuyla gerçek verilere dönebilirsiniz.
                   </p>
                 </div>
+
                 <div className="space-y-4">
-                  <p>
-                    <strong>Güneş Fırtınası ve Biyolojik Etkiler:</strong>
-                    <br />
-                    Dünya'nın elektromanyetik kalkanı ile insan kalp ritmi, sinir sistema dengesi ve melatonin salgısı doğrudan senkronizedir. Kp endeksinin yükseldiği (grafikte sarı, turuncu ve beyaz patlama olarak gösterilen) günlerde baş ağrısı, yorgunluk, rüyalarda aşırı berraklık veya uyku bozuklukları gibi kozmik adaptasyon semptomları yaşanması bilimsel olarak oldukça yaygındır.
-                  </p>
+                  <div className="bg-white/5 border border-white/10 p-4 rounded-2xl mb-4">
+                    <strong className="text-white">Güneş Rüzgarı Sözlüğü:</strong>
+                    <div className="mt-2 text-xs leading-relaxed flex flex-col gap-2">
+                      <p>
+                        <strong>• Kp Endeksi:</strong> Dünya genelindeki manyetometrelerden alınan verilerle hesaplanan 0-9 arası jeomanyetik aktivite derecesidir. 5 ve üzeri küresel fırtınayı ifade eder.
+                      </p>
+                      <p>
+                        <strong>• Güneş Rüzgarı Hızı:</strong> Güneş yüzeyinden kopup saniyede süzülen plazma hızıdır. Hız arttıkça Dünya'nın koruyucu kalkanı daha çok sıkışır.
+                      </p>
+                      <p>
+                        <strong>• Proton Yoğunluğu:</strong> Plazmadaki santimetreküp başına düşen parçacık miktarıdır. Yoğunluk yükseldikçe atmosferle girilen enerjisel etkileşim artar.
+                      </p>
+                      <p>
+                        <strong>• Bz Değeri (Yön):</strong> Manyetik kalkanın kuzey-güney yönüdür. Bz'nin eksiye (-) yani güneye yönelmesi, Dünya'nın kalkanında kapılar açarak plazmanın içeri sızmasını kolaylaştırır.
+                      </p>
+                      <p>
+                        <strong>• Toplam Alan (Bt):</strong> Gezegenler arası manyetik alanın toplam gücünü nT cinsinden gösterir.
+                      </p>
+                      <p>
+                        <strong>• Sıcaklık:</strong> Güneş plazmasının termal sıcaklığıdır. Yüksek termal değerler taç küre kütle atılımlarını (CME) işaret eder.
+                      </p>
+                    </div>
+                  </div>
+
                   <p>
                     <strong>Saat Dilimi ve Yerel Saat Dönüşümü:</strong>
                     <br />
-                    Bölgesel gözlemevi grafikleri genellikle istasyonun kurulu olduğu ülkenin veya şehrin yerel saat dilimine göre çizilir (örneğin Asya/Sibirya gözlemevleri kendi yerel saat dilimini kullanır). Bu gösterge paneli ise uluslararası uzay havası verilerini <strong>tamamen sizin cihazınızın yerel saat dilimine (örneğin Türkiye saati UTC+3)</strong> dönüştürerek gösterir. Bu nedenle yabancı grafiklerle aranızda saat farkı bulunması tamamen normaldir; buradaki saatler doğrudan kendi gününüzdeki anı temsil eder.
+                    Bölgesel gözlemevi grafikleri genellikle istasyonun kurulu olduğu ülkenin yerel saat dilimine göre çizilir (örneğin Asya/Sibirya gözlemevleri kendi yerel saatini kullanır). Bu gösterge paneli ise uluslararası uzay havası verilerini <strong>tamamen sizin cihazınızın yerel saat dilimine (örneğin Türkiye saati UTC+3)</strong> dönüştürerek gösterir. Bu nedenle yabancı grafiklerle aranızda saat farkı bulunması tamamen normaldir; buradaki saatler doğrudan kendi gününüzdeki anı temsil eder.
                   </p>
+
                   <p>
                     <strong>Kozmik Hava Tahmini: Gelecek 24 Saat Nasıl Hesaplanır?</strong>
                     <br />
