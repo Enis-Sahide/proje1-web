@@ -810,80 +810,6 @@ export default function SchumannPage() {
           </p>
         </div>
 
-        {/* Gösterge Panelleri */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          
-          {/* Card 2: Kozmik Etki İndeksi (CEI) */}
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-center items-center md:col-span-1">
-            <div className="w-full text-center">
-              <div className="flex items-center justify-between text-mystic-text-muted mb-4">
-                <span className="text-xs uppercase tracking-wider font-semibold flex items-center justify-center gap-1">
-                  Schumann Rezonans Tahmini
-                  <span className="relative flex items-center justify-center group/tooltip ml-1">
-                    <span className="cursor-pointer text-white/40 hover:text-white transition-colors">
-                      <Info size={13} />
-                    </span>
-                    <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-64 p-3 bg-black/95 border border-white/10 text-[11px] text-white/90 rounded-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
-                      Güneş rüzgarı hızı, parçacık yoğunluğu ve kalkan açıklığına göre hesaplanan anlık Schumann Rezonans uyarılma seviyesi tahmini.
-                      <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
-                    </span>
-                  </span>
-                </span>
-                <Gauge size={16} className="text-[#00E5FF]" />
-              </div>
-              {isLoading ? (
-                <div className="h-8 w-16 bg-white/5 animate-pulse rounded mx-auto"></div>
-              ) : (() => {
-                const activeImpact = simulatedKp !== null ? getCalculatedImpact(simulatedKp) : (data?.cosmic_impact_score ?? 0);
-                return (
-                  <div className={`text-4xl font-extrabold my-2 transition-colors duration-300 ${getKpTextColorClass(activeImpact)}`}>
-                    {activeImpact.toFixed(1)}
-                  </div>
-                );
-              })()}
-            </div>
-          </div>
-
-          {/* Card 3: Durum Seviyesi */}
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-between md:col-span-3">
-            <div>
-              <div className="flex items-center justify-between text-mystic-text-muted mb-4">
-                <span className="text-xs uppercase tracking-wider font-semibold">Manyetik Alan Durumu</span>
-                <Zap size={16} className="text-amber-400" />
-              </div>
-              {isLoading ? (
-                <div className="h-8 w-24 bg-white/5 animate-pulse rounded"></div>
-              ) : (() => {
-                const activeKp = simulatedKp !== null ? simulatedKp : (data?.current_kp ?? 0);
-                const activeImpact = simulatedKp !== null ? getCalculatedImpact(simulatedKp) : (data?.cosmic_impact_score ?? activeKp);
-                const activeLabel = simulatedKp !== null ? getCosmicStatusInfo(activeImpact).label : (data?.cosmic_status_label ?? data?.status_label);
-                const activeDesc = simulatedKp !== null ? getCosmicStatusInfo(activeImpact).desc : (data?.cosmic_status_desc ?? data?.status_desc);
-                return (
-                  <>
-                    <div className="text-xl font-extrabold text-white flex items-center gap-2">
-                      <span className={`w-2.5 h-2.5 rounded-full ${
-                        activeImpact >= 7.0
-                          ? 'bg-red-500 animate-ping'
-                          : activeImpact >= 5.0
-                          ? 'bg-orange-400'
-                          : activeImpact >= 3.0
-                          ? 'bg-amber-400'
-                          : 'bg-emerald-400'
-                      }`}></span>
-                      {activeLabel}
-                    </div>
-                    {activeDesc && (
-                      <p className="text-sm md:text-[14.5px] text-white/90 leading-relaxed border-t border-white/5 pt-3 mt-3 animate-in fade-in duration-300 text-justify">
-                        {activeDesc}
-                      </p>
-                    )}
-                  </>
-                );
-              })()}
-            </div>
-          </div>
-        </div>
-
         {/* 1. Yol Kural Tabanlı Kozmik Durum Analizi */}
         {!isLoading && (
           (() => {
@@ -903,20 +829,36 @@ export default function SchumannPage() {
                 <div className="absolute top-0 right-0 w-48 h-48 bg-[#4F46E5]/10 blur-[60px] rounded-full pointer-events-none"></div>
                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#00E5FF]/5 blur-[40px] rounded-full pointer-events-none"></div>
 
-                <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-5">
-                  <div className="flex items-center gap-3">
-                    <div className="bg-[#4F46E5]/20 p-2.5 rounded-2xl border border-[#4F46E5]/40 text-[#00E5FF] shadow-inner animate-pulse">
-                      <Sparkles size={20} />
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-5 mb-6 gap-4">
+                  <div className="flex items-center gap-4">
+                    {/* Big glowing score badge */}
+                    <div className="bg-[#4F46E5]/10 border border-[#00E5FF]/40 w-20 h-20 rounded-2xl flex flex-col justify-center items-center shrink-0 shadow-[0_0_20px_rgba(0,229,255,0.15)] relative">
+                      <span className="text-[10px] text-mystic-text-muted uppercase font-bold tracking-wider">Tahmin</span>
+                      <strong className={`text-3xl font-extrabold ${getKpTextColorClass(score)}`}>
+                        {score.toFixed(1)}
+                      </strong>
                     </div>
+
                     <div>
-                      <span className="text-[10px] font-bold tracking-widest text-[#00E5FF] bg-[#00E5FF]/10 px-2.5 py-0.5 rounded-full uppercase border border-[#00E5FF]/20">
+                      <span className="text-[9px] font-extrabold tracking-widest text-[#00E5FF] bg-[#00E5FF]/10 px-2.5 py-0.5 rounded-full uppercase border border-[#00E5FF]/20">
                         KOZMİK ORACLE / DURUM RAPORU
                       </span>
-                      <h2 className="text-lg font-bold text-white mt-1">
+                      <h2 className="text-xl font-extrabold text-white mt-1.5 flex items-center gap-2">
                         {analysis.title}
                       </h2>
                     </div>
                   </div>
+
+                  {/* Info button with tooltip */}
+                  <span className="relative flex items-center justify-center group/tooltip md:mr-2 self-end md:self-center">
+                    <span className="cursor-pointer text-white/30 hover:text-white transition-colors bg-white/5 p-2.5 rounded-xl border border-white/5">
+                      <Info size={16} />
+                    </span>
+                    <span className="absolute bottom-full mb-2 right-0 w-64 p-3 bg-black/95 border border-white/10 text-[11px] text-white/90 rounded-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
+                      Güneş rüzgarı hızı, parçacık yoğunluğu ve kalkan açıklığına göre hesaplanan anlık Schumann Rezonans uyarılma seviyesi tahmini.
+                      <span className="absolute top-full right-4 border-4 border-transparent border-t-black/95"></span>
+                    </span>
+                  </span>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
