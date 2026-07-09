@@ -78,7 +78,7 @@ export default function SchumannMiniWidget() {
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="text-mystic-primary text-[10px] font-bold uppercase tracking-widest">Schumann Rezonansı • Kp {kpVal.toFixed(1)}</span>
+              <span className="text-mystic-primary text-[10px] font-bold uppercase tracking-widest">Schumann Rezonansı • SR {scoreVal.toFixed(1)}</span>
               <span className={`w-1.5 h-1.5 rounded-full ${getGlowingIndicator(scoreVal)}`} />
             </div>
             <h4 className="text-white font-extrabold text-sm mt-0.5 tracking-tight group-hover/schumann:text-mystic-accent transition-colors">
@@ -89,8 +89,8 @@ export default function SchumannMiniWidget() {
 
         {/* Right: Kp Value Badge */}
         <div className={`py-1 px-3 rounded-xl border text-xs font-mono font-black flex items-center gap-1.5 ${getScoreColor(scoreVal)}`}>
-          <span className="text-white font-extrabold">{scoreVal.toFixed(2)}</span>
-          <span className="opacity-60 text-[10px]">SR</span>
+          <span className="text-white font-extrabold">{kpVal.toFixed(2)}</span>
+          <span className="opacity-60 text-[10px]">Kp</span>
         </div>
 
       </div>
