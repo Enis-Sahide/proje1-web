@@ -6,37 +6,27 @@ async function main() {
   const client = new Client({ connectionString });
   await client.connect();
 
-  const activityRes = await client.query(`
-    SELECT 
-      u.email, 
-      u.full_name, 
-      p.role,
-      (
-        SELECT s.created_at 
-        FROM sessions s 
-        WHERE s.user_id = u.id AND s.expires_at > NOW() AND s.revoked_at IS NULL 
-        ORDER BY s.created_at DESC 
-        LIMIT 1
-      ) as last_session_created,
-      (
-        SELECT COUNT(*)::int 
-        FROM sessions s 
-        WHERE s.user_id = u.id AND s.expires_at > NOW() AND s.revoked_at IS NULL
-      ) as active_sessions_count
+  const userRes = await client.query(`
+    SELECT u.id, u.email, u.full_name, p.role, u.created_at, u.updated_at
     FROM users u
     LEFT JOIN profiles p ON p.user_id = u.id
-    ORDER BY last_session_created DESC NULLS LAST
+    WHERE u.email = 'testuser12345@gmail.com'
   `);
 
-  console.log('\n=== EN SON AKTİF OTURUM AÇANLAR ===');
-  activityRes.rows.forEach((row, index) => {
-    if (row.last_session_created) {
-      console.log(`${index + 1}. ${row.full_name || 'İsimsiz'} (${row.email})`);
-      console.log(`   Rol: ${row.role} | En Son Oturum Başlangıcı: ${row.last_session_created} | Toplam Aktif Oturum: ${row.active_sessions_count}`);
-    } else {
-      console.log(`${index + 1}. ${row.full_name || 'İsimsiz'} (${row.email}) - Aktif Oturumu Yok`);
-    }
-  });
+  console.log('=== TEST USER DETAILS ===');
+  console.log(JSON.stringify(userRes.rows, null, 2));
+
+  if (userRes.rows.length > 0) {
+    const userId = userRes.rows[0].id;
+    const sessionsRes = await client.query(`
+      SELECT id, expires_at, revoked_at, user_agent, created_at
+      FROM sessions
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+    `, [userId]);
+    console.log('\n=== TEST USER SESSIONS ===');
+    console.log(JSON.stringify(sessionsRes.rows, null, 2));
+  }
 
   await client.end();
 }
