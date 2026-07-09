@@ -739,8 +739,8 @@ export default function SchumannPage() {
             <div className="w-full text-center">
               <div className="flex items-center justify-between text-mystic-text-muted mb-4">
                 <span className="text-xs uppercase tracking-wider font-semibold flex items-center justify-center gap-1">
-                  Kozmik Etki
-                  <span className="cursor-help text-white/40 hover:text-white" title="Güneş rüzgarı, yoğunluk ve Bz kalkan verileriyle hesaplanan birleşik uyarılma endeksi.">
+                  Schumann Rezonans Tahmini
+                  <span className="cursor-help text-white/40 hover:text-white" title="Güneş rüzgarı hızı, parçacık yoğunluğu ve kalkan açıklığına göre hesaplanan anlık Schumann Rezonans uyarılma seviyesi tahmini.">
                     <Info size={11} />
                   </span>
                 </span>
@@ -982,7 +982,7 @@ export default function SchumannPage() {
                     <span className="text-mystic-text-muted">Zaman:</span>
                     <strong className="text-[#00E5FF] font-mono">{hoverInfo.timeStr}</strong>
                     <span className="text-white/20">|</span>
-                    <span className="text-mystic-text-muted">{hoverInfo.isCurrent ? 'Kozmik Etki (CEI):' : 'Genlik (Kp):'}</span>
+                    <span className="text-mystic-text-muted">{hoverInfo.isCurrent ? 'Schumann Tahmini:' : 'Genlik (Kp):'}</span>
                     <strong className="text-white font-mono">{hoverInfo.kp.toFixed(2)}</strong>
                     <span className="text-white/20">|</span>
                     <span className="text-cyan-300 font-semibold">{hoverInfo.spiritualStatus}</span>
