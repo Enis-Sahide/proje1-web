@@ -211,6 +211,24 @@ export default function SchumannPage() {
     return parseFloat(Math.min(10.0, rawImpact * bzMultiplier).toFixed(2));
   };
 
+  const getEstimatedImpact = (kpVal: number) => {
+    // Kp değerine göre güneş rüzgarı parametrelerini tahmin ediyoruz (yaklaşık korelasyon):
+    const speedVal = 300 + (kpVal / 9) * 500;
+    const densityVal = 3 + (kpVal / 9) * 15;
+    const btVal = 5 + (kpVal / 9) * 15;
+    const bzVal = 5 - (kpVal / 9) * 15;
+    
+    const kpWeight = (kpVal / 9) * 4.0;
+    const speedWeight = Math.max(0, Math.min(2.5, ((speedVal - 300) / 500) * 2.5));
+    const densityWeight = Math.max(0, Math.min(2.0, ((densityVal - 2) / 15) * 2.0));
+    const btWeight = Math.max(0, Math.min(1.5, ((btVal - 5) / 15) * 1.5));
+    
+    const bzMultiplier = bzVal < 0 ? (1.0 + Math.min(0.25, (Math.abs(bzVal) / 20) * 0.25)) : 1.0;
+    
+    const rawImpact = kpWeight + speedWeight + densityWeight + btWeight;
+    return parseFloat(Math.min(10.0, rawImpact * bzMultiplier).toFixed(2));
+  };
+
   const getCosmicStatusInfo = (score: number) => {
     if (score < 3.0) {
       return {
@@ -273,14 +291,17 @@ export default function SchumannPage() {
       return lastIdx;
     }, -1);
 
-    // Sadece ŞİMDİ sütunu için CEI hesapla (bozulmayı önlemek için geçmiş/tahmin Kp olarak kalır)
+    // Canlı / ŞİMDİ sütunu için tam gözlemlenen CEI hesapla
     if (idx === lastMeasuredIdx) {
       const activeKp = simulatedKp !== null ? simulatedKp : item.kp;
       const activeImpact = getCalculatedImpact(activeKp);
       return { ...item, kp: activeImpact };
     }
     
-    return item;
+    // Geçmiş ve gelecek tahmin blokları için Kp tabanlı güneş rüzgarı tahmini ile CEI hesapla
+    // Bu sayede grafik düzleşmesi engellenir ve dikey dalgalanmalar korunur
+    const estimatedImpact = getEstimatedImpact(item.kp);
+    return { ...item, kp: estimatedImpact };
   }) : [];
 
   const kpHistoryToRender = data?.history ? data.history.map((item, idx) => {
@@ -1021,7 +1042,7 @@ export default function SchumannPage() {
               Schumann Rezonansı
             </h2>
             <p className="text-xs text-mystic-text-muted mt-1">
-              Frekans dalgalanmalarını ve Kozmik Etki İndeksi kaynaklı uyarılma durumunu canlı izleyin. ŞİMDİ çizgisi gerçek zamanlı güneş rüzgarı birleşik etkisini, diğer alanlar ise jeomanyetik Kp indeksini yansıtır. (Saat bilgisi için grafiğin üzerine gelin)
+              Frekans dalgalanmalarını ve Schumann Rezonans uyarılma seviyesini canlı izleyin. ŞİMDİ çizgisi anlık güneş rüzgarı birleşik etkisini, diğer zaman dilimleri ise geçmiş ve gelecek tahmini Schumann değerlerini yansıtır. (Saat bilgisi için grafiğin üzerine gelin)
             </p>
           </div>
 
