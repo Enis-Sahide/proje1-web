@@ -732,25 +732,8 @@ export default function SchumannPage() {
         </div>
 
         {/* Gösterge Panelleri */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           
-          {/* Card 1: Kp Endeksi */}
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-center items-center md:col-span-1">
-            <div className="w-full text-center">
-              <div className="flex items-center justify-between text-mystic-text-muted mb-4">
-                <span className="text-xs uppercase tracking-wider font-semibold">Küresel Genlik (Kp)</span>
-                <Activity size={16} className="text-[#00E5FF]" />
-              </div>
-              {isLoading ? (
-                <div className="h-8 w-16 bg-white/5 animate-pulse rounded mx-auto"></div>
-              ) : (
-                <div className={`text-4xl font-extrabold my-2 transition-colors duration-300 ${getKpTextColorClass(simulatedKp !== null ? simulatedKp : (data?.current_kp ?? 0))}`}>
-                  {simulatedKp !== null ? simulatedKp.toFixed(1) : data?.current_kp}
-                </div>
-              )}
-            </div>
-          </div>
-
           {/* Card 2: Kozmik Etki İndeksi (CEI) */}
           <div className="bg-black/40 border border-white/10 rounded-2xl p-6 backdrop-blur-md relative overflow-hidden flex flex-col justify-center items-center md:col-span-1">
             <div className="w-full text-center">
