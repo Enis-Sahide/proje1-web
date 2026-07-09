@@ -1571,7 +1571,10 @@ export default function SchumannPage() {
                     <strong className="text-white">Güneş Rüzgarı Sözlüğü:</strong>
                     <div className="mt-2 text-xs leading-relaxed flex flex-col gap-2">
                       <p>
-                        <strong>• Kp Endeksi:</strong> Dünya genelindeki manyetometrelerden alınan verilerle hesaplanan 0-9 arası jeomanyetik aktivite derecesidir. 5 ve üzeri küresel fırtınayı ifade eder.
+                        <strong>• Schumann Tahmini (SR Skoru):</strong> Güneş rüzgarı hızı, plazma yoğunluğu, Kp endeksi ve manyetik kalkan yönü (Bz) gibi parametrelerin birleşik etkisinden hesaplanan, 0.0 - 10.0 arası bir iyonosferik uyarım göstergesidir. Tıpkı Richter ölçeği gibi, uzay havası dalgalanmalarının uyarım şiddetini tek bir skorla anlamanızı sağlar.
+                      </p>
+                      <p>
+                        <strong>• Kp Endeksi:</strong> Dünya genelindeki manyetometrelerden alınan verilerle hesaplanan 0-9 arası jeomanyetik aktivite derecesidir. 5 ve üzeri, küresel manyetik fırtınaları (NOAA G1-G5 seviyeleri) ifade eder.
                       </p>
                       <p>
                         <strong>• Güneş Rüzgarı Hızı:</strong> Güneş yüzeyinden kopup saniyede süzülen plazma hızıdır. Hız arttıkça Dünya'nın koruyucu kalkanı daha çok sıkışır.
