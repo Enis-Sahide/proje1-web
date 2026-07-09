@@ -168,54 +168,7 @@ function parseDiscussion(text: string) {
 
 export async function GET() {
   try {
-    // 1. Fetch Kp index forecast data (observed + forecast)
-    const kpRes = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json', {
-      next: { revalidate: 300 } // cache for 5 minutes
-    });
-    if (!kpRes.ok) {
-      throw new Error(`NOAA Kp API responded with status: ${kpRes.status}`);
-    }
-    const kpList = await kpRes.json();
-    
-    // Find index of the last observed reading
-    const lastObservedIndex = kpList.map((item: any) => item.observed).lastIndexOf('observed');
-    
-    let past: any[] = [];
-    let future: any[] = [];
-    let currentKp = 0;
-    let lastReadingTime = '';
-
-    if (lastObservedIndex !== -1) {
-      const startIdx = Math.max(0, lastObservedIndex - 15);
-      past = kpList.slice(startIdx, lastObservedIndex + 1);
-      future = kpList.slice(lastObservedIndex + 1, lastObservedIndex + 9);
-      
-      const lastObserved = kpList[lastObservedIndex];
-      currentKp = parseFloat(lastObserved.kp);
-      lastReadingTime = lastObserved.time_tag;
-    } else {
-      past = kpList.slice(-24);
-      const lastItem = kpList[kpList.length - 1];
-      currentKp = parseFloat(lastItem.kp);
-      lastReadingTime = lastItem.time_tag;
-    }
-
-    const history = [
-      ...past.map((item: any) => ({
-        time: item.time_tag,
-        kp: parseFloat(item.kp),
-        predicted: false
-      })),
-      ...future.map((item: any) => ({
-        time: item.time_tag,
-        kp: parseFloat(item.kp),
-        predicted: true
-      }))
-    ];
-
-    const status = getStatusInfo(currentKp);
-
-    // 2. Fetch real-time solar wind data (propagated solar wind 1-hour cadence is small and fast)
+    // 1. Fetch real-time solar wind data (propagated solar wind 1-hour cadence is small and fast)
     let solarWind = {
       speed: 0,
       density: 0,
@@ -256,6 +209,74 @@ export async function GET() {
       console.error('Failed to fetch solar wind data:', windErr);
     }
 
+    // Helper to calculate CEI for any Kp value using the fetched solar wind parameters
+    const calculateCEI = (kpVal: number) => {
+      const kpWeight = (kpVal / 9) * 4.0;
+      
+      const speedVal = solarWind.speed || 350;
+      const speedWeight = Math.max(0, Math.min(2.5, ((speedVal - 300) / 500) * 2.5));
+      
+      const densityVal = solarWind.density || 4;
+      const densityWeight = Math.max(0, Math.min(2.0, ((densityVal - 2) / 15) * 2.0));
+      
+      const btVal = solarWind.bt || 5;
+      const btWeight = Math.max(0, Math.min(1.5, ((btVal - 5) / 15) * 1.5));
+      
+      const bzVal = solarWind.bz || 0;
+      const bzMultiplier = bzVal < 0 ? (1.0 + Math.min(0.25, (Math.abs(bzVal) / 20) * 0.25)) : 1.0;
+      
+      const rawImpactScore = kpWeight + speedWeight + densityWeight + btWeight;
+      return parseFloat(Math.min(10.0, rawImpactScore * bzMultiplier).toFixed(2));
+    };
+
+    // 2. Fetch Kp index forecast data (observed + forecast)
+    const kpRes = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json', {
+      next: { revalidate: 300 } // cache for 5 minutes
+    });
+    if (!kpRes.ok) {
+      throw new Error(`NOAA Kp API responded with status: ${kpRes.status}`);
+    }
+    const kpList = await kpRes.json();
+    
+    // Find index of the last observed reading
+    const lastObservedIndex = kpList.map((item: any) => item.observed).lastIndexOf('observed');
+    
+    let past: any[] = [];
+    let future: any[] = [];
+    let currentKp = 0;
+    let lastReadingTime = '';
+
+    if (lastObservedIndex !== -1) {
+      const startIdx = Math.max(0, lastObservedIndex - 15);
+      past = kpList.slice(startIdx, lastObservedIndex + 1);
+      future = kpList.slice(lastObservedIndex + 1, lastObservedIndex + 9);
+      
+      const lastObserved = kpList[lastObservedIndex];
+      currentKp = parseFloat(lastObserved.kp);
+      lastReadingTime = lastObserved.time_tag;
+    } else {
+      past = kpList.slice(-24);
+      const lastItem = kpList[kpList.length - 1];
+      currentKp = parseFloat(lastItem.kp);
+      lastReadingTime = lastItem.time_tag;
+    }
+
+    // Map all history blocks (past and future predictions) to Cosmic Impact Index (CEI)
+    const history = [
+      ...past.map((item: any) => ({
+        time: item.time_tag,
+        kp: calculateCEI(parseFloat(item.kp)),
+        predicted: false
+      })),
+      ...future.map((item: any) => ({
+        time: item.time_tag,
+        kp: calculateCEI(parseFloat(item.kp)),
+        predicted: true
+      }))
+    ];
+
+    const status = getStatusInfo(currentKp);
+
     // 3. Fetch daily discussion text & translate
     let noaaDiscussion = {
       solar_activity_tr: '',
@@ -283,29 +304,8 @@ export async function GET() {
       console.error('Failed to fetch/translate NOAA discussion:', discErr);
     }
 
-    // 4. Calculate custom cosmic impact score (0.0 to 10.0)
-    // Kp weight: up to 4.0 points
-    const kpWeight = (currentKp / 9) * 4.0;
-
-    // Solar Wind speed weight: up to 2.5 points (normal range 300 to 800)
-    const speedVal = solarWind.speed || 350;
-    const speedWeight = Math.max(0, Math.min(2.5, ((speedVal - 300) / 500) * 2.5));
-
-    // Proton density weight: up to 2.0 points (normal range 2 to 17)
-    const densityVal = solarWind.density || 4;
-    const densityWeight = Math.max(0, Math.min(2.0, ((densityVal - 2) / 15) * 2.0));
-
-    // Bt field weight: up to 1.5 points (normal range 5 to 20)
-    const btVal = solarWind.bt || 5;
-    const btWeight = Math.max(0, Math.min(1.5, ((btVal - 5) / 15) * 1.5));
-
-    // Bz orientation multiplier: if Bz < 0 (southward), shield is open, increase impact by up to 25%
-    const bzVal = solarWind.bz || 0;
-    const bzMultiplier = bzVal < 0 ? (1.0 + Math.min(0.25, (Math.abs(bzVal) / 20) * 0.25)) : 1.0;
-
-    const rawImpactScore = kpWeight + speedWeight + densityWeight + btWeight;
-    const finalImpactScore = parseFloat(Math.min(10.0, rawImpactScore * bzMultiplier).toFixed(2));
-
+    // 4. Calculate custom cosmic impact score (0.0 to 10.0) for the current moment
+    const finalImpactScore = calculateCEI(currentKp);
     const cosmicStatus = getCosmicImpactStatusInfo(finalImpactScore);
 
     return json({

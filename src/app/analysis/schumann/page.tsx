@@ -972,7 +972,7 @@ export default function SchumannPage() {
                     <span className="text-mystic-text-muted">Zaman:</span>
                     <strong className="text-[#00E5FF] font-mono">{hoverInfo.timeStr}</strong>
                     <span className="text-white/20">|</span>
-                    <span className="text-mystic-text-muted">Değer (Etki/Genlik):</span>
+                    <span className="text-mystic-text-muted">Kozmik Etki (CEI):</span>
                     <strong className="text-white font-mono">{hoverInfo.kp.toFixed(2)}</strong>
                     <span className="text-white/20">|</span>
                     <span className="text-cyan-300 font-semibold">{hoverInfo.spiritualStatus}</span>
@@ -1040,10 +1040,10 @@ export default function SchumannPage() {
           <div className="border-b border-white/10 pb-4 mb-6">
             <h2 className="text-xl font-bold flex items-center gap-2 text-white">
               <Activity size={22} className="text-[#00E5FF]" />
-              Jeomanyetik Kp İndeks Eğilimi (Resmi Altyapı)
+              Kozmik Etki İndeks Eğilimi (Son 72 Saat)
             </h2>
             <p className="text-xs text-mystic-text-muted mt-1">
-              Dünya genelindeki gözlemevlerinden ölçülen ham planetary Kp değerlerinin son 3 günlük (72 saat) gösterimi. Bu veriler uyarılma indeksimiz için resmi bilimsel altyapıyı oluşturur.
+              Güneş rüzgarı hızı, parçacık yoğunluğu ve Dünya manyetik kalkanının durumuna göre hesaplanan Kozmik Etki İndeksi'nin (CEI) 3 günlük eğilimi (Düz sütunlar ölçümü, kesikli sütunlar 24 saatlik tahmini gösterir).
             </p>
           </div>
 
