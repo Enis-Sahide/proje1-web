@@ -78,11 +78,11 @@ export default function SchumannMiniWidget() {
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="text-mystic-primary text-[10px] font-bold uppercase tracking-widest">Schumann Rezonansı</span>
+              <span className="text-mystic-primary text-[10px] font-bold uppercase tracking-widest">Schumann Rezonansı • Kp {kpVal.toFixed(1)}</span>
               <span className={`w-1.5 h-1.5 rounded-full ${getGlowingIndicator(scoreVal)}`} />
             </div>
             <h4 className="text-white font-extrabold text-sm mt-0.5 tracking-tight group-hover/schumann:text-mystic-accent transition-colors">
-              {data?.status_label.split(' ')[0]} <span className="text-xs font-normal text-mystic-text-muted">(Kp {kpVal.toFixed(1)})</span>
+              {data?.status_label.split(' ')[0]}
             </h4>
           </div>
         </div>
