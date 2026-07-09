@@ -50,6 +50,13 @@ export default function SchumannMiniWidget() {
     return 'bg-red-400 shadow-[0_0_12px_rgba(239,68,68,0.8)] animate-ping';
   };
 
+  const getKpColor = (kp: number) => {
+    if (kp < 3.0) return 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10 shadow-[0_0_8px_rgba(16,185,129,0.15)]';
+    if (kp < 4.0) return 'text-amber-400 border-amber-500/30 bg-amber-500/10 shadow-[0_0_8px_rgba(245,158,11,0.15)]';
+    if (kp < 5.0) return 'text-orange-400 border-orange-500/30 bg-orange-500/10 shadow-[0_0_8px_rgba(249,115,22,0.15)]';
+    return 'text-red-400 border-red-500/30 bg-red-500/10 shadow-[0_0_8px_rgba(239,68,68,0.2)] animate-pulse';
+  };
+
   if (isLoading) {
     return (
       <div className="bg-mystic-surface/50 backdrop-blur-md rounded-2xl p-5 border border-mystic-surface-light w-full max-w-sm shadow-xl flex items-center justify-center min-h-[90px] animate-pulse">
@@ -88,7 +95,7 @@ export default function SchumannMiniWidget() {
         </div>
 
         {/* Right: Kp Value Badge */}
-        <div className={`py-1 px-3 rounded-xl border text-xs font-mono font-black flex items-center gap-1.5 ${getScoreColor(scoreVal)}`}>
+        <div className={`py-1 px-3 rounded-xl border text-xs font-mono font-black flex items-center gap-1.5 ${getKpColor(kpVal)}`}>
           <span className="text-white font-extrabold">{kpVal.toFixed(2)}</span>
           <span className="opacity-60 text-[10px]">Kp</span>
         </div>
