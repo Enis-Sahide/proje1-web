@@ -917,138 +917,178 @@ export default function SchumannPage() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              {/* 1. Rüzgar Hızı */}
-              <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
-                <div className="flex items-center justify-between text-mystic-text-muted mb-2">
-                  <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
-                    Güneş Rüzgarı Hızı
-                    <span className="relative flex items-center justify-center group/tooltip ml-0.5">
-                      <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
-                        <Info size={10} />
-                      </span>
-                      <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
-                        Güneş'ten yayılan plazma akışının hızıdır. Hızlı rüzgarlar Dünya'nın manyetik alanını sıkıştırarak yüksek enerjisel girişlere sebep olur.
-                        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
-                      </span>
-                    </span>
-                  </span>
-                  <Wind size={16} className="text-cyan-400" />
-                </div>
-                <div>
-                  <div className="text-2xl font-extrabold text-white">
-                    {data.solar_wind.speed ? `${Math.round(data.solar_wind.speed)} km/s` : '---'}
-                  </div>
-                  <span className={`text-[10px] font-semibold ${
-                    data.solar_wind.speed >= 600 ? 'text-red-400' : data.solar_wind.speed >= 450 ? 'text-amber-400' : 'text-emerald-400'
-                  }`}>
-                    {data.solar_wind.speed >= 600 ? '🔴 Çok Hızlı' : data.solar_wind.speed >= 450 ? '🟡 Hızlı' : '🟢 Sakin'}
-                  </span>
-                </div>
-              </div>
+            {(() => {
+              const activeKp = simulatedKp !== null ? simulatedKp : (data.current_kp ?? 0);
+              const speed = simulatedKp !== null ? (300 + (simulatedKp / 9) * 500) : (data.solar_wind.speed ?? 350);
+              const density = simulatedKp !== null ? (3 + (simulatedKp / 9) * 15) : (data.solar_wind.density ?? 4);
+              const bz = simulatedKp !== null ? (5 - (simulatedKp / 9) * 15) : (data.solar_wind.bz ?? 0);
+              const bt = simulatedKp !== null ? (5 + (simulatedKp / 9) * 15) : (data.solar_wind.bt ?? 5);
+              const temp = simulatedKp !== null ? (100000 + (simulatedKp / 9) * 400000) : (data.solar_wind.temperature ?? 150000);
 
-              {/* 2. Proton Yoğunluğu */}
-              <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
-                <div className="flex items-center justify-between text-mystic-text-muted mb-2">
-                  <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
-                    Proton Yoğunluğu
-                    <span className="relative flex items-center justify-center group/tooltip ml-0.5">
-                      <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
-                        <Info size={10} />
+              return (
+                <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
+                  {/* 1. Kp Değeri */}
+                  <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
+                    <div className="flex items-center justify-between text-mystic-text-muted mb-2">
+                      <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
+                        Kp Endeksi
+                        <span className="relative flex items-center justify-center group/tooltip ml-0.5">
+                          <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
+                            <Info size={10} />
+                          </span>
+                          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
+                            Dünya'nın manyetik alanındaki küresel dalgalanma derecesidir (0-9 arası). Değer yükseldikçe jeomanyetik fırtına etkisi artar.
+                            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
+                          </span>
+                        </span>
                       </span>
-                      <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
-                        Güneş rüzgarındaki yüklü parçacıkların (protonlar) cm³ başına yoğunluğudur. Yoğunluğun artması, Dünya atmosferiyle etkileşime giren enerjiyi artırır.
-                        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
+                      <Activity size={16} className="text-amber-400" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-extrabold text-white">
+                        Kp {activeKp.toFixed(1)}
+                      </div>
+                      <span className={`text-[10px] font-semibold ${
+                        activeKp >= 5 ? 'text-red-400' : activeKp >= 3 ? 'text-amber-400' : 'text-emerald-400'
+                      }`}>
+                        {activeKp >= 5 ? '🔴 Fırtına' : activeKp >= 3 ? '🟡 Uyarılmış' : '🟢 Sakin'}
                       </span>
-                    </span>
-                  </span>
-                  <Gauge size={16} className="text-purple-400" />
-                </div>
-                <div>
-                  <div className="text-2xl font-extrabold text-white">
-                    {data.solar_wind.density ? `${data.solar_wind.density.toFixed(1)} p/cm³` : '---'}
+                    </div>
                   </div>
-                  <span className="text-[10px] text-mystic-text-muted">Parçacık yoğunluğu</span>
-                </div>
-              </div>
 
-              {/* 3. Bz Değeri */}
-              <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
-                <div className="flex items-center justify-between text-mystic-text-muted mb-2">
-                  <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
-                    Bz Değeri (Yön)
-                    <span className="relative flex items-center justify-center group/tooltip ml-0.5">
-                      <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
-                        <Info size={10} />
+                  {/* 2. Rüzgar Hızı */}
+                  <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
+                    <div className="flex items-center justify-between text-mystic-text-muted mb-2">
+                      <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
+                        Güneş Rüzgarı Hızı
+                        <span className="relative flex items-center justify-center group/tooltip ml-0.5">
+                          <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
+                            <Info size={10} />
+                          </span>
+                          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
+                            Güneş'ten yayılan plazma akışının hızıdır. Hızlı rüzgarlar Dünya'nın manyetik alanını sıkıştırarak yüksek enerjisel girişlere sebep olur.
+                            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
+                          </span>
+                        </span>
                       </span>
-                      <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
-                        Manyetik alanın kuzey-güney doğrultusudur. Değerin güneye doğru (negatif/-) olması, manyetik kalkanımızda kapılar açarak enerjinin içeri sızmasını sağlar.
-                        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
+                      <Wind size={16} className="text-cyan-400" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-extrabold text-white">
+                        {speed ? `${Math.round(speed)} km/s` : '---'}
+                      </div>
+                      <span className={`text-[10px] font-semibold ${
+                        speed >= 600 ? 'text-red-400' : speed >= 450 ? 'text-amber-400' : 'text-emerald-400'
+                      }`}>
+                        {speed >= 600 ? '🔴 Çok Hızlı' : speed >= 450 ? '🟡 Hızlı' : '🟢 Sakin'}
                       </span>
-                    </span>
-                  </span>
-                  <Shield size={16} className={data.solar_wind.bz < 0 ? "text-red-400" : "text-emerald-400"} />
-                </div>
-                <div>
-                  <div className={`text-2xl font-extrabold ${data.solar_wind.bz < 0 ? 'text-red-400' : 'text-emerald-400'}`}>
-                    {data.solar_wind.bz ? `${data.solar_wind.bz.toFixed(1)} nT` : '---'}
+                    </div>
                   </div>
-                  <span className="text-[10px] font-semibold">
-                    {data.solar_wind.bz < 0 ? '🔴 Kalkan Açık (G)' : '🟢 Kalkan Kapalı (K)'}
-                  </span>
-                </div>
-              </div>
 
-              {/* 4. Toplam Manyetik Alan (Bt) */}
-              <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
-                <div className="flex items-center justify-between text-mystic-text-muted mb-2">
-                  <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
-                    Toplam Alan (Bt)
-                    <span className="relative flex items-center justify-center group/tooltip ml-0.5">
-                      <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
-                        <Info size={10} />
+                  {/* 3. Proton Yoğunluğu */}
+                  <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
+                    <div className="flex items-center justify-between text-mystic-text-muted mb-2">
+                      <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
+                        Proton Yoğunluğu
+                        <span className="relative flex items-center justify-center group/tooltip ml-0.5">
+                          <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
+                            <Info size={10} />
+                          </span>
+                          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
+                            Güneş rüzgarındaki yüklü parçacıkların (protonlar) cm³ başına yoğunluğudur. Yoğunluğun artması, Dünya atmosferiyle etkileşime giren enerjiyi artırır.
+                            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
+                          </span>
+                        </span>
                       </span>
-                      <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
-                        Güneşler arası manyetik alanın toplam gücüdür. Yüksek Bt değerleri, Dünya çevresindeki elektromanyetik alan uyarılmasının şiddetini artırır.
-                        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
-                      </span>
-                    </span>
-                  </span>
-                  <Activity size={16} className="text-amber-400" />
-                </div>
-                <div>
-                  <div className="text-2xl font-extrabold text-white">
-                    {data.solar_wind.bt ? `${data.solar_wind.bt.toFixed(1)} nT` : '---'}
+                      <Gauge size={16} className="text-purple-400" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-extrabold text-white">
+                        {density ? `${density.toFixed(1)} p/cm³` : '---'}
+                      </div>
+                      <span className="text-[10px] text-mystic-text-muted">Parçacık yoğunluğu</span>
+                    </div>
                   </div>
-                  <span className="text-[10px] text-mystic-text-muted">Alan gücü</span>
-                </div>
-              </div>
 
-              {/* 5. Plazma Sıcaklığı */}
-              <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between col-span-2 md:col-span-1">
-                <div className="flex items-center justify-between text-mystic-text-muted mb-2">
-                  <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
-                    Sıcaklık
-                    <span className="relative flex items-center justify-center group/tooltip ml-0.5">
-                      <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
-                        <Info size={10} />
+                  {/* 4. Bz Değeri */}
+                  <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
+                    <div className="flex items-center justify-between text-mystic-text-muted mb-2">
+                      <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
+                        Bz Değeri (Yön)
+                        <span className="relative flex items-center justify-center group/tooltip ml-0.5">
+                          <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
+                            <Info size={10} />
+                          </span>
+                          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
+                            Manyetik alanın kuzey-güney doğrultusudur. Değerin güneye doğru (negatif/-) olması, manyetik kalkanımızda kapılar açarak enerjinin içeri sızmasını sağlar.
+                            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
+                          </span>
+                        </span>
                       </span>
-                      <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
-                        Güneş rüzgarı plazmasının termal sıcaklığıdır. Yüksek sıcaklıklar Güneş'teki aktif patlamalardan ve taç küre atılımlarından (CME) kaynaklanan akışları gösterir.
-                        <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
+                      <Shield size={16} className={bz < 0 ? "text-red-400" : "text-emerald-400"} />
+                    </div>
+                    <div>
+                      <div className={`text-2xl font-extrabold ${bz < 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+                        {bz ? `${bz.toFixed(1)} nT` : '---'}
+                      </div>
+                      <span className="text-[10px] font-semibold">
+                        {bz < 0 ? '🔴 Kalkan Açık (G)' : '🟢 Kalkan Kapalı (K)'}
                       </span>
-                    </span>
-                  </span>
-                  <Thermometer size={16} className="text-orange-400" />
-                </div>
-                <div>
-                  <div className="text-2xl font-extrabold text-white">
-                    {data.solar_wind.temperature ? `${(data.solar_wind.temperature / 1000).toFixed(0)}k K` : '---'}
+                    </div>
                   </div>
-                  <span className="text-[10px] text-mystic-text-muted">Kelvin cinsinden</span>
+
+                  {/* 5. Toplam Manyetik Alan (Bt) */}
+                  <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
+                    <div className="flex items-center justify-between text-mystic-text-muted mb-2">
+                      <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
+                        Toplam Alan (Bt)
+                        <span className="relative flex items-center justify-center group/tooltip ml-0.5">
+                          <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
+                            <Info size={10} />
+                          </span>
+                          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
+                            Güneşler arası manyetik alanın toplam gücüdür. Yüksek Bt değerleri, Dünya çevresindeki elektromanyetik alan uyarılmasının şiddetini artırır.
+                            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
+                          </span>
+                        </span>
+                      </span>
+                      <Activity size={16} className="text-amber-400" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-extrabold text-white">
+                        {bt ? `${bt.toFixed(1)} nT` : '---'}
+                      </div>
+                      <span className="text-[10px] text-mystic-text-muted">Alan gücü</span>
+                    </div>
+                  </div>
+
+                  {/* 6. Plazma Sıcaklığı */}
+                  <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
+                    <div className="flex items-center justify-between text-mystic-text-muted mb-2">
+                      <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
+                        Sıcaklık
+                        <span className="relative flex items-center justify-center group/tooltip ml-0.5">
+                          <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
+                            <Info size={10} />
+                          </span>
+                          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
+                            Güneş rüzgarı plazmasının termal sıcaklığıdır. Yüksek sıcaklıklar Güneş'teki aktif patlamalardan ve taç küre atılımlarından (CME) kaynaklanan akışları gösterir.
+                            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
+                          </span>
+                        </span>
+                      </span>
+                      <Thermometer size={16} className="text-orange-400" />
+                    </div>
+                    <div>
+                      <div className="text-2xl font-extrabold text-white">
+                        {temp ? `${(temp / 1000).toFixed(0)}k K` : '---'}
+                      </div>
+                      <span className="text-[10px] text-mystic-text-muted">Kelvin cinsinden</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              );
+            })()}
           </div>
         )}
 
@@ -1063,12 +1103,12 @@ export default function SchumannPage() {
                 </span>
               </h3>
               <p className="text-xs text-mystic-text-muted mt-1">
-                Farklı Genlik seviyelerinin etkilerini ve renk değişimlerini test edin
+                Farklı Kp seviyelerinin etkilerini ve renk değişimlerini test edin
               </p>
             </div>
 
             <div className="flex items-center gap-4 mt-2">
-              <span className="text-xs text-mystic-text-muted font-semibold">Genlik 0</span>
+              <span className="text-xs text-mystic-text-muted font-semibold">Kp 0</span>
               <input 
                 type="range" 
                 min="0" 
@@ -1079,14 +1119,14 @@ export default function SchumannPage() {
                 className="flex-1 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer" 
                 style={{ accentColor: '#D4AF37' }}
               />
-              <span className="text-xs text-mystic-text-muted font-semibold">Genlik 9</span>
+              <span className="text-xs text-mystic-text-muted font-semibold">Kp 9</span>
             </div>
 
             <div className="flex items-center justify-between mt-2 pt-4 border-t border-white/5">
               <div className="text-sm text-mystic-text-muted flex items-center gap-2">
                 <span>Simüle Edilen Değer:</span>
                 <strong className={simulatedKp !== null ? "text-[#D4AF37] font-bold text-[15px]" : "text-white font-bold text-[15px]"}>
-                  {simulatedKp !== null ? `Genlik ${simulatedKp.toFixed(1)}` : 'Canlı Akış'}
+                  {simulatedKp !== null ? `Kp ${simulatedKp.toFixed(1)}` : 'Canlı Akış'}
                 </strong>
               </div>
               {simulatedKp !== null && (
@@ -1235,7 +1275,7 @@ export default function SchumannPage() {
                     <span className="text-mystic-text-muted">Zaman (UTC):</span>
                     <strong className="text-white">{formatTimeRange(hoveredBar.time)}</strong>
                     <span className="text-white/20">|</span>
-                    <span className="text-mystic-text-muted">Genlik:</span>
+                    <span className="text-mystic-text-muted">Kp Değeri:</span>
                     <strong className="text-white">
                       {hoveredBar.kp.toFixed(2)}
                     </strong>
