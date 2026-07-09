@@ -50,19 +50,106 @@ function getStatusInfo(kp: number) {
   }
 }
 
+// Translate English text to Turkish using Google Translate gtx client
+async function translateToTurkish(text: string): Promise<string> {
+  if (!text || !text.trim()) return '';
+  try {
+    // Clean up single newlines which wrap sentences mid-way
+    // Translate paragraph by paragraph to preserve spacing and grammar structure
+    const paragraphs = text
+      .split('\n\n')
+      .map(para => para.replace(/\n/g, ' ').replace(/\s+/g, ' ').trim())
+      .filter(para => para.length > 0);
+
+    const translatedParagraphs: string[] = [];
+
+    for (const paragraph of paragraphs) {
+      if (paragraph.length === 0) continue;
+      
+      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=tr&dt=t&q=${encodeURIComponent(paragraph)}`;
+      
+      const res = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+        },
+        next: { revalidate: 3600 } // Cache translated chunks for 1 hour
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data && data[0]) {
+          const translatedPart = data[0].map((item: any) => item[0]).join('');
+          translatedParagraphs.push(translatedPart);
+        } else {
+          translatedParagraphs.push(paragraph);
+        }
+      } else {
+        translatedParagraphs.push(paragraph);
+      }
+    }
+
+    return translatedParagraphs.join('\n\n');
+  } catch (error) {
+    console.error('Translation failed:', error);
+    return text; // Return English original if translation fails
+  }
+}
+
+function parseDiscussion(text: string) {
+  const sections = {
+    solar: '',
+    geomagnetic: '',
+    wind: '',
+    date: ''
+  };
+
+  const cleanText = text.replace(/\r\n/g, '\n');
+
+  // Extract issued date
+  const issuedMatch = cleanText.match(/:Issued:\s*(.*)/i);
+  if (issuedMatch && issuedMatch[1]) {
+    sections.date = issuedMatch[1].trim();
+  }
+
+  // Find index of main section headings
+  const solarIdx = cleanText.indexOf('Solar Activity');
+  const particlesIdx = cleanText.indexOf('Energetic Particle');
+  const windIdx = cleanText.indexOf('Solar Wind');
+  const geoIdx = cleanText.indexOf('Geomagnetic Field');
+
+  // Solar Activity section
+  if (solarIdx !== -1) {
+    const endIdx = particlesIdx !== -1 ? particlesIdx : (windIdx !== -1 ? windIdx : (geoIdx !== -1 ? geoIdx : cleanText.length));
+    sections.solar = cleanText.substring(solarIdx + 14, endIdx).trim();
+  }
+
+  // Solar Wind section
+  if (windIdx !== -1) {
+    const endIdx = geoIdx !== -1 ? geoIdx : cleanText.length;
+    sections.wind = cleanText.substring(windIdx + 10, endIdx).trim();
+  }
+
+  // Geomagnetic Field section
+  if (geoIdx !== -1) {
+    sections.geomagnetic = cleanText.substring(geoIdx + 17).trim();
+  }
+
+  return sections;
+}
+
 export async function GET() {
   try {
-    // Fetch from the combined observed + forecast endpoint
-    const res = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json', {
-      next: { revalidate: 300 } // cache for 5 minutes (300 seconds) to get near real-time updates
+    // 1. Fetch Kp index forecast data (observed + forecast)
+    const kpRes = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json', {
+      next: { revalidate: 300 } // cache for 5 minutes
     });
-    if (!res.ok) {
-      throw new Error(`NOAA API responded with status: ${res.status}`);
+    if (!kpRes.ok) {
+      throw new Error(`NOAA Kp API responded with status: ${kpRes.status}`);
     }
-    const list = await res.json();
+    const kpList = await kpRes.json();
     
     // Find index of the last observed reading
-    const lastObservedIndex = list.map((item: any) => item.observed).lastIndexOf('observed');
+    const lastObservedIndex = kpList.map((item: any) => item.observed).lastIndexOf('observed');
     
     let past: any[] = [];
     let future: any[] = [];
@@ -70,25 +157,20 @@ export async function GET() {
     let lastReadingTime = '';
 
     if (lastObservedIndex !== -1) {
-      // Get the last 16 observed readings (past 48 hours)
       const startIdx = Math.max(0, lastObservedIndex - 15);
-      past = list.slice(startIdx, lastObservedIndex + 1);
+      past = kpList.slice(startIdx, lastObservedIndex + 1);
+      future = kpList.slice(lastObservedIndex + 1, lastObservedIndex + 9);
       
-      // Get the next 8 predicted readings (future 24 hours)
-      future = list.slice(lastObservedIndex + 1, lastObservedIndex + 9);
-      
-      const lastObserved = list[lastObservedIndex];
+      const lastObserved = kpList[lastObservedIndex];
       currentKp = parseFloat(lastObserved.kp);
       lastReadingTime = lastObserved.time_tag;
     } else {
-      // Fallback if no 'observed' flag is found (slice last 24)
-      past = list.slice(-24);
-      const lastItem = list[list.length - 1];
+      past = kpList.slice(-24);
+      const lastItem = kpList[kpList.length - 1];
       currentKp = parseFloat(lastItem.kp);
       lastReadingTime = lastItem.time_tag;
     }
 
-    // Combine history with a predicted flag
     const history = [
       ...past.map((item: any) => ({
         time: item.time_tag,
@@ -104,12 +186,82 @@ export async function GET() {
 
     const status = getStatusInfo(currentKp);
 
+    // 2. Fetch real-time solar wind data (propagated solar wind 1-hour cadence is small and fast)
+    let solarWind = {
+      speed: 0,
+      density: 0,
+      temperature: 0,
+      bz: 0,
+      bt: 0,
+      time: ''
+    };
+
+    try {
+      const windRes = await fetch('https://services.swpc.noaa.gov/products/geospace/propagated-solar-wind-1-hour.json', {
+        next: { revalidate: 300 } // Cache for 5 minutes
+      });
+      if (windRes.ok) {
+        const windList = await windRes.json();
+        if (windList && windList.length > 1) {
+          const latest = windList[windList.length - 1];
+          const headers = windList[0];
+          
+          const speedIdx = headers.indexOf('speed');
+          const densityIdx = headers.indexOf('density');
+          const tempIdx = headers.indexOf('temperature');
+          const bzIdx = headers.indexOf('bz');
+          const btIdx = headers.indexOf('bt');
+          const timeIdx = headers.indexOf('time_tag');
+
+          solarWind = {
+            speed: parseFloat(latest[speedIdx]) || 0,
+            density: parseFloat(latest[densityIdx]) || 0,
+            temperature: parseFloat(latest[tempIdx]) || 0,
+            bz: parseFloat(latest[bzIdx]) || 0,
+            bt: parseFloat(latest[btIdx]) || 0,
+            time: latest[timeIdx] || ''
+          };
+        }
+      }
+    } catch (windErr) {
+      console.error('Failed to fetch solar wind data:', windErr);
+    }
+
+    // 3. Fetch daily discussion text & translate
+    let noaaDiscussion = {
+      solar_activity_tr: '',
+      geomagnetic_field_tr: '',
+      solar_wind_tr: '',
+      raw_date: ''
+    };
+
+    try {
+      const discRes = await fetch('https://services.swpc.noaa.gov/text/discussion.txt', {
+        next: { revalidate: 3600 } // Cache text for 1 hour
+      });
+      if (discRes.ok) {
+        const discText = await discRes.text();
+        const parsed = parseDiscussion(discText);
+        
+        noaaDiscussion = {
+          solar_activity_tr: await translateToTurkish(parsed.solar),
+          geomagnetic_field_tr: await translateToTurkish(parsed.geomagnetic),
+          solar_wind_tr: await translateToTurkish(parsed.wind),
+          raw_date: parsed.date
+        };
+      }
+    } catch (discErr) {
+      console.error('Failed to fetch/translate NOAA discussion:', discErr);
+    }
+
     return json({
       current_kp: currentKp,
       status_label: status.label,
       status_desc: status.desc,
       updated_at: lastReadingTime,
-      history: history
+      history: history,
+      solar_wind: solarWind,
+      noaa_discussion: noaaDiscussion
     });
   } catch (error: any) {
     console.error('NOAA Kp API Error:', error);

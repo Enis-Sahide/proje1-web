@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Activity, Zap, Compass, BookOpen, AlertCircle, Info, RefreshCw, Lock, Bell, BellOff, Sun, Waves, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, Activity, Zap, Compass, BookOpen, AlertCircle, Info, RefreshCw, Lock, Bell, BellOff, Sun, Waves, ChevronDown, ChevronUp, Wind, Gauge, Shield, Thermometer } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { ROLE_LEVELS } from '@/lib/auth/roles';
@@ -12,12 +12,30 @@ interface KpHistoryItem {
   predicted?: boolean;
 }
 
+interface SolarWindData {
+  speed: number;
+  density: number;
+  temperature: number;
+  bz: number;
+  bt: number;
+  time: string;
+}
+
+interface NOAADiscussion {
+  solar_activity_tr: string;
+  geomagnetic_field_tr: string;
+  solar_wind_tr: string;
+  raw_date: string;
+}
+
 interface KpData {
   current_kp: number;
   status_label: string;
   status_desc: string;
   updated_at: string;
   history: KpHistoryItem[];
+  solar_wind?: SolarWindData;
+  noaa_discussion?: NOAADiscussion;
 }
 
 interface HoverInfo {
@@ -691,9 +709,98 @@ export default function SchumannPage() {
 
         </div>
 
+        {/* Güneş Rüzgarı & Manyetik Alan İstasyonu */}
+        {!isLoading && data?.solar_wind && (
+          <div className="bg-black/40 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8 relative overflow-hidden">
+            <div className="border-b border-white/10 pb-4 mb-6">
+              <h2 className="text-xl font-bold flex items-center gap-2 text-white">
+                <Sun size={22} className="text-[#00E5FF] animate-pulse" />
+                Kozmik Hava Durumu & Güneş Rüzgarı
+              </h2>
+              <p className="text-xs text-mystic-text-muted mt-1">
+                Dünya ile Güneş arasındaki L1 noktasında ölçülen anlık plazma ve manyetik alan hareketleri.
+              </p>
+            </div>
 
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              {/* 1. Rüzgar Hızı */}
+              <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
+                <div className="flex items-center justify-between text-mystic-text-muted mb-2">
+                  <span className="text-[11px] uppercase tracking-wider font-semibold">Güneş Rüzgarı Hızı</span>
+                  <Wind size={16} className="text-cyan-400" />
+                </div>
+                <div>
+                  <div className="text-2xl font-extrabold text-white">
+                    {data.solar_wind.speed ? `${Math.round(data.solar_wind.speed)} km/s` : '---'}
+                  </div>
+                  <span className={`text-[10px] font-semibold ${
+                    data.solar_wind.speed >= 600 ? 'text-red-400' : data.solar_wind.speed >= 450 ? 'text-amber-400' : 'text-emerald-400'
+                  }`}>
+                    {data.solar_wind.speed >= 600 ? '🔴 Çok Hızlı' : data.solar_wind.speed >= 450 ? '🟡 Hızlı' : '🟢 Sakin'}
+                  </span>
+                </div>
+              </div>
 
+              {/* 2. Proton Yoğunluğu */}
+              <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
+                <div className="flex items-center justify-between text-mystic-text-muted mb-2">
+                  <span className="text-[11px] uppercase tracking-wider font-semibold">Proton Yoğunluğu</span>
+                  <Gauge size={16} className="text-purple-400" />
+                </div>
+                <div>
+                  <div className="text-2xl font-extrabold text-white">
+                    {data.solar_wind.density ? `${data.solar_wind.density.toFixed(1)} p/cm³` : '---'}
+                  </div>
+                  <span className="text-[10px] text-mystic-text-muted">Parçacık yoğunluğu</span>
+                </div>
+              </div>
 
+              {/* 3. Bz Değeri */}
+              <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
+                <div className="flex items-center justify-between text-mystic-text-muted mb-2">
+                  <span className="text-[11px] uppercase tracking-wider font-semibold">Bz Değeri (Yön)</span>
+                  <Shield size={16} className={data.solar_wind.bz < 0 ? "text-red-400" : "text-emerald-400"} />
+                </div>
+                <div>
+                  <div className={`text-2xl font-extrabold ${data.solar_wind.bz < 0 ? 'text-red-400' : 'text-emerald-400'}`}>
+                    {data.solar_wind.bz ? `${data.solar_wind.bz.toFixed(1)} nT` : '---'}
+                  </div>
+                  <span className="text-[10px] font-semibold">
+                    {data.solar_wind.bz < 0 ? '🔴 Kalkan Açık (G)' : '🟢 Kalkan Kapalı (K)'}
+                  </span>
+                </div>
+              </div>
+
+              {/* 4. Toplam Manyetik Alan (Bt) */}
+              <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
+                <div className="flex items-center justify-between text-mystic-text-muted mb-2">
+                  <span className="text-[11px] uppercase tracking-wider font-semibold">Toplam Alan (Bt)</span>
+                  <Activity size={16} className="text-amber-400" />
+                </div>
+                <div>
+                  <div className="text-2xl font-extrabold text-white">
+                    {data.solar_wind.bt ? `${data.solar_wind.bt.toFixed(1)} nT` : '---'}
+                  </div>
+                  <span className="text-[10px] text-mystic-text-muted">Alan gücü</span>
+                </div>
+              </div>
+
+              {/* 5. Plazma Sıcaklığı */}
+              <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between col-span-2 md:col-span-1">
+                <div className="flex items-center justify-between text-mystic-text-muted mb-2">
+                  <span className="text-[11px] uppercase tracking-wider font-semibold">Sıcaklık</span>
+                  <Thermometer size={16} className="text-orange-400" />
+                </div>
+                <div>
+                  <div className="text-2xl font-extrabold text-white">
+                    {data.solar_wind.temperature ? `${(data.solar_wind.temperature / 1000).toFixed(0)}k K` : '---'}
+                  </div>
+                  <span className="text-[10px] text-mystic-text-muted">Kelvin cinsinden</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Kozmik Enerji Simülatörü Kartı */}
         <div className="bg-black/40 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8 relative overflow-hidden">
@@ -1012,6 +1119,66 @@ export default function SchumannPage() {
             </div>
           )}
         </div>
+
+        {/* NOAA Günlük Uzay Havası Raporu */}
+        {!isLoading && data?.noaa_discussion && (data.noaa_discussion.solar_activity_tr || data.noaa_discussion.geomagnetic_field_tr || data.noaa_discussion.solar_wind_tr) && (
+          <div className="bg-black/40 border border-white/10 rounded-3xl p-6 md:p-8 backdrop-blur-md mb-8 relative overflow-hidden">
+            <div className="border-b border-white/10 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <div>
+                <h2 className="text-xl font-bold flex items-center gap-2 text-white">
+                  <BookOpen size={22} className="text-[#00E5FF]" />
+                  NOAA Günlük Uzay Havası Raporu
+                </h2>
+                <p className="text-xs text-mystic-text-muted mt-1">
+                  U.S. SWPC Uzay Tahmin Merkezi tarafından hazırlanan günlük bilimsel raporun Türkçe çevirisi.
+                </p>
+              </div>
+              {data.noaa_discussion.raw_date && (
+                <span className="bg-white/5 border border-white/10 text-mystic-text-muted text-[10px] font-bold font-mono px-3 py-1 rounded-full shrink-0">
+                  Yayınlanma: {data.noaa_discussion.raw_date}
+                </span>
+              )}
+            </div>
+
+            <div className="space-y-6">
+              {data.noaa_discussion.solar_activity_tr && (
+                <div className="bg-black/25 border border-white/5 rounded-2xl p-5">
+                  <h3 className="text-sm font-bold text-[#00E5FF] uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <Sun size={14} />
+                    Güneş Aktivitesi Özet & Tahmini
+                  </h3>
+                  <p className="text-sm text-white/80 leading-relaxed whitespace-pre-line text-justify">
+                    {data.noaa_discussion.solar_activity_tr}
+                  </p>
+                </div>
+              )}
+
+              {data.noaa_discussion.solar_wind_tr && (
+                <div className="bg-black/25 border border-white/5 rounded-2xl p-5">
+                  <h3 className="text-sm font-bold text-cyan-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <Wind size={14} />
+                    Güneş Rüzgarı Analizi
+                  </h3>
+                  <p className="text-sm text-white/80 leading-relaxed whitespace-pre-line text-justify">
+                    {data.noaa_discussion.solar_wind_tr}
+                  </p>
+                </div>
+              )}
+
+              {data.noaa_discussion.geomagnetic_field_tr && (
+                <div className="bg-black/25 border border-white/5 rounded-2xl p-5">
+                  <h3 className="text-sm font-bold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-2">
+                    <Zap size={14} />
+                    Jeomanyetik Alan & Fırtına Tahmini
+                  </h3>
+                  <p className="text-sm text-white/80 leading-relaxed whitespace-pre-line text-justify">
+                    {data.noaa_discussion.geomagnetic_field_tr}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Bilgilendirme Bölümü (Açılır/Kapanır) */}
         <div className="bg-black/40 border border-white/10 rounded-3xl p-6 md:p-8 backdrop-blur-md transition-all duration-300">
