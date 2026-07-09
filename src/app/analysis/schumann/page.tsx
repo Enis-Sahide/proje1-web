@@ -1043,7 +1043,7 @@ export default function SchumannPage() {
                     <span className="text-mystic-text-muted">Zaman:</span>
                     <strong className="text-[#00E5FF] font-mono">{hoverInfo.timeStr}</strong>
                     <span className="text-white/20">|</span>
-                    <span className="text-mystic-text-muted">{hoverInfo.isCurrent ? 'Schumann Tahmini:' : 'Genlik (Kp):'}</span>
+                    <span className="text-mystic-text-muted">Schumann Tahmini:</span>
                     <strong className="text-white font-mono">{hoverInfo.kp.toFixed(2)}</strong>
                     <span className="text-white/20">|</span>
                     <span className="text-cyan-300 font-semibold">{hoverInfo.spiritualStatus}</span>
