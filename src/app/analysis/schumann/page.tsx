@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { ArrowLeft, Activity, Zap, Compass, BookOpen, AlertCircle, Info, RefreshCw, Lock, Bell, BellOff, Sun, Waves, ChevronDown, ChevronUp, Wind, Gauge, Shield, Thermometer } from 'lucide-react';
+import { ArrowLeft, Activity, Zap, Compass, BookOpen, AlertCircle, Info, RefreshCw, Lock, Bell, BellOff, Sun, Waves, ChevronDown, ChevronUp, Wind, Gauge, Shield, Thermometer, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { ROLE_LEVELS } from '@/lib/auth/roles';
@@ -28,6 +28,13 @@ interface NOAADiscussion {
   raw_date: string;
 }
 
+interface AIAnalysis {
+  title: string;
+  science: string;
+  symptoms: string;
+  spiritual: string;
+}
+
 interface KpData {
   current_kp: number;
   status_label: string;
@@ -39,6 +46,7 @@ interface KpData {
   cosmic_impact_score?: number;
   cosmic_status_label?: string;
   cosmic_status_desc?: string;
+  ai_analysis?: AIAnalysis;
 }
 
 interface HoverInfo {
@@ -280,6 +288,56 @@ export default function SchumannPage() {
         desc: 'Güçlü kozmik enerji fırtınası devrede! Hücresel uyanış portalları açık. Fiziksel yorgunluk, yoğun rüyalar ve yüksek enerjisel titreşim dalgaları olasıdır.'
       };
     }
+  };
+
+  const generateRulesAnalysis = (score: number, speed: number, density: number, bz: number, bt: number) => {
+    // 1. Zirve Jeomanyetik Fırtına
+    if (score >= 7.0) {
+      return {
+        title: 'Zirve Schumann Rezonans Uyarılması (Fırtına)',
+        science: `Güneş'ten fırlayan son derece yüksek enerjili plazma rüzgarları (CME) manyetosferimizi doğrudan vuruyor. Dünya'nın koruyucu kalkanı (Bz) güneye doğru geniş bir açıyla kapı araladı. İyonosfer tabakası maksimum seviyede elektrik yüküyle titreşiyor.`,
+        symptoms: 'Sinir sisteminde aşırı uyarılma, uyku düzeninde derin kaymalar (yoğun uykusuzluk ya da derin trans benzeri uyku), baş ve ense bölgesinde yoğun basınç, kulaklarda kesintisiz tiz titreşim çınlamaları ve son derece canlı, rehber niteliğinde rüyalar.',
+        spiritual: 'Taç ve kalp çakralarınızda aşırı aktifleşme devrededir. Bugün kendinizi zorlayacak fiziksel işlerden kaçının. Bol alkali su tüketin ve çıplak ayakla toprağa basın. Taç çakranızdan giren ışığın bedeninizi yıkayarak yere aktığını imgeleyerek nefes meditasyonları yapın.'
+      };
+    }
+    
+    // 2. Güneş Rüzgarı Hızı Sıçraması
+    if (speed >= 500) {
+      return {
+        title: 'Kozmik Plazma Rüzgarı Dalgası (Hızlı Akış)',
+        science: `Güneş yüzeyindeki koronal deliklerden kopan yüksek hızlı plazma akışı saniyede ${Math.round(speed)} km hıza ulaşarak manyetik kalkanımızı sıkıştırıyor. Bu yüksek hız, iyonosferik Schumann rezonans katmanlarındaki titreşim genliğini uyararak yükseltiyor.`,
+        symptoms: 'Fiziksel bedende ani bir enerjik uyarılma, içsel sabırsızlık veya huzursuzluk hissi, kalp atışlarında hızlanma dalgaları, hafif sersemlik ve kulaklarda dalgalı frekans sesleri.',
+        spiritual: 'Artan plazma akışı, aura alanınızı temizlemek ve eski hücresel kalıpları salıvermek için çalışır. Birikmiş statik elektriği nötrlemek için ılık/tuzlu bir duş alın. Kalp merkezli nefes pratikleri (4 saniye al, 4 saniye ver) yaparak akışı bedende dengeleyin.'
+      };
+    }
+    
+    // 3. Kalkan Açılması (Bz Güney)
+    if (bz <= -3.0) {
+      return {
+        title: 'Manyetik Kalkan Geçiş Portalı (Bz Güney Yönlü)',
+        science: `Dünya'nın koruyucu manyetik kalkanının yönünü belirleyen Bz parametresi güneye yönelerek ${bz.toFixed(1)} nT seviyesine ulaştı. Kalkanımızda açılan bu elektromanyetik kapı, Güneş rüzgarı parçacıklarının doğrudan atmosfere sızmasını kolaylaştırıyor.`,
+        symptoms: 'Yüksek duygusal duyarlılık, empati yeteneğinde aşırı artış, başkalarının enerjilerini hissetme, hafif şakak ağrıları ve rüyalarda yoğun astral semboller.',
+        spiritual: 'Kalkanın açık olması ruhsal olarak alıcı (reseptif) modda olduğumuzu gösterir. Negatif enerjilerden korunmak için kendinizi mor bir ışık küresi içinde hayal edin. Adaçayı veya üzerlik otu yakarak yaşam alanınızı arındırın.'
+      };
+    }
+    
+    // 4. Parçacık Yoğunluğu Sıçraması
+    if (density >= 10.0) {
+      return {
+        title: 'Yoğun Parçacık Bombardımanı (Proton Yoğunluğu)',
+        science: `Güneş rüzgarındaki parçacık (proton) yoğunluğu cm³ başına ${density.toFixed(1)} seviyesine ulaşarak normalin çok üzerine çıktı. Bu yoğun parçacık dalgası iyonosfer tabakasına çarparak Schumann rezonansını aktifleştiriyor.`,
+        symptoms: 'Eklem ağrıları, kas seğirmeleri, aşırı fiziksel yorgunluk ve uykuya geçişte zorlanma, göz arkasında hafif sızlama veya basınç.',
+        spiritual: 'Artan proton akışı, hücresel şablonumuzda ve DNA yapımızda yoğun bir elektromanyetik dönüşüm tetikler. Ağır yiyeceklerden kaçının, hafif beslenin ve bol su için. Vücuttaki iletkenliği ve topraklanmayı artırmak için magnezyum takviyesi alabilirsiniz.'
+      };
+    }
+    
+    // 5. Sakin ve Dengeli Durum
+    return {
+      title: 'Dingin Elektromanyetik Akış (Sakin Faz)',
+      science: `Güneş rüzgarı hızı (${Math.round(speed)} km/s) ve parçacık yoğunluğu (${density.toFixed(1)} p/cm³) normal sınırlarında seyrediyor. Dünya'nın manyetik kalkanı (Bz: ${bz.toFixed(1)} nT) kapalı ve tam koruyucu fazda. İyonosferik Schumann rezonansı dengeli temel titreşiminde (7.83 Hz ve çevresi).`,
+      symptoms: 'Zihinsel netlik, dengeli enerji seviyeleri, sakin uyku düzeni ve bedensel rahatlık. Olağanüstü bir uyarılma belirtisi beklenmez.',
+      spiritual: 'Zihnin gürültüsünü yatıştırmak, yeni bilgiler öğrenmek, kadim dersleri çalışmak ve kök çakra meditasyonları yapmak için en ideal dönemdir. Enerjinizin merkezlendiği bu dingin zamanı tefekkür ile değerlendirebilirsiniz.'
+    };
   };
 
   const historyToRender = data?.history ? data.history.map((item, idx) => {
@@ -824,8 +882,85 @@ export default function SchumannPage() {
               })()}
             </div>
           </div>
-
         </div>
+
+        {/* 1. Yol Kural Tabanlı Kozmik Durum Analizi */}
+        {!isLoading && (
+          (() => {
+            // Determine active metrics (simulated or live)
+            const activeKp = simulatedKp !== null ? simulatedKp : (data?.current_kp ?? 0);
+            const speed = simulatedKp !== null ? (300 + (simulatedKp / 9) * 500) : (data?.solar_wind?.speed ?? 350);
+            const density = simulatedKp !== null ? (3 + (simulatedKp / 9) * 15) : (data?.solar_wind?.density ?? 4);
+            const bz = simulatedKp !== null ? (5 - (simulatedKp / 9) * 15) : (data?.solar_wind?.bz ?? 0);
+            const bt = simulatedKp !== null ? (5 + (simulatedKp / 9) * 15) : (data?.solar_wind?.bt ?? 5);
+            const score = simulatedKp !== null ? getCalculatedImpact(simulatedKp) : (data?.cosmic_impact_score ?? activeKp);
+
+            const analysis = generateRulesAnalysis(score, speed, density, bz, bt);
+
+            return (
+              <div className="bg-gradient-to-br from-[#0B0B1E] to-[#120E2E] border border-[#4F46E5]/30 rounded-3xl p-6 backdrop-blur-md mb-8 relative overflow-hidden shadow-[0_0_30px_rgba(79,70,229,0.15)] animate-in fade-in slide-in-from-bottom-4 duration-500">
+                {/* Background glowing effects */}
+                <div className="absolute top-0 right-0 w-48 h-48 bg-[#4F46E5]/10 blur-[60px] rounded-full pointer-events-none"></div>
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#00E5FF]/5 blur-[40px] rounded-full pointer-events-none"></div>
+
+                <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-5">
+                  <div className="flex items-center gap-3">
+                    <div className="bg-[#4F46E5]/20 p-2.5 rounded-2xl border border-[#4F46E5]/40 text-[#00E5FF] shadow-inner animate-pulse">
+                      <Sparkles size={20} />
+                    </div>
+                    <div>
+                      <span className="text-[10px] font-bold tracking-widest text-[#00E5FF] bg-[#00E5FF]/10 px-2.5 py-0.5 rounded-full uppercase border border-[#00E5FF]/20">
+                        KOZMİK ORACLE / DURUM RAPORU
+                      </span>
+                      <h2 className="text-lg font-bold text-white mt-1">
+                        {analysis.title}
+                      </h2>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Bilimsel Teşhis */}
+                  <div className="bg-black/30 border border-white/5 rounded-2xl p-5 flex flex-col justify-between">
+                    <div>
+                      <h4 className="text-[13px] font-bold text-[#00E5FF] uppercase tracking-wider flex items-center gap-1.5 mb-3">
+                        <span>🔬</span> Bilimsel Teşhis
+                      </h4>
+                      <p className="text-xs text-white/80 leading-relaxed text-justify font-sans">
+                        {analysis.science}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Beden Reaksiyonları */}
+                  <div className="bg-black/30 border border-white/5 rounded-2xl p-5 flex flex-col justify-between">
+                    <div>
+                      <h4 className="text-[13px] font-bold text-pink-400 uppercase tracking-wider flex items-center gap-1.5 mb-3">
+                        <span>⚡</span> Beden Reaksiyonları
+                      </h4>
+                      <p className="text-xs text-white/80 leading-relaxed text-justify font-sans">
+                        {analysis.symptoms}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Ruhsal Rehberlik */}
+                  <div className="bg-black/30 border border-[#D4AF37]/20 rounded-2xl p-5 flex flex-col justify-between relative overflow-hidden">
+                    <div className="absolute top-[-20%] right-[-20%] w-16 h-16 bg-[#D4AF37]/5 blur-[20px] rounded-full pointer-events-none"></div>
+                    <div>
+                      <h4 className="text-[13px] font-bold text-[#D4AF37] uppercase tracking-wider flex items-center gap-1.5 mb-3">
+                        <span>🧘</span> Ruhsal Rehberlik
+                      </h4>
+                      <p className="text-xs text-white/80 leading-relaxed text-justify font-sans">
+                        {analysis.spiritual}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            );
+          })()
+        )}
 
         {/* Güneş Rüzgarı & Manyetik Alan İstasyonu */}
         {!isLoading && data?.solar_wind && (

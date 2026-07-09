@@ -79,6 +79,56 @@ function getCosmicImpactStatusInfo(score: number) {
   }
 }
 
+function generateRulesAnalysis(score: number, speed: number, density: number, bz: number, bt: number) {
+  // 1. Zirve Jeomanyetik Fırtına
+  if (score >= 7.0) {
+    return {
+      title: 'Zirve Schumann Rezonans Uyarılması (Fırtına)',
+      science: `Güneş'ten fırlayan son derece yüksek enerjili plazma rüzgarları (CME) manyetosferimizi doğrudan vuruyor. Dünya'nın koruyucu kalkanı (Bz) güneye doğru geniş bir açıyla kapı araladı. İyonosfer tabakası maksimum seviyede elektrik yüküyle titreşiyor.`,
+      symptoms: 'Sinir sisteminde aşırı uyarılma, uyku düzeninde derin kaymalar (yoğun uykusuzluk ya da derin trans benzeri uyku), baş ve ense bölgesinde yoğun basınç, kulaklarda kesintisiz tiz titreşim çınlamaları ve son derece canlı, rehber niteliğinde rüyalar.',
+      spiritual: 'Taç ve kalp çakralarınızda aşırı aktifleşme devrededir. Bugün kendinizi zorlayacak fiziksel işlerden kaçının. Bol alkali su tüketin ve çıplak ayakla toprağa basın. Taç çakranızdan giren ışığın bedeninizi yıkayarak yere aktığını imgeleyerek nefes meditasyonları yapın.'
+    };
+  }
+  
+  // 2. Güneş Rüzgarı Hızı Sıçraması
+  if (speed >= 500) {
+    return {
+      title: 'Kozmik Plazma Rüzgarı Dalgası (Hızlı Akış)',
+      science: `Güneş yüzeyindeki koronal deliklerden kopan yüksek hızlı plazma akışı saniyede ${Math.round(speed)} km hıza ulaşarak manyetik kalkanımızı sıkıştırıyor. Bu yüksek hız, iyonosferik Schumann rezonans katmanlarındaki titreşim genliğini uyararak yükseltiyor.`,
+      symptoms: 'Fiziksel bedende ani bir enerjik uyarılma, içsel sabırsızlık veya huzursuzluk hissi, kalp atışlarında hızlanma dalgaları, hafif sersemlik ve kulaklarda dalgalı frekans sesleri.',
+      spiritual: 'Artan plazma akışı, aura alanınızı temizlemek ve eski hücresel kalıpları salıvermek için çalışır. Birikmiş statik elektriği nötrlemek için ılık/tuzlu bir duş alın. Kalp merkezli nefes pratikleri (4 saniye al, 4 saniye ver) yaparak akışı bedende dengeleyin.'
+    };
+  }
+  
+  // 3. Kalkan Açılması (Bz Güney)
+  if (bz <= -3.0) {
+    return {
+      title: 'Manyetik Kalkan Geçiş Portalı (Bz Güney Yönlü)',
+      science: `Dünya'nın koruyucu manyetik kalkanının yönünü belirleyen Bz parametresi güneye yönelerek ${bz.toFixed(1)} nT seviyesine ulaştı. Kalkanımızda açılan bu elektromanyetik kapı, Güneş rüzgarı parçacıklarının doğrudan atmosfere sızmasını kolaylaştırıyor.`,
+      symptoms: 'Yüksek duygusal duyarlılık, empati yeteneğinde aşırı artış, başkalarının enerjilerini hissetme, hafif şakak ağrıları ve rüyalarda yoğun astral semboller.',
+      spiritual: 'Kalkanın açık olması ruhsal olarak alıcı (reseptif) modda olduğumuzu gösterir. Negatif enerjilerden korunmak için kendinizi mor bir ışık küresi içinde hayal edin. Adaçayı veya üzerlik otu yakarak yaşam alanınızı arındırın.'
+    };
+  }
+  
+  // 4. Parçacık Yoğunluğu Sıçraması
+  if (density >= 10.0) {
+    return {
+      title: 'Yoğun Parçacık Bombardımanı (Proton Yoğunluğu)',
+      science: `Güneş rüzgarındaki parçacık (proton) yoğunluğu cm³ başına ${density.toFixed(1)} seviyesine ulaşarak normalin çok üzerine çıktı. Bu yoğun parçacık dalgası iyonosfer tabakasına çarparak Schumann rezonansını aktifleştiriyor.`,
+      symptoms: 'Eklem ağrıları, kas seğirmeleri, aşırı fiziksel yorgunluk ve uykuya geçişte zorlanma, göz arkasında hafif sızlama veya basınç.',
+      spiritual: 'Artan proton akışı, hücresel şablonumuzda ve DNA yapımızda yoğun bir elektromanyetik dönüşüm tetikler. Ağır yiyeceklerden kaçının, hafif beslenin ve bol su için. Vücuttaki iletkenliği ve topraklanmayı artırmak için magnezyum takviyesi alabilirsiniz.'
+    };
+  }
+  
+  // 5. Sakin ve Dengeli Durum
+  return {
+    title: 'Dingin Elektromanyetik Akış (Sakin Faz)',
+    science: `Güneş rüzgarı hızı (${Math.round(speed)} km/s) ve parçacık yoğunluğu (${density.toFixed(1)} p/cm³) normal sınırlarında seyrediyor. Dünya'nın manyetik kalkanı (Bz: ${bz.toFixed(1)} nT) kapalı ve tam koruyucu fazda. İyonosferik Schumann rezonansı dengeli temel titreşiminde (7.83 Hz ve çevresi).`,
+    symptoms: 'Zihinsel netlik, dengeli enerji seviyeleri, sakin uyku düzeni ve bedensel rahatlık. Olağanüstü bir uyarılma belirtisi beklenmez.',
+    spiritual: 'Zihnin gürültüsünü yatıştırmak, yeni bilgiler öğrenmek, kadim dersleri çalışmak ve kök çakra meditasyonları yapmak için en ideal dönemdir. Enerjinizin merkezlendiği bu dingin zamanı tefekkür ile değerlendirebilirsiniz.'
+  };
+}
+
 // Translate English text to Turkish using Google Translate gtx client
 async function translateToTurkish(text: string): Promise<string> {
   if (!text || !text.trim()) return '';
@@ -308,6 +358,14 @@ export async function GET() {
     const finalImpactScore = calculateCEI(currentKp);
     const cosmicStatus = getCosmicImpactStatusInfo(finalImpactScore);
 
+    const aiAnalysis = generateRulesAnalysis(
+      finalImpactScore,
+      solarWind.speed,
+      solarWind.density,
+      solarWind.bz,
+      solarWind.bt
+    );
+
     return json({
       current_kp: currentKp,
       status_label: status.label,
@@ -318,7 +376,8 @@ export async function GET() {
       noaa_discussion: noaaDiscussion,
       cosmic_impact_score: finalImpactScore,
       cosmic_status_label: cosmicStatus.label,
-      cosmic_status_desc: cosmicStatus.desc
+      cosmic_status_desc: cosmicStatus.desc,
+      ai_analysis: aiAnalysis
     });
   } catch (error: any) {
     console.error('NOAA Kp API Error:', error);
