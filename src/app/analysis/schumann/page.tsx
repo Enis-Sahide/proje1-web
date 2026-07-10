@@ -921,9 +921,10 @@ export default function SchumannPage() {
                   </div>
 
                   {/* Beden Reaksiyonları */}
-                  <div className="bg-black/30 border border-white/5 rounded-2xl p-5 flex flex-col justify-between">
+                  <div className="bg-black/30 border border-[#D4AF37]/20 rounded-2xl p-5 flex flex-col justify-between relative overflow-hidden">
+                    <div className="absolute top-[-20%] right-[-20%] w-16 h-16 bg-[#D4AF37]/5 blur-[20px] rounded-full pointer-events-none"></div>
                     <div>
-                      <h4 className="text-[13px] font-bold text-pink-400 uppercase tracking-wider flex items-center gap-1.5 mb-3">
+                      <h4 className="text-[13px] font-bold text-[#D4AF37] uppercase tracking-wider flex items-center gap-1.5 mb-3">
                         <span>⚡</span> Beden Reaksiyonları
                       </h4>
                       <p className="text-xs text-white/80 leading-relaxed text-justify font-sans">
@@ -933,10 +934,9 @@ export default function SchumannPage() {
                   </div>
 
                   {/* Ruhsal Rehberlik */}
-                  <div className="bg-black/30 border border-[#D4AF37]/20 rounded-2xl p-5 flex flex-col justify-between relative overflow-hidden">
-                    <div className="absolute top-[-20%] right-[-20%] w-16 h-16 bg-[#D4AF37]/5 blur-[20px] rounded-full pointer-events-none"></div>
+                  <div className="bg-black/30 border border-white/5 rounded-2xl p-5 flex flex-col justify-between">
                     <div>
-                      <h4 className="text-[13px] font-bold text-[#D4AF37] uppercase tracking-wider flex items-center gap-1.5 mb-3">
+                      <h4 className="text-[13px] font-bold text-pink-400 uppercase tracking-wider flex items-center gap-1.5 mb-3">
                         <span>🧘</span> Ruhsal Rehberlik
                       </h4>
                       <p className="text-xs text-white/80 leading-relaxed text-justify font-sans">
