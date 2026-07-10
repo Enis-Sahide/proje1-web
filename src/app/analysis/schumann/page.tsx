@@ -870,7 +870,7 @@ export default function SchumannPage() {
             const analysis = generateRulesAnalysis(score, speed, density, bz, bt, activeKp);
 
             return (
-              <div className="bg-gradient-to-br from-[#0B0B1E] to-[#120E2E] border border-[#4F46E5]/30 rounded-3xl p-6 backdrop-blur-md mb-8 relative overflow-hidden shadow-[0_0_30px_rgba(79,70,229,0.15)] animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="bg-black/40 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8 relative overflow-hidden shadow-[0_0_30px_rgba(255,255,255,0.02)] animate-in fade-in slide-in-from-bottom-4 duration-500">
                 {/* Background glowing effects */}
                 <div className="absolute top-0 right-0 w-48 h-48 bg-[#4F46E5]/10 blur-[60px] rounded-full pointer-events-none"></div>
                 <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#00E5FF]/5 blur-[40px] rounded-full pointer-events-none"></div>
