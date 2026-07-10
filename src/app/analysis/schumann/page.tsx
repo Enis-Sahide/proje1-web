@@ -900,9 +900,9 @@ export default function SchumannPage() {
                     <span className="cursor-pointer text-white/30 hover:text-white transition-colors bg-white/5 p-2.5 rounded-xl border border-white/5">
                       <Info size={16} />
                     </span>
-                    <span className="absolute bottom-full mb-2 right-0 w-64 p-3 bg-black/95 border border-white/10 text-[11px] text-white/90 rounded-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
+                    <span className="absolute top-full mt-2 right-0 w-64 p-3 bg-black/95 border border-white/10 text-[11px] text-white/90 rounded-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
                       Güneş rüzgarı hızı, parçacık yoğunluğu ve kalkan açıklığına göre hesaplanan anlık Schumann Rezonans uyarılma seviyesi tahmini.
-                      <span className="absolute top-full right-4 border-4 border-transparent border-t-black/95"></span>
+                      <span className="absolute bottom-full right-4 border-4 border-transparent border-b-black/95"></span>
                     </span>
                   </span>
                 </div>
