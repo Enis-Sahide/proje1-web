@@ -4,7 +4,7 @@ import React from 'react';
 import ExploreSection from '@/features/astrology/components/ExploreSection';
 import { useContent } from '@/lib/useContent';
 import PlanetaryHourWidget from '@/features/astrology/components/PlanetaryHourWidget';
-import { ChevronDown, Quote, Loader2 } from 'lucide-react';
+import { ChevronDown, Quote, Loader2, Smartphone, Sparkles, ChevronRight } from 'lucide-react';
 import MoonCyclesWidget from '@/features/astrology/components/MoonCyclesWidget';
 import SchumannMiniWidget from '@/features/astrology/components/SchumannMiniWidget';
 import Link from 'next/link';
@@ -48,7 +48,29 @@ export default function Home() {
             </div>
           </div>
 
-          <h2 className="text-2xl font-bold text-mystic-accent text-center mb-12">7 İnisiyasyon Katmanı</h2>
+          <h2 className="text-2xl font-bold text-mystic-accent text-center mb-6">7 İnisiyasyon Katmanı</h2>
+
+          {/* Mobile App Download Prompt Banner */}
+          <div className="max-w-md mx-auto mb-12 w-full animate-pulse">
+            <Link 
+              href="/test"
+              className="flex items-center gap-4 bg-gradient-to-r from-mystic-primary/20 via-mystic-accent/15 to-mystic-primary/20 border border-mystic-primary/30 rounded-2xl p-4 shadow-[0_0_20px_rgba(212,175,55,0.15)] hover:border-mystic-primary/60 transition-all duration-300 hover:scale-[1.01]"
+            >
+              <div className="p-2.5 bg-mystic-primary/10 text-mystic-primary rounded-xl border border-mystic-primary/20 shrink-0">
+                <Smartphone size={20} className="animate-pulse" />
+              </div>
+              <div className="flex-grow text-left">
+                <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
+                  7LAYERS Android Uygulaması Yayında!
+                  <Sparkles className="text-mystic-accent shrink-0" size={14} />
+                </h4>
+                <p className="text-[11px] text-mystic-text-muted mt-0.5 leading-snug">
+                  Google Play test ekibimize katılmak ve hemen indirmek için tıklayın.
+                </p>
+              </div>
+              <ChevronRight size={18} className="text-mystic-primary" />
+            </Link>
+          </div>
 
           {/* Main Layout Grid */}
           <div className="mb-20 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 w-full">
