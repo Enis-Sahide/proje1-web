@@ -9,15 +9,18 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     const { slug } = await params;
     if (slug) {
       const rows = await db
-        .select({ title: blogPosts.title, summary: blogPosts.summary })
+        .select({ title: blogPosts.title, content: blogPosts.content })
         .from(blogPosts)
         .where(and(eq(blogPosts.slug, slug), eq(blogPosts.published, true)))
         .limit(1);
 
       if (rows.length > 0) {
+        const cleanDescription = rows[0].content
+          ? rows[0].content.replace(/<[^>]*>/g, '').substring(0, 155) + '...'
+          : `${rows[0].title} yazısını okuyun ve bilincinizi yükseltin.`;
         return {
           title: `${rows[0].title} | 7Layers Blog`,
-          description: rows[0].summary || `${rows[0].title} yazısını okuyun ve bilincinizi yükseltin.`,
+          description: cleanDescription,
         };
       }
     }
