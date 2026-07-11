@@ -10,7 +10,7 @@ export async function OPTIONS() {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { natalDate, natalTime, transitDate, transitTime, cityData } = body;
+    const { natalDate, natalTime, transitDate, transitTime, cityData, transitCityData } = body;
 
     if (!natalDate || !natalTime || !transitDate || !transitTime || !cityData) {
       return errorJson('Eksik parametreler.', 400, { success: false });
@@ -19,14 +19,15 @@ export async function POST(req: NextRequest) {
     const nMoment = moment.tz(`${natalDate} ${natalTime}:00`, 'YYYY-MM-DD HH:mm:ss', cityData.tz);
     const nDateObj = nMoment.toDate();
 
-    const tMoment = moment.tz(`${transitDate} ${transitTime}:00`, 'YYYY-MM-DD HH:mm:ss', cityData.tz);
+    const tCity = transitCityData || cityData;
+    const tMoment = moment.tz(`${transitDate} ${transitTime}:00`, 'YYYY-MM-DD HH:mm:ss', tCity.tz || tCity.timezone || cityData.tz);
     const tDateObj = tMoment.toDate();
 
     if (isNaN(nDateObj.getTime()) || isNaN(tDateObj.getTime())) {
       return errorJson('Geçersiz tarih formatı.', 400, { success: false });
     }
 
-    const transitData = await generateTransitChart(nDateObj, tDateObj, cityData);
+    const transitData = await generateTransitChart(nDateObj, tDateObj, cityData, tCity);
 
     return json({
       success: true,

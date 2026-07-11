@@ -445,9 +445,14 @@ export function calculateTransitAspects(transitPlanets: AstroPoint[], natalPlane
   return aspects;
 }
 
-export async function generateTransitChart(natalDateObj: Date, transitDateObj: Date, cityInput: string | AstroCity): Promise<TransitChartData> {
+export async function generateTransitChart(
+  natalDateObj: Date, 
+  transitDateObj: Date, 
+  cityInput: string | AstroCity,
+  transitCityInput?: string | AstroCity
+): Promise<TransitChartData> {
   const natalChart = await generateAstrologyChart(natalDateObj, cityInput, false);
-  const transitChart = await generateAstrologyChart(transitDateObj, cityInput, false);
+  const transitChart = await generateAstrologyChart(transitDateObj, transitCityInput || cityInput, false);
 
   // Map transit planets to natal houses
   const mappedTransitPlanets = transitChart.planets.map(tp => ({
