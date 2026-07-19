@@ -267,30 +267,6 @@ export default function SchumannPage() {
     return parseFloat(Math.min(10.0, rawImpact * bzMultiplier).toFixed(2));
   };
 
-  const getLocalTimelineTicks = (endTimeUtc: string) => {
-    if (!endTimeUtc) return [];
-    try {
-      const utcDate = new Date(endTimeUtc);
-      const tomskTime = new Date(utcDate.getTime() + 7 * 60 * 60 * 1000);
-      const day1Date = new Date(tomskTime.getTime() - 2 * 24 * 60 * 60 * 1000);
-      
-      const chartStartMs = Date.UTC(day1Date.getFullYear(), day1Date.getMonth(), day1Date.getDate(), 0, 0, 0) - 7 * 60 * 60 * 1000;
-      
-      const ticks = [];
-      for (let i = 0; i <= 6; i++) {
-        const tickTimeMs = chartStartMs + i * 12 * 60 * 60 * 1000;
-        const date = new Date(tickTimeMs);
-        ticks.push({
-          hour: date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false }),
-          day: `${date.getDate()} ${date.toLocaleDateString('tr-TR', { month: 'short' })}`
-        });
-      }
-      return ticks;
-    } catch (e) {
-      return [];
-    }
-  };
-
   const getCosmicStatusInfo = (score: number) => {
     if (score < 3.0) {
       return {
@@ -880,6 +856,21 @@ export default function SchumannPage() {
     }
   };
 
+  const formatTomskTime = (utcTimeStr?: string) => {
+    if (!utcTimeStr) return '---';
+    try {
+      const d = new Date(utcTimeStr);
+      const tomskDate = new Date(d.getTime() + 7 * 60 * 60 * 1000);
+      return tomskDate.toLocaleString('tr-TR', {
+        dateStyle: 'medium',
+        timeStyle: 'short',
+        timeZone: 'UTC'
+      });
+    } catch (e) {
+      return utcTimeStr;
+    }
+  };
+
   const formatTimeRange = (timeStr: string) => {
     try {
       const dStart = new Date(timeStr.endsWith('Z') ? timeStr : timeStr + 'Z');
@@ -1216,54 +1207,32 @@ export default function SchumannPage() {
             </div>
           ) : (
             <div className="w-full flex flex-col justify-center items-center py-6 bg-black/40 rounded-2xl border border-white/5 relative overflow-hidden group">
-              <div className="absolute top-4 right-4 bg-[#00E5FF]/10 border border-[#00E5FF]/30 text-[#00E5FF] text-[10px] font-extrabold px-3 py-1 rounded-full flex items-center gap-1.5 backdrop-blur-sm z-10 shadow-lg tracking-wider uppercase">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse"></span> Canlı Gözlemevi Ölçümü {data?.schumann_real && `(${formatRealTime(data.schumann_real.time_utc)})`}
+              {/* Header block with local and observer times */}
+              <div className="flex flex-col sm:flex-row items-center gap-3 px-4 mb-4 text-center z-10 w-full justify-center">
+                <div className="bg-[#00E5FF]/10 border border-[#00E5FF]/30 text-[#00E5FF] text-[10px] font-extrabold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-lg tracking-wider uppercase">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse"></span> Canlı Gözlemevi Ölçümü
+                </div>
+                {data?.schumann_real && (
+                  <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-white/90 font-semibold font-sans">
+                    <span className="bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
+                      Yerel Saat: <span className="text-[#00E5FF]">{formatRealTime(data.schumann_real.time_utc)}</span>
+                    </span>
+                    <span className="text-white/30 font-normal">|</span>
+                    <span className="bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
+                      Tomsk Saati: <span className="text-[#A78BFA]">{formatTomskTime(data.schumann_real.time_utc)}</span>
+                    </span>
+                  </div>
+                )}
               </div>
 
               {/* Scrollable Spectrogram Container */}
               <div className="w-full overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
-                <div className="min-w-[750px] px-4 mt-8 relative">
+                <div className="min-w-[750px] px-4 mt-2 relative">
                   <img 
                     src={`/api/schumann/image?t=${timestamp}`} 
                     alt="Canlı Schumann Rezonans Spektrogramı (Tomsk, Rusya)" 
                     className="w-full h-auto rounded-xl border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)]"
                   />
-                  
-                  {/* Dynamic Local Time Timeline */}
-                  {data?.schumann_real?.time_utc && (
-                    (() => {
-                      const ticks = getLocalTimelineTicks(data.schumann_real.time_utc);
-                      return (
-                        <div className="mt-3 relative w-full font-sans select-none">
-                          {/* Timeline container aligned with middle 87.0% waterfall area */}
-                          <div className="ml-[6.8%] w-[87.0%] flex justify-between relative">
-                            {ticks.map((tick, index) => (
-                              <div 
-                                key={index} 
-                                className="flex flex-col items-center relative shrink-0" 
-                                style={{ 
-                                  transform: 'translateX(-50%)', 
-                                  left: `${(index / 6) * 100}%`, 
-                                  position: 'absolute' 
-                                }}
-                              >
-                                {/* Small vertical tick mark */}
-                                <div className="w-[1.5px] h-2.5 bg-[#00E5FF]/40 mb-1"></div>
-                                <span className="text-[10px] text-white/90 font-bold leading-none">{tick.hour}</span>
-                                <span className="text-[9px] text-[#00E5FF] font-semibold mt-0.5 leading-none">{tick.day}</span>
-                              </div>
-                            ))}
-                          </div>
-                          {/* Left axis label placeholder (frequency labels padding) */}
-                          <div className="absolute left-0 bottom-0 text-[9px] text-mystic-text-muted/60 font-bold uppercase tracking-wider pl-1">
-                            Yerel Saat
-                          </div>
-                          {/* Extra spacing under absolute labels */}
-                          <div className="h-8"></div>
-                        </div>
-                      );
-                    })()
-                  )}
                 </div>
               </div>
 
