@@ -837,6 +837,50 @@ export default function SchumannPage() {
     }
   };
 
+  const getSchumannBadgeStyle = (score: number) => {
+    if (score < 3.0) {
+      return {
+        borderColor: 'rgba(6, 182, 212, 0.4)', // cyan/mavi
+        shadowColor: 'rgba(6, 182, 212, 0.15)',
+        textClass: 'text-cyan-400',
+        bgColor: 'bg-cyan-500/10'
+      };
+    }
+    if (score < 5.0) {
+      return {
+        borderColor: 'rgba(16, 185, 129, 0.4)', // emerald/yeşil
+        shadowColor: 'rgba(16, 185, 129, 0.15)',
+        textClass: 'text-emerald-400',
+        bgColor: 'bg-emerald-500/10'
+      };
+    }
+    if (score < 7.0) {
+      return {
+        borderColor: 'rgba(239, 68, 68, 0.4)', // red/kırmızı
+        shadowColor: 'rgba(239, 68, 68, 0.15)',
+        textClass: 'text-red-400',
+        bgColor: 'bg-red-500/10'
+      };
+    }
+    // Peak / White spot / Flare
+    return {
+      borderColor: 'rgba(255, 255, 255, 0.6)', // white/beyaz
+      shadowColor: 'rgba(255, 255, 255, 0.4)',
+      textClass: 'text-white font-extrabold drop-shadow-[0_0_6px_rgba(255,255,255,0.8)]',
+      bgColor: 'bg-white/10'
+    };
+  };
+
+  const getSchumannLevelLabel = (score: number) => {
+    if (score < 3.0) return 'Düşük Seviye (Sakin / G0)';
+    if (score < 5.0) return 'Hafif Uyarım (Aktif / G0)';
+    if (score < 6.0) return 'Orta Fırtına (G1 Seviyesi)';
+    if (score < 7.0) return 'Güçlü Fırtına (G2 Seviyesi)';
+    if (score < 8.0) return 'Şiddetli Fırtına (G3 Seviyesi)';
+    if (score < 9.0) return 'Ağır Fırtına (G4 Seviyesi)';
+    return 'Zirve Patlama (Ekstrem G5 Fırtınası)';
+  };
+
   return (
     <div className="min-h-screen bg-[#05050A] text-white overflow-hidden relative font-sans pt-24">
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay pointer-events-none z-0"></div>
@@ -897,19 +941,41 @@ export default function SchumannPage() {
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-5 mb-6 gap-4">
                   <div className="flex items-center gap-4">
                     {/* Big glowing score badge */}
-                    <div className="bg-[#4F46E5]/10 border border-[#00E5FF]/40 w-20 h-20 rounded-2xl flex flex-col justify-center items-center shrink-0 shadow-[0_0_20px_rgba(0,229,255,0.15)] relative">
-                      <span className="text-[10px] text-mystic-text-muted uppercase font-bold tracking-wider">Tahmin</span>
-                      <strong className={`text-3xl font-extrabold ${getKpTextColorClass(score)}`}>
-                        {score.toFixed(1)}
-                      </strong>
-                    </div>
+                    {(() => {
+                      const badge = getSchumannBadgeStyle(score);
+                      return (
+                        <div 
+                          className={`${badge.bgColor} border w-20 h-20 rounded-2xl flex flex-col justify-center items-center shrink-0 relative transition-all duration-300`}
+                          style={{
+                            borderColor: badge.borderColor,
+                            boxShadow: `0 0 20px ${badge.shadowColor}`
+                          }}
+                        >
+                          <span className="text-[10px] text-mystic-text-muted uppercase font-bold tracking-wider">Tahmin</span>
+                          <strong className={`text-3xl font-extrabold ${badge.textClass}`}>
+                            {score.toFixed(1)}
+                          </strong>
+                        </div>
+                      );
+                    })()}
 
                     <div>
                       <span className="text-[9px] font-extrabold tracking-widest text-[#00E5FF] bg-[#00E5FF]/10 px-2.5 py-0.5 rounded-full uppercase border border-[#00E5FF]/20">
                         KOZMİK ORACLE / DURUM RAPORU {data?.schumann_real && `- GÖZLEM SAATİ: ${formatRealTime(data.schumann_real.time_utc)}`}
                       </span>
-                      <h2 className="text-xl font-extrabold text-white mt-1.5 flex items-center gap-2">
+                      <h2 className="text-xl font-extrabold text-white mt-1.5 flex flex-wrap items-center gap-2">
                         {analysis.title}
+                        <span 
+                          className="text-[10px] font-bold px-2 py-0.5 rounded-md border transition-all duration-300"
+                          style={{
+                            color: score < 3.0 ? '#22D3EE' : score < 5.0 ? '#34D399' : score < 7.0 ? '#F87171' : '#FFFFFF',
+                            borderColor: score < 3.0 ? 'rgba(34, 211, 238, 0.3)' : score < 5.0 ? 'rgba(52, 211, 153, 0.3)' : score < 7.0 ? 'rgba(248, 113, 113, 0.3)' : 'rgba(255, 255, 255, 0.5)',
+                            backgroundColor: score < 3.0 ? 'rgba(6, 182, 212, 0.1)' : score < 5.0 ? 'rgba(16, 185, 129, 0.1)' : score < 7.0 ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255, 255, 255, 0.15)',
+                            textShadow: score >= 7.0 ? '0 0 4px rgba(255,255,255,0.6)' : 'none'
+                          }}
+                        >
+                          {getSchumannLevelLabel(score)}
+                        </span>
                       </h2>
                     </div>
                   </div>
