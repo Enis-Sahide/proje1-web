@@ -1,4 +1,5 @@
 import { json, errorJson, preflight } from '@/lib/http/cors';
+import sharp from 'sharp';
 
 export const dynamic = 'force-dynamic';
 
@@ -323,6 +324,94 @@ async function fetchRealSchumannData(): Promise<RealSchumannRow | null> {
   }
 }
 
+async function detectFlaresFromImage(): Promise<{ score: number; peakA1: number } | null> {
+  try {
+    const url = 'https://sos70.ru/provider.php?file=shm.jpg';
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Referer': 'https://sos70.ru/'
+      },
+      next: { revalidate: 300 } // Cache for 5 minutes
+    });
+    if (!res.ok) return null;
+    
+    const buffer = Buffer.from(await res.arrayBuffer());
+    const image = sharp(buffer);
+    const { data, info } = await image.raw().toBuffer({ resolveWithObject: true });
+    
+    const dataStartX = 60;
+    const dataEndX = 1444;
+    const bgRegions = [
+      { start: 55, end: 85 },   // 2 - 5 Hz
+      { start: 130, end: 155 }, // 10 - 12.5 Hz
+      { start: 190, end: 215 }  // 16 - 18.5 Hz
+    ];
+    
+    let minBr = 255;
+    let maxBr = 0;
+    let sumTotalBr = 0;
+    let colsCount = 0;
+    const colBrightnesses: number[] = [];
+    
+    for (let x = dataStartX; x <= dataEndX; x++) {
+      let sumBr = 0;
+      let count = 0;
+      for (const reg of bgRegions) {
+        for (let y = reg.start; y <= reg.end; y++) {
+          const idx = (y * info.width + x) * info.channels;
+          const r = data[idx];
+          const g = data[idx + 1];
+          const b = data[idx + 2];
+          const br = 0.299 * r + 0.587 * g + 0.114 * b;
+          sumBr += br;
+          count++;
+        }
+      }
+      const avgBr = sumBr / count;
+      colBrightnesses.push(avgBr);
+      if (avgBr < minBr) minBr = avgBr;
+      if (avgBr > maxBr) maxBr = avgBr;
+      sumTotalBr += avgBr;
+      colsCount++;
+    }
+    
+    // Check the latest columns (last 10 minutes, approx. 3 columns)
+    let latestSum = 0;
+    let latestCount = 0;
+    for (let i = colBrightnesses.length - 3; i < colBrightnesses.length; i++) {
+      latestSum += colBrightnesses[i];
+      latestCount++;
+    }
+    const latestAvg = latestSum / latestCount;
+    
+    // Dynamic activity score from 0.0 to 10.0
+    const range = maxBr - minBr;
+    const normalizedScore = range === 0 ? 0.5 : ((latestAvg - minBr) / range) * 10;
+    
+    // Extrapolate peak A1 based on the normalized score
+    // Minimum activity starts at A1=4.0, maximum activity (flare peak) goes up to A1=75.0
+    let peakA1 = 6.0;
+    if (normalizedScore < 3.0) {
+      peakA1 = 4.0 + (normalizedScore / 3.0) * 4.0;
+    } else if (normalizedScore < 6.0) {
+      peakA1 = 8.0 + ((normalizedScore - 3.0) / 3.0) * 12.0;
+    } else if (normalizedScore < 8.5) {
+      peakA1 = 20.0 + ((normalizedScore - 6.0) / 2.5) * 20.0;
+    } else {
+      peakA1 = 40.0 + ((normalizedScore - 8.5) / 1.5) * 35.0;
+    }
+    
+    return {
+      score: parseFloat(normalizedScore.toFixed(2)),
+      peakA1: parseFloat(peakA1.toFixed(1))
+    };
+  } catch (err) {
+    console.error('Error detecting flares from image:', err);
+    return null;
+  }
+}
+
 export async function GET() {
   try {
     // 1. Fetch real-time solar wind data (propagated solar wind 1-hour cadence is small and fast)
@@ -442,7 +531,34 @@ export async function GET() {
     }
 
     // 4. Fetch actual Schumann values from Tomsk .afq logs
-    const realSchumann = await fetchRealSchumannData();
+    let realSchumann = await fetchRealSchumannData();
+    
+    // Detect flares/bursts dynamically from the live spectrogram image
+    const imageFlareData = await detectFlaresFromImage();
+    if (imageFlareData) {
+      if (!realSchumann) {
+        // Create fallback object since .afq log is offline but spectrogram image works
+        realSchumann = {
+          time_tomsk: 'Canlı Gözlem',
+          time_utc: new Date().toISOString(),
+          a1: imageFlareData.peakA1,
+          f1: 7.83,
+          q1: 10,
+          a2: 6.0,
+          f2: 14.1,
+          q2: 10,
+          a3: 6.0,
+          f3: 20.3,
+          q3: 10,
+          a4: 6.0,
+          f4: 26.4,
+          q4: 10
+        };
+      } else if (imageFlareData.peakA1 > realSchumann.a1) {
+        console.log(`Image-based flare detected! Scaling A1 from ${realSchumann.a1} to ${imageFlareData.peakA1}`);
+        realSchumann.a1 = imageFlareData.peakA1;
+      }
+    }
     
     // 5. Calculate custom cosmic impact score (0.0 to 10.0)
     let finalImpactScore = 0.5;
