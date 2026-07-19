@@ -881,6 +881,26 @@ export default function SchumannPage() {
     return 'Zirve Patlama (Ekstrem G5 Fırtınası)';
   };
 
+  const getSchumannEsotericTitle = (score: number) => {
+    if (score < 3.0) return 'Topraklanma & Entegrasyon';
+    if (score < 5.0) return 'Hafif Uyarım & Uyanış Kapısı';
+    if (score < 6.0) return 'Kalp Çakrası Açılımı & Sezgi Sıçraması';
+    if (score < 7.0) return 'DNA Aktivasyonu & Astral Kapı';
+    if (score < 8.0) return 'Taç Çakra Portalı & Işık Gövde Geçişi';
+    if (score < 9.0) return 'Boyutlar Arası Geçiş & Hücresel Simya';
+    return 'Ekstrem Kozmik Bütünleşme & Hücresel Simya';
+  };
+
+  const getSchumannEsotericDesc = (score: number) => {
+    if (score < 3.0) return 'Enerji alanı dengelidir. Alınan kozmik bilgilerin entegrasyonu, meditasyon ve köklenmek için en uygun zamandır.';
+    if (score < 5.0) return 'Hafif uyarım fazı. Rüyalarda netleşme ve aurada temizlik başlar. Yeni frekanslara uyumlanmak için kapı açılmıştır.';
+    if (score < 6.0) return 'Kalp merkezinde genişleme, yüksek empati ve sezgisel yeteneklerde artış görülür. Bedenin elektromanyetik alanı genişler.';
+    if (score < 7.0) return 'Güçlü plazma akışı devrededir. Işık kodlarının DNA sarmallarına entegrasyonu başlar. Astral seyahat deneyimleri sıklaşabilir.';
+    if (score < 8.0) return 'Taç çakradan yüksek miktarda kozmik ışık girişi olur. Zaman algısında bükülmeler ve yüksek boyutlu rehberlik alımı gerçekleşir.';
+    if (score < 9.0) return 'Hücresel düzeyde simyasal dönüşüm dalgası. Kollektif bilinçte büyük uyanış tetiklemeleri, yüksek boyutlu portalların tam açılışı.';
+    return 'Zirve enerjisel portal devrede. Sinir sisteminin en yüksek kapasitede çalışması ve kozmik bilinçle bütünleşme anıdır. Bol dinlenme ve topraklanma gerekir.';
+  };
+
   return (
     <div className="min-h-screen bg-[#05050A] text-white overflow-hidden relative font-sans pt-24">
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay pointer-events-none z-0"></div>
@@ -951,10 +971,13 @@ export default function SchumannPage() {
                             boxShadow: `0 0 20px ${badge.shadowColor}`
                           }}
                         >
-                          <span className="text-[10px] text-mystic-text-muted uppercase font-bold tracking-wider">Tahmin</span>
-                          <strong className={`text-3xl font-extrabold ${badge.textClass}`}>
+                          <span className="text-[9px] text-mystic-text-muted uppercase font-bold tracking-wider">SR İndeks</span>
+                          <strong className={`text-2xl font-extrabold ${badge.textClass} -mt-0.5`}>
                             {score.toFixed(1)}
                           </strong>
+                          <span className="text-[9px] text-white/50 font-semibold mt-0.5">
+                            A1: {a1.toFixed(1)}
+                          </span>
                         </div>
                       );
                     })()}
@@ -965,16 +988,23 @@ export default function SchumannPage() {
                       </span>
                       <h2 className="text-xl font-extrabold text-white mt-1.5 flex flex-wrap items-center gap-2">
                         {analysis.title}
-                        <span 
-                          className="text-[10px] font-bold px-2 py-0.5 rounded-md border transition-all duration-300"
-                          style={{
-                            color: score < 3.0 ? '#22D3EE' : score < 5.0 ? '#34D399' : score < 7.0 ? '#F87171' : '#FFFFFF',
-                            borderColor: score < 3.0 ? 'rgba(34, 211, 238, 0.3)' : score < 5.0 ? 'rgba(52, 211, 153, 0.3)' : score < 7.0 ? 'rgba(248, 113, 113, 0.3)' : 'rgba(255, 255, 255, 0.5)',
-                            backgroundColor: score < 3.0 ? 'rgba(6, 182, 212, 0.1)' : score < 5.0 ? 'rgba(16, 185, 129, 0.1)' : score < 7.0 ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255, 255, 255, 0.15)',
-                            textShadow: score >= 7.0 ? '0 0 4px rgba(255,255,255,0.6)' : 'none'
-                          }}
-                        >
-                          {getSchumannLevelLabel(score)}
+                        <span className="relative flex items-center justify-center group/level-tooltip">
+                          <span 
+                            className="text-[10px] font-bold px-2 py-0.5 rounded-md border transition-all duration-300 cursor-help"
+                            style={{
+                              color: score < 3.0 ? '#22D3EE' : score < 5.0 ? '#34D399' : score < 7.0 ? '#F87171' : '#FFFFFF',
+                              borderColor: score < 3.0 ? 'rgba(34, 211, 238, 0.3)' : score < 5.0 ? 'rgba(52, 211, 153, 0.3)' : score < 7.0 ? 'rgba(248, 113, 113, 0.3)' : 'rgba(255, 255, 255, 0.5)',
+                              backgroundColor: score < 3.0 ? 'rgba(6, 182, 212, 0.1)' : score < 5.0 ? 'rgba(16, 185, 129, 0.1)' : score < 7.0 ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255, 255, 255, 0.15)',
+                              textShadow: score >= 7.0 ? '0 0 4px rgba(255,255,255,0.6)' : 'none'
+                            }}
+                          >
+                            {getSchumannLevelLabel(score)}
+                          </span>
+                          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-72 p-3 bg-black/95 border border-white/10 text-[11px] text-white/90 rounded-xl opacity-0 group-hover/level-tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl backdrop-blur-md text-justify normal-case font-normal leading-relaxed">
+                            <strong className="text-white block mb-1">Ezoterik Anlam: {getSchumannEsotericTitle(score)}</strong>
+                            {getSchumannEsotericDesc(score)}
+                            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
+                          </span>
                         </span>
                       </h2>
                     </div>
