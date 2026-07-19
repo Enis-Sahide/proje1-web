@@ -272,12 +272,12 @@ export default function SchumannPage() {
     try {
       const utcDate = new Date(endTimeUtc);
       const tomskTime = new Date(utcDate.getTime() + 7 * 60 * 60 * 1000);
-      const day1Date = new Date(tomskTime.getTime() - 24 * 60 * 60 * 1000);
+      const day1Date = new Date(tomskTime.getTime() - 2 * 24 * 60 * 60 * 1000);
       
       const chartStartMs = Date.UTC(day1Date.getFullYear(), day1Date.getMonth(), day1Date.getDate(), 0, 0, 0) - 7 * 60 * 60 * 1000;
       
       const ticks = [];
-      for (let i = 0; i <= 4; i++) {
+      for (let i = 0; i <= 6; i++) {
         const tickTimeMs = chartStartMs + i * 12 * 60 * 60 * 1000;
         const date = new Date(tickTimeMs);
         ticks.push({
@@ -1243,7 +1243,7 @@ export default function SchumannPage() {
                                 className="flex flex-col items-center relative shrink-0" 
                                 style={{ 
                                   transform: 'translateX(-50%)', 
-                                  left: `${(index / 4) * 100}%`, 
+                                  left: `${(index / 6) * 100}%`, 
                                   position: 'absolute' 
                                 }}
                               >
