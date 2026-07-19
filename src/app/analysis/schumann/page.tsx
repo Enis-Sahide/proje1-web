@@ -1683,7 +1683,7 @@ export default function SchumannPage() {
                     <strong className="text-white">Grafiklerin Yapısı ve Okunması:</strong>
                     <div className="mt-2 text-xs leading-relaxed flex flex-col gap-2">
                       <p>
-                        <strong>• Schumann Rezonans Spektrogramı:</strong> Elektromanyetik alanın dikey eksende frekans (0 - 40 Hz), yatay eksende ise zaman bazlı uyarılma düzeyini gösterir. Bu grafik, Space Observing System 70 (Tomsk, Rusya) rasathanesinde bulunan ELF alıcı antenleri aracılığıyla doğrudan yeryüzünden ölçülen gerçek zamanlı elektromanyetik sonogram verilerini temsil eder.
+                        <strong>• Schumann Rezonans Spektrogramı:</strong> Elektromanyetik alanın dikey eksende frekans (0 - 40 Hz), yatay eksende ise zaman bazlı uyarılma düzeyini gösterir. Bu grafik, Space Observing System 70 (Tomsk, Rusya) rasathanesinde bulunan ELF alıcı antenleri aracılığıyla doğrudan yeryüzünden ölçülen gerçek zamanlı elektromanyetik sonogram verilerini temsil eder. Zaman dilimi farkını en üstteki çift göstergeli anlık zaman panelinden (Yerel Saat ve Tomsk Saati) takip edebilirsiniz.
                       </p>
                       <p>
                         <strong>• Jeomanyetik Kp Eğilimi:</strong> 72 saatlik zaman diliminde ölçülen ve tahmin edilen jeomanyetik fırtına derecelerini (Kp) gösterir. Düz sütunlar kesinleşmiş geçmiş ölçümleri, kesikli sınırları olan sütunlar ise gelecek 24 saatlik tahmini temsil eder.
@@ -1694,7 +1694,7 @@ export default function SchumannPage() {
                   <p>
                     <strong>Kozmik Oracle / Durum Raporu Nedir?</strong>
                     <br />
-                    Güneş rüzgarı uydularından alınan 6 farklı elektromanyetik parametreyi (Kp Endeksi, Hız, Yoğunluk, Bz kalkan durumu, Bt alan gücü ve Sıcaklık) anlık olarak inceleyen yerel kural motorudur. Bu motor, uzay havasındaki dalgalanmaları yorumlayarak size üç alanda bilgi verir:
+                    Gözlemevinden alınan canlı Schumann Rezonansı genliği (A1), spektrogram uyarım dalgaları ve uydulardan alınan jeomanyetik parametreleri (Kp Endeksi, Hız, Yoğunluk, Bz kalkan durumu, Bt alan gücü ve Sıcaklık) anlık olarak inceleyen yerel kural motorudur. Bu motor, uzay havasındaki dalgalanmaları yorumlayarak size üç alanda bilgi verir:
                     <br />
                     <span className="text-white font-semibold">• 🔬 Bilimsel Teşhis:</span> İyonosfer ve manyetosferde gerçekleşen fiziksel olayların bilimsel açıklaması.
                     <br />
@@ -1706,7 +1706,7 @@ export default function SchumannPage() {
                   <p>
                     <strong>Kozmik Enerji Simülatörü (Test Paneli):</strong>
                     <br />
-                    Uygulamadaki test sürgüsü yardımıyla Kp endeksini (0-9 arası) manuel olarak değiştirebilirsiniz. Sürgüyü oynattığınızda, tüm güneş rüzgarı parametreleri ve Kozmik Oracle teşhisi senkronize bir şekilde güncellenerek olası jeomanyetik fırtınaların ve yüksek enerjisel geçişlerin iyonosfer üzerindeki etkilerini test etmenizi sağlar. "Canlı Veriye Dön" butonuyla gerçek verilere dönebilirsiniz.
+                    Uygulamadaki test sürgüsü yardımıyla Schumann A1 Genlik değerini (4.0 - 75.0 arası) manuel olarak değiştirebilirsiniz. Sürgüyü oynattığınızda, Kozmik Oracle teşhisi, beden reaksiyonları ve ruhsal rehberlik önerileri senkronize bir şekilde güncellenerek yüksek rezonans titreşimlerinin etkilerini test etmenizi sağlar. Güneş rüzgarı parametreleri (Kp, hız, yoğunluk vb.) ise simülasyondan izole edilerek canlı değerlerinde sabit kalır. "Canlı Veriye Dön" butonuyla gerçek verilere dönebilirsiniz.
                   </p>
                 </div>
 
@@ -1715,7 +1715,7 @@ export default function SchumannPage() {
                     <strong className="text-white">Güneş Rüzgarı Sözlüğü:</strong>
                     <div className="mt-2 text-xs leading-relaxed flex flex-col gap-2">
                       <p>
-                        <strong>• Schumann Tahmini (SR Skoru):</strong> Güneş rüzgarı hızı, plazma yoğunluğu, Kp endeksi ve manyetik kalkan yönü (Bz) gibi parametrelerin birleşik etkisinden hesaplanan, 0.0 - 10.0 arası bir iyonosferik uyarım göstergesidir. Tıpkı Richter ölçeği gibi, uzay havası dalgalanmalarının uyarım şiddetini tek bir skorla anlamanızı sağlar.
+                        <strong>• Schumann Tahmini (SR Skoru):</strong> Tomsk rasathanesi spektrogram görüntüsündeki dikey uyarım parlamalarının (flare) piksel yoğunluğu ve fiziksel A1 mod genliğinin anlık bileşiminden hesaplanan, 0.0 - 10.0 arası bir iyonosferik uyarım göstergesidir. Tıpkı Richter ölçeği gibi, canlı uzay havası dalgalanmalarının ve rezonans uyarım şiddetinin seviyesini (Sakin, Hafif, Aktif, Zirve) tek bir skorla anlamanızı sağlar.
                       </p>
                       <p>
                         <strong>• Kp Endeksi:</strong> Dünya genelindeki manyetometrelerden alınan verilerle hesaplanan 0-9 arası jeomanyetik aktivite derecesidir. 5 ve üzeri, küresel manyetik fırtınaları (NOAA G1-G5 seviyeleri) ifade eder.
