@@ -1032,6 +1032,12 @@ export default function SchumannPage() {
                       <p className="text-sm text-white/85 leading-relaxed text-justify font-sans">
                         {analysis.science}
                       </p>
+                      <div className="mt-4 pt-3 border-t border-white/5 text-[11px] text-mystic-text-muted/65 italic leading-normal flex items-start gap-1.5">
+                        <span className="text-[#00E5FF] font-bold">※</span>
+                        <span>
+                          Önemli Not: Spektrogram verileri Tomsk (Rusya) Rasathanesi'nden alınmaktadır. Schumann Rezonansı küresel bir fenomen olsa da, ölçülen genlik seviyeleri ve anlık beyaz parlamalar istasyon çevresindeki yerel yıldırım fırtınalarından da etkilenebilmektedir.
+                        </span>
+                      </div>
                     </div>
                   </div>
 
