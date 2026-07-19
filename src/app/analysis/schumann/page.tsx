@@ -1205,87 +1205,33 @@ export default function SchumannPage() {
               Schumann Rezonansı
             </h2>
             <p className="text-xs text-mystic-text-muted mt-1">
-              Frekans dalgalanmalarını ve Schumann Rezonans uyarılma seviyesini canlı izleyin. Dikey kesikli ŞİMDİ çizgisi anlık zamanı belirtir; bu çizginin sol tarafı kesinleşmiş geçmiş ölçümleri, sağ tarafı ise gelecek 24 saatlik tahmin bloklarını ayırır. (Saat bilgisi için grafiğin üzerine gelin)
+              Frekans dalgalanmalarını ve Schumann Rezonansı sonogramını canlı izleyin. Bu veriler Space Observing System 70 (Tomsk, Rusya) rasathanesinden canlı olarak alınmaktadır.
             </p>
           </div>
 
           {isLoading ? (
             <div className="h-64 bg-white/5 animate-pulse rounded-2xl flex items-center justify-center text-mystic-text-muted">
-              Spektrogram Çiziliyor...
+              Spektrogram Yükleniyor...
             </div>
           ) : (
             <div className="w-full flex flex-col justify-center items-center py-6 bg-black/40 rounded-2xl border border-white/5 relative overflow-hidden group">
-              
-              <div className="absolute top-4 right-4 bg-red-600 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full flex items-center gap-1.5 backdrop-blur-sm z-10 shadow-lg tracking-wider uppercase animate-pulse">
-                <span className="w-1.5 h-1.5 rounded-full bg-white"></span> Canlı
+              <div className="absolute top-4 right-4 bg-[#00E5FF]/10 border border-[#00E5FF]/30 text-[#00E5FF] text-[10px] font-extrabold px-3 py-1 rounded-full flex items-center gap-1.5 backdrop-blur-sm z-10 shadow-lg tracking-wider uppercase">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse"></span> Canlı Rasathane Ölçümü
               </div>
 
-              {/* Tooltip display space for Spectrogram */}
-              <div className="min-h-[36px] mb-4 text-center w-full px-4 flex justify-center items-center">
-                {hoverInfo ? (
-                  <div className="flex flex-wrap justify-center items-center gap-1.5 md:gap-3 text-xs bg-white/5 border border-white/10 px-3 py-1.5 rounded-full animate-in fade-in duration-200">
-                    <span className="text-mystic-text-muted">Zaman:</span>
-                    <strong className="text-[#00E5FF] font-mono">{hoverInfo.timeStr}</strong>
-                    <span className="text-white/20">|</span>
-                    <span className="text-mystic-text-muted">Schumann Tahmini:</span>
-                    <strong className="text-white font-mono">{hoverInfo.kp.toFixed(2)}</strong>
-                    <span className="text-white/20">|</span>
-                    <span className="text-cyan-300 font-semibold">{hoverInfo.spiritualStatus}</span>
-                    <span className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase ${
-                      hoverInfo.isForecast ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
-                    }`}>
-                      {hoverInfo.isForecast ? 'Tahmin' : 'Ölçüm'}
-                    </span>
-                  </div>
-                ) : (
-                  <span className="text-xs text-mystic-text-muted">
-                    Detayları görmek için grafiğin üzerine gelin
-                  </span>
-                )}
+              <div className="w-full px-4 mt-6">
+                <img 
+                  src={`/api/schumann/image?t=${timestamp}`} 
+                  alt="Canlı Schumann Rezonans Spektrogramı (Tomsk, Rusya)" 
+                  className="w-full h-auto rounded-xl border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)]"
+                />
               </div>
 
-              {/* Flex Container for Static Hz Panel + Horizontal Scroll Canvas */}
-              <div className="flex gap-2 items-start mt-6 w-full px-4 relative">
-                
-                {/* Left Column: Fixed Hz Scale (outside of scroll container) */}
-                <div className="w-12 flex flex-col justify-start relative select-none pointer-events-none shrink-0" style={{ height: '270px' }}>
-                  {labelResonances.map(res => {
-                    const yPct = ((graphTop + (res / 40) * graphHeight) / canvasHeight) * 100;
-                    return (
-                      <span 
-                        key={res}
-                        className="absolute right-1.5 text-[9.5px] font-bold font-mono text-white/50 -translate-y-1/2"
-                        style={{ top: `${yPct}%` }}
-                      >
-                        {res} Hz
-                      </span>
-                    );
-                  })}
-                </div>
-
-                {/* Right Column: Scrollable Canvas Container */}
-                <div ref={scrollContainerRef} className="flex-1 overflow-x-auto relative min-w-0">
-                  <div className="relative">
-                    <canvas 
-                      ref={canvasRef} 
-                      width={800} 
-                      height={270}
-                      onMouseMove={handleMouseMove}
-                      onMouseLeave={handleMouseLeave}
-                      className="rounded-lg border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)] cursor-crosshair"
-                    />
-
-                  </div>
-                </div>
-
-                {/* Watermark Logo & Text */}
-                <div className="absolute right-8 top-4 hidden md:flex items-center gap-1.5 bg-black/45 backdrop-blur-sm border border-white/10 px-3 py-1.5 rounded-xl pointer-events-none select-none z-10 opacity-60">
-                  <img src="/logo.png" className="w-3.5 h-3.5 rounded-full" alt="7LAYERS Logo" />
-                  <span className="text-[10px] font-bold text-white tracking-widest font-mono">7LAYERS</span>
-                </div>
+              <div className="mt-4 text-center">
+                <span className="text-xs text-mystic-text-muted">
+                  Grafik verileri Space Observing System 70 (Tomsk, Rusya) üzerinden her saat güncellenmektedir.
+                </span>
               </div>
-
-
             </div>
           )}
         </div>
@@ -1539,7 +1485,7 @@ export default function SchumannPage() {
                     <strong className="text-white">Grafiklerin Yapısı ve Okunması:</strong>
                     <div className="mt-2 text-xs leading-relaxed flex flex-col gap-2">
                       <p>
-                        <strong>• Schumann Rezonans Spektrogramı:</strong> Elektromanyetik alanın dikey eksende frekans (0 - 40 Hz), yatay eksende ise zaman bazlı tahmini uyarılma düzeyini gösterir. Bu grafik, yeryüzündeki tek bir gözlemevinin doğrudan radyo anten ölçümü yerine; NOAA güneş rüzgarı uydularından alınan küresel verilerin (Kp, hız, yoğunluk vb.) iyonosfer üzerindeki tahmini etkilerini görselleştiren estetik bir simülasyon modelidir. Yatay renkli bantlar (7.83, 14, 20 Hz vb.) ana rezonans frekanslarının teorik konumlarını, renk geçişleri ise hesaplanan uyarılma şiddetini temsil eder. Grafik üzerindeki dikey kesikli ŞİMDİ çizgisi ise anlık zamanı belirtir; bu çizginin sol tarafı kesinleşmiş geçmiş tahmin modellerini, sağ tarafı ise gelecek 24 saatlik tahmin bloklarını belirtir.
+                        <strong>• Schumann Rezonans Spektrogramı:</strong> Elektromanyetik alanın dikey eksende frekans (0 - 40 Hz), yatay eksende ise zaman bazlı uyarılma düzeyini gösterir. Bu grafik, Space Observing System 70 (Tomsk, Rusya) rasathanesinde bulunan ELF alıcı antenleri aracılığıyla doğrudan yeryüzünden ölçülen gerçek zamanlı elektromanyetik sonogram verilerini temsil eder.
                       </p>
                       <p>
                         <strong>• Jeomanyetik Kp Eğilimi:</strong> 72 saatlik zaman diliminde ölçülen ve tahmin edilen jeomanyetik fırtına derecelerini (Kp) gösterir. Düz sütunlar kesinleşmiş geçmiş ölçümleri, kesikli sınırları olan sütunlar ise gelecek 24 saatlik tahmini temsil eder.
