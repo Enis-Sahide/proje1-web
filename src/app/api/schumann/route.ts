@@ -79,12 +79,12 @@ function getCosmicImpactStatusInfo(score: number) {
   }
 }
 
-function generateRulesAnalysis(score: number, speed: number, density: number, bz: number, bt: number) {
-  // 1. Zirve Jeomanyetik Fırtına
+function generateRulesAnalysis(score: number, speed: number, density: number, bz: number, bt: number, a1: number, f1: number) {
+  // 1. Zirve Schumann Rezonans Uyarılması (Fırtına)
   if (score >= 7.0) {
     return {
       title: 'Zirve Schumann Rezonans Uyarılması (Fırtına)',
-      science: `Güneş'ten fırlayan son derece yüksek enerjili plazma rüzgarları (CME) manyetosferimizi doğrudan vuruyor. Dünya'nın koruyucu kalkanı (Bz) güneye doğru geniş bir açıyla kapı araladı. İyonosfer tabakası maksimum seviyede elektrik yüküyle titreşiyor.`,
+      science: `Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana mod genliği (A1) sıradışı bir yükselişle ${a1.toFixed(1)} seviyesine ulaştı. Frekans ${f1.toFixed(2)} Hz düzeyinde seyrediyor. İyonosfer tabakası maksimum seviyede elektrik yüküyle titreşiyor.`,
       symptoms: 'Sinir sisteminde aşırı uyarılma, uyku düzeninde derin kaymalar (yoğun uykusuzluk ya da derin trans benzeri uyku), baş ve ense bölgesinde yoğun basınç, kulaklarda kesintisiz tiz titreşim çınlamaları ve son derece canlı, rehber niteliğinde rüyalar.',
       spiritual: 'Taç ve kalp çakralarınızda aşırı aktifleşme devrededir. Bugün kendinizi zorlayacak fiziksel işlerden kaçının. Bol alkali su tüketin ve çıplak ayakla toprağa basın. Taç çakranızdan giren ışığın bedeninizi yıkayarak yere aktığını imgeleyerek nefes meditasyonları yapın.'
     };
@@ -94,7 +94,7 @@ function generateRulesAnalysis(score: number, speed: number, density: number, bz
   if (speed >= 500) {
     return {
       title: 'Kozmik Plazma Rüzgarı Dalgası (Hızlı Akış)',
-      science: `Güneş yüzeyindeki koronal deliklerden kopan yüksek hızlı plazma akışı saniyede ${Math.round(speed)} km hıza ulaşarak manyetik kalkanımızı sıkıştırıyor. Bu yüksek hız, iyonosferik Schumann rezonans katmanlarındaki titreşim genliğini uyararak yükseltiyor.`,
+      science: `Güneş yüzeyindeki koronal deliklerden kopan yüksek hızlı plazma akışı saniyede ${Math.round(speed)} km hıza ulaşarak manyetik kalkanımızı sıkıştırıyor. Schumann Rezonansı ana mod genliği (A1): ${a1.toFixed(1)}, frekansı: ${f1.toFixed(2)} Hz.`,
       symptoms: 'Fiziksel bedende ani bir enerjik uyarılma, içsel sabırsızlık veya huzursuzluk hissi, kalp atışlarında hızlanma dalgaları, hafif sersemlik ve kulaklarda dalgalı frekans sesleri.',
       spiritual: 'Artan plazma akışı, aura alanınızı temizlemek ve eski hücresel kalıpları salıvermek için çalışır. Birikmiş statik elektriği nötrlemek için ılık/tuzlu bir duş alın. Kalp merkezli nefes pratikleri (4 saniye al, 4 saniye ver) yaparak akışı bedende dengeleyin.'
     };
@@ -104,7 +104,7 @@ function generateRulesAnalysis(score: number, speed: number, density: number, bz
   if (bz <= -3.0) {
     return {
       title: 'Manyetik Kalkan Geçiş Portalı (Bz Güney Yönlü)',
-      science: `Dünya'nın koruyucu manyetik kalkanının yönünü belirleyen Bz parametresi güneye yönelerek ${bz.toFixed(1)} nT seviyesine ulaştı. Kalkanımızda açılan bu elektromanyetik kapı, Güneş rüzgarı parçacıklarının doğrudan atmosfere sızmasını kolaylaştırıyor.`,
+      science: `Dünya'nın koruyucu manyetik kalkanının yönünü belirleyen Bz parametresi güneye yönelerek ${bz.toFixed(1)} nT seviyesine ulaştı. Kalkanımızda açılan bu kapı güneş rüzgarı sızıntısını artırırken, Schumann Rezonansı genliği ${a1.toFixed(1)} ve frekansı ${f1.toFixed(2)} Hz olarak ölçüldü.`,
       symptoms: 'Yüksek duygusal duyarlılık, empati yeteneğinde aşırı artış, başkalarının enerjilerini hissetme, hafif şakak ağrıları ve rüyalarda yoğun astral semboller.',
       spiritual: 'Kalkanın açık olması ruhsal olarak alıcı (reseptif) modda olduğumuzu gösterir. Negatif enerjilerden korunmak için kendinizi mor bir ışık küresi içinde hayal edin. Adaçayı veya üzerlik otu yakarak yaşam alanınızı arındırın.'
     };
@@ -114,7 +114,7 @@ function generateRulesAnalysis(score: number, speed: number, density: number, bz
   if (density >= 10.0) {
     return {
       title: 'Yoğun Parçacık Bombardımanı (Proton Yoğunluğu)',
-      science: `Güneş rüzgarındaki parçacık (proton) yoğunluğu cm³ başına ${density.toFixed(1)} seviyesine ulaşarak normalin çok üzerine çıktı. Bu yoğun parçacık dalgası iyonosfer tabakasına çarparak Schumann rezonansını aktifleştiriyor.`,
+      science: `Güneş rüzgarındaki parçacık (proton) yoğunluğu cm³ başına ${density.toFixed(1)} seviyesine ulaştı. Schumann Rezonansı ana mod genliği (A1) ${a1.toFixed(1)} ve frekansı ${f1.toFixed(2)} Hz olarak kaydedildi.`,
       symptoms: 'Eklem ağrıları, kas seğirmeleri, aşırı fiziksel yorgunluk ve uykuya geçişte zorlanma, göz arkasında hafif sızlama veya basınç.',
       spiritual: 'Artan proton akışı, hücresel şablonumuzda ve DNA yapımızda yoğun bir elektromanyetik dönüşüm tetikler. Ağır yiyeceklerden kaçının, hafif beslenin ve bol su için. Vücuttaki iletkenliği ve topraklanmayı artırmak için magnezyum takviyesi alabilirsiniz.'
     };
@@ -123,7 +123,7 @@ function generateRulesAnalysis(score: number, speed: number, density: number, bz
   // 5. Sakin ve Dengeli Durum
   return {
     title: 'Dingin Elektromanyetik Akış (Sakin Faz)',
-    science: `Güneş rüzgarı hızı (${Math.round(speed)} km/s) ve parçacık yoğunluğu (${density.toFixed(1)} p/cm³) normal sınırlarında seyrediyor. Dünya'nın manyetik kalkanı (Bz: ${bz.toFixed(1)} nT) kapalı ve tam koruyucu fazda. İyonosferik Schumann rezonansı dengeli temel titreşiminde (7.83 Hz ve çevresi).`,
+    science: `Güneş rüzgarı hızı (${Math.round(speed)} km/s) ve parçacık yoğunluğu (${density.toFixed(1)} p/cm³) normal sınırlarında. Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana frekansı ${f1.toFixed(2)} Hz (Genlik A1: ${a1.toFixed(1)}) seviyesinde dengeli ve doğal titreşiminde seyrediyor.`,
     symptoms: 'Zihinsel netlik, dengeli enerji seviyeleri, sakin uyku düzeni ve bedensel rahatlık. Olağanüstü bir uyarılma belirtisi beklenmez.',
     spiritual: 'Zihnin gürültüsünü yatıştırmak, yeni bilgiler öğrenmek, kadim dersleri çalışmak ve kök çakra meditasyonları yapmak için en ideal dönemdir. Enerjinizin merkezlendiği bu dingin zamanı tefekkür ile değerlendirebilirsiniz.'
   };
@@ -216,6 +216,113 @@ function parseDiscussion(text: string) {
   return sections;
 }
 
+interface RealSchumannRow {
+  time_tomsk: string;
+  time_utc: string;
+  a1: number;
+  f1: number;
+  q1: number;
+  a2: number;
+  f2: number;
+  q2: number;
+  a3: number;
+  f3: number;
+  q3: number;
+  a4: number;
+  f4: number;
+  q4: number;
+}
+
+const getSchumannScoreFromA1 = (a1: number): number => {
+  if (a1 <= 0) return 0.5;
+  if (a1 < 8) {
+    return parseFloat((0.5 + ((a1 - 4) / 4) * 2.5).toFixed(2));
+  } else if (a1 < 15) {
+    return parseFloat((3.0 + ((a1 - 8) / 7) * 3.0).toFixed(2));
+  } else if (a1 < 25) {
+    return parseFloat((6.0 + ((a1 - 15) / 10) * 2.5).toFixed(2));
+  } else {
+    return parseFloat(Math.min(10.0, 8.5 + ((a1 - 25) / 25) * 1.5).toFixed(2));
+  }
+};
+
+async function fetchRealSchumannData(): Promise<RealSchumannRow | null> {
+  const tomskOffset = 7 * 60 * 60 * 1000;
+  const nowTomsk = new Date(Date.now() + tomskOffset);
+  
+  const getFilename = (date: Date) => {
+    const yyyy = date.getUTCFullYear();
+    const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
+    const dd = String(date.getUTCDate()).padStart(2, '0');
+    return `${yyyy}${mm}${dd}.afq`;
+  };
+
+  const currentFilename = getFilename(nowTomsk);
+  const prevFilename = getFilename(new Date(nowTomsk.getTime() - 24 * 60 * 60 * 1000));
+
+  const tryFetch = async (filename: string): Promise<string | null> => {
+    try {
+      const url = `https://sos70.ru/images/${filename}`;
+      const res = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        },
+        next: { revalidate: 180 } // Cache for 3 minutes
+      });
+      if (res.ok) {
+        return await res.text();
+      }
+    } catch (e) {
+      console.error(`Error fetching .afq file ${filename}:`, e);
+    }
+    return null;
+  };
+
+  let dataText = await tryFetch(currentFilename);
+  if (!dataText) {
+    console.log(`Current day's .afq file not found, falling back to previous day: ${prevFilename}`);
+    dataText = await tryFetch(prevFilename);
+  }
+
+  if (!dataText) return null;
+
+  try {
+    const lines = dataText.split('\n')
+      .map(line => line.trim())
+      .filter(line => line.length > 0 && line.startsWith('2'));
+
+    if (lines.length === 0) return null;
+
+    const lastLine = lines[lines.length - 1];
+    const parts = lastLine.split(/\s+/);
+    if (parts.length < 14) return null;
+
+    const time_tomsk = `${parts[0]} ${parts[1]}`;
+    const utcDate = new Date(`${parts[0]}T${parts[1]}:00+07:00`);
+    const time_utc = utcDate.toISOString();
+
+    return {
+      time_tomsk,
+      time_utc,
+      a1: parseFloat(parts[2]) || 0,
+      f1: parseFloat(parts[3]) || 0,
+      q1: parseFloat(parts[4]) || 0,
+      a2: parseFloat(parts[5]) || 0,
+      f2: parseFloat(parts[6]) || 0,
+      q2: parseFloat(parts[7]) || 0,
+      a3: parseFloat(parts[8]) || 0,
+      f3: parseFloat(parts[9]) || 0,
+      q3: parseFloat(parts[10]) || 0,
+      a4: parseFloat(parts[11]) || 0,
+      f4: parseFloat(parts[12]) || 0,
+      q4: parseFloat(parts[13]) || 0,
+    };
+  } catch (parseErr) {
+    console.error('Error parsing .afq file:', parseErr);
+    return null;
+  }
+}
+
 export async function GET() {
   try {
     // 1. Fetch real-time solar wind data (propagated solar wind 1-hour cadence is small and fast)
@@ -258,26 +365,6 @@ export async function GET() {
     } catch (windErr) {
       console.error('Failed to fetch solar wind data:', windErr);
     }
-
-    // Helper to calculate CEI for any Kp value using the fetched solar wind parameters
-    const calculateCEI = (kpVal: number) => {
-      const kpWeight = (kpVal / 9) * 4.0;
-      
-      const speedVal = solarWind.speed || 350;
-      const speedWeight = Math.max(0, Math.min(2.5, ((speedVal - 300) / 500) * 2.5));
-      
-      const densityVal = solarWind.density || 4;
-      const densityWeight = Math.max(0, Math.min(2.0, ((densityVal - 2) / 15) * 2.0));
-      
-      const btVal = solarWind.bt || 5;
-      const btWeight = Math.max(0, Math.min(1.5, ((btVal - 5) / 15) * 1.5));
-      
-      const bzVal = solarWind.bz || 0;
-      const bzMultiplier = bzVal < 0 ? (1.0 + Math.min(0.25, (Math.abs(bzVal) / 20) * 0.25)) : 1.0;
-      
-      const rawImpactScore = kpWeight + speedWeight + densityWeight + btWeight;
-      return parseFloat(Math.min(10.0, rawImpactScore * bzMultiplier).toFixed(2));
-    };
 
     // 2. Fetch Kp index forecast data (observed + forecast)
     const kpRes = await fetch('https://services.swpc.noaa.gov/products/noaa-planetary-k-index-forecast.json', {
@@ -354,16 +441,41 @@ export async function GET() {
       console.error('Failed to fetch/translate NOAA discussion:', discErr);
     }
 
-    // 4. Calculate custom cosmic impact score (0.0 to 10.0) for the current moment
-    const finalImpactScore = calculateCEI(currentKp);
+    // 4. Fetch actual Schumann values from Tomsk .afq logs
+    const realSchumann = await fetchRealSchumannData();
+    
+    // 5. Calculate custom cosmic impact score (0.0 to 10.0)
+    let finalImpactScore = 0.5;
+    if (realSchumann) {
+      finalImpactScore = getSchumannScoreFromA1(realSchumann.a1);
+    } else {
+      // Fallback to Kp-based CEI calculation
+      const kpWeight = (currentKp / 9) * 4.0;
+      const speedVal = solarWind.speed || 350;
+      const speedWeight = Math.max(0, Math.min(2.5, ((speedVal - 300) / 500) * 2.5));
+      const densityVal = solarWind.density || 4;
+      const densityWeight = Math.max(0, Math.min(2.0, ((densityVal - 2) / 15) * 2.0));
+      const btVal = solarWind.bt || 5;
+      const btWeight = Math.max(0, Math.min(1.5, ((btVal - 5) / 15) * 1.5));
+      const bzVal = solarWind.bz || 0;
+      const bzMultiplier = bzVal < 0 ? (1.0 + Math.min(0.25, (Math.abs(bzVal) / 20) * 0.25)) : 1.0;
+      const rawImpactScore = kpWeight + speedWeight + densityWeight + btWeight;
+      finalImpactScore = parseFloat(Math.min(10.0, rawImpactScore * bzMultiplier).toFixed(2));
+    }
+    
     const cosmicStatus = getCosmicImpactStatusInfo(finalImpactScore);
+
+    const finalA1 = realSchumann ? realSchumann.a1 : 6.0;
+    const finalF1 = realSchumann ? realSchumann.f1 : 7.83;
 
     const aiAnalysis = generateRulesAnalysis(
       finalImpactScore,
       solarWind.speed,
       solarWind.density,
       solarWind.bz,
-      solarWind.bt
+      solarWind.bt,
+      finalA1,
+      finalF1
     );
 
     return json({
@@ -377,7 +489,8 @@ export async function GET() {
       cosmic_impact_score: finalImpactScore,
       cosmic_status_label: cosmicStatus.label,
       cosmic_status_desc: cosmicStatus.desc,
-      ai_analysis: aiAnalysis
+      ai_analysis: aiAnalysis,
+      schumann_real: realSchumann
     });
   } catch (error: any) {
     console.error('NOAA Kp API Error:', error);

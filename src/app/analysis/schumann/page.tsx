@@ -35,6 +35,23 @@ interface AIAnalysis {
   spiritual: string;
 }
 
+interface RealSchumannRow {
+  time_tomsk: string;
+  time_utc: string;
+  a1: number;
+  f1: number;
+  q1: number;
+  a2: number;
+  f2: number;
+  q2: number;
+  a3: number;
+  f3: number;
+  q3: number;
+  a4: number;
+  f4: number;
+  q4: number;
+}
+
 interface KpData {
   current_kp: number;
   status_label: string;
@@ -47,6 +64,7 @@ interface KpData {
   cosmic_status_label?: string;
   cosmic_status_desc?: string;
   ai_analysis?: AIAnalysis;
+  schumann_real?: RealSchumannRow;
 }
 
 interface HoverInfo {
@@ -298,52 +316,14 @@ export default function SchumannPage() {
     }
   };
 
-  const generateRulesAnalysis = (score: number, speed: number, density: number, bz: number, bt: number, kp: number) => {
-    // 1. Zirve Jeomanyetik Fırtına (G1-G5 Seviyeleri)
-    if (kp >= 5.0 || score >= 7.0) {
-      let gLevel = 'G1';
-      let gDesc = 'Küçük (Minor)';
-      let science = '';
-      let symptoms = '';
-      let spiritual = '';
-
-      if (kp >= 9.0) {
-        gLevel = 'G5';
-        gDesc = 'Sıra Dışı (Extreme)';
-        science = `Kp ${kp.toFixed(1)} seviyesinde tarihi bir G5 fırtınası yaşanıyor. Güneş'ten gelen devasa plazma bombardımanı Dünya'nın koruyucu kalkanını tamamen sarmış durumda. İyonosfer aşırı yüklenmiş ve elektrik fırtınası fazındadır.`;
-        symptoms = 'Bedensel trans benzeri durumlar, aşırı enerjik hassasiyet veya tam aksine derin fiziksel yorgunluk, kulaklarda yoğun çınlama ve zamansızlık hissi.';
-        spiritual = 'Kolektif uyanış ve küresel enerjisel vites değişimi en üst düzeydedir. Sadece dinlenin, derin nefes meditasyonları yapın and akan ışık portalına direnmeden kendinizi akışa bırakın.';
-      } else if (kp >= 8.0) {
-        gLevel = 'G4';
-        gDesc = 'Şiddetli (Severe)';
-        science = `Kp ${kp.toFixed(1)} seviyesinde G4 sınıfı şiddetli jeomanyetik fırtına devrede. Atmosfere aşırı yüksek plazma girişi iyonosferi aşırı uyararak küresel radyo sinyallerinde kesintilere yol açıyor. Schumann rezonansı maksimum titreşim düzeyinde.`;
-        symptoms = 'Yoğun yorgunluk ve halsizlik, kalp atışlarında dalgalanmalar, aşırı zihinsel gerginlik, uykusuzluk ve kas seğirmeleri.';
-        spiritual = 'DNA aktivasyonu ve hücresel arınma zirve fazındadır. Ağır fiziksel aktiviteleri tamamen durdurun. Bol alkali su için, hafif gıdalar tüketin ve zihni dinginleştirin.';
-      } else if (kp >= 7.0) {
-        gLevel = 'G3';
-        gDesc = 'Güçlü (Strong)';
-        science = `Kp ${kp.toFixed(1)} seviyesinde G3 sınıfı güçlü jeomanyetik fırtına yaşanıyor. Manyetosferde belirgin dalgalanmalar ve kutup ışıklarında (Aurora) artış var. Schumann frekanslarında dikey sıçramalar tetikleniyor.`;
-        symptoms = 'Kulaklarda tiz frekans sesleri (çınlama), baş ve ense bölgesinde yoğun basınç, odaklanma güçlüğü (beyin sisi) ve çok yoğun, sembolik rüyalar.';
-        spiritual = 'Kalp ve taç çakralarınızda yoğun bir portal açılışı var. Statik elektriği atmak için çıplak ayakla toprağa basın. Meditasyonda mor ışık koruma kalkanını imgeleyin.';
-      } else if (kp >= 6.0) {
-        gLevel = 'G2';
-        gDesc = 'Orta (Moderate)';
-        science = `Kp ${kp.toFixed(1)} seviyesinde G2 sınıfı jeomanyetik fırtına aktif. Manyetik kalkanımızda belirgin sıkışmalar mevcut. İyonosferik titreşimler güçleniyor.`;
-        symptoms = 'Eklem sızıları, baş ağrısı, gün içinde dalgalı enerji seviyeleri, sabırsızlık hissi ve uykudan sık sık uyanma.';
-        spiritual = 'Enerji bedeniniz genişliyor. Aşırı zihinsel yorgunluğu önlemek için doğada vakit geçirin, tuzlu su banyosu yapın ve topraklanın.';
-      } else {
-        gLevel = 'G1';
-        gDesc = 'Küçük (Minor)';
-        science = `Kp ${kp.toFixed(1)} seviyesinde G1 sınıfı jeomanyetik fırtına devrede. Güneş'ten gelen plazma dalgaları Dünya manyetik alanını uyararak iyonosferde hafif elektrik yüklenmesine yol açıyor.`;
-        symptoms = 'Hafif baş ağrısı, ense gerginliği, normalden biraz daha canlı rüyalar ve uykuya geçişte hafif gecikme.';
-        spiritual = 'G1 seviyesi enerjiler hafif bir hücresel uyarım başlatır. Meditasyon, ılık duş ve hafif esneme hareketleriyle akışı dengeleyebilirsiniz.';
-      }
-
+  const generateRulesAnalysis = (score: number, speed: number, density: number, bz: number, bt: number, kp: number, a1: number, f1: number) => {
+    // 1. Zirve Schumann Rezonans Uyarılması (Fırtına)
+    if (score >= 7.0) {
       return {
-        title: `Zirve Jeomanyetik Fırtına (${gLevel} - ${gDesc})`,
-        science,
-        symptoms,
-        spiritual
+        title: 'Zirve Schumann Rezonans Uyarılması (Fırtına)',
+        science: `Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana mod genliği (A1) sıradışı bir yükselişle ${a1.toFixed(1)} seviyesine ulaştı. Frekans ${f1.toFixed(2)} Hz düzeyinde seyrediyor. İyonosfer tabakası maksimum seviyede elektrik yüküyle titreşiyor.`,
+        symptoms: 'Sinir sisteminde aşırı uyarılma, uyku düzeninde derin kaymalar (yoğun uykusuzluk ya da derin trans benzeri uyku), baş ve ense bölgesinde yoğun basınç, kulaklarda kesintisiz tiz titreşim çınlamaları ve son derece canlı, rehber niteliğinde rüyalar.',
+        spiritual: 'Taç ve kalp çakralarınızda aşırı aktifleşme devrededir. Bugün kendinizi zorlayacak fiziksel işlerden kaçının. Bol alkali su tüketin ve çıplak ayakla toprağa basın. Taç çakranızdan giren ışığın bedeninizi yıkayarak yere aktığını imgeleyerek nefes meditasyonları yapın.'
       };
     }
     
@@ -351,7 +331,7 @@ export default function SchumannPage() {
     if (speed >= 500) {
       return {
         title: 'Kozmik Plazma Rüzgarı Dalgası (Hızlı Akış)',
-        science: `Güneş yüzeyindeki koronal deliklerden kopan yüksek hızlı plazma akışı saniyede ${Math.round(speed)} km hıza ulaşarak manyetik kalkanımızı sıkıştırıyor. Bu yüksek hız, iyonosferik Schumann rezonans katmanlarındaki titreşim genliğini uyararak yükseltiyor.`,
+        science: `Güneş yüzeyindeki koronal deliklerden kopan yüksek hızlı plazma akışı saniyede ${Math.round(speed)} km hıza ulaşarak manyetik kalkanımızı sıkıştırıyor. Schumann Rezonansı ana mod genliği (A1): ${a1.toFixed(1)}, frekansı: ${f1.toFixed(2)} Hz.`,
         symptoms: 'Fiziksel bedende ani bir enerjik uyarılma, içsel sabırsızlık veya huzursuzluk hissi, kalp atışlarında hızlanma dalgaları, hafif sersemlik ve kulaklarda dalgalı frekans sesleri.',
         spiritual: 'Artan plazma akışı, aura alanınızı temizlemek ve eski hücresel kalıpları salıvermek için çalışır. Birikmiş statik elektriği nötrlemek için ılık/tuzlu bir duş alın. Kalp merkezli nefes pratikleri (4 saniye al, 4 saniye ver) yaparak akışı bedende dengeleyin.'
       };
@@ -361,7 +341,7 @@ export default function SchumannPage() {
     if (bz <= -3.0) {
       return {
         title: 'Manyetik Kalkan Geçiş Portalı (Bz Güney Yönlü)',
-        science: `Dünya'nın koruyucu manyetik kalkanının yönünü belirleyen Bz parametresi güneye yönelerek ${bz.toFixed(1)} nT seviyesine ulaştı. Kalkanımızda açılan bu elektromanyetik kapı, Güneş rüzgarı parçacıklarının doğrudan atmosfere sızmasını kolaylaştırıyor.`,
+        science: `Dünya'nın koruyucu manyetik kalkanının yönünü belirleyen Bz parametresi güneye yönelerek ${bz.toFixed(1)} nT seviyesine ulaştı. Kalkanımızda açılan bu kapı güneş rüzgarı sızıntısını artırırken, Schumann Rezonansı genliği ${a1.toFixed(1)} ve frekansı ${f1.toFixed(2)} Hz olarak ölçüldü.`,
         symptoms: 'Yüksek duygusal duyarlılık, empati yeteneğinde aşırı artış, başkalarının enerjilerini hissetme, hafif şakak ağrıları ve rüyalarda yoğun astral semboller.',
         spiritual: 'Kalkanın açık olması ruhsal olarak alıcı (reseptif) modda olduğumuzu gösterir. Negatif enerjilerden korunmak için kendinizi mor bir ışık küresi içinde hayal edin. Adaçayı veya üzerlik otu yakarak yaşam alanınızı arındırın.'
       };
@@ -371,7 +351,7 @@ export default function SchumannPage() {
     if (density >= 10.0) {
       return {
         title: 'Yoğun Parçacık Bombardımanı (Proton Yoğunluğu)',
-        science: `Güneş rüzgarındaki parçacık (proton) yoğunluğu cm³ başına ${density.toFixed(1)} seviyesine ulaşarak normalin çok üzerine çıktı. Bu yoğun parçacık dalgası iyonosfer tabakasına çarparak Schumann rezonansını aktifleştiriyor.`,
+        science: `Güneş rüzgarındaki parçacık (proton) yoğunluğu cm³ başına ${density.toFixed(1)} seviyesine ulaştı. Schumann Rezonansı ana mod genliği (A1) ${a1.toFixed(1)} ve frekansı ${f1.toFixed(2)} Hz olarak kaydedildi.`,
         symptoms: 'Eklem ağrıları, kas seğirmeleri, aşırı fiziksel yorgunluk ve uykuya geçişte zorlanma, göz arkasında hafif sızlama veya basınç.',
         spiritual: 'Artan proton akışı, hücresel şablonumuzda ve DNA yapımızda yoğun bir elektromanyetik dönüşüm tetikler. Ağır yiyeceklerden kaçının, hafif beslenin ve bol su için. Vücuttaki iletkenliği ve topraklanmayı artırmak için magnezyum takviyesi alabilirsiniz.'
       };
@@ -380,7 +360,7 @@ export default function SchumannPage() {
     // 5. Sakin ve Dengeli Durum
     return {
       title: 'Dingin Elektromanyetik Akış (Sakin Faz)',
-      science: `Güneş rüzgarı hızı (${Math.round(speed)} km/s) ve parçacık yoğunluğu (${density.toFixed(1)} p/cm³) normal sınırlarında seyrediyor. Dünya'nın manyetik kalkanı (Bz: ${bz.toFixed(1)} nT) kapalı ve tam koruyucu fazda. İyonosferik Schumann rezonansı dengeli temel titreşiminde (7.83 Hz ve çevresi).`,
+      science: `Güneş rüzgarı hızı (${Math.round(speed)} km/s) ve parçacık yoğunluğu (${density.toFixed(1)} p/cm³) normal sınırlarında. Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana frekansı ${f1.toFixed(2)} Hz (Genlik A1: ${a1.toFixed(1)}) seviyesinde dengeli ve doğal titreşiminde seyrediyor.`,
       symptoms: 'Zihinsel netlik, dengeli enerji seviyeleri, sakin uyku düzeni ve bedensel rahatlık. Olağanüstü bir uyarılma belirtisi beklenmez.',
       spiritual: 'Zihnin gürültüsünü yatıştırmak, yeni bilgiler öğrenmek, kadim dersleri çalışmak ve kök çakra meditasyonları yapmak için en ideal dönemdir. Enerjinizin merkezlendiği bu dingin zamanı tefekkür ile değerlendirebilirsiniz.'
     };
@@ -807,6 +787,19 @@ export default function SchumannPage() {
     }
   };
 
+  const formatRealTime = (utcTimeStr?: string) => {
+    if (!utcTimeStr) return '---';
+    try {
+      const d = new Date(utcTimeStr);
+      return d.toLocaleString('tr-TR', {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+      });
+    } catch (e) {
+      return utcTimeStr;
+    }
+  };
+
   const formatTimeRange = (timeStr: string) => {
     try {
       const dStart = new Date(timeStr.endsWith('Z') ? timeStr : timeStr + 'Z');
@@ -867,7 +860,27 @@ export default function SchumannPage() {
             const bt = simulatedKp !== null ? (5 + (simulatedKp / 9) * 15) : (data?.solar_wind?.bt ?? 5);
             const score = simulatedKp !== null ? getCalculatedImpact(simulatedKp) : (data?.cosmic_impact_score ?? activeKp);
 
-            const analysis = generateRulesAnalysis(score, speed, density, bz, bt, activeKp);
+            // Calculate simulated A1 and F1 based on Kp index or use live data
+            let a1 = 6.0;
+            let f1 = 7.83;
+            if (simulatedKp !== null) {
+              const simScore = getCalculatedImpact(simulatedKp);
+              if (simScore < 3.0) {
+                a1 = 4.0 + (simScore / 3.0) * 4.0;
+              } else if (simScore < 6.0) {
+                a1 = 8.0 + ((simScore - 3.0) / 3.0) * 7.0;
+              } else if (simScore < 8.5) {
+                a1 = 15.0 + ((simScore - 6.0) / 2.5) * 10.0;
+              } else {
+                a1 = 25.0 + ((simScore - 8.5) / 1.5) * 25.0;
+              }
+              f1 = 7.83 - 0.2 + (simulatedKp / 9.0) * 0.4;
+            } else if (data?.schumann_real) {
+              a1 = data.schumann_real.a1;
+              f1 = data.schumann_real.f1;
+            }
+
+            const analysis = generateRulesAnalysis(score, speed, density, bz, bt, activeKp, a1, f1);
 
             return (
               <div className="bg-black/40 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8 relative overflow-hidden shadow-[0_0_30px_rgba(255,255,255,0.02)] animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -887,7 +900,7 @@ export default function SchumannPage() {
 
                     <div>
                       <span className="text-[9px] font-extrabold tracking-widest text-[#00E5FF] bg-[#00E5FF]/10 px-2.5 py-0.5 rounded-full uppercase border border-[#00E5FF]/20">
-                        KOZMİK ORACLE / DURUM RAPORU
+                        KOZMİK ORACLE / DURUM RAPORU {data?.schumann_real && `- GÖZLEM SAATİ: ${formatRealTime(data.schumann_real.time_utc)}`}
                       </span>
                       <h2 className="text-xl font-extrabold text-white mt-1.5 flex items-center gap-2">
                         {analysis.title}
@@ -1216,7 +1229,7 @@ export default function SchumannPage() {
           ) : (
             <div className="w-full flex flex-col justify-center items-center py-6 bg-black/40 rounded-2xl border border-white/5 relative overflow-hidden group">
               <div className="absolute top-4 right-4 bg-[#00E5FF]/10 border border-[#00E5FF]/30 text-[#00E5FF] text-[10px] font-extrabold px-3 py-1 rounded-full flex items-center gap-1.5 backdrop-blur-sm z-10 shadow-lg tracking-wider uppercase">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse"></span> Canlı Rasathane Ölçümü
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse"></span> Canlı Gözlemevi Ölçümü {data?.schumann_real && `(${formatRealTime(data.schumann_real.time_utc)})`}
               </div>
 
               <div className="w-full px-4 mt-6">
