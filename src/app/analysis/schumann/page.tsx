@@ -1035,6 +1035,104 @@ export default function SchumannPage() {
           })()
         )}
 
+        {/* Kozmik Enerji Simülatörü Kartı */}
+        <div className="bg-black/40 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8 relative overflow-hidden">
+          <div className="flex flex-col gap-4">
+            <div>
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                Kozmik Enerji Simülatörü
+                <span className="bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  Test Paneli
+                </span>
+              </h3>
+              <p className="text-xs text-mystic-text-muted mt-1">
+                Farklı Kp seviyelerinin etkilerini ve renk değişimlerini test edin
+              </p>
+            </div>
+
+            <div className="flex items-center gap-4 mt-2">
+              <span className="text-xs text-mystic-text-muted font-semibold">A1 4.0</span>
+              <input 
+                type="range" 
+                min="4.0" 
+                max="75.0" 
+                step="0.5" 
+                value={simulatedA1 !== null ? simulatedA1 : (data?.schumann_real?.a1 ?? 6.0)}
+                onChange={(e) => setSimulatedA1(parseFloat(e.target.value))}
+                className="flex-1 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer" 
+                style={{ accentColor: '#D4AF37' }}
+              />
+              <span className="text-xs text-mystic-text-muted font-semibold">A1 75.0</span>
+            </div>
+
+            <div className="flex items-center justify-between mt-2 pt-4 border-t border-white/5">
+              <div className="text-sm text-mystic-text-muted flex items-center gap-2">
+                <span>Simüle Edilen Değer:</span>
+                <strong className={simulatedA1 !== null ? "text-[#D4AF37] font-bold text-[15px]" : "text-white font-bold text-[15px]"}>
+                  {simulatedA1 !== null ? `A1 Genliği ${simulatedA1.toFixed(1)}` : 'Canlı Akış'}
+                </strong>
+              </div>
+              {simulatedA1 !== null && (
+                <button 
+                  onClick={() => setSimulatedA1(null)}
+                  className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold py-1.5 px-4 rounded-xl text-xs transition-all cursor-pointer"
+                >
+                  Canlı Veriye Dön
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {error && (
+          <div className="mb-8 p-4 bg-red-500/20 border border-red-500/30 rounded-2xl text-red-200 text-sm flex items-center gap-3">
+            <AlertCircle size={20} className="text-red-400" />
+            <div>
+              <p className="font-bold">Bir bağlantı hatası oluştu</p>
+              <p className="text-xs opacity-80">{error}</p>
+            </div>
+          </div>
+        )}
+
+        {/* 1. Canlı Spektrogram (Sonogram) Modu */}
+        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8">
+          <div className="border-b border-white/10 pb-4 mb-6">
+            <h2 className="text-xl font-bold flex items-center gap-2 text-white">
+              <Waves size={22} className="text-[#00E5FF]" />
+              Schumann Rezonansı
+            </h2>
+            <p className="text-xs text-mystic-text-muted mt-1">
+              Frekans dalgalanmalarını ve Schumann Rezonansı sonogramını canlı izleyin. Bu veriler Space Observing System 70 (Tomsk, Rusya) rasathanesinden canlı olarak alınmaktadır.
+            </p>
+          </div>
+
+          {isLoading ? (
+            <div className="h-64 bg-white/5 animate-pulse rounded-2xl flex items-center justify-center text-mystic-text-muted">
+              Spektrogram Yükleniyor...
+            </div>
+          ) : (
+            <div className="w-full flex flex-col justify-center items-center py-6 bg-black/40 rounded-2xl border border-white/5 relative overflow-hidden group">
+              <div className="absolute top-4 right-4 bg-[#00E5FF]/10 border border-[#00E5FF]/30 text-[#00E5FF] text-[10px] font-extrabold px-3 py-1 rounded-full flex items-center gap-1.5 backdrop-blur-sm z-10 shadow-lg tracking-wider uppercase">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse"></span> Canlı Gözlemevi Ölçümü {data?.schumann_real && `(${formatRealTime(data.schumann_real.time_utc)})`}
+              </div>
+
+              <div className="w-full px-4 mt-6">
+                <img 
+                  src={`/api/schumann/image?t=${timestamp}`} 
+                  alt="Canlı Schumann Rezonans Spektrogramı (Tomsk, Rusya)" 
+                  className="w-full h-auto rounded-xl border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)]"
+                />
+              </div>
+
+              <div className="mt-4 text-center">
+                <span className="text-xs text-mystic-text-muted">
+                  Grafik verileri Space Observing System 70 (Tomsk, Rusya) üzerinden her saat güncellenmektedir.
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* Güneş Rüzgarı & Manyetik Alan İstasyonu */}
         {!isLoading && data?.solar_wind && (
           <div className="bg-black/40 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8 relative overflow-hidden">
@@ -1223,104 +1321,6 @@ export default function SchumannPage() {
             })()}
           </div>
         )}
-
-        {/* Kozmik Enerji Simülatörü Kartı */}
-        <div className="bg-black/40 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8 relative overflow-hidden">
-          <div className="flex flex-col gap-4">
-            <div>
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                Kozmik Enerji Simülatörü
-                <span className="bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                  Test Paneli
-                </span>
-              </h3>
-              <p className="text-xs text-mystic-text-muted mt-1">
-                Farklı Kp seviyelerinin etkilerini ve renk değişimlerini test edin
-              </p>
-            </div>
-
-            <div className="flex items-center gap-4 mt-2">
-              <span className="text-xs text-mystic-text-muted font-semibold">A1 4.0</span>
-              <input 
-                type="range" 
-                min="4.0" 
-                max="75.0" 
-                step="0.5" 
-                value={simulatedA1 !== null ? simulatedA1 : (data?.schumann_real?.a1 ?? 6.0)}
-                onChange={(e) => setSimulatedA1(parseFloat(e.target.value))}
-                className="flex-1 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer" 
-                style={{ accentColor: '#D4AF37' }}
-              />
-              <span className="text-xs text-mystic-text-muted font-semibold">A1 75.0</span>
-            </div>
-
-            <div className="flex items-center justify-between mt-2 pt-4 border-t border-white/5">
-              <div className="text-sm text-mystic-text-muted flex items-center gap-2">
-                <span>Simüle Edilen Değer:</span>
-                <strong className={simulatedA1 !== null ? "text-[#D4AF37] font-bold text-[15px]" : "text-white font-bold text-[15px]"}>
-                  {simulatedA1 !== null ? `A1 Genliği ${simulatedA1.toFixed(1)}` : 'Canlı Akış'}
-                </strong>
-              </div>
-              {simulatedA1 !== null && (
-                <button 
-                  onClick={() => setSimulatedA1(null)}
-                  className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold py-1.5 px-4 rounded-xl text-xs transition-all cursor-pointer"
-                >
-                  Canlı Veriye Dön
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {error && (
-          <div className="mb-8 p-4 bg-red-500/20 border border-red-500/30 rounded-2xl text-red-200 text-sm flex items-center gap-3">
-            <AlertCircle size={20} className="text-red-400" />
-            <div>
-              <p className="font-bold">Bir bağlantı hatası oluştu</p>
-              <p className="text-xs opacity-80">{error}</p>
-            </div>
-          </div>
-        )}
-
-        {/* 1. Canlı Spektrogram (Sonogram) Modu */}
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8">
-          <div className="border-b border-white/10 pb-4 mb-6">
-            <h2 className="text-xl font-bold flex items-center gap-2 text-white">
-              <Waves size={22} className="text-[#00E5FF]" />
-              Schumann Rezonansı
-            </h2>
-            <p className="text-xs text-mystic-text-muted mt-1">
-              Frekans dalgalanmalarını ve Schumann Rezonansı sonogramını canlı izleyin. Bu veriler Space Observing System 70 (Tomsk, Rusya) rasathanesinden canlı olarak alınmaktadır.
-            </p>
-          </div>
-
-          {isLoading ? (
-            <div className="h-64 bg-white/5 animate-pulse rounded-2xl flex items-center justify-center text-mystic-text-muted">
-              Spektrogram Yükleniyor...
-            </div>
-          ) : (
-            <div className="w-full flex flex-col justify-center items-center py-6 bg-black/40 rounded-2xl border border-white/5 relative overflow-hidden group">
-              <div className="absolute top-4 right-4 bg-[#00E5FF]/10 border border-[#00E5FF]/30 text-[#00E5FF] text-[10px] font-extrabold px-3 py-1 rounded-full flex items-center gap-1.5 backdrop-blur-sm z-10 shadow-lg tracking-wider uppercase">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse"></span> Canlı Gözlemevi Ölçümü {data?.schumann_real && `(${formatRealTime(data.schumann_real.time_utc)})`}
-              </div>
-
-              <div className="w-full px-4 mt-6">
-                <img 
-                  src={`/api/schumann/image?t=${timestamp}`} 
-                  alt="Canlı Schumann Rezonans Spektrogramı (Tomsk, Rusya)" 
-                  className="w-full h-auto rounded-xl border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)]"
-                />
-              </div>
-
-              <div className="mt-4 text-center">
-                <span className="text-xs text-mystic-text-muted">
-                  Grafik verileri Space Observing System 70 (Tomsk, Rusya) üzerinden her saat güncellenmektedir.
-                </span>
-              </div>
-            </div>
-          )}
-        </div>
 
         {/* 2. Sayısal Kp Grafik Çizelgesi (Bar Chart) */}
         <div className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8">
