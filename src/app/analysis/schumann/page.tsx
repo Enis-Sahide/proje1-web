@@ -1141,7 +1141,7 @@ export default function SchumannPage() {
                 </span>
               </h3>
               <p className="text-xs text-mystic-text-muted mt-1">
-                Farklı Kp seviyelerinin etkilerini ve renk değişimlerini test edin
+                Farklı Schumann A1 genlik seviyelerinin etkilerini ve renk değişimlerini test edin
               </p>
             </div>
 
