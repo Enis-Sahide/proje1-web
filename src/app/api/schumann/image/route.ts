@@ -4,11 +4,12 @@ export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const res = await fetch('http://sosrff.tsu.ru/new/shm.jpg', {
+    const res = await fetch('https://sos70.ru/provider.php?file=shm.jpg', {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+        'Referer': 'https://sos70.ru/'
       },
-      next: { revalidate: 3600 } // Cache for 1 hour
+      next: { revalidate: 600 } // Cache for 10 minutes
     });
 
     if (!res.ok) {
