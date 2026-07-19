@@ -92,7 +92,7 @@ export default function SchumannPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const [canvasWidth, setCanvasWidth] = useState(800);
   const [data, setData] = useState<KpData | null>(null);
-  const [simulatedKp, setSimulatedKp] = useState<number | null>(null);
+  const [simulatedA1, setSimulatedA1] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [timestamp, setTimestamp] = useState<number>(Date.now());
@@ -214,6 +214,18 @@ export default function SchumannPage() {
       g: low.g + (high.g - low.g) * factor,
       b: low.b + (high.b - low.b) * factor
     };
+  };
+
+  const getSchumannScoreFromA1 = (a1: number) => {
+    if (a1 < 8) {
+      return parseFloat((0.5 + ((a1 - 4) / 4) * 2.5).toFixed(2));
+    } else if (a1 < 15) {
+      return parseFloat((3.0 + ((a1 - 8) / 7) * 3.0).toFixed(2));
+    } else if (a1 < 25) {
+      return parseFloat((6.0 + ((a1 - 15) / 10) * 2.5).toFixed(2));
+    } else {
+      return parseFloat(Math.min(10.0, 8.5 + ((a1 - 25) / 25) * 1.5).toFixed(2));
+    }
   };
 
   const getCalculatedImpact = (kpVal: number) => {
@@ -377,7 +389,10 @@ export default function SchumannPage() {
 
     // Canlı / ŞİMDİ sütunu için tam gözlemlenen CEI hesapla
     if (idx === lastMeasuredIdx) {
-      const activeKp = simulatedKp !== null ? simulatedKp : item.kp;
+      if (simulatedA1 !== null) {
+        return { ...item, kp: getSchumannScoreFromA1(simulatedA1) };
+      }
+      const activeKp = item.kp;
       const activeImpact = getCalculatedImpact(activeKp);
       return { ...item, kp: activeImpact };
     }
@@ -396,8 +411,9 @@ export default function SchumannPage() {
       return lastIdx;
     }, -1);
 
-    if (simulatedKp !== null && idx === lastMeasuredIdx) {
-      return { ...item, kp: simulatedKp };
+    if (simulatedA1 !== null && idx === lastMeasuredIdx) {
+      const activeKp = Math.min(9.0, (simulatedA1 / 75.0) * 9.0);
+      return { ...item, kp: activeKp };
     }
     return item;
   }) : [];
@@ -693,7 +709,7 @@ export default function SchumannPage() {
       hasAutoScrolled.current = true;
     }
 
-  }, [data, timestamp, hoveredX, simulatedKp]);
+  }, [data, timestamp, hoveredX, simulatedA1]);
 
   const handleRefresh = () => {
     fetchData();
@@ -853,32 +869,20 @@ export default function SchumannPage() {
         {!isLoading && (
           (() => {
             // Determine active metrics (simulated or live)
-            const activeKp = simulatedKp !== null ? simulatedKp : (data?.current_kp ?? 0);
-            const speed = simulatedKp !== null ? (300 + (simulatedKp / 9) * 500) : (data?.solar_wind?.speed ?? 350);
-            const density = simulatedKp !== null ? (3 + (simulatedKp / 9) * 15) : (data?.solar_wind?.density ?? 4);
-            const bz = simulatedKp !== null ? (5 - (simulatedKp / 9) * 15) : (data?.solar_wind?.bz ?? 0);
-            const bt = simulatedKp !== null ? (5 + (simulatedKp / 9) * 15) : (data?.solar_wind?.bt ?? 5);
-            const score = simulatedKp !== null ? getCalculatedImpact(simulatedKp) : (data?.cosmic_impact_score ?? activeKp);
-
-            // Calculate simulated A1 and F1 based on Kp index or use live data
-            let a1 = 6.0;
-            let f1 = 7.83;
-            if (simulatedKp !== null) {
-              const simScore = getCalculatedImpact(simulatedKp);
-              if (simScore < 3.0) {
-                a1 = 4.0 + (simScore / 3.0) * 4.0;
-              } else if (simScore < 6.0) {
-                a1 = 8.0 + ((simScore - 3.0) / 3.0) * 7.0;
-              } else if (simScore < 8.5) {
-                a1 = 15.0 + ((simScore - 6.0) / 2.5) * 10.0;
-              } else {
-                a1 = 25.0 + ((simScore - 8.5) / 1.5) * 25.0;
-              }
-              f1 = 7.83 - 0.2 + (simulatedKp / 9.0) * 0.4;
-            } else if (data?.schumann_real) {
-              a1 = data.schumann_real.a1;
-              f1 = data.schumann_real.f1;
+            let a1 = data?.schumann_real?.a1 ?? 6.0;
+            let f1 = data?.schumann_real?.f1 ?? 7.83;
+            
+            if (simulatedA1 !== null) {
+              a1 = simulatedA1;
+              f1 = 7.83 + (simulatedA1 / 75.0) * 0.5;
             }
+
+            const score = simulatedA1 !== null ? getSchumannScoreFromA1(simulatedA1) : (data?.cosmic_impact_score ?? 0.5);
+            const activeKp = simulatedA1 !== null ? Math.min(9.0, (simulatedA1 / 75.0) * 9.0) : (data?.current_kp ?? 0);
+            const speed = simulatedA1 !== null ? (300 + (activeKp / 9) * 500) : (data?.solar_wind?.speed ?? 350);
+            const density = simulatedA1 !== null ? (3 + (activeKp / 9) * 15) : (data?.solar_wind?.density ?? 4);
+            const bz = simulatedA1 !== null ? (5 - (activeKp / 9) * 15) : (data?.solar_wind?.bz ?? 0);
+            const bt = simulatedA1 !== null ? (5 + (activeKp / 9) * 15) : (data?.solar_wind?.bt ?? 5);
 
             const analysis = generateRulesAnalysis(score, speed, density, bz, bt, activeKp, a1, f1);
 
@@ -977,12 +981,13 @@ export default function SchumannPage() {
             </div>
 
             {(() => {
-              const activeKp = simulatedKp !== null ? simulatedKp : (data.current_kp ?? 0);
-              const speed = simulatedKp !== null ? (300 + (simulatedKp / 9) * 500) : (data.solar_wind.speed ?? 350);
-              const density = simulatedKp !== null ? (3 + (simulatedKp / 9) * 15) : (data.solar_wind.density ?? 4);
-              const bz = simulatedKp !== null ? (5 - (simulatedKp / 9) * 15) : (data.solar_wind.bz ?? 0);
-              const bt = simulatedKp !== null ? (5 + (simulatedKp / 9) * 15) : (data.solar_wind.bt ?? 5);
-              const temp = simulatedKp !== null ? (100000 + (simulatedKp / 9) * 400000) : (data.solar_wind.temperature ?? 150000);
+              const a1 = simulatedA1 !== null ? simulatedA1 : (data.schumann_real?.a1 ?? 6.0);
+              const activeKp = simulatedA1 !== null ? Math.min(9.0, (a1 / 75.0) * 9.0) : (data.current_kp ?? 0);
+              const speed = simulatedA1 !== null ? (300 + (activeKp / 9) * 500) : (data.solar_wind.speed ?? 350);
+              const density = simulatedA1 !== null ? (3 + (activeKp / 9) * 15) : (data.solar_wind.density ?? 4);
+              const bz = simulatedA1 !== null ? (5 - (activeKp / 9) * 15) : (data.solar_wind.bz ?? 0);
+              const bt = simulatedA1 !== null ? (5 + (activeKp / 9) * 15) : (data.solar_wind.bt ?? 5);
+              const temp = simulatedA1 !== null ? (100000 + (activeKp / 9) * 400000) : (data.solar_wind.temperature ?? 150000);
 
               return (
                 <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
@@ -1167,30 +1172,30 @@ export default function SchumannPage() {
             </div>
 
             <div className="flex items-center gap-4 mt-2">
-              <span className="text-xs text-mystic-text-muted font-semibold">Kp 0</span>
+              <span className="text-xs text-mystic-text-muted font-semibold">A1 4.0</span>
               <input 
                 type="range" 
-                min="0" 
-                max="9" 
-                step="0.1" 
-                value={simulatedKp !== null ? simulatedKp : (data?.current_kp ?? 0)}
-                onChange={(e) => setSimulatedKp(parseFloat(e.target.value))}
+                min="4.0" 
+                max="75.0" 
+                step="0.5" 
+                value={simulatedA1 !== null ? simulatedA1 : (data?.schumann_real?.a1 ?? 6.0)}
+                onChange={(e) => setSimulatedA1(parseFloat(e.target.value))}
                 className="flex-1 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer" 
                 style={{ accentColor: '#D4AF37' }}
               />
-              <span className="text-xs text-mystic-text-muted font-semibold">Kp 9</span>
+              <span className="text-xs text-mystic-text-muted font-semibold">A1 75.0</span>
             </div>
 
             <div className="flex items-center justify-between mt-2 pt-4 border-t border-white/5">
               <div className="text-sm text-mystic-text-muted flex items-center gap-2">
                 <span>Simüle Edilen Değer:</span>
-                <strong className={simulatedKp !== null ? "text-[#D4AF37] font-bold text-[15px]" : "text-white font-bold text-[15px]"}>
-                  {simulatedKp !== null ? `Kp ${simulatedKp.toFixed(1)}` : 'Canlı Akış'}
+                <strong className={simulatedA1 !== null ? "text-[#D4AF37] font-bold text-[15px]" : "text-white font-bold text-[15px]"}>
+                  {simulatedA1 !== null ? `A1 Genliği ${simulatedA1.toFixed(1)}` : 'Canlı Akış'}
                 </strong>
               </div>
-              {simulatedKp !== null && (
+              {simulatedA1 !== null && (
                 <button 
-                  onClick={() => setSimulatedKp(null)}
+                  onClick={() => setSimulatedA1(null)}
                   className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold py-1.5 px-4 rounded-xl text-xs transition-all cursor-pointer"
                 >
                   Canlı Veriye Dön
