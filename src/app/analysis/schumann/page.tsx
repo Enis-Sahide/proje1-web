@@ -1055,8 +1055,9 @@ export default function SchumannPage() {
                     <span className="cursor-pointer text-white/30 hover:text-white transition-colors bg-white/5 p-2.5 rounded-xl border border-white/5">
                       <Info size={16} />
                     </span>
-                    <span className="absolute top-full mt-2 right-0 w-64 p-3 bg-black/95 border border-white/10 text-[11px] text-white/90 rounded-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
-                      Güneş rüzgarı hızı, parçacık yoğunluğu ve kalkan açıklığına göre hesaplanan anlık Schumann Rezonans uyarılma seviyesi tahmini.
+                    <span className="absolute top-full mt-2 right-0 w-72 p-3.5 bg-black/95 border border-white/10 text-[11px] text-white/90 rounded-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
+                      <strong>Schumann Rezonansı Uyarılma İndeksi:</strong><br />
+                      Fiziksel A1 genlik aralıkları (4.0 - 75.0+) ve spektrogram renk yoğunluğunu esas alan 0.0 - 10.0 arası bir ölektir: Sakin (Mavi, &lt;3.0), Hafif Uyarım (Yeşil, &lt;5.0), Aktif Fırtına (Kırmızı, &lt;7.0) ve Zirve Portal (Beyaz, &ge;7.0).
                       <span className="absolute bottom-full right-4 border-4 border-transparent border-b-black/95"></span>
                     </span>
                   </span>
@@ -1072,10 +1073,13 @@ export default function SchumannPage() {
                       <p className="text-sm text-white/85 leading-relaxed text-justify font-sans">
                         {analysis.science}
                       </p>
-                      <div className="mt-4 pt-3 border-t border-white/5 text-[11px] text-mystic-text-muted/65 italic leading-normal flex items-start gap-1.5">
-                        <span className="text-[#00E5FF] font-bold">※</span>
-                        <span>
-                          Önemli Not: Spektrogram verileri Tomsk (Rusya) Rasathanesi'nden alınmaktadır. Schumann Rezonansı küresel bir fenomen olsa da, ölçülen genlik seviyeleri ve anlık beyaz parlamalar istasyon çevresindeki yerel yıldırım fırtınalarından da etkilenebilmektedir.
+                      <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
+                        <span className="relative flex items-center gap-1 group/obs-tooltip cursor-help text-[11px] text-[#00E5FF]/70 hover:text-[#00E5FF] transition-colors font-semibold">
+                          <span>🌐</span> Rasathane Ölçüm Notu ⓘ
+                          <span className="absolute bottom-full mb-2 left-0 w-72 p-3 bg-black/95 border border-[#00E5FF]/20 text-[11px] text-white/90 rounded-xl opacity-0 group-hover/obs-tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl backdrop-blur-md text-justify normal-case font-normal leading-relaxed">
+                            Spektrogram verileri Tomsk (Rusya) Rasathanesi'nden alınmaktadır. Schumann Rezonansı küresel bir fenomen olsa da, ölçülen genlik seviyeleri ve anlık beyaz parlamalar istasyon çevresindeki yerel yıldırım fırtınalarından da etkilenebilmektedir.
+                            <span className="absolute top-full left-6 border-4 border-transparent border-t-black/95"></span>
+                          </span>
                         </span>
                       </div>
                     </div>
