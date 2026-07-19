@@ -339,7 +339,27 @@ export default function SchumannPage() {
       };
     }
     
-    // 2. Güneş Rüzgarı Hızı Sıçraması
+    // 2. Aktif Schumann Manyetik Fırtınası (G1-G2 Seviyesi)
+    if (score >= 5.0) {
+      return {
+        title: 'Aktif Schumann Manyetik Fırtınası (G1-G2 Seviyesi)',
+        science: `Tomsk Rasathanesi verilerinde Schumann Rezonansı genliği (A1) yüksek uyarım göstererek ${a1.toFixed(1)} seviyesine ulaştı. Frekans ${f1.toFixed(2)} Hz olarak iyonosferik dalgalanmaları tetikliyor.`,
+        symptoms: 'Kalp atışlarında ani hızlanma veya genişleme hissi, vücutta hafif statik elektrik birikimi (dokunulan yerlerin çarpması), hafif eklem ve şakak ağrıları, uykuya dalmakta gecikme ve içsel sabırsızlık.',
+        spiritual: 'Kalp çakrası ve aura alanı genişlemektedir. Bedendeki fazla elektriği boşaltmak için tuzlu su banyosu yapın veya çıplak elle toprağa dokunun. Kalp merkezli nefes pratikleri (4 saniye al, 4 saniye ver) yaparak kozmik akışı bedende dengeleyin.'
+      };
+    }
+
+    // 3. Hafif Schumann Dalgalanması (Hafif Uyarım Seviyesi)
+    if (score >= 3.0) {
+      return {
+        title: 'Hafif Schumann Dalgalanması (Hafif Uyarım Seviyesi)',
+        science: `Schumann Rezonansı ana mod genliği (A1) ${a1.toFixed(1)} seviyesine çıkarak hafif bir hareketlenme gösteriyor. Frekans ${f1.toFixed(2)} Hz civarında stabil seyrediyor.`,
+        symptoms: 'Rüyalarda belirgin netleşme ve sembolizm artışı, sezgisel uyanışlar, zihinde yaratıcı fikir patlamaları, kulaklarda hafif dalgalı uğultular ve hafif tatlı bir yorgunluk/esneme hali.',
+        spiritual: 'Uyanış kapıları hafifçe uyarılmaktadır. Meditasyon, günlük tutma, rüya analizleri yapma ve yaratıcı projelere odaklanma için harika bir akıştır. Üçüncü göz bölgesine mavi/mor bir ışık hayal ederek odaklanabilirsiniz.'
+      };
+    }
+
+    // 4. Güneş Rüzgarı Hızı Sıçraması
     if (speed >= 500) {
       return {
         title: 'Kozmik Plazma Rüzgarı Dalgası (Hızlı Akış)',
@@ -349,7 +369,7 @@ export default function SchumannPage() {
       };
     }
     
-    // 3. Kalkan Açılması (Bz Güney)
+    // 5. Kalkan Açılması (Bz Güney)
     if (bz <= -3.0) {
       return {
         title: 'Manyetik Kalkan Geçiş Portalı (Bz Güney Yönlü)',
@@ -359,7 +379,7 @@ export default function SchumannPage() {
       };
     }
     
-    // 4. Parçacık Yoğunluğu Sıçraması
+    // 6. Parçacık Yoğunluğu Sıçraması
     if (density >= 10.0) {
       return {
         title: 'Yoğun Parçacık Bombardımanı (Proton Yoğunluğu)',
@@ -369,7 +389,7 @@ export default function SchumannPage() {
       };
     }
     
-    // 5. Sakin ve Dengeli Durum
+    // 7. Sakin ve Dengeli Durum
     return {
       title: 'Dingin Elektromanyetik Akış (Sakin Faz)',
       science: `Güneş rüzgarı hızı (${Math.round(speed)} km/s) ve parçacık yoğunluğu (${density.toFixed(1)} p/cm³) normal sınırlarında. Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana frekansı ${f1.toFixed(2)} Hz (Genlik A1: ${a1.toFixed(1)}) seviyesinde dengeli ve doğal titreşiminde seyrediyor.`,
