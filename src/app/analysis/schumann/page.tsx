@@ -344,7 +344,7 @@ export default function SchumannPage() {
     // 4. Sakin ve Dengeli Durum
     return {
       title: 'Dingin Elektromanyetik Akış (Sakin Faz)',
-      science: `Güneş rüzgarı hızı (${Math.round(speed)} km/s) ve parçacık yoğunluğu (${density.toFixed(1)} p/cm³) normal sınırlarında. Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana frekansı ${f1.toFixed(2)} Hz (Genlik A1: ${a1.toFixed(1)}) seviyesinde dengeli ve doğal titreşiminde seyrediyor.`,
+      science: `Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana frekansı ${f1.toFixed(2)} Hz (Genlik A1: ${a1.toFixed(1)}) seviyesinde dengeli ve doğal titreşiminde seyrediyor. İyonosfer tabakası sakin durumda.`,
       symptoms: 'Zihinsel netlik, dengeli enerji seviyeleri, sakin uyku düzeni ve bedensel rahatlık. Olağanüstü bir uyarılma belirtisi beklenmez.',
       spiritual: 'Zihnin gürültüsünü yatıştırmak, yeni bilgiler öğrenmek, kadim dersleri çalışmak ve kök çakra meditasyonları yapmak için en ideal dönemdir. Enerjinizin merkezlendiği bu dingin zamanı tefekkür ile değerlendirebilirsiniz.'
     };
@@ -950,17 +950,25 @@ export default function SchumannPage() {
                       const badge = getSchumannBadgeStyle(score);
                       return (
                         <div 
-                          className={`${badge.bgColor} border w-20 h-20 rounded-2xl flex flex-col justify-center items-center shrink-0 relative transition-all duration-300`}
+                          className={`${badge.bgColor} border w-20 h-20 rounded-2xl flex flex-col justify-center items-center shrink-0 relative transition-all duration-300 overflow-hidden`}
                           style={{
                             borderColor: badge.borderColor,
                             boxShadow: `0 0 20px ${badge.shadowColor}`
                           }}
                         >
-                          <span className="text-[9px] text-mystic-text-muted uppercase font-bold tracking-wider">SR İndeks</span>
-                          <strong className={`text-2xl font-extrabold ${badge.textClass} -mt-0.5`}>
-                            {score.toFixed(1)}
-                          </strong>
-                          <span className="text-[9px] text-white/50 font-semibold mt-0.5">
+                          <span className="text-[8px] text-mystic-text-muted uppercase font-bold tracking-wider mb-1">Seviye</span>
+                          {/* Inner glowing column/bar */}
+                          <div className="w-3.5 h-7 bg-white/10 rounded-md relative overflow-hidden mb-1 border border-white/5">
+                            <div 
+                              className="w-full absolute bottom-0 transition-all duration-300"
+                              style={{
+                                height: `${Math.max(10, score * 10)}%`,
+                                backgroundColor: score < 3.0 ? '#22D3EE' : score < 5.0 ? '#34D399' : score < 7.0 ? '#EF4444' : '#FFFFFF',
+                                boxShadow: `0 0 10px ${score < 3.0 ? '#22D3EE' : score < 5.0 ? '#34D399' : score < 7.0 ? '#EF4444' : '#FFFFFF'}`
+                              }}
+                            />
+                          </div>
+                          <span className="text-[9px] text-white/50 font-semibold">
                             A1: {a1.toFixed(1)}
                           </span>
                         </div>
@@ -975,12 +983,11 @@ export default function SchumannPage() {
                         {analysis.title}
                         <span className="relative flex items-center justify-center group/level-tooltip">
                           <span 
-                            className="text-[10px] font-bold px-2 py-0.5 rounded-md border transition-all duration-300 cursor-help"
+                            className="text-[10px] font-extrabold px-3 py-1 rounded-full transition-all duration-300 cursor-help shadow-[0_0_15px_rgba(255,255,255,0.05)] border border-white/10"
                             style={{
-                              color: score < 3.0 ? '#22D3EE' : score < 5.0 ? '#34D399' : score < 7.0 ? '#F87171' : '#FFFFFF',
-                              borderColor: score < 3.0 ? 'rgba(34, 211, 238, 0.3)' : score < 5.0 ? 'rgba(52, 211, 153, 0.3)' : score < 7.0 ? 'rgba(248, 113, 113, 0.3)' : 'rgba(255, 255, 255, 0.5)',
-                              backgroundColor: score < 3.0 ? 'rgba(6, 182, 212, 0.1)' : score < 5.0 ? 'rgba(16, 185, 129, 0.1)' : score < 7.0 ? 'rgba(239, 68, 68, 0.1)' : 'rgba(255, 255, 255, 0.15)',
-                              textShadow: score >= 7.0 ? '0 0 4px rgba(255,255,255,0.6)' : 'none'
+                              color: score >= 7.0 ? '#000000' : '#FFFFFF',
+                              backgroundColor: score < 3.0 ? '#0891B2' : score < 5.0 ? '#059669' : score < 7.0 ? '#DC2626' : '#FFFFFF',
+                              boxShadow: score < 3.0 ? '0 0 10px rgba(8, 145, 178, 0.4)' : score < 5.0 ? '0 0 10px rgba(5, 150, 105, 0.4)' : score < 7.0 ? '0 0 10px rgba(220, 38, 38, 0.4)' : '0 0 15px rgba(255, 255, 255, 0.8)'
                             }}
                           >
                             {getSchumannLevelLabel(score)}
@@ -1001,8 +1008,14 @@ export default function SchumannPage() {
                       <Info size={16} />
                     </span>
                     <span className="absolute top-full mt-2 right-0 w-72 p-3.5 bg-[#181124] border border-[#8b5cf6]/40 text-[11px] text-white/90 rounded-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl text-justify leading-relaxed font-sans normal-case">
-                      <strong>Schumann Rezonansı Uyarılma İndeksi:</strong><br />
-                      Fiziksel A1 genlik aralıkları (4.0 - 75.0+) ve spektrogram renk yoğunluğunu esas alan 0.0 - 10.0 arası bir ölektir: Sakin (Mavi, &lt;3.0), Hafif Uyarım (Yeşil, &lt;5.0), Aktif Fırtına (Kırmızı, &lt;7.0) ve Zirve Portal (Beyaz, &ge;7.0).
+                      <strong>Schumann Rezonansı Seviyeleri:</strong><br />
+                      Fiziksel A1 genlik aralıkları (4.0 - 75.0+) ve spektrogram renk yoğunluğunu temel alan Schumann uyarılma göstergesidir:
+                      <br />• Sakin Faz (A1 &lt; 8.0) - Mavi
+                      <br />• Hafif Uyarım (A1 &lt; 15.0) - Yeşil
+                      <br />• G1-G2 Aktif Seviye (A1 &lt; 40.0) - Turuncu
+                      <br />• G3 Şiddetli Seviye (A1 &lt; 55.0) - Kırmızı
+                      <br />• G4 Ağır Seviye (A1 &lt; 70.0) - Pembe
+                      <br />• G5 Zirve Portalı (A1 &ge; 70.0) - Beyaz
                       <span className="absolute bottom-full right-4 border-4 border-transparent border-b-[#181124]"></span>
                     </span>
                   </span>
