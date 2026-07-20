@@ -1012,10 +1012,8 @@ export default function SchumannPage() {
                       Fiziksel A1 genlik aralıkları (4.0 - 75.0+) ve spektrogram renk yoğunluğunu temel alan Schumann uyarılma göstergesidir:
                       <br />• Sakin Faz (A1 &lt; 8.0) - Mavi
                       <br />• Hafif Uyarım (A1 &lt; 15.0) - Yeşil
-                      <br />• G1-G2 Aktif Seviye (A1 &lt; 40.0) - Turuncu
-                      <br />• G3 Şiddetli Seviye (A1 &lt; 55.0) - Kırmızı
-                      <br />• G4 Ağır Seviye (A1 &lt; 70.0) - Pembe
-                      <br />• G5 Zirve Portalı (A1 &ge; 70.0) - Beyaz
+                      <br />• G1-G2 Aktif Seviye (A1 &lt; 40.0) - Kırmızı
+                      <br />• G3-G5 Seviyeleri (A1 &ge; 40.0) - Beyaz
                       <span className="absolute bottom-full right-4 border-4 border-transparent border-b-[#181124]"></span>
                     </span>
                   </span>
