@@ -76,8 +76,9 @@ export default function Home() {
           {/* Main Layout Grid */}
           <div className="mb-20 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 w-full">
             
-            {/* Left: Günün Mesajı & Gezegen Saati */}
+            {/* Left: Gezegen Saati & Günün Mesajı */}
             <div className="w-full lg:w-1/3 flex flex-col items-center lg:items-end order-2 lg:order-1 gap-6">
+              <PlanetaryHourWidget />
               {affirmation && (
                 <div className="bg-mystic-surface/50 backdrop-blur-md rounded-2xl p-6 border border-mystic-surface-light w-full max-w-sm shadow-xl text-center lg:text-right relative overflow-hidden">
                   <div className="absolute -top-4 -left-4 text-mystic-primary/20">
@@ -119,7 +120,6 @@ export default function Home() {
                   })()}
                 </div>
               )}
-              <PlanetaryHourWidget />
             </div>
 
             {/* Center: Anatomical View */}
