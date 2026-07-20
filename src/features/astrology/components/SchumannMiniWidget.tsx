@@ -36,18 +36,30 @@ export default function SchumannMiniWidget() {
     return () => clearInterval(interval);
   }, []);
 
-  const getScoreColor = (score: number) => {
-    if (score < 3.0) return 'text-emerald-400 border-emerald-500/30 bg-emerald-500/10 shadow-[0_0_8px_rgba(16,185,129,0.15)]';
-    if (score < 5.0) return 'text-amber-400 border-amber-500/30 bg-amber-500/10 shadow-[0_0_8px_rgba(245,158,11,0.15)]';
-    if (score < 7.0) return 'text-orange-400 border-orange-500/30 bg-orange-500/10 shadow-[0_0_8px_rgba(249,115,22,0.15)]';
-    return 'text-red-400 border-red-500/30 bg-red-500/10 shadow-[0_0_8px_rgba(239,68,68,0.2)] animate-pulse';
+  const getGLevelLabel = (score: number) => {
+    if (score < 5.0) return 'G0';
+    if (score < 6.0) return 'G1';
+    if (score < 7.0) return 'G2';
+    if (score < 8.0) return 'G3';
+    if (score < 9.0) return 'G4';
+    return 'G5';
+  };
+
+  const getGLevelText = (score: number) => {
+    if (score < 3.0) return 'G0 Sakin';
+    if (score < 5.0) return 'G0 Aktif';
+    if (score < 6.0) return 'G1 Orta';
+    if (score < 7.0) return 'G2 Güçlü';
+    if (score < 8.0) return 'G3 Şiddetli';
+    if (score < 9.0) return 'G4 Ağır';
+    return 'G5 Zirve';
   };
 
   const getGlowingIndicator = (score: number) => {
-    if (score < 3.0) return 'bg-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.5)]';
-    if (score < 5.0) return 'bg-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.5)]';
-    if (score < 7.0) return 'bg-orange-400 shadow-[0_0_10px_rgba(249,115,22,0.5)]';
-    return 'bg-red-400 shadow-[0_0_12px_rgba(239,68,68,0.8)] animate-ping';
+    if (score < 3.0) return 'bg-[#22D3EE] shadow-[0_0_10px_rgba(34,211,238,0.6)]';
+    if (score < 5.0) return 'bg-[#34D399] shadow-[0_0_10px_rgba(52,211,153,0.6)]';
+    if (score < 7.0) return 'bg-[#EF4444] shadow-[0_0_10px_rgba(239,68,68,0.6)]';
+    return 'bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)]';
   };
 
   if (isLoading) {
@@ -58,8 +70,7 @@ export default function SchumannMiniWidget() {
     );
   }
 
-  const kpVal = data?.current_kp ?? 0;
-  const scoreVal = data?.cosmic_impact_score ?? kpVal;
+  const scoreVal = data?.cosmic_impact_score ?? 0.5;
 
   return (
     <Link 
@@ -82,15 +93,21 @@ export default function SchumannMiniWidget() {
               <span className={`w-1.5 h-1.5 rounded-full ${getGlowingIndicator(scoreVal)}`} />
             </div>
             <h4 className="text-white font-extrabold text-sm mt-0.5 tracking-tight group-hover/schumann:text-mystic-accent transition-colors">
-              {data?.status_label.split(' ')[0]}
+              {getGLevelText(scoreVal)}
             </h4>
           </div>
         </div>
 
         {/* Right: SR Value Badge */}
-        <div className={`py-1 px-3 rounded-xl border text-xs font-mono font-black flex items-center gap-1.5 ${getScoreColor(scoreVal)}`}>
-          <span className="text-white font-extrabold">{scoreVal.toFixed(2)}</span>
-          <span className="opacity-60 text-[10px]">SR</span>
+        <div 
+          className="py-1 px-3 rounded-xl border text-xs font-mono font-black flex items-center gap-1.5 transition-all duration-300"
+          style={{
+            borderColor: scoreVal < 3.0 ? '#22D3EE' : scoreVal < 5.0 ? '#34D399' : scoreVal < 7.0 ? '#EF4444' : '#FFFFFF',
+            backgroundColor: scoreVal < 3.0 ? '#22D3EE20' : scoreVal < 5.0 ? '#34D39920' : scoreVal < 7.0 ? '#EF444420' : '#FFFFFF20',
+            color: scoreVal < 3.0 ? '#22D3EE' : scoreVal < 5.0 ? '#34D399' : scoreVal < 7.0 ? '#EF4444' : '#FFFFFF'
+          }}
+        >
+          <span className="font-extrabold">{getGLevelLabel(scoreVal)}</span>
         </div>
 
       </div>
