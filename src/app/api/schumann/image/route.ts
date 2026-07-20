@@ -1,3 +1,4 @@
+// Build trigger: refreshed git connection
 import { NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
