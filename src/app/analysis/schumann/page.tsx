@@ -97,6 +97,7 @@ export default function SchumannPage() {
   const [error, setError] = useState<string | null>(null);
   const [timestamp, setTimestamp] = useState<number>(Date.now());
   const [notificationsEnabled, setNotificationsEnabled] = useState(false);
+  const [notificationLevel, setNotificationLevel] = useState<'G1' | 'G2' | 'G3'>('G1');
   const [notificationMsg, setNotificationMsg] = useState<string | null>(null);
   const [hoveredBar, setHoveredBar] = useState<KpHistoryItem | null>(null);
   
@@ -113,6 +114,10 @@ export default function SchumannPage() {
     if (saved === 'true') {
       setNotificationsEnabled(true);
     }
+    const savedLevel = localStorage.getItem('schumann_notification_level');
+    if (savedLevel === 'G1' || savedLevel === 'G2' || savedLevel === 'G3') {
+      setNotificationLevel(savedLevel);
+    }
   }, []);
 
   const isApprenticeOrAbove = role && (ROLE_LEVELS[role] >= 1 || role === 'admin');
@@ -124,7 +129,7 @@ export default function SchumannPage() {
     localStorage.setItem('schumann_notifications', String(newState));
     
     if (newState) {
-      setNotificationMsg("Jeomanyetik fırtına (Kp ≥ 5) ve yoğun kozmik enerji dalgalanmalarında cihazınıza bildirim gönderilecektir.");
+      setNotificationMsg(`Fırtına uyarısı ${notificationLevel} ve üzeri seviyelerde tetiklenecek şekilde ayarlandı.`);
       setTimeout(() => setNotificationMsg(null), 5000);
 
       // Web Notification API integration for direct browser notifications
@@ -133,19 +138,35 @@ export default function SchumannPage() {
           Notification.requestPermission().then(permission => {
             if (permission === 'granted') {
               new Notification("Kozmik Rezonans Bildirimleri Aktif!", {
-                body: "Jeomanyetik fırtına (Kp ≥ 5) ve güçlü uyanış portallarında tarayıcınıza anlık bildirim gönderilecektir.",
-                icon: "/sun.png"
+                body: "Seçtiğiniz fırtına seviyeleri ve üzeri iyonosferik enerji patlamalarında anlık bildirim gönderilecektir.",
+                icon: "/logo.png"
               });
             }
           });
         } else if (Notification.permission === 'granted') {
           new Notification("Kozmik Rezonans Bildirimleri Aktif!", {
             body: "Bildirim ayarlarınız başarıyla doğrulandı.",
-            icon: "/sun.png"
+            icon: "/logo.png"
           });
         }
       }
     }
+  };
+
+  const getNotificationBody = (a1: number) => {
+    if (a1 >= 70.0) {
+      return "Etkiler: Yoğun baş/ense basıncı, kulak uğultusu, derin trans hali. Öneri: Çıplak ayakla nemli toprağa basın ve alkali su tüketin.";
+    }
+    if (a1 >= 55.0) {
+      return "Etkiler: Yoğun yorgunluk, kas seğirmeleri, uyku kayması. Öneri: Fiziksel işlerden kaçının, beyaz ışık imgelemesi yapın.";
+    }
+    if (a1 >= 40.0) {
+      return "Etkiler: Uykusuzluk, baş/ense basıncı, kulak çınlaması. Öneri: Hafif egzersizler yapın ve bol su tüketin.";
+    }
+    if (a1 >= 15.0) {
+      return "Etkiler: Kalp merkezinde uyarılma, statik elektriklenme. Öneri: Tuzlu su banyosu yapın veya çıplak elle toprağa dokunun.";
+    }
+    return "Enerji alanı dengelidir. Meditasyon ve köklenmek için en uygun zamandır.";
   };
 
   const fetchData = async () => {
@@ -164,6 +185,49 @@ export default function SchumannPage() {
       }
       setData(jsonData);
       setTimestamp(Date.now());
+
+      // Trigger browser notifications if enabled
+      const savedNotifications = localStorage.getItem('schumann_notifications') === 'true';
+      const savedLevel = (localStorage.getItem('schumann_notification_level') || 'G1') as 'G1' | 'G2' | 'G3';
+      
+      if (savedNotifications && jsonData.triggered_g_level && jsonData.schumann_real) {
+        const triggeredLevel = jsonData.triggered_g_level;
+        const lastNotifLevel = localStorage.getItem('schumann_last_notification_level');
+        const lastNotifTimeStr = localStorage.getItem('schumann_last_notification_time');
+        
+        let shouldNotify = false;
+        const currentTime = Date.now();
+        const lastTime = lastNotifTimeStr ? parseInt(lastNotifTimeStr) : 0;
+        
+        const levels = ['G1', 'G2', 'G3', 'G4', 'G5'];
+        const userThresholdIdx = levels.indexOf(savedLevel);
+        const triggeredIdx = levels.indexOf(triggeredLevel);
+        
+        if (triggeredIdx >= userThresholdIdx) {
+          if (currentTime - lastTime < 3 * 60 * 60 * 1000) {
+            // Within 3 hours, notify ONLY if the new level is higher than the last notified level
+            const lastNotifiedIdx = lastNotifLevel ? levels.indexOf(lastNotifLevel) : -1;
+            if (triggeredIdx > lastNotifiedIdx) {
+              shouldNotify = true;
+            }
+          } else {
+            // More than 3 hours have passed, notify anyway
+            shouldNotify = true;
+          }
+        }
+        
+        if (shouldNotify) {
+          if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
+            const bodyText = getNotificationBody(jsonData.schumann_real.a1);
+            new Notification(`🚨 Schumann Rezonansı Yükseldi: ${triggeredLevel}`, {
+              body: bodyText,
+              icon: "/logo.png"
+            });
+            localStorage.setItem('schumann_last_notification_level', triggeredLevel);
+            localStorage.setItem('schumann_last_notification_time', String(currentTime));
+          }
+        }
+      }
     } catch (err: any) {
       console.error('Kp API fetch error:', err);
       setError(err.message || 'Veriler yüklenirken bir hata oluştu.');
@@ -1208,7 +1272,7 @@ export default function SchumannPage() {
                 </h3>
                 <p className="text-xs text-mystic-text-muted mt-1 max-w-xl">
                   {isApprenticeOrAbove 
-                    ? "Jeomanyetik fırtınaları (Kp ≥ 5) ve yoğun iyonosferik enerji patlamalarını anlık bildirim olarak alın."
+                    ? "Şık Kapısı fırtına uyarısı (G1, G2 veya G3 ve üzeri) iyonosferik enerji patlamalarında tarayıcınıza anlık bildirim gönderilecektir."
                     : "Bu özellik Çırak seviyesi ve üzeri üyelerimiz içindir. Seviyenizi yükselterek bildirimleri aktif edebilirsiniz."}
                 </p>
               </div>
@@ -1233,10 +1297,36 @@ export default function SchumannPage() {
               )}
             </div>
           </div>
+
+          {notificationsEnabled && isApprenticeOrAbove && (
+            <div className="mt-4 pt-4 border-t border-white/5 flex flex-col gap-2">
+              <span className="text-[11px] font-bold text-mystic-text-muted uppercase tracking-wider">Hassasiyet Seviyesi</span>
+              <div className="flex flex-wrap gap-2">
+                {(['G1', 'G2', 'G3'] as const).map((level) => (
+                  <button
+                    key={level}
+                    onClick={() => {
+                      setNotificationLevel(level);
+                      localStorage.setItem('schumann_notification_level', level);
+                      setNotificationMsg(`Fırtına uyarısı ${level} ve üzeri seviyelerde tetiklenecek şekilde ayarlandı.`);
+                      setTimeout(() => setNotificationMsg(null), 5000);
+                    }}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
+                      notificationLevel === level
+                        ? 'bg-[#00E5FF]/20 border-[#00E5FF] text-[#00E5FF] shadow-[0_0_15px_rgba(0,229,255,0.2)]'
+                        : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
+                    }`}
+                  >
+                    {level} ve Üzeri
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
           
           {notificationMsg && (
-            <div className="mt-4 p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-300 text-xs flex items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+            <div className="mt-4 p-3 bg-[#00E5FF]/10 border border-[#00E5FF]/20 rounded-xl text-[#00E5FF] text-xs flex items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-300">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse"></span>
               {notificationMsg}
             </div>
           )}
