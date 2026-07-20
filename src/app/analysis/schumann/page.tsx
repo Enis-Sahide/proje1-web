@@ -1741,7 +1741,7 @@ export default function SchumannPage() {
                   <p>
                     <strong>Saat Dilimi ve Yerel Saat Dönüşümü:</strong>
                     <br />
-                    Bölgesel gözlemevi grafikleri genellikle istasyonun kurulu olduğu ülkenin yerel saat dilimine göre çizilir (örneğin Asya/Sibirya gözlemevleri kendi yerel saatini kullanır). Bu gösterge paneli ise uluslararası uzay havası verilerini <strong>tamamen sizin cihazınızın yerel saat dilimine (örneğin Türkiye saati UTC+3)</strong> dönüştürerek gösterir. Bu nedenle yabancı grafiklerle aranızda saat farkı bulunması tamamen normaldir; buradaki saatler doğrudan kendi gününüzdeki anı temsil eder.
+                    Bölgesel gözlemevi grafikleri üzerinde (örneğin Tomsk ELF grafiğinin eksenlerinde) yazan saatler istasyonun yerel saatidir. Spektrogram görselinin hemen üzerine yerleştirdiğimiz çift zaman göstergeli panel ise, son ölçüm anını hem kendi cihazınızın yerel saat dilimine (örneğin Türkiye saati) dönüştürerek hem de Tomsk yerel saatiyle birlikte gösterir. Bu sayede grafik üzerindeki zaman dilimi farkını görselin hemen üstündeki zaman panelinden kolayca takip edebilirsiniz.
                   </p>
 
                   <p>
@@ -1753,7 +1753,7 @@ export default function SchumannPage() {
               </div>
               <div className="mt-8 pt-6 border-t border-white/10 text-xs text-center text-mystic-text-muted">
                 <p>
-                  Veriler Amerika Birleşik Devletleri Ulusal Okyanus ve Atmosfer Dairesi (NOAA) Space Weather Prediction Center kaynaklarından anlık ve yasal olarak çekilmektedir.
+                  Elektromanyetik Schumann verileri Tomsk Gözlemevi (Space Observing System 70, Rusya), jeomanyetik Kp ve güneş rüzgarı verileri ise ABD Ulusal Okyanus ve Atmosfer Dairesi (NOAA) Space Weather Prediction Center kaynaklarından anlık olarak çekilmektedir.
                 </p>
               </div>
             </div>
