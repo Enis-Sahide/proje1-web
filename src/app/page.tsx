@@ -8,6 +8,7 @@ import { ChevronDown, Quote, Loader2, Smartphone, Sparkles, ChevronRight } from 
 import MoonCyclesWidget from '@/features/astrology/components/MoonCyclesWidget';
 import SchumannMiniWidget from '@/features/astrology/components/SchumannMiniWidget';
 import Link from 'next/link';
+import { PLANET_DAY_GUIDELINES } from '@/utils/PlanetaryHours';
 
 // CHAKRA_MODULES içeriği DB'den gelir (/api/content/chakras → modules)
 
@@ -87,7 +88,35 @@ export default function Home() {
                   <p className="text-mystic-text text-base italic leading-relaxed relative z-10 mb-4">
                     "{affirmation.text}"
                   </p>
-                  <p className="text-mystic-accent font-semibold text-sm">— {affirmation.author}</p>
+                  <p className="text-mystic-accent font-semibold text-sm mb-4">— {affirmation.author}</p>
+                  
+                  {/* Planetary Day Guidelines */}
+                  {(() => {
+                    const day = new Date().getDay();
+                    const planetKeys = ['Sun', 'Moon', 'Mars', 'Mercury', 'Jupiter', 'Venus', 'Saturn'];
+                    const key = planetKeys[day];
+                    const guide = PLANET_DAY_GUIDELINES[key];
+                    if (!guide) return null;
+                    return (
+                      <div className="border-t border-white/5 pt-4 mt-2 text-left text-xs leading-relaxed">
+                        <div className="flex items-center gap-1.5 mb-2 justify-center lg:justify-end">
+                          <span className="font-extrabold uppercase tracking-wider text-mystic-accent" style={{ color: guide.color }}>
+                            {guide.symbol} {guide.name} Günü Enerjisi
+                          </span>
+                        </div>
+                        <div className="space-y-2 text-mystic-text-muted">
+                          <div>
+                            <strong className="text-emerald-400 block mb-0.5">✓ Yapılması Önerilenler:</strong>
+                            {guide.do}
+                          </div>
+                          <div>
+                            <strong className="text-rose-400 block mb-0.5">✗ Kaçınılması Gerekenler:</strong>
+                            {guide.avoid}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
               <PlanetaryHourWidget />
