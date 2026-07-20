@@ -341,64 +341,7 @@ export default function SchumannPage() {
       };
     }
 
-    // 4. Güneş Rüzgarı Hızı Sıçraması
-    if (speed >= 500) {
-      if (score >= 3.0) {
-        return {
-          title: 'Kozmik Plazma Rüzgarı Dalgası (Hızlı Akış)',
-          science: `Güneş yüzeyindeki koronal deliklerden kopan yüksek hızlı plazma akışı saniyede ${Math.round(speed)} km hıza ulaşarak manyetik kalkanımızı sıkıştırıyor. Schumann Rezonansı ana mod genliği (A1): ${a1.toFixed(1)}, frekansı: ${f1.toFixed(2)} Hz.`,
-          symptoms: 'Fiziksel bedende ani bir enerjik uyarılma, içsel sabırsızlık veya huzursuzluk hissi, kalp atışlarında hızlanma dalgaları, hafif sersemlik ve kulaklarda dalgalı frekans sesleri.',
-          spiritual: 'Artan plazma akışı, aura alanınızı temizlemek ve eski hücresel kalıpları salıvermek için çalışır. Birikmiş statik elektriği nötrlemek için ılık/tuzlu bir duş alın. Kalp merkezli nefes pratikleri (4 saniye al, 4 saniye ver) yaparak akışı bedende dengeleyin.'
-        };
-      } else {
-        return {
-          title: 'Kozmik Plazma Rüzgarı Dalgası (Yumuşak Akış)',
-          science: `Güneş rüzgarı hızı saniyede ${Math.round(speed)} km hıza ulaşsa da, iyonosferik Schumann genliği (${a1.toFixed(1)}) ve Kp seviyesi sakin seyrediyor.`,
-          symptoms: 'Genel olarak dengeli enerji seviyeleri. Bazı hassas bünyelerde hafif esneme, tatlı bir yorgunluk ve statik elektrik uyarımı hissedilebilir.',
-          spiritual: 'Gelen plazma rüzgarı hafif bir arınma sağlar. Bol su için ve bedendeki statik elektriği nötrlemek için topraklanın.'
-        };
-      }
-    }
-    
-    // 5. Kalkan Açılması (Bz Güney)
-    if (bz <= -3.0) {
-      if (score >= 3.0) {
-        return {
-          title: 'Manyetik Kalkan Geçiş Portalı (Bz Güney Yönlü)',
-          science: `Dünya'nın koruyucu manyetik kalkanının yönünü belirleyen Bz parametresi güneye yönelerek ${bz.toFixed(1)} nT seviyesine ulaştı. Kalkanımızda açılan bu kapı güneş rüzgarı sızıntısını artırırken, Schumann Rezonansı genliği ${a1.toFixed(1)} ve frekansı ${f1.toFixed(2)} Hz olarak ölçüldü.`,
-          symptoms: 'Yüksek duygusal duyarlılık, empati yeteneğinde aşırı artış, başkalarının enerjilerini hissetme, hafif şakak ağrıları ve rüyalarda yoğun astral semboller.',
-          spiritual: 'Kalkanın açık olması ruhsal olarak alıcı (reseptif) modda olduğumuzu gösterir. Negatif enerjilerden korunmak için kendinizi mor bir ışık küresi içinde hayal edin. Adaçayı veya üzerlik otu yakarak yaşam alanınızı arındırın.'
-        };
-      } else {
-        return {
-          title: 'Manyetik Kalkan Açılımı (Sakin Alıcılık Fazı)',
-          science: `Manyetik kalkanın yönünü belirleyen Bz parametresi güneye yönelerek ${bz.toFixed(1)} nT seviyesine ulaştı. Kalkanımızda hafif geçirgenlik oluşsa da, Schumann genliği (${a1.toFixed(1)}) ve Kp seviyesi sakin olduğundan iyonosferik uyarım düşüktür.`,
-          symptoms: 'Belirgin bir fiziksel veya duygusal semptom beklenmez. Ancak sezgilerde hafif bir netleşme, alıcı (reseptif) ruh hali ve sakin rüyalar görülebilir.',
-          spiritual: 'Kapı açık ancak akış yumuşaktır. Aura alanını mor ışıkla koruma altına alıp dingin tefekkür ve meditasyon çalışmaları yapabilirsiniz.'
-        };
-      }
-    }
-    
-    // 6. Parçacık Yoğunluğu Sıçraması
-    if (density >= 10.0) {
-      if (score >= 3.0) {
-        return {
-          title: 'Yoğun Parçacık Bombardımanı (Proton Yoğunluğu)',
-          science: `Güneş rüzgarındaki parçacık (proton) yoğunluğu cm³ başına ${density.toFixed(1)} seviyesine ulaştı. Schumann Rezonansı ana mod genliği (A1) ${a1.toFixed(1)} ve frekansı ${f1.toFixed(2)} Hz olarak kaydedildi.`,
-          symptoms: 'Eklem ağrıları, kas seğirmeleri, aşırı fiziksel yorgunluk ve uykuya geçişte zorlanma, göz arkasında hafif sızlama veya basınç.',
-          spiritual: 'Artan proton akışı, hücresel şablonumuzda ve DNA yapımızda yoğun bir elektromanyetik dönüşüm tetikler. Ağır yiyeceklerden kaçının, hafif beslenin ve bol su için. Vücuttaki iletkenliği ve topraklanmayı artırmak için magnezyum takviyesi alabilirsiniz.'
-        };
-      } else {
-        return {
-          title: 'Kozmik Parçacık Akışı (Dengeli Entegrasyon)',
-          science: `Güneş rüzgarındaki proton yoğunluğu cm³ başına ${density.toFixed(1)} seviyesinde aktif, ancak Schumann genliği (${a1.toFixed(1)}) dengeli ve doğal titreşimindedir.`,
-          symptoms: 'Hafif bedensel ağırlık veya uyku isteği dışında ekstrem eklem/şakak hassasiyeti beklenmez.',
-          spiritual: 'Hücresel düzeyde yavaş ve güvenli entegrasyon aktiftir. Hafif gıdalarla beslenerek bedene yardımcı olabilirsiniz.'
-        };
-      }
-    }
-    
-    // 7. Sakin ve Dengeli Durum
+    // 4. Sakin ve Dengeli Durum
     return {
       title: 'Dingin Elektromanyetik Akış (Sakin Faz)',
       science: `Güneş rüzgarı hızı (${Math.round(speed)} km/s) ve parçacık yoğunluğu (${density.toFixed(1)} p/cm³) normal sınırlarında. Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana frekansı ${f1.toFixed(2)} Hz (Genlik A1: ${a1.toFixed(1)}) seviyesinde dengeli ve doğal titreşiminde seyrediyor.`,
