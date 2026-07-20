@@ -275,18 +275,18 @@ export default function PlanetaryHoursPage() {
             )}
           </div>
 
-          {/* Right Column: Gündüz and Gece Saatleri Scroll lists */}
-          <div className="lg:col-span-2 space-y-8">
+          {/* Right Column: Gündüz and Gece Saatleri Side-by-side lists */}
+          <div className="lg:col-span-2">
             
             {hoursData ? (
-              <>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                 {/* Gündüz Saatleri */}
                 <div className="bg-mystic-surface/20 backdrop-blur-md rounded-2xl p-6 border border-mystic-surface-light shadow-xl">
                   <h3 className="text-mystic-accent font-bold text-sm uppercase tracking-wider mb-4 flex items-center gap-2">
                     <Sun size={14} className="text-mystic-accent" /> Gündüz Gezegen Saatleri
                   </h3>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3">
                     {hoursData.dayHours.map((hour: any, idx: number) => {
                       const isActive = isCurrentHour(hour.startTime, hour.endTime);
                       return (
@@ -333,7 +333,7 @@ export default function PlanetaryHoursPage() {
                     <Moon size={14} className="text-mystic-primary" /> Gece Gezegen Saatleri
                   </h3>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 gap-3">
                     {hoursData.nightHours.map((hour: any, idx: number) => {
                       const isActive = isCurrentHour(hour.startTime, hour.endTime);
                       return (
@@ -373,7 +373,7 @@ export default function PlanetaryHoursPage() {
                     })}
                   </div>
                 </div>
-              </>
+              </div>
             ) : (
               <div className="flex justify-center items-center py-12">
                 <Loader2 className="animate-spin text-mystic-primary" size={24} />
