@@ -974,7 +974,7 @@ export default function SchumannPage() {
             Schumann Rezonansı & Kozmik Enerji
           </h1>
           <p className="text-mystic-text-muted text-lg max-w-2xl mx-auto">
-            Gezegenimizin manyetik kalkanındaki dalgalanmaları, güneş rüzgarı hareketlerini ve anlık/tahmini Schumann Rezonans uyarılma düzeylerini canlı takip edin.
+            Gezegenimizin manyetik kalkanındaki dalgalanmaları, güneş rüzgârı hareketlerini ve anlık/tahmini Schumann Rezonansı uyarılma düzeylerini canlı takip edin.
           </p>
         </div>
 
