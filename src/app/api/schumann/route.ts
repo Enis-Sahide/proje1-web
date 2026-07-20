@@ -339,12 +339,26 @@ export async function GET() {
       finalF1
     );
 
+    let triggeredGLevel: string | null = null;
+    if (finalA1 >= 70.0) {
+      triggeredGLevel = 'G5';
+    } else if (finalA1 >= 55.0) {
+      triggeredGLevel = 'G4';
+    } else if (finalA1 >= 40.0) {
+      triggeredGLevel = 'G3';
+    } else if (finalA1 >= 25.0) {
+      triggeredGLevel = 'G2';
+    } else if (finalA1 >= 15.0) {
+      triggeredGLevel = 'G1';
+    }
+
     return json({
       cosmic_impact_score: finalImpactScore,
       cosmic_status_label: cosmicStatus.label,
       cosmic_status_desc: cosmicStatus.desc,
       ai_analysis: aiAnalysis,
-      schumann_real: realSchumann
+      schumann_real: realSchumann,
+      triggered_g_level: triggeredGLevel
     });
   } catch (error: any) {
     console.error('Schumann API Error:', error);
