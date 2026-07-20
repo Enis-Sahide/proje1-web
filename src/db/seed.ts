@@ -51,6 +51,7 @@ import {
   racesWithAvatar,
   chakraHomeFor,
   BLOG_POSTS,
+  SCHUMANN_RULES,
 } from './seedExtra';
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
@@ -362,6 +363,7 @@ async function main() {
     await tx.delete(s.moonPhases);
     await tx.delete(s.races);
     await tx.delete(s.blogPosts);
+    await tx.delete(s.schumannRules);
 
     // insert parents first
     await chunkedInsert(tx, s.chakras, chakraRows);
@@ -391,6 +393,7 @@ async function main() {
     await chunkedInsert(tx, s.moonPhases, moonRows);
     await chunkedInsert(tx, s.races, raceRows);
     await chunkedInsert(tx, s.blogPosts, BLOG_POSTS);
+    await chunkedInsert(tx, s.schumannRules, SCHUMANN_RULES);
   });
 
   // ── Özet ──────────────────────────────────────────────────────

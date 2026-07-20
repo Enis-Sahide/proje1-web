@@ -1,5 +1,7 @@
 import { json, errorJson, preflight } from '@/lib/http/cors';
 import sharp from 'sharp';
+import { db } from '@/db/client';
+import * as schema from '@/db/schema';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,64 +39,57 @@ function getCosmicImpactStatusInfo(score: number) {
   }
 }
 
-function generateRulesAnalysis(score: number, a1: number, f1: number) {
-  // 1. Zirve Ekstrem Schumann Fırtınası (Ekstrem G5 Fırtınası)
-  if (score >= 9.0) {
-    return {
-      title: 'Ekstrem Schumann Rezonans Fırtınası (G5 Zirve Seviyesi)',
-      science: `Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana mod genliği (A1) tarihi zirvesine ulaşarak ${a1.toFixed(1)} seviyesine çıktı. Frekans ${f1.toFixed(2)} Hz düzeyinde ekstrem titreşiyor. İyonosfer tabakası tam doygunluk sınırında elektrik yüküyle yüklü.`,
-      symptoms: 'Sinir sisteminin en yüksek kapasitede uyarılması, derin trans benzeri uyku halleri veya mutlak uykusuzluk, baş ve ensede çok yoğun basınç, kulaklarda çok yüksek tonda uğultu/çınlama sesleri, aşırı duyarlılık ve bedensel hafiflik/ağırlık hissi dalgalanmaları.',
-      spiritual: 'Zirve boyutlar arası geçiş portalı ve hücresel simya devrededir. Kollektif bilinçle ve kozmik kaynakla bütünleşme anıdır. Bol alkali su tüketin ve çıplak ayakla nemli toprağa basarak mutlak topraklanma sağlayın. Zihni tamamen susturarak teslimiyet meditasyonu yapın.'
-    };
-  }
+async function generateRulesAnalysis(score: number, a1: number, f1: number) {
+  try {
+    const rules = await db.select().from(schema.schumannRules);
+    const sortedRules = rules.sort((a, b) => parseFloat(a.minScore) - parseFloat(b.minScore));
 
-  // 2. Ağır Schumann Fırtınası (G4 Seviyesi)
-  if (score >= 8.0) {
-    return {
-      title: 'Ağır Schumann Rezonans Fırtınası (G4 Seviyesi)',
-      science: `Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana mod genliği (A1) ekstrem bir yükselişle ${a1.toFixed(1)} seviyesine ulaştı. Frekans ${f1.toFixed(2)} Hz düzeyinde seyrediyor. İyonosfer tabakası çok yüksek manyetik basınç altında.`,
-      symptoms: 'Yoğun fiziksel yorgunluk ve kas seğirmeleri (frekans uyumlanması), baş bölgesinde taç kısmına doğru yayılan basınç, uyku düzeninde derin kaymalar (gece yarısı uyanıp tekrar uyuyamama), zaman algısında geçici bükülmeler.',
-      spiritual: 'Taç çakra portalı tamamen açılmıştır ve yüksek boyutlu ışık bedene geçiş enerjisi aktiftir. Bugün kendinizi zorlayacak fiziksel işlerden kesinlikle kaçının. Taç çakranızdan giren beyaz ışığın bedeninizi yıkayarak yere aktığını imgeleyin.'
-    };
-  }
+    let matchedRule = sortedRules[0];
+    for (const rule of sortedRules) {
+      if (score >= parseFloat(rule.minScore)) {
+        matchedRule = rule;
+      }
+    }
 
-  // 3. Şiddetli Schumann Fırtınası (G3 Seviyesi)
-  if (score >= 7.0) {
-    return {
-      title: 'Şiddetli Schumann Rezonans Fırtınası (G3 Seviyesi)',
-      science: `Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana mod genliği (A1) sıradışı bir sıçramayla ${a1.toFixed(1)} seviyesine ulaştı. Frekans ${f1.toFixed(2)} Hz civarında seyrediyor. İyonosfer tabakası yoğun bir elektrik yüküyle titreşiyor.`,
-      symptoms: 'Sinir sisteminde belirgin uyarılma, uyku düzeninde dalgalanmalar (derin uykusuzluk ya da rüya yoğunluğu), baş ve ense bölgesinde hafif basınç, kulaklarda kesintisiz tiz çınlamalar ve çok canlı, sembolik rüyalar.',
-      spiritual: 'DNA sarmallarında uyarım ve ışık kodlarının entegrasyonu aktiftir. Bedeninizi yormadan hafif egzersizler yapın. Bol su tüketin, topraklanın ve yüksek frekanslı meditasyonlara odaklanın.'
-    };
-  }
+    if (!matchedRule) {
+      return {
+        title: 'Dingin Elektromanyetik Akış (Sakin Faz)',
+        science: `Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana frekansı ${f1.toFixed(2)} Hz (Genlik A1: ${a1.toFixed(1)}) seviyesinde dengeli ve doğal titreşiminde seyrediyor. İyonosfer tabakası sakin durumda.`,
+        symptoms: 'Zihinsel netlik, dengeli enerji seviyeleri, sakin uyku düzeni ve bedensel rahatlık. Olağanüstü bir uyarılma belirtisi beklenmez.',
+        spiritual: 'Zihnin gürültüsünü yatıştırmak, yeni bilgiler öğrenmek, kadim dersleri çalışmak ve kök çakra meditasyonları yapmak için en ideal dönemdir. Enerjinizin merkezlendiği bu dingin zamanı tefekkür ile değerlendirebilirsiniz.'
+      };
+    }
 
-  // 2. Aktif Schumann Manyetik Fırtınası (G1-G2 Seviyesi)
-  if (score >= 5.0) {
-    return {
-      title: 'Aktif Schumann Manyetik Fırtınası (G1-G2 Seviyesi)',
-      science: `Tomsk Rasathanesi verilerinde Schumann Rezonansı genliği (A1) yüksek uyarım göstererek ${a1.toFixed(1)} seviyesine ulaştı. Frekans ${f1.toFixed(2)} Hz olarak iyonosferik dalgalanmaları tetikliyor.`,
-      symptoms: 'Kalp atışlarında ani hızlanma veya genişleme hissi, vücutta hafif statik elektrik birikimi (dokunulan yerlerin çarpması), hafif eklem ve şakak ağrıları, uykuya dalmakta gecikme ve içsel sabırsızlık.',
-      spiritual: 'Kalp çakrası ve aura alanı genişlemektedir. Bedendeki fazla elektriği boşaltmak için tuzlu su banyosu yapın veya çıplak elle toprağa dokunun. Kalp merkezli nefes pratikleri (4 saniye al, 4 saniye ver) yaparak kozmik akışı bedende dengeleyin.'
-    };
-  }
+    let scienceText = matchedRule.science;
+    if (parseFloat(matchedRule.minScore) >= 9.0) {
+      scienceText = `Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana mod genliği (A1) tarihi zirvesine ulaşarak ${a1.toFixed(1)} seviyesine çıktı. Frekans ${f1.toFixed(2)} Hz düzeyinde ekstrem titreşiyor. İyonosfer tabakası tam doygunluk sınırında elektrik yüküyle yüklü.`;
+    } else if (parseFloat(matchedRule.minScore) >= 8.0) {
+      scienceText = `Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana mod genliği (A1) ekstrem bir yükselişle ${a1.toFixed(1)} seviyesine ulaştı. Frekans ${f1.toFixed(2)} Hz düzeyinde seyrediyor. İyonosfer tabakası çok yüksek manyetik basınç altında.`;
+    } else if (parseFloat(matchedRule.minScore) >= 7.0) {
+      scienceText = `Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana mod genliği (A1) sıradışı bir sıçramayla ${a1.toFixed(1)} seviyesine ulaştı. Frekans ${f1.toFixed(2)} Hz civarında seyrediyor. İyonosfer tabakası yoğun bir elektrik yüküyle titreşiyor.`;
+    } else if (parseFloat(matchedRule.minScore) >= 5.0) {
+      scienceText = `Tomsk Rasathanesi verilerinde Schumann Rezonansı genliği (A1) yüksek uyarım göstererek ${a1.toFixed(1)} seviyesine ulaştı. Frekans ${f1.toFixed(2)} Hz olarak iyonosferik dalgalanmaları tetikliyor.`;
+    } else if (parseFloat(matchedRule.minScore) >= 3.0) {
+      scienceText = `Schumann Rezonansı ana mod genliği (A1) ${a1.toFixed(1)} seviyesine çıkarak hafif bir hareketlenme gösteriyor. Frekans ${f1.toFixed(2)} Hz civarında stabil seyrediyor.`;
+    } else {
+      scienceText = `Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana frekansı ${f1.toFixed(2)} Hz (Genlik A1: ${a1.toFixed(1)}) seviyesinde dengeli ve doğal titreşiminde seyrediyor. İyonosfer tabakası sakin durumda.`;
+    }
 
-  // 3. Hafif Schumann Dalgalanması (Hafif Uyarım Seviyesi)
-  if (score >= 3.0) {
     return {
-      title: 'Hafif Schumann Dalgalanması (Hafif Uyarım Seviyesi)',
-      science: `Schumann Rezonansı ana mod genliği (A1) ${a1.toFixed(1)} seviyesine çıkarak hafif bir hareketlenme gösteriyor. Frekans ${f1.toFixed(2)} Hz civarında stabil seyrediyor.`,
-      symptoms: 'Rüyalarda belirgin netleşme ve sembolizm artışı, sezgisel uyanışlar, zihinde yaratıcı fikir patlamaları, kulaklarda hafif dalgalı uğultular ve hafif tatlı bir yorgunluk/esneme hali.',
-      spiritual: 'Uyanış kapıları hafifçe uyarılmaktadır. Meditasyon, günlük tutma, rüya analizleri yapma ve yaratıcı projelere odaklanma için harika bir akıştır. Üçüncü göz bölgesine mavi/mor bir ışık hayal ederek odaklanabilirsiniz.'
+      title: matchedRule.title,
+      science: scienceText,
+      symptoms: matchedRule.symptoms,
+      spiritual: matchedRule.spiritual,
+    };
+  } catch (err) {
+    console.error('Error fetching schumann rules from DB:', err);
+    return {
+      title: 'Dingin Elektromanyetik Akış (Sakin Faz)',
+      science: `Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana frekansı ${f1.toFixed(2)} Hz (Genlik A1: ${a1.toFixed(1)}) seviyesinde dengeli ve doğal titreşiminde seyrediyor. İyonosfer tabakası sakin durumda.`,
+      symptoms: 'Zihinsel netlik, dengeli enerji seviyeleri, sakin uyku düzeni ve bedensel rahatlık. Olağanüstü bir uyarılma belirtisi beklenmez.',
+      spiritual: 'Zihnin gürültüsünü yatıştırmak, yeni bilgiler öğrenmek, kadim dersleri çalışmak ve kök çakra meditasyonları yapmak için en ideal dönemdir. Enerjinizin merkezlendiği bu dingin zamanı tefekkür ile değerlendirebilirsiniz.'
     };
   }
-  
-  // 4. Sakin ve Dengeli Durum
-  return {
-    title: 'Dingin Elektromanyetik Akış (Sakin Faz)',
-    science: `Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana frekansı ${f1.toFixed(2)} Hz (Genlik A1: ${a1.toFixed(1)}) seviyesinde dengeli ve doğal titreşiminde seyrediyor. İyonosfer tabakası sakin durumda.`,
-    symptoms: 'Zihinsel netlik, dengeli enerji seviyeleri, sakin uyku düzeni ve bedensel rahatlık. Olağanüstü bir uyarılma belirtisi beklenmez.',
-    spiritual: 'Zihnin gürültüsünü yatıştırmak, yeni bilgiler öğrenmek, kadim dersleri çalışmak ve kök çakra meditasyonları yapmak için en ideal dönemdir. Enerjinizin merkezlendiği bu dingin zamanı tefekkür ile değerlendirebilirsiniz.'
-  };
 }
 
 
@@ -293,8 +288,13 @@ async function detectFlaresFromImage(): Promise<{ score: number; peakA1: number 
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const simulatedA1Param = searchParams.get('simulatedA1');
+    const hasSimulatedA1 = simulatedA1Param !== null && simulatedA1Param !== '';
+    const simulatedA1 = hasSimulatedA1 ? parseFloat(simulatedA1Param!) : null;
+
     // 1. Fetch actual Schumann values from Tomsk .afq logs
     let realSchumann = await fetchRealSchumannData();
     
@@ -326,14 +326,13 @@ export async function GET() {
     }
     
     // 2. Calculate custom cosmic impact score (0.0 to 10.0)
-    const finalImpactScore = realSchumann ? getSchumannScoreFromA1(realSchumann.a1) : 0.5;
+    const finalA1 = simulatedA1 !== null ? simulatedA1 : (realSchumann ? realSchumann.a1 : 6.0);
+    const finalF1 = simulatedA1 !== null ? (7.83 + (simulatedA1 / 75.0) * 0.5) : (realSchumann ? realSchumann.f1 : 7.83);
+    const finalImpactScore = getSchumannScoreFromA1(finalA1);
     
     const cosmicStatus = getCosmicImpactStatusInfo(finalImpactScore);
 
-    const finalA1 = realSchumann ? realSchumann.a1 : 6.0;
-    const finalF1 = realSchumann ? realSchumann.f1 : 7.83;
-
-    const aiAnalysis = generateRulesAnalysis(
+    const aiAnalysis = await generateRulesAnalysis(
       finalImpactScore,
       finalA1,
       finalF1
@@ -352,13 +351,16 @@ export async function GET() {
       triggeredGLevel = 'G1';
     }
 
+    const allRules = await db.select().from(schema.schumannRules);
+
     return json({
       cosmic_impact_score: finalImpactScore,
       cosmic_status_label: cosmicStatus.label,
       cosmic_status_desc: cosmicStatus.desc,
       ai_analysis: aiAnalysis,
       schumann_real: realSchumann,
-      triggered_g_level: triggeredGLevel
+      triggered_g_level: triggeredGLevel,
+      schumann_rules: allRules
     });
   } catch (error: any) {
     console.error('Schumann API Error:', error);

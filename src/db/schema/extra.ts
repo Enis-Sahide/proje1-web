@@ -69,3 +69,13 @@ export const races = pgTable('races', {
   avatarUrl: text('avatar_url'),
   sort: integer('sort').notNull().default(0),
 });
+
+// SCHUMANN_RULES
+export const schumannRules = pgTable('schumann_rules', {
+  id: serial('id').primaryKey(),
+  minScore: numeric('min_score', { precision: 3, scale: 1 }).notNull(),
+  title: text('title').notNull(),
+  science: text('science').notNull(),
+  symptoms: text('symptoms').notNull(),
+  spiritual: text('spiritual').notNull(),
+});

@@ -43,6 +43,13 @@
       "when": 1783511385020,
       "tag": "0005_flaky_tempest",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1784561218955,
+      "tag": "0006_thick_the_fury",
+      "breakpoints": true
     }
   ]
 }
