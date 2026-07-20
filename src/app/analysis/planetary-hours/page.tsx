@@ -121,7 +121,7 @@ export default function PlanetaryHoursPage() {
   };
 
   return (
-    <div className="min-h-screen bg-mystic-dark text-mystic-text flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-mystic-dark text-mystic-text flex flex-col relative overflow-hidden pt-28">
       {/* Background elements */}
       <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-mystic-primary/10 via-mystic-dark to-mystic-dark pointer-events-none z-0" />
 
