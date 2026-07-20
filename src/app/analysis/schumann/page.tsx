@@ -1175,306 +1175,7 @@ export default function SchumannPage() {
           )}
         </div>
 
-        {/* Güneş Rüzgarı & Manyetik Alan İstasyonu */}
-        {!isLoading && data?.solar_wind && (
-          <div className="bg-black/40 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8 relative overflow-hidden">
-            <div className="border-b border-white/10 pb-4 mb-6">
-              <h2 className="text-xl font-bold flex items-center gap-2 text-white">
-                <Sun size={22} className="text-[#00E5FF] animate-pulse" />
-                Kozmik Hava Durumu & Güneş Rüzgarı
-              </h2>
-              <p className="text-xs text-mystic-text-muted mt-1">
-                Dünya ile Güneş arasındaki L1 noktasında ölçülen anlık plazma ve manyetik alan hareketleri.
-              </p>
-            </div>
 
-            {(() => {
-              // Keep solar wind and Kp index strictly at their live values (do not simulate)
-              const activeKp = data.current_kp ?? 0;
-              const speed = data.solar_wind.speed ?? 350;
-              const density = data.solar_wind.density ?? 4;
-              const bz = data.solar_wind.bz ?? 0;
-              const bt = data.solar_wind.bt ?? 5;
-              const temp = data.solar_wind.temperature ?? 150000;
-
-              return (
-                <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-                  {/* 1. Kp Değeri */}
-                  <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
-                    <div className="flex items-center justify-between text-mystic-text-muted mb-2">
-                      <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
-                        Kp Endeksi
-                        <span className="relative flex items-center justify-center group/tooltip ml-0.5">
-                          <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
-                            <Info size={10} />
-                          </span>
-                          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
-                            Dünya'nın manyetik alanındaki küresel dalgalanma derecesidir (0-9 arası). Değer yükseldikçe jeomanyetik fırtına etkisi artar.
-                            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
-                          </span>
-                        </span>
-                      </span>
-                      <Activity size={16} className="text-amber-400" />
-                    </div>
-                    <div>
-                      <div className="text-2xl font-extrabold text-white">
-                        Kp {activeKp.toFixed(1)}
-                      </div>
-                      <span className={`text-[10px] font-semibold ${
-                        activeKp >= 5 ? 'text-red-400' : activeKp >= 3 ? 'text-amber-400' : 'text-emerald-400'
-                      }`}>
-                        {activeKp >= 5 ? '🔴 Fırtına' : activeKp >= 3 ? '🟡 Uyarılmış' : '🟢 Sakin'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* 2. Rüzgar Hızı */}
-                  <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
-                    <div className="flex items-center justify-between text-mystic-text-muted mb-2">
-                      <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
-                        Güneş Rüzgarı Hızı
-                        <span className="relative flex items-center justify-center group/tooltip ml-0.5">
-                          <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
-                            <Info size={10} />
-                          </span>
-                          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
-                            Güneş'ten yayılan plazma akışının hızıdır. Hızlı rüzgarlar Dünya'nın manyetik alanını sıkıştırarak yüksek enerjisel girişlere sebep olur.
-                            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
-                          </span>
-                        </span>
-                      </span>
-                      <Wind size={16} className="text-cyan-400" />
-                    </div>
-                    <div>
-                      <div className="text-2xl font-extrabold text-white">
-                        {speed ? `${Math.round(speed)} km/s` : '---'}
-                      </div>
-                      <span className={`text-[10px] font-semibold ${
-                        speed >= 600 ? 'text-red-400' : speed >= 450 ? 'text-amber-400' : 'text-emerald-400'
-                      }`}>
-                        {speed >= 600 ? '🔴 Çok Hızlı' : speed >= 450 ? '🟡 Hızlı' : '🟢 Sakin'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* 3. Proton Yoğunluğu */}
-                  <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
-                    <div className="flex items-center justify-between text-mystic-text-muted mb-2">
-                      <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
-                        Proton Yoğunluğu
-                        <span className="relative flex items-center justify-center group/tooltip ml-0.5">
-                          <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
-                            <Info size={10} />
-                          </span>
-                          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
-                            Güneş rüzgarındaki yüklü parçacıkların (protonlar) cm³ başına yoğunluğudur. Yoğunluğun artması, Dünya atmosferiyle etkileşime giren enerjiyi artırır.
-                            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
-                          </span>
-                        </span>
-                      </span>
-                      <Gauge size={16} className="text-purple-400" />
-                    </div>
-                    <div>
-                      <div className="text-2xl font-extrabold text-white">
-                        {density ? `${density.toFixed(1)} p/cm³` : '---'}
-                      </div>
-                      <span className="text-[10px] text-mystic-text-muted">Parçacık yoğunluğu</span>
-                    </div>
-                  </div>
-
-                  {/* 4. Bz Değeri */}
-                  <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
-                    <div className="flex items-center justify-between text-mystic-text-muted mb-2">
-                      <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
-                        Bz Değeri (Yön)
-                        <span className="relative flex items-center justify-center group/tooltip ml-0.5">
-                          <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
-                            <Info size={10} />
-                          </span>
-                          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
-                            Manyetik alanın kuzey-güney doğrultusudur. Değerin güneye doğru (negatif/-) olması, manyetik kalkanımızda kapılar açarak enerjinin içeri sızmasını sağlar.
-                            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
-                          </span>
-                        </span>
-                      </span>
-                      <Shield size={16} className={bz < 0 ? "text-red-400" : "text-emerald-400"} />
-                    </div>
-                    <div>
-                      <div className={`text-2xl font-extrabold ${bz < 0 ? 'text-red-400' : 'text-emerald-400'}`}>
-                        {bz ? `${bz.toFixed(1)} nT` : '---'}
-                      </div>
-                      <span className="text-[10px] font-semibold">
-                        {bz < 0 ? '🔴 Kalkan Açık (G)' : '🟢 Kalkan Kapalı (K)'}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* 5. Toplam Manyetik Alan (Bt) */}
-                  <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
-                    <div className="flex items-center justify-between text-mystic-text-muted mb-2">
-                      <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
-                        Toplam Alan (Bt)
-                        <span className="relative flex items-center justify-center group/tooltip ml-0.5">
-                          <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
-                            <Info size={10} />
-                          </span>
-                          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
-                            Güneşler arası manyetik alanın toplam gücüdür. Yüksek Bt değerleri, Dünya çevresindeki elektromanyetik alan uyarılmasının şiddetini artırır.
-                            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
-                          </span>
-                        </span>
-                      </span>
-                      <Activity size={16} className="text-amber-400" />
-                    </div>
-                    <div>
-                      <div className="text-2xl font-extrabold text-white">
-                        {bt ? `${bt.toFixed(1)} nT` : '---'}
-                      </div>
-                      <span className="text-[10px] text-mystic-text-muted">Alan gücü</span>
-                    </div>
-                  </div>
-
-                  {/* 6. Plazma Sıcaklığı */}
-                  <div className="bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col justify-between">
-                    <div className="flex items-center justify-between text-mystic-text-muted mb-2">
-                      <span className="text-[11px] uppercase tracking-wider font-semibold flex items-center gap-1">
-                        Sıcaklık
-                        <span className="relative flex items-center justify-center group/tooltip ml-0.5">
-                          <span className="cursor-pointer text-white/30 hover:text-white transition-colors">
-                            <Info size={10} />
-                          </span>
-                          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-48 p-2.5 bg-black/95 border border-white/10 text-[10px] text-white/90 rounded-lg opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-xl backdrop-blur-md text-justify leading-relaxed font-sans normal-case">
-                            Güneş rüzgarı plazmasının termal sıcaklığıdır. Yüksek sıcaklıklar Güneş'teki aktif patlamalardan ve taç küre atılımlarından (CME) kaynaklanan akışları gösterir.
-                            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/95"></span>
-                          </span>
-                        </span>
-                      </span>
-                      <Thermometer size={16} className="text-orange-400" />
-                    </div>
-                    <div>
-                      <div className="text-2xl font-extrabold text-white">
-                        {temp ? `${(temp / 1000).toFixed(0)}k K` : '---'}
-                      </div>
-                      <span className="text-[10px] text-mystic-text-muted">Kelvin cinsinden</span>
-                    </div>
-                  </div>
-                </div>
-              );
-            })()}
-          </div>
-        )}
-
-        {/* 2. Sayısal Kp Grafik Çizelgesi (Bar Chart) */}
-        <div className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8">
-          <div className="border-b border-white/10 pb-4 mb-6">
-            <h2 className="text-xl font-bold flex items-center gap-2 text-white">
-              <Activity size={22} className="text-[#00E5FF]" />
-              Jeomanyetik Kp İndeks Eğilimi (Resmi Altyapı)
-            </h2>
-            <p className="text-xs text-mystic-text-muted mt-1">
-              Dünya genelindeki gözlemevlerinden ölçülen ham planetary Kp değerlerinin son 3 günlük (72 saat) gösterimi. Bu veriler uyarılma indeksimiz için resmi bilimsel altyapıyı oluşturur.
-            </p>
-          </div>
-
-          {isLoading ? (
-            <div className="h-48 bg-white/5 animate-pulse rounded-2xl flex items-center justify-center text-mystic-text-muted">
-              Grafik Yükleniyor...
-            </div>
-          ) : (
-            <div className="w-full bg-black/40 rounded-2xl border border-white/5 p-6 relative">
-              {/* Watermark Logo & Text */}
-              <div className="absolute right-6 top-6 hidden md:flex items-center gap-1.5 bg-black/45 backdrop-blur-sm border border-white/10 px-3 py-1.5 rounded-xl pointer-events-none select-none z-10 opacity-60">
-                <img src="/logo.png" className="w-3.5 h-3.5 rounded-full" alt="7LAYERS Logo" />
-                <span className="text-[10px] font-bold text-white tracking-widest font-mono">7LAYERS</span>
-              </div>
-
-              {/* Tooltip display space */}
-              <div className="min-h-[36px] mb-4 text-center flex justify-center items-center">
-                {hoveredBar ? (
-                  <div className="flex flex-wrap justify-center items-center gap-1.5 md:gap-3 text-xs bg-white/5 border border-white/10 px-3 py-1.5 rounded-full animate-in fade-in duration-200">
-                    <span className="text-mystic-text-muted">Zaman (UTC):</span>
-                    <strong className="text-white">{formatTimeRange(hoveredBar.time)}</strong>
-                    <span className="text-white/20">|</span>
-                    <span className="text-mystic-text-muted">Kp Değeri:</span>
-                    <strong className="text-white">
-                      {hoveredBar.kp.toFixed(2)}
-                    </strong>
-                    <span className="text-white/20">|</span>
-                    <span className={`text-[9px] px-1.5 py-0.5 rounded font-extrabold uppercase ${
-                      hoveredBar.predicted ? 'bg-amber-500/10 text-amber-400 border border-amber-500/20' : 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
-                    }`}>
-                      {hoveredBar.predicted ? '⚠️ Tahmin (Değişebilir)' : '✅ Kesinleşmiş Ölçüm'}
-                    </span>
-                  </div>
-                ) : (
-                  <span className="text-xs text-mystic-text-muted">
-                    Detayları görmek için sütunların üzerine gelin
-                  </span>
-                )}
-              </div>
-
-              {/* Bars Grid */}
-              <div className="flex items-end justify-between h-48 w-full border-b border-white/10 pb-2 gap-1 md:gap-2 px-1">
-                {kpHistoryToRender.map((item, index) => {
-                  const isForecast = !!item.predicted;
-                  return (
-                    <div 
-                      key={index} 
-                      className="flex-1 flex flex-col items-center h-full justify-end group/bar cursor-pointer"
-                      onMouseEnter={() => setHoveredBar(item)}
-                      onMouseLeave={() => setHoveredBar(null)}
-                    >
-                      {/* The colored bar */}
-                      <div 
-                        className={`w-full max-w-[14px] rounded-t transition-all duration-300 ${getKpColorClass(item.kp, isForecast)}`}
-                        style={{ height: `${Math.max((item.kp / 9) * 100, 6)}%` }}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-
-              {/* X Axis Labels */}
-              <div className="flex justify-between text-[9px] text-mystic-text-muted mt-2 px-1">
-                {kpHistoryToRender.map((item, index) => {
-                  if (index % 4 === 0) {
-                    return (
-                      <span key={index} className="text-center w-12 font-mono">
-                        {formatTime(item.time)}
-                      </span>
-                    );
-                  }
-                  return <span key={index} className="w-0 overflow-hidden" />;
-                })}
-              </div>
-
-              {/* Y Axis Legend indicators */}
-              <div className="flex flex-wrap gap-4 justify-center mt-6 pt-4 border-t border-t-white/5 text-[10px]">
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded bg-emerald-500"></span>
-                  <span className="text-mystic-text-muted">Sakin (0 - 2.9)</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded bg-amber-500"></span>
-                  <span className="text-mystic-text-muted">Kararsız (3 - 3.9)</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded bg-orange-500"></span>
-                  <span className="text-mystic-text-muted">Aktif (4 - 4.9)</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="w-2.5 h-2.5 rounded bg-red-500"></span>
-                  <span className="text-mystic-text-muted">Fırtına (5+)</span>
-                </div>
-                <div className="flex items-center gap-1.5 border-l border-white/10 pl-4">
-                  <span className="w-2.5 h-2.5 rounded border border-dashed border-cyan-400 bg-cyan-400/20"></span>
-                  <span className="text-cyan-300 font-semibold">[Dashed] Tahmin Blokları (Önümüzdeki 24s)</span>
-                </div>
-              </div>
-
-            </div>
-          )}
-        </div>
 
 
 
@@ -1530,65 +1231,7 @@ export default function SchumannPage() {
           )}
         </div>
 
-        {/* NOAA Günlük Uzay Havası Raporu */}
-        {!isLoading && data?.noaa_discussion && (data.noaa_discussion.solar_activity_tr || data.noaa_discussion.geomagnetic_field_tr || data.noaa_discussion.solar_wind_tr) && (
-          <div className="bg-black/40 border border-white/10 rounded-3xl p-6 md:p-8 backdrop-blur-md mb-8 relative overflow-hidden">
-            <div className="border-b border-white/10 pb-4 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <div>
-                <h2 className="text-xl font-bold flex items-center gap-2 text-white">
-                  <BookOpen size={22} className="text-[#00E5FF]" />
-                  NOAA Günlük Uzay Havası Raporu
-                </h2>
-                <p className="text-xs text-mystic-text-muted mt-1">
-                  U.S. SWPC Uzay Tahmin Merkezi tarafından hazırlanan günlük bilimsel raporun Türkçe çevirisi.
-                </p>
-              </div>
-              {data.noaa_discussion.raw_date && (
-                <span className="bg-white/5 border border-white/10 text-mystic-text-muted text-[10px] font-bold font-mono px-3 py-1 rounded-full shrink-0">
-                  Yayınlanma: {data.noaa_discussion.raw_date}
-                </span>
-              )}
-            </div>
 
-            <div className="space-y-6">
-              {data.noaa_discussion.solar_activity_tr && (
-                <div className="bg-black/25 border border-white/5 rounded-2xl p-5">
-                  <h3 className="text-sm font-bold text-[#00E5FF] uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <Sun size={14} />
-                    Güneş Aktivitesi Özet & Tahmini
-                  </h3>
-                  <p className="text-sm text-white/80 leading-relaxed whitespace-pre-line text-justify">
-                    {data.noaa_discussion.solar_activity_tr}
-                  </p>
-                </div>
-              )}
-
-              {data.noaa_discussion.solar_wind_tr && (
-                <div className="bg-black/25 border border-white/5 rounded-2xl p-5">
-                  <h3 className="text-sm font-bold text-cyan-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <Wind size={14} />
-                    Güneş Rüzgarı Analizi
-                  </h3>
-                  <p className="text-sm text-white/80 leading-relaxed whitespace-pre-line text-justify">
-                    {data.noaa_discussion.solar_wind_tr}
-                  </p>
-                </div>
-              )}
-
-              {data.noaa_discussion.geomagnetic_field_tr && (
-                <div className="bg-black/25 border border-white/5 rounded-2xl p-5">
-                  <h3 className="text-sm font-bold text-amber-400 uppercase tracking-wider mb-3 flex items-center gap-2">
-                    <Zap size={14} />
-                    Jeomanyetik Alan & Fırtına Tahmini
-                  </h3>
-                  <p className="text-sm text-white/80 leading-relaxed whitespace-pre-line text-justify">
-                    {data.noaa_discussion.geomagnetic_field_tr}
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
 
         {/* Bilgilendirme Bölümü (Açılır/Kapanır) */}
         <div className="bg-black/40 border border-white/10 rounded-3xl p-6 md:p-8 backdrop-blur-md transition-all duration-300">
@@ -1615,75 +1258,39 @@ export default function SchumannPage() {
                       <p>
                         <strong>• Schumann Rezonans Spektrogramı:</strong> Elektromanyetik alanın dikey eksende frekans (0 - 40 Hz), yatay eksende ise zaman bazlı uyarılma düzeyini gösterir. Bu grafik, Space Observing System 70 (Tomsk, Rusya) rasathanesinde bulunan ELF alıcı antenleri aracılığıyla doğrudan yeryüzünden ölçülen gerçek zamanlı elektromanyetik sonogram verilerini temsil eder. Zaman dilimi farkını en üstteki çift göstergeli anlık zaman panelinden (Yerel Saat ve Tomsk Saati) takip edebilirsiniz.
                       </p>
-                      <p>
-                        <strong>• Jeomanyetik Kp Eğilimi:</strong> 72 saatlik zaman diliminde ölçülen ve tahmin edilen jeomanyetik fırtına derecelerini (Kp) gösterir. Düz sütunlar kesinleşmiş geçmiş ölçümleri, kesikli sınırları olan sütunlar ise gelecek 24 saatlik tahmini temsil eder.
-                      </p>
                     </div>
                   </div>
 
                   <p>
                     <strong>Kozmik Oracle / Durum Raporu Nedir?</strong>
                     <br />
-                    Gözlemevinden alınan canlı Schumann Rezonansı genliği (A1), spektrogram uyarım dalgaları ve uydulardan alınan jeomanyetik parametreleri (Kp Endeksi, Hız, Yoğunluk, Bz kalkan durumu, Bt alan gücü ve Sıcaklık) anlık olarak inceleyen yerel kural motorudur. Bu motor, uzay havasındaki dalgalanmaları yorumlayarak size üç alanda bilgi verir:
+                    Gözlemevinden alınan canlı Schumann Rezonansı genliğini (A1) ve spektrogram uyarım dalgalarını anlık olarak inceleyen yerel kural motorudur. Bu motor, rezonanstaki dalgalanmaları yorumlayarak size üç alanda bilgi verir:
                     <br />
-                    <span className="text-white font-semibold">• 🔬 Bilimsel Teşhis:</span> İyonosfer ve manyetosferde gerçekleşen fiziksel olayların bilimsel açıklaması.
+                    <span className="text-white font-semibold">• 🔬 Bilimsel Teşhis:</span> İyonosferde gerçekleşen fiziksel olayların bilimsel açıklaması.
                     <br />
-                    <span className="text-white font-semibold">• ⚡ Beden Reaksiyonları:</span> Artan kozmik plazmanın sinir sistemi, uyku düzeni ve baş bölgesi üzerindeki olası fiziksel etkileri.
+                    <span className="text-white font-semibold">• ⚡ Beden Reaksiyonları:</span> Rezonans değişimlerinin sinir sistemi, uyku düzeni ve baş bölgesi üzerindeki olası fiziksel etkileri.
                     <br />
                     <span className="text-white font-semibold">• 🧘 Ruhsal Rehberlik:</span> Enerjiyi topraklamak, aura alanını korumak ve uyanış kapılarından faydalanmak için önerilen meditasyon ve nefes pratikleri.
-                  </p>
-
-                  <p>
-                    <strong>Kozmik Enerji Simülatörü (Test Paneli):</strong>
-                    <br />
-                    Uygulamadaki test sürgüsü yardımıyla Schumann A1 Genlik değerini (4.0 - 75.0 arası) manuel olarak değiştirebilirsiniz. Sürgüyü oynattığınızda, Kozmik Oracle teşhisi, beden reaksiyonları ve ruhsal rehberlik önerileri senkronize bir şekilde güncellenerek yüksek rezonans titreşimlerinin etkilerini test etmenizi sağlar. Güneş rüzgarı parametreleri (Kp, hız, yoğunluk vb.) ise simülasyondan izole edilerek canlı değerlerinde sabit kalır. "Canlı Veriye Dön" butonuyla gerçek verilere dönebilirsiniz.
                   </p>
                 </div>
 
                 <div className="space-y-4">
-                  <div className="bg-white/5 border border-white/10 p-4 rounded-2xl mb-4">
-                    <strong className="text-white">Güneş Rüzgarı Sözlüğü:</strong>
-                    <div className="mt-2 text-xs leading-relaxed flex flex-col gap-2">
-                      <p>
-                        <strong>• Schumann Tahmini (SR Skoru):</strong> Tomsk rasathanesi spektrogram görüntüsündeki dikey uyarım parlamalarının (flare) piksel yoğunluğu ve fiziksel A1 mod genliğinin anlık bileşiminden hesaplanan, 0.0 - 10.0 arası bir iyonosferik uyarım göstergesidir. Tıpkı Richter ölçeği gibi, canlı uzay havası dalgalanmalarının ve rezonans uyarım şiddetinin seviyesini (Sakin, Hafif, Aktif, Zirve) tek bir skorla anlamanızı sağlar.
-                      </p>
-                      <p>
-                        <strong>• Kp Endeksi:</strong> Dünya genelindeki manyetometrelerden alınan verilerle hesaplanan 0-9 arası jeomanyetik aktivite derecesidir. 5 ve üzeri, küresel manyetik fırtınaları (NOAA G1-G5 seviyeleri) ifade eder.
-                      </p>
-                      <p>
-                        <strong>• Güneş Rüzgarı Hızı:</strong> Güneş yüzeyinden kopup saniyede süzülen plazma hızıdır. Hız arttıkça Dünya'nın koruyucu kalkanı daha çok sıkışır.
-                      </p>
-                      <p>
-                        <strong>• Proton Yoğunluğu:</strong> Plazmadaki santimetreküp başına düşen parçacık miktarıdır. Yoğunluk yükseldikçe atmosferle girilen enerjisel etkileşim artar.
-                      </p>
-                      <p>
-                        <strong>• Bz Değeri (Yön):</strong> Manyetik kalkanın kuzey-güney yönüdür. Bz'nin eksiye (-) yani güneye yönelmesi, Dünya'nın kalkanında kapılar açarak plazmanın içeri sızmasını kolaylaştırır.
-                      </p>
-                      <p>
-                        <strong>• Toplam Alan (Bt):</strong> Gezegenler arası manyetik alanın toplam gücünü nT cinsinden gösterir.
-                      </p>
-                      <p>
-                        <strong>• Sıcaklık:</strong> Güneş plazmasının termal sıcaklığıdır. Yüksek termal değerler taç küre kütle atılımlarını (CME) işaret eder.
-                      </p>
-                    </div>
-                  </div>
+                  <p>
+                    <strong>Kozmik Enerji Simülatörü (Test Paneli):</strong>
+                    <br />
+                    Uygulamadaki test sürgüsü yardımıyla Schumann A1 Genlik değerini (4.0 - 75.0 arası) manuel olarak değiştirebilirsiniz. Sürgüyü oynattığınızda, Kozmik Oracle teşhisi, beden reaksiyonları ve ruhsal rehberlik önerileri senkronize bir şekilde güncellenerek yüksek rezonans titreşimlerinin etkilerini test etmenizi sağlar. "Canlı Veriye Dön" butonuyla gerçek verilere dönebilirsiniz.
+                  </p>
 
                   <p>
                     <strong>Saat Dilimi ve Yerel Saat Dönüşümü:</strong>
                     <br />
                     Bölgesel gözlemevi grafikleri üzerinde (örneğin Tomsk ELF grafiğinin eksenlerinde) yazan saatler istasyonun yerel saatidir. Spektrogram görselinin hemen üzerine yerleştirdiğimiz çift zaman göstergeli panel ise, son ölçüm anını hem kendi cihazınızın yerel saat dilimine (örneğin Türkiye saati) dönüştürerek hem de Tomsk yerel saatiyle birlikte gösterir. Bu sayede grafik üzerindeki zaman dilimi farkını görselin hemen üstündeki zaman panelinden kolayca takip edebilirsiniz.
                   </p>
-
-                  <p>
-                    <strong>Kozmik Hava Tahmini: Gelecek 24 Saat Nasıl Hesaplanır?</strong>
-                    <br />
-                    Dünya ile Güneş arasında (L1 noktasında) konumlanmış gelişmiş uzay uyduları (DSCOVR ve ACE), Güneş patlamalarıyla fırlayan yüklü parçacıkları yola çıktıkları anda ölçer. Bu kozmik rüzgarların Dünya'ya ulaşması fiziksel olarak 15 saat ile 3 gün arasında sürer. Sistemimiz, uyduların yolda yakaladığı bu verileri işleyerek henüz gezegenimize ulaşmamış olan bu "kozmik bilgi paketçiklerini" saatlik modellemeler halinde önceden sunar. Böylece önümüzdeki 24 saatin uyanış portallarını (grafikteki kesikli tahmin alanlarını) önceden görerek meditasyon, niyet ve çakra dengeleme çalışmalarınızı en yüksek farkındalıkla planlayabilirsiniz.
-                  </p>
                 </div>
               </div>
               <div className="mt-8 pt-6 border-t border-white/10 text-xs text-center text-mystic-text-muted">
                 <p>
-                  Elektromanyetik Schumann verileri Tomsk Gözlemevi (Space Observing System 70, Rusya), jeomanyetik Kp ve güneş rüzgarı verileri ise ABD Ulusal Okyanus ve Atmosfer Dairesi (NOAA) Space Weather Prediction Center kaynaklarından anlık olarak çekilmektedir.
+                  Elektromanyetik Schumann verileri Tomsk Gözlemevi (Space Observing System 70, Rusya) kaynaklarından anlık olarak çekilmektedir.
                 </p>
               </div>
             </div>
