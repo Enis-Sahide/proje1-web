@@ -1272,7 +1272,7 @@ export default function SchumannPage() {
                 </h3>
                 <p className="text-xs text-mystic-text-muted mt-1 max-w-xl">
                   {isApprenticeOrAbove 
-                    ? "Şık Kapısı fırtına uyarısı (G1, G2 veya G3 ve üzeri) iyonosferik enerji patlamalarında tarayıcınıza anlık bildirim gönderilecektir."
+                    ? "Işık Kapısı fırtına uyarısı (G1, G2 veya G3 ve üzeri) iyonosferik enerji patlamalarında tarayıcınıza anlık bildirim gönderilecektir."
                     : "Bu özellik Çırak seviyesi ve üzeri üyelerimiz içindir. Seviyenizi yükselterek bildirimleri aktif edebilirsiniz."}
                 </p>
               </div>
