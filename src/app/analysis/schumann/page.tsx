@@ -228,44 +228,6 @@ export default function SchumannPage() {
     }
   };
 
-  const getCalculatedImpact = (kpVal: number) => {
-    if (!data?.solar_wind) return kpVal;
-    
-    const kpWeight = (kpVal / 9) * 4.0;
-    
-    const speedVal = data.solar_wind.speed || 350;
-    const speedWeight = Math.max(0, Math.min(2.5, ((speedVal - 300) / 500) * 2.5));
-    
-    const densityVal = data.solar_wind.density || 4;
-    const densityWeight = Math.max(0, Math.min(2.0, ((densityVal - 2) / 15) * 2.0));
-    
-    const btVal = data.solar_wind.bt || 5;
-    const btWeight = Math.max(0, Math.min(1.5, ((btVal - 5) / 15) * 1.5));
-    
-    const bzVal = data.solar_wind.bz || 0;
-    const bzMultiplier = bzVal < 0 ? (1.0 + Math.min(0.25, (Math.abs(bzVal) / 20) * 0.25)) : 1.0;
-    
-    const rawImpact = kpWeight + speedWeight + densityWeight + btWeight;
-    return parseFloat(Math.min(10.0, rawImpact * bzMultiplier).toFixed(2));
-  };
-
-  const getEstimatedImpact = (kpVal: number) => {
-    // Kp değerine göre güneş rüzgarı parametrelerini tahmin ediyoruz (yaklaşık korelasyon):
-    const speedVal = 300 + (kpVal / 9) * 500;
-    const densityVal = 3 + (kpVal / 9) * 15;
-    const btVal = 5 + (kpVal / 9) * 15;
-    const bzVal = 5 - (kpVal / 9) * 15;
-    
-    const kpWeight = (kpVal / 9) * 4.0;
-    const speedWeight = Math.max(0, Math.min(2.5, ((speedVal - 300) / 500) * 2.5));
-    const densityWeight = Math.max(0, Math.min(2.0, ((densityVal - 2) / 15) * 2.0));
-    const btWeight = Math.max(0, Math.min(1.5, ((btVal - 5) / 15) * 1.5));
-    
-    const bzMultiplier = bzVal < 0 ? (1.0 + Math.min(0.25, (Math.abs(bzVal) / 20) * 0.25)) : 1.0;
-    
-    const rawImpact = kpWeight + speedWeight + densityWeight + btWeight;
-    return parseFloat(Math.min(10.0, rawImpact * bzMultiplier).toFixed(2));
-  };
 
   const getCosmicStatusInfo = (score: number) => {
     if (score < 3.0) {
@@ -454,20 +416,16 @@ export default function SchumannPage() {
       return lastIdx;
     }, -1);
 
-    // Canlı / ŞİMDİ sütunu için tam gözlemlenen CEI hesapla
+    // Canlı / ŞİMDİ sütunu için tam gözlemlenen Schumann indeksini kullan
     if (idx === lastMeasuredIdx) {
       if (simulatedA1 !== null) {
         return { ...item, kp: getSchumannScoreFromA1(simulatedA1) };
       }
-      const activeKp = item.kp;
-      const activeImpact = getCalculatedImpact(activeKp);
-      return { ...item, kp: activeImpact };
+      return { ...item, kp: data.cosmic_impact_score };
     }
     
-    // Geçmiş ve gelecek tahmin blokları için Kp tabanlı güneş rüzgarı tahmini ile CEI hesapla
-    // Bu sayede grafik düzleşmesi engellenir ve dikey dalgalanmalar korunur
-    const estimatedImpact = getEstimatedImpact(item.kp);
-    return { ...item, kp: estimatedImpact };
+    // Geçmiş ve gelecek tahmin blokları için doğrudan kendi Kp değerini kullan (eski ağırlıklı hesaplamalar kaldırıldı)
+    return { ...item, kp: item.kp ?? 0 };
   }) : [];
 
   const kpHistoryToRender = data?.history ? data.history.map((item, idx) => {
@@ -520,8 +478,10 @@ export default function SchumannPage() {
       const indexHigh = Math.min(indexLow + 1, cols.length - 1);
       const weight = indexFloat - indexLow;
 
-      const kpLow = cols[indexLow].kp;
-      const kpHigh = cols[indexHigh].kp;
+      const colLow = cols[indexLow];
+      const colHigh = cols[indexHigh];
+      const kpLow = colLow?.kp ?? 0;
+      const kpHigh = colHigh?.kp ?? 0;
       const kp = kpLow + (kpHigh - kpLow) * weight;
 
       // Determine if this pixel column is in the future relative to the actual current time
@@ -803,7 +763,7 @@ export default function SchumannPage() {
 
     // Get the discrete 3-hour block under the cursor
     const blockIndex = Math.min(cols.length - 1, Math.max(0, Math.floor(xPct * cols.length)));
-    const kp = cols[blockIndex].kp;
+    const kp = cols[blockIndex]?.kp ?? 0;
     const isForecast = !!cols[blockIndex].predicted;
 
     // Find the last measured index representing the current ("ŞİMDİ") slot

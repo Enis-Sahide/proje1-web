@@ -628,23 +628,7 @@ export async function GET() {
     }
     
     // 5. Calculate custom cosmic impact score (0.0 to 10.0)
-    let finalImpactScore = 0.5;
-    if (realSchumann) {
-      finalImpactScore = getSchumannScoreFromA1(realSchumann.a1);
-    } else {
-      // Fallback to Kp-based CEI calculation
-      const kpWeight = (currentKp / 9) * 4.0;
-      const speedVal = solarWind.speed || 350;
-      const speedWeight = Math.max(0, Math.min(2.5, ((speedVal - 300) / 500) * 2.5));
-      const densityVal = solarWind.density || 4;
-      const densityWeight = Math.max(0, Math.min(2.0, ((densityVal - 2) / 15) * 2.0));
-      const btVal = solarWind.bt || 5;
-      const btWeight = Math.max(0, Math.min(1.5, ((btVal - 5) / 15) * 1.5));
-      const bzVal = solarWind.bz || 0;
-      const bzMultiplier = bzVal < 0 ? (1.0 + Math.min(0.25, (Math.abs(bzVal) / 20) * 0.25)) : 1.0;
-      const rawImpactScore = kpWeight + speedWeight + densityWeight + btWeight;
-      finalImpactScore = parseFloat(Math.min(10.0, rawImpactScore * bzMultiplier).toFixed(2));
-    }
+    const finalImpactScore = realSchumann ? getSchumannScoreFromA1(realSchumann.a1) : 0.5;
     
     const cosmicStatus = getCosmicImpactStatusInfo(finalImpactScore);
 
