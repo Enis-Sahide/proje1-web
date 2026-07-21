@@ -2,6 +2,53 @@ export interface EmotionalDisease {
   name: string;
   cause: string;
   affirmation: string;
+  organSystem?: string;
+  detailedExplanation?: string;
+  symptomMessage?: string;
+}
+
+export function enrichDisease(d: EmotionalDisease): Required<EmotionalDisease> {
+  let organSystem = d.organSystem;
+  let detailedExplanation = d.detailedExplanation;
+  let symptomMessage = d.symptomMessage;
+
+  const n = (d.name || '').toLowerCase();
+  const c = (d.cause || '').toLowerCase();
+
+  if (!organSystem) {
+    if (n.includes('böbrek') || n.includes('adrenal') || n.includes('addison') || n.includes('omurga') || n.includes('bacak') || n.includes('ayak') || n.includes('kemik')) {
+      organSystem = 'Kök Çakra & Varoluşsal Güvenlik (Savaş - Kaç Sistemi)';
+    } else if (n.includes('adet') || n.includes('rahim') || n.includes('yumurtalık') || n.includes('cinsel') || n.includes('prostat') || n.includes('idrar') || n.includes('mesane')) {
+      organSystem = 'Sakral Çakra & Üreme / Yaratıcılık / Duygusal Denge';
+    } else if (n.includes('mide') || n.includes('sindirim') || n.includes('karaciğer') || n.includes('safra') || n.includes('pankreas') || n.includes('bağırsak') || n.includes('ülser')) {
+      organSystem = 'Solar Plexus (Karın) Çakrası & Sindirim / Özdeğer / İrade';
+    } else if (n.includes('kalp') || n.includes('akciğer') || n.includes('göğüs') || n.includes('kan') || n.includes('damar') || n.includes('tansiyon') || n.includes('solunum') || n.includes('astım')) {
+      organSystem = 'Kalp Çakrası & Dolaşım / Sevgi / Yaşam Nefesi';
+    } else if (n.includes('boğaz') || n.includes('tiroit') || n.includes('ses') || n.includes('ağız') || n.includes('diş') || n.includes('boyun') || n.includes('öksürük') || n.includes('adenoid')) {
+      organSystem = 'Boğaz Çakrası & İfade / İletişim / Hakikat';
+    } else if (n.includes('göz') || n.includes('baş') || n.includes('beyin') || n.includes('migren') || n.includes('kulak') || n.includes('sinüs') || n.includes('zihin')) {
+      organSystem = 'Üçüncü Göz (Alın) Çakrası & Zihin / Sezgi / İçsel Görüş';
+    } else {
+      organSystem = 'Genel Biyolojik & Hücresel Beden Sistemi';
+    }
+  }
+
+  if (!detailedExplanation) {
+    detailedExplanation = `Zihinsel düzlemde bastırılan "${d.cause.replace(/\.$/, '')}" kalıbı, bedenin bu bölgesindeki enerjisel akışı kısıtlayarak fiziksel bir semptom şeklinde dışa vurmaktadır. Psikosomatik şifanın temel ilkesi, zihindeki kök korkuyu fark edip hücresel seviyede serbest bırakmaktır.`;
+  }
+
+  if (!symptomMessage) {
+    symptomMessage = `Bedeniniz bu semptomla size şu mesajı veriyor: "Geçmişten getirdiğin savunma mekanizmalarını ve zihinsel yükleri bırak, kendi öz değerini hatırla ve yaşamın doğal akışına sevgiyle güven."`;
+  }
+
+  return {
+    name: d.name,
+    cause: d.cause,
+    affirmation: d.affirmation,
+    organSystem,
+    detailedExplanation,
+    symptomMessage,
+  };
 }
 
 export const EMOTIONAL_DISEASES: EmotionalDisease[] = [

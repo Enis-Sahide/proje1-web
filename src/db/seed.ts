@@ -19,7 +19,7 @@ import { LESSONS } from '../data/chakraLessons';
 import { allQuizzes, type Quiz } from '../data/allQuizzes';
 import { FINAL_QUIZ_QUESTIONS } from '../data/finalQuiz';
 import { ruhBedenQuiz1, ruhBedenQuiz2, ruhBedenQuiz3 } from '../data/ruhBedenQuizzes';
-import { EMOTIONAL_DISEASES } from '../data/emotionalDiseases';
+import { EMOTIONAL_DISEASES, enrichDisease } from '../data/emotionalDiseases';
 import { CHAKRA_TEST_QUESTIONS } from '../data/chakraTestQuestions';
 import gatesData from '../data/gates.json';
 import { DAILY_AFFIRMATIONS } from '../data/affirmations';
@@ -236,11 +236,17 @@ async function main() {
     });
   });
 
-  const emotionalRows = EMOTIONAL_DISEASES.map((d) => ({
-    name: d.name,
-    cause: d.cause,
-    affirmation: d.affirmation,
-  }));
+  const emotionalRows = EMOTIONAL_DISEASES.map((d) => {
+    const enriched = enrichDisease(d);
+    return {
+      name: enriched.name,
+      cause: enriched.cause,
+      affirmation: enriched.affirmation,
+      organSystem: enriched.organSystem,
+      detailedExplanation: enriched.detailedExplanation,
+      symptomMessage: enriched.symptomMessage,
+    };
+  });
 
   const chakraTestRows = CHAKRA_TEST_QUESTIONS.map((q) => ({
     id: q.id,

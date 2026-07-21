@@ -10,6 +10,9 @@ interface EmotionalDisease {
   name: string;
   cause: string;
   affirmation: string;
+  organSystem?: string;
+  detailedExplanation?: string;
+  symptomMessage?: string;
 }
 
 export default function DuygusalHastaliklarPage() {
@@ -142,14 +145,50 @@ export default function DuygusalHastaliklarPage() {
                     </button>
                     
                     {isExpanded && (
-                      <div className="px-6 pb-6 pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                        <div className="mb-4">
-                          <h4 className="text-sm font-bold text-mystic-primary uppercase tracking-wider mb-2">Duygusal Nedeni</h4>
-                          <p className="text-mystic-text-muted leading-relaxed">{disease.cause}</p>
+                      <div className="px-6 pb-6 pt-2 animate-in fade-in slide-in-from-top-2 duration-300 space-y-4 border-t border-mystic-surface-light/30">
+                        {/* Organ / Chakra Badge */}
+                        {disease.organSystem && (
+                          <div className="pt-2">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-mystic-primary/10 border border-mystic-primary/30 text-mystic-primary text-xs font-bold rounded-full">
+                              🧬 {disease.organSystem}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Basic Cause */}
+                        <div>
+                          <h4 className="text-xs font-bold text-mystic-primary uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                            📌 Temel Duygusal Neden & Kök İnanç
+                          </h4>
+                          <p className="text-mystic-text text-sm leading-relaxed font-medium">{disease.cause}</p>
                         </div>
-                        <div className="bg-mystic-dark/50 p-4 rounded-xl border border-mystic-surface-light/50">
-                          <h4 className="text-sm font-bold text-mystic-accent uppercase tracking-wider mb-2">Yeni Düşünce Modeli (Telkin)</h4>
-                          <p className="text-mystic-text italic">"{disease.affirmation}"</p>
+
+                        {/* Detailed Psychosomatic Explanation */}
+                        {disease.detailedExplanation && (
+                          <div className="p-4 bg-mystic-dark/40 rounded-xl border border-mystic-surface-light/40">
+                            <h4 className="text-xs font-bold text-mystic-accent uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                              🧠 Detaylı Psikosomatik & Ruhsal Analiz
+                            </h4>
+                            <p className="text-mystic-text-muted text-xs md:text-sm leading-relaxed">{disease.detailedExplanation}</p>
+                          </div>
+                        )}
+
+                        {/* Body Message */}
+                        {disease.symptomMessage && (
+                          <div className="p-4 bg-amber-500/10 rounded-xl border border-amber-500/20">
+                            <h4 className="text-xs font-bold text-amber-400 uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                              💡 Bedenin Şifa Mesajı
+                            </h4>
+                            <p className="text-amber-100/90 text-xs md:text-sm italic">{disease.symptomMessage}</p>
+                          </div>
+                        )}
+
+                        {/* Affirmation Card */}
+                        <div className="bg-gradient-to-r from-mystic-primary/10 via-mystic-accent/5 to-mystic-primary/10 p-4 rounded-xl border border-mystic-primary/30 shadow-inner">
+                          <h4 className="text-xs font-bold text-mystic-primary uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                            ✨ Yeni Düşünce Modeli & Olumlama Telkini
+                          </h4>
+                          <p className="text-white text-sm md:text-base font-semibold italic">"{disease.affirmation}"</p>
                         </div>
                       </div>
                     )}

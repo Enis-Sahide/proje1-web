@@ -11,7 +11,14 @@ export async function GET(request: Request) {
   const payload = await getAuthPayload(request);
   if (!payload) return errorJson('Yetkisiz', 401);
   const rows = await db.select().from(emotionalDiseases).orderBy(asc(emotionalDiseases.id));
-  return json(rows.map((r) => ({ name: r.name, cause: r.cause, affirmation: r.affirmation })));
+  return json(rows.map((r) => ({ 
+    name: r.name, 
+    cause: r.cause, 
+    affirmation: r.affirmation,
+    organSystem: r.organSystem,
+    detailedExplanation: r.detailedExplanation,
+    symptomMessage: r.symptomMessage
+  })));
 }
 
 export const OPTIONS = preflight;

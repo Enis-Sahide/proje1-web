@@ -80,6 +80,9 @@ export const emotionalDiseases = pgTable('emotional_diseases', {
   name: text('name').notNull(),
   cause: text('cause'),
   affirmation: text('affirmation'),
+  organSystem: text('organ_system'),
+  detailedExplanation: text('detailed_explanation'),
+  symptomMessage: text('symptom_message'),
 });
 
 export const chakraTestQuestions = pgTable('chakra_test_questions', {
