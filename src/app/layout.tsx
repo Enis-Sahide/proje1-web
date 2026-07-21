@@ -34,7 +34,9 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "7Layers" }],
   creator: "7Layers",
-  publisher: "7Layers",
+  verification: {
+    google: 'a15kbuAKAeY4DSM8hNw31SrHZjIoSb1IIyMFTBEhq14',
+  },
   icons: {
     icon: '/logo.png',
     shortcut: '/logo.png',
