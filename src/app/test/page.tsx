@@ -155,9 +155,62 @@ export default function TestPage() {
           </div>
         </div>
 
+        {/* Share & Invite Card */}
+        <div className="bg-gradient-to-r from-emerald-950/40 via-mystic-surface/80 to-mystic-surface/80 border border-emerald-500/30 rounded-3xl p-6 md:p-8 shadow-2xl mb-8 relative overflow-hidden">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+            <div className="space-y-2 text-center md:text-left">
+              <h3 className="text-lg md:text-xl font-bold text-white flex items-center justify-center md:justify-start gap-2">
+                <Sparkles className="text-emerald-400" size={20} />
+                Arkadaşlarınızı Test Ekibine Davet Edin!
+              </h3>
+              <p className="text-xs md:text-sm text-mystic-text-muted max-w-lg leading-relaxed">
+                20 kişilik test barajını aşabilmemiz için çevrenizdeki dostlarınızla bu sayfayı paylaşarak destek olabilirsiniz. Her bir katılım bizim için çok değerli.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-3 shrink-0 w-full md:w-auto">
+              <a
+                href={`https://api.whatsapp.com/send?text=${encodeURIComponent("Merhaba! 7LAYERS Android mobil uygulamasının Google Play kapalı test ekibine katılarak uygulamayı herkesten önce deneyimleyebilirsin: https://www.7layers.tr/test")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs md:text-sm rounded-xl transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0.3)] cursor-pointer"
+              >
+                WhatsApp'ta Paylaş
+                <ChevronRight size={16} />
+              </a>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText('https://www.7layers.tr/test');
+                  alert('Test sayfası bağlantısı panoya kopyalandı!');
+                }}
+                className="inline-flex items-center justify-center gap-2 px-4 py-3 bg-white/10 hover:bg-white/20 text-white font-medium text-xs md:text-sm rounded-xl border border-white/20 transition-colors cursor-pointer"
+              >
+                Bağlantıyı Kopyala
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Alternative Direct APK Section */}
+        <div className="bg-mystic-surface/40 backdrop-blur-md border border-mystic-surface-light rounded-3xl p-6 text-center md:text-left flex flex-col md:flex-row items-center justify-between gap-4">
+          <div>
+            <h4 className="text-sm font-bold text-white mb-1">Doğrudan APK Olarak Yüklemek İster Mısınız?</h4>
+            <p className="text-xs text-mystic-text-muted">
+              Google Play onay adımlarını beklemeden uygulamayı doğrudan Android cihazınıza kurup deneyebilirsiniz.
+            </p>
+          </div>
+          <a
+            href="https://expo.dev/artifacts/eas/1A3eb9EWeVzGXtysz_IvKgV25m8p88ocaAWS1wiLSqA.aab"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-2.5 bg-white/5 hover:bg-white/10 text-mystic-accent font-semibold text-xs rounded-xl border border-mystic-accent/30 transition-all shrink-0 cursor-pointer"
+          >
+            Hızlı Yükleme Paketini İncele
+            <Download size={14} />
+          </a>
+        </div>
 
         {/* Support Alert */}
-        <div className="mt-10 bg-mystic-surface/40 backdrop-blur-md border border-mystic-surface-light rounded-2xl p-5 flex items-center gap-4">
+        <div className="mt-8 bg-mystic-surface/40 backdrop-blur-md border border-mystic-surface-light rounded-2xl p-5 flex items-center gap-4">
           <Info className="text-mystic-accent shrink-0" size={24} />
           <p className="text-xs text-white/70 leading-relaxed">
             Kurulum veya üyelik adımlarında herhangi bir sorunla karşılaşırsanız lütfen <a href="https://wa.me/905384623588" target="_blank" rel="noopener noreferrer" className="text-mystic-accent hover:underline font-semibold">WhatsApp destek hattımız</a> üzerinden bizimle iletişime geçin. Katkılarınız için şimdiden çok teşekkür ederiz!
