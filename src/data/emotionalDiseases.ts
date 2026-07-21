@@ -7,13 +7,35 @@ export interface EmotionalDisease {
   symptomMessage?: string;
 }
 
+function cleanText(text: string): string {
+  if (!text) return '';
+  const parts = text.split(',').map(s => s.trim()).filter(Boolean);
+  const uniqueParts: string[] = [];
+  const seen = new Set<string>();
+
+  for (const part of parts) {
+    const key = part.toLowerCase();
+    if (!seen.has(key)) {
+      seen.add(key);
+      uniqueParts.push(part);
+    }
+  }
+
+  let cleaned = uniqueParts.join(', ');
+  cleaned = cleaned.replace(/\.([a-zA-ZÇĞİÖŞÜçğıöşü])/g, '. $1');
+  return cleaned;
+}
+
 export function enrichDisease(d: EmotionalDisease): Required<EmotionalDisease> {
+  const name = cleanText(d.name);
+  const cause = cleanText(d.cause);
+  const affirmation = cleanText(d.affirmation);
+
   let organSystem = d.organSystem;
   let detailedExplanation = d.detailedExplanation;
   let symptomMessage = d.symptomMessage;
 
-  const n = (d.name || '').toLowerCase();
-  const c = (d.cause || '').toLowerCase();
+  const n = (name || '').toLowerCase();
 
   if (!organSystem) {
     if (n.includes('böbrek') || n.includes('adrenal') || n.includes('addison') || n.includes('omurga') || n.includes('bacak') || n.includes('ayak') || n.includes('kemik')) {
@@ -34,7 +56,7 @@ export function enrichDisease(d: EmotionalDisease): Required<EmotionalDisease> {
   }
 
   if (!detailedExplanation) {
-    detailedExplanation = `Zihinsel düzlemde bastırılan "${d.cause.replace(/\.$/, '')}" kalıbı, bedenin bu bölgesindeki enerjisel akışı kısıtlayarak fiziksel bir semptom şeklinde dışa vurmaktadır. Psikosomatik şifanın temel ilkesi, zihindeki kök korkuyu fark edip hücresel seviyede serbest bırakmaktır.`;
+    detailedExplanation = `Zihinsel düzlemde bastırılan "${cause.replace(/\.$/, '')}" kalıbı, bedenin bu bölgesindeki enerjisel akışı kısıtlayarak fiziksel bir semptom şeklinde dışa vurmaktadır. Psikosomatik şifanın temel ilkesi, zihindeki kök korkuyu fark edip hücresel seviyede serbest bırakmaktır.`;
   }
 
   if (!symptomMessage) {
@@ -42,9 +64,9 @@ export function enrichDisease(d: EmotionalDisease): Required<EmotionalDisease> {
   }
 
   return {
-    name: d.name,
-    cause: d.cause,
-    affirmation: d.affirmation,
+    name,
+    cause,
+    affirmation,
     organSystem,
     detailedExplanation,
     symptomMessage,
