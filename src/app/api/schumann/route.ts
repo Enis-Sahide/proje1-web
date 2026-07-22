@@ -277,27 +277,10 @@ async function detectFlaresFromImage(): Promise<{
       latestSum += colBrightnesses[i];
       latestCount++;
     }
-    const latestAvg = latestCount > 0 ? (latestSum / latestCount) : minBr;
-    
-    const range = maxBr - minBr;
-    const normalizedScore = range === 0 ? 0.5 : ((latestAvg - minBr) / range) * 10;
-    
-    const getA1FromScore = (score: number): number => {
-      if (score < 3.0) {
-        return 4.0 + (score / 3.0) * 4.0;
-      } else if (score < 6.0) {
-        return 8.0 + ((score - 3.0) / 3.0) * 12.0;
-      } else if (score < 8.5) {
-        return 20.0 + ((score - 6.0) / 2.5) * 20.0;
-      } else {
-        return 40.0 + ((score - 8.5) / 1.5) * 35.0;
-      }
-    };
-
-    const peakA1 = getA1FromScore(normalizedScore);
+    const latestAvg = latestCount > 0 ? (latestSum / latestCount) : 4.0;
     
     // 2. Calculate the overall peak in the last 24 hours (maximum column in the chart, ignoring margins)
-    let maxOverallBr = minBr;
+    let maxOverallBr = 4.0;
     const safeStart = Math.min(20, colBrightnesses.length);
     const safeEnd = Math.max(0, colBrightnesses.length - 10);
     for (let i = safeStart; i < safeEnd; i++) {
@@ -305,14 +288,36 @@ async function detectFlaresFromImage(): Promise<{
         maxOverallBr = colBrightnesses[i];
       }
     }
-    const normalizedScore24h = range === 0 ? 0.5 : ((maxOverallBr - minBr) / range) * 10;
-    const peakA124h = getA1FromScore(normalizedScore24h);
+
+    const getA1FromBrightness = (avgBr: number): number => {
+      if (avgBr <= 15.0) {
+        return parseFloat((4.0 + (avgBr / 15.0) * 4.0).toFixed(1));
+      } else if (avgBr <= 40.0) {
+        return parseFloat((8.0 + ((avgBr - 15.0) / 25.0) * 7.0).toFixed(1));
+      } else if (avgBr <= 80.0) {
+        return parseFloat((15.0 + ((avgBr - 40.0) / 40.0) * 10.0).toFixed(1));
+      } else if (avgBr <= 120.0) {
+        return parseFloat((25.0 + ((avgBr - 80.0) / 40.0) * 15.0).toFixed(1));
+      } else if (avgBr <= 160.0) {
+        return parseFloat((40.0 + ((avgBr - 120.0) / 40.0) * 15.0).toFixed(1));
+      } else if (avgBr <= 200.0) {
+        return parseFloat((55.0 + ((avgBr - 160.0) / 40.0) * 15.0).toFixed(1));
+      } else {
+        return parseFloat((70.0 + Math.min(20.0, ((avgBr - 200.0) / 55.0) * 20.0)).toFixed(1));
+      }
+    };
+
+    const peakA1 = getA1FromBrightness(latestAvg);
+    const score = getSchumannScoreFromA1(peakA1);
+    
+    const peakA124h = getA1FromBrightness(maxOverallBr);
+    const score24h = getSchumannScoreFromA1(peakA124h);
 
     return {
-      score: parseFloat(normalizedScore.toFixed(2)),
-      peakA1: parseFloat(peakA1.toFixed(1)),
-      score24h: parseFloat(normalizedScore24h.toFixed(2)),
-      peakA124h: parseFloat(peakA124h.toFixed(1))
+      score: score,
+      peakA1: peakA1,
+      score24h: score24h,
+      peakA124h: peakA124h
     };
   } catch (err) {
     console.error('Error detecting flares from image:', err);
