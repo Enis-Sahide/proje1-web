@@ -200,7 +200,12 @@ async function fetchRealSchumannData(): Promise<RealSchumannRow | null> {
   }
 }
 
-async function detectFlaresFromImage(): Promise<{ score: number; peakA1: number } | null> {
+async function detectFlaresFromImage(): Promise<{ 
+  score: number; 
+  peakA1: number; 
+  score24h: number; 
+  peakA124h: number; 
+} | null> {
   try {
     const url = 'https://sos70.ru/provider.php?file=shm.jpg';
     const res = await fetch(url, {
@@ -217,7 +222,7 @@ async function detectFlaresFromImage(): Promise<{ score: number; peakA1: number 
     const { data, info } = await image.raw().toBuffer({ resolveWithObject: true });
     
     const dataStartX = 60;
-    const dataEndX = 1444;
+    const dataEndX = info.width - 10;
     const bgRegions = [
       { start: 55, end: 85 },   // 2 - 5 Hz
       { start: 130, end: 155 }, // 10 - 12.5 Hz
@@ -226,8 +231,6 @@ async function detectFlaresFromImage(): Promise<{ score: number; peakA1: number 
     
     let minBr = 255;
     let maxBr = 0;
-    let sumTotalBr = 0;
-    let colsCount = 0;
     const colBrightnesses: number[] = [];
     
     for (let x = dataStartX; x <= dataEndX; x++) {
@@ -248,39 +251,53 @@ async function detectFlaresFromImage(): Promise<{ score: number; peakA1: number 
       colBrightnesses.push(avgBr);
       if (avgBr < minBr) minBr = avgBr;
       if (avgBr > maxBr) maxBr = avgBr;
-      sumTotalBr += avgBr;
-      colsCount++;
     }
     
-    // Check the latest columns (last 10 minutes, approx. 3 columns)
+    // 1. Calculate current / latest average (last 10-15 minutes, avoiding the very edge)
     let latestSum = 0;
     let latestCount = 0;
-    for (let i = colBrightnesses.length - 3; i < colBrightnesses.length; i++) {
+    const startIndex = Math.max(0, colBrightnesses.length - 8);
+    const endIndex = Math.max(0, colBrightnesses.length - 3);
+    for (let i = startIndex; i <= endIndex; i++) {
       latestSum += colBrightnesses[i];
       latestCount++;
     }
-    const latestAvg = latestSum / latestCount;
+    const latestAvg = latestCount > 0 ? (latestSum / latestCount) : minBr;
     
-    // Dynamic activity score from 0.0 to 10.0
     const range = maxBr - minBr;
     const normalizedScore = range === 0 ? 0.5 : ((latestAvg - minBr) / range) * 10;
     
-    // Extrapolate peak A1 based on the normalized score
-    // Minimum activity starts at A1=4.0, maximum activity (flare peak) goes up to A1=75.0
-    let peakA1 = 6.0;
-    if (normalizedScore < 3.0) {
-      peakA1 = 4.0 + (normalizedScore / 3.0) * 4.0;
-    } else if (normalizedScore < 6.0) {
-      peakA1 = 8.0 + ((normalizedScore - 3.0) / 3.0) * 12.0;
-    } else if (normalizedScore < 8.5) {
-      peakA1 = 20.0 + ((normalizedScore - 6.0) / 2.5) * 20.0;
-    } else {
-      peakA1 = 40.0 + ((normalizedScore - 8.5) / 1.5) * 35.0;
-    }
+    const getA1FromScore = (score: number): number => {
+      if (score < 3.0) {
+        return 4.0 + (score / 3.0) * 4.0;
+      } else if (score < 6.0) {
+        return 8.0 + ((score - 3.0) / 3.0) * 12.0;
+      } else if (score < 8.5) {
+        return 20.0 + ((score - 6.0) / 2.5) * 20.0;
+      } else {
+        return 40.0 + ((score - 8.5) / 1.5) * 35.0;
+      }
+    };
+
+    const peakA1 = getA1FromScore(normalizedScore);
     
+    // 2. Calculate the overall peak in the last 24 hours (maximum column in the chart, ignoring margins)
+    let maxOverallBr = minBr;
+    const safeStart = Math.min(20, colBrightnesses.length);
+    const safeEnd = Math.max(0, colBrightnesses.length - 10);
+    for (let i = safeStart; i < safeEnd; i++) {
+      if (colBrightnesses[i] > maxOverallBr) {
+        maxOverallBr = colBrightnesses[i];
+      }
+    }
+    const normalizedScore24h = range === 0 ? 0.5 : ((maxOverallBr - minBr) / range) * 10;
+    const peakA124h = getA1FromScore(normalizedScore24h);
+
     return {
       score: parseFloat(normalizedScore.toFixed(2)),
-      peakA1: parseFloat(peakA1.toFixed(1))
+      peakA1: parseFloat(peakA1.toFixed(1)),
+      score24h: parseFloat(normalizedScore24h.toFixed(2)),
+      peakA124h: parseFloat(peakA124h.toFixed(1))
     };
   } catch (err) {
     console.error('Error detecting flares from image:', err);
@@ -351,6 +368,13 @@ export async function GET(req: Request) {
       triggeredGLevel = 'G1';
     }
 
+    let peakA124h = realSchumann ? realSchumann.a1 : 6.0;
+    if (imageFlareData) {
+      peakA124h = Math.max(peakA124h, imageFlareData.peakA124h);
+    }
+    const finalPeakA1 = simulatedA1 !== null ? simulatedA1 : peakA124h;
+    const finalPeakScore = getSchumannScoreFromA1(finalPeakA1);
+
     const allRules = await db.select().from(schema.schumannRules);
 
     return json({
@@ -360,7 +384,9 @@ export async function GET(req: Request) {
       ai_analysis: aiAnalysis,
       schumann_real: realSchumann,
       triggered_g_level: triggeredGLevel,
-      schumann_rules: allRules
+      schumann_rules: allRules,
+      peak_a1_24h: finalPeakA1,
+      peak_score_24h: finalPeakScore
     });
   } catch (error: any) {
     console.error('Schumann API Error:', error);
