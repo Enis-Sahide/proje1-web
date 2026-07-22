@@ -34,13 +34,11 @@ export async function POST(request: Request) {
     return errorJson('Bu sınava bugün zaten girdiniz. Günde en fazla 1 kez girilebilir.', 429);
   }
 
-  // 3. Aktif oturumu kaydet ve günlük deneme hakkını hemen tüket (examAttempts'e ekle)
-  const updatedAttempts = { ...examAttempts, [quizId]: today };
+  // 3. Aktif oturumu kaydet (Günlük limit tüketimi FINISH esnasında yapılacaktır)
   await db
     .update(userProgress)
     .set({
       activeExam: { examId: quizId, startTime: new Date().toISOString(), device },
-      examAttempts: updatedAttempts,
       updatedAt: new Date(),
     })
     .where(eq(userProgress.userId, payload.sub));
