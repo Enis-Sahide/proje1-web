@@ -258,14 +258,14 @@ const getHolisticSynthesisText = (type: string) => {
   if (type === "Yansıtıcı" || type === "Reflector") {
     return {
       title: "Ruhsal ve Yaşamsal Sentez Analiziniz",
-      text1: "Siz dünya nüfusunun sadece %1'ini oluşturan en nadir tiplerden birisiniz. Enerji merkezlerinizin tamamı açık olduğu için, adeta yaşayan bir ayna gibi çevrenizin enerjisini yansıtırsınız. Bu dişil (yin) ve sezgisel gücünüz, çevrenizdeki insanların ve bulunduğunuz mekanların sağlık ve dengesini anında ölçebilmenizi sağlar.",
-      text2: "Yaşamdaki en önemli rehberiniz doğru ortamlarda bulunmaktır. Eğer bulunduğunuz yerdeki insanlar sağlıksız veya huzursuzsa, siz de fiziksel ve ruhsal olarak hastalanabilirsiniz. Çevrenizi son derece seçici oluşturmalısınız. Kararlarınızı aceleye getirmemeli, içinizdeki netliğin olgunlaşması için 28 günlük Ay döngüsünü beklemelisiniz."
+      text1: "Siz dünya nüfusunun sadece %1'ini oluşturan en nadir tiplerden birisiniz. Enerji merkezlerinizin tamamı açık olduğu için, adeta yaşayan bir ayna gibi çevrenizin enerjisini yansıtırsınız. Bu alıcı/yansıtıcı (dişil/yin) ve sezgisel gücünüz -ki bu durum biyolojik cinsiyetten tamamen bağımsız, enerjisel bir açık olma ve dinleme halidir- çevrenizdeki insanların ve bulunduğunuz mekanların sağlık ve dengesini anında ölçebilmenizi sağlar.",
+      text2: "Yaşamdaki en önemli rehberiniz doğru ortamlarda bulunmaktır. Eğer bulunduğunuz yerdeki insanlar sağlıksız veya huzursuzsa, siz de fiziksel olarak hastalanabilirsiniz. Çevrenizi son derece seçici oluşturmalısınız. Kararlarınızı aceleye getirmemeli, içinizdeki netliğin olgunlaşması için 28 günlük Ay döngüsünü beklemelisiniz."
     };
   }
   if (type === "Projektör" || type === "Projector") {
     return {
       title: "Ruhsal ve Yaşamsal Sentez Analiziniz",
-      text1: "Siz diğer insanların enerjisini okumak, yönetmek ve onlara rehberlik etmek için buradasınız. Doğal bir sezgisel anlayışa ve liderlik gücüne sahipsiniz. Ancak bu gücün doğru çalışabilmesi için davet edilmeyi beklemelisiniz. Bu dişil alıcı yanınız, sizi doğru insanlarla buluşturacak anahtardır.",
+      text1: "Siz diğer insanların enerjisini okumak, yönetmek ve onlara rehberlik etmek için buradasınız. Doğal bir sezgisel anlayışa ve liderlik gücüne sahipsiniz. Ancak bu gücün doğru çalışabilmesi için davet edilmeyi beklemelisiniz. Bu alıcı (dişil/yin) duruşunuz -ki bu durum biyolojik cinsiyetten bağımsız, enerjisel bir açık olma, sabır ve dinleme halidir- sizi doğru insanlarla buluşturacak anahtardır.",
       text2: "Eğer davet edilmeden kendinizi ve fikirlerinizi öne sürerseniz, enerjiniz görülmeyecek ve burukluk (bitterness) hissedeceksiniz. Kendi değerinizi bilin, doğru insanların sizi keşfetmesini bekleyin. Dinlenmek, yalnız kalmak ve enerjinizi korumak en büyük gücünüzdür."
     };
   }
