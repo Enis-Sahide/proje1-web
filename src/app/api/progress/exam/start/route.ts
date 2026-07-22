@@ -31,14 +31,25 @@ export async function POST(request: Request) {
   const attempt = examAttempts[quizId];
   const attemptDate = typeof attempt === 'string' ? attempt : (attempt as any)?.date;
   if (attemptDate === today) {
+    // 60 saniyelik tolerans süresi: React Strict Mode çift mount veya sayfa yenileme durumunda engellemez
+    if (activeExam && activeExam.examId === String(quizId) && activeExam.startTime) {
+      const startTime = new Date(activeExam.startTime).getTime();
+      const now = new Date().getTime();
+      const diffSeconds = (now - startTime) / 1000;
+      if (diffSeconds < 60) {
+        return json({ success: true });
+      }
+    }
     return errorJson('Bu sınava bugün zaten girdiniz. Günde en fazla 1 kez girilebilir.', 429);
   }
 
-  // 3. Aktif oturumu kaydet (Günlük limit tüketimi FINISH esnasında yapılacaktır)
+  // 3. Aktif oturumu kaydet ve günlük deneme hakkını hemen tüket (çift cihaz/çıkış engelleme)
+  const updatedAttempts = { ...examAttempts, [quizId]: today };
   await db
     .update(userProgress)
     .set({
       activeExam: { examId: quizId, startTime: new Date().toISOString(), device },
+      examAttempts: updatedAttempts,
       updatedAt: new Date(),
     })
     .where(eq(userProgress.userId, payload.sub));
