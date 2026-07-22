@@ -103,8 +103,8 @@ export default function SchumannMiniWidget() {
           className="py-1 px-3 rounded-xl border text-xs font-mono font-black flex items-center gap-1.5 transition-all duration-300"
           style={{
             borderColor: scoreVal < 3.0 ? '#22D3EE' : scoreVal < 5.0 ? '#34D399' : scoreVal < 7.0 ? '#EF4444' : '#FFFFFF',
-            backgroundColor: scoreVal < 3.0 ? '#22D3EE20' : scoreVal < 5.0 ? '#34D39920' : scoreVal < 7.0 ? '#EF444420' : '#FFFFFF20',
-            color: scoreVal < 3.0 ? '#22D3EE' : scoreVal < 5.0 ? '#34D399' : scoreVal < 7.0 ? '#EF4444' : '#FFFFFF'
+            backgroundColor: scoreVal < 3.0 ? '#22D3EE' : scoreVal < 5.0 ? '#34D399' : scoreVal < 7.0 ? '#EF4444' : '#FFFFFF',
+            color: '#000000'
           }}
         >
           <span className="font-extrabold">{getGLevelLabel(scoreVal)}</span>
