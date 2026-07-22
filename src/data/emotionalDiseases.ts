@@ -56,12 +56,15 @@ export function enrichDisease(d: EmotionalDisease): Required<EmotionalDisease> {
   }
 
   if (!detailedExplanation) {
-    const cleanCause = cause.replace(/\.$/, '');
-    detailedExplanation = `Zihinsel düzlemde bastırılan ve bilinçaltında bloke edilen "${cleanCause}" düşünce kalıbı, bedenin bu bölgesindeki hücresel düzeyde enerjisel akışı kısıtlamaktadır. Psikosomatik ekollere (Jacques Martel ve Lise Bourbeau) göre, bu durum genellikle çocukluk döneminde atılan reddedilme, kontrolü kaybetme veya değersizlik tohumlarının, yetişkinlikte eş, partner, ebeveynler (özellikle anne/baba) veya iş hayatındaki otorite figürleriyle yaşanan çatışmalarla tetiklenmesiyle ortaya çıkar. Şifanın anahtarı, bu zihinsel kalıbı fark edip, içsel gücü ve öz sevgiyi yeniden kabul etmektir.`;
+    let cleanCause = cause.trim();
+    if (cleanCause.endsWith('.')) cleanCause = cleanCause.slice(0, -1);
+    detailedExplanation = `Psikosomatik ekollere göre, ${name} bölgesinde yaşanan bu rahatsızlık bilinçaltında biriken "${cleanCause}" kalıbıyla doğrudan ilişkilidir. Zihinsel düzeyde çözülmeyen bu gerilim bedensel bir savunma mekanizmasına dönüşmüştür. Şifa süreci, bu zihinsel direnci fark edip hücresel seviyede serbest bırakmakla başlar.`;
   }
 
   if (!symptomMessage) {
-    symptomMessage = `Bedeniniz bu semptomla size şu mesajı veriyor: "Geçmişten gelen savunma mekanizmalarını, kontrol etme ihtiyacını ve eril/dişil figürlere karşı hissettiğin bastırılmış kırgınlıkları sevgiyle serbest bırak. Kendi sınırlarını çiz, öz değerini hatırla ve yaşamın doğal, güvenli akışına teslim ol."`;
+    let cleanCause = cause.trim();
+    if (cleanCause.endsWith('.')) cleanCause = cleanCause.slice(0, -1);
+    symptomMessage = `Bedeniniz, ${name} bölgesindeki bu semptomla size şu mesajı iletiyor: "Yaşamında seni yoran '${cleanCause}' zihinsel kalıbını artık sevgiyle serbest bırakabilirsin. Kendini şefkatle kucakla, güvendesin ve yaşamın akışıyla uyumlusun."`;
   }
 
   return {
