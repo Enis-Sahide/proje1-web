@@ -56,11 +56,12 @@ export function enrichDisease(d: EmotionalDisease): Required<EmotionalDisease> {
   }
 
   if (!detailedExplanation) {
-    detailedExplanation = `Zihinsel düzlemde bastırılan "${cause.replace(/\.$/, '')}" kalıbı, bedenin bu bölgesindeki enerjisel akışı kısıtlayarak fiziksel bir semptom şeklinde dışa vurmaktadır. Psikosomatik şifanın temel ilkesi, zihindeki kök korkuyu fark edip hücresel seviyede serbest bırakmaktır.`;
+    const cleanCause = cause.replace(/\.$/, '');
+    detailedExplanation = `Zihinsel düzlemde bastırılan ve bilinçaltında bloke edilen "${cleanCause}" düşünce kalıbı, bedenin bu bölgesindeki hücresel düzeyde enerjisel akışı kısıtlamaktadır. Psikosomatik ekollere (Jacques Martel ve Lise Bourbeau) göre, bu durum genellikle çocukluk döneminde atılan reddedilme, kontrolü kaybetme veya değersizlik tohumlarının, yetişkinlikte eş, partner, ebeveynler (özellikle anne/baba) veya iş hayatındaki otorite figürleriyle yaşanan çatışmalarla tetiklenmesiyle ortaya çıkar. Şifanın anahtarı, bu zihinsel kalıbı fark edip, içsel gücü ve öz sevgiyi yeniden kabul etmektir.`;
   }
 
   if (!symptomMessage) {
-    symptomMessage = `Bedeniniz bu semptomla size şu mesajı veriyor: "Geçmişten getirdiğin savunma mekanizmalarını ve zihinsel yükleri bırak, kendi öz değerini hatırla ve yaşamın doğal akışına sevgiyle güven."`;
+    symptomMessage = `Bedeniniz bu semptomla size şu mesajı veriyor: "Geçmişten gelen savunma mekanizmalarını, kontrol etme ihtiyacını ve eril/dişil figürlere karşı hissettiğin bastırılmış kırgınlıkları sevgiyle serbest bırak. Kendi sınırlarını çiz, öz değerini hatırla ve yaşamın doğal, güvenli akışına teslim ol."`;
   }
 
   return {
@@ -171,8 +172,10 @@ export const EMOTIONAL_DISEASES: EmotionalDisease[] = [
   },
   {
     "name": "Akıntı",
-    "cause": "Eşe duyulan kızgınlık. Cinsel suçluluk duygusu. Kendini cezalandırma.",
-    "affirmation": "Başkaları,kendime duyduğum sevgi ve saygının aynalığını yapıyor. Cinselliğimin coşkusunu yaşıyorum."
+    "cause": "Eşe, sevgiliye, babaya, iş hayatındaki veya ailedeki diğer eril figürlere duyulan bastırılmış öfke ve hayal kırıklığı. Cinsel suçluluk duyguları, kontrolü kaybetme korkusu, eril enerji tarafından yönlendirildiğini veya incitildiğini hissetme.",
+    "affirmation": "Tüm erkeklerle, geçmişimle, eril enerjiyle ve kendi kadınlığımla barış içindeyim. Kendi gücümü, bedenimi ve dişil hakikatimi sevgiyle elime alıyorum. Güvendeyim ve özgürüm.",
+    "detailedExplanation": "Akıntı semptomu, dişil enerjinin eril enerji (eş, partner, baba veya diğer otorite figürü erkekler) karşısında sınırlarını koruma refleksidir. Beden, eril enerjiyi veya incinme korkusunu fiziksel olarak 'uzak tutmaya' çalışır. Genellikle babayla çözülmemiş otorite çatışmaları veya geçmişteki eril figürlerden kaynaklanan ihanet yaraları bu alanda blokaj oluşturur.",
+    "symptomMessage": "Bedeniniz diyor ki: 'Dişil gücünden, kadınlığından ve bedeninden korkma. Hayatındaki eril figürlere karşı beslediğin o eski hayal kırıklıklarını ve öfkeyi serbest bırak. Kendi öz sınırlarını sevgiyle çiz ve değerini onurlandır.'"
   },
   {
     "name": "Akne –Ergenlik sivilceleri",
@@ -441,8 +444,10 @@ export const EMOTIONAL_DISEASES: EmotionalDisease[] = [
   },
   {
     "name": "Beyaz akıntı, Kadın hastalıkları, dölyolu iltihabı",
-    "cause": "Kadınların erkekler karşısında güçsüz olduklarına inanma. Bir sevgiliye, eşe karşı öfke duyma.",
-    "affirmation": "Tüm deneyimlerimi ben yaratırım. Ben gücün ta kendisiyim. Kadın olduğum için seviniyorum. Özgürüm."
+    "cause": "Kadınlığın eril enerji karşısında değersiz, güçsüz ve ezilen bir konumda olduğuna dair derin inançlar. Eşe, babaya veya geçmişteki eril otoritelere karşı içten içe biriken derin kızgınlık ve haksızlığa uğramışlık hissi.",
+    "affirmation": "Kendi yaşamımın tek yaratıcısı benim. Kendi dişil gücünü onurlandırıyor, kadınlığımın tüm yönlerini neşeyle kucaklıyorum. Hayatımdaki tüm eril figürleri sevgiyle bağışlıyor ve kendi egemenliğimi ilan ediyorum.",
+    "detailedExplanation": "Vajinit ve beyaz akıntı, kadının cinsel kimliğini, arzularını veya eril dünya karşısındaki konumunu reddetmesiyle doğrudan ilişkilidir. Toplumsal veya ailevi inançlardan gelen 'cinsellik kirlidir' veya 'erkekler zarar verir' düşünce kalıpları, dölyolunda savunma amaçlı iltihabi reaksiyonları tetikler.",
+    "symptomMessage": "Bedeniniz diyor ki: 'Geçmişin haksızlık ve ihanet yaralarını sevgiyle şifalandır. Kadın olmanın zarafetini ve gücünü eline al. Sen kendi yaşamının egemen kraliçesisin.'"
   },
   {
     "name": "Beyaz saç",
