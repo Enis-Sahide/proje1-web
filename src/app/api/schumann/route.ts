@@ -228,7 +228,7 @@ async function detectFlaresFromImage(): Promise<{
     const { data, info } = await image.raw().toBuffer({ resolveWithObject: true });
     
     const dataStartX = 60;
-    const dataEndX = info.width - 10;
+    const dataEndX = Math.min(1420, info.width - 120);
     const bgRegions = [
       { start: 55, end: 85 },   // 2 - 5 Hz
       { start: 130, end: 155 }, // 10 - 12.5 Hz
