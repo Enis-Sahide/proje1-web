@@ -292,21 +292,28 @@ async function detectFlaresFromImage(): Promise<{
     }
 
     const getA1FromBrightness = (avgBr: number): number => {
-      if (avgBr <= 15.0) {
-        return parseFloat((4.0 + (avgBr / 15.0) * 4.0).toFixed(1));
-      } else if (avgBr <= 40.0) {
-        return parseFloat((8.0 + ((avgBr - 15.0) / 25.0) * 7.0).toFixed(1));
-      } else if (avgBr <= 80.0) {
-        return parseFloat((15.0 + ((avgBr - 40.0) / 40.0) * 10.0).toFixed(1));
-      } else if (avgBr <= 120.0) {
-        return parseFloat((25.0 + ((avgBr - 80.0) / 40.0) * 15.0).toFixed(1));
-      } else if (avgBr <= 160.0) {
-        return parseFloat((40.0 + ((avgBr - 120.0) / 40.0) * 15.0).toFixed(1));
-      } else if (avgBr <= 200.0) {
-        return parseFloat((55.0 + ((avgBr - 160.0) / 40.0) * 15.0).toFixed(1));
-      } else {
-        return parseFloat((70.0 + Math.min(20.0, ((avgBr - 200.0) / 55.0) * 20.0)).toFixed(1));
+      // 0 - 60 (Koyu Mavi): Sakin (A1: 4.0 - 8.0)
+      if (avgBr <= 60.0) {
+        return parseFloat((4.0 + (avgBr / 60.0) * 4.0).toFixed(1));
       }
+      // 60 - 130 (Açık Mavi / Yeşil): G1 (A1: 8.0 - 15.0)
+      if (avgBr <= 130.0) {
+        return parseFloat((8.0 + ((avgBr - 60.0) / 70.0) * 7.0).toFixed(1));
+      }
+      // 130 - 170 (Yeşil / Sarı): G2 (A1: 15.0 - 25.0)
+      if (avgBr <= 170.0) {
+        return parseFloat((15.0 + ((avgBr - 130.0) / 40.0) * 10.0).toFixed(1));
+      }
+      // 170 - 210 (Sarı / Kırmızı): G3 (A1: 25.0 - 40.0)
+      if (avgBr <= 210.0) {
+        return parseFloat((25.0 + ((avgBr - 170.0) / 40.0) * 15.0).toFixed(1));
+      }
+      // 210 - 230 (Turuncu / Kırmızı / Açık Beyaz): G4 (A1: 40.0 - 55.0)
+      if (avgBr <= 230.0) {
+        return parseFloat((40.0 + ((avgBr - 210.0) / 20.0) * 15.0).toFixed(1));
+      }
+      // 230 - 255 (Saf Beyaz): G5 (A1: 55.0 - 90.0+)
+      return parseFloat((55.0 + Math.min(35.0, ((avgBr - 230.0) / 25.0) * 35.0)).toFixed(1));
     };
 
     const peakA1 = getA1FromBrightness(latestAvg);
