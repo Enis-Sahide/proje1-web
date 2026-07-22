@@ -68,6 +68,25 @@ const GATE_COORDS: Record<number, { x: number, y: number }> = {
   6: { x: 285, y: 387 }, 49: { x: 295, y: 398 }, 55: { x: 315, y: 408 }, 30: { x: 335, y: 418 },
 };
 
+const normalizeHDKey = (key: string, type?: string): string => {
+  if (!key) return "";
+  const k = key.trim();
+  if (k === "Memnuniyet") return "Tatmin";
+  if (k === "Tepki Vermek") return "Yanıt Vermek";
+  if (k === "Duygusal (Solar Pleksus)") return "Duygusal";
+  if (k === "Reflektör") return "Yansıtıcı";
+  if (k === "Manifesting Jeneratör") return "Manifesting Generator";
+  if (k === "Ay Otoritesi (Reflektör)") return "Ay Döngüsü";
+  if (k === "Ego (Kalp)") return "Ego";
+  if (k === "Kendinden Gelen (G Merkezi)") return "Benlik";
+  if (k === "Çevresel (Zihinsel)") return "Zihinsel";
+  if (k === "Bir Ay Döngüsü Beklemek") return "28 Gün Beklemek";
+  if (k === "Hayal Kırıklığı" && (type === "Reflektör" || type === "Yansıtıcı")) {
+    return "Hayal Kırıklığı (Yansıtıcı)";
+  }
+  return k;
+};
+
 const HD_DETAILS_MAP: Record<string, { subtitle: string; description: string }> = {
   "Projektör": {
     subtitle: "Tür / Tip",
@@ -647,7 +666,7 @@ export default function HumanDesignPage() {
                   className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
                   onClick={() => {
                     setActiveGateId(null);
-                    const match = HD_DETAILS_MAP[chart.type];
+                    const match = HD_DETAILS_MAP[normalizeHDKey(chart.type)];
                     setActiveDetail({
                       title: chart.type,
                       subtitle: match?.subtitle || "Tür / Tip",
@@ -662,7 +681,7 @@ export default function HumanDesignPage() {
                   className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
                   onClick={() => {
                     setActiveGateId(null);
-                    const match = HD_DETAILS_MAP[chart.authority];
+                    const match = HD_DETAILS_MAP[normalizeHDKey(chart.authority)];
                     setActiveDetail({
                       title: chart.authority,
                       subtitle: match?.subtitle || "İç Otorite",
@@ -677,7 +696,7 @@ export default function HumanDesignPage() {
                   className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
                   onClick={() => {
                     setActiveGateId(null);
-                    const match = HD_DETAILS_MAP[chart.strategy];
+                    const match = HD_DETAILS_MAP[normalizeHDKey(chart.strategy)];
                     setActiveDetail({
                       title: chart.strategy,
                       subtitle: match?.subtitle || "Strateji",
@@ -707,7 +726,7 @@ export default function HumanDesignPage() {
                   className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
                   onClick={() => {
                     setActiveGateId(null);
-                    const match = HD_DETAILS_MAP[chart.signature];
+                    const match = HD_DETAILS_MAP[normalizeHDKey(chart.signature)];
                     setActiveDetail({
                       title: chart.signature,
                       subtitle: match?.subtitle || "İmza (Hizalanma Ödülü)",
@@ -722,7 +741,7 @@ export default function HumanDesignPage() {
                   className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
                   onClick={() => {
                     setActiveGateId(null);
-                    const match = HD_DETAILS_MAP[chart.notSelfTheme];
+                    const match = HD_DETAILS_MAP[normalizeHDKey(chart.notSelfTheme, chart.type)];
                     setActiveDetail({
                       title: chart.notSelfTheme,
                       subtitle: match?.subtitle || "Benlik Olmayan Tema",
