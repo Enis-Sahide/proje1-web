@@ -259,11 +259,20 @@ async function detectFlaresFromImage(): Promise<{
       if (avgBr > maxBr) maxBr = avgBr;
     }
     
-    // 1. Calculate current / latest average (last 10-15 minutes, avoiding the very edge)
+    // 1. Find the latest column index that has actual signal (avoiding empty black timezone buffer)
+    let latestDataIndex = colBrightnesses.length - 1;
+    for (let i = colBrightnesses.length - 1; i >= 1; i--) {
+      if (colBrightnesses[i] > 15.0 && colBrightnesses[i - 1] > 15.0) {
+        latestDataIndex = i;
+        break;
+      }
+    }
+
+    // Calculate current / latest average around the latest data point
     let latestSum = 0;
     let latestCount = 0;
-    const startIndex = Math.max(0, colBrightnesses.length - 8);
-    const endIndex = Math.max(0, colBrightnesses.length - 3);
+    const startIndex = Math.max(0, latestDataIndex - 5);
+    const endIndex = latestDataIndex;
     for (let i = startIndex; i <= endIndex; i++) {
       latestSum += colBrightnesses[i];
       latestCount++;

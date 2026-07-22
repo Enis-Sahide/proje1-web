@@ -1032,49 +1032,33 @@ export default function SchumannPage() {
 
                 <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-5 mb-6 gap-4">
                   <div className="flex items-center gap-4">
-                    <div className="flex items-center gap-2.5">
-                      {(() => {
-                        const score = simulatedA1 !== null ? getSchumannScoreFromA1(simulatedA1) : (data?.cosmic_impact_score ?? 0.5);
-                        const a1 = simulatedA1 !== null ? simulatedA1 : (data?.schumann_real?.a1 ?? 4.0);
-                        const badge = getSchumannBadgeStyle(score);
-                        return (
-                          <div 
-                            className={`${badge.bgColor} border w-16 h-16 rounded-xl flex flex-col justify-center items-center shrink-0 relative transition-all duration-300 overflow-hidden`}
-                            style={{
-                              borderColor: badge.borderColor,
-                              boxShadow: `0 0 15px ${badge.shadowColor}`
-                            }}
-                          >
-                            <span className="text-[7px] text-mystic-text-muted uppercase font-bold tracking-wider mb-0.5">ANLIK</span>
-                            <span className="text-[10px] font-black text-white">{getSchumannLevelLabel(a1)}</span>
-                            <span className="text-[8px] text-white/50 font-semibold mt-0.5">
-                              A1: {a1.toFixed(1)}
-                            </span>
+                    {(() => {
+                      const badge = getSchumannBadgeStyle(score);
+                      return (
+                        <div 
+                          className={`${badge.bgColor} border w-14 h-16 rounded-xl flex flex-col justify-center items-center shrink-0 relative transition-all duration-300 overflow-hidden`}
+                          style={{
+                            borderColor: badge.borderColor,
+                            boxShadow: `0 0 15px ${badge.shadowColor}`
+                          }}
+                        >
+                          <span className="text-[7px] text-mystic-text-muted uppercase font-bold tracking-wider mb-0.5">SEVİYE</span>
+                          <div className="w-3.5 h-7 bg-white/10 rounded-md relative overflow-hidden mb-1 border border-white/5">
+                            <div 
+                              className="w-full absolute bottom-0 transition-all duration-300"
+                              style={{
+                                height: `${Math.max(10, score * 10)}%`,
+                                backgroundColor: score < 3.0 ? '#22D3EE' : score < 5.0 ? '#34D399' : score < 7.0 ? '#EF4444' : '#FFFFFF',
+                                boxShadow: `0 0 10px ${score < 3.0 ? '#22D3EE' : score < 5.0 ? '#34D399' : score < 7.0 ? '#EF4444' : '#FFFFFF'}`
+                              }}
+                            />
                           </div>
-                        );
-                      })()}
-
-                      {(() => {
-                        const peakA1 = data?.peak_a1_24h ?? (simulatedA1 !== null ? simulatedA1 : (data?.schumann_real?.a1 ?? 4.0));
-                        const peakScore = data?.peak_score_24h ?? getSchumannScoreFromA1(peakA1);
-                        const badge = getSchumannBadgeStyle(peakScore);
-                        return (
-                          <div 
-                            className={`${badge.bgColor} border w-16 h-16 rounded-xl flex flex-col justify-center items-center shrink-0 relative transition-all duration-300 overflow-hidden`}
-                            style={{
-                              borderColor: badge.borderColor,
-                              boxShadow: `0 0 15px ${badge.shadowColor}`
-                            }}
-                          >
-                            <span className="text-[7px] text-amber-400 uppercase font-bold tracking-wider mb-0.5">24S ZİRVE</span>
-                            <span className="text-[10px] font-black text-white">{getSchumannLevelLabel(peakA1)}</span>
-                            <span className="text-[8px] text-white/50 font-semibold mt-0.5">
-                              A1: {peakA1.toFixed(1)}
-                            </span>
-                          </div>
-                        );
-                      })()}
-                    </div>
+                          <span className="text-[9px] text-white/50 font-semibold">
+                            A1: {a1.toFixed(1)}
+                          </span>
+                        </div>
+                      );
+                    })()}
 
                     <div>
                       <span className="text-[9px] font-extrabold tracking-widest text-[#00E5FF] bg-[#00E5FF]/10 px-2.5 py-0.5 rounded-full uppercase border border-[#00E5FF]/20">
@@ -1091,7 +1075,7 @@ export default function SchumannPage() {
                               boxShadow: score < 3.0 ? '0 0 10px rgba(8, 145, 178, 0.4)' : score < 5.0 ? '0 0 10px rgba(5, 150, 105, 0.4)' : score < 7.0 ? '0 0 10px rgba(220, 38, 38, 0.4)' : '0 0 15px rgba(255, 255, 255, 0.8)'
                             }}
                           >
-                            Anlık: {getSchumannLevelLabel(a1)}
+                            {getSchumannLevelLabel(a1)}
                           </span>
                           <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-72 p-3 bg-[#181124] border border-[#8b5cf6]/40 text-[11px] text-white/90 rounded-xl opacity-0 group-hover/level-tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl text-justify normal-case font-normal leading-relaxed">
                             <strong className="text-white block mb-1">Ezoterik Anlam: {getSchumannEsotericTitle(a1)}</strong>
@@ -1099,24 +1083,6 @@ export default function SchumannPage() {
                             <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#181124]"></span>
                           </span>
                         </span>
-
-                        {(() => {
-                          const peakA1 = data?.peak_a1_24h ?? (simulatedA1 !== null ? simulatedA1 : (data?.schumann_real?.a1 ?? 4.0));
-                          return (
-                            <span className="relative flex items-center justify-center group/peak-tooltip">
-                              <span 
-                                className="text-[10px] font-extrabold px-3 py-1 rounded-full transition-all duration-300 cursor-help shadow-[0_0_15px_rgba(255,255,255,0.05)] border border-amber-500/30 text-amber-400 bg-amber-500/10"
-                              >
-                                24S Zirve: {getSchumannLevelLabel(peakA1)}
-                              </span>
-                              <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-72 p-3 bg-[#181124] border border-[#8b5cf6]/40 text-[11px] text-white/90 rounded-xl opacity-0 group-hover/peak-tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl text-justify normal-case font-normal leading-relaxed">
-                                <strong className="text-white block mb-1">Ezoterik Anlam: {getSchumannEsotericTitle(peakA1)}</strong>
-                                {getSchumannEsotericDesc(peakA1)}
-                                <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#181124]"></span>
-                              </span>
-                            </span>
-                          );
-                        })()}
                       </h2>
                     </div>
                   </div>
