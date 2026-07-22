@@ -172,10 +172,10 @@ export const EMOTIONAL_DISEASES: EmotionalDisease[] = [
   },
   {
     "name": "Akıntı",
-    "cause": "Eşe, sevgiliye, babaya, iş hayatındaki veya ailedeki diğer eril figürlere duyulan bastırılmış öfke ve hayal kırıklığı. Cinsel suçluluk duyguları, kontrolü kaybetme korkusu, eril enerji tarafından yönlendirildiğini veya incitildiğini hissetme.",
-    "affirmation": "Tüm erkeklerle, geçmişimle, eril enerjiyle ve kendi kadınlığımla barış içindeyim. Kendi gücümü, bedenimi ve dişil hakikatimi sevgiyle elime alıyorum. Güvendeyim ve özgürüm.",
-    "detailedExplanation": "Akıntı semptomu, dişil enerjinin eril enerji (eş, partner, baba veya diğer otorite figürü erkekler) karşısında sınırlarını koruma refleksidir. Beden, eril enerjiyi veya incinme korkusunu fiziksel olarak 'uzak tutmaya' çalışır. Genellikle babayla çözülmemiş otorite çatışmaları veya geçmişteki eril figürlerden kaynaklanan ihanet yaraları bu alanda blokaj oluşturur.",
-    "symptomMessage": "Bedeniniz diyor ki: 'Dişil gücünden, kadınlığından ve bedeninden korkma. Hayatındaki eril figürlere karşı beslediğin o eski hayal kırıklıklarını ve öfkeyi serbest bırak. Kendi öz sınırlarını sevgiyle çiz ve değerini onurlandır.'"
+    "cause": "Partnerine veya cinselliğe duyulan bastırılmış öfke, cinsel suçluluk duyguları ve kendini cezalandırma eğilimi. Kadınlığın ve cinsel isteklerin özgürce ifade edilememesi, partner tarafından manipüle edildiği veya kontrol edildiği hissi.",
+    "affirmation": "Kendi kadınlığımı, bedenimi ve cinselliğimi sevgiyle kabul ediyorum. Cinsel yaşamımda güvendeyim, özgürüm ve huzurluyum.",
+    "detailedExplanation": "Vajinal akıntı ve vajinit, kadının cinsel kimliğiyle, haz alma hakkıyla veya partneriyle olan ilişkisindeki sınırlarıyla çatışma yaşadığının psikosomatik bir göstergesidir. Jacques Martel ve Lise Bourbeau'ya göre, cinselliğin günah veya kirli olduğuna dair inançlar bilinçaltında suçluluk yaratarak bedenin cinsel birleşmeyi engellemek amacıyla savunma (akıntı/iltihap) üretmesine yol açar. Kişinin partnerine karşı bastırdığı kızgınlık da bu bölgede bloke olur.",
+    "symptomMessage": "Bedeniniz size şu mesajı veriyor: 'Kadınlığından, cinsel kimliğinden ve bedeninden suçluluk duyma. Geçmişten gelen utanç veya kırgınlık kalıplarını serbest bırak. Kendi bedeninin bilgeliğine güven ve haz almayı hak ettiğini kabul et.'"
   },
   {
     "name": "Akne –Ergenlik sivilceleri",
@@ -444,10 +444,10 @@ export const EMOTIONAL_DISEASES: EmotionalDisease[] = [
   },
   {
     "name": "Beyaz akıntı, Kadın hastalıkları, dölyolu iltihabı",
-    "cause": "Kadınlığın eril enerji karşısında değersiz, güçsüz ve ezilen bir konumda olduğuna dair derin inançlar. Eşe, babaya veya geçmişteki eril otoritelere karşı içten içe biriken derin kızgınlık ve haksızlığa uğramışlık hissi.",
-    "affirmation": "Kendi yaşamımın tek yaratıcısı benim. Kendi dişil gücünü onurlandırıyor, kadınlığımın tüm yönlerini neşeyle kucaklıyorum. Hayatımdaki tüm eril figürleri sevgiyle bağışlıyor ve kendi egemenliğimi ilan ediyorum.",
-    "detailedExplanation": "Vajinit ve beyaz akıntı, kadının cinsel kimliğini, arzularını veya eril dünya karşısındaki konumunu reddetmesiyle doğrudan ilişkilidir. Toplumsal veya ailevi inançlardan gelen 'cinsellik kirlidir' veya 'erkekler zarar verir' düşünce kalıpları, dölyolunda savunma amaçlı iltihabi reaksiyonları tetikler.",
-    "symptomMessage": "Bedeniniz diyor ki: 'Geçmişin haksızlık ve ihanet yaralarını sevgiyle şifalandır. Kadın olmanın zarafetini ve gücünü eline al. Sen kendi yaşamının egemen kraliçesisin.'"
+    "cause": "Kadınların erkekler karşısında güçsüz ve ezilen bir konumda olduğuna dair inançlar. Eşe/partnere karşı biriken öfke, cinsel kimliğini değersizleştirme.",
+    "affirmation": "Ben kendi yaşamımın ve kararlarımın yaratıcısıyım. Dişil gücümü sevgiyle elime alıyorum, kadın olduğum için mutluyum ve güvendeyim.",
+    "detailedExplanation": "Beyaz akıntı (lökore), bilinçaltında kadınlığın ve dişil enerjinin zayıf, savunmasız veya erkek egemenliği altında ezildiğine dair inançlardan beslenir. Kadın, cinsel ilişkide kendini değersiz hissettiğinde veya partnerine karşı haksızlığa uğradığını düşündüğünde, beden bu değersizlik inancını beyaz akıntı üreterek fiziksel düzleme yansıtır.",
+    "symptomMessage": "Bedeniniz size şu mesajı veriyor: 'Eril enerji karşısında kendi gücünü ve dişil değerini hatırla. Başkalarının seni yönetmesine izin verdiğin inancını bırak ve kendi kararlarının sorumluluğunu sevgiyle üstlen.'"
   },
   {
     "name": "Beyaz saç",
