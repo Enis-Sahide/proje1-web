@@ -271,24 +271,35 @@ async function detectFlaresFromImage(): Promise<{
     const clampedCurrentX = Math.max(dataStartX, Math.min(dataEndX, currentX));
     const latestDataIndex = clampedCurrentX - dataStartX;
 
-    // Son veriden geriye doğru 5 pikseli (yaklaşık 10 dakikalık anlık akış) ortala
-    let latestSum = 0;
-    let latestCount = 0;
-    const startIndex = Math.max(0, latestDataIndex - 5);
-    const endIndex = Math.max(0, latestDataIndex);
-    for (let i = startIndex; i <= endIndex; i++) {
-      latestSum += colBrightnesses[i];
-      latestCount++;
+    // Grid çizgilerini (ince dikey beyaz çizgileri) filtrelemek için 7 piksellik kayan pencerede en parlak 2 değeri çöpe atıp ortalama alıyoruz
+    const cleanBrightnesses: number[] = [];
+    const halfWin = 3;
+    for (let i = 0; i < colBrightnesses.length; i++) {
+      const values: number[] = [];
+      for (let offset = -halfWin; offset <= halfWin; offset++) {
+        const idx = i + offset;
+        if (idx >= 0 && idx < colBrightnesses.length) {
+          values.push(colBrightnesses[idx]);
+        }
+      }
+      values.sort((a, b) => a - b);
+      const keepCount = Math.max(1, values.length - 2);
+      let sum = 0;
+      for (let k = 0; k < keepCount; k++) {
+        sum += values[k];
+      }
+      cleanBrightnesses.push(sum / keepCount);
     }
-    const latestAvg = latestCount > 0 ? (latestSum / latestCount) : 4.0;
+
+    const latestAvg = cleanBrightnesses[latestDataIndex] || 4.0;
     
-    // 2. 24 saatlik peak hesapla (sadece temiz alandaki maksimum sütun)
+    // 2. 24 saatlik peak hesapla (filtreli temiz alandaki maksimum sütun)
     let maxOverallBr = 4.0;
-    const safeStart = Math.min(20, colBrightnesses.length);
-    const safeEnd = colBrightnesses.length;
+    const safeStart = Math.min(20, cleanBrightnesses.length);
+    const safeEnd = cleanBrightnesses.length;
     for (let i = safeStart; i < safeEnd; i++) {
-      if (colBrightnesses[i] > maxOverallBr) {
-        maxOverallBr = colBrightnesses[i];
+      if (cleanBrightnesses[i] > maxOverallBr) {
+        maxOverallBr = cleanBrightnesses[i];
       }
     }
 
