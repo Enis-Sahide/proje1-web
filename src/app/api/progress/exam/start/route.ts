@@ -31,12 +31,12 @@ export async function POST(request: Request) {
   const attempt = examAttempts[quizId];
   const attemptDate = typeof attempt === 'string' ? attempt : (attempt as any)?.date;
   if (attemptDate === today) {
-    // 60 saniyelik tolerans süresi: React Strict Mode çift mount veya sayfa yenileme durumunda engellemez
+    // 5 saniyelik tolerans süresi: Sadece React Strict Mode çift mount durumunu tolere eder, F5 yenilemesini engeller
     if (activeExam && activeExam.examId === String(quizId) && activeExam.startTime) {
       const startTime = new Date(activeExam.startTime).getTime();
       const now = new Date().getTime();
       const diffSeconds = (now - startTime) / 1000;
-      if (diffSeconds < 60) {
+      if (diffSeconds < 5) {
         return json({ success: true });
       }
     }
