@@ -259,20 +259,22 @@ async function detectFlaresFromImage(): Promise<{
       if (avgBr > maxBr) maxBr = avgBr;
     }
     
-    // 1. Find the latest column index that has actual signal (avoiding empty black timezone buffer)
-    let latestDataIndex = colBrightnesses.length - 1;
-    for (let i = colBrightnesses.length - 1; i >= 1; i--) {
-      if (colBrightnesses[i] > 15.0 && colBrightnesses[i - 1] > 15.0) {
-        latestDataIndex = i;
-        break;
-      }
-    }
+    // 1. Tomsk saatini ve buna karşılık gelen X koordinatını hesapla (dünden kalan yazılmayan pikselleri atlamak için)
+    const tomskOffset = 7 * 60 * 60 * 1000;
+    const nowTomsk = new Date(Date.now() + tomskOffset);
+    const tomskHours = nowTomsk.getUTCHours() + nowTomsk.getUTCMinutes() / 60;
+    
+    // Genişlik hesabı: dataStartX (60) ile dataEndX (1420) arası 24 saattir
+    const dataWidth = dataEndX - dataStartX;
+    const currentX = Math.round(dataStartX + tomskHours * (dataWidth / 24));
+    const clampedCurrentX = Math.max(dataStartX, Math.min(dataEndX, currentX));
+    const latestDataIndex = clampedCurrentX - dataStartX;
 
-    // Calculate current / latest average around the latest data point
+    // Son veriden geriye doğru 5 pikseli (yaklaşık 10 dakikalık anlık akış) ortala
     let latestSum = 0;
     let latestCount = 0;
     const startIndex = Math.max(0, latestDataIndex - 5);
-    const endIndex = latestDataIndex;
+    const endIndex = Math.max(0, latestDataIndex);
     for (let i = startIndex; i <= endIndex; i++) {
       latestSum += colBrightnesses[i];
       latestCount++;
