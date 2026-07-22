@@ -936,33 +936,33 @@ export default function SchumannPage() {
     };
   };
 
-  const getSchumannLevelLabel = (score: number) => {
-    if (score < 3.0) return 'Düşük Seviye (Sakin / G0)';
-    if (score < 5.0) return 'Hafif Uyarım (Aktif / G0)';
-    if (score < 6.0) return 'Orta Fırtına (G1 Seviyesi)';
-    if (score < 7.0) return 'Güçlü Fırtına (G2 Seviyesi)';
-    if (score < 8.0) return 'Şiddetli Fırtına (G3 Seviyesi)';
-    if (score < 9.0) return 'Ağır Fırtına (G4 Seviyesi)';
+  const getSchumannLevelLabel = (a1: number) => {
+    if (a1 < 8.0) return 'Düşük Seviye (Sakin / G0)';
+    if (a1 < 15.0) return 'Hafif Uyarım (Aktif / G0)';
+    if (a1 < 25.0) return 'Orta Fırtına (G1 Seviyesi)';
+    if (a1 < 40.0) return 'Güçlü Fırtına (G2 Seviyesi)';
+    if (a1 < 55.0) return 'Şiddetli Fırtına (G3 Seviyesi)';
+    if (a1 < 70.0) return 'Ağır Fırtına (G4 Seviyesi)';
     return 'Zirve Patlama (Ekstrem G5 Fırtınası)';
   };
 
-  const getSchumannEsotericTitle = (score: number) => {
-    if (score < 3.0) return 'Topraklanma & Entegrasyon';
-    if (score < 5.0) return 'Hafif Uyarım & Uyanış Kapısı';
-    if (score < 6.0) return 'Kalp Çakrası Açılımı & Sezgi Sıçraması';
-    if (score < 7.0) return 'DNA Aktivasyonu & Astral Kapı';
-    if (score < 8.0) return 'Taç Çakra Portalı & Işık Gövde Geçişi';
-    if (score < 9.0) return 'Boyutlar Arası Geçiş & Hücresel Simya';
+  const getSchumannEsotericTitle = (a1: number) => {
+    if (a1 < 8.0) return 'Topraklanma & Entegrasyon';
+    if (a1 < 15.0) return 'Hafif Uyarım & Uyanış Kapısı';
+    if (a1 < 25.0) return 'Kalp Çakrası Açılımı & Sezgi Sıçraması';
+    if (a1 < 40.0) return 'DNA Aktivasyonu & Astral Kapı';
+    if (a1 < 55.0) return 'Taç Çakra Portalı & Işık Gövde Geçişi';
+    if (a1 < 70.0) return 'Boyutlar Arası Geçiş & Hücresel Simya';
     return 'Ekstrem Kozmik Bütünleşme & Hücresel Simya';
   };
 
-  const getSchumannEsotericDesc = (score: number) => {
-    if (score < 3.0) return 'Enerji alanı dengelidir. Alınan kozmik bilgilerin entegrasyonu, meditasyon ve köklenmek için en uygun zamandır.';
-    if (score < 5.0) return 'Hafif uyarım fazı. Rüyalarda netleşme ve aurada temizlik başlar. Yeni frekanslara uyumlanmak için kapı açılmıştır.';
-    if (score < 6.0) return 'Kalp merkezinde genişleme, yüksek empati ve sezgisel yeteneklerde artış görülür. Bedenin elektromanyetik alanı genişler.';
-    if (score < 7.0) return 'Güçlü plazma akışı devrededir. Işık kodlarının DNA sarmallarına entegrasyonu başlar. Astral seyahat deneyimleri sıklaşabilir.';
-    if (score < 8.0) return 'Taç çakradan yüksek miktarda kozmik ışık girişi olur. Zaman algısında bükülmeler ve yüksek boyutlu rehberlik alımı gerçekleşir.';
-    if (score < 9.0) return 'Hücresel düzeyde simyasal dönüşüm dalgası. Kollektif bilinçte büyük uyanış tetiklemeleri, yüksek boyutlu portalların tam açılışı.';
+  const getSchumannEsotericDesc = (a1: number) => {
+    if (a1 < 8.0) return 'Enerji alanı dengelidir. Alınan kozmik bilgilerin entegrasyonu, meditasyon ve köklenmek için en uygun zamandır.';
+    if (a1 < 15.0) return 'Hafif uyarım fazı. Rüyalarda netleşme ve aurada temizlik başlar. Yeni frekanslara uyumlanmak için kapı açılmıştır.';
+    if (a1 < 25.0) return 'Kalp merkezinde genişleme, yüksek empati ve sezgisel yeteneklerde artış görülür. Bedenin elektromanyetik alanı genişler.';
+    if (a1 < 40.0) return 'Güçlü plazma akışı devrededir. Işık kodlarının DNA sarmallarına entegrasyonu başlar. Astral seyahat deneyimleri sıklaşabilir.';
+    if (a1 < 55.0) return 'Taç çakradan yüksek miktarda kozmik ışık girişi olur. Zaman algısında bükülmeler ve yüksek boyutlu rehberlik alımı gerçekleşir.';
+    if (a1 < 70.0) return 'Hücresel düzeyde simyasal dönüşüm dalgası. Kollektif bilinçte büyük uyanış tetiklemeleri, yüksek boyutlu portalların tam açılışı.';
     return 'Zirve enerjisel portal devrede. Sinir sisteminin en yüksek kapasitede çalışması ve kozmik bilinçle bütünleşme anıdır. Bol dinlenme ve topraklanma gerekir.';
   };
 
@@ -1039,7 +1039,7 @@ export default function SchumannPage() {
                             }}
                           >
                             <span className="text-[7px] text-mystic-text-muted uppercase font-bold tracking-wider mb-0.5">ANLIK</span>
-                            <span className="text-[10px] font-black text-white">{getSchumannLevelLabel(score)}</span>
+                            <span className="text-[10px] font-black text-white">{getSchumannLevelLabel(a1)}</span>
                             <span className="text-[8px] text-white/50 font-semibold mt-0.5">
                               A1: {a1.toFixed(1)}
                             </span>
@@ -1060,7 +1060,7 @@ export default function SchumannPage() {
                             }}
                           >
                             <span className="text-[7px] text-amber-400 uppercase font-bold tracking-wider mb-0.5">24S ZİRVE</span>
-                            <span className="text-[10px] font-black text-white">{getSchumannLevelLabel(peakScore)}</span>
+                            <span className="text-[10px] font-black text-white">{getSchumannLevelLabel(peakA1)}</span>
                             <span className="text-[8px] text-white/50 font-semibold mt-0.5">
                               A1: {peakA1.toFixed(1)}
                             </span>
@@ -1084,28 +1084,27 @@ export default function SchumannPage() {
                               boxShadow: score < 3.0 ? '0 0 10px rgba(8, 145, 178, 0.4)' : score < 5.0 ? '0 0 10px rgba(5, 150, 105, 0.4)' : score < 7.0 ? '0 0 10px rgba(220, 38, 38, 0.4)' : '0 0 15px rgba(255, 255, 255, 0.8)'
                             }}
                           >
-                            Anlık: {getSchumannLevelLabel(score)}
+                            Anlık: {getSchumannLevelLabel(a1)}
                           </span>
                           <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-72 p-3 bg-[#181124] border border-[#8b5cf6]/40 text-[11px] text-white/90 rounded-xl opacity-0 group-hover/level-tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl text-justify normal-case font-normal leading-relaxed">
-                            <strong className="text-white block mb-1">Ezoterik Anlam: {getSchumannEsotericTitle(score)}</strong>
-                            {getSchumannEsotericDesc(score)}
+                            <strong className="text-white block mb-1">Ezoterik Anlam: {getSchumannEsotericTitle(a1)}</strong>
+                            {getSchumannEsotericDesc(a1)}
                             <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#181124]"></span>
                           </span>
                         </span>
 
                         {(() => {
                           const peakA1 = data?.peak_a1_24h ?? (simulatedA1 !== null ? simulatedA1 : (data?.schumann_real?.a1 ?? 4.0));
-                          const peakScore = data?.peak_score_24h ?? getSchumannScoreFromA1(peakA1);
                           return (
                             <span className="relative flex items-center justify-center group/peak-tooltip">
                               <span 
                                 className="text-[10px] font-extrabold px-3 py-1 rounded-full transition-all duration-300 cursor-help shadow-[0_0_15px_rgba(255,255,255,0.05)] border border-amber-500/30 text-amber-400 bg-amber-500/10"
                               >
-                                24S Zirve: {getSchumannLevelLabel(peakScore)}
+                                24S Zirve: {getSchumannLevelLabel(peakA1)}
                               </span>
                               <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-72 p-3 bg-[#181124] border border-[#8b5cf6]/40 text-[11px] text-white/90 rounded-xl opacity-0 group-hover/peak-tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl text-justify normal-case font-normal leading-relaxed">
-                                <strong className="text-white block mb-1">Ezoterik Anlam: {getSchumannEsotericTitle(peakScore)}</strong>
-                                {getSchumannEsotericDesc(peakScore)}
+                                <strong className="text-white block mb-1">Ezoterik Anlam: {getSchumannEsotericTitle(peakA1)}</strong>
+                                {getSchumannEsotericDesc(peakA1)}
                                 <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#181124]"></span>
                               </span>
                             </span>
