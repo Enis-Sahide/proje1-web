@@ -1113,11 +1113,6 @@ export default function SchumannPage() {
                       </h4>
                       <p className="text-sm text-white/85 leading-relaxed text-justify font-sans">
                         {analysis.science}
-                        {data?.peak_a1_24h && (
-                          <span className="block mt-2 text-xs text-amber-400 font-semibold bg-amber-500/5 border border-amber-500/20 p-2.5 rounded-lg">
-                            ⚠️ Zirve Analizi: Rasathane spektrogramında son 24 saat içinde A1 genliği {data.peak_a1_24h.toFixed(1)} seviyesine ({getSchumannLevelLabel(data.peak_score_24h ?? 0.5)}) kadar ulaşan yoğun uyarılmalar ve parlamalar gözlemlendi.
-                          </span>
-                        )}
                       </p>
                       <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
                         <span className="relative flex items-center gap-1 group/obs-tooltip cursor-help text-[11px] text-[#00E5FF]/70 hover:text-[#00E5FF] transition-colors font-semibold">
