@@ -228,7 +228,8 @@ async function detectFlaresFromImage(): Promise<{
     const { data, info } = await image.raw().toBuffer({ resolveWithObject: true });
     
     const dataStartX = 60;
-    const dataEndX = Math.min(1420, info.width - 120);
+    // S 70 O S logosu ve renk lejantı sağdaki 21:00-24:00 (X=1200+) arasını kapladığı için taramayı 1200'de kesiyoruz.
+    const dataEndX = 1200;
     const bgRegions = [
       { start: 55, end: 85 },   // 2 - 5 Hz
       { start: 130, end: 155 }, // 10 - 12.5 Hz
@@ -259,14 +260,14 @@ async function detectFlaresFromImage(): Promise<{
       if (avgBr > maxBr) maxBr = avgBr;
     }
     
-    // 1. Tomsk saatini ve buna karşılık gelen X koordinatını hesapla (dünden kalan yazılmayan pikselleri atlamak için)
+    // 1. Tomsk saatini ve buna karşılık gelen X koordinatını hesapla (safe alanda kalarak)
     const tomskOffset = 7 * 60 * 60 * 1000;
     const nowTomsk = new Date(Date.now() + tomskOffset);
     const tomskHours = nowTomsk.getUTCHours() + nowTomsk.getUTCMinutes() / 60;
     
-    // Genişlik hesabı: dataStartX (60) ile dataEndX (1420) arası 24 saattir
+    // Genişlik hesabı: dataStartX (60) ile dataEndX (1200) arası 0-21 saat aralığını kapsar
     const dataWidth = dataEndX - dataStartX;
-    const currentX = Math.round(dataStartX + tomskHours * (dataWidth / 24));
+    const currentX = Math.round(dataStartX + tomskHours * ((1420 - dataStartX) / 24));
     const clampedCurrentX = Math.max(dataStartX, Math.min(dataEndX, currentX));
     const latestDataIndex = clampedCurrentX - dataStartX;
 
@@ -281,10 +282,10 @@ async function detectFlaresFromImage(): Promise<{
     }
     const latestAvg = latestCount > 0 ? (latestSum / latestCount) : 4.0;
     
-    // 2. Calculate the overall peak in the last 24 hours (maximum column in the chart, ignoring margins)
+    // 2. 24 saatlik peak hesapla (sadece temiz alandaki maksimum sütun)
     let maxOverallBr = 4.0;
     const safeStart = Math.min(20, colBrightnesses.length);
-    const safeEnd = Math.max(0, colBrightnesses.length - 10);
+    const safeEnd = colBrightnesses.length;
     for (let i = safeStart; i < safeEnd; i++) {
       if (colBrightnesses[i] > maxOverallBr) {
         maxOverallBr = colBrightnesses[i];
@@ -292,28 +293,28 @@ async function detectFlaresFromImage(): Promise<{
     }
 
     const getA1FromBrightness = (avgBr: number): number => {
-      // 0 - 60 (Koyu Mavi): Sakin (A1: 4.0 - 8.0)
-      if (avgBr <= 60.0) {
-        return parseFloat((4.0 + (avgBr / 60.0) * 4.0).toFixed(1));
+      // 0 - 45 (Koyu Mavi): Sakin (A1: 4.0 - 8.0)
+      if (avgBr <= 45.0) {
+        return parseFloat((4.0 + (avgBr / 45.0) * 4.0).toFixed(1));
       }
-      // 60 - 130 (Açık Mavi / Yeşil): G1 (A1: 8.0 - 15.0)
-      if (avgBr <= 130.0) {
-        return parseFloat((8.0 + ((avgBr - 60.0) / 70.0) * 7.0).toFixed(1));
+      // 45 - 65 (Açık Mavi / Yeşil): G1 (A1: 8.0 - 15.0)
+      if (avgBr <= 65.0) {
+        return parseFloat((8.0 + ((avgBr - 45.0) / 20.0) * 7.0).toFixed(1));
       }
-      // 130 - 170 (Yeşil / Sarı): G2 (A1: 15.0 - 25.0)
-      if (avgBr <= 170.0) {
-        return parseFloat((15.0 + ((avgBr - 130.0) / 40.0) * 10.0).toFixed(1));
+      // 65 - 85 (Yeşil / Sarı): G2 (A1: 15.0 - 25.0)
+      if (avgBr <= 85.0) {
+        return parseFloat((15.0 + ((avgBr - 65.0) / 20.0) * 10.0).toFixed(1));
       }
-      // 170 - 210 (Sarı / Kırmızı): G3 (A1: 25.0 - 40.0)
-      if (avgBr <= 210.0) {
-        return parseFloat((25.0 + ((avgBr - 170.0) / 40.0) * 15.0).toFixed(1));
+      // 85 - 100 (Sarı / Kırmızı): G3 (A1: 25.0 - 40.0)
+      if (avgBr <= 100.0) {
+        return parseFloat((25.0 + ((avgBr - 85.0) / 15.0) * 15.0).toFixed(1));
       }
-      // 210 - 230 (Turuncu / Kırmızı / Açık Beyaz): G4 (A1: 40.0 - 55.0)
-      if (avgBr <= 230.0) {
-        return parseFloat((40.0 + ((avgBr - 210.0) / 20.0) * 15.0).toFixed(1));
+      // 100 - 112 (Turuncu / Kırmızı): G4 (A1: 40.0 - 55.0)
+      if (avgBr <= 112.0) {
+        return parseFloat((40.0 + ((avgBr - 100.0) / 12.0) * 15.0).toFixed(1));
       }
-      // 230 - 255 (Saf Beyaz): G5 (A1: 55.0 - 90.0+)
-      return parseFloat((55.0 + Math.min(35.0, ((avgBr - 230.0) / 25.0) * 35.0)).toFixed(1));
+      // 112 - 255 (Saf Beyaz): G5 (A1: 55.0 - 90.0+)
+      return parseFloat((55.0 + Math.min(35.0, ((avgBr - 112.0) / 15.0) * 35.0)).toFixed(1));
     };
 
     const peakA1 = getA1FromBrightness(latestAvg);
