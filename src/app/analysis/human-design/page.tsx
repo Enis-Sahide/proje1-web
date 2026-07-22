@@ -809,19 +809,28 @@ export default function HumanDesignPage() {
                 </h2>
                 
                 <div className="bg-black/30 rounded-2xl p-5 border border-white/5 space-y-4">
-                  <div className="flex items-start gap-3">
-                    <span className="text-xs font-bold uppercase tracking-widest text-[#32D74B] w-20 shrink-0 pt-0.5">I Ching</span>
-                    <span className="text-sm text-gray-300 font-medium">{activeGateData.iching}</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-start gap-3">
+                      <span className="text-xs font-bold uppercase tracking-widest text-[#32D74B] w-20 shrink-0 pt-0.5">I Ching</span>
+                      <span className="text-sm text-gray-300 font-medium">{activeGateData.iching}</span>
+                    </div>
+                    <span className="text-[10px] text-gray-500 italic pl-[92px] -mt-1 leading-normal">Bu kapının felsefi sembol ismi ve arketipi</span>
                   </div>
                   <div className="w-full h-px bg-white/5" />
-                  <div className="flex items-start gap-3">
-                    <span className="text-xs font-bold uppercase tracking-widest text-[#E63946] w-20 shrink-0 pt-0.5">Astroloji</span>
-                    <span className="text-sm text-gray-300 font-medium">{activeGateData.astrology}</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-start gap-3">
+                      <span className="text-xs font-bold uppercase tracking-widest text-[#E63946] w-20 shrink-0 pt-0.5">Astroloji</span>
+                      <span className="text-sm text-gray-300 font-medium">{activeGateData.astrology}</span>
+                    </div>
+                    <span className="text-[10px] text-gray-500 italic pl-[92px] -mt-1 leading-normal">Bu kapının gökyüzündeki burç koordinatı</span>
                   </div>
                   <div className="w-full h-px bg-white/5" />
-                  <div className="flex items-start gap-3">
-                    <span className="text-xs font-bold uppercase tracking-widest text-[#F4D03F] w-20 shrink-0 pt-0.5">Biyoloji</span>
-                    <span className="text-sm text-gray-300 font-medium">{activeGateData.biology}</span>
+                  <div className="flex flex-col gap-1">
+                    <div className="flex items-start gap-3">
+                      <span className="text-xs font-bold uppercase tracking-widest text-[#F4D03F] w-20 shrink-0 pt-0.5">Biyoloji</span>
+                      <span className="text-sm text-gray-300 font-medium">{activeGateData.biology}</span>
+                    </div>
+                    <span className="text-[10px] text-gray-500 italic pl-[92px] -mt-1 leading-normal">Bu kapının vücutta etkilediği organ veya salgı bezi</span>
                   </div>
                 </div>
 
