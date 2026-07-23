@@ -1001,220 +1001,6 @@ export default function SchumannPage() {
           </p>
         </div>
 
-        {/* 1. Yol Kural Tabanlı Kozmik Durum Analizi */}
-        {!isLoading && (
-          (() => {
-            // Determine active metrics (simulated or live)
-            let a1 = data?.schumann_real?.a1 ?? 6.0;
-            let f1 = data?.schumann_real?.f1 ?? 7.83;
-            
-            if (simulatedA1 !== null) {
-              a1 = simulatedA1;
-              f1 = 7.83 + (simulatedA1 / 75.0) * 0.5;
-            }
-
-            const score = getSchumannScoreFromA1(a1);
-            
-            // Keep solar wind and Kp index strictly at their live values (do not simulate)
-            const activeKp = data?.current_kp ?? 0;
-            const speed = data?.solar_wind?.speed ?? 350;
-            const density = data?.solar_wind?.density ?? 4;
-            const bz = data?.solar_wind?.bz ?? 0;
-            const bt = data?.solar_wind?.bt ?? 5;
-
-            const analysis = generateRulesAnalysis(score, speed, density, bz, bt, activeKp, a1, f1);
-
-            return (
-              <div className="bg-black/40 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8 relative overflow-hidden shadow-[0_0_30px_rgba(255,255,255,0.02)] animate-in fade-in slide-in-from-bottom-4 duration-500">
-                {/* Background glowing effects */}
-                <div className="absolute top-0 right-0 w-48 h-48 bg-[#4F46E5]/10 blur-[60px] rounded-full pointer-events-none"></div>
-                <div className="absolute bottom-0 left-0 w-32 h-32 bg-[#00E5FF]/5 blur-[40px] rounded-full pointer-events-none"></div>
-
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-5 mb-6 gap-4">
-                  <div className="flex items-center gap-4">
-                    {(() => {
-                      const badge = getSchumannBadgeStyle(score);
-                      return (
-                        <div 
-                          className={`${badge.bgColor} border w-14 h-16 rounded-xl flex flex-col justify-center items-center shrink-0 relative transition-all duration-300 overflow-hidden`}
-                          style={{
-                            borderColor: badge.borderColor,
-                            boxShadow: `0 0 15px ${badge.shadowColor}`
-                          }}
-                        >
-                          <span className="text-[7px] text-mystic-text-muted uppercase font-bold tracking-wider mb-0.5">SEVİYE</span>
-                          <div className="w-3.5 h-7 bg-white/10 rounded-md relative overflow-hidden mb-1 border border-white/5">
-                            <div 
-                              className="w-full absolute bottom-0 transition-all duration-300"
-                              style={{
-                                height: `${Math.max(10, score * 10)}%`,
-                                backgroundColor: score < 3.0 ? '#22D3EE' : score < 5.0 ? '#34D399' : score < 7.0 ? '#EF4444' : '#FFFFFF',
-                                boxShadow: `0 0 10px ${score < 3.0 ? '#22D3EE' : score < 5.0 ? '#34D399' : score < 7.0 ? '#EF4444' : '#FFFFFF'}`
-                              }}
-                            />
-                          </div>
-                          <span className="text-[9px] text-white/50 font-semibold">
-                            A1: {a1.toFixed(1)}
-                          </span>
-                        </div>
-                      );
-                    })()}
-
-                    <div>
-                      <span className="text-[9px] font-extrabold tracking-widest text-[#00E5FF] bg-[#00E5FF]/10 px-2.5 py-0.5 rounded-full uppercase border border-[#00E5FF]/20">
-                        KOZMİK ORACLE / DURUM RAPORU {data?.schumann_real && `- GÖZLEM SAATİ: ${formatRealTime(data.schumann_real.time_utc)}`}
-                      </span>
-                      <h2 className="text-xl font-extrabold text-white mt-1.5 flex flex-wrap items-center gap-2">
-                        {analysis.title}
-                        <span className="relative flex items-center justify-center group/level-tooltip">
-                          <span 
-                            className="text-[10px] font-extrabold px-3 py-1 rounded-full transition-all duration-300 cursor-help shadow-[0_0_15px_rgba(255,255,255,0.05)] border border-white/10"
-                            style={{
-                              color: score >= 7.0 ? '#000000' : '#FFFFFF',
-                              backgroundColor: score < 3.0 ? '#0891B2' : score < 5.0 ? '#059669' : score < 7.0 ? '#DC2626' : '#FFFFFF',
-                              boxShadow: score < 3.0 ? '0 0 10px rgba(8, 145, 178, 0.4)' : score < 5.0 ? '0 0 10px rgba(5, 150, 105, 0.4)' : score < 7.0 ? '0 0 10px rgba(220, 38, 38, 0.4)' : '0 0 15px rgba(255, 255, 255, 0.8)'
-                            }}
-                          >
-                            {getSchumannLevelLabel(a1)}
-                          </span>
-                          <span className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 w-72 p-3 bg-[#181124] border border-[#8b5cf6]/40 text-[11px] text-white/90 rounded-xl opacity-0 group-hover/level-tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl text-justify normal-case font-normal leading-relaxed">
-                            <strong className="text-white block mb-1">Ezoterik Anlam: {getSchumannEsotericTitle(a1)}</strong>
-                            {getSchumannEsotericDesc(a1)}
-                            <span className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-[#181124]"></span>
-                          </span>
-                        </span>
-                      </h2>
-                    </div>
-                  </div>
-
-                  {/* Info button with tooltip */}
-                  <span className="relative flex items-center justify-center group/tooltip md:mr-2 self-end md:self-center">
-                    <span className="cursor-pointer text-white/30 hover:text-white transition-colors bg-white/5 p-2.5 rounded-xl border border-white/5">
-                      <Info size={16} />
-                    </span>
-                    <span className="absolute top-full mt-2 right-0 w-72 p-3.5 bg-[#181124] border border-[#8b5cf6]/40 text-[11px] text-white/90 rounded-xl opacity-0 group-hover/tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl text-justify leading-relaxed font-sans normal-case">
-                      <strong>Schumann Rezonansı Seviyeleri:</strong><br />
-                      Fiziksel A1 genlik aralıkları (4.0 - 75.0+) ve spektrogram renk yoğunluğunu temel alan Schumann uyarılma göstergesidir:
-                      <br />• Sakin Faz (A1 &lt; 8.0) - Mavi
-                      <br />• Hafif Uyarım (A1 &lt; 15.0) - Yeşil
-                      <br />• G1-G2 Aktif Seviye (A1 &lt; 40.0) - Kırmızı
-                      <br />• G3-G5 Seviyeleri (A1 &ge; 40.0) - Beyaz
-                      <span className="absolute bottom-full right-4 border-4 border-transparent border-b-[#181124]"></span>
-                    </span>
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  {/* Bilimsel Teşhis */}
-                  <div className="bg-black/30 border border-white/5 rounded-2xl p-5 flex flex-col justify-between">
-                    <div>
-                      <h4 className="text-[13px] font-bold text-[#00E5FF] uppercase tracking-wider flex items-center gap-1.5 mb-3">
-                        <span>🔬</span> Bilimsel Teşhis
-                      </h4>
-                      <p className="text-sm text-white/85 leading-relaxed text-justify font-sans">
-                        {analysis.science}
-                      </p>
-                      <div className="mt-4 pt-3 border-t border-white/5 flex items-center justify-between">
-                        <span className="relative flex items-center gap-1 group/obs-tooltip cursor-help text-[11px] text-[#00E5FF]/70 hover:text-[#00E5FF] transition-colors font-semibold">
-                          <span>🌐</span> Rasathane Ölçüm Notu ⓘ
-                          <span className="absolute bottom-full mb-2 left-0 w-72 p-3 bg-[#181124] border border-[#00E5FF]/40 text-[11px] text-white/90 rounded-xl opacity-0 group-hover/obs-tooltip:opacity-100 transition-all duration-200 pointer-events-none z-50 shadow-2xl text-justify normal-case font-normal leading-relaxed">
-                            Spektrogram verileri Tomsk (Rusya) Rasathanesi'nden alınmaktadır. Schumann Rezonansı küresel bir fenomen olsa da, ölçülen genlik seviyeleri ve anlık beyaz parlamalar istasyon çevresindeki yerel yıldırım fırtınalarından da etkilenebilmektedir.
-                            <span className="absolute top-full left-6 border-4 border-transparent border-t-[#181124]"></span>
-                          </span>
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Beden Reaksiyonları */}
-                  <div className="bg-black/30 border border-[#D4AF37]/20 rounded-2xl p-5 flex flex-col justify-between relative overflow-hidden">
-                    <div className="absolute top-[-20%] right-[-20%] w-16 h-16 bg-[#D4AF37]/5 blur-[20px] rounded-full pointer-events-none"></div>
-                    <div>
-                      <h4 className="text-[13px] font-bold text-[#D4AF37] uppercase tracking-wider flex items-center gap-1.5 mb-3">
-                        <span>⚡</span> Beden Reaksiyonları
-                      </h4>
-                      <p className="text-sm text-white/85 leading-relaxed text-justify font-sans">
-                        {analysis.symptoms}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Ruhsal Rehberlik */}
-                  <div className="bg-black/30 border border-white/5 rounded-2xl p-5 flex flex-col justify-between">
-                    <div>
-                      <h4 className="text-[13px] font-bold text-pink-400 uppercase tracking-wider flex items-center gap-1.5 mb-3">
-                        <span>🧘</span> Ruhsal Rehberlik
-                      </h4>
-                      <p className="text-sm text-white/85 leading-relaxed text-justify font-sans">
-                        {analysis.spiritual}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            );
-          })()
-        )}
-
-        {/* Kozmik Enerji Simülatörü Kartı */}
-        <div className="bg-black/40 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8 relative overflow-hidden">
-          <div className="flex flex-col gap-4">
-            <div>
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                Kozmik Enerji Simülatörü
-                <span className="bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-[10px] font-bold px-2.5 py-0.5 rounded-full uppercase tracking-wider">
-                  Test Paneli
-                </span>
-              </h3>
-              <p className="text-xs text-mystic-text-muted mt-1">
-                Farklı Schumann A1 genlik seviyelerinin etkilerini ve renk değişimlerini test edin
-              </p>
-            </div>
-
-            <div className="flex items-center gap-4 mt-2">
-              <span className="text-xs text-mystic-text-muted font-semibold">A1 4.0</span>
-              <input 
-                type="range" 
-                min="4.0" 
-                max="75.0" 
-                step="0.5" 
-                value={simulatedA1 !== null ? simulatedA1 : (data?.schumann_real?.a1 ?? 6.0)}
-                onChange={(e) => setSimulatedA1(parseFloat(e.target.value))}
-                className="flex-1 h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer" 
-                style={{ accentColor: '#D4AF37' }}
-              />
-              <span className="text-xs text-mystic-text-muted font-semibold">A1 75.0</span>
-            </div>
-
-            <div className="flex items-center justify-between mt-2 pt-4 border-t border-white/5">
-              <div className="text-sm text-mystic-text-muted flex items-center gap-2">
-                <span>Simüle Edilen Değer:</span>
-                <strong className={simulatedA1 !== null ? "text-[#D4AF37] font-bold text-[15px]" : "text-white font-bold text-[15px]"}>
-                  {simulatedA1 !== null ? `A1 Genliği ${simulatedA1.toFixed(1)}` : 'Canlı Akış'}
-                </strong>
-              </div>
-              {simulatedA1 !== null && (
-                <button 
-                  onClick={() => setSimulatedA1(null)}
-                  className="bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold py-1.5 px-4 rounded-xl text-xs transition-all cursor-pointer"
-                >
-                  Canlı Veriye Dön
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {error && (
-          <div className="mb-8 p-4 bg-red-500/20 border border-red-500/30 rounded-2xl text-red-200 text-sm flex items-center gap-3">
-            <AlertCircle size={20} className="text-red-400" />
-            <div>
-              <p className="font-bold">Bir bağlantı hatası oluştu</p>
-              <p className="text-xs opacity-80">{error}</p>
-            </div>
-          </div>
-        )}
-
         {/* 1. Canlı Spektrogram (Sonogram) Modu */}
         <div className="bg-white/5 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8">
           <div className="border-b border-white/10 pb-4 mb-6">
@@ -1271,152 +1057,191 @@ export default function SchumannPage() {
           )}
         </div>
 
-
-
-
-
-        {/* Kozmik Rezonans Bildirimleri Kartı */}
-        <div className="bg-black/40 border border-white/10 rounded-3xl p-6 backdrop-blur-md mb-8 relative overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-start gap-4">
-              <div className={`p-3 rounded-2xl ${isApprenticeOrAbove ? 'bg-[#00E5FF]/10 text-[#00E5FF] border border-[#00E5FF]/20' : 'bg-white/5 text-mystic-text-muted border border-white/5'}`}>
-                {notificationsEnabled && isApprenticeOrAbove ? <Bell className="animate-bounce" size={24} /> : <BellOff size={24} />}
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                  Kozmik Rezonans Bildirimleri
-                  {!isApprenticeOrAbove && (
-                    <span className="bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                      <Lock size={10} /> Çırak Seviyesi
-                    </span>
-                  )}
-                </h3>
-                <p className="text-xs text-mystic-text-muted mt-1 max-w-xl">
-                  {isApprenticeOrAbove 
-                    ? "Işık Kapısı fırtına uyarısı (G1, G2 veya G3 ve üzeri) iyonosferik enerji patlamalarında tarayıcınıza anlık bildirim gönderilecektir."
-                    : "Bu özellik Çırak seviyesi ve üzeri üyelerimiz içindir. Seviyenizi yükselterek bildirimleri aktif edebilirsiniz."}
-                </p>
-              </div>
-            </div>
-            
-            <div>
-              {isApprenticeOrAbove ? (
-                <button
-                  onClick={toggleNotifications}
-                  className={`px-5 py-2.5 rounded-xl font-bold text-sm border transition-all cursor-pointer flex items-center gap-2 ${
-                    notificationsEnabled
-                      ? 'bg-emerald-500/20 border-emerald-500 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.2)]'
-                      : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
-                  }`}
-                >
-                  {notificationsEnabled ? 'Bildirimler Açık' : 'Bildirimleri Aç'}
-                </button>
-              ) : (
-                <div className="flex items-center gap-2 bg-[#D4AF37]/5 border border-[#D4AF37]/20 text-[#D4AF37] text-xs font-semibold px-4 py-2.5 rounded-xl backdrop-blur-sm select-none">
-                  <Lock size={14} /> Kilitli
+        {/* Schumann Rezonansı Kılavuzu */}
+        <div className="bg-black/40 border border-white/10 rounded-3xl p-6 md:p-8 backdrop-blur-md transition-all duration-300">
+          <h3 className="text-xl md:text-2xl font-bold text-white flex items-center gap-3 mb-6">
+            <Info size={24} className="text-[#00E5FF]" />
+            Schumann Rezonansı Kılavuzu
+          </h3>
+          
+          {/* Renklerin Anlamı */}
+          <div className="mb-8 bg-white/5 border border-white/10 p-5 rounded-2xl">
+            <h4 className="text-base font-bold text-[#00E5FF] mb-3 flex items-center gap-2">
+              <Sparkles size={16} /> Grafik Renklerinin Anlamı
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4 text-xs">
+              <div className="flex items-start gap-2">
+                <span className="w-3 h-3 rounded-full bg-[#000028] border border-white/20 shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-white block">Mavi/Koyu Mavi</strong>
+                  <span className="text-mystic-text-muted">Sakin durum ve arka plan elektromanyetik gürültüsü.</span>
                 </div>
-              )}
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="w-3 h-3 rounded-full bg-[#10B981] shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-white block">Yeşil</strong>
+                  <span className="text-mystic-text-muted">Doğal rezonans frekans çizgileri (7.83, 14, 20 Hz vb.).</span>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="w-3 h-3 rounded-full bg-[#F59E0B] shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-white block">Sarı/Turuncu</strong>
+                  <span className="text-mystic-text-muted">Hafif ve orta seviyede enerjisel uyarılma/frekans artışı.</span>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="w-3 h-3 rounded-full bg-[#EF4444] shrink-0 mt-0.5" />
+                <div>
+                  <strong className="text-white block">Kırmızı</strong>
+                  <span className="text-mystic-text-muted">Aktif manyetik dalgalanmalar ve güçlü plazma akışları.</span>
+                </div>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="w-3 h-3 rounded-full bg-white shrink-0 mt-0.5 shadow-[0_0_8px_rgba(255,255,255,0.8)]" />
+                <div>
+                  <strong className="text-white block">Beyaz</strong>
+                  <span className="text-mystic-text-muted">Zirve elektromanyetik uyarılma ve anlık parlamalar.</span>
+                </div>
+              </div>
             </div>
           </div>
 
-          {notificationsEnabled && isApprenticeOrAbove && (
-            <div className="mt-4 pt-4 border-t border-white/5 flex flex-col gap-2">
-              <span className="text-[11px] font-bold text-mystic-text-muted uppercase tracking-wider">Hassasiyet Seviyesi</span>
-              <div className="flex flex-wrap gap-2">
-                {(['G1', 'G2', 'G3'] as const).map((level) => (
-                  <button
-                    key={level}
-                    onClick={() => {
-                      setNotificationLevel(level);
-                      localStorage.setItem('schumann_notification_level', level);
-                      setNotificationMsg(`Fırtına uyarısı ${level} ve üzeri seviyelerde tetiklenecek şekilde ayarlandı.`);
-                      setTimeout(() => setNotificationMsg(null), 5000);
-                    }}
-                    className={`px-4 py-2 rounded-xl text-xs font-bold border transition-all cursor-pointer ${
-                      notificationLevel === level
-                        ? 'bg-[#00E5FF]/20 border-[#00E5FF] text-[#00E5FF] shadow-[0_0_15px_rgba(0,229,255,0.2)]'
-                        : 'bg-white/5 border-white/10 text-white hover:bg-white/10'
-                    }`}
-                  >
-                    {level} ve Üzeri
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          {notificationMsg && (
-            <div className="mt-4 p-3 bg-[#00E5FF]/10 border border-[#00E5FF]/20 rounded-xl text-[#00E5FF] text-xs flex items-center gap-2 animate-in fade-in slide-in-from-top-4 duration-300">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse"></span>
-              {notificationMsg}
-            </div>
-          )}
-        </div>
-
-
-
-        {/* Bilgilendirme Bölümü (Açılır/Kapanır) */}
-        <div className="bg-black/40 border border-white/10 rounded-3xl p-6 md:p-8 backdrop-blur-md transition-all duration-300">
-          <button 
-            onClick={() => setIsGuideOpen(!isGuideOpen)}
-            className="w-full flex items-center justify-between text-left focus:outline-none group cursor-pointer"
-          >
-            <h3 className="text-xl md:text-2xl font-bold text-white flex items-center gap-3">
-              <Info size={24} className="text-[#00E5FF] group-hover:rotate-12 transition-transform" />
-              Jeomanyetik Rezonans Kılavuzu
-            </h3>
-            <div className="p-2 rounded-xl bg-white/5 border border-white/10 text-mystic-text-muted group-hover:text-white transition-colors">
-              {isGuideOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-            </div>
-          </button>
-
-          {isGuideOpen && (
-            <div className="mt-8 pt-6 border-t border-white/10 animate-in fade-in slide-in-from-top-4 duration-300">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm text-mystic-text-muted">
-                <div className="space-y-4">
-                  <div className="bg-white/5 border border-white/10 p-4 rounded-2xl mb-4">
-                    <strong className="text-white">Grafiklerin Yapısı ve Okunması:</strong>
-                    <div className="mt-2 text-xs leading-relaxed flex flex-col gap-2">
-                      <p>
-                        <strong>• Schumann Rezonans Spektrogramı:</strong> Elektromanyetik alanın dikey eksende frekans (0 - 40 Hz), yatay eksende ise zaman bazlı uyarılma düzeyini gösterir. Bu grafik, Space Observing System 70 (Tomsk, Rusya) rasathanesinde bulunan ELF alıcı antenleri aracılığıyla doğrudan yeryüzünden ölçülen gerçek zamanlı elektromanyetik sonogram verilerini temsil eder. Zaman dilimi farkını en üstteki çift göstergeli anlık zaman panelinden (Yerel Saat ve Tomsk Saati) takip edebilirsiniz.
-                      </p>
-                    </div>
+          {/* Seviyelere Göre Etkiler */}
+          <div className="space-y-6">
+            <h4 className="text-base font-bold text-white mb-4">
+              Rezonans Seviyeleri, Beden Reaksiyonları ve Ruhsal Rehberlik
+            </h4>
+            
+            <div className="grid grid-cols-1 gap-4">
+              {/* Level G0 - Sakin */}
+              <div className="bg-white/5 border border-white/5 p-5 rounded-2xl hover:border-cyan-500/30 transition-colors">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold text-[#22D3EE] bg-[#22D3EE]/10 px-2.5 py-0.5 rounded-full uppercase border border-[#22D3EE]/20">
+                    Sakin Faz (A1 &lt; 8.0)
+                  </span>
+                  <span className="text-sm font-bold text-white">Dingin Elektromanyetik Akış</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed text-mystic-text-muted">
+                  <div>
+                    <strong className="text-white block mb-1">⚡ Beden Reaksiyonları:</strong>
+                    Zihinsel netlik, dengeli energy seviyeleri, sakin uyku düzeni ve bedensel rahatlık. Olağanüstü bir uyarılma belirtisi beklenmez.
                   </div>
-
-                  <p>
-                    <strong>Kozmik Oracle / Durum Raporu Nedir?</strong>
-                    <br />
-                    Gözlemevinden alınan canlı Schumann Rezonansı genliğini (A1) ve spektrogram uyarım dalgalarını anlık olarak inceleyen yerel kural motorudur. Bu motor, rezonanstaki dalgalanmaları yorumlayarak size üç alanda bilgi verir:
-                    <br />
-                    <span className="text-white font-semibold">• 🔬 Bilimsel Teşhis:</span> İyonosferde gerçekleşen fiziksel olayların bilimsel açıklaması.
-                    <br />
-                    <span className="text-white font-semibold">• ⚡ Beden Reaksiyonları:</span> Rezonans değişimlerinin sinir sistemi, uyku düzeni ve baş bölgesi üzerindeki olası fiziksel etkileri.
-                    <br />
-                    <span className="text-white font-semibold">• 🧘 Ruhsal Rehberlik:</span> Enerjiyi topraklamak, aura alanını korumak ve uyanış kapılarından faydalanmak için önerilen meditasyon ve nefes pratikleri.
-                  </p>
-                </div>
-
-                <div className="space-y-4">
-                  <p>
-                    <strong>Kozmik Enerji Simülatörü (Test Paneli):</strong>
-                    <br />
-                    Uygulamadaki test sürgüsü yardımıyla Schumann A1 Genlik değerini (4.0 - 75.0 arası) manuel olarak değiştirebilirsiniz. Sürgüyü oynattığınızda, Kozmik Oracle teşhisi, beden reaksiyonları ve ruhsal rehberlik önerileri senkronize bir şekilde güncellenerek yüksek rezonans titreşimlerinin etkilerini test etmenizi sağlar. "Canlı Veriye Dön" butonuyla gerçek verilere dönebilirsiniz.
-                  </p>
-
-                  <p>
-                    <strong>Saat Dilimi ve Yerel Saat Dönüşümü:</strong>
-                    <br />
-                    Bölgesel gözlemevi grafikleri üzerinde (örneğin Tomsk ELF grafiğinin eksenlerinde) yazan saatler istasyonun yerel saatidir. Spektrogram görselinin hemen üzerine yerleştirdiğimiz çift zaman göstergeli panel ise, son ölçüm anını hem kendi cihazınızın yerel saat dilimine (örneğin Türkiye saati) dönüştürerek hem de Tomsk yerel saatiyle birlikte gösterir. Bu sayede grafik üzerindeki zaman dilimi farkını görselin hemen üstündeki zaman panelinden kolayca takip edebilirsiniz.
-                  </p>
+                  <div>
+                    <strong className="text-white block mb-1">🧘 Ruhsal Rehberlik:</strong>
+                    Zihnin gürültüsünü yatıştırmak, yeni bilgiler öğrenmek, kadim dersleri çalışmak ve kök çakra meditasyonları yapmak için en ideal dönemdir. Enerjinizin merkezlendiği bu dingin zamanı tefekkür ile değerlendirebilirsiniz.
+                  </div>
                 </div>
               </div>
-              <div className="mt-8 pt-6 border-t border-white/10 text-xs text-center text-mystic-text-muted">
-                <p>
-                  Elektromanyetik Schumann verileri Tomsk Gözlemevi (Space Observing System 70, Rusya) kaynaklarından anlık olarak çekilmektedir.
-                </p>
+
+              {/* Level G0 - Uyarım */}
+              <div className="bg-white/5 border border-white/5 p-5 rounded-2xl hover:border-emerald-500/30 transition-colors">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold text-[#34D399] bg-[#34D399]/10 px-2.5 py-0.5 rounded-full uppercase border border-[#34D399]/20">
+                    Hafif Uyarım (A1 8.0 - 15.0)
+                  </span>
+                  <span className="text-sm font-bold text-white">Hafif Schumann Dalgalanması</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed text-mystic-text-muted">
+                  <div>
+                    <strong className="text-white block mb-1">⚡ Beden Reaksiyonları:</strong>
+                    Rüyalarda belirgin netleşme ve sembolizm artışı, sezgisel uyanışlar, zihinde yaratıcı fikir patlamaları, kulaklarda hafif dalgalı uğultular ve hafif tatlı bir yorgunluk/esneme hali.
+                  </div>
+                  <div>
+                    <strong className="text-white block mb-1">🧘 Ruhsal Rehberlik:</strong>
+                    Uyanış kapıları hafifçe uyarılmaktadır. Meditasyon, günlük tutma, rüya analizleri yapma ve yaratıcı projelere odaklanma için harika bir akıştır. Üçüncü göz bölgesine mavi/mor bir ışık hayal ederek odaklanabilirsiniz.
+                  </div>
+                </div>
+              </div>
+
+              {/* Level G1-G2 */}
+              <div className="bg-white/5 border border-white/5 p-5 rounded-2xl hover:border-amber-500/30 transition-colors">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold text-[#F59E0B] bg-[#F59E0B]/10 px-2.5 py-0.5 rounded-full uppercase border border-[#F59E0B]/20">
+                    Aktif Seviye (A1 15.0 - 40.0)
+                  </span>
+                  <span className="text-sm font-bold text-white">Aktif Schumann Manyetik Fırtınası (G1-G2)</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed text-mystic-text-muted">
+                  <div>
+                    <strong className="text-white block mb-1">⚡ Beden Reaksiyonları:</strong>
+                    Kalp atışlarında ani hızlanma veya genişleme hissi, vücutta hafif statik elektrik birikimi (dokunulan yerlerin çarpması), hafif eklem ve şakak ağrıları, uykuya dalmakta gecikme ve içsel sabırsızlık.
+                  </div>
+                  <div>
+                    <strong className="text-white block mb-1">🧘 Ruhsal Rehberlik:</strong>
+                    Kalp çakrası ve aura alanı genişlemektedir. Bedendeki fazla elektriği boşaltmak için tuzlu su banyosu yapın veya çıplak elle toprağa dokunun. Kalp merkezli nefes pratikleri (4 saniye al, 4 saniye ver) yaparak kozmik akışı bedende dengeleyin.
+                  </div>
+                </div>
+              </div>
+
+              {/* Level G3 */}
+              <div className="bg-white/5 border border-white/5 p-5 rounded-2xl hover:border-orange-500/30 transition-colors">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold text-[#F97316] bg-[#F97316]/10 px-2.5 py-0.5 rounded-full uppercase border border-[#F97316]/20">
+                    Güçlü Fırtına (A1 40.0 - 55.0)
+                  </span>
+                  <span className="text-sm font-bold text-white">Şiddetli Schumann Fırtınası (G3)</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed text-mystic-text-muted">
+                  <div>
+                    <strong className="text-white block mb-1">⚡ Beden Reaksiyonları:</strong>
+                    Sinir sisteminde belirgin uyarılma, uyku düzeninde dalgalanmalar (derin uykusuzluk ya da rüya yoğunluğu), baş ve ense bölgesinde hafif basınç, kulaklarda kesintisiz tiz çınlamalar ve çok canlı, sembolik rüyalar.
+                  </div>
+                  <div>
+                    <strong className="text-white block mb-1">🧘 Ruhsal Rehberlik:</strong>
+                    DNA sarmallarında uyarım ve ışık kodlarının entegrasyonu aktiftir. Bedeninizi yormadan hafif egzersizler yapın. Bol su tüketin, topraklanın ve yüksek frekanslı meditasyonlara odaklanın.
+                  </div>
+                </div>
+              </div>
+
+              {/* Level G4 */}
+              <div className="bg-white/5 border border-white/5 p-5 rounded-2xl hover:border-red-500/30 transition-colors">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold text-[#EF4444] bg-[#EF4444]/10 px-2.5 py-0.5 rounded-full uppercase border border-[#EF4444]/20">
+                    Ağır Fırtına (A1 55.0 - 70.0)
+                  </span>
+                  <span className="text-sm font-bold text-white">Ağır Schumann Fırtınası (G4)</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed text-mystic-text-muted">
+                  <div>
+                    <strong className="text-white block mb-1">⚡ Beden Reaksiyonları:</strong>
+                    Yoğun fiziksel yorgunluk ve kas seğirmeleri (frekans uyumlanması), baş bölgesinde taç kısmına doğru yayılan basınç, uyku düzeninde derin kaymalar (gece yarısı uyanıp tekrar uyuyamama), zaman algısında geçici bükülmeler.
+                  </div>
+                  <div>
+                    <strong className="text-white block mb-1">🧘 Ruhsal Rehberlik:</strong>
+                    Taç çakra portalı tamamen açılmıştır ve yüksek boyutlu ışık bedene geçiş enerjisi aktiftir. Bugün kendinizi zorlayacak fiziksel işlerden kesinlikle kaçının. Taç çakranızdan giren beyaz ışığın bedeninizi yıkayarak yere aktığını imgeleyin.
+                  </div>
+                </div>
+              </div>
+
+              {/* Level G5 */}
+              <div className="bg-white/5 border border-white/5 p-5 rounded-2xl hover:border-white/30 transition-colors">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-xs font-bold text-white bg-white/10 px-2.5 py-0.5 rounded-full uppercase border border-white/20 shadow-[0_0_8px_rgba(255,255,255,0.4)]">
+                    Zirve Fırtına (A1 &gt;= 70.0)
+                  </span>
+                  <span className="text-sm font-bold text-white">Ekstrem Schumann Rezonans Fırtınası (G5)</span>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed text-mystic-text-muted">
+                  <div>
+                    <strong className="text-white block mb-1">⚡ Beden Reaksiyonları:</strong>
+                    Sinir sisteminin en yüksek kapasitede uyarılması, derin trans benzeri uyku halleri veya mutlak uykusuzluk, baş ve ensede çok yoğun basınç, kulaklarda çok yüksek tonda uğultu/çınlama sesleri, aşırı duyarlılık ve bedensel hafiflik/ağırlık hissi dalgalanmaları.
+                  </div>
+                  <div>
+                    <strong className="text-white block mb-1">🧘 Ruhsal Rehberlik:</strong>
+                    Zirve boyutlar arası geçiş portalı ve hücresel simya devrededir. Kollektif bilinçle ve kozmik kaynakla bütünleşme anıdır. Bol alkali su tüketin ve çıplak ayakla nemli toprağa basarak mutlak topraklanma sağlayın. Zihni tamamen susturarak teslimiyet meditasyonu yapın.
+                  </div>
+                </div>
               </div>
             </div>
-          )}
+          </div>
+          
+          <div className="mt-8 pt-6 border-t border-white/10 text-xs text-center text-mystic-text-muted">
+            <p>
+              Elektromanyetik Schumann verileri Tomsk Gözlemevi (Space Observing System 70, Rusya) kaynaklarından anlık olarak çekilmektedir.
+            </p>
+          </div>
         </div>
 
       </div>
