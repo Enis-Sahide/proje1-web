@@ -8,7 +8,7 @@ export const AKUPUNKTUR_LESSONS: Record<string, any> = {
   },
   '1_dil_teşhisi': {
     title: 'Ders 2: Teşhis Metotları - Dil Analizi (Glossoscopy)',
-    image: { uri: 'https://upload.wikimedia.org/wikipedia/commons/8/86/Chinese_tongue_diagnosis_diagram_Wellcome_L0039592.jpg' },
+    image: { uri: '/tcm_tongue.png' },
     content: 'Dil teşhisi, GÇT\'de organların ve kanın anlık durumunu gösteren en objektif tanı yöntemlerinden biridir. Dilin rengi, şekli, üzerindeki pas tabakası ve nem oranı, bedenin iç yapısındaki değişimleri gösterir.\n\n1. Dil Üzerindeki Organ Haritası:\n• Dil Ucu: Kalp ve Akciğer (Üst Isıtıcı) durumunu gösterir. Dil ucunun aşırı kırmızı olması kalp ateşi ve zihinsel aşırı uyarılmaya işarettir.\n• Dil Orta Bölgesi: Dalak ve Mide (Orta Isıtıcı / sindirim sistemi) alanıdır. Orta bölgede derin yarıklar olması mide asidi yetersizliğini veya kronik sindirim zayıflığını gösterir.\n• Dil Yanları: Karaciğer ve Safra Kesesi bölgesidir. Yanların kızarması veya şişmesi karaciğerde Qi sıkışması ve öfke birikiminin somut kanıtıdır.\n• Dil Kökü (Arka Kısım): Böbrekler, Mesane ve Bağırsaklar (Alt Isıtıcı) buradadır. Kök kısmında kalın, kirli pas birikmesi ürogenital sistemde nem ve hararet birikimini gösterir.\n\n2. Dil Rengi Analizi:\n• Soluk Dil: Vücutta kan eksikliği (anemi) veya Yang (ısı) yetersizliği anlamına gelir.\n• Kırmızı Dil: Vücutta aktif bir ısı (inflamasyon, enfeksiyon veya stres) olduğunu gösterir.\n• Mor/Koyu Dil: Beden genelinde kan durgunluğunu (stagnation) ve dolaşım kilitlenmesini gösterir. Genellikle şiddetli ağrılara eşlik eder.\n\n3. Dil Şekli ve Yapısı:\n• Şiş ve Diş İzli Dil: Dil kenarlarında diş izlerinin belirginleşmesi, Dalak Qi\'sinin zayıfladığını ve vücudun suyu yönetemeyip ödem yaptığını gösterir.\n• Çatlak Dil: Dil üzerindeki derin çatlaklar, vücut sıvılarının tükendiğini (Yin eksikliği) gösterir.\n\n4. Dil Pası (Kaplama):\n• İnce Beyaz Pas: Sağlıklı dildir.\n• Kalın Sarı Pas: Sindirim sisteminde aşırı nem ve hararet (toksin birikimi) anlamına gelir.\n• Pasın Olmaması (Soyulmuş Dil): Mide Yin\'inin bittiğini, vücudun aşırı kuru olduğunu gösterir.'
   },
   '1_nabiz_teşhisi': {
@@ -17,7 +17,7 @@ export const AKUPUNKTUR_LESSONS: Record<string, any> = {
   },
   '1_meridyen_anatomisi': {
     title: 'Ders 4: Meridyen Anatomisi ve Lokasyon Ölçüsü (Cun)',
-    image: { uri: 'https://upload.wikimedia.org/wikipedia/commons/0/09/Wellcome_L0034720_Acupuncture_chart%2C_front_view.jpg' },
+    image: { uri: '/tcm_meridians.png' },
     content: 'Meridyenler, bedeni baştan aşağıya saran görünmez elektromanyetik enerji kanallarıdır. Bu kanallar üzerindeki akupunktur noktalarını milimetrik olarak bulmak için kişiye özel anatomik ölçü birimi "Cun" kullanılır.\n\n1. Cun Ölçü Birimi Nedir?\nHer insanın boyu ve kemik yapısı farklı olduğundan, akupunkturda sabit milimetre ölçüleri kullanılmaz. Bunun yerine kişinin kendi parmak genişlikleri baz alınır:\n- 1 Cun: Kişinin başparmağının ilk ekleminin genişliğidir.\n- 1.5 Cun: İşaret ve orta parmağın yan yana getirilmiş birleşik genişliğidir.\n- 3 Cun: Başparmak hariç, yan yana birleştirilmiş dört parmağın genişliğidir (Özellikle bacaklardaki noktaları bulmak için sıkça kullanılır).\n- 0.5 Cun: Küçük parmağın eklem genişliğidir.\n\n2. Bedenin Kemik Ölçüm Standartları (Proportional Measurements):\n- Bilek çizgisi ile dirsek çizgisi arası mesafe her insanda 12 Cun kabul edilir.\n- Diz kapağı ile dış ayak bileği arası mesafe 16 Cun kabul edilir.\n- İki meme ucu arası mesafe 8 Cun kabul edilir.\n\n3. Meridyenlerin Akış Mantığı:\n- Enerji 24 saat boyunca durmaksızın akar.\n- Yin meridyenleri enerjiyi ayaklardan göğse ve göğüsten ellere taşır (yükselen/besleyen enerji).\n- Yang meridyenleri enerjiyi ellerden kafaya ve kafadan ayaklara taşır (inen/arındıran enerji).'
   },
 
@@ -34,7 +34,7 @@ export const AKUPUNKTUR_LESSONS: Record<string, any> = {
   },
   '2_olağanüstü_kanallar': {
     title: 'Ders 7: 8 Olağanüstü Kanal (Extraordinary Vessels)',
-    image: { uri: 'https://upload.wikimedia.org/wikipedia/commons/7/7b/Acupuncture_chart_L0034721.jpg' },
+    image: { uri: '/tcm_meridians.png' },
     content: 'Olağanüstü Kanallar, 12 ana meridyenin ötesinde, embriyonik gelişim anından itibaren var olan ve bedenin derin enerjisini (Jing) depolayan rezervuar göllerdir. Ana meridyenler kuruduğunda veya taştığında bu kanallar devreye girer.\n\nEn Önemli İki Ana Kanal:\n1. Ren Mai (Kavrama / Conception Vessel):\nDudak altından başlar, ön orta hattan inip perine bölgesinde biter. Bedenin tüm Yin meridyenlerini kontrol eder. Dişil enerjinin, hormonların ve çakraların ön yüz yöneticisidir.\n2. Du Mai (Yönetici / Governing Vessel):\nPerineden başlar, omurga boyunca yükselerek kafanın tepesinden (Baihui) üst dudağa iner. Bedenin tüm Yang meridyenlerini yönetir. Eril enerjinin, omurganın ve merkezi sinir sisteminin koruyucusudur.\n\nDiğer Kritik Kanallar:\n- Chong Mai (Geçit / Penetrating Vessel): Böbrek meridyeni boyunca yükselir. Kanın ve enerjinin denizidir. Derin karmik yaraların çözüldüğü alandır.\n- Dai Mai (Kuşak / Girdle Vessel): Bedenin yatay olarak dönen tek meridyenidir. Beli bir kemer gibi sarar. Üst ve alt enerji dengesini sağlar, bastırılmış kalça travmalarını tutar.'
   },
 
