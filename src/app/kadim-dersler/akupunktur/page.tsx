@@ -149,21 +149,28 @@ export default function AkupunkturPage() {
             {/* 1. Derece */}
             {activeTab === 'cirak' && (
               <div className="animate-in fade-in duration-500">
-                <AccordionItem lessonKey="1_temel_sifa" isExpanded={expandedLesson === '1_temel_sifa'} onToggle={() => handleToggle('1_temel_sifa')} lessonsData={lessonsData} />
+                <AccordionItem lessonKey="1_temel_felsefe" isExpanded={expandedLesson === '1_temel_felsefe'} onToggle={() => handleToggle('1_temel_felsefe')} lessonsData={lessonsData} />
+                <AccordionItem lessonKey="1_dil_teşhisi" isExpanded={expandedLesson === '1_dil_teşhisi'} onToggle={() => handleToggle('1_dil_teşhisi')} lessonsData={lessonsData} />
+                <AccordionItem lessonKey="1_nabiz_teşhisi" isExpanded={expandedLesson === '1_nabiz_teşhisi'} onToggle={() => handleToggle('1_nabiz_teşhisi')} lessonsData={lessonsData} />
+                <AccordionItem lessonKey="1_meridyen_anatomisi" isExpanded={expandedLesson === '1_meridyen_anatomisi'} onToggle={() => handleToggle('1_meridyen_anatomisi')} lessonsData={lessonsData} />
               </div>
             )}
 
             {/* 2. Derece */}
             {activeTab === 'kalfa' && isKalfaUnlocked && (
               <div className="animate-in fade-in duration-500">
-                <AccordionItem lessonKey="2_12_meridyen" isExpanded={expandedLesson === '2_12_meridyen'} onToggle={() => handleToggle('2_12_meridyen')} lessonsData={lessonsData} />
+                <AccordionItem lessonKey="2_yin_meridyenleri" isExpanded={expandedLesson === '2_yin_meridyenleri'} onToggle={() => handleToggle('2_yin_meridyenleri')} lessonsData={lessonsData} />
+                <AccordionItem lessonKey="2_yang_meridyenleri" isExpanded={expandedLesson === '2_yang_meridyenleri'} onToggle={() => handleToggle('2_yang_meridyenleri')} lessonsData={lessonsData} />
+                <AccordionItem lessonKey="2_olağanüstü_kanallar" isExpanded={expandedLesson === '2_olağanüstü_kanallar'} onToggle={() => handleToggle('2_olağanüstü_kanallar')} lessonsData={lessonsData} />
               </div>
             )}
 
             {/* 3. Derece */}
             {activeTab === 'ustat' && isUstatUnlocked && (
               <div className="animate-in fade-in duration-500">
-                <AccordionItem lessonKey="3_dugumler_cozmek" isExpanded={expandedLesson === '3_dugumler_cozmek'} onToggle={() => handleToggle('3_dugumler_cozmek')} lessonsData={lessonsData} />
+                <AccordionItem lessonKey="3_ozel_noktalar" isExpanded={expandedLesson === '3_ozel_noktalar'} onToggle={() => handleToggle('3_ozel_noktalar')} lessonsData={lessonsData} />
+                <AccordionItem lessonKey="3_akupresur_formulleri" isExpanded={expandedLesson === '3_akupresur_formulleri'} onToggle={() => handleToggle('3_akupresur_formulleri')} lessonsData={lessonsData} />
+                <AccordionItem lessonKey="3_meridyen_saatleri" isExpanded={expandedLesson === '3_meridyen_saatleri'} onToggle={() => handleToggle('3_meridyen_saatleri')} lessonsData={lessonsData} />
               </div>
             )}
           </div>
