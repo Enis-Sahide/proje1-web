@@ -29,6 +29,15 @@ const AccordionItem = ({ lessonKey, isExpanded, onToggle, lessonsData }: Accordi
       
       {isExpanded && (
         <div className="px-6 pb-6 pt-2 border-t border-white/5 animate-in fade-in duration-300">
+          {lesson.image?.uri && (
+            <div className="mb-4 overflow-hidden rounded-xl border border-mystic-primary/10 max-w-lg mx-auto">
+              <img 
+                src={lesson.image.uri} 
+                alt={lesson.title} 
+                className="w-full object-contain max-h-80"
+              />
+            </div>
+          )}
           {lesson.content && (
             <p className="text-mystic-text leading-relaxed text-sm md:text-base whitespace-pre-line">
               {lesson.content}
