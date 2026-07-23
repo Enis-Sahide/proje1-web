@@ -1123,7 +1123,7 @@ export default function SchumannPage() {
                   </span>
                   <span className="text-sm font-bold text-white">Dingin Elektromanyetik Akış</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed text-mystic-text-muted">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm leading-relaxed text-mystic-text-muted">
                   <div>
                     <strong className="text-white block mb-1">⚡ Beden Reaksiyonları:</strong>
                     Zihinsel netlik, dengeli energy seviyeleri, sakin uyku düzeni ve bedensel rahatlık. Olağanüstü bir uyarılma belirtisi beklenmez.
@@ -1143,7 +1143,7 @@ export default function SchumannPage() {
                   </span>
                   <span className="text-sm font-bold text-white">Hafif Schumann Dalgalanması</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed text-mystic-text-muted">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm leading-relaxed text-mystic-text-muted">
                   <div>
                     <strong className="text-white block mb-1">⚡ Beden Reaksiyonları:</strong>
                     Rüyalarda belirgin netleşme ve sembolizm artışı, sezgisel uyanışlar, zihinde yaratıcı fikir patlamaları, kulaklarda hafif dalgalı uğultular ve hafif tatlı bir yorgunluk/esneme hali.
@@ -1163,7 +1163,7 @@ export default function SchumannPage() {
                   </span>
                   <span className="text-sm font-bold text-white">Aktif Schumann Manyetik Fırtınası (G1-G2)</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed text-mystic-text-muted">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm leading-relaxed text-mystic-text-muted">
                   <div>
                     <strong className="text-white block mb-1">⚡ Beden Reaksiyonları:</strong>
                     Kalp atışlarında ani hızlanma veya genişleme hissi, vücutta hafif statik elektrik birikimi (dokunulan yerlerin çarpması), hafif eklem ve şakak ağrıları, uykuya dalmakta gecikme ve içsel sabırsızlık.
@@ -1183,7 +1183,7 @@ export default function SchumannPage() {
                   </span>
                   <span className="text-sm font-bold text-white">Şiddetli Schumann Fırtınası (G3)</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed text-mystic-text-muted">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm leading-relaxed text-mystic-text-muted">
                   <div>
                     <strong className="text-white block mb-1">⚡ Beden Reaksiyonları:</strong>
                     Sinir sisteminde belirgin uyarılma, uyku düzeninde dalgalanmalar (derin uykusuzluk ya da rüya yoğunluğu), baş ve ense bölgesinde hafif basınç, kulaklarda kesintisiz tiz çınlamalar ve çok canlı, sembolik rüyalar.
@@ -1203,7 +1203,7 @@ export default function SchumannPage() {
                   </span>
                   <span className="text-sm font-bold text-white">Ağır Schumann Fırtınası (G4)</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed text-mystic-text-muted">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm leading-relaxed text-mystic-text-muted">
                   <div>
                     <strong className="text-white block mb-1">⚡ Beden Reaksiyonları:</strong>
                     Yoğun fiziksel yorgunluk ve kas seğirmeleri (frekans uyumlanması), baş bölgesinde taç kısmına doğru yayılan basınç, uyku düzeninde derin kaymalar (gece yarısı uyanıp tekrar uyuyamama), zaman algısında geçici bükülmeler.
@@ -1223,7 +1223,7 @@ export default function SchumannPage() {
                   </span>
                   <span className="text-sm font-bold text-white">Ekstrem Schumann Rezonans Fırtınası (G5)</span>
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs leading-relaxed text-mystic-text-muted">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm leading-relaxed text-mystic-text-muted">
                   <div>
                     <strong className="text-white block mb-1">⚡ Beden Reaksiyonları:</strong>
                     Sinir sisteminin en yüksek kapasitede uyarılması, derin trans benzeri uyku halleri veya mutlak uykusuzluk, baş ve ensede çok yoğun basınç, kulaklarda çok yüksek tonda uğultu/çınlama sesleri, aşırı duyarlılık ve bedensel hafiflik/ağırlık hissi dalgalanmaları.
