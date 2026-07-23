@@ -104,5 +104,15 @@ export const ASTROLOGY_LESSONS: Record<string, any> = {
       { title: 'Kova (Aquarius)', content: 'Gölge: Soğukluk, aidiyetsizlik, anarşi ve duygusuz isyan.\nEzoterik: Kendini unutan, Kutsal Kâse\'den tüm insanlığın üzerine yaşam ve kardeşlik suyunu (evrensel aydınlanmayı) döken su taşıyıcısı.' },
       { title: 'Balık (Pisces)', content: 'Gölge: Kurban psikolojisi, kaçış, bağımlılıklar ve gerçeklikten kopuş.\nEzoterik: Dünyevi illüzyonun sonu. Egonun tamamen eriyip okyanusa (Tanrı\'ya) karıştığı, evrensel kurtarıcı, en yüksek merhamet ve Mesih bilinci.' }
     ]
+  },
+  '3_harita_entegrasyonu': {
+    title: 'Ders 10: 4 Katmanlı Harita Entegrasyonu ve Ödevler',
+    content: 'Doğum haritasını bu 4 katman üzerinden okurken en önemli altın kural sırayı takip etmektir. Bir danışanın veya kendinizin fiziksel hayatındaki tıkanıklıkları (1. Katman: Asiyah) çözmeden ve psikolojik gölgelerini (2. Katman: Yetzirah) entegre etmeden, onu ezoterik amaçlarına (3. Katman: Briah) veya galaktik kökenlerine (4. Katman: Atziluth) yönlendirmek havada kalacaktır. Gerçek ezoterizm, yukarısı ile aşağısını birleştirmektir.\n\n4 Katmanlı Okuma Sentezi:\n1. Adım (Asiyah): Element dengesi ve ASC yöneticisi analiz edilerek fiziksel donanım belirlenir.\n2. Adım (Yetzirah): Ay, Merkür ve Chiron konumlarına bakılarak duygusal yaralar ve savunma mekanizmaları çözülür.\n3. Adım (Briah): Ezoterik yöneticiler ve Kuzey Ay Düğümü aksı incelenerek bu enkarnasyondaki ruhsal dersler ortaya çıkarılır.\n4. Adım (Atziluth): Sabit yıldızlar, Galaktik Merkez kavuşumları ve Yıldız Kökenleri (Starseed) hesaplanarak ilahi plandaki kozmik misyon ve Monad bağlantısı entegre edilir.',
+    items: [
+      { title: 'Ödev 1: Element & Köklenme Analizi', content: 'Kendi haritanızdaki element dağılımını çıkartın. Eksik elementi tespit edip dünyevi (Asiyah) düzeyde bunu dengelemek için 1 hafta boyunca somut pratikler yapın.' },
+      { title: 'Ödev 2: Ay Burcu & Bilinçaltı İncelemesi', content: 'Ay burcunuzun yerleştiği evi ve açılarını inceleyin. Çocukluktan gelen en güçlü 3 savunma mekanizmanızı yazın ve Yetzirah planında gölge yönlerinizle yüzleşin.' },
+      { title: 'Ödev 3: Ezoterik Yönetici Haritası', content: 'Haritanızdaki Güneş ve Kuzey Ay Düğümü\'nün ezoterik yöneticilerini bulun. Bu gezegenlerin konumlarına bakarak ruhsal amacınızın yol haritasını çizin.' },
+      { title: 'Ödev 4: Sabit Yıldız Kavuşumları', content: 'Haritanızdaki köşe noktaların ve kişisel gezegenlerin sabit yıldızlarla olan kavuşumlarını (1° orb ile) listeleyin. Kozmik Öz (Atziluth) seviyesindeki galaktik bağlantılarınızı araştırın.' }
+    ]
   }
 };
