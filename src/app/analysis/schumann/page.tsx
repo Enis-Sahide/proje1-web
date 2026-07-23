@@ -98,9 +98,6 @@ export default function SchumannPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [timestamp, setTimestamp] = useState<number>(Date.now());
-  const [notificationsEnabled, setNotificationsEnabled] = useState(false);
-  const [notificationLevel, setNotificationLevel] = useState<'G1' | 'G2' | 'G3'>('G1');
-  const [notificationMsg, setNotificationMsg] = useState<string | null>(null);
   const [hoveredBar, setHoveredBar] = useState<KpHistoryItem | null>(null);
   
   // Interactive Hover Spectrogram State
@@ -110,66 +107,6 @@ export default function SchumannPage() {
   // Accordion Guide State
   const [isGuideOpen, setIsGuideOpen] = useState(false);
 
-  // Load notification state from localStorage
-  useEffect(() => {
-    const saved = localStorage.getItem('schumann_notifications');
-    if (saved === 'true') {
-      setNotificationsEnabled(true);
-    }
-    const savedLevel = localStorage.getItem('schumann_notification_level');
-    if (savedLevel === 'G1' || savedLevel === 'G2' || savedLevel === 'G3') {
-      setNotificationLevel(savedLevel);
-    }
-  }, []);
-
-  const isApprenticeOrAbove = role && (ROLE_LEVELS[role] >= 1 || role === 'admin');
-
-  const toggleNotifications = () => {
-    if (!isApprenticeOrAbove) return;
-    const newState = !notificationsEnabled;
-    setNotificationsEnabled(newState);
-    localStorage.setItem('schumann_notifications', String(newState));
-    
-    if (newState) {
-      setNotificationMsg(`Fırtına uyarısı ${notificationLevel} ve üzeri seviyelerde tetiklenecek şekilde ayarlandı.`);
-      setTimeout(() => setNotificationMsg(null), 5000);
-
-      // Web Notification API integration for direct browser notifications
-      if (typeof window !== 'undefined' && 'Notification' in window) {
-        if (Notification.permission === 'default') {
-          Notification.requestPermission().then(permission => {
-            if (permission === 'granted') {
-              new Notification("Kozmik Rezonans Bildirimleri Aktif!", {
-                body: "Seçtiğiniz fırtına seviyeleri ve üzeri iyonosferik enerji patlamalarında anlık bildirim gönderilecektir.",
-                icon: "/logo.png"
-              });
-            }
-          });
-        } else if (Notification.permission === 'granted') {
-          new Notification("Kozmik Rezonans Bildirimleri Aktif!", {
-            body: "Bildirim ayarlarınız başarıyla doğrulandı.",
-            icon: "/logo.png"
-          });
-        }
-      }
-    }
-  };
-
-  const getNotificationBody = (a1: number) => {
-    if (a1 >= 70.0) {
-      return "Etkiler: Yoğun baş/ense basıncı, kulak uğultusu, derin trans hali. Öneri: Çıplak ayakla nemli toprağa basın ve alkali su tüketin.";
-    }
-    if (a1 >= 55.0) {
-      return "Etkiler: Yoğun yorgunluk, kas seğirmeleri, uyku kayması. Öneri: Fiziksel işlerden kaçının, beyaz ışık imgelemesi yapın.";
-    }
-    if (a1 >= 40.0) {
-      return "Etkiler: Uykusuzluk, baş/ense basıncı, kulak çınlaması. Öneri: Hafif egzersizler yapın ve bol su tüketin.";
-    }
-    if (a1 >= 15.0) {
-      return "Etkiler: Kalp merkezinde uyarılma, statik elektriklenme. Öneri: Tuzlu su banyosu yapın veya çıplak elle toprağa dokunun.";
-    }
-    return "Enerji alanı dengelidir. Meditasyon ve köklenmek için en uygun zamandır.";
-  };
 
   const fetchData = async () => {
     try {
@@ -188,48 +125,7 @@ export default function SchumannPage() {
       setData(jsonData);
       setTimestamp(Date.now());
 
-      // Trigger browser notifications if enabled
-      const savedNotifications = localStorage.getItem('schumann_notifications') === 'true';
-      const savedLevel = (localStorage.getItem('schumann_notification_level') || 'G1') as 'G1' | 'G2' | 'G3';
-      
-      if (savedNotifications && jsonData.triggered_g_level && jsonData.schumann_real) {
-        const triggeredLevel = jsonData.triggered_g_level;
-        const lastNotifLevel = localStorage.getItem('schumann_last_notification_level');
-        const lastNotifTimeStr = localStorage.getItem('schumann_last_notification_time');
-        
-        let shouldNotify = false;
-        const currentTime = Date.now();
-        const lastTime = lastNotifTimeStr ? parseInt(lastNotifTimeStr) : 0;
-        
-        const levels = ['G1', 'G2', 'G3', 'G4', 'G5'];
-        const userThresholdIdx = levels.indexOf(savedLevel);
-        const triggeredIdx = levels.indexOf(triggeredLevel);
-        
-        if (triggeredIdx >= userThresholdIdx) {
-          if (currentTime - lastTime < 3 * 60 * 60 * 1000) {
-            // Within 3 hours, notify ONLY if the new level is higher than the last notified level
-            const lastNotifiedIdx = lastNotifLevel ? levels.indexOf(lastNotifLevel) : -1;
-            if (triggeredIdx > lastNotifiedIdx) {
-              shouldNotify = true;
-            }
-          } else {
-            // More than 3 hours have passed, notify anyway
-            shouldNotify = true;
-          }
-        }
-        
-        if (shouldNotify) {
-          if (typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted') {
-            const bodyText = getNotificationBody(jsonData.schumann_real.a1);
-            new Notification(`🚨 Schumann Rezonansı Yükseldi: ${triggeredLevel}`, {
-              body: bodyText,
-              icon: "/logo.png"
-            });
-            localStorage.setItem('schumann_last_notification_level', triggeredLevel);
-            localStorage.setItem('schumann_last_notification_time', String(currentTime));
-          }
-        }
-      }
+
     } catch (err: any) {
       console.error('Kp API fetch error:', err);
       setError(err.message || 'Veriler yüklenirken bir hata oluştu.');
