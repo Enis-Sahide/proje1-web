@@ -8,6 +8,7 @@ import { ASTRO_CITIES, AstroPoint, NatalChartData, AstroCity } from '@/features/
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { X } from 'lucide-react';
 import RequireRole from '@/core/ui/RequireRole';
+import { downloadKabbalahPDF } from '@/utils/kabbalahPdfGenerator';
 
 const ZODIAC_COLORS: Record<string, string> = {
   'Koç': '#FF453A', 'Aslan': '#FF453A', 'Yay': '#FF453A',
@@ -325,6 +326,18 @@ export default function KabbalahAnalysisPage() {
                 <p className="text-mystic-text-muted text-center max-w-xl mt-4">
                   Yükselen Burcunuz: <strong className="text-white">{chartData.assiah.ascendant.sign}</strong>
                 </p>
+                <button
+                  onClick={() => downloadKabbalahPDF(
+                    chartData,
+                    kabbalahAnalysis,
+                    interpretations,
+                    cityKey ? cityKey.name : '',
+                    `${dateStr.split('-').reverse().join('.')} ${timeStr}`
+                  )}
+                  className="mt-6 flex items-center gap-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-2.5 px-6 rounded-xl transition-all shadow-md shadow-[#D4AF37]/10"
+                >
+                  PDF Raporu İndir
+                </button>
               </div>
 
               <div className={`p-8 rounded-2xl border max-w-3xl mx-auto ${kabbalahAnalysis.shortcutLevel > 0 ? 'bg-[#D4AF37]/10 border-[#D4AF37]/30' : 'bg-white/5 border-white/10'} backdrop-blur-sm relative overflow-hidden`}>
