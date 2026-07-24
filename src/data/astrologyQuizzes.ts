@@ -3,23 +3,35 @@ import { Quiz } from './allQuizzes';
 export const astrologyQuiz1: Quiz = {
   id: "astroloji_1",
   title: "1. Derece: Çıraklık Sınavı",
-  description: "Fiziksel Katman (Assiah), 12 Evin temel dünyevi anlamları ve Gezegen arketipleri üzerine Çıraklık sınavı. (20 Soru)",
+  description: "Fiziksel Katman (Assiah), harita okuma sentez kuralları, evlerin 1. katman dünyevi anlamları ve gezegen arketipleri sınavı. (20 Soru)",
   questions: [
     {
       id: "ast_1",
-      question: "Sıradan bir astroloji haritasıyla '4 Katmanlı Ezoterik Harita' arasındaki en temel fark nedir?",
+      question: "Sıradan astroloji ile '4 Katmanlı Ezoterik Astroloji' arasındaki en temel fark nedir?",
       options: [
-        "Ezoterik haritanın sadece Ay burcunu dikkate alması",
-        "Sıradan astrolojinin sadece fiziksel (dünyevi) olaylarla ilgilenmesi, ezoterik astrolojinin ise ruhun tekamülüne ve karmik plana bakması",
-        "Ezoterik haritanın geleceği %100 kesin bilmesi",
-        "Sıradan astrolojinin 12, ezoterik astrolojinin 14 burç kullanması"
+        "Ezoterik haritanın sadece Ay burcuna odaklanması",
+        "Sıradan astrolojinin sadece fiziksel (Assiah) olaylarla ilgilenmesi, ezoterik astrolojinin ise haritayı 4 derinlikte (Olay, Psikoloji, Karma, Ruhsal) okuması",
+        "Ezoterik astrolojinin 14 burçtan oluşması",
+        "Sıradan astrolojinin sadece Güneş merkezli (Heliocentric) hesaplama yapması"
       ],
       correctAnswerIndex: 1,
-      explanation: "Sıradan astroloji 'Ne olacak?' der (1. Katman). Ezoterik astroloji ise 'Neden oluyor ve ruhun amacı ne?' diyerek haritayı 4 derinlikte (Fiziksel, Psikolojik, Karmik, Ruhsal) okur."
+      explanation: "Sıradan astroloji sadece dünyevi/fiziksel olayları (Ne olacak?) incelerken, ezoterik astroloji ruhun tekamülünü ve 4 farklı varoluş katmanını (Assiah, Yetzirah, Briah, Atziluth) sentezler."
     },
     {
       id: "ast_2",
-      question: "Harita okuma sanatındaki 'Kim, Nasıl, Nerede' altın kuralında 'NASIL (Kostüm / Tarz)' sorusunun karşılığı hangisidir?",
+      question: "Harita okuma sentez formülündeki 'Kim (Aktör / İçsel Güç)' sorusunun astrolojik karşılığı hangisidir?",
+      options: [
+        "Gezegen",
+        "Burç",
+        "Ev",
+        "Açı"
+      ],
+      correctAnswerIndex: 0,
+      explanation: "Harita sentezinde; Gezegen 'Kim?' (Aktör/Güç), Burç 'Nasıl?' (Kostüm/Tarz) ve Ev 'Nerede?' (Yaşam sahnesi) sorularına yanıt verir."
+    },
+    {
+      id: "ast_3",
+      question: "Sentez formülündeki 'Nasıl (Kostüm / Tarz)' sorusuna doğum haritasında hangi unsur cevap verir?",
       options: [
         "Gezegen",
         "Ev",
@@ -27,223 +39,211 @@ export const astrologyQuiz1: Quiz = {
         "Burç"
       ],
       correctAnswerIndex: 3,
-      explanation: "Sentezde: Gezegen = Kim (Aktör), Burç = Nasıl (Kostüm/Tarz), Ev = Nerede (Sahne)'dir."
-    },
-    {
-      id: "ast_3",
-      question: "Astrolojik evlerin dünyevi 1. katmanında; 'Cüzdanınız, sahip olduğunuz maddi kaynaklar ve para kazanma yeteneğiniz' hangi eve aittir?",
-      options: [
-        "2. Ev",
-        "5. Ev",
-        "8. Ev",
-        "10. Ev"
-      ],
-      correctAnswerIndex: 0,
-      explanation: "Fiziksel katmanda 2. Ev tamamen cüzdan, taşınır mallar ve dünyevi kazançtır."
+      explanation: "Burçlar, gezegen aktörlerinin rolleri sergilerken giydikleri kostümleri, yani enerjiyi nasıl ve hangi tarzda yansıtacaklarını gösterir."
     },
     {
       id: "ast_4",
-      question: "Kariyer, şöhret, toplum önündeki statü ve patronlarla olan ilişkilerin okunduğu 'Tepe Noktası (MC)' hangi evdir?",
+      question: "Harita okumasında 'Nerede (Sahne / Yaşam Alanı)' sorusunun karşılığı hangisidir?",
+      options: [
+        "Gezegen",
+        "Ev",
+        "Burç",
+        "Açı"
+      ],
+      correctAnswerIndex: 1,
+      explanation: "Evler, gezegenlerin (aktörler) ve burçların (kostümler) kendilerini hangi somut hayat sahnesinde (ilişkiler, kariyer, para vb.) göstereceğini belirler."
+    },
+    {
+      id: "ast_5",
+      question: "Mars gezegeninin Koç burcunda ve 7. evde yer alması, sentez formülüne göre ne şekilde yorumlanır?",
+      options: [
+        "Kişinin kariyerinde (10. ev) çok başarılı ve sabırlı olacağı",
+        "Kişinin ikili ilişkiler (7. ev) arenasında sabırsız, atılgan ve çatışmacı/rekabetçi (Mars/Koç) olabileceği",
+        "Kişinin maddi konularda çok tutucu davranacağı",
+        "Kardeşleriyle olan ilişkilerinde aşırı korumacı bir yapı sergileyeceği"
+      ],
+      correctAnswerIndex: 1,
+      explanation: "Mars (Savaşçı) + Koç (Atılgan/Sabırsız) + 7. Ev (İlişkiler/Ortaklıklar) sentezlendiğinde, kişinin ilişkilerinde mücadeleci ve sabırsız bir üslup benimseyeceği anlaşılır."
+    },
+    {
+      id: "ast_6",
+      question: "Gezegenlerin birbirleriyle yaptığı açılardan 'Kare Açı (90 Derece)' neyi simgeler?",
+      options: [
+        "Hiç çaba harcamadan rahatça akan şanslı enerjileri",
+        "İki enerjinin kaynaşarak tek bir güçlü odak noktası oluşturmasını",
+        "İçsel gerilim, kriz, çatışma ve eyleme geçme zorunluluğunu",
+        "İlişkilerde yansıtılan tamamlanma ve denge ihtiyacını"
+      ],
+      correctAnswerIndex: 2,
+      explanation: "Kare açılar (90°), haritadaki en büyük motivasyon kaynaklarıdır. Kriz yaratarak kişiyi konfor alanından çıkmaya ve eyleme geçmeye zorlar."
+    },
+    {
+      id: "ast_7",
+      question: "Gezegenler arasındaki 'Üçgen Açı (120 Derece)' ne anlama gelir?",
+      options: [
+        "Kişinin hayatında büyük krizler ve engellerle karşılaşacağını",
+        "Doğuştan gelen, zahmetsizce akan rahat enerjileri ve doğal yetenekleri",
+        "Fiziksel düzeyde ani ve yıkıcı olayların yaşanacağını",
+        "İki gezegenin enerjilerinin birbirini tamamen yok edeceğini"
+      ],
+      correctAnswerIndex: 1,
+      explanation: "Üçgen açılar (120°), haritada enerjinin dirençle karşılaşmadan aktığı, doğuştan gelen olumlu yetenek ve kolaylıkları temsil eder."
+    },
+    {
+      id: "ast_8",
+      question: "Gezegenler arasındaki 'Karşıt Açı (180 Derece)' psikolojik/dünyevi olarak ne şekilde tezahür eder?",
+      options: [
+        "Bireyin içsel dünyasında hiçbir gerilim yaşamayacağı şeklinde",
+        "İki gezegen enerjisinin tek bir noktada birleşmesi şeklinde",
+        "Dış dünyada, özellikle ilişkilerde yansıtılan açık çatışmalar veya tamamlanma ihtiyacı şeklinde",
+        "Kariyerde aniden gelen şans ve terfiler şeklinde"
+      ],
+      correctAnswerIndex: 2,
+      explanation: "Karşıt açılar (180°), projeksiyon yoluyla ilişkilerimizde karşı tarafa yansıttığımız içsel zıtlıkları ve denge arayışlarını gösterir."
+    },
+    {
+      id: "ast_9",
+      question: "İki gezegenin doğum haritasında 'Kavuşum (0 Derece)' yapması neyi gösterir?",
+      options: [
+        "Enerjilerin birbirini tamamen bloke ettiğini",
+        "İki gezegen enerjisinin birleşerek çok güçlü bir odak noktası oluşturduğunu",
+        "Kişinin mutlaka yurt dışına gideceğini",
+        "Ebeveynlerin çocuklukta kişiyi tamamen serbest bıraktığını"
+      ],
+      correctAnswerIndex: 1,
+      explanation: "Kavuşum açısı (0°), iki gezegen karakterinin bir araya gelerek tek bir güçlü enerji odağı ve mizaç özelliği oluşturmasıdır."
+    },
+    {
+      id: "ast_10",
+      question: "12 Evin 1. katmanında (Fiziksel Katman); 1. Ev (Yükselen / ASC) neyi temsil eder?",
+      options: [
+        "Maddi kazançlarımızı ve banka hesabımızı",
+        "Fiziksel görünümümüzü, beden sağlığımızı ve dış dünyaya sunduğumuz maskeyi (Persona)",
+        "Eşimizle olan resmi evliliğimizi",
+        "Rüyalarımızı ve bilinçaltı korkularımızı"
+      ],
+      correctAnswerIndex: 1,
+      explanation: "1. Ev (Yükselen), ruhun enkarne olduğu fiziksel bedeni, sağlık durumunu ve dış dünya ile ilk etkileşim maskesini yönetir."
+    },
+    {
+      id: "ast_11",
+      question: "Astrolojik haritada dünyevi anlamıyla 'cüzdanımız, sahip olduğumuz mallar ve para kazanma gücümüz' hangi evdir?",
+      options: [
+        "2. Ev",
+        "5. Ev",
+        "8. Ev",
+        "11. Ev"
+      ],
+      correctAnswerIndex: 0,
+      explanation: "Fiziksel düzeyde 2. Ev, tamamen kişinin kendi çabasıyla elde ettiği maddi kaynakları, cüzdanını ve taşınır mallarını yönetir."
+    },
+    {
+      id: "ast_12",
+      question: "'Kardeşler, kuzenler, yakın çevre, kısa yolculuklar ve günlük iletişim kapasitesi' hangi evin fiziksel konularındandır?",
+      options: [
+        "3. Ev",
+        "6. Ev",
+        "9. Ev",
+        "12. Ev"
+      ],
+      correctAnswerIndex: 0,
+      explanation: "3. Ev, yakın çevremizle olan her türlü bilgi akışını, kardeşleri, kısa seyahatleri ve temel zihinsel iletişimi yönetir."
+    },
+    {
+      id: "ast_13",
+      question: "Baba ocağı, gayrimenkuller, vatan, kökler ve haritanın en dip noktasını (IC) temsil eden ev hangisidir?",
       options: [
         "1. Ev",
         "4. Ev",
         "7. Ev",
         "10. Ev"
       ],
-      correctAnswerIndex: 3,
-      explanation: "10. Ev (MC) haritanın zirvesidir. Kariyer, statü ve dış dünyadaki başarı alanıdır."
-    },
-    {
-      id: "ast_5",
-      question: "Baba ocağı, doğduğunuz ev, vatan ve köklerinizi temsil eden 4. Ev'in Latince kısaltması nedir?",
-      options: [
-        "AC (Ascendant)",
-        "IC (Imum Coeli)",
-        "MC (Medium Coeli)",
-        "DC (Descendant)"
-      ],
       correctAnswerIndex: 1,
-      explanation: "4. Evin başlangıç noktası IC'dir (Haritanın En Dibi). Kökleri ve yuvayı temsil eder."
-    },
-    {
-      id: "ast_6",
-      question: "Kardeşler, kısa yolculuklar, ilkokul eğitimi ve günlük iletişim kapasitesini hangi ev gösterir?",
-      options: [
-        "3. Ev",
-        "6. Ev",
-        "9. Ev",
-        "11. Ev"
-      ],
-      correctAnswerIndex: 0,
-      explanation: "3. Ev; zihnin günlük işleyişi, komşular, kardeşler ve yakın çevre iletişimidir."
-    },
-    {
-      id: "ast_7",
-      question: "Evlilik, açık düşmanlar, resmi sözleşmeler ve ortaklıklar hangi evin konusudur?",
-      options: [
-        "5. Ev",
-        "7. Ev",
-        "8. Ev",
-        "12. Ev"
-      ],
-      correctAnswerIndex: 1,
-      explanation: "7. Ev (Alçalan - DC) bizden çıkıp başkalarıyla kurduğumuz 'ikili' ilişkiler (eş veya açık düşman) arenasıdır."
-    },
-    {
-      id: "ast_8",
-      question: "Gezegenlerin temel arketiplerinden hangisi 'İçgüdüler, Anne, ve Bilinçaltı Güvenlik İhtiyacı'nı temsil eder?",
-      options: [
-        "Güneş",
-        "Venüs",
-        "Ay",
-        "Satürn"
-      ],
-      correctAnswerIndex: 2,
-      explanation: "Ay, içsel annemiz, duygularımız, çocukluğumuz ve strese karşı sığındığımız güvenlik limanıdır."
-    },
-    {
-      id: "ast_9",
-      question: "'Nasıl düşündüğünüz, konuştuğunuz ve zihinsel algı kapasiteniz' hangi gezegenin görevidir?",
-      options: [
-        "Jüpiter",
-        "Merkür",
-        "Mars",
-        "Ay"
-      ],
-      correctAnswerIndex: 1,
-      explanation: "Merkür haritanın postacısıdır. Zihnin çalışma şeklini, iletişimi ve aklı yönetir."
-    },
-    {
-      id: "ast_10",
-      question: "Astrolojide sınırları, disiplini, zamanı ve korkuları öğreten, 'Karma'nın Lordu' lakaplı gezegen hangisidir?",
-      options: [
-        "Uranüs",
-        "Plüton",
-        "Satürn",
-        "Neptün"
-      ],
-      correctAnswerIndex: 2,
-      explanation: "Satürn acımasız ama adil bir öğretmendir. Kişiye sınırları, disiplini ve sabrı öğretir."
-    },
-    {
-      id: "ast_11",
-      question: "Fiziksel bedeninizi, dış görünüşünüzü ve doğduğunuz an dünyaya taktığınız 'Maskeyi' (Persona) gösteren ev hangisidir?",
-      options: [
-        "1. Ev",
-        "2. Ev",
-        "6. Ev",
-        "12. Ev"
-      ],
-      correctAnswerIndex: 0,
-      explanation: "1. Ev (Yükselen) sizin fiziksel vitrininizdir. Dış dünyanın sizi ilk gördüğü andaki maskenizdir."
-    },
-    {
-      id: "ast_12",
-      question: "Eşin parası, banka kredileri, miras, vergiler ve cinselliğin fiziksel boyutunu hangi ev yönetir?",
-      options: [
-        "2. Ev",
-        "5. Ev",
-        "8. Ev",
-        "11. Ev"
-      ],
-      correctAnswerIndex: 2,
-      explanation: "8. Ev krizler ve başkalarının kaynaklarıdır (Ortak mallar, miras, krediler, nafaka)."
-    },
-    {
-      id: "ast_13",
-      question: "Üniversite eğitimi, yurtdışı yolculukları, yabancı diller ve mahkemelerin felsefi/hukuki boyutunu gösteren ev hangisidir?",
-      options: [
-        "3. Ev",
-        "9. Ev",
-        "10. Ev",
-        "12. Ev"
-      ],
-      correctAnswerIndex: 1,
-      explanation: "9. Ev sınırları aşmakla ilgilidir. Fiziksel sınırları (yurtdışı) ve zihinsel sınırları (akademi/din) aşmayı anlatır."
+      explanation: "4. Ev (IC), ailemizi, doğduğumuz evi, köklerimizi, taşınmaz mallarımızı ve iç dünyamızın temellerini temsil eder."
     },
     {
       id: "ast_14",
-      question: "Sosyal çevre, dernekler, takım çalışmaları ve kariyerden elde edilen kazançlar (primler) nerede okunur?",
+      question: "Fiziksel katmanda 'romantik aşklar, çocuklar, hobiler, borsa ve sahne yaratıcılığı' hangi evle bağdaştırılır?",
       options: [
+        "2. Ev",
         "5. Ev",
         "7. Ev",
-        "9. Ev",
-        "11. Ev"
+        "9. Ev"
       ],
-      correctAnswerIndex: 3,
-      explanation: "11. Ev kolektif çevredir. Bireyin dahil olduğu gruplar, sosyal ağlar ve büyük umutlarıdır."
+      correctAnswerIndex: 1,
+      explanation: "5. Ev, yaşama sevincini, aşk ilişkilerini, çocukları ve spekülatif kazanç yollarını yönetir."
     },
     {
       id: "ast_15",
-      question: "Gezegenlerin yaptığı açılardan 'Kare Açı (90 Derece)' neyi ifade eder?",
-      options: [
-        "Tam bir uyum ve huzur",
-        "İçsel gerilim, çatışma ve kişiyi mecburi bir eyleme (gelişime) zorlayan kriz",
-        "İki gezegenin yan yana aynı burçta olması",
-        "Zayıf bir şans"
-      ],
-      correctAnswerIndex: 1,
-      explanation: "Kare açı rahatsız edicidir ama çok faydalıdır. Ruh bu sürtüşmeyi aşmak için harekete geçmek (tekamül etmek) zorunda kalır."
-    },
-    {
-      id: "ast_16",
-      question: "'Üçgen Açı (120 Derece)' haritada ne anlama gelir?",
-      options: [
-        "Çok zorlu bir karma borcu",
-        "Dış düşmanlarla açık çatışma",
-        "Doğuştan gelen, hiç çaba harcamadan rahatça akan şans, yetenek ve destek",
-        "Gizli düşmanların saldırısı"
-      ],
-      correctAnswerIndex: 2,
-      explanation: "Üçgen açı ruhun geçmişte kazandığı bir ödüldür; çaba gerektirmeden çalışan çok pozitif ve akıcı bir enerjidir."
-    },
-    {
-      id: "ast_17",
-      question: "Fiziksel hastaneler, hapishaneler, kapalı alanlar ve gizli düşmanların (arkadan iş çevirenlerin) okunduğu 1. katman evi hangisidir?",
+      question: "Günlük rutin işler, ofis çalışma ortamı, evcil hayvanlar ve akut fiziksel hastalıkların göstergesi olan ev hangisidir?",
       options: [
         "4. Ev",
         "6. Ev",
         "8. Ev",
         "12. Ev"
       ],
-      correctAnswerIndex: 3,
-      explanation: "12. Ev görünmeyen her şeydir. Fiziksel dünyada bu izolasyon (hastane, hapishane) ve saklanan şeyler (gizli düşmanlar) olarak tezahür eder."
+      correctAnswerIndex: 1,
+      explanation: "6. Ev, bedenimize nasıl baktığımızı, günlük işlerimizi, evcil hayvanlarımızı ve hizmet ettiğimiz alanları yönetir."
     },
     {
-      id: "ast_18",
-      question: "Astrolojide öfke, rekabet, libido, savaşma cesareti ve eyleme geçme motivasyonu hangi gezegene aittir?",
+      id: "ast_16",
+      question: "Resmi nikahlı eş, ortaklıklar, açık düşmanlar ve mahkemeler hangi evin sahnesidir?",
       options: [
-        "Jüpiter",
-        "Güneş",
-        "Mars",
-        "Satürn"
-      ],
-      correctAnswerIndex: 2,
-      explanation: "Mars sizin silahınızdır. Neye öfkelendiğinizi ve hakkınızı nasıl savunduğunuzu Mars'ın burcu belirler."
-    },
-    {
-      id: "ast_19",
-      question: "Günlük rutinler, ofis çalışanları, evcil hayvanlar ve akut (günlük) bedensel hastalıkların 1. katmanda incelendiği ev neresidir?",
-      options: [
-        "1. Ev",
-        "3. Ev",
-        "6. Ev",
+        "7. Ev",
+        "8. Ev",
+        "10. Ev",
         "12. Ev"
       ],
-      correctAnswerIndex: 2,
-      explanation: "6. Ev günlük hizmet ve sağlık evidir. Bedenin makine gibi nasıl işlediğini ve rutin iş hayatını gösterir."
+      correctAnswerIndex: 0,
+      explanation: "7. Ev (Alçalan/DC), birebir yaptığımız resmi anlaşmaları, ortaklıkları, evlilikleri ve karşımızdaki açık düşmanları simgeler."
     },
     {
-      id: "ast_20",
-      question: "Romantik aşklar, flört, borsa/kumar, hobiler ve sahnede parlayıp eğlenme enerjisi hangi evden gelir?",
+      id: "ast_17",
+      question: "Eşin parası, miras, nafakalar, banka kredileri ve fiziksel ölüm şekli hangi evden okunur?",
       options: [
         "2. Ev",
         "5. Ev",
-        "7. Ev",
+        "8. Ev",
         "11. Ev"
       ],
-      correctAnswerIndex: 1,
-      explanation: "5. Ev yaratıcılığın, çocukların ve aşkın evidir. Kişinin hayatın tadını nasıl çıkardığını gösterir."
+      correctAnswerIndex: 2,
+      explanation: "8. Ev, başkalarından gelen paraları (miras, kredi, borç), krizleri, ameliyatları ve dönüşüm süreçlerini temsil eder."
+    },
+    {
+      id: "ast_18",
+      question: "Yurtdışı seyahatleri, uzun yolculuklar, üniversite eğitimi, din/felsefe ve yayıncılık hangi evin konusudur?",
+      options: [
+        "3. Ev",
+        "6. Ev",
+        "9. Ev",
+        "11. Ev"
+      ],
+      correctAnswerIndex: 2,
+      explanation: "9. Ev, zihni genişleten yüksek eğitimi, uzak ülkeleri, yabancı kültürleri ve inanç sistemlerini yönetir."
+    },
+    {
+      id: "ast_19",
+      question: "Gezegen arketiplerinden 'Sınırlar, disiplin, zaman, korku, sorumluluklar ve Karma'nın Lordu' olarak bilinen gezegen hangisidir?",
+      options: [
+        "Mars",
+        "Jüpiter",
+        "Satürn",
+        "Plüton"
+      ],
+      correctAnswerIndex: 2,
+      explanation: "Satürn, hayat okulundaki zorlu öğretmenimizdir. Bizi sınırlayarak disipline sokar ve karmik borçlarımızı ödetir."
+    },
+    {
+      id: "ast_20",
+      question: "Doğum haritasındaki işlevi 'inanç, şans, büyüteç etkisi, genişleme ve felsefe' olan bilge gezegen hangisidir?",
+      options: [
+        "Güneş",
+        "Venüs",
+        "Jüpiter",
+        "Neptün"
+      ],
+      correctAnswerIndex: 2,
+      explanation: "Jüpiter, dokunduğu her şeyi büyüten, şans, bilgelik, inanç ve genişlemeyi temsil eden koruyucu gezegendir."
     }
   ]
 };
@@ -251,247 +251,247 @@ export const astrologyQuiz1: Quiz = {
 export const astrologyQuiz2: Quiz = {
   id: "astroloji_2",
   title: "2. Derece: Kalfalık Sınavı",
-  description: "Psikolojik (Yetzirah) ve Karmik Katman (Briah), Ay Düğümleri, Retro Gezegenler ve Evlerin 2/3. Katman anlamları. (20 Soru)",
+  description: "Psikolojik (Yetzirah) ve Karmik Katman (Briah), Ay Düğümleri, Retro Gezegenler ve Evlerin derin şifreleri. (20 Soru)",
   questions: [
     {
       id: "ast_21",
-      question: "2. Katmanda (Psikolojik) 7. Evin anlamı nedir?",
+      question: "Psikolojik Katmanda (Yetzirah) 7. Evin anlamı nedir?",
       options: [
-        "Kişinin çok para kazanması",
-        "Kişinin kendi içinde eksik hissettiği parçayı (gölgesini) düşmanlarına veya eşine yansıtması (Projeksiyon)",
-        "Babasıyla olan sorunları",
-        "Gizli anıları"
+        "Eşimizin banka hesap durumu",
+        "Kişinin kendi içinde bastırdığı veya eksik hissettiği gölge yanlarını başkalarına yansıtması (Projeksiyon)",
+        "Kardeşlerimizle çocuklukta yaşadığımız rekabet",
+        "Toplum önünde takındığımız kariyer maskesi"
       ],
       correctAnswerIndex: 1,
-      explanation: "7. Ev psikolojik olarak projeksiyon alanıdır. Bizde olan ama kabul etmediğimiz gölgeyi, dışarıda bir başkası (eş veya düşman) olarak kendimize çekeriz."
+      explanation: "Psikolojik katmanda 7. Ev, kendimizde kabullenmeyip dışarıya yansıttığımız (projeksiyon) özelliklerimizi eş veya düşman olarak hayatımıza çekme alanımızdır."
     },
     {
       id: "ast_22",
-      question: "Güney Ay Düğümü (GAD) karmik katmanda (3. Katman) neyi temsil eder?",
+      question: "Psikolojik Katmanda 2. Evin temsil ettiği temel içsel kavram hangisidir?",
       options: [
-        "Kişinin gelecekteki kariyerini",
-        "Ruhun geçmiş yaşamlarında ustalaştığı, doğuştan yetenekli olduğu ancak bu hayatta bırakıp uzaklaşması gereken 'Konfor Alanı'nı",
-        "Ölüm şeklini",
-        "Karmik ödüllerini"
+        "Zihinsel merak ve algı hızı",
+        "Özdeğer duygusu (Ben değerli miyim? sorusunun içsel yanıtı)",
+        "Aileden kalan mirasların miktarı",
+        "Kolektif bilinçaltı korkuları"
       ],
       correctAnswerIndex: 1,
-      explanation: "GAD, ruhun çok iyi bildiği eski mahallesidir. Ancak kişi sürekli GAD'a yönelirse tekamül edemez; bu hayattaki görevini (KAD'yi) reddetmiş olur."
+      explanation: "Psikolojik düzeyde 2. Ev, cüzdandan öte özdeğer duygumuzdur. Maddi biriktirme hırsı genellikle bu içsel özdeğer boşluğunu kapatma çabasıdır."
     },
     {
       id: "ast_23",
-      question: "3. Katmanda (Karmik) 4. Ev'in temsil ettiği derin anlam aşağıdakilerden hangisidir?",
+      question: "Egonun dünyayla ilk karşılaşmasında geliştirdiği birincil savunma mekanizması (Persona) psikolojik olarak hangi evden başlar?",
       options: [
-        "Yurtdışı seyahatleri",
-        "Atalardan aktarılan kök karma, soydan gelen ruhsal miras ve geçmiş yaşamların kapanış alanı",
-        "Yeni bir iş kurma karması",
-        "Geçmişte edinilen borsa becerileri"
+        "1. Ev",
+        "4. Ev",
+        "7. Ev",
+        "10. Ev"
       ],
-      correctAnswerIndex: 1,
-      explanation: "4. Ev karmik olarak köklerimizin dibidir. Aileden taşıdığımız karmik yükler (atalar karması) ve ruhsal sığınağımızdır."
+      correctAnswerIndex: 0,
+      explanation: "1. Ev, benliğin dünyadaki ilk savunma mekanizmasıdır. Hayatta kalmak için taktığımız maske buradadır."
     },
     {
       id: "ast_24",
-      question: "Doğum haritasında bir gezegenin 'Retro' (Geri Harekette) olması karmik olarak neyin işaretidir?",
+      question: "'İçsel Çocuk' (Inner Child) kavramının saf, kontrolsüz bir şekilde kimliğini yansıtma ve onaylanma alanı hangi evdir?",
       options: [
-        "O gezegenin enerjisinin çok şanslı olduğunun",
-        "O gezegenin temasında geçmiş yaşamlarda yapılan bir hata, israf veya tamamlanmamış bir ders (Karmik Borç) olduğunun",
-        "Gezegenin hiç çalışmadığının",
-        "Fiziksel olarak çok sağlıklı olunacağının"
+        "2. Ev",
+        "5. Ev",
+        "9. Ev",
+        "12. Ev"
       ],
       correctAnswerIndex: 1,
-      explanation: "Retro gezegenler, ruhun önceki hayatta sınıfta kaldığı veya yarım bıraktığı dersleri gösterir. Bu hayatta o enerji içe dönük ve düzeltilmeye muhtaçtır."
+      explanation: "5. Ev, psikolojik olarak içsel çocuğun özgürce oynadığı, yaratıcılığını sergilediği ve onay aradığı alandır."
     },
     {
       id: "ast_25",
-      question: "Haritanın 'Yaralı Şifacısı' olarak bilinen ve kişinin kendine merhem olamadığı ama başkalarını iyileştirerek acısını hafiflettiği gök cismi hangisidir?",
+      question: "Psikolojik krizlerin bedene fiziksel hastalık (somatizasyon) olarak yansıması, takıntılar ve kendini aşırı eleştirme hangi evin psikolojik gölgesidir?",
       options: [
-        "Lilith",
-        "Ceres",
-        "Kiron (Chiron)",
-        "Juno"
+        "3. Ev",
+        "6. Ev",
+        "8. Ev",
+        "12. Ev"
       ],
-      correctAnswerIndex: 2,
-      explanation: "Kiron, haritadaki en derin, sızlayan ruhsal yaranızdır. Orası sizin başkalarına şifa dağıtacağınız ama kendiniz için her zaman eksik hissedeceğiniz kör noktanızdır."
+      correctAnswerIndex: 1,
+      explanation: "6. Ev, beden-zihin dengesidir. Zihinsel tıkanıklıklar buradaki gölgelerle bedene akut hastalıklar olarak yansır."
     },
     {
       id: "ast_26",
-      question: "Psikolojik katmanda 10. Evin anlamı aşağıdakilerden hangisiyle ilgilidir?",
+      question: "Derin krizler, travmalar, tabular ve egonun ölümü ile yüzleştiğimiz psikolojik terapi evi hangisidir?",
       options: [
-        "Çocuklarla oyun oynamak",
-        "Toplumda kabul görmek için bireyin egosunu nasıl terbiye ettiği ve Annenin (dominant ebeveynin) psikolojik mirası",
-        "Gizli hastalıklar",
-        "Kardeş kıskançlığı"
+        "4. Ev",
+        "7. Ev",
+        "8. Ev",
+        "12. Ev"
       ],
-      correctAnswerIndex: 1,
-      explanation: "10. Ev psikolojik olarak dışarıya gösterdiğimiz otoritelerdir. Çocuklukta otorite figürü (genelde dominant anne/baba) tarafından bize öğretilen 'Toplumda böyle olmalısın' baskısıdır."
+      correctAnswerIndex: 2,
+      explanation: "8. Ev, egonun kontrol edemediği karanlık sularla, krizlerle ve dönüşümlerle yüzleştiği psikolojik evdir."
     },
     {
       id: "ast_27",
-      question: "Ruhun bu hayattaki nihai sınavını, hiç bilmediği, korktuğu ama zorla gitmesi gereken 'Kutup Yıldızını' temsil eden yapı hangisidir?",
+      question: "Psikolojik olarak ebeveynlerin (dominant ebeveynin/annenin) mirası ve bireyin toplumda kabul görmek için egosunu terbiye etmesi hangi evdir?",
       options: [
-        "Güney Ay Düğümü",
-        "Güneş",
-        "Kuzey Ay Düğümü (KAD)",
-        "Yükselen Burç"
+        "1. Ev",
+        "4. Ev",
+        "10. Ev",
+        "12. Ev"
       ],
       correctAnswerIndex: 2,
-      explanation: "Kuzey Ay Düğümü ruhun bu hayatta ulaşması gereken yegane tekamül hedefidir. Gitmesi zor ve yabancıdır ama ruhsal aydınlanma oradadır."
+      explanation: "10. Ev (MC), ailedeki otorite figürlerinin beklentilerini karşılamak için egonun şekillendirildiği ve terbiye edildiği alandır."
     },
     {
       id: "ast_28",
-      question: "Karmik katmanda (3. Katman) 12. Ev neden 'Ruhun Bekleme Odası' veya 'Kara Delik' olarak adlandırılır?",
+      question: "Kolektif gölgeler, bastırılmış anılar, rüyalar ve egonun çözülüp okyanusa karışması psikolojik düzeyde hangi evdedir?",
       options: [
-        "Orada hiçbir gezegen bulunmadığı için",
-        "Tüm geçmiş yaşam karmalarının, henüz çözülmemiş atavistik anıların gizlendiği arşiv ve rüyalar/kolektif alan olduğu için",
-        "Evliliklerin bittiği yer olduğu için",
-        "Sadece sağlık sorunlarını gösterdiği için"
+        "6. Ev",
+        "8. Ev",
+        "9. Ev",
+        "12. Ev"
       ],
-      correctAnswerIndex: 1,
-      explanation: "12. Ev 3. Katmanda ruhun okyanusudur. Önceki yaşamlardan arta kalan tüm bilinçdışı yükler burada gizlidir; rüyalarda ve psikozlarda ortaya çıkar."
+      correctAnswerIndex: 3,
+      explanation: "12. Ev, bilinçaltının derin okyanusudur. Kolektif gölgeleri ve egonun çözülme sancılarını yönetir."
     },
     {
       id: "ast_29",
-      question: "8. Evin psikolojik (2. Katman) anlamı nedir?",
+      question: "Karmik Katmanda (Briah) Güney Ay Düğümü (GAD) neyi temsil eder?",
       options: [
-        "Yeni bir dil öğrenme",
-        "Derin psikolojik krizler, tabular, ölüm/yok olma korkusu ve egonun yüzleşerek dönüşümü (Terapi alanı)",
-        "Para saymak",
-        "Mutfakta yemek pişirmek"
+        "Ruhun bu hayatta gitmesi gereken, hiç bilmediği zorlu hedefi",
+        "Geçmiş yaşamlarda ustalaşılan fakat artık ruhu aşağı çeken konfor alanını",
+        "Anneyle olan çocukluk travmalarını",
+        "Maddi kazanç elde etme yöntemlerimizi"
       ],
       correctAnswerIndex: 1,
-      explanation: "8. Ev (Akrep evi) egonun korkularla yüzleştiği ve öldüğü yerdir. Psikolojik olarak travmaların kazılıp dönüştürüldüğü ruhsal bir ameliyathanedir."
+      explanation: "GAD, ruhun geçmişten getirdiği alışkanlıkları ve konfor alanını gösterir. Gelişmek için bu alandan çıkıp KAD yönüne gidilmelidir."
     },
     {
       id: "ast_30",
-      question: "Karmik (3. Katman) açıdan 6. Evin anlamı 'Hizmet Karması'dır. Bu ne demektir?",
+      question: "Ruhun bu hayattaki nihai sınavı, korktuğu ama mutlaka öğrenmesi gereken hedef (Kutup Yıldızı) hangisidir?",
       options: [
-        "Kişinin mutlaka garson olması gerektiği",
-        "Geçmiş yaşamda 'Efendi/Zalim' olan ruhun, bu hayatta 'Hizmetkar' olarak egosunu kırması ve şifa dağıtması gerektiği",
-        "Sadece evcil hayvan beslemesi gerektiği",
-        "Hiç çalışmadan maaş alacağı"
+        "Güney Ay Düğümü (GAD)",
+        "Kuzey Ay Düğümü (KAD)",
+        "Kiron (Chiron)",
+        "MC Noktası"
       ],
       correctAnswerIndex: 1,
-      explanation: "6. Ev karmik olarak tevazu evidir. Ruh, geçmiş yaşam kibrini kırmak için bu hayatta başkalarına karşılıksız hizmet etmeyi öğrenmelidir."
+      explanation: "Kuzey Ay Düğümü (KAD), ruhun bu enkarnasyonda tekamül etmek için gitmesi gereken pusula yönünü gösterir."
     },
     {
       id: "ast_31",
-      question: "Bir haritada Güney Ay Düğümü (GAD) Akrep'te ise kişi bu hayatta hangi yöne (KAD) gitmelidir?",
+      question: "Doğum anında geri giden (Retro) bir gezegen karmik olarak neyi ifade eder?",
       options: [
-        "Aslan'a",
-        "Boğa'ya (Huzura, maddeye ve sadeliğe)",
-        "Kova'ya",
-        "İkizler'e"
+        "Kişinin o alanda çok şanslı olacağını",
+        "Geçmiş yaşamlarda o gezegenin temsil ettiği enerjide yapılmış bir hata, israf veya karmik borcu",
+        "Yurtdışına taşınma zorunluluğunu",
+        "Kariyerde çok hızlı yükseleceğini"
       ],
       correctAnswerIndex: 1,
-      explanation: "Ay düğümleri her zaman zıt burçlardadır. GAD Akrep (kriz, kaos) ise, ruhun bu hayattaki hedefi KAD Boğa'dır (sadelik, huzur ve güven)."
+      explanation: "Retro gezegenler, geçmiş enkarnasyonlarda doğru kullanılmamış, geciktirilmiş veya suistimal edilmiş enerji derslerini (Karmik Borç) temsil eder."
     },
     {
       id: "ast_32",
-      question: "Psikolojik (2. Katman) olarak 2. Ev 'Özdeğer' duygusudur. Bu ne anlama gelir?",
+      question: "Doğum haritasındaki 'Kiron (Chiron - Yaralı Şifacı)' neyi simgeler?",
       options: [
-        "Kişinin cüzdanındaki para miktarının her şeyi belirlediği",
-        "Maddi birikim ve eşya arzusunun aslında içsel 'Ben Değerliyim' boşluğunu doldurma çabası olduğu",
-        "Sadece fiziksel güzellik",
-        "Pintilik yapmak"
+        "Zenginlik getiren şans noktalarını",
+        "Kişinin kendine fayda sağlayamadığı ama başkalarını iyileştirerek şifa bulduğu en derin ruhsal yarasını",
+        "Eşinin ailesinden gelecek olan borçları",
+        "İlk okulda öğretmenleriyle yaşadığı çatışmaları"
       ],
       correctAnswerIndex: 1,
-      explanation: "Psikolojik okumada 2. evde yaşanan maddi sorunlar veya doyumsuzluk, tamamen kişinin çocuklukta aldığı veya alamadığı içsel özdeğer hissine dayanır."
+      explanation: "Kiron yaralı şifacıdır. Kendi yarasını kapatamaz ancak başkalarına şifa verdikçe ruhsal olarak kendi acısını dindirir."
     },
     {
       id: "ast_33",
-      question: "Karmik okumada 5. Evin temsil ettiği 'Karmik Aşklar' ne anlama gelir?",
+      question: "Karmik Katmanda 'atalardan aktarılan kök karma ve soydan gelen miras' hangi evden incelenir?",
       options: [
-        "Her aşkın sonsuza dek süreceği",
-        "Geçmiş yaşamlardan gelen ruh eşi (soulmate) bağlarının romantik bir sahneyle yeniden birleşmesi",
-        "Evliliğin yasaklanması",
-        "Sadece çocuk yapmak için evlenmek"
+        "2. Ev",
+        "4. Ev",
+        "8. Ev",
+        "12. Ev"
       ],
       correctAnswerIndex: 1,
-      explanation: "5. Ev karmada ruh eşlerinin evidir. Kişinin hayatına ansızın giren ve 'Sanki onu yıllardır tanıyorum' dedirten aşklar bu evin konusudur."
+      explanation: "4. Ev (IC) ruhun kök karmasıdır. Aile soyundan taşınan genetik ve karmik yükleri gösterir."
     },
     {
       id: "ast_34",
-      question: "Psikolojik katmanda 4. Ev (IC) kişinin neresidir?",
+      question: "Geçmişte kibirli bir efendi olan ruhun bu hayatta kibri kırmak için 'hizmetkar' rolü üstlendiği hizmet karması evi hangisidir?",
       options: [
-        "Sosyal medya hesabı",
-        "En derin bilinçaltı, içsel sığınağı ve çocukluktaki güvenlik koşullanmaları",
-        "Üniversitedeki başarıları",
-        "Yabancı dil öğrenme kapasitesi"
+        "1. Ev",
+        "6. Ev",
+        "10. Ev",
+        "12. Ev"
       ],
       correctAnswerIndex: 1,
-      explanation: "4. Ev ruhumuzun gece yarısıdır. Kimsenin görmediği, sadece bizim bildiğimiz içsel dünyamız ve psikolojik temelimizdir."
+      explanation: "6. Ev karmik katmanda hizmet ve arınma sınavıdır. Egonun kibrini kırarak başkalarına hizmet etmeyi öğretir."
     },
     {
       id: "ast_35",
-      question: "Eğer bir haritada Mars Retro ise (Geçmiş Yaşam Borcu), kişi bu hayatta nasıl bir psikoloji yaşayabilir?",
+      question: "Geçmiş yaşam bağlantılı ruh eşi (soulmate) karşılaşmaları ve karmik aşklar hangi evde aranır?",
       options: [
-        "Hiç öfkelenmeyen, saf bir melek",
-        "Öfkesini dışa vurmakta zorlanan, eyleme geçmekten korkan veya geçmişte gücü yanlış kullandığı için bu hayatta hakkını savunamayan biri",
-        "Sürekli uyuyan biri",
-        "Dünyanın en cesur komutanı"
+        "2. Ev",
+        "5. Ev",
+        "9. Ev",
+        "11. Ev"
       ],
       correctAnswerIndex: 1,
-      explanation: "Retro Mars, geçmişte savaş/güç konularında yaşanan travmayı gösterir. Kişi bu hayatta öfkesini doğru kullanmayı yeniden (içsel olarak) öğrenmek zorundadır."
+      explanation: "5. Ev, geçmiş enkarnasyonlardan taşınan karmik aşkları ve ruhsal rezonansları barındırır."
     },
     {
       id: "ast_36",
-      question: "Karmik Katmanda (3. Katman) 9. Ev 'İnanç Sınavları' evidir. Neden?",
+      question: "Geçmiş yaşamlarda edinilmiş karanlık bilgeliğin, büyü ve okült pratiklerin bu hayatta temizlendiği karmik borç evi hangisidir?",
       options: [
-        "Sadece papazları ilgilendirdiği için",
-        "Geçmiş yaşamlarda dogma ile insanları yargılayan veya inanç uğruna savaşan ruhların, bu hayatta evrensel gerçeği arama krizleri yaşamasıdır",
-        "Sürekli seyahat etmek zorunda oldukları için",
-        "Sınavlardan hep sıfır alacakları için"
+        "7. Ev",
+        "8. Ev",
+        "9. Ev",
+        "12. Ev"
       ],
       correctAnswerIndex: 1,
-      explanation: "9. Ev ruhun felsefesidir. Geçmişteki dogmatik hatalar, bu hayatta kişinin inançlarını yıkıp yeniden evrensel bir doğru bulmasına yol açar."
+      explanation: "8. Ev, geçmişteki okült ve ezoterik güçlerin yanlış kullanımından doğan karmik borçların tahsilat alanıdır."
     },
     {
       id: "ast_37",
-      question: "Psikolojik olarak 11. Ev (Kolektif Bilinçaltı) kişinin hangi ihtiyacını yansıtır?",
+      question: "Geçmiş yaşamlarda insanları kendi dogmaları ve inançlarıyla yargılayanların, bu hayatta 'inanç krizleri' yaşaması hangi evin karmik sınavıdır?",
       options: [
-        "Tek başına yaşama",
-        "Toplumun vizyonuna dahil olma, gruplar içinde aidiyet hissetme ve büyük resmin bir parçası olma",
-        "Çocuk yapma",
-        "Para biriktirme"
+        "3. Ev",
+        "6. Ev",
+        "9. Ev",
+        "12. Ev"
       ],
-      correctAnswerIndex: 1,
-      explanation: "11. Ev bireyin ego sınırlarından çıkıp bir grubun (kolektifin) parçası olma psikolojisidir."
+      correctAnswerIndex: 2,
+      explanation: "9. Ev, yüksek inançların sınav yeridir. Geçmişteki dogmatik kibir, bu hayatta inanç krizlerine yol açar."
     },
     {
       id: "ast_38",
-      question: "Kiron (Chiron) hangi iki gezegenin yörüngesi arasında dolaşan bir köprüdür (ve bu nedenle dünyevi ile ilahi arasında köprü kurar)?",
+      question: "Ruhun bekleme odası olarak nitelendirilen, geçmiş hayat rüyalarının ve tüm çözülmemiş karmaların arşivi olan ev hangisidir?",
       options: [
-        "Venüs ve Dünya",
-        "Satürn ve Uranüs",
-        "Mars ve Jüpiter",
-        "Plüton ve Neptün"
+        "4. Ev",
+        "8. Ev",
+        "10. Ev",
+        "12. Ev"
       ],
-      correctAnswerIndex: 1,
-      explanation: "Kiron, eski kuralları temsil eden Satürn ile asi ve uyanış gezegeni Uranüs arasında bir köprüdür. Ruhun geleneksel acılarından uyanışına geçişi simgeler."
+      correctAnswerIndex: 3,
+      explanation: "12. Ev, tüm enkarnasyon geçmişinin kilitlendiği, çözülmeyi bekleyen karmik kara deliktir."
     },
     {
       id: "ast_39",
-      question: "Psikolojik olarak 3. Ev neyin şekillendiği yerdir?",
+      question: "Doğum haritasında 'Güneş' psikolojik olarak hangi merkezimizi yönetir?",
       options: [
-        "Ölüm korkusunun",
-        "Evlilik beklentisinin",
-        "Bireyin çocuklukta etrafındaki dünyayı nasıl algılayıp, nasıl bir zihinsel dil ve merak yapısı geliştirdiğinin",
-        "Kariyer seçiminin"
+        "Bilinçaltı savunma mekanizmalarımızı",
+        "Bilinçli egomuzu, yaşam gücümüzü ve kendimizi gerçekleştirme merkezimizi",
+        "Korkularımızı ve kısıtlamalarımızı",
+        "Zihinsel iletişim yollarımızı"
       ],
-      correctAnswerIndex: 2,
-      explanation: "3. Ev çocukluktaki ilk sorular ve dünyayı anlamlandırma çabasıdır. Zihin ilk şeklini burada alır."
+      correctAnswerIndex: 1,
+      explanation: "Güneş (Ego/Bilinç), kimliğimizin ve dünyadaki aktif varlığımızın temel yaşam gücü merkezidir."
     },
     {
       id: "ast_40",
-      question: "Karmik katmanda (3. Katman) 7. Ev 'İkiz Alev' veya 'Karmik Düşman' karşılaşmalarını sembolize eder. Amacı nedir?",
+      question: "Doğum haritasında 'Ay' psikolojik olarak neyin göstergesidir?",
       options: [
-        "Sadece evlenip çocuk yapmak",
-        "Geçmiş yaşamlarda yarım bırakılan (borçlu kalınan) ilişkilerin düğümünü çözmek için bu ruhların tekrar sahneye çıkması",
-        "Ticari ortaklık kurmak",
-        "Mahkeme kazanmak"
+        "Kariyer hedeflerimizin",
+        "Bilinçaltı güvenlik ihtiyacımızın, duygusal tepkilerimizin ve anneyle olan bağımızın",
+        "Mantıklı kararlarımızın",
+        "Toplum önündeki statümüzün"
       ],
       correctAnswerIndex: 1,
-      explanation: "7. Ev karmada ayna görevi görür. Yarım kalmış bir hesap varsa, ruh geçmişteki o kişiyi (bazen düşman, bazen eş olarak) tekrar bu hayatta karşısına çeker."
+      explanation: "Ay (Duygu), savunma reflekslerimizi, çocukluk alışkanlıklarımızı ve kendimizi güvende hissettiğimiz anları yönetir."
     }
   ]
 };
@@ -499,262 +499,248 @@ export const astrologyQuiz2: Quiz = {
 export const astrologyQuiz3: Quiz = {
   id: "astroloji_3",
   title: "3. Derece: Üstatlık Sınavı",
-  description: "Ezoterik Katman (Atziluth), Sabit Yıldızlar, Heliocentric (Güneş Merkezli) plan ve 12 Burcun ruhsal tekamül şifreleri. (50 Soru)",
+  description: "Ezoterik Katman (Atziluth), burçların tekamül şifreleri, sabit yıldızlar, heliocentric harita ve 4 katmanlı okuma sentez adımları. (20 Soru)",
   questions: [
     {
       id: "ast_41",
-      question: "4. Katman olan 'Ezoterik Astroloji'nin temel dayanak noktası nedir?",
+      question: "Ezoterik Astroloji katmanındaki (Atziluth) temel felsefi odak noktası nedir?",
       options: [
-        "Kişinin ne zaman zengin olacağını bulmak",
-        "Kişisel ego (Ben) üzerinden değil, ruhun insanlığa ve Tanrısal plana (Biz) nasıl hizmet edeceği üzerinden haritayı okumak",
-        "Sadece gezegenlerin boyutlarını ölçmek",
-        "Gelecekteki depremleri tahmin etmek"
+        "Bireyin daha zengin olması ve evlenmesi",
+        "Kişisel egoyu (Ben) aşarak, kolektifin evrimine ve dünyaya hizmet eden bir ruh haline gelmek (Biz)",
+        "Gelecekteki fiziksel olayları tahmin etmek",
+        "Sadece retro gezegenlerin yerlerini hesaplamak"
       ],
       correctAnswerIndex: 1,
-      explanation: "Ezoterik astrolojide 'Ben' kavramı erir. Harita, ruhun evrensel bilince hangi araçlarla hizmet edeceği bir İlahi Plan (Atziluth) haritasına dönüşür."
+      explanation: "Ezoterik astrolojide 'Ben' kavramı erir. Ruh, dünyevi hırslarından sıyrılarak evrensel plana hizmet eden bir işçi bilincine (Atziluth) ulaşır."
     },
     {
       id: "ast_42",
-      question: "Ezoterik harita okumasında 'Güneş Merkezli' (Heliocentric) harita neyi ifade eder?",
+      question: "Doğum haritasında bir gezegenin Sabit Yıldızlarla (Sirius, Regulus, Antares vb.) kavuşum yapması neyi gösterir?",
       options: [
-        "Ay'ın evrelerini",
-        "Dünyadan bakışla egonun (Geocentric) illüzyonunu bırakıp, Güneş'i (Yüksek Benliği) merkeze koyarak ruhun galaksideki gerçek rotasını görmek",
-        "Mars'ın savaş stratejilerini",
-        "Sadece yaz mevsimini"
+        "Kişinin hiçbir yeteneği olmadığını",
+        "Dünyevi kaderin ötesinde, kolektif/tanrısal bir yetki, misyon veya kozmik müdahale etkisini",
+        "Eşinin çok zengin olacağını",
+        "Sadece çocuk sahibi olacağını"
       ],
       correctAnswerIndex: 1,
-      explanation: "Sıradan astroloji Dünya merkezlidir (Ego). Heliocentric harita Güneş merkezlidir ve ruhun ego ötesindeki kozmik amacını gösterir."
+      explanation: "Sabit yıldızlar, haritadaki kişisel planı aşan, tanrısal ve kozmik müdahaleleri, büyük trajedileri veya devasa başarı şifrelerini taşır."
     },
     {
       id: "ast_43",
-      question: "Sabit Yıldızların (Fixed Stars) doğum haritasındaki rolü nedir?",
+      question: "Güneş'i merkeze alan 'Heliocentric Harita' ezoterik olarak neyi gösterir?",
       options: [
-        "Kişiye hiçbir etki etmezler",
-        "Dünyevi kaderin ötesinde, gökyüzündeki Tanrıların müdahalesidir. Kişiye muazzam bir yetki, şöhret veya büyük bir trajedi (mitolojik bir görev) yükler",
-        "Sadece denizcilere yön gösterir",
-        "Fiziksel hastalıkları iyileştirir"
+        "Kişinin dünyevi zenginliğini",
+        "Egonun (yer merkezli) kaygılarından sıyrılarak, ruhun galaksideki gerçek rotasını, öz amacını ve ilahi planını",
+        "Sağlık durumunun detaylarını",
+        "Doğum yerinin coğrafi koordinatlarını"
       ],
       correctAnswerIndex: 1,
-      explanation: "Regulus, Sirius, Algol gibi Sabit Yıldızlar kişinin hayatına dokunduğunda onu sıradanlıktan çıkarır ve kolektif (evrensel) bir kaderin oyuncusu yapar."
+      explanation: "Güneş merkezli harita, dünyevi ego haritasından (Geocentric) farklı olarak ruhun (Güneş'in) gözünden tekamül amacını gösterir."
     },
     {
       id: "ast_44",
-      question: "Koç burcunun (Aries) gölge yanı bencilce 'Ben' demekken, EZOTERİK (Tekamül etmiş) amacı nedir?",
+      question: "Ezoterik astrolojide Koç burcunun yöneticisinin Merkür olması neyi simgeler?",
       options: [
-        "Herkesle savaşmak ve yok etmek",
-        "Zihinsel aydınlanmayı ve ilahi ateşin (fikrin) kıvılcımını dünyaya getiren korkusuz bir 'Işık Elçisi' olmak",
-        "Sürekli uyumak ve pasif kalmak",
-        "Sadece para kazanmaya odaklanmak"
+        "Koç'un çok dedikoducu olacağını",
+        "Koç'un uyanmış formunda, zihinsel aydınlanma ateşini dünyaya cesaretle getiren bir ışık elçisi olmasını",
+        "Kişinin seyahat etmeyi çok seveceğini",
+        "Sadece ticaretle ilgileneceğini"
       ],
       correctAnswerIndex: 1,
-      explanation: "Koç, zodyakın ilk burcudur. Ezoterik olarak Tanrısal iradenin kıvılcımını dünyaya getiren, uyanışın ateşini yakan bir elçidir."
+      explanation: "Mars dünyevi Koç'un yöneticisidir (savaş). Merkür ise ezoterik Koç'u yönetir; buradaki amaç zihinsel aydınlanmayı cesaretle başlatmaktır."
     },
     {
       id: "ast_45",
-      question: "Sıradan astrolojide Koç burcunun yöneticisi Mars iken, EZOTERİK astrolojide Koç'un yönetici gezegeni hangisidir?",
+      question: "Koç burcunun gölge ve ezoterik (uyanmış) şifresi hangi seçenekte doğru verilmiştir?",
       options: [
-        "Venüs",
-        "Ay",
-        "Merkür",
-        "Satürn"
+        "Gölge: Tembellik / Ezoterik: Sanatçı olmak",
+        "Gölge: Bencilce saldırmak ('Ben') / Ezoterik: İlahi aydınlanma ateşini cesaretle getiren aydınlanma öncüsü",
+        "Gölge: Korkaklık / Ezoterik: Para biriktirmek",
+        "Gölge: İçe kapanıklık / Ezoterik: Yönetici olmak"
       ],
-      correctAnswerIndex: 2,
-      explanation: "Ezoterik olarak Koç fiziksel şiddetle (Mars) değil, ilahi düşünceyi aktarmakla (Merkür) ilgilidir. Evrilmiş bir Koç düşünceyle savaşır."
+      correctAnswerIndex: 1,
+      explanation: "Uyanmamış Koç bencilce savaşır. Uyanmış/Ezoterik Koç ise kolektif aydınlanmanın korkusuz liderliğini üstlenir."
     },
     {
       id: "ast_46",
-      question: "Boğa burcunun (Taurus) ezoterik (uyanmış) şifresi aşağıdakilerden hangisidir?",
+      question: "Boğa burcunun ezoterik şifresi nedir?",
       options: [
-        "Sadece yiyip içmek ve maddiyata tapmak",
-        "Üçüncü gözü (aydınlanmayı) açarak, formun (maddenin) içindeki ilahi ışığı bulmak ve o ışığı dünyada demirlemek",
-        "Sürekli seyahat etmek",
-        "Herkesi eleştirmek"
+        "Maddi konforu sonsuza kadar korumak",
+        "Üçüncü gözü açarak maddenin (formun) içindeki ışığı ve maneviyatı bulmak, ışığı dünyada demirlemek",
+        "Sürekli yer değiştirmek",
+        "Hizmet sektöründe lider olmak"
       ],
       correctAnswerIndex: 1,
-      explanation: "Boğa'nın mantrası 'Görüyorum ve Göz (Üçüncü Göz) açıldığında her şey aydınlanır'dır. O, ışığı maddenin içine hapseden/demirliyen kutsal enerjidir."
+      explanation: "Uyanmış Boğa, maddenin illüzyonunu aşar. Formun içindeki ilahi ışığı ve manevi zenginliği görerek dünyevi planda sabitler."
     },
     {
       id: "ast_47",
-      question: "İkizler (Gemini) burcunun ruhsal tekamül görevi nedir?",
+      question: "İkizler (Gemini) burcunun ezoterik (uyanmış) şifresi hangisidir?",
       options: [
-        "Sürekli yalan söylemek ve dedikodu yapmak",
-        "Ruh ve madde (Ben ve Kardeşim) arasındaki dualiteyi (ikiliği) sevgi dolu bir sentezde birleştirmek",
-        "Duygusal olarak ağlamak",
-        "Kral olmak"
+        "Her konuda yüzeysel bilgi sahibi olmak",
+        "Ruh ve madde arasındaki ikiliği (dualiteyi) saf bir sevgi senteziyle birleştirmek",
+        "Kardeşleriyle ortak ticaret yapmak",
+        "Duygusal olarak sürekli içe kapanmak"
       ],
       correctAnswerIndex: 1,
-      explanation: "İkizler ayrılığı temsil eder (Mortal ve İmmoortal kardeş). Tekamül etmiş bir İkizler, bu zıtlıkları ilahi bir sevgi frekansında birleştirir."
+      explanation: "İkizler uyanmış seviyede, dualiteyi (ikiliği) parçalamak yerine sevgi ve bilgelik senteziyle tekliğe ulaştırır."
     },
     {
       id: "ast_48",
-      question: "Yengeç (Cancer) burcunun en yüksek ezoterik (Atziluth) frekansında ulaştığı form nedir?",
+      question: "Yengeç burcunun uyanmış ezoterik formunun görevi nedir?",
       options: [
-        "Sadece kendi ailesini koruyan milliyetçi bir figür",
-        "Bütün insanlığı kendi çocuklarıymış gibi şefkatle besleyen ve kucaklayan evrensel bir 'Kozmik Anne'",
-        "Acımasız bir savaşçı",
-        "Dünyadan kopuk bir yalnız"
+        "Kendi ailesine bağımlı olmak",
+        "Tüm insanlığı kendi çocuğu gibi şefkatle besleyen 'Evrensel Anne' bilincine yükselmek",
+        "Tarih öğretmeni olmak",
+        "Gayrimenkul ticareti yapmak"
       ],
       correctAnswerIndex: 1,
-      explanation: "Yengeç, kabilenin anneliğinden evrensel anneliğe (Meryem Ana arketipine) yükselmelidir. Tüm yaralı ruhlara şefkat verebilmelidir."
+      explanation: "Yengeç uyanışında sadece kendi yuvasını değil, tüm dünyayı evi görerek insanlığa şefkatli bir analık (Evrensel Anne) sunar."
     },
     {
       id: "ast_49",
-      question: "Aslan (Leo) burcunun egosunu aştığında (tekamül ettiğinde) uyandırdığı arketip hangisidir?",
+      question: "Aslan burcunun narsisizm ve kibir (gölge) kalıbından sıyrılarak ulaştığı ezoterik hedef hangisidir?",
       options: [
-        "Kibirli Diktatör",
-        "Narsist Oyuncu",
-        "İçindeki 'İlahi Çocuğu' uyandırıp, onun ışığını ve neşesini evrensel bir armağan olarak çevreye saçan yaratıcı",
-        "Depresif Mahkum"
+        "Daha büyük sahnelerde şov yapmak",
+        "Kişisel egoyu eritip içindeki İlahi Çocuğu uyandırmak ve sevgisini evrensel bir ışık olarak saçmak",
+        "Her şeyi kontrol altında tutmak",
+        "Bütün parayı tek başına yönetmek"
       ],
-      correctAnswerIndex: 2,
-      explanation: "Aslan Güneş'in kendisidir. Egosu kırıldığında, kendini kanıtlama ihtiyacını bırakır ve sadece saf sevgi ışığı saçan İlahi Çocuğa dönüşür."
+      correctAnswerIndex: 1,
+      explanation: "Aslan uyanışında alkış ve egosal onay aramaz; ilahi yaratıcı kıvılcımı sevgiyle kitlelere ulaştırır."
     },
     {
       id: "ast_50",
-      question: "Başak (Virgo) burcunun ezoterik sırrı (görevi) nedir?",
+      question: "Başak (Virgo) burcunun uyanmış ezoterik şifresi nedir?",
       options: [
-        "Herkesi acımasızca eleştirip kusur bulmak",
-        "Mesih (Christ) bilincine hamile kalmak; kendi saflığı içinde ilahi olanı doğurmak ve insanlığa kusursuzca hizmet etmek",
-        "Sadece temizlik yapmak",
-        "Ölüm ve yıkım getirmek"
+        "Detaylarda boğulup insanları sürekli eleştirmek",
+        "Kusursuz bir adanmışlıkla insanlığa karşılıksız ve şefkatle hizmet etmek, 'Mesih' bilincini taşımak",
+        "Sürekli temizlik yapmak",
+        "Ofis ortamının yöneticisi olmak"
       ],
       correctAnswerIndex: 1,
-      explanation: "Meryem Ana (Virgin) arketipidir. Başak, saflaşarak (arınarak) kendi içindeki 'kurtarıcı/ilahi' enerjiyi doğuran ve insanlığa hizmet eden kutsal toprak anadır."
+      explanation: "Başak inisiyasyonunda kibirli eleştiriyi bırakır. Kusursuz bir teslimiyetle insanlığa şifa ve karşılıksız hizmet verir."
     },
     {
       id: "ast_51",
-      question: "Terazi (Libra) burcunun ezoterik tekamül şifresi neyi anlatır?",
+      question: "Terazi (Libra) burcunun uyanmış ezoterik işlevi nedir?",
       options: [
-        "Karanlık ile aydınlık, eril ile dişil arasındaki jilet gibi ince dengeyi (dar geçidi) bularak evrensel adaleti ve barışı sağlamak",
-        "Kendi fikri olmadığı için sürekli başkalarını onaylamak",
-        "Estetik ameliyatlarla ilgilenmek",
-        "Sürekli yalnız kalmak"
+        "Sürekli kararsız kalmak ve onay beklemek",
+        "Karanlık ve aydınlığın (karşıtlıkların) jilet gibi ince dengesini kurarak evrensel adaleti ve barışı sağlamak",
+        "Estetik ameliyatlar yaptırmak",
+        "Sadece evlenmek için taviz vermek"
       ],
-      correctAnswerIndex: 0,
-      explanation: "Terazi kozmik dengedir. Seçimlerin evrensel karmayı nasıl etkilediğini idrak edip, kılıç ucunda yürür gibi kutupları (dualiteyi) dengeleme noktasıdır."
+      correctAnswerIndex: 1,
+      explanation: "Terazi uyanışı, dünyevi uyum arayışını aşarak hakiki kozmik adaleti ve zıtlıkların dengesini yeryüzüne getirir."
     },
     {
       id: "ast_52",
-      question: "Akrep (Scorpio) burcunun tekamül ederek 'Anka Kuşu'na dönüştüğü sürecin ezoterik açıklaması nedir?",
+      question: "Akrep burcunun gölgeleri (intikam, zehir, manipülasyon) yerine ezoterik seviyede temsil ettiği en büyük ruhsal güç hangisidir?",
       options: [
-        "Zehrini kullanarak herkesi öldürüp yok etmek",
-        "Kendi şeytanıyla (gölgesiyle) yüzleşip, dokuz başlı hidranın başını keserek egonun ölümünü yaşamak ve ruhsal dirilişi sağlamak",
-        "Parayı çok sevmek",
-        "Sürekli kaçmak ve saklanmak"
+        "Gizli sırları açığa çıkarıp şantaj yapmak",
+        "Şeytanıyla (gölgesiyle) yüzleşip onu alt ederek ruhsal dirilişi (Anka Kuşu / Phoenix) gerçekleştirmek",
+        "Bütün ortakların parasını ele geçirmek",
+        "Seksüel enerjiyi dünyevi hırslar için kullanmak"
       ],
       correctAnswerIndex: 1,
-      explanation: "Akrep astrolojinin en ağır inisiyasyonudur. Karanlığın dibine inip oradaki canavarla (kendi nefsiyle) savaşır ve küllerinden yeniden (aydınlanmış olarak) doğar."
+      explanation: "Akrep inisiyasyonunda ejderhayla (gölgeyle) savaşıp kazanır; ölümü ve yeniden doğuşu deneyimleyerek Anka Kuşu olur."
     },
     {
       id: "ast_53",
-      question: "Yay (Sagittarius) burcunun ezoterik olarak hedeflediği 'Ok' nereye yöneltilmiştir?",
+      question: "Yay burcunun ezoterik (uyanmış) şifresi hangisinde doğru tanımlanmıştır?",
       options: [
-        "Düşmanlarına",
-        "Doğrudan Tanrı'ya (ilahi gerçeğe); insanlığı dünyevi karanlıktan çekip bilgeliğe ve evrensel idrake taşımak için",
-        "Paraya ve şöhrete",
-        "Sadece eğlenceye"
+        "Kendi inancının tek doğru olduğunu iddia etmek (Fanatiklik)",
+        "Oku doğrudan Tanrı'ya (ilahi gerçeğe) nişanlayan, insanlığı dünyevi karanlıktan bilgeliğe ulaştıran bilge",
+        "Sürekli gezerek macera yaşamak",
+        "Akademik unvanlarla övünmek"
       ],
       correctAnswerIndex: 1,
-      explanation: "Yay, bilgenin okudur. Dünyevi (hayvansal) alt benliğinden (At-Adam arketipi) kurtulup, oku en yüce ilahi hedefe fırlatan ve yolu aydınlatan rehberdir."
+      explanation: "Yay burcunun oku, dünyevi hedeflerden ilahi gerçeğe (bilgeliğe) yönelmiştir. Kitleleri karanlıktan ışığa taşır."
     },
     {
       id: "ast_54",
-      question: "Oğlak (Capricorn) burcunun ezoterik 'Dağın Zirvesi' inisiyasyonu ne anlama gelir?",
+      question: "Oğlak burcunun ezoterik seviyedeki 'zirvedeki inisiyasyonu' neyi ifade eder?",
       options: [
-        "Şirket CEO'su olup herkesi ezmek",
-        "Tüm dünyevi ve maddi yüklerinden arınarak, dağın en tepesinde Tanrısal ışıkla (Evrensel Güneş) aydınlanan ruhsal usta (Mesih/Buda) olmak",
-        "Keçi yetiştirmek",
-        "Yalnızlıktan depresyona girmek"
+        "Şirkette en üst düzey yönetici olmak",
+        "Tüm dünyevi hırslardan arınarak, dağın zirvesinde Tanrısal ışıkla aydınlanan ruhsal usta olmak (Buda/İsa arketipi)",
+        "Gayrimenkul imparatorluğu kurmak",
+        "Çok katı kurallarla insanları yönetmek"
       ],
       correctAnswerIndex: 1,
-      explanation: "Oğlak, inisiyasyonun zirvesidir. Dünyevi hırslarını aştığında, İsa veya Buda gibi dağın zirvesinde aydınlanan büyük ruhsal lidere dönüşür."
+      explanation: "Oğlak uyanışında madde dağının tepesine dünyevi hiçbir yük getirmeden tırmanır ve orada ilahi ışıkla aydınlanır (Üstat seviyesi)."
     },
     {
       id: "ast_55",
-      question: "Kova (Aquarius) burcu, 'Su Taşıyıcısı' olarak ezoterik evriminde neyi ifade eder?",
+      question: "Kova burcunun uyanmış ezoterik vazifesi nedir?",
       options: [
-        "Sadece anarşi çıkarıp isyan etmeyi",
-        "Kişisel varlığını tamamen unutup, Kutsal Kâse'den insanlığın üzerine yaşam suyunu (evrensel aydınlanmayı ve kardeşliği) dökmeyi",
-        "Duygusuz ve robotik olmayı",
-        "Sadece bilgisayar kullanmayı"
+        "Kurallara karşı sebepsizce anarşi yaratmak",
+        "Kendini unutan, Kutsal Kâse'den tüm insanlığın üzerine yaşam ve kardeşlik suyunu (evrensel aydınlanmayı) döken su taşıyıcısı",
+        "Sadece internet gruplarında takılmak",
+        "Duygusuz ve soğuk arkadaşlıklar kurmak"
       ],
       correctAnswerIndex: 1,
-      explanation: "Kova 'Ben' demez, 'İnsanlık' der. Suyun (Bilincin/İlhamın) dökülmesi, tüm dünyanın ruhsal olarak yıkanıp kardeşliğe (Kova Çağı) uyanmasını sembolize eder."
+      explanation: "Kova, tüm insanlığı kucaklar. Kendi egosunu feda ederek aydınlanma suyunu kitlelere ulaştırır."
     },
     {
       id: "ast_56",
-      question: "Balık (Pisces) burcunun 12. ve son burç olarak ezoterik görevi (Atziluth) nedir?",
+      question: "Balık burcunun dünyevi kurban psikolojisi (gölge) yerine ezoterik seviyede temsil ettiği ilahi bilinç hangisidir?",
       options: [
-        "Bağımlılıklardan kendini kaybedip kurban psikolojisi yaşamak",
-        "Dünyevi illüzyonu (Maya) tamamen sonlandırmak, egoyu okyanusta (Tanrıda) eritmek ve en yüksek merhametle insanlığı kurtarmak",
-        "Bütün gün uyumak",
-        "Okyanus bilimi yapmak"
+        "Gerçek dünyadan kaçarak hayallere sığınmak",
+        "Egonun tamamen eriyip okyanusa (Tanrı'ya) karıştığı, evrensel kurtarıcı, en yüksek merhamet ve Mesih bilinci",
+        "Sürekli mağdur rolü oynamak",
+        "Maddi yardımlardan kaçmak"
       ],
       correctAnswerIndex: 1,
-      explanation: "Balık zodyakın sonudur. Artık form (beden) bitmiş, ruh Tanrı'ya geri dönmüştür. Evrensel şefkat, Mesih bilinci ve egonun sıfırlanmasıdır."
+      explanation: "Balık, inisiyasyon çemberinin sonudur. Egonun sınırları kalkar ve ruh ilahi bütünlüğe (merhamet ve birlik bilincine) karışır."
     },
     {
       id: "ast_57",
-      question: "Ezoterik astrolojide 'Dünya'nın bir gezegen olarak haritada değerlendirilmesi hangi sisteme özgüdür?",
+      question: "4 Katmanlı Harita Entegrasyonundaki en temel altın kural hangisidir?",
       options: [
-        "Placidus Ev Sistemi",
-        "Geocentric (Dünya Merkezli) Harita",
-        "Heliocentric (Güneş Merkezli) Harita",
-        "Draconic Harita"
+        "Sadece 4. katmandaki sabit yıldızları dikkate almak",
+        "Fiziksel (1. Katman) ve Psikolojik (2. Katman) tıkanıklıkları çözmeden, kişiyi doğrudan ezoterik ve ruhsal amaçlara yönlendirmemek",
+        "Yükselen burcu her zaman ihmal etmek",
+        "Sadece retro gezegenlerin olduğu evleri okumak"
       ],
-      correctAnswerIndex: 2,
-      explanation: "Güneş merkezli haritada, Güneş'in olduğu yerde artık 'Dünya' gezegeni vardır. Bu, kişinin fiziksel bedeniyle (Dünya) bu galaktik gücü nasıl topraklayacağını gösterir."
+      correctAnswerIndex: 1,
+      explanation: "Altın kural sırayı takip etmektir. Dünyevi (Asiyah) ve psikolojik (Yetzirah) dengelenme kurulmadan ruhsal amaçlar (Briah/Atziluth) havada kalır."
     },
     {
       id: "ast_58",
-      question: "Astrolojideki 'Sirius' Sabit Yıldızı ezoterik olarak neyi temsil eder?",
+      question: "Harita entegrasyon sentezinin 1. Adımında (Asiyah) neyi tespit edip dengeleriz?",
       options: [
-        "Karanlık ve ölümü",
-        "Güneşimizin de Güneşi olan (Ruhsal Güneş), çok yüksek evrensel bir başarı, ihtişam ve küçük fedakarlıklar gerektiren ilahi bir gücü",
-        "Fakirlik ve hastalığı",
-        "Evlilikte hüsranı"
+        "Sabit yıldız kavuşumlarını",
+        "Element dengesini ve Yükselen (ASC) yöneticisinin durumunu (fiziksel donanım)",
+        "Karmik borçları ve retroları",
+        "İkiz alev kodlarını"
       ],
       correctAnswerIndex: 1,
-      explanation: "Sirius, gökyüzünün en parlak yıldızıdır. Ezoterik öğretide bizim galaksimizin ruhsal merkezidir. Etkisi altına aldığı gezegeni olağanüstü büyütür."
+      explanation: "1. Adım dünyevi katmandır. Element dağılımı ve ASC yöneticisi analiz edilerek fiziksel donanım dengelenir."
     },
     {
       id: "ast_59",
-      question: "Karmik ve Ezoterik anlamda 'Algol' Sabit Yıldızı hangi enerjiyi taşır?",
+      question: "Entegrasyon sentezinin 2. Adımında (Yetzirah) hangi yerleşimleri inceleyerek savunma mekanizmalarımızı ve yaralarımızı çözeriz?",
       options: [
-        "Sınırsız şans",
-        "Medusa'nın Kesik Başı; son derece tahripkar, vahşi ve yıkıcı bir güç (ancak kontrol edilebilirse en karanlık enerjileri bile yönetme gücü)",
-        "Müzikal yetenek",
-        "Tarım becerisi"
+        "Sadece Jüpiter ve Satürn'ü",
+        "Ay, Merkür ve Chiron (Kiron) konumlarını",
+        "Heliocentric haritayı",
+        "Sadece Güney Ay Düğümünü"
       ],
       correctAnswerIndex: 1,
-      explanation: "Algol çok zorlu bir yıldızdır. Doğasında 'başın kesilmesi' (aklın kaybedilmesi) vardır. İlahi adaletin ve en sert sınavların yıldızıdır."
+      explanation: "2. Adım psikolojik katmandır. Ay, Merkür ve Chiron analiz edilerek bilinçaltı yaralar ve egonun savunma mekanizmaları çözülür."
     },
     {
       id: "ast_60",
-      question: "Ezoterik astrolojide, kişinin 'Yükselen Burcu' (Ascendant) sadece maskesi değil, aynı zamanda neyidir?",
+      question: "Entegrasyon sentezinin 4. Adımında (Atziluth) ilahi misyonumuzu entegre etmek için neleri hesaplarız?",
       options: [
-        "Kaçmaya çalıştığı yer",
-        "Ruhunun bu hayattaki nihai TEKAMÜL AMACINI (Soul Purpose) gösteren en önemli pusuladır",
-        "Sadece giyim tarzıdır",
-        "Ölüm saatini gösterir"
+        "Sadece 2. evdeki para durumunu",
+        "Sabit yıldızlar, Galaktik Merkez kavuşumları ve Monad bağlantısını",
+        "Sadece kardeşlerle olan ilişkileri",
+        "Ofis çalışma ortamındaki rutinlerimizi"
       ],
       correctAnswerIndex: 1,
-      explanation: "Güneş sizin egonuzdur, ancak Yükselen Burç sizin ruhunuzun bu yaşamdaki yolculuğunun varış noktası, hizmet edeceğiniz ana temadır."
-    },
-    // Adding placeholder questions to fulfill the 50 limit requirement (totaling 50 Master questions)
-    // For brevity in code generation, generating conceptually accurate placeholders that fit the topic.
-    ...Array.from({length: 30}).map((_, i) => ({
-      id: `ast_master_extra_${i+61}`,
-      question: `(Üstatlık Derinleştirme Soru ${i+21}) Ezoterik 4. Katman sentezinde ruhun İlahi plandaki tezahüründe Atziluth (Emanation) seviyesinin en temel prensibi nedir?`,
-      options: [
-        "Egonun arzuları doğrultusunda fiziksel dünyayı kontrol etmek.",
-        "Kişisel 'Ben' kimliğinin ötesine geçerek tamamen evrensel 'Bir' (Oneness) bilinciyle eylemsiz eylem içinde Tanrı'ya aracı olmak.",
-        "Bütün gün sadece meditasyon yapıp yemek yememek.",
-        "Astroloji haritasından para kazanma taktikleri üretmek."
-      ],
-      correctAnswerIndex: 1,
-      explanation: "Atziluth (İlahi Yayılım) katmanı, kişinin kendi bireysel iradesinden tamamen vazgeçip, evrensel iradenin (Tanrı'nın) yeryüzündeki saf bir borusu (kanal) haline gelmesini anlatır."
-    }))
+      explanation: "4. Adım kozmik plandır (Atziluth). Sabit yıldızlar ve Galaktik Merkez bağlantılarıyla ruhun evrensel misyonu sentezlenir."
+    }
   ]
 };
 
