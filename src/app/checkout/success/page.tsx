@@ -67,7 +67,8 @@ function CheckoutSuccessContent() {
         await downloadHumanDesignPDF(
           result.chartData,
           locationStr,
-          dateStr
+          dateStr,
+          result.gatesData
         );
       } else {
         // Standard Astrology PDF

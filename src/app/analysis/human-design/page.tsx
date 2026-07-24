@@ -712,7 +712,8 @@ export default function HumanDesignPage() {
                           await downloadHumanDesignPDF(
                             chart,
                             city ? city.name : '',
-                            `${dateStr.split('-').reverse().join('.')} ${timeStr}`
+                            `${dateStr.split('-').reverse().join('.')} ${timeStr}`,
+                            gatesData || undefined
                           );
                         } else {
                           router.push(`/checkout/guest?type=human-design&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(city?.name || '')}&lat=${city?.lat || ''}&lon=${city?.lon || ''}&tz=${city?.tz || ''}&country=${encodeURIComponent(city?.country || '')}`);

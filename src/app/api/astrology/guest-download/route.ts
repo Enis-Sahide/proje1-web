@@ -99,9 +99,12 @@ export async function GET(request: Request) {
       };
     } else if (order.analysisType === 'human-design' || order.analysisType === 'human_design') {
       const { generateChart } = require('@/utils/HumanDesignEngine');
+      const { hdGates } = require('@/db/schema');
       const chartData = generateChart(dateObj);
+      const gates = await db.select().from(hdGates);
       resultData = {
-        chartData
+        chartData,
+        gatesData: gates
       };
     } else {
       // Standard Esoteric Astrology Chart

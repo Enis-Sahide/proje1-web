@@ -471,7 +471,8 @@ const getHolisticSynthesisText = (type: string) => {
 export const downloadHumanDesignPDF = async (
   chart: HumanDesignChart,
   locationStr: string,
-  dateStr: string
+  dateStr: string,
+  gatesData?: any[]
 ) => {
   const doc = new jsPDF();
 
@@ -829,6 +830,70 @@ export const downloadHumanDesignPDF = async (
     bodyStyles: { fillColor: secondaryDark, textColor: [255, 255, 255], font: 'LiberationSans' },
     alternateRowStyles: { fillColor: primaryDark },
   });
+
+  // --- Section 5: Detailed Active Gates Analysis ---
+  if (gatesData && gatesData.length > 0) {
+    doc.addPage();
+    doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
+    doc.rect(0, 0, 210, 297, 'F');
+    currentY = 25;
+
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(15);
+    doc.setTextColor(gold[0], gold[1], gold[2]);
+    doc.text("Aktif Kapı Çözümlemeleri", 20, currentY);
+    currentY += 10;
+
+    const sortedActiveGates = [...chart.activeGates].sort((a, b) => a - b);
+
+    for (const gateId of sortedActiveGates) {
+      const gateInfo = gatesData.find((g: any) => g.id === gateId);
+      if (!gateInfo) continue;
+
+      const personalityActivations = chart.conscious.filter((c: any) => c.gate === gateId);
+      const designActivations = chart.unconscious.filter((c: any) => c.gate === gateId);
+
+      const hasPersonality = personalityActivations.length > 0;
+      const hasDesign = designActivations.length > 0;
+
+      let statusLabel = '';
+      if (hasPersonality && hasDesign) {
+        statusLabel = "Kişilik (Bilinçli) & Tasarım (Bilinçdışı)";
+      } else if (hasPersonality) {
+        statusLabel = "Kişilik (Bilinçli - Siyah)";
+      } else if (hasDesign) {
+        statusLabel = "Tasarım (Bilinçdışı - Kırmızı)";
+      }
+
+      checkSpace(60);
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(gold[0], gold[1], gold[2]);
+      doc.text(`${gateId}. Kapı: ${gateInfo.title || ''}`, 20, currentY);
+      currentY += 6;
+
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(9.5);
+      doc.setTextColor(white[0], white[1], white[2]);
+      doc.text(`Aktivasyon Durumu: ${statusLabel}`, 20, currentY);
+      currentY += 5;
+
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(9.5);
+      doc.setTextColor(grayText[0], grayText[1], grayText[2]);
+      
+      const metaStr = `• I Ching: ${gateInfo.iching || ''}  |  • Astroloji: ${gateInfo.astrology || ''}  |  • Biyoloji: ${gateInfo.biology || ''}`;
+      doc.text(tr(metaStr), 20, currentY);
+      currentY += 6;
+
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(230, 230, 230);
+      
+      currentY = drawTextWithBold(doc, gateInfo.description || '', 20, currentY, 170, 5.5);
+      currentY += 10;
+    }
+  }
 
   // Save the PDF
   doc.save(`Human_Design_Analiz_Raporu_${locationStr.replace(/\s+/g, '_')}.pdf`);
