@@ -9,6 +9,8 @@ import * as htmlToImage from 'html-to-image';
 import download from 'downloadjs';
 import { PrintableChart } from '@/components/PrintableChart';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
+import { useAuth } from '@/context/AuthContext';
+import { downloadChartPDF } from '@/utils/pdfGenerator';
 
 const ZODIAC_COLORS: Record<string, string> = {
   'Koç': '#FF453A', 'Aslan': '#FF453A', 'Yay': '#FF453A',
@@ -50,6 +52,10 @@ const RADIUS = CENTER - 85;
 
 export default function AstrologyPage() {
   const router = useRouter();
+  const { role, user } = useAuth();
+  const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
+  const [showLockModal, setShowLockModal] = useState(false);
+
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [chartData, setChartData] = useState<NatalChartData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -450,6 +456,23 @@ export default function AstrologyPage() {
                      {(isDownloading || renderPrintable) ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />} 
                      {(isDownloading || renderPrintable) ? "Görsel Hazırlanıyor..." : "Haritayı İndir (PNG)"}
                    </button>
+                   <button 
+                     onClick={async () => {
+                       if (isApprenticeOrAbove) {
+                         await downloadChartPDF(
+                           chartData,
+                           cityKey ? cityKey.name : '',
+                           `${dateStr.split('-').reverse().join('.')} ${timeStr}`
+                         );
+                       } else {
+                         router.push(`/checkout/guest?type=astrology&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}&country=${encodeURIComponent(cityKey?.country || '')}`);
+                       }
+                     }}
+                     className="flex-1 sm:flex-initial text-xs sm:text-sm px-4 py-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] rounded-full text-black font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2"
+                   >
+                     <Download size={16} />
+                     {isApprenticeOrAbove ? "PDF Raporu İndir" : "PDF Raporu Satın Al (50 TL)"}
+                   </button>
                    <button onClick={() => setChartData(null)} className="flex-1 sm:flex-initial text-xs sm:text-sm px-4 py-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap text-center">
                      Yeni Harita
                    </button>
@@ -483,7 +506,13 @@ export default function AstrologyPage() {
                   {[...chartData.planets, chartData.ascendant, chartData.midheaven].map((p, i) => (
                     <button 
                       key={i} 
-                      onClick={() => setSelectedInterp(getFullPlanetInterpretation(p.name, p.sign, p.house))}
+                     onClick={() => {
+                       if (isApprenticeOrAbove) {
+                         setSelectedInterp(getFullPlanetInterpretation(p.name, p.sign, p.house));
+                       } else {
+                         setShowLockModal(true);
+                       }
+                     }}
                       className="w-full flex items-center text-left hover:bg-white/5 transition-colors p-3 sm:p-4 rounded-xl border border-transparent hover:border-white/10 group"
                     >
                       <div className="w-[45%] flex items-center gap-2 sm:gap-3 min-w-0">
@@ -530,7 +559,13 @@ export default function AstrologyPage() {
                     return (
                       <button 
                         key={i} 
-                        onClick={() => setSelectedInterp(getHouseCuspInterpretation(h.house, h.sign))}
+                        onClick={() => {
+                          if (isApprenticeOrAbove) {
+                            setSelectedInterp(getHouseCuspInterpretation(h.house, h.sign));
+                          } else {
+                            setShowLockModal(true);
+                          }
+                        }}
                         className="flex flex-col p-4 bg-white/5 rounded-xl hover:bg-white/10 border border-white/5 hover:border-white/20 transition-all text-left group"
                       >
                         <div className="flex items-center justify-between mb-2">
@@ -592,7 +627,13 @@ export default function AstrologyPage() {
                   {chartData.aspects.filter(a => a.orb <= 7).sort((a,b) => a.orb - b.orb).map((a, i) => (
                     <button 
                       key={i} 
-                      onClick={() => setSelectedInterp(getAspectInterpretation(a.planet1, a.planet2, a.type))}
+                      onClick={() => {
+                        if (isApprenticeOrAbove) {
+                          setSelectedInterp(getAspectInterpretation(a.planet1, a.planet2, a.type));
+                        } else {
+                          setShowLockModal(true);
+                        }
+                      }}
                       className="w-full flex items-center justify-between p-4 bg-white/5 rounded-xl hover:bg-white/10 border border-white/5 hover:border-white/20 transition-all text-left"
                     >
                       <div>
@@ -638,6 +679,49 @@ export default function AstrologyPage() {
             </div>
           </div>
         )}
+
+      {/* Premium Lock Modal */}
+      {showLockModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowLockModal(false)}>
+          <div 
+            className="bg-[#111] border border-[#D4AF37]/30 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl relative animate-in fade-in zoom-in duration-300"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="text-[#D4AF37] mx-auto mb-4 flex justify-center"><AlertCircle size={48} /></div>
+            <h3 className="text-xl font-bold text-white mb-2">Detaylı Analiz Kilitli</h3>
+            <p className="text-mystic-text-muted text-sm mb-6">
+              Doğum haritasındaki gezegen yerleşimleri, ev ve açı yorumlarının derin detayları Çıraklık Seviyesi (Apprentice) ve üzeri üyelere özeldir.
+              Dilerseniz kayıt olmadan analiz raporunu PDF olarak satın alabilir veya üyeliğinizi Çıraklık seviyesine yükseltebilirsiniz.
+            </p>
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={() => {
+                  setShowLockModal(false);
+                  router.push(`/checkout/guest?type=astrology&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}&country=${encodeURIComponent(cityKey?.country || '')}`);
+                }}
+                className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all shadow-lg shadow-[#D4AF37]/10"
+              >
+                Misafir Olarak PDF Satın Al (50 TL)
+              </button>
+              <button 
+                onClick={() => {
+                  setShowLockModal(false);
+                  router.push(`/membership`);
+                }}
+                className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 font-bold py-3 px-4 rounded-xl transition-all"
+              >
+                Çıraklık Seviyesine Yüksel
+              </button>
+              <button 
+                onClick={() => setShowLockModal(false)}
+                className="w-full text-mystic-text-muted hover:text-white text-sm transition-colors mt-2"
+              >
+                Kapat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
         {/* Printable Chart (Hidden in a 0x0 container to prevent GPU layer composition glitches on mobile browser engines) */}
         <div style={{ width: 0, height: 0, overflow: 'hidden', position: 'fixed', left: -9999, top: -9999, pointerEvents: 'none', opacity: 0 }}>
