@@ -1,16 +1,90 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 
-// Turkish character translation helper for default jsPDF fonts
+// Helper to convert ArrayBuffer to Base64 (needed for jsPDF addFileToVFS)
+const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
+  let binary = '';
+  const bytes = new Uint8Array(buffer);
+  const len = bytes.byteLength;
+  for (let i = 0; i < len; i++) {
+    binary += String.fromCharCode(bytes[i]);
+  }
+  return window.btoa(binary);
+};
+
+// Safe string translator/wrapper
 const tr = (str: string | number | null | undefined): string => {
   if (str === null || str === undefined) return '';
-  return String(str)
-    .replace(/ş/g, 's').replace(/Ş/g, 'S')
-    .replace(/ğ/g, 'g').replace(/Ğ/g, 'G')
-    .replace(/ı/g, 'i').replace(/İ/g, 'I')
-    .replace(/ç/g, 'c').replace(/Ç/g, 'C')
-    .replace(/ö/g, 'o').replace(/Ö/g, 'O')
-    .replace(/ü/g, 'u').replace(/Ü/g, 'U');
+  return String(str);
+};
+
+// Cleans cell text by stripping markdown images, HTML images, and headers
+const cleanCellText = (text: string | null | undefined): string => {
+  if (!text) return '';
+  let clean = String(text);
+  // Remove markdown images
+  clean = clean.replace(/!\[.*?\]\(.*?\)/g, '');
+  // Remove html images
+  clean = clean.replace(/<img.*?src=".*?".*?>/g, '');
+  // Translate GitHub alerts
+  clean = clean.replace(/>\s*\[!WARNING\]/gi, 'DİKKAT:');
+  clean = clean.replace(/>\s*\[!TIP\]/gi, 'İPUCU:');
+  clean = clean.replace(/>\s*\[!NOTE\]/gi, 'NOT:');
+  clean = clean.replace(/>\s*\[!IMPORTANT\]/gi, 'ÖNEMLİ:');
+  // Remove markdown blockquote characters
+  clean = clean.replace(/^\s*>\s*/gm, '');
+  // Remove bold markdown asterisks
+  clean = clean.replace(/\*\*/g, '');
+  return clean.trim();
+};
+
+// Word-wrap text renderer that supports inline markdown bold formatting (**text**)
+const drawTextWithBold = (
+  doc: jsPDF,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  lineHeight: number = 6
+): number => {
+  let curX = x;
+  let curY = y;
+  
+  // Clean up any remaining blockquote chars or image links for safety
+  const sanitizedText = text
+    .replace(/!\[.*?\]\(.*?\)/g, '')
+    .replace(/<img.*?src=".*?".*?>/g, '')
+    .replace(/^\s*>\s*/gm, '');
+    
+  // Split by space/delimiters or markdown bold tag while keeping it
+  const parts = sanitizedText.split(/(\s+|\*\*)/);
+  let isBold = false;
+  
+  for (const part of parts) {
+    if (part === '**') {
+      isBold = !isBold;
+      doc.setFont('LiberationSans', isBold ? 'bold' : 'normal');
+      continue;
+    }
+    if (part === '\n') {
+      curX = x;
+      curY += lineHeight;
+      continue;
+    }
+    if (part === '') continue;
+    
+    const wordWidth = doc.getTextWidth(part);
+    if (curX + wordWidth > x + maxWidth && part.trim() !== '') {
+      curX = x;
+      curY += lineHeight;
+    }
+    
+    doc.text(part, curX, curY);
+    curX += wordWidth;
+  }
+  
+  doc.setFont('LiberationSans', 'normal');
+  return curY + lineHeight;
 };
 
 interface WorldData {
@@ -22,7 +96,7 @@ interface WorldData {
   };
 }
 
-export const downloadKabbalahPDF = (
+export const downloadKabbalahPDF = async (
   charts: { assiah: WorldData; yetzirah: WorldData; beriyah: WorldData; atzilut: WorldData },
   kabbalahAnalysis: { primaryRuler: string; shortcutMessage: string },
   interpretations: any,
@@ -30,6 +104,32 @@ export const downloadKabbalahPDF = (
   dateStr: string
 ) => {
   const doc = new jsPDF();
+
+  // Load custom fonts for Turkish character support
+  try {
+    const [regularRes, boldRes] = await Promise.all([
+      fetch('/fonts/LiberationSans-Regular.ttf'),
+      fetch('/fonts/LiberationSans-Bold.ttf')
+    ]);
+    
+    const [regularBuf, boldBuf] = await Promise.all([
+      regularRes.arrayBuffer(),
+      boldRes.arrayBuffer()
+    ]);
+
+    const base64Regular = arrayBufferToBase64(regularBuf);
+    const base64Bold = arrayBufferToBase64(boldBuf);
+
+    doc.addFileToVFS('LiberationSans-Regular.ttf', base64Regular);
+    doc.addFont('LiberationSans-Regular.ttf', 'LiberationSans', 'normal');
+
+    doc.addFileToVFS('LiberationSans-Bold.ttf', base64Bold);
+    doc.addFont('LiberationSans-Bold.ttf', 'LiberationSans', 'bold');
+
+    doc.setFont('LiberationSans', 'normal');
+  } catch (error) {
+    console.error("Failed to load custom fonts, falling back to standard font:", error);
+  }
 
   const primaryDark: [number, number, number] = [20, 25, 40]; // #141928
   const secondaryDark: [number, number, number] = [30, 35, 50]; 
@@ -50,40 +150,45 @@ export const downloadKabbalahPDF = (
   // --- Title Page / Header ---
   doc.setTextColor(gold[0], gold[1], gold[2]);
   doc.setFontSize(22);
-  doc.text(tr("KABALISTIK 4 ALEM DOGUM HARITASI RAPORU"), 14, currentY);
+  doc.setFont('LiberationSans', 'bold');
+  doc.text(tr("KABALİSTİK 4 ALEM DOĞUM HARİTASI RAPORU"), 14, currentY);
   currentY += 10;
 
   doc.setTextColor(grayText[0], grayText[1], grayText[2]);
   doc.setFontSize(11);
-  doc.text(tr(`Dogum Bilgileri: ${locationStr} | Tarih: ${dateStr}`), 14, currentY);
+  doc.setFont('LiberationSans', 'normal');
+  doc.text(tr(`Doğum Bilgileri: ${locationStr} | Tarih: ${dateStr}`), 14, currentY);
   currentY += 15;
 
   // --- General Kabbalistic Overview ---
-  checkSpace(60);
+  checkSpace(70);
   doc.setTextColor(gold[0], gold[1], gold[2]);
   doc.setFontSize(15);
-  doc.text(tr("Kabalistik ve Kozmik Genel Bakis"), 14, currentY);
+  doc.setFont('LiberationSans', 'bold');
+  doc.text(tr("Kabalistik ve Kozmik Genel Bakış"), 14, currentY);
   currentY += 8;
 
-  doc.setTextColor(white[0], white[1], white[2]);
-  doc.setFontSize(10);
+  // Background rect for overview
   doc.setFillColor(secondaryDark[0], secondaryDark[1], secondaryDark[2]);
-  doc.rect(14, currentY, 182, 35, 'F');
+  doc.rect(14, currentY, 182, 45, 'F');
   
   doc.setTextColor(gold[0], gold[1], gold[2]);
-  doc.text(tr(`Beden Yoneticiniz (Yasam Yolu): ${kabbalahAnalysis.primaryRuler}`), 18, currentY + 7);
+  doc.setFontSize(11);
+  doc.text(tr(`Beden Yöneticiniz (Yaşam Yolu): ${kabbalahAnalysis.primaryRuler}`), 18, currentY + 7);
   
   doc.setTextColor(white[0], white[1], white[2]);
-  const splitMessage = doc.splitTextToSize(tr(kabbalahAnalysis.shortcutMessage), 174);
-  doc.text(splitMessage, 18, currentY + 15);
-  currentY += 45;
+  doc.setFontSize(9.5);
+  
+  // Render shortcut message using drawTextWithBold
+  drawTextWithBold(doc, kabbalahAnalysis.shortcutMessage, 18, currentY + 15, 174, 5.5);
+  currentY += 55;
 
   // --- 4 Worlds Analysis ---
   const worldKeys = ['assiah', 'yetzirah', 'beriyah', 'atzilut'] as const;
   const worldTitles: Record<string, string> = {
     assiah: "1. Assiah Alemi (Fiziksel / Eylem Alemi)",
-    yetzirah: "2. Yetzirah Alemi (Duygusal / Sekillendirme Alemi)",
-    beriyah: "3. Beriyah Alemi (Zihinsel / Yaratim Alemi)",
+    yetzirah: "2. Yetzirah Alemi (Duygusal / Şekillendirme Alemi)",
+    beriyah: "3. Beriyah Alemi (Zihinsel / Yaratım Alemi)",
     atzilut: "4. Atzilut Alemi (Ruhsal / Kudret Alemi)"
   };
 
@@ -97,12 +202,14 @@ export const downloadKabbalahPDF = (
 
     doc.setTextColor(gold[0], gold[1], gold[2]);
     doc.setFontSize(16);
+    doc.setFont('LiberationSans', 'bold');
     doc.text(tr(worldTitles[world]), 14, currentY);
     currentY += 8;
 
     // Progression / Intercepted Info
     doc.setTextColor(grayText[0], grayText[1], grayText[2]);
     doc.setFontSize(10);
+    doc.setFont('LiberationSans', 'normal');
 
     if (world === 'assiah') {
       const sun = chart.planets.find(p => p.name === 'Güneş');
@@ -111,9 +218,9 @@ export const downloadKabbalahPDF = (
       if (sun && progSign) {
         let progText = '';
         if (progSign === sun.sign) {
-          progText = `Ruhsal Gunesiniz henüz burc degistirmemistir. Ancak ${progAge} yasina geldiginizde Gunesiniz sinirlari asarak yeni bir tekamul asamasina gececektir.`;
+          progText = `Ruhsal Güneşiniz henüz burç değiştirmemiştir. Ancak ${progAge} yaşına geldiğinizde Güneşiniz sınırları aşarak yeni bir tekamül aşamasına geçecektir.`;
         } else {
-          progText = `Natal Gunesiniz ${sun.sign} olsa da, ruhunuz ${progAge} yasindan sonra uyanis yasayarak sinirlari asmis ve ${progSign} burcuna (Progressed) evrilmistir.`;
+          progText = `Natal Güneşiniz ${sun.sign} olsa da, ruhunuz ${progAge} yaşından sonra uyanış yaşayarak sınırları aşmış ve ${progSign} burcuna (Progressed) evrilmiştir.`;
         }
         const splitProg = doc.splitTextToSize(tr(progText), 182);
         doc.text(splitProg, 14, currentY);
@@ -124,9 +231,9 @@ export const downloadKabbalahPDF = (
     const intercepted = chart.esoteric.interceptedSigns || [];
     let interceptedText = '';
     if (intercepted.length > 0) {
-      interceptedText = `Kistirilan (Intercepted) Burclar: ${intercepted.join(' ve ')}. Bu burclar, bu alemdeki en derin ve kilitli karmik potansiyellerinizi isaret eder.`;
+      interceptedText = `Kıstırılan (Intercepted) Burçlar: ${intercepted.join(' ve ')}. Bu burçlar, bu alemdeki en derin ve kilitli karmik potansiyellerinizi işaret eder.`;
     } else {
-      interceptedText = "Bu harita katmaninda kistirilan burc bulunmamaktadir. Tum enerjiler dogrudan ev alanlarina akmaktadir.";
+      interceptedText = "Bu harita katmanında kıstırılmış burç bulunmamaktadır. Tüm enerjiler doğrudan ev alanlarınıza akmaktadır.";
     }
     const splitIntercepted = doc.splitTextToSize(tr(interceptedText), 182);
     doc.text(splitIntercepted, 14, currentY);
@@ -137,7 +244,7 @@ export const downloadKabbalahPDF = (
       const interp = interpretations?.[world]?.[p.name];
       const placementText = `${p.sign} | ${p.house}. Ev`;
       const degreeText = `${p.degreeInSign}° ${String(p.minutes).padStart(2, '0')}' ${p.isRetrograde ? 'Rx' : ''}`;
-      const interpText = interp ? `${interp.title}: ${interp.content}` : 'Yorum yok';
+      const interpText = interp ? `${interp.title}: ${cleanCellText(interp.content)}` : 'Yorum yok';
       return [
         tr(p.name),
         tr(placementText),
@@ -148,11 +255,11 @@ export const downloadKabbalahPDF = (
 
     autoTable(doc, {
       startY: currentY,
-      head: [[tr('Gezegen'), tr('Yerlesim'), tr('Derece'), tr('Esoterik Aciklama')]],
+      head: [[tr('Gezegen'), tr('Yerleşim'), tr('Derece'), tr('Ezoterik Açıklama')]],
       body: tableBody,
       theme: 'grid',
-      headStyles: { fillColor: gold, textColor: primaryDark, fontStyle: 'bold' },
-      bodyStyles: { fillColor: secondaryDark, textColor: [255, 255, 255], fontSize: 8 },
+      headStyles: { fillColor: gold, textColor: primaryDark, fontStyle: 'bold', font: 'LiberationSans' },
+      bodyStyles: { fillColor: secondaryDark, textColor: [255, 255, 255], fontSize: 8, font: 'LiberationSans' },
       alternateRowStyles: { fillColor: primaryDark },
       columnStyles: {
         0: { cellWidth: 20 },
