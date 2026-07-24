@@ -20,14 +20,14 @@ export default function AnalysisPage() {
   const isMasterOrAdmin = role === 'master' || role === 'admin';
 
   const tools: ToolItem[] = [
-    ...(isMasterOrAdmin ? [{
+    {
       id: 'kabbalah',
       title: 'Kabalistik 4 Alem',
       description: 'Sefirot ağacındaki kadersel sıçrama noktalarınızı bulun.',
       icon: <MoonStar size={32} />,
       color: '#D4AF37',
       link: '/analysis/kabbalah'
-    }] : []),
+    },
     {
       id: 'astrology',
       title: 'Doğum Haritası',

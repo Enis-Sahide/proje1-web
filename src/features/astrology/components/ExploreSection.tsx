@@ -70,7 +70,7 @@ const exploreItems: ExploreItem[] = [
     icon: MoonStar,
     href: '/analysis/kabbalah',
     color: 'from-yellow-600 to-amber-400',
-    requiresAuth: true,
+    requiresAuth: false,
     status: 'ACTIVE'
   }
 ];
