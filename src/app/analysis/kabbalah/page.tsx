@@ -316,7 +316,7 @@ export default function KabbalahAnalysisPage() {
               
               <div className="flex flex-col items-center justify-center p-6 bg-gradient-to-b from-[#111] to-black border border-white/10 rounded-2xl max-w-3xl mx-auto">
                 <div className="text-[#D4AF37] mb-2"><MoonStar size={32} /></div>
-                <h2 className="text-2xl font-bold text-white mb-2">1. Beden Haritası Yönetici Analizi</h2>
+                <h2 className="text-2xl font-bold text-white mb-2">Kabalistik 4 Alem Harita Analizi</h2>
                 <div className="flex flex-col gap-1 text-sm">
                   <p className="text-[#D4AF37] flex items-center gap-2">
                     <span className="w-2 h-2 rounded-full bg-[#D4AF37]"></span>
