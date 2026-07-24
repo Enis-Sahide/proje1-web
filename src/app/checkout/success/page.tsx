@@ -5,6 +5,7 @@ import { useSearchParams, useRouter } from 'next/navigation';
 import { ArrowLeft, CheckCircle2, Download, Loader2, Mail, ShieldAlert } from 'lucide-react';
 import { downloadKabbalahPDF } from '@/utils/kabbalahPdfGenerator';
 import { downloadChartPDF } from '@/utils/pdfGenerator';
+import { downloadHumanDesignPDF } from '@/utils/humanDesignPdfGenerator';
 
 function CheckoutSuccessContent() {
   const router = useRouter();
@@ -59,6 +60,12 @@ function CheckoutSuccessContent() {
           result.charts,
           result.kabbalahAnalysis,
           result.interpretations,
+          locationStr,
+          dateStr
+        );
+      } else if (analysisType === 'human-design' || analysisType === 'human_design') {
+        await downloadHumanDesignPDF(
+          result.chartData,
           locationStr,
           dateStr
         );

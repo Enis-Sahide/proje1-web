@@ -171,7 +171,12 @@ export async function sendGuestDownloadEmail(email: string, token: string, analy
   const downloadLink = `${appUrl}/checkout/success?token=${encodeURIComponent(token)}`;
   const from = process.env.SMTP_FROM || '"7Layers" <noreply@7layers.tr>';
   
-  const reportName = analysisType === 'kabbalah' ? 'Kabalistik 4 Alem Harita Analizi Raporu' : 'Doğum Haritası Analizi Raporu';
+  let reportName = 'Doğum Haritası Analizi Raporu';
+  if (analysisType === 'kabbalah') {
+    reportName = 'Kabalistik 4 Alem Harita Analizi Raporu';
+  } else if (analysisType === 'human-design' || analysisType === 'human_design') {
+    reportName = 'Human Design Analizi Raporu';
+  }
 
   const html = `
     <!DOCTYPE html>

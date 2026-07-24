@@ -97,6 +97,12 @@ export async function GET(request: Request) {
         kabbalahAnalysis,
         interpretations
       };
+    } else if (order.analysisType === 'human-design' || order.analysisType === 'human_design') {
+      const { generateChart } = require('@/utils/HumanDesignEngine');
+      const chartData = generateChart(dateObj);
+      resultData = {
+        chartData
+      };
     } else {
       // Standard Esoteric Astrology Chart
       const assiahChart = await generateAstrologyChart(dateObj, cityData, false);
