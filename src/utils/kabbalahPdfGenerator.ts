@@ -278,8 +278,8 @@ export const downloadKabbalahPDF = async (
       doc.setFontSize(12);
       doc.setTextColor(gold[0], gold[1], gold[2]);
       
-      // Build a title combining planet name and interpreted title
-      const titleStr = `${p.name} - ${interp.title}`;
+      // Build a title using the interpreted title directly (it already includes the planet name)
+      const titleStr = interp.title;
       doc.text(tr(titleStr), 20, currentY);
       currentY += 7;
 
