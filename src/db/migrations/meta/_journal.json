@@ -50,6 +50,13 @@
       "when": 1784561218955,
       "tag": "0006_thick_the_fury",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1784895910493,
+      "tag": "0007_outgoing_ozymandias",
+      "breakpoints": true
     }
   ]
 }

@@ -7,7 +7,7 @@ import { ASTRO_CITIES, AstroPoint, NatalChartData, AstroCity } from '@/features/
 // Interpretations are fetched from the backend API.
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { X } from 'lucide-react';
-import RequireRole from '@/core/ui/RequireRole';
+import { useAuth } from '@/context/AuthContext';
 import { downloadKabbalahPDF } from '@/utils/kabbalahPdfGenerator';
 
 const ZODIAC_COLORS: Record<string, string> = {
@@ -47,6 +47,17 @@ const RADIUS = CENTER - 85;
 
 export default function KabbalahAnalysisPage() {
   const router = useRouter();
+  const { role, user } = useAuth();
+  const isMasterOrAdmin = role === 'master' || role === 'admin';
+  const [showLockModal, setShowLockModal] = useState(false);
+
+  const handleInterpClick = (interp: any) => {
+    if (isMasterOrAdmin) {
+      setSelectedInterp(interp || null);
+    } else {
+      setShowLockModal(true);
+    }
+  };
 
   const [dateStr, setDateStr] = useState('');
   const [timeStr, setTimeStr] = useState('12:00');
@@ -202,7 +213,7 @@ export default function KabbalahAnalysisPage() {
             const py = getY(p.longitude, R_PLANETS - rOffset);
             
             return (
-              <g key={`planet-${i}`} className="cursor-pointer hover:opacity-80 transition-opacity" onClick={() => setSelectedInterp(interpretations?.[selectedWorld]?.[p.name] || null)}>
+              <g key={`planet-${i}`} className="cursor-pointer hover:opacity-80 transition-opacity" onClick={() => handleInterpClick(interpretations?.[selectedWorld]?.[p.name] || null)}>
                 <line x1={getX(p.longitude, R_ZODIAC_INNER)} y1={getY(p.longitude, R_ZODIAC_INNER)} x2={px} y2={py} stroke="rgba(212,175,55,0.3)" strokeWidth="0.5" strokeDasharray="1, 2" />
                 <circle cx={px} cy={py} r="12" fill="#0F172A" stroke="#D4AF37" strokeWidth="1" className="hover:fill-[#D4AF37]/20 transition-colors" />
                 <text x={px} y={py + 5} fontSize="14" fill="#D4AF37" textAnchor="middle" fontWeight="bold">
@@ -250,7 +261,6 @@ export default function KabbalahAnalysisPage() {
           </p>
         </div>
 
-        <RequireRole minimumRole="master">
           {!chartData && (
             <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-md shadow-2xl max-w-3xl mx-auto">
               <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
@@ -327,16 +337,22 @@ export default function KabbalahAnalysisPage() {
                   Yükselen Burcunuz: <strong className="text-white">{chartData.assiah.ascendant.sign}</strong>
                 </p>
                 <button
-                  onClick={() => downloadKabbalahPDF(
-                    chartData,
-                    kabbalahAnalysis,
-                    interpretations,
-                    cityKey ? cityKey.name : '',
-                    `${dateStr.split('-').reverse().join('.')} ${timeStr}`
-                  )}
+                  onClick={() => {
+                    if (isMasterOrAdmin) {
+                      downloadKabbalahPDF(
+                        chartData,
+                        kabbalahAnalysis,
+                        interpretations,
+                        cityKey ? cityKey.name : '',
+                        `${dateStr.split('-').reverse().join('.')} ${timeStr}`
+                      );
+                    } else {
+                      router.push(`/checkout/guest?type=kabbalah&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}&country=${encodeURIComponent(cityKey?.country || '')}`);
+                    }
+                  }}
                   className="mt-6 flex items-center gap-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-2.5 px-6 rounded-xl transition-all shadow-md shadow-[#D4AF37]/10"
                 >
-                  PDF Raporu İndir
+                  {isMasterOrAdmin ? 'PDF Raporu İndir' : 'PDF Raporu Satın Al (500 TL)'}
                 </button>
               </div>
 
@@ -443,7 +459,7 @@ export default function KabbalahAnalysisPage() {
                         <div 
                           key={idx} 
                           className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:border-[#D4AF37]/50 cursor-pointer transition-colors"
-                          onClick={() => setSelectedInterp(interpretations?.[selectedWorld]?.[p.name] || null)}
+                          onClick={() => handleInterpClick(interpretations?.[selectedWorld]?.[p.name] || null)}
                         >
                           <div className="flex items-center gap-3">
                             <span className="w-8 h-8 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] text-lg font-bold">
@@ -569,8 +585,50 @@ export default function KabbalahAnalysisPage() {
               
             </div>
           )}
-        </RequireRole>
       </div>
+
+      {/* Premium Lock Modal */}
+      {showLockModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowLockModal(false)}>
+          <div 
+            className="bg-[#111] border border-[#D4AF37]/30 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl relative animate-in fade-in zoom-in duration-300"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="text-[#D4AF37] mx-auto mb-4 flex justify-center"><AlertCircle size={48} /></div>
+            <h3 className="text-xl font-bold text-white mb-2">Detaylı Analiz Kilitli</h3>
+            <p className="text-mystic-text-muted text-sm mb-6">
+              Kabalistik gezegen yerleşimlerinin derin ezoterik analizleri Usta Seviyesi (Master) üyelere özeldir. 
+              Dilerseniz kayıt olmadan analiz raporunuzu PDF olarak satın alabilir veya üyeliğinizi Usta seviyesine yükseldebilirsiniz.
+            </p>
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={() => {
+                  setShowLockModal(false);
+                  router.push(`/checkout/guest?type=kabbalah&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}&country=${encodeURIComponent(cityKey?.country || '')}`);
+                }}
+                className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all shadow-lg shadow-[#D4AF37]/10"
+              >
+                Misafir Olarak PDF Satın Al (500 TL)
+              </button>
+              <button 
+                onClick={() => {
+                  setShowLockModal(false);
+                  router.push(`/membership`);
+                }}
+                className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 font-bold py-3 px-4 rounded-xl transition-all"
+              >
+                Ustalık Seviyesine Yüksel
+              </button>
+              <button 
+                onClick={() => setShowLockModal(false)}
+                className="w-full text-mystic-text-muted hover:text-white text-sm transition-colors mt-2"
+              >
+                Kapat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Modal - Interpretation Popup */}
       {selectedInterp && (

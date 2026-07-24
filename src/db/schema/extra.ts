@@ -1,4 +1,4 @@
-import { pgTable, text, integer, numeric, serial, jsonb } from 'drizzle-orm/pg-core';
+import { pgTable, text, integer, numeric, serial, jsonb, timestamp } from 'drizzle-orm/pg-core';
 
 // Daha önce sayfalara gömülü (inline) olan içerikler.
 
@@ -78,4 +78,16 @@ export const schumannRules = pgTable('schumann_rules', {
   science: text('science').notNull(),
   symptoms: text('symptoms').notNull(),
   spiritual: text('spiritual').notNull(),
+});
+
+// GUEST_ORDERS (ziyaretçi ödemeli PDF siparişleri)
+export const guestOrders = pgTable('guest_orders', {
+  id: text('id').primaryKey(), // Benzersiz UUID / Sipariş Kodu
+  email: text('email').notNull(),
+  analysisType: text('analysis_type').notNull(), // 'astrology' | 'kabbalah'
+  birthData: jsonb('birth_data').notNull(), // Doğum detayları JSON
+  amount: integer('amount').notNull(), // Ücret (TL)
+  paymentStatus: text('payment_status').notNull().default('pending'), // 'pending' | 'success' | 'failed'
+  downloadToken: text('download_token'), // Tek kullanımlık indirme belirteci
+  createdAt: timestamp('created_at').defaultNow().notNull(),
 });

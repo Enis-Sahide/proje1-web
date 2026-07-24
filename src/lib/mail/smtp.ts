@@ -165,3 +165,143 @@ export async function sendResetPasswordEmail(email: string, token: string): Prom
     return false;
   }
 }
+
+export async function sendGuestDownloadEmail(email: string, token: string, analysisType: string): Promise<boolean> {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.7layers.tr';
+  const downloadLink = `${appUrl}/checkout/success?token=${encodeURIComponent(token)}`;
+  const from = process.env.SMTP_FROM || '"7Layers" <noreply@7layers.tr>';
+  
+  const reportName = analysisType === 'kabbalah' ? 'Kabalistik 4 Alem Harita Analizi Raporu' : 'Doğum Haritası Analizi Raporu';
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="tr">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>7Layers Rapor İndirme</title>
+      <style>
+        body {
+          margin: 0;
+          padding: 0;
+          background-color: #0b0f19;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          color: #e2e8f0;
+          -webkit-font-smoothing: antialiased;
+        }
+        .container {
+          max-width: 580px;
+          margin: 40px auto;
+          background-color: #111827;
+          border: 1px solid rgba(212, 175, 55, 0.25);
+          border-radius: 20px;
+          overflow: hidden;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .header {
+          background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+          padding: 40px 20px;
+          text-align: center;
+          border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+        }
+        .logo-text {
+          font-size: 32px;
+          font-weight: bold;
+          color: #D4AF37;
+          letter-spacing: 3px;
+          text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+          margin: 0;
+        }
+        .logo-sub {
+          font-size: 11px;
+          color: #9ca3af;
+          letter-spacing: 4px;
+          text-transform: uppercase;
+          margin-top: 5px;
+          margin-bottom: 0;
+        }
+        .body {
+          padding: 40px 30px;
+          line-height: 1.6;
+        }
+        h2 {
+          color: #f1f5f9;
+          font-size: 22px;
+          margin-top: 0;
+          margin-bottom: 20px;
+        }
+        p {
+          color: #9ca3af;
+          font-size: 15px;
+          margin-bottom: 24px;
+        }
+        .btn-wrapper {
+          text-align: center;
+          margin: 35px 0;
+        }
+        .btn {
+          display: inline-block;
+          background: linear-gradient(135deg, #D4AF37 0%, #AA7C11 100%);
+          color: #0f172a !important;
+          text-decoration: none;
+          padding: 14px 32px;
+          font-size: 15px;
+          font-weight: bold;
+          border-radius: 10px;
+          box-shadow: 0 4px 15px rgba(212, 175, 55, 0.35);
+          transition: all 0.3s ease;
+        }
+        .footer {
+          background-color: #0c0f17;
+          padding: 25px 20px;
+          text-align: center;
+          font-size: 12px;
+          color: #6b7280;
+          border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .footer a {
+          color: #D4AF37;
+          text-decoration: none;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <div class="logo-text">7LAYERS</div>
+          <div class="logo-sub">KADİM BİLGİLER VE ANALİZLER</div>
+        </div>
+        <div class="body">
+          <h2>Merhaba,</h2>
+          <p>Satın almış olduğunuz <strong>${reportName}</strong> başarıyla hazırlandı! Aşağıdaki butona tıklayarak analiz raporunuzu PDF olarak indirebilirsiniz:</p>
+          
+          <div class="btn-wrapper">
+            <a href="${downloadLink}" class="btn" target="_blank">RAPORU PDF OLARAK İNDİR</a>
+          </div>
+          
+          <p>İndirme bağlantısı güvenliğiniz amacıyla tek kullanımlıktır. Raporunuzu cihazınıza kaydetmeyi unutmayınız.</p>
+        </div>
+        <div class="footer">
+          <p>© 2026 7Layers. Tüm Hakları Saklıdır.<br>
+          Destek veya sorularınız için lütfen <a href="${appUrl}">web sitemizi</a> ziyaret edin.</p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  try {
+    const client = getTransporter();
+    await client.sendMail({
+      from,
+      to: email,
+      subject: `7Layers - ${reportName} Hazır!`,
+      html,
+    });
+    console.log(`Guest report download email sent successfully to ${email}`);
+    return true;
+  } catch (err) {
+    console.error("Failed to send guest download email:", err);
+    return false;
+  }
+}
