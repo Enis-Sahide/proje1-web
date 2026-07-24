@@ -120,7 +120,7 @@ const HD_DETAILS_MAP: Record<string, { subtitle: string; description: string }> 
   },
   "Benlik": {
     subtitle: "İç Otorite",
-    description: "Benlik (Self-Projected) Otoritesi, kalbinizin ve kimliğinizin sesini duymakla ilgilidir. Sizin için en doğru karar, başkalarıyla konuşurken ağzınızdan filtresizce çıkan kendi sözlerinizde gizlidir. Karar almadan önce güvendiğiniz dostlarınızla sohbet edin ve ne söylediğinizi, sesinizin tonunu dinleyin; gerçeğiniz orada belirecektir."
+    description: "Benlik (Self-Projected) Otoritesi, kalbinizin ve kimliğinin sesini duymakla ilgilidir. Sizin için en doğru karar, başkalarıyla konuşurken ağzınızdan filtresizce çıkan kendi sözlerinizde gizlidir. Karar almadan önce güvendiğiniz dostlarınızla sohbet edin ve ne söylediğinizi, sesinizin tonunu dinleyin; gerçeğiniz orada belirecektir."
   },
   "Zihinsel": {
     subtitle: "İç Otorite",
@@ -299,7 +299,7 @@ const GATE_NAMES: Record<number, string> = {
   38: "Savaşçı / Anlam Arayışı",
   39: "Provokasyon / Enerjisel Tetikleme",
   40: "Yalnızlık / Teslimiyet (Topluluk)",
-  41: "Hayal Gücü / Kaynak İstekleri",
+  41: "Hayal Gücü / Kaynak İhtiyaçları",
   42: "Büyüme / Bitirme ve Olgunlaşma",
   43: "İçgörü / Bireysel Deha",
   44: "Uyanıklık / Geçmiş Deneyimler",
@@ -324,6 +324,85 @@ const GATE_NAMES: Record<number, string> = {
   63: "Şüphe / Mantıksal Sorgulama",
   64: "Kafa Karışıklığı / Geçmişi Değerlendirme"
 };
+
+const CENTER_COORDS: Record<CenterCode, { x: number, y: number, shape: string, color: string, s: number }> = {
+  Head: { x: 200, y: 45, shape: 'triangle', color: '#F4D03F', s: 28 },
+  Ajna: { x: 200, y: 115, shape: 'triangle-down', color: '#A8D5BA', s: 28 },
+  Throat: { x: 200, y: 190, shape: 'square', color: '#D2B48C', s: 25 },
+  G: { x: 200, y: 300, shape: 'diamond', color: '#F4D03F', s: 35 },
+  Heart: { x: 255, y: 340, shape: 'triangle', color: '#FFFFFF', s: 24 },
+  Sacral: { x: 200, y: 400, shape: 'square', color: '#E1464F', s: 25 },
+  Root: { x: 200, y: 480, shape: 'square', color: '#FFFFFF', s: 25 },
+  Spleen: { x: 90, y: 390, shape: 'triangle-right', color: '#FFFFFF', s: 30 },
+  SolarPlexus: { x: 310, y: 390, shape: 'triangle-left', color: '#D2B48C', s: 30 },
+};
+
+const GATE_COORDS: Record<number, { x: number, y: number }> = {
+  64: { x: 183, y: 70 }, 61: { x: 200, y: 70 }, 63: { x: 217, y: 70 },
+  47: { x: 183, y: 90 }, 24: { x: 200, y: 90 }, 4: { x: 217, y: 90 },
+  17: { x: 183, y: 109 }, 43: { x: 200, y: 136 }, 11: { x: 217, y: 109 },
+  62: { x: 183, y: 168 }, 23: { x: 200, y: 168 }, 56: { x: 217, y: 168 },
+  16: { x: 178, y: 176 }, 35: { x: 222, y: 176 },
+  20: { x: 178, y: 190 }, 12: { x: 222, y: 190 },
+  45: { x: 222, y: 204 },
+  31: { x: 186, y: 212 }, 8: { x: 200, y: 212 }, 33: { x: 214, y: 212 },
+  7: { x: 186, y: 279 }, 1: { x: 200, y: 272 }, 13: { x: 214, y: 279 },
+  10: { x: 172, y: 300 }, 25: { x: 228, y: 300 },
+  15: { x: 186, y: 321 }, 2: { x: 200, y: 328 }, 46: { x: 214, y: 321 },
+  21: { x: 255, y: 322 }, 51: { x: 240, y: 350 },
+  26: { x: 240, y: 360 }, 40: { x: 270, y: 360 },
+  5: { x: 186, y: 378 }, 14: { x: 200, y: 378 }, 29: { x: 214, y: 378 },
+  34: { x: 178, y: 386 }, 27: { x: 178, y: 414 },
+  59: { x: 222, y: 400 },
+  42: { x: 186, y: 422 }, 3: { x: 200, y: 422 }, 9: { x: 214, y: 422 },
+  53: { x: 186, y: 458 }, 60: { x: 200, y: 458 }, 52: { x: 214, y: 458 },
+  54: { x: 178, y: 468 }, 19: { x: 222, y: 468 },
+  38: { x: 178, y: 480 }, 39: { x: 222, y: 480 },
+  58: { x: 178, y: 492 }, 41: { x: 222, y: 492 },
+  48: { x: 65, y: 362 }, 57: { x: 85, y: 372 }, 44: { x: 115, y: 387 },
+  50: { x: 105, y: 398 }, 32: { x: 85, y: 408 }, 28: { x: 75, y: 412 }, 18: { x: 65, y: 418 },
+  36: { x: 335, y: 362 }, 22: { x: 315, y: 372 }, 37: { x: 295, y: 382 },
+  6: { x: 285, y: 387 }, 49: { x: 295, y: 398 }, 55: { x: 315, y: 408 }, 30: { x: 335, y: 418 },
+};
+
+const CHANNELS = [
+  { id: 18, gates: [1, 8], centers: ['G', 'Throat'] },
+  { id: 214, gates: [2, 14], centers: ['G', 'Sacral'] },
+  { id: 360, gates: [3, 60], centers: ['Sacral', 'Root'] },
+  { id: 463, gates: [4, 63], centers: ['Ajna', 'Head'] },
+  { id: 515, gates: [5, 15], centers: ['Sacral', 'G'] },
+  { id: 659, gates: [6, 59], centers: ['SolarPlexus', 'Sacral'] },
+  { id: 731, gates: [7, 31], centers: ['G', 'Throat'] },
+  { id: 952, gates: [9, 52], centers: ['Sacral', 'Root'] },
+  { id: 1020, gates: [10, 20], centers: ['G', 'Throat'] },
+  { id: 1034, gates: [10, 34], centers: ['G', 'Sacral'] },
+  { id: 1057, gates: [10, 57], centers: ['G', 'Spleen'] },
+  { id: 1156, gates: [11, 56], centers: ['Ajna', 'Throat'] },
+  { id: 1222, gates: [12, 22], centers: ['Throat', 'SolarPlexus'] },
+  { id: 1333, gates: [13, 33], centers: ['G', 'Throat'] },
+  { id: 1648, gates: [16, 48], centers: ['Throat', 'Spleen'] },
+  { id: 1762, gates: [17, 62], centers: ['Ajna', 'Throat'] },
+  { id: 1858, gates: [18, 58], centers: ['Spleen', 'Root'] },
+  { id: 1949, gates: [19, 49], centers: ['Root', 'SolarPlexus'] },
+  { id: 2034, gates: [20, 34], centers: ['Throat', 'Sacral'] },
+  { id: 2057, gates: [20, 57], centers: ['Throat', 'Spleen'] },
+  { id: 2145, gates: [21, 45], centers: ['Heart', 'Throat'] },
+  { id: 2343, gates: [23, 43], centers: ['Throat', 'Ajna'] },
+  { id: 2461, gates: [24, 61], centers: ['Ajna', 'Head'] },
+  { id: 2551, gates: [25, 51], centers: ['G', 'Heart'] },
+  { id: 2644, gates: [26, 44], centers: ['Heart', 'Spleen'] },
+  { id: 2750, gates: [27, 50], centers: ['Sacral', 'Spleen'] },
+  { id: 2838, gates: [28, 38], centers: ['Spleen', 'Root'] },
+  { id: 2946, gates: [29, 46], centers: ['Sacral', 'G'] },
+  { id: 3041, gates: [30, 41], centers: ['SolarPlexus', 'Root'] },
+  { id: 3254, gates: [32, 54], centers: ['Spleen', 'Root'] },
+  { id: 3457, gates: [34, 57], centers: ['Sacral', 'Spleen'] },
+  { id: 3536, gates: [35, 36], centers: ['Throat', 'SolarPlexus'] },
+  { id: 3740, gates: [37, 40], centers: ['SolarPlexus', 'Heart'] },
+  { id: 3955, gates: [39, 55], centers: ['Root', 'SolarPlexus'] },
+  { id: 4253, gates: [42, 53], centers: ['Sacral', 'Root'] },
+  { id: 4764, gates: [47, 64], centers: ['Ajna', 'Head'] }
+];
 
 const getIncarnationCrossDetails = (cross: string): string => {
   const match = cross.match(/\((\d+)\/(\d+)\s*\|\s*(\d+)\/(\d+)\)/);
@@ -464,12 +543,12 @@ export const downloadHumanDesignPDF = async (
 
   currentY = 75;
 
-  // --- Section 1: Summary Table ---
-  checkSpace(75);
+  // --- Section 1: Summary Table & Bodygraph side-by-side ---
+  checkSpace(115);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(14);
   doc.setTextColor(gold[0], gold[1], gold[2]);
-  doc.text("Tasarım Özeti", 20, currentY);
+  doc.text("Tasarım Özeti ve Bodygraph", 20, currentY);
   currentY += 8;
 
   const summaryBody = [
@@ -482,16 +561,120 @@ export const downloadHumanDesignPDF = async (
     ["Enkarnasyon Haçı", tr(chart.incarnationCross.split(' (')[0])]
   ];
 
+  // Render autoTable on the left (width 95mm)
   autoTable(doc, {
     startY: currentY,
-    margin: { left: 20, right: 20 },
-    head: [['Parametre', 'Değer / Durum']],
+    margin: { left: 20 },
+    tableWidth: 95,
+    head: [['Parametre', 'Değer']],
     body: summaryBody,
     theme: 'grid',
     headStyles: { fillColor: gold, textColor: primaryDark, fontStyle: 'bold', font: 'LiberationSans' },
-    bodyStyles: { fillColor: secondaryDark, textColor: [255, 255, 255], font: 'LiberationSans' },
+    bodyStyles: { fillColor: secondaryDark, textColor: [255, 255, 255], font: 'LiberationSans', fontSize: 8.5 },
     alternateRowStyles: { fillColor: primaryDark },
   });
+
+  // Render Vector Bodygraph on the right (x from 125 to 195, scale = 0.20)
+  const offsetX = 125;
+  const offsetY = currentY - 5;
+  const scale = 0.20;
+
+  // Draw Bodygraph channels background lines
+  doc.setLineWidth(1.0);
+  doc.setDrawColor(80, 90, 110);
+  for (const ch of CHANNELS) {
+    const g1 = ch.gates[0];
+    const g2 = ch.gates[1];
+    const c1 = GATE_COORDS[g1];
+    const c2 = GATE_COORDS[g2];
+    if (!c1 || !c2) continue;
+    
+    const p1x = offsetX + (c1.x - 40) * scale;
+    const p1y = offsetY + (c1.y - 10) * scale;
+    const p2x = offsetX + (c2.x - 40) * scale;
+    const p2y = offsetY + (c2.y - 10) * scale;
+
+    doc.line(p1x, p1y, p2x, p2y);
+  }
+
+  // Draw active channel halves
+  doc.setLineWidth(1.8);
+  for (const ch of CHANNELS) {
+    const g1 = ch.gates[0];
+    const g2 = ch.gates[1];
+    const c1 = GATE_COORDS[g1];
+    const c2 = GATE_COORDS[g2];
+    if (!c1 || !c2) continue;
+
+    const hasCon1 = chart.conscious.some(p => p.gate === g1);
+    const hasUncon1 = chart.unconscious.some(p => p.gate === g1);
+    const hasCon2 = chart.conscious.some(p => p.gate === g2);
+    const hasUncon2 = chart.unconscious.some(p => p.gate === g2);
+
+    const active1 = hasCon1 || hasUncon1;
+    const active2 = hasCon2 || hasUncon2;
+
+    const p1x = offsetX + (c1.x - 40) * scale;
+    const p1y = offsetY + (c1.y - 10) * scale;
+    const p2x = offsetX + (c2.x - 40) * scale;
+    const p2y = offsetY + (c2.y - 10) * scale;
+
+    const midX = (p1x + p2x) / 2;
+    const midY = (p1y + p2y) / 2;
+
+    if (active1) {
+      const color1 = hasCon1 ? [255, 255, 255] : [230, 70, 70];
+      doc.setDrawColor(color1[0], color1[1], color1[2]);
+      doc.line(p1x, p1y, midX, midY);
+    }
+    if (active2) {
+      const color2 = hasCon2 ? [255, 255, 255] : [230, 70, 70];
+      doc.setDrawColor(color2[0], color2[1], color2[2]);
+      doc.line(p2x, p2y, midX, midY);
+    }
+  }
+
+  // Helper to draw center shapes
+  const drawCenterShape = (center: CenterCode, x: number, y: number, size: number, isDefined: boolean, defaultColorHex: string) => {
+    let fillColor = [30, 41, 59]; // dark gray background for undefined
+    if (isDefined) {
+      const r = parseInt(defaultColorHex.substring(1, 3), 16);
+      const g = parseInt(defaultColorHex.substring(3, 5), 16);
+      const b = parseInt(defaultColorHex.substring(5, 7), 16);
+      fillColor = [r, g, b];
+    }
+    doc.setFillColor(fillColor[0], fillColor[1], fillColor[2]);
+    doc.setDrawColor(gold[0], gold[1], gold[2]);
+    doc.setLineWidth(0.4);
+
+    const coord = CENTER_COORDS[center];
+    const s = size * scale;
+    const px = offsetX + (x - 40) * scale;
+    const py = offsetY + (y - 10) * scale;
+
+    if (coord.shape === 'triangle') {
+      doc.triangle(px, py - s, px - s, py + s/2, px + s, py + s/2, 'FD');
+    } else if (coord.shape === 'triangle-down') {
+      doc.triangle(px, py + s, px - s, py - s/2, px + s, py - s/2, 'FD');
+    } else if (coord.shape === 'triangle-right') {
+      doc.triangle(px + s, py, px - s/2, py - s, px - s/2, py + s, 'FD');
+    } else if (coord.shape === 'triangle-left') {
+      doc.triangle(px - s, py, px + s/2, py - s, px + s/2, py + s, 'FD');
+    } else if (coord.shape === 'square') {
+      doc.rect(px - s, py - s, s * 2, s * 2, 'FD');
+    } else if (coord.shape === 'diamond') {
+      doc.triangle(px, py - s, px + s, py, px - s, py, 'FD');
+      doc.triangle(px, py + s, px + s, py, px - s, py, 'FD');
+    }
+  };
+
+  // Draw all 9 centers
+  const centerKeys: CenterCode[] = ['Head', 'Ajna', 'Throat', 'G', 'Heart', 'Sacral', 'Root', 'Spleen', 'SolarPlexus'];
+  for (const center of centerKeys) {
+    const isDefined = chart.definedCenters.includes(center);
+    const coord = CENTER_COORDS[center];
+    drawCenterShape(center, coord.x, coord.y, coord.s, isDefined, coord.color);
+  }
 
   currentY = (doc as any).lastAutoTable.finalY + 15;
 
@@ -580,7 +763,6 @@ export const downloadHumanDesignPDF = async (
   doc.text("Enerji Merkezleri Çözümlemesi", 20, currentY);
   currentY += 10;
 
-  const centerKeys: CenterCode[] = ['Head', 'Ajna', 'Throat', 'G', 'Heart', 'Sacral', 'Root', 'Spleen', 'SolarPlexus'];
   for (const center of centerKeys) {
     const isDefined = chart.definedCenters.includes(center);
     const centerName = CENTER_NAMES[center] || center;
