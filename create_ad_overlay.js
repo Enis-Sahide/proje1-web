@@ -1,7 +1,7 @@
 const sharp = require('sharp');
 const path = require('path');
 
-const bgPath = 'C:\\Users\\baha\\.gemini\\antigravity-ide\\brain\\aa884945-8be4-4b6c-af8f-16a831497c6f\\astro_comparative_ad_bg_1787227883855.png';
+const bgPath = 'C:\\Users\\baha\\.gemini\\antigravity-ide\\brain\\aa884945-8be4-4b6c-af8f-16a831497c6f\\astro_real_pdf_comparative_bg_1787228433510.png';
 const outputPath = 'c:\\projeler\\7layers\\web\\public\\four_layer_astrology_ad.png';
 
 async function main() {
@@ -12,7 +12,7 @@ async function main() {
 
   console.log(`Image dimensions: ${width}x${height}`);
 
-  // Create a stunning comparative SVG overlay with Turkish texts
+  // Create a stunning comparative SVG overlay with Turkish texts and wrapped paragraphs
   const svgOverlay = `
     <svg width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -71,8 +71,12 @@ async function main() {
       <circle cx="80" cy="875" r="4" fill="url(#goldGrad)" />
       <text x="95" y="879" font-family="'Segoe UI', Arial, sans-serif" font-size="14" font-weight="700" fill="#E2E8F0">Gezegen Konumları ve Ev Yerleşimleri</text>
       
-      <text x="70" y="930" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="500" 
-            fill="#94A3B8" text-anchor="start" width="390">Astrolojiye yeni başlayanlar için en sade, net ve anlaşılır dünyevi rehberlik dökümanı.</text>
+      <!-- HTML ForeignObject Wrapper for Perfect Text Wrapping -->
+      <foreignObject x="70" y="910" width="390" height="60">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #94A3B8; font-weight: 500; line-height: 1.4; text-align: left;">
+          Astrolojiye yeni başlayanlar için en sade, net ve anlaşılır dünyevi rehberlik dökümanı.
+        </div>
+      </foreignObject>
 
 
       <!-- RIGHT CARD: 4 Katmanlı Ezoterik Harita -->
@@ -96,8 +100,12 @@ async function main() {
       <circle cx="574" cy="875" r="4" fill="url(#goldGrad)" />
       <text x="589" y="879" font-family="'Segoe UI', Arial, sans-serif" font-size="14" font-weight="700" fill="#E2E8F0">4 Alem (Assiah, Yetzirah, Briah, Atziluth)</text>
       
-      <text x="564" y="930" font-family="'Segoe UI', Arial, sans-serif" font-size="13" font-weight="500" 
-            fill="#94A3B8" text-anchor="start" width="390">Ruhsal ve derin karmik arayışta olanlar, hayat amacını ve ilahi misyonunu arayanlar için ideal.</text>
+      <!-- HTML ForeignObject Wrapper for Perfect Text Wrapping -->
+      <foreignObject x="564" y="910" width="390" height="60">
+        <div xmlns="http://www.w3.org/1999/xhtml" style="font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; color: #94A3B8; font-weight: 500; line-height: 1.4; text-align: left;">
+          Ruhsal ve derin karmik arayışta olanlar, hayat amacını ve ilahi misyonunu arayanlar için ideal.
+        </div>
+      </foreignObject>
 
     </svg>
   `;
