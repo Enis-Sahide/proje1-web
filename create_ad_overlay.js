@@ -1,7 +1,7 @@
 const sharp = require('sharp');
 const path = require('path');
 
-const bgPath = 'C:\\Users\\baha\\.gemini\\antigravity-ide\\brain\\aa884945-8be4-4b6c-af8f-16a831497c6f\\four_layer_astrology_bg_1787221746959.png';
+const bgPath = 'C:\\Users\\baha\\.gemini\\antigravity-ide\\brain\\aa884945-8be4-4b6c-af8f-16a831497c6f\\four_layer_astrology_digital_bg_1787221938991.png';
 const outputPath = 'c:\\projeler\\7layers\\web\\public\\four_layer_astrology_ad.png';
 
 async function main() {
