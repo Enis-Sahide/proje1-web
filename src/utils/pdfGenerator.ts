@@ -234,6 +234,15 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
   console.log("[pdfGenerator] downloadChartPDF initiated.", { locationStr, dateStr });
   const doc = new jsPDF();
 
+  // Override addPage to automatically paint the dark background on all new pages (e.g. from autotable)
+  const originalAddPage = doc.addPage.bind(doc);
+  doc.addPage = function(this: any, ...args: any[]) {
+    const result = originalAddPage(...args);
+    doc.setFillColor(20, 25, 40); // primaryDark
+    doc.rect(0, 0, 210, 297, 'F');
+    return result;
+  };
+
   // Generate chart image in background (runs in browser context)
   let chartImageBase64 = '';
   try {
@@ -313,16 +322,12 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
 
   // Move content to Page 2
   doc.addPage();
-  doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
-  doc.rect(0, 0, 210, 297, 'F');
 
   let currentY = 25;
 
   const checkSpace = (required: number) => {
     if (currentY + required > 275) {
       doc.addPage();
-      doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
-      doc.rect(0, 0, 210, 297, 'F');
       currentY = 25;
     }
   };
