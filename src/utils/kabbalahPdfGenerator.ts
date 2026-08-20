@@ -204,14 +204,12 @@ const generateSvgString = (chartData: any): string => {
 const convertSvgToPng = (svgString: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     try {
-      console.log("[pdfGenerator-kabbalah] SVG convert to PNG started...");
       const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
       const URL = window.URL || window.webkitURL || window;
       const blobURL = URL.createObjectURL(svgBlob);
       
       const image = new Image();
       image.onload = () => {
-        console.log("[pdfGenerator-kabbalah] Image element loaded SVG successfully.");
         const canvas = document.createElement('canvas');
         canvas.width = 640;
         canvas.height = 640;
@@ -220,7 +218,6 @@ const convertSvgToPng = (svgString: string): Promise<string> => {
           context.drawImage(image, 0, 0, 640, 640);
           const png = canvas.toDataURL('image/png');
           URL.revokeObjectURL(blobURL);
-          console.log("[pdfGenerator-kabbalah] SVG successfully converted to base64 PNG, length:", png.length);
           resolve(png);
         } else {
           console.error("[pdfGenerator-kabbalah] Canvas context could not be created.");
@@ -275,7 +272,6 @@ export const downloadKabbalahPDF = async (
       try {
         const svgStr = generateSvgString(chart);
         chartImages[world] = await convertSvgToPng(svgStr);
-        console.log(`[pdfGenerator-kabbalah] Successfully generated chart visual for ${world}`);
       } catch (err) {
         console.error(`[pdfGenerator-kabbalah] Failed to generate chart visual for ${world}:`, err);
       }
