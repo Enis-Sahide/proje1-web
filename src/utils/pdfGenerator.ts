@@ -195,12 +195,14 @@ const generateSvgString = (chartData: any): string => {
 const convertSvgToPng = (svgString: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     try {
+      console.log("[pdfGenerator] SVG convert to PNG started...");
       const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
       const URL = window.URL || window.webkitURL || window;
       const blobURL = URL.createObjectURL(svgBlob);
       
       const image = new Image();
       image.onload = () => {
+        console.log("[pdfGenerator] Image element loaded SVG successfully.");
         const canvas = document.createElement('canvas');
         canvas.width = 640;
         canvas.height = 640;
@@ -209,31 +211,37 @@ const convertSvgToPng = (svgString: string): Promise<string> => {
           context.drawImage(image, 0, 0, 640, 640);
           const png = canvas.toDataURL('image/png');
           URL.revokeObjectURL(blobURL);
+          console.log("[pdfGenerator] SVG successfully converted to base64 PNG, length:", png.length);
           resolve(png);
         } else {
+          console.error("[pdfGenerator] Canvas context could not be created.");
           reject(new Error('Canvas context could not be created'));
         }
       };
       image.onerror = (err) => {
+        console.error("[pdfGenerator] Image element failed to load SVG blob URL:", err);
         reject(err);
       };
       image.src = blobURL;
     } catch (err) {
+      console.error("[pdfGenerator] Exception in convertSvgToPng:", err);
       reject(err);
     }
   });
 };
 
 export const downloadChartPDF = async (chartData: any, locationStr: string, dateStr: string) => {
+  console.log("[pdfGenerator] downloadChartPDF initiated.", { locationStr, dateStr });
   const doc = new jsPDF();
 
   // Generate chart image in background (runs in browser context)
   let chartImageBase64 = '';
   try {
     const svgStr = generateSvgString(chartData);
+    console.log("[pdfGenerator] SVG string generated. Length:", svgStr.length);
     chartImageBase64 = await convertSvgToPng(svgStr);
   } catch (err) {
-    console.error("Failed to generate chart visual for PDF:", err);
+    console.error("[pdfGenerator] Failed to generate chart visual for PDF:", err);
   }
 
   // Load custom fonts for Turkish character support
