@@ -5,12 +5,18 @@ const bgPath = 'C:\\Users\\baha\\.gemini\\antigravity-ide\\brain\\aa884945-8be4-
 const outputPath = 'c:\\projeler\\7layers\\web\\public\\four_layer_astrology_ad.png';
 
 async function main() {
-  const image = sharp(bgPath);
-  const metadata = await image.metadata();
-  const width = metadata.width || 1080;
-  const height = metadata.height || 1920;
+  console.log(`Loading background image from: ${bgPath}`);
+  
+  // Force resize background image to dikey story format (1080x1920) before compositing
+  const resizedBgBuffer = await sharp(bgPath)
+    .resize(1080, 1920, { fit: 'cover' })
+    .toBuffer();
 
-  console.log(`Image dimensions: ${width}x${height}`);
+  const image = sharp(resizedBgBuffer);
+  const width = 1080;
+  const height = 1920;
+
+  console.log(`Forced image dimensions to vertical: ${width}x${height}`);
 
   // Create a stunning comparative vertical SVG overlay for stories (1080x1920) with larger mobile-friendly fonts
   const svgOverlay = `
