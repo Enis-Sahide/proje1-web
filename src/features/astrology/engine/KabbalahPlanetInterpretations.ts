@@ -321,16 +321,16 @@ export function getEsotericPlanetInterpretation(planetName: string, signName: Zo
   const planetContent = planet[layerKey] || planet.assiah;
   const signContent = sign[layerKey] || sign.assiah;
 
-  const content = `[KOZMİK SEMBOLİZM: ${planetName}]
+  const content = `**[KOZMİK SEMBOLİZM: ${planetName}]**
 ${planetContent}
 
-[BURÇ REZONANSI: ${signName}]
+**[BURÇ REZONANSI: ${signName}]**
 ${signContent}
 
-[YAŞAM ALANI (EV): ${houseNum}. Ev]
+**[YAŞAM ALANI (EV): ${houseNum}. Ev]**
 ${house.esoteric}
 
-[${titleSuffix.replace(' (', '').replace(')', '')} SENTEZİ]
+**[${titleSuffix.replace(' (', '').replace(')', '')} SENTEZİ]**
 ${synthesis}${retroSynthesis}`;
 
   return { title, content };

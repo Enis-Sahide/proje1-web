@@ -31,6 +31,7 @@ const drawTextWithBold = (
   let curY = y;
   
   const sanitizedText = text
+    .replace(/\r\n/g, '\n') // Convert CRLF to LF
     .replace(/!\[.*?\]\(.*?\)/g, '')
     .replace(/<img.*?src=".*?".*?>/g, '')
     .replace(/^\s*>\s*/gm, '');
@@ -44,9 +45,10 @@ const drawTextWithBold = (
       doc.setFont('LiberationSans', isBold ? 'bold' : 'normal');
       continue;
     }
-    if (part === '\n') {
+    if (part.includes('\n')) {
+      const newlineCount = (part.match(/\n/g) || []).length;
       curX = x;
-      curY += lineHeight;
+      curY += lineHeight * newlineCount;
       continue;
     }
     if (part === '') continue;

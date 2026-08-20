@@ -27,7 +27,9 @@ const drawTextWithBold = (
 ): number => {
   let curX = x;
   let curY = y;
-  const sanitizedText = text.replace(/^\s*>\s*/gm, '');
+  const sanitizedText = text
+    .replace(/\r\n/g, '\n') // Convert CRLF to LF
+    .replace(/^\s*>\s*/gm, '');
   const parts = sanitizedText.split(/(\s+|\*\*)/);
   let isBold = false;
   
@@ -37,9 +39,10 @@ const drawTextWithBold = (
       doc.setFont('LiberationSans', isBold ? 'bold' : 'normal');
       continue;
     }
-    if (part === '\n') {
+    if (part.includes('\n')) {
+      const newlineCount = (part.match(/\n/g) || []).length;
       curX = x;
-      curY += lineHeight;
+      curY += lineHeight * newlineCount;
       continue;
     }
     if (part === '') continue;
