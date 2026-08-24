@@ -43,12 +43,36 @@ export const RESOURCES = [
     sort: 5
   },
   {
+    title: 'Düşünce Gücüyle Tedavi (You Can Heal Your Life) - Louise L. Hay',
+    type: 'book',
+    fileUrl: '',
+    level: 1,
+    description: 'Hastalıkların zihinsel ve duygusal nedenlerini inceleyen, zihinsel şablonların fiziksel bedene yansımasını açıklayan temel rehber eser.',
+    sort: 6
+  },
+  {
+    title: 'Sarı İmparator\'un İçsel Tıp Klasiği (Huangdi Neijing) - Klasik Eser',
+    type: 'book',
+    fileUrl: '',
+    level: 1,
+    description: 'Geleneksel Çin Tıbbı, akupunktur meridyenleri ve Yin-Yang dengesi üzerine yazılmış en eski ve en kutsal tıp metni.',
+    sort: 7
+  },
+  {
+    title: 'The Web That Has No Weaver - Ted J. Kaptchuk',
+    type: 'book',
+    fileUrl: '',
+    level: 1,
+    description: 'Doğu tıbbının enerji meridyenleri teorisini ve insan bedenindeki akupunktur kanallarının işleyişini batı zihniyetiyle açıklayan yetkin kaynak.',
+    sort: 8
+  },
+  {
     title: 'Aura Koruma Teknikleri ve Günlük Topraklanma Pratikleri',
     type: 'research',
     level: 1,
     fileUrl: '',
     description: 'Fiziksel bedenin günlük elektromanyetik ve negatif yüklerden temizlenmesi, auranın sevgi kalkanıyla mühürlenmesi süreçlerinin araştırılması.',
-    sort: 6
+    sort: 9
   },
 
   // Seviye 2: Journeyman (Kalfalık)
@@ -58,7 +82,7 @@ export const RESOURCES = [
     fileUrl: '',
     level: 2,
     description: 'Hayat Ağacı, sefirotlar ve yolların batı gizemciliği ile sentezlendiği, Kabala felsefesini anlamak için en yetkin rehber.',
-    sort: 7
+    sort: 10
   },
   {
     title: 'Kutsal Geometri (Sacred Geometry) - Robert Lawlor',
@@ -66,7 +90,7 @@ export const RESOURCES = [
     fileUrl: '',
     level: 2,
     description: 'Evrenin arkasındaki geometrik oranlar, altın oran, platonik cisimler ve sayıların evrensel mimariyle olan ilişkisinin incelenmesi.',
-    sort: 8
+    sort: 11
   },
   {
     title: 'Numeroloji (Numerology: Or What Hath God Wrought) - Shirley B. Lawrence',
@@ -74,7 +98,31 @@ export const RESOURCES = [
     fileUrl: '',
     level: 2,
     description: 'Sayıların bilimi, Pisagor matematiği, harflerin sayısal değerleri ve bunların insan karakteri üzerindeki etkilerinin analizi.',
-    sort: 9
+    sort: 12
+  },
+  {
+    title: 'Esoteric Astrology - Alice A. Bailey',
+    type: 'book',
+    fileUrl: '',
+    level: 2,
+    description: '4 katmanlı ruhsal harita okuma sanatı ve gezegenlerin ezoterik yöneticilerinin ruhun tekamülü üzerindeki etkilerini açıklayan temel kaynak.',
+    sort: 13
+  },
+  {
+    title: 'Futhark: A Handbook of Rune Magic - Edred Thorsson',
+    type: 'book',
+    fileUrl: '',
+    level: 2,
+    description: '24 Elder Futhark rune sembollerinin kozmik enerjileri, tılsımlı bağlamaları ve runik inisiyasyon çalışmalarının el kitabı.',
+    sort: 14
+  },
+  {
+    title: 'Runelore: A Handbook of Esoteric Runology - Edred Thorsson',
+    type: 'book',
+    fileUrl: '',
+    level: 2,
+    description: 'Rune sembollerinin derin ezoterik, tarihi ve kozmolojik arka planını, runik takvimleri ve ileri düzey okumaları içeren rehber kitap.',
+    sort: 15
   },
 
   // Seviye 3: Master (Ustalık)
@@ -84,7 +132,7 @@ export const RESOURCES = [
     fileUrl: '',
     level: 3,
     description: 'Antik Mısır ve Yunan inisiyasyonlarının temeli olan 7 Evrensel Hermetik Yasanın (Zihinsellik, Titreşim, Kutupluluk, Ritim vb.) anahtarı.',
-    sort: 10
+    sort: 16
   },
   {
     title: 'Altın Şafak (The Golden Dawn) - Israel Regardie',
@@ -92,7 +140,7 @@ export const RESOURCES = [
     fileUrl: '',
     level: 3,
     description: 'Majikal törenler, inisiyasyon ritüelleri, İbrani alfabesinin sırları ve ileri düzey hermetik çalışmaların derlemesi.',
-    sort: 11
+    sort: 17
   },
   {
     title: 'Zohar (Görkem Kitabı) - Şimon Bar Yohay',
@@ -100,6 +148,38 @@ export const RESOURCES = [
     fileUrl: '',
     level: 3,
     description: 'Tevrat\'ın gizemli ve ezoterik yorumlarını içeren, Kabala öğretisinin en kutsal, en derin ve anlaşılması en zor ana metni.',
-    sort: 12
+    sort: 18
+  },
+  {
+    title: 'İnsan Tasarımı: Özünüzdeki İnsanı Keşfedin - Chetan Parkyn',
+    type: 'book',
+    fileUrl: '',
+    level: 3,
+    description: 'Vücut grafiğindeki 9 enerji merkezinin, kapıların ve kanalların pratik analizini sunan kapsamlı Türkçe Human Design rehberi.',
+    sort: 19
+  },
+  {
+    title: 'İnsan Tasarımını Anlamak (Understanding Human Design) - Karen Curry',
+    type: 'book',
+    fileUrl: '',
+    level: 3,
+    description: 'Human Design sisteminin genetik şifreleri, tipleri ve otoriteleri nasıl etkilediğini anlamak için yazılmış temel ders kaynağı.',
+    sort: 20
+  },
+  {
+    title: 'The Definitive Book of Human Design - Ra Uru Hu & Lynda Bunnell',
+    type: 'book',
+    fileUrl: '',
+    level: 3,
+    description: 'Sistemin kurucusu Ra Uru Hu tarafından yazılmış, Human Design öğretisinin en yetkin, eksiksiz ve yetkilendirilmiş resmi başvuru kaynağı.',
+    sort: 21
+  },
+  {
+    title: 'Sefer Yetzirah (Oluşum Kitabı) - Antik Ezoterik Metin',
+    type: 'book',
+    fileUrl: '',
+    level: 3,
+    description: 'Kabala kozmolojisinin temeli olan, 32 gizemli yolu (10 sefira ve 22 harf) açıklayan en eski ezoterik ve matematiksel metin.',
+    sort: 22
   }
 ];
