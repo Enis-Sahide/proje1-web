@@ -323,6 +323,74 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
 
   let currentY = 25;
 
+  // --- Kadim Astroloji Rehberi Sayfası ---
+  doc.setFont('LiberationSans', 'bold');
+  doc.setFontSize(16);
+  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.text("KADİM ASTROLOJİ REHBERİ: GEZEGENLER VE EVLER", 20, currentY);
+  currentY += 12;
+
+  doc.setFont('LiberationSans', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(230, 230, 230);
+
+  const guideIntro = "Doğum haritanız, doğduğunuz an ve konumda gökyüzünün anlık bir fotoğrafıdır. Bu haritayı doğru okumak ve yorumları anlamlandırmak için en temel iki kavram **Gezegenler** ve **Evler**dir.";
+  currentY = drawTextWithBold(doc, guideIntro, 20, currentY, 170, 5.5);
+  currentY += 5;
+
+  doc.setFont('LiberationSans', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.text("1. GEZEGENLER (Bilinç Fonksiyonları ve Güçler)", 20, currentY);
+  currentY += 7;
+
+  doc.setFont('LiberationSans', 'normal');
+  doc.setFontSize(9.5);
+  doc.setTextColor(220, 220, 220);
+  
+  const planetsText = 
+    "Gezegenler, haritamızdaki aktif enerji odaklarıdır ve **'Ne?'** sorusuna yanıt verirler:\n" +
+    "• **Güneş:** Öz benliğiniz, yaşam enerjiniz, iradeniz ve kimliğiniz.\n" +
+    "• **Ay:** Bilinçaltınız, duygusal ihtiyaçlarınız, güvende hissetme şekliniz ve içgüdüleriniz.\n" +
+    "• **Merkür:** İletişim tarzınız, zihinsel süreçleriniz, mantık ve öğrenme biçiminiz.\n" +
+    "• **Venüs:** Sevgi diliniz, değer algınız, ilişkilerdeki tutumunuz ve estetik zevkiniz.\n" +
+    "• **Mars:** Eyleme geçme gücünüz, tutkularınız, cesaretiniz ve mücadele tarzınız.\n" +
+    "• **Jüpiter:** Şansınız, bolluk-bereket algınız, büyüme, inançlar ve bilgelik alanınız.\n" +
+    "• **Satürn:** Sınırlarınız, sorumluluklarınız, hayat dersleriniz, disiplin ve olgunlaşma alanınız.\n" +
+    "• **Kolektif Gezegenler (Uranüs, Neptün, Plüton):** Sırasıyla bireysel özgürleşme, ruhsal çözülme/hayaller ve köklü dönüşüm/küllerinden doğma enerjileridir.";
+  currentY = drawTextWithBold(doc, planetsText, 20, currentY, 170, 5.2);
+  currentY += 5;
+
+  doc.setFont('LiberationSans', 'bold');
+  doc.setFontSize(12);
+  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.text("2. EVLER (Yaşam Sahnesi ve Deneyim Alanları)", 20, currentY);
+  currentY += 7;
+
+  doc.setFont('LiberationSans', 'normal');
+  doc.setFontSize(9.5);
+  doc.setTextColor(220, 220, 220);
+
+  const housesText = 
+    "Evler, doğum haritanızın 12 farklı dilimidir ve gezegenlerin enerjilerini **'Nerede?'** sergileyeceğini gösterir:\n" +
+    "• **1. Ev (Yükselen / ASC):** Dış dünyaya sunduğunuz maske, fiziksel bedeniniz ve ilk izleniminiz.\n" +
+    "• **2. Ev:** Maddi kaynaklarınız, kendi çabanızla kazandığınız para ve öz değer algınız.\n" +
+    "• **3. Ev:** Yakın çevre ilişkileriniz, kardeşleriniz, kısa yolculuklar ve iletişim zihniniz.\n" +
+    "• **4. Ev:** Yuvanız, aileniz, kökleriniz, bilinçaltı güvenliğiniz ve ev hayatınız.\n" +
+    "• **5. Ev:** Yaratıcılığınız, aşk hayatınız, çocuklarınız, hobileriniz ve yaşamsal neşeniz.\n" +
+    "• **6. Ev:** Günlük rutinleriniz, iş ortamınız, sağlığınız ve hizmet etme bilinciniz.\n" +
+    "• **7. Ev:** İkili ilişkileriniz, evlilik, ortaklıklar ve açık düşmanlarınız.\n" +
+    "• **8. Ev:** Ortaklaşa kaynaklar, miras, cinsellik, okültizm ve dönüşüm alanınız.\n" +
+    "• **9. Ev:** Yüksek öğrenim, felsefe, inançlar, uzak yolculuklar ve hayat vizyonunuz.\n" +
+    "• **10. Ev (MC):** Kariyeriniz, toplumsal statünüz, hedefleriniz ve otorite ilişkileriniz.\n" +
+    "• **11. Ev:** Sosyal çevre, arkadaş grupları, idealleriniz ve toplumsal projeleriniz.\n" +
+    "• **12. Ev:** Bilinçaltı, gizli düşmanlar, izolasyon, rüyalar ve ruhsal teslimiyet alanınız.";
+  currentY = drawTextWithBold(doc, housesText, 20, currentY, 170, 5.2);
+
+  // Move content to Page 3
+  doc.addPage();
+  currentY = 25;
+
   const checkSpace = (required: number) => {
     if (currentY + required > 275) {
       doc.addPage();
@@ -441,6 +509,79 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
       currentY += 10;
     }
   }
+
+  // --- Mobile App Advertisement Page ---
+  doc.addPage();
+  currentY = 25;
+
+  doc.setFont('LiberationSans', 'bold');
+  doc.setFontSize(18);
+  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.text("7LAYERS MOBİL UYGULAMASI İLE KEŞFE DEVAM EDİN", 20, currentY);
+  currentY += 15;
+
+  // Decorative Line
+  doc.setDrawColor(gold[0], gold[1], gold[2]);
+  doc.setLineWidth(0.5);
+  doc.line(20, currentY, 190, currentY);
+  currentY += 12;
+
+  doc.setFont('LiberationSans', 'normal');
+  doc.setFontSize(10.5);
+  doc.setTextColor(240, 240, 240);
+
+  const adIntro = "Doğum haritanızdaki derin ezoterik anlamları günlük hayatınıza entegre etmek ve gök kubbenin anlık enerjilerini her an takip etmek için **7LAYERS** mobil uygulamamızı kullanabilirsiniz.";
+  currentY = drawTextWithBold(doc, adIntro, 20, currentY, 170, 6);
+  currentY += 10;
+
+  // Feature 1
+  doc.setFont('LiberationSans', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.text("• Anlık Gökyüzü Sorgulama (Transit Analizi)", 20, currentY);
+  currentY += 7;
+
+  doc.setFont('LiberationSans', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(210, 210, 210);
+  const feat1 = "Şu andaki gökyüzü enerjilerinin sizin doğum haritanız üzerindeki etkilerini anlık olarak analiz edin. Günlük, haftalık transit etkilerini ve gezegen geçişlerini takip ederek hayatınızı gökyüzüyle uyumlayın.";
+  currentY = drawTextWithBold(doc, feat1, 20, currentY, 170, 5.5);
+  currentY += 10;
+
+  // Feature 2
+  doc.setFont('LiberationSans', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.text("• Detaylı Doğum Haritası Sorgulama", 20, currentY);
+  currentY += 7;
+
+  doc.setFont('LiberationSans', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(210, 210, 210);
+  const feat2 = "Mobil uygulamamız üzerinden doğum bilgilerinizi girerek haritanızı interaktif olarak inceleyin, gezegen açılarını ve karmik göstergelerinizi detaylı grafiklerle görüntüleyin.";
+  currentY = drawTextWithBold(doc, feat2, 20, currentY, 170, 5.5);
+  currentY += 10;
+
+  // Feature 3
+  doc.setFont('LiberationSans', 'bold');
+  doc.setFontSize(13);
+  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.text("• Ay Döngüleri ve Faz Analizleri", 20, currentY);
+  currentY += 7;
+
+  doc.setFont('LiberationSans', 'normal');
+  doc.setFontSize(10);
+  doc.setTextColor(210, 210, 210);
+  const feat3 = "Ay'ın evrelerini (Yeniay, Dolunay, Hilal vb.) ve bunların ruh haliniz, enerjiniz ve çakralarınız üzerindeki yansımalarını takip edin. Ay ritimlerine uygun meditasyon ve niyet pratiklerine erişin.";
+  currentY = drawTextWithBold(doc, feat3, 20, currentY, 170, 5.5);
+  currentY += 15;
+
+  // Closing Call to Action
+  doc.setFont('LiberationSans', 'bold');
+  doc.setFontSize(11);
+  doc.setTextColor(gold[0], gold[1], gold[2]);
+  const adClosing = "**7LAYERS** Mobil Uygulamasını **Google Play Store** üzerinden indirerek kadim astroloji ve ezoterizm yolculuğunuzu her an yanınızda taşıyabilirsiniz.";
+  currentY = drawTextWithBold(doc, adClosing, 20, currentY, 170, 6);
 
   // Save the PDF
   doc.save(`Ezoterik_Dogum_Haritasi_${locationStr.replace(/\s+/g, '_')}.pdf`);
