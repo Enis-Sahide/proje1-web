@@ -30,12 +30,28 @@ export function getTransitHouseInterpretation(transitPlanet: string, house: numb
     12: 'bilinçaltınız, gizli korkularınız, ruhsal inziva ihtiyacınız ve kadersel çözülmeler alanında derin bir içsel çalışma yaptığı dönem.'
   };
 
+  const houseKeywords: Record<number, string> = {
+    1: 'kişisel imajınız, bedeniniz ve hayata başlangıç enerjiniz',
+    2: 'maddi kaynaklarınız, yetenekleriniz ve özdeğer algınız',
+    3: 'iletişim ağınız, yakın çevreniz, eğitimleriniz ve zihinsel projeleriniz',
+    4: 'kökleriniz, aileniz, ev hayatınız ve en derin içsel dünyanız',
+    5: 'aşk hayatınız, yaratıcılığınız, çocuklarla ilgili konular ve hayattan aldığınız keyif',
+    6: 'günlük rutinleriniz, iş ortamınız, sağlığınız ve hizmet etme şekliniz',
+    7: 'ikili ilişkileriniz, evliliğiniz, ortaklıklarınız ve açık düşmanlıklar',
+    8: 'krizler, dönüşümler, paylaşılan finansal kaynaklar ve derin psikolojik yüzleşmeler',
+    9: 'hayat felsefeniz, inançlarınız, seyahatleriniz veya yüksek eğitim konularınız',
+    10: 'kariyeriniz, toplumsal statünüz ve hedefleriniz',
+    11: 'sosyal çevreniz, idealleriniz, umutlarınız ve dahil olduğunuz gruplar',
+    12: 'bilinçaltınız, gizli korkularınız, ruhsal inziva ihtiyacınız ve kadersel çözülmeleriniz'
+  };
+
   const pTheme = planetNames[transitPlanet] || 'Bu gezegen enerjisinin';
   const hTheme = houseThemes[house] || 'bu alanda etkili olduğu bir süreç.';
+  const hKeywords = houseKeywords[house] || 'bu evin';
 
   return {
     title: `Transit ${transitPlanet} ${house}. Evinizde`,
-    content: `${transitPlanet} transit halindeyken ${house}. evinize girdiğinde; ${pTheme.toLowerCase()} ${hTheme} \n\nBu transit geçişi, haritanızdaki bu evin konularını tetikleyecek ve yaşamınızın bu alanında yeni bir sayfa açmanıza, farkındalık kazanmanıza veya birtakım sınavlar vermenize neden olacaktır.`
+    content: `${transitPlanet} transit halindeyken ${house}. evinize girdiğinde; ${pTheme.toLowerCase()} ${hTheme} \n\nBu transit geçişi, haritanızdaki ${hKeywords} konularını tetikleyecek ve yaşamınızın bu alanında yeni bir sayfa açmanıza, farkındalık kazanmanıza veya birtakım sınavlar vermenize neden olacaktır.`
   };
 }
 
