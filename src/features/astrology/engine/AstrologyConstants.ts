@@ -47,6 +47,7 @@ export interface TransitChartData {
   natalChart: NatalChartData;
   transitPlanets: AstroPoint[];
   transitAspects: TransitAspect[];
+  transitTransitAspects: AstroAspect[];
 }
 
 export const ZODIAC_SIGNS: ZodiacSign[] = [

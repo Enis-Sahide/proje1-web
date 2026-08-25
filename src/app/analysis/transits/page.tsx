@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Compass, Loader2, Sparkles, AlertCircle, Star, X } from 'lucide-react';
-import { getTransitHouseInterpretation, getTransitAspectInterpretation } from '@/features/astrology/engine/TransitInterpretations';
+import { getTransitHouseInterpretation, getTransitAspectInterpretation, getTransitTransitAspectInterpretation } from '@/features/astrology/engine/TransitInterpretations';
 import { AstroCity, TransitChartData } from '@/features/astrology/engine/AstrologyConstants';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 
@@ -424,10 +424,22 @@ export default function TransitsPage() {
                   if (tMoon) p1 += `Duygusal pusulanız olan Ay ise an itibarıyla ${tMoon.house}. evinizden geçiş yapıyor; bu durum bugünkü ruh halinizi ve anlık reaksiyonlarınızı doğrudan "${getHouseFocus(tMoon.house)}" konularına yönlendirecek.`;
                   paragraphs.push(p1);
 
-                  // Paragraph 2: Exact Aspects
+                  // Paragraph: Transit-Transit Aspects (Kolektif Gökyüzü Havası)
+                  const transitTransitAspects = transitData.transitTransitAspects || [];
+                  const majorTTAspects = [...transitTransitAspects].filter(a => a.isExact).slice(0, 2);
+                  if (majorTTAspects.length > 0) {
+                    let pTT = `Bugün gökyüzünde genel (kolektif) olarak çok etkili göksel kombinasyonlar devrede. `;
+                    majorTTAspects.forEach(a => {
+                      const p1House = transitData.transitPlanets.find(p => p.name === a.planet1)?.house;
+                      pTT += `Gökyüzündeki Transit ${a.planet1} ile Transit ${a.planet2} ${a.type} açısı yapıyor ve bu kolektif enerji sizin haritanızda doğrudan ${p1House ? `${p1House}. Evinizde` : 'kader alanınızda'} gerçekleşiyor. Bu durum, yaşamınızın bu alanında küresel etkilerin bireysel hayatınıza yansımasını hızlandıracaktır. `;
+                    });
+                    paragraphs.push(pTT);
+                  }
+
+                  // Paragraph 3: Exact Aspects
                   if (exactAspects.length > 0) {
                     const mainAspect = exactAspects[0];
-                    let p2 = `Günün en belirgin kadersel tetiklenmesi ise Transit ${mainAspect.transitPlanet} ile Natal ${mainAspect.natalPlanet} arasındaki ${mainAspect.orb.toFixed(1)}° toleranslı ${mainAspect.type} açısıdır. `;
+                    let p2 = `Günün sizin üzerinizdeki en belirgin kadersel tetiklenmesi ise Transit ${mainAspect.transitPlanet} ile Natal ${mainAspect.natalPlanet} arasındaki ${mainAspect.orb.toFixed(1)}° toleranslı ${mainAspect.type} açısıdır. `;
                     p2 += `Astrolojik olarak bu enerji; ${getAspectSummary(mainAspect.transitPlanet, mainAspect.natalPlanet, mainAspect.type)}`;
                     paragraphs.push(p2);
 
@@ -441,7 +453,7 @@ export default function TransitsPage() {
                          const themesText = affectedThemes.join(', ').replace(/, ([^,]*)$/, ' ve $1');
                          paragraphs.push(`⚠️ Gökyüzünde ayrıca gerilimli etkileşimler devrede. Özellikle "${themesText}" konularında dışarıdan gelen baskılara karşı bugün ani tepkiler vermekten veya fevri kararlar almaktan kaçınmalısınız. Olaylara daha geniş bir perspektiften bakmak ve sabırlı kalmak size çok şey kazandıracaktır.`);
                       } else {
-                         paragraphs.push(`⚠️ Gökyüzünde ayrıca bazı sert etkileşimler devrede olduğu için, bugün genel olarak ani tepkiler vermekten veya fevri kararlar almaktan kaçınmanız çok önemli. Sabırlı olmak size kazandıracaktır.`);
+                         paragraphs.push(`⚠️ Gökyüzünde ayrıca bazı sert etkileşimler devrede olduğu için, bugün genel olarak ani tepkiler vermekten veya fevri kararlar almanız çok önemli. Sabırlı olmak size kazandıracaktır.`);
                       }
                     } else {
                       paragraphs.push(`✨ Gökyüzündeki bu uyumlu akış, size yenilikler ve fırsatlar sunmak için destekleyici bir enerji veriyor. Harekete geçmek için harika bir gün!`);
@@ -460,7 +472,7 @@ export default function TransitsPage() {
             </div>
 
             {/* Analysis Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               
               {/* Transitlerin Düştüğü Evler */}
               <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-8 rounded-3xl shadow-2xl">
@@ -522,6 +534,52 @@ export default function TransitsPage() {
                         </div>
                       </div>
                     ))
+                  )}
+                </div>
+              </div>
+
+              {/* Gökyüzünün Kendi Açıları (Genel Hava Durumu) */}
+              <div className="bg-black/50 backdrop-blur-md border border-[#D4AF37]/30 p-8 rounded-3xl shadow-2xl">
+                <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Kolektif Gökyüzü Açıları (Hava Durumu)</h3>
+                <p className="text-sm text-mystic-text-muted mb-4">Gezegenlerin gökyüzünde kendi aralarında yaptığı ve dünya genelini etkileyen güncel açılar.</p>
+                <div className="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
+                  {!transitData.transitTransitAspects || transitData.transitTransitAspects.length === 0 ? (
+                    <p className="text-mystic-text-muted text-center py-4">Şu an gökyüzünde majör bir göksel açı bulunmuyor.</p>
+                  ) : (
+                    transitData.transitTransitAspects.sort((a,b) => a.orb - b.orb).map((aspect, i) => {
+                      const p1House = transitData.transitPlanets.find(p => p.name === aspect.planet1)?.house;
+                      return (
+                        <div 
+                          key={`tta-${i}`} 
+                          className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-white/20 hover:bg-white/10 transition-colors cursor-pointer"
+                          onClick={() => setSelectedInterp(getTransitTransitAspectInterpretation(aspect.planet1, aspect.planet2, aspect.type, p1House))}
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="text-xl text-[#0EA5E9] font-bold w-6 text-center">{PLANET_SYMBOLS[aspect.planet1] || ''}</span>
+                            <span className="text-white font-medium text-sm">T.{aspect.planet1}</span>
+                          </div>
+                          
+                          <div className="flex flex-col items-center flex-1 px-2">
+                            <span className="text-xs font-bold px-2 py-1 rounded bg-white/10" style={{ color: ASPECT_COLORS[aspect.type] }}>
+                              {aspect.type}
+                            </span>
+                            <span className="text-[10px] text-mystic-text-muted mt-1">
+                              Orb: {aspect.orb.toFixed(1)}° {aspect.isExact && <span className="text-[#D4AF37]">(Tam)</span>}
+                            </span>
+                            {p1House && (
+                              <span className="text-[9px] text-[#0EA5E9] font-bold mt-0.5">
+                                {p1House}. Evinizde
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <span className="text-white font-medium text-sm">T.{aspect.planet2}</span>
+                            <span className="text-xl text-[#0EA5E9] font-bold w-6 text-center">{PLANET_SYMBOLS[aspect.planet2] || ''}</span>
+                          </div>
+                        </div>
+                      );
+                    })
                   )}
                 </div>
               </div>

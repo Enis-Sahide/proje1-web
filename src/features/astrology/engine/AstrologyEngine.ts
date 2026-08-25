@@ -479,6 +479,7 @@ export async function generateTransitChart(
   return {
     natalChart,
     transitPlanets: mappedTransitPlanets,
-    transitAspects
+    transitAspects,
+    transitTransitAspects: transitChart.aspects
   };
 }
