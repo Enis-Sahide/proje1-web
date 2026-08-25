@@ -471,6 +471,72 @@ export default function TransitsPage() {
               </div>
             </div>
 
+            {/* Bütünsel (Holistik) Günlük Rehber */}
+            {transitData.holisticGuidance && (
+              <div className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-md border border-[#0EA5E9]/30 p-8 rounded-3xl shadow-2xl relative overflow-hidden mt-8">
+                <div className="absolute top-0 right-0 w-96 h-96 bg-[#0EA5E9]/10 rounded-full blur-3xl -z-10 translate-x-1/3 -translate-y-1/3"></div>
+                
+                <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3 border-b border-white/10 pb-4">
+                  <Compass className="text-[#0EA5E9]" size={28} /> Bütünsel Gökyüzü Rehberi (Gaia & Çakra Uyumlanması)
+                </h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                  {/* Çakralar */}
+                  <div className="bg-white/5 p-5 rounded-2xl border border-white/5 hover:border-[#0EA5E9]/20 transition-all">
+                    <span className="text-xs text-mystic-text-muted font-bold block mb-2 tracking-wider uppercase">Aktif Çakralar</span>
+                    <div className="flex flex-wrap gap-2">
+                      {transitData.holisticGuidance.activeChakras.map((c, idx) => (
+                        <span key={idx} className="text-sm font-semibold px-3 py-1.5 rounded-xl bg-[#0EA5E9]/10 text-[#0EA5E9] border border-[#0EA5E9]/20">
+                          {c}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Topraklanma */}
+                  <div className="bg-white/5 p-5 rounded-2xl border border-white/5 hover:border-[#D4AF37]/20 transition-all">
+                    <span className="text-xs text-mystic-text-muted font-bold block mb-1 tracking-wider uppercase">Topraklanma Süresi</span>
+                    <span className="text-lg font-bold text-white block mb-1">{transitData.holisticGuidance.groundingTime}</span>
+                    <p className="text-xs text-mystic-text-muted leading-relaxed">{transitData.holisticGuidance.reasoning}</p>
+                  </div>
+
+                  {/* Nefes */}
+                  <div className="bg-white/5 p-5 rounded-2xl border border-white/5 hover:border-[#0EA5E9]/20 transition-all">
+                    <span className="text-xs text-mystic-text-muted font-bold block mb-1 tracking-wider uppercase">Nefes Çalışması</span>
+                    <span className="text-lg font-bold text-white block mb-1">{transitData.holisticGuidance.breathWork.split(' (')[0]}</span>
+                    <p className="text-xs text-mystic-text-muted leading-relaxed">
+                      {transitData.holisticGuidance.breathWork.includes(' (') 
+                        ? transitData.holisticGuidance.breathWork.substring(transitData.holisticGuidance.breathWork.indexOf(' (') + 2, transitData.holisticGuidance.breathWork.length - 1)
+                        : 'Günün enerjisini dengelemek için bu çalışmayı uygulayın.'}
+                    </p>
+                  </div>
+
+                  {/* Bilinçaltı */}
+                  <div className="bg-white/5 p-5 rounded-2xl border border-white/5 hover:border-[#D4AF37]/20 transition-all">
+                    <span className="text-xs text-mystic-text-muted font-bold block mb-1 tracking-wider uppercase">Bilinçaltı Odağı</span>
+                    <p className="text-sm text-gray-200 leading-relaxed font-semibold">{transitData.holisticGuidance.subconsciousFocus}</p>
+                  </div>
+                </div>
+
+                {/* Günlük Olumlama */}
+                <div className="mt-6 bg-[#D4AF37]/5 border border-[#D4AF37]/20 p-5 rounded-2xl flex flex-col md:flex-row items-center gap-4">
+                  <div className="flex-1">
+                    <span className="text-xs text-[#D4AF37] font-bold block tracking-wider uppercase mb-1">Günün Bilinçaltı Kodlaması / Olumlaması</span>
+                    <p className="text-lg font-bold text-white italic">"{transitData.holisticGuidance.dailyAffirmation}"</p>
+                  </div>
+                  <button 
+                    onClick={() => setSelectedInterp({
+                      title: "Günün Olumlaması ve Bilinçaltı Çalışması",
+                      interpretation: `Bu olumlamayı gün içerisinde aklınıza geldikçe içinizden veya sesli olarak tekrarlayın. \n\nTransit gezegenlerin ve ev yerleşimlerinizin tetiklediği bilinçaltı alanlarında yeni nöral yollar inşa etmek ve Gaia ile uyumlanmak için harika bir çalışmadır.\n\nÖnerilen Egzersiz:\n1. 41 dakika boyunca yalın ayak çim veya toprağa basın.\n2. Bu esnada önerilen nefes çalışmasını uygulayın.\n3. Nefesi verirken bu olumlamayı içinizden tekrarlayarak bilinçaltınıza kaydedin.`
+                    })}
+                    className="px-6 py-3 rounded-2xl bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30 hover:bg-[#D4AF37]/30 transition-all font-semibold text-sm whitespace-nowrap"
+                  >
+                    Nasıl Uygulanır?
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Analysis Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               

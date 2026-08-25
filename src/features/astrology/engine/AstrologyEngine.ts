@@ -2,6 +2,7 @@ import { SwissEph, Constants } from '@fusionstrings/swisseph-wasi';
 import fs from 'fs';
 import path from 'path';
 import { ZodiacSign, Planet, AstroPoint, AstroAspect, NatalChartData, AstroCity, ASTRO_CITIES, ZODIAC_SIGNS, TransitChartData, TransitAspect } from './AstrologyConstants';
+import { calculateHolisticGuidance } from './HolisticGuidance';
 
 export { ASTRO_CITIES };
 
@@ -477,10 +478,17 @@ export async function generateTransitChart(
 
   const transitAspects = calculateTransitAspects(mappedTransitPlanets, natalChart.planets);
 
+  const holisticGuidance = calculateHolisticGuidance(
+    mappedTransitPlanets,
+    transitAspects,
+    transitChart.aspects
+  );
+
   return {
     natalChart,
     transitPlanets: mappedTransitPlanets,
     transitAspects,
-    transitTransitAspects: transitChart.aspects
+    transitTransitAspects: transitChart.aspects,
+    holisticGuidance
   };
 }
