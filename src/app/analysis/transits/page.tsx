@@ -333,6 +333,19 @@ export default function TransitsPage() {
 
 
 
+            {/* Önemli Bilgilendirme Uyarı Kutusu */}
+            <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 p-6 rounded-3xl flex items-start gap-4">
+              <AlertCircle className="text-[#D4AF37] shrink-0 mt-0.5" size={24} />
+              <div>
+                <h4 className="text-sm font-bold text-white mb-2 uppercase tracking-wider">Önemli Bilgilendirme</h4>
+                <p className="text-xs text-mystic-text-muted leading-relaxed">
+                  Sistemimiz tarafından sunulan yorumlar, astrolojik hesaplama algoritmaları ile üretilmektedir. 
+                  Astrolojide hiçbir gösterge tek başına bir anlam ifade etmez. Haritanızdaki herhangi bir gezegen konumu, ev yerleşimi veya açı; 
+                  her zaman doğum haritanızın tamamı, diğer gezegen yerleşimleri ve gökyüzünün bütünsel bağlamı ile ilişkilendirilerek değerlendirilmelidir.
+                </p>
+              </div>
+            </div>
+
             {/* Analysis Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               
