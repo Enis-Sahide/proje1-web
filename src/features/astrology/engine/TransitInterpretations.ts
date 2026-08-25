@@ -51,11 +51,11 @@ export function getTransitHouseInterpretation(transitPlanet: string, house: numb
 
   let advice = '';
   if (transitPlanet === 'Güneş' || transitPlanet === 'Mars') {
-    advice = `\n\nAstrolog Önerisi: Bu süreçte enerjinizi planlı kullanın. Bedeninizi fazla yormadan, yapıcı ve somut adımlarla ilerlemeyi seçin.`;
+    advice = `\n\nTavsiye: Bu süreçte enerjinizi planlı kullanın. Bedeninizi fazla yormadan, yapıcı ve somut adımlarla ilerlemeyi seçin.`;
   } else if (transitPlanet === 'Ay') {
-    advice = `\n\nAstrolog Önerisi: Duygusal dalgalanmaların geçici olduğunu bilin. Karar vermeden önce zihninizi sakinleştirmeye özen gösterin.`;
+    advice = `\n\nTavsiye: Duygusal dalgalanmaların geçici olduğunu bilin. Karar vermeden önce zihninizi sakinleştirmeye özen gösterin.`;
   } else if (transitPlanet === 'Satürn') {
-    advice = `\n\nAstrolog Önerisi: Karşılaştığınız engelleri birer ders olarak kabul edin. Disiplinli olmak ve sorumluluk almak size uzun vadede büyük başarı getirecektir.`;
+    advice = `\n\nTavsiye: Karşılaştığınız engelleri birer ders olarak kabul edin. Disiplinli olmak ve sorumluluk almak size uzun vadede büyük başarı getirecektir.`;
   }
 
   return {
