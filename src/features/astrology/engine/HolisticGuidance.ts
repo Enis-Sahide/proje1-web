@@ -76,37 +76,97 @@ export function calculateHolisticGuidance(
     groundingReason = `Gökyüzündeki gerilimli etkileri (${tightHardAspects.map(a => `${a.transitPlanet}-${a.natalPlanet} ${a.type}`).join(', ')}) dengelemek ve topraklamak için en az 1 saat toprakla temas edin.`;
   }
 
-  // 3. Determine Breath Work
+  // 3. Determine Breath Work and Subconscious Focus based on active aspects and houses
   let breathWork = '4-4-4 Kare Nefes';
+  const sunHouse = tSun ? tSun.house : 1;
+
+  // Check for Cazimi (Sun-Mercury conjunction with orb < 0.5°)
+  const cazimi = transitTransitAspects.find(
+    a => ((a.planet1 === 'Güneş' && a.planet2 === 'Merkür') || (a.planet1 === 'Merkür' && a.planet2 === 'Güneş')) &&
+         a.type === 'Kavuşum' && a.orb <= 0.5
+  );
+
+  let subconsciousFocus = 'Günlük rutinleri düzene sokma ve bedensel arınma.';
+  let dailyAffirmation = 'Kendimi ve bedenimi sevgiyle kabul ediyorum, Gaia ile uyum içindeyim.';
+
   if (tightHardAspects.length > 0) {
     breathWork = '4-4-8 Rahatlama Nefesi veya Pranayama (Sinir sistemini yatıştırmak için)';
-  } else {
-    // Check for Cazimi (Sun-Mercury conjunction with orb < 0.5°)
-    const cazimi = transitTransitAspects.find(
-      a => ((a.planet1 === 'Güneş' && a.planet2 === 'Merkür') || (a.planet1 === 'Merkür' && a.planet2 === 'Güneş')) &&
-           a.type === 'Kavuşum' && a.orb <= 0.5
-    );
-    if (cazimi) {
-      breathWork = 'Pranayama ve Niyet Çalışması (Cazimi - Dile benden ne dilersen kapısı açık)';
-    }
-  }
-
-  // 4. Subconscious focus
-  let subconsciousFocus = 'Günlük rutinleri düzene sokma ve bedensel arınma.';
-  if (isNewMoon || isFullMoon) {
-    subconsciousFocus = 'Rüya günlüğü tutma, eski kalıpları serbest bırakma ve niyet tohumları ekme.';
-  } else if (tightHardAspects.length > 0) {
     subconsciousFocus = 'Blokaj temizleme, gölge yönlerle yüzleşme ve travma şifalandırma çalışması.';
-  }
-
-  // 5. Daily Affirmation
-  let dailyAffirmation = 'Kendimi ve bedenimi sevgiyle kabul ediyorum, Gaia ile uyum içindeyim.';
-  if (isNewMoon) {
-    dailyAffirmation = 'Yeniliğe ve hayatın bana sunduğu tüm güzel olasılıklara kendimi açıyorum.';
-  } else if (isFullMoon) {
-    dailyAffirmation = 'Bana hizmet etmeyen tüm eski duyguları ve yükleri sevgiyle serbest bırakıyorum.';
-  } else if (tightHardAspects.length > 0) {
     dailyAffirmation = 'Fırtınaların ortasında merkezimde kalmayı, huzuru ve dengeyi seçiyorum.';
+  } else if (cazimi) {
+    // Dynamically adjust recommendations based on WHICH HOUSE the Sun-Mercury Cazimi falls in!
+    const houseThemes: Record<number, { breath: string; focus: string; affirmation: string }> = {
+      1: {
+        breath: 'Başlangıç ve Canlılık Nefesi (Cazimi - 1. evinizde bedensel yenilenme)',
+        focus: 'Kişisel hedefleri netleştirme, fiziksel canlılık ve yeni kararlar için niyet etme.',
+        affirmation: 'Kendimi tüm varlığımla kabul ediyor, hayatımda yepyeni ve parlak bir sayfa açıyorum.'
+      },
+      2: {
+        breath: 'Bolluk ve Öz Değer Nefesi (Cazimi - 2. evinizde bolluk bilinci)',
+        focus: 'Finansal niyetler yazma, öz güven tazeleme ve öz değer bilincini artırma.',
+        affirmation: 'Hayatın tüm bolluk ve bereketine kendimi açıyorum, kendi değerimin farkındayım.'
+      },
+      3: {
+        breath: 'Zihinsel Netlik Nefesi (Cazimi - 3. evinizde zihinsel vizyon)',
+        focus: 'Yeni anlaşmalar, eğitim niyetleri ve yakın çevre ilişkilerini şifalandırma.',
+        affirmation: 'Zihnim net, sözlerim güçlü ve yaratıcı fikirlerle doluyum.'
+      },
+      4: {
+        breath: 'Köklenme ve Güven Nefesi (Cazimi - 4. evinizde ailevi şifalanma)',
+        focus: 'Aile içi huzur niyetleri, köklerle barışma ve ev ortamını arındırma.',
+        affirmation: 'Köklerimden gelen güçle güvendeyim, yuvamda huzuru ve sevgiyi seçiyorum.'
+      },
+      5: {
+        breath: 'Yaratıcılık ve Neşe Nefesi (Cazimi - 5. evinizde yaratıcı manifest)',
+        focus: 'Sanatsal projeler, hobiler veya aşk hayatı için niyet tohumları ekme.',
+        affirmation: 'Hayatın neşesini ve yaratıcı enerjimi sevgiyle dışarıya yansıtıyorum.'
+      },
+      6: {
+        breath: 'Şifa ve Hizmet Nefesi (Cazimi - 6. evinizde bedensel arınma)',
+        focus: 'Sağlıklı yaşam kararları alma ve günlük çalışma düzenini şifalandırma.',
+        affirmation: 'Bedenime sevgiyle bakıyor, onu şifa, sağlık ve zindelikle dolduruyorum.'
+      },
+      7: {
+        breath: 'Uyum ve İlişki Nefesi (Cazimi - 7. evinizde ilişkileri şifalandırma)',
+        focus: 'Ortaklıklar, evlilik ve ikili ilişkilerde denge ve sevgi niyetleri.',
+        affirmation: 'İlişkilerimde sevgi, saygı ve mükemmel bir uyumu tezahür ettiriyorum.'
+      },
+      8: {
+        breath: 'Simya ve Dönüşüm Nefesi (Cazimi - 8. evinizde derin arınma)',
+        focus: 'Ortak kaynaklar, finansal kriz çözümleri ve korkuları dönüştürme çalışması.',
+        affirmation: 'Tüm korkularımı güce dönüştürüyor, hayatın akışına güvenle teslim oluyorum.'
+      },
+      9: {
+        breath: 'Bilgelik ve Keşif Nefesi (Cazimi - 9. evinizde vizyon genişletme)',
+        focus: 'Eğitim, yüksek bilgi, seyahat ve felsefi konularda yeni ufuklara niyet etme.',
+        affirmation: 'Evrenin bilgeliğine kendimi açıyor, inançlarımla hayatımı güzelleştiriyorum.'
+      },
+      10: {
+        breath: 'Başarı ve Liderlik Nefesi (Cazimi - 10. evinizde kariyer odağı)',
+        focus: 'Kariyer hedefleri yazma, iş hayatında başarı ve toplumsal statü niyetleri.',
+        affirmation: 'Kariyerimde parlıyor, sorumluluklarımı başarıyla ve güvenle yerine getiriyorum.'
+      },
+      11: {
+        breath: 'Vizyon ve Topluluk Nefesi (Cazimi - 11. evinizde gelecek idealleri)',
+        focus: 'Gelecek hedeflerini kağıda dökme, dilekleri netleştirme ve sosyal çevre niyetleri.',
+        affirmation: 'Geleceğe güvenle yürüyorum, hayallerimin kolaylıkla gerçekleşmesine izin veriyorum.'
+      },
+      12: {
+        breath: 'Rüya ve Meditasyon Nefesi (Cazimi - 12. evinizde rüyalar yoluyla manifest)',
+        focus: 'Rüya günlüğü tutma, uyku öncesi niyetler ve derin bilinçaltı blokaj temizliği.',
+        affirmation: 'Bilinçaltımdaki tüm eski kalıpları sevgiyle serbest bırakıyor, rüyalarımın rehberliğini kabul ediyorum.'
+      }
+    };
+
+    const theme = houseThemes[sunHouse] || houseThemes[12];
+    breathWork = theme.breath;
+    subconsciousFocus = theme.focus;
+    dailyAffirmation = theme.affirmation;
+  } else if (isNewMoon || isFullMoon) {
+    subconsciousFocus = 'Rüya günlüğü tutma, eski kalıpları serbest bırakma ve niyet tohumları ekme.';
+    dailyAffirmation = isNewMoon 
+      ? 'Yeniliğe ve hayatın bana sunduğu tüm güzel olasılıklara kendimi açıyorum.'
+      : 'Bana hizmet etmeyen tüm eski duyguları ve yükleri sevgiyle serbest bırakıyorum.';
   }
 
   return {
