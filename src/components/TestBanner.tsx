@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { Smartphone, X, Sparkles, ArrowRight } from 'lucide-react';
+import { Smartphone, X, Sparkles, ArrowRight, Share2 } from 'lucide-react';
 
 export default function TestBanner() {
   const [isVisible, setIsVisible] = useState(false);
@@ -29,10 +29,9 @@ export default function TestBanner() {
     setIsVisible(false);
   };
 
-  const handleJoin = () => {
+  const handleDownload = () => {
     localStorage.setItem('dismissed_test_banner', 'true');
     setIsVisible(false);
-    router.push('/test');
   };
 
   if (!isVisible) return null;
@@ -62,24 +61,36 @@ export default function TestBanner() {
           {/* Texts */}
           <div className="space-y-1">
             <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
-              7LAYERS Android Yayında!
+              7LAYERS Android Uygulaması!
               <Sparkles className="text-mystic-accent" size={14} />
             </h4>
             <p className="text-xs text-mystic-text-muted leading-relaxed">
-              Google Play onay sürecine katkı sağlamak ve uygulamamızı hemen indirmek için test ekibimize katılın.
+              Çakra, İnsan Tasarımı ve Gezegen Saatlerini cebinizden takip etmek için hemen Google Play'den indirin.
             </p>
           </div>
         </div>
 
-        {/* Action Button */}
-        <div className="mt-4 flex justify-end">
-          <button 
-            onClick={handleJoin}
+        {/* Action Buttons */}
+        <div className="mt-4 flex justify-end gap-2.5">
+          <a
+            href="https://api.whatsapp.com/send?text=Merhaba!%207LAYERS%20Android%20mobil%20uygulamasını%20Google%20Play'den%20indirebilirsin:%20https://www.7layers.tr/android"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 px-3 py-2 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 text-xs font-semibold rounded-xl transition-all duration-300 border border-emerald-500/20 hover:border-emerald-500/40 cursor-pointer"
+          >
+            <Share2 size={13} />
+            Paylaş
+          </a>
+          <a 
+            href="/android"
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={handleDownload}
             className="inline-flex items-center gap-1.5 px-4 py-2 bg-mystic-primary text-black hover:bg-mystic-accent text-xs font-bold rounded-xl transition-all duration-300 shadow-[0_0_15px_rgba(212,175,55,0.2)] hover:scale-[1.02] cursor-pointer"
           >
-            Test Ekibine Katıl
+            Hemen İndir
             <ArrowRight size={14} />
-          </button>
+          </a>
         </div>
 
       </div>
