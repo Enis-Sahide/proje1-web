@@ -51,10 +51,7 @@ export function calculateHolisticGuidance(
     activeChakras.push('Kalp Çakrası', 'Kök Çakra');
   }
 
-  // 2. Determine Grounding Time based on user rules
-  let groundingTime = 'En az 41 dakika';
-  let groundingReason = 'Yer ana (Gaia) ile hizalanmak ve rezonansa girmek için en az 41 dakika toprakla temas edin.';
-
+  // 2. Determine if today is a "Special Day" with significant triggers
   // Check for New Moon / Full Moon in transit transit aspects
   const sunMoonAspect = transitTransitAspects.find(
     a => (a.planet1 === 'Güneş' && a.planet2 === 'Ay') || (a.planet1 === 'Ay' && a.planet2 === 'Güneş')
@@ -63,10 +60,37 @@ export function calculateHolisticGuidance(
   const isNewMoon = sunMoonAspect && sunMoonAspect.type === 'Kavuşum' && sunMoonAspect.orb < 5;
   const isFullMoon = sunMoonAspect && sunMoonAspect.type === 'Karşıt' && sunMoonAspect.orb < 5;
 
-  // Check for very hard aspects (Square/Opposition with tight orb < 2°)
+  // Check for tight hard aspects (Square/Opposition with tight orb < 2°)
   const tightHardAspects = transitAspects.filter(
     a => (a.type === 'Kare' || a.type === 'Karşıt') && a.orb < 2.0
   );
+
+  // Check for any exact aspect (orb < 1.0°) that creates a direct connection
+  const exactAspects = transitAspects.filter(a => a.orb < 1.0);
+
+  // Check for Cazimi (Sun-Mercury conjunction with orb < 0.5°)
+  const cazimi = transitTransitAspects.find(
+    a => ((a.planet1 === 'Güneş' && a.planet2 === 'Merkür') || (a.planet1 === 'Merkür' && a.planet2 === 'Güneş')) &&
+         a.type === 'Kavuşum' && a.orb <= 0.5
+  );
+
+  const isSpecialDay = isNewMoon || isFullMoon || tightHardAspects.length > 0 || exactAspects.length > 0 || !!cazimi;
+
+  // If it's a calm day with no significant triggers, don't force intense advice
+  if (!isSpecialDay) {
+    return {
+      activeChakras: [],
+      groundingTime: 'Rutin Temas (15-20 dk)',
+      breathWork: 'Doğal Nefes Ritmi',
+      subconsciousFocus: 'Zihni dinlendirme, özel bir çalışma veya arınma gerekmiyor.',
+      dailyAffirmation: 'Bugün hayatın doğal akışıyla ve dengesiyle uyum içindeyim.',
+      reasoning: 'Bugün haritanızda kadersel, yoğun veya gerilimli bir göksel tetiklenme bulunmuyor. Gökyüzü sakin ve dengeli. Enerjinizi zorlamadan günlük rutininizi sürdürebilirsiniz.'
+    };
+  }
+
+  // 3. Determine Grounding Time based on user rules for Special Days
+  let groundingTime = 'En az 41 dakika';
+  let groundingReason = 'Yer ana (Gaia) ile hizalanmak ve rezonansa girmek için en az 41 dakika toprakla temas edin.';
 
   if (isNewMoon || isFullMoon) {
     groundingTime = 'Mümkünse gün boyu';
@@ -76,15 +100,9 @@ export function calculateHolisticGuidance(
     groundingReason = `Gökyüzündeki gerilimli etkileri (${tightHardAspects.map(a => `${a.transitPlanet}-${a.natalPlanet} ${a.type}`).join(', ')}) dengelemek ve topraklamak için en az 1 saat toprakla temas edin.`;
   }
 
-  // 3. Determine Breath Work and Subconscious Focus based on active aspects and houses
+  // 4. Determine Breath Work and Subconscious Focus based on active aspects and houses
   let breathWork = '4-4-4 Kare Nefes';
   const sunHouse = tSun ? tSun.house : 1;
-
-  // Check for Cazimi (Sun-Mercury conjunction with orb < 0.5°)
-  const cazimi = transitTransitAspects.find(
-    a => ((a.planet1 === 'Güneş' && a.planet2 === 'Merkür') || (a.planet1 === 'Merkür' && a.planet2 === 'Güneş')) &&
-         a.type === 'Kavuşum' && a.orb <= 0.5
-  );
 
   let subconsciousFocus = 'Günlük rutinleri düzene sokma ve bedensel arınma.';
   let dailyAffirmation = 'Kendimi ve bedenimi sevgiyle kabul ediyorum, Gaia ile uyum içindeyim.';
@@ -103,7 +121,7 @@ export function calculateHolisticGuidance(
       },
       2: {
         breath: 'Bolluk ve Öz Değer Nefesi (Cazimi - 2. evinizde bolluk bilinci)',
-        focus: 'Finansal niyetler yazma, öz güven tazeleme ve öz değer bilincini artırma.',
+        focus: 'Finansal niyetler yazma, öz güven tazeleme and öz değer bilincini artırma.',
         affirmation: 'Hayatın tüm bolluk ve bereketine kendimi açıyorum, kendi değerimin farkındayım.'
       },
       3: {
