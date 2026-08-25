@@ -51,30 +51,61 @@ export function calculateHolisticGuidance(
     activeChakras.push('Kalp Çakrası', 'Kök Çakra');
   }
 
-  // 2. Determine if today is a "Special Day" with significant triggers
-  // Check for New Moon / Full Moon in transit transit aspects
+  // 2. Score the day's transits to see if it qualifies as a Special Day matching professional standards
+  let totalScore = 0;
+
+  // New Moon / Full Moon check (2.0 points)
   const sunMoonAspect = transitTransitAspects.find(
     a => (a.planet1 === 'Güneş' && a.planet2 === 'Ay') || (a.planet1 === 'Ay' && a.planet2 === 'Güneş')
   );
+  const isNewMoon = sunMoonAspect && sunMoonAspect.type === 'Kavuşum' && sunMoonAspect.orb < 3.0;
+  const isFullMoon = sunMoonAspect && sunMoonAspect.type === 'Karşıt' && sunMoonAspect.orb < 3.0;
 
-  const isNewMoon = sunMoonAspect && sunMoonAspect.type === 'Kavuşum' && sunMoonAspect.orb < 5;
-  const isFullMoon = sunMoonAspect && sunMoonAspect.type === 'Karşıt' && sunMoonAspect.orb < 5;
+  if (isNewMoon || isFullMoon) {
+    totalScore += 2.0;
+  }
 
-  // Check for tight hard aspects (Square/Opposition with tight orb < 2°)
-  const tightHardAspects = transitAspects.filter(
-    a => (a.type === 'Kare' || a.type === 'Karşıt') && a.orb < 2.0
-  );
-
-  // Check for any exact aspect (orb < 1.0°) that creates a direct connection
-  const exactAspects = transitAspects.filter(a => a.orb < 1.0);
-
-  // Check for Cazimi (Sun-Mercury conjunction with orb < 0.5°)
+  // Cazimi check (4.0 points)
   const cazimi = transitTransitAspects.find(
     a => ((a.planet1 === 'Güneş' && a.planet2 === 'Merkür') || (a.planet1 === 'Merkür' && a.planet2 === 'Güneş')) &&
          a.type === 'Kavuşum' && a.orb <= 0.5
   );
+  if (cazimi) {
+    totalScore += 4.0;
+  }
 
-  const isSpecialDay = isNewMoon || isFullMoon || tightHardAspects.length > 0 || exactAspects.length > 0 || !!cazimi;
+  // Check transit aspects (personal transits to natal)
+  const outerPlanets = ['Jüpiter', 'Satürn', 'Uranüs', 'Neptün', 'Plüton', 'Kiron'];
+  const personalPlanets = ['Güneş', 'Ay', 'Merkür', 'Venüs', 'Mars'];
+  const criticalNatalPoints = ['Güneş', 'Ay', 'Yükselen (ASC)', 'Tepe Noktası (MC)'];
+
+  const tightHardAspects = transitAspects.filter(
+    a => (a.type === 'Kare' || a.type === 'Karşıt') && a.orb < 1.5
+  );
+
+  transitAspects.forEach(aspect => {
+    // Rule A: Outer planet exact transit to natal planet (orb < 1.5) -> 4.0 points
+    const isOuterPlanet = outerPlanets.includes(aspect.transitPlanet);
+    if (isOuterPlanet && aspect.orb < 1.5) {
+      totalScore += 4.0;
+    }
+
+    // Rule B: Personal planet transit to critical natal points with tight orb (< 1.0) and major aspects -> 3.0 points
+    const isPersonalPlanet = personalPlanets.includes(aspect.transitPlanet);
+    const isCriticalPoint = criticalNatalPoints.includes(aspect.natalPlanet);
+    const isHardAspect = aspect.type === 'Kavuşum' || aspect.type === 'Kare' || aspect.type === 'Karşıt';
+    
+    if (isPersonalPlanet && isCriticalPoint && isHardAspect && aspect.orb < 1.0) {
+      totalScore += 3.0;
+    }
+
+    // Rule C: Minor personal transits (orb < 1.0) -> 0.5 points
+    if (isPersonalPlanet && aspect.orb < 1.0 && !isCriticalPoint) {
+      totalScore += 0.5;
+    }
+  });
+
+  const isSpecialDay = totalScore >= 4.0;
 
   // If it's a calm day with no significant triggers, don't force intense advice
   if (!isSpecialDay) {
