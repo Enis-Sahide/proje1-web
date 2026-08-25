@@ -469,9 +469,10 @@ export async function generateTransitChart(
   const transitChart = await generateAstrologyChart(transitDateObj, transitCityInput || cityInput, false);
 
   // Map transit planets to natal houses
+  const natalCusps = [0, ...natalChart.houses.map(h => h.longitude)];
   const mappedTransitPlanets = transitChart.planets.map(tp => ({
     ...tp,
-    house: getHouseForLon(tp.longitude, natalChart.houses.map(h => h.longitude))
+    house: getHouseForLon(tp.longitude, natalCusps)
   }));
 
   const transitAspects = calculateTransitAspects(mappedTransitPlanets, natalChart.planets);
