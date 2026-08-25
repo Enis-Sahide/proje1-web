@@ -127,8 +127,8 @@ export default function TransitsPage() {
     const chartData = transitData.natalChart;
     const ascDegree = chartData.ascendant.longitude;
     
-    const getX = (lon: number, r: number) => CENTER + r * Math.cos((lon - ascDegree + 180) * Math.PI / 180);
-    const getY = (lon: number, r: number) => CENTER + r * Math.sin((lon - ascDegree + 180) * Math.PI / 180);
+    const getX = (lon: number, r: number) => CENTER + r * Math.cos((180 + ascDegree - lon) * Math.PI / 180);
+    const getY = (lon: number, r: number) => CENTER + r * Math.sin((180 + ascDegree - lon) * Math.PI / 180);
 
     const R_ZODIAC_OUTER = RADIUS;
     const R_ZODIAC_INNER = RADIUS - 30;
