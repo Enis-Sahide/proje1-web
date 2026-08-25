@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Compass, Loader2, Sparkles, AlertCircle, Star, X } from 'lucide-react';
-import { getTransitHouseInterpretation, getTransitAspectInterpretation, getTransitTransitAspectInterpretation } from '@/features/astrology/engine/TransitInterpretations';
+import { getTransitHouseInterpretation, getTransitAspectInterpretation } from '@/features/astrology/engine/TransitInterpretations';
 import { AstroCity, TransitChartData } from '@/features/astrology/engine/AstrologyConstants';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 
@@ -424,19 +424,7 @@ export default function TransitsPage() {
                   if (tMoon) p1 += `Duygusal pusulanız olan Ay ise an itibarıyla ${tMoon.house}. evinizden geçiş yapıyor; bu durum bugünkü ruh halinizi ve anlık reaksiyonlarınızı doğrudan "${getHouseFocus(tMoon.house)}" konularına yönlendirecek.`;
                   paragraphs.push(p1);
 
-                  // Paragraph: Transit-Transit Aspects (Kolektif Gökyüzü Havası)
-                  const transitTransitAspects = transitData.transitTransitAspects || [];
-                  const majorTTAspects = [...transitTransitAspects].filter(a => a.isExact).slice(0, 2);
-                  if (majorTTAspects.length > 0) {
-                    let pTT = `Bugün gökyüzünde genel (kolektif) olarak çok etkili göksel kombinasyonlar devrede. `;
-                    majorTTAspects.forEach(a => {
-                      const p1House = transitData.transitPlanets.find(p => p.name === a.planet1)?.house;
-                      pTT += `Gökyüzündeki Transit ${a.planet1} ile Transit ${a.planet2} ${a.type} açısı yapıyor ve bu kolektif enerji sizin haritanızda doğrudan ${p1House ? `${p1House}. Evinizde` : 'kader alanınızda'} gerçekleşiyor. Bu durum, yaşamınızın bu alanında küresel etkilerin bireysel hayatınıza yansımasını hızlandıracaktır. `;
-                    });
-                    paragraphs.push(pTT);
-                  }
-
-                  // Paragraph 3: Exact Aspects
+                  // Paragraph 2: Exact Aspects
                   if (exactAspects.length > 0) {
                     const mainAspect = exactAspects[0];
                     let p2 = `Günün sizin üzerinizdeki en belirgin kadersel tetiklenmesi ise Transit ${mainAspect.transitPlanet} ile Natal ${mainAspect.natalPlanet} arasındaki ${mainAspect.orb.toFixed(1)}° toleranslı ${mainAspect.type} açısıdır. `;
@@ -453,7 +441,7 @@ export default function TransitsPage() {
                          const themesText = affectedThemes.join(', ').replace(/, ([^,]*)$/, ' ve $1');
                          paragraphs.push(`⚠️ Gökyüzünde ayrıca gerilimli etkileşimler devrede. Özellikle "${themesText}" konularında dışarıdan gelen baskılara karşı bugün ani tepkiler vermekten veya fevri kararlar almaktan kaçınmalısınız. Olaylara daha geniş bir perspektiften bakmak ve sabırlı kalmak size çok şey kazandıracaktır.`);
                       } else {
-                         paragraphs.push(`⚠️ Gökyüzünde ayrıca bazı sert etkileşimler devrede olduğu için, bugün genel olarak ani tepkiler vermekten veya fevri kararlar almanız çok önemli. Sabırlı olmak size kazandıracaktır.`);
+                         paragraphs.push(`⚠️ Gökyüzünde ayrıca bazı sert etkileşimler devrede olduğu için, bugün genel olarak ani tepkiler vermekten veya fevri kararlar almaktan kaçınmanız çok önemli. Sabırlı olmak size kazandıracaktır.`);
                       }
                     } else {
                       paragraphs.push(`✨ Gökyüzündeki bu uyumlu akış, size yenilikler ve fırsatlar sunmak için destekleyici bir enerji veriyor. Harekete geçmek için harika bir gün!`);
@@ -471,74 +459,8 @@ export default function TransitsPage() {
               </div>
             </div>
 
-            {/* Bütünsel (Holistik) Günlük Rehber */}
-            {transitData.holisticGuidance && (
-              <div className="bg-gradient-to-br from-black/60 to-black/40 backdrop-blur-md border border-[#0EA5E9]/30 p-8 rounded-3xl shadow-2xl relative overflow-hidden mt-8">
-                <div className="absolute top-0 right-0 w-96 h-96 bg-[#0EA5E9]/10 rounded-full blur-3xl -z-10 translate-x-1/3 -translate-y-1/3"></div>
-                
-                <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-3 border-b border-white/10 pb-4">
-                  <Compass className="text-[#0EA5E9]" size={28} /> Bütünsel Gökyüzü Rehberi (Gaia & Çakra Uyumlanması)
-                </h3>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {/* Çakralar */}
-                  <div className="bg-white/5 p-5 rounded-2xl border border-white/5 hover:border-[#0EA5E9]/20 transition-all">
-                    <span className="text-xs text-mystic-text-muted font-bold block mb-2 tracking-wider uppercase">Aktif Çakralar</span>
-                    <div className="flex flex-wrap gap-2">
-                      {transitData.holisticGuidance.activeChakras.map((c, idx) => (
-                        <span key={idx} className="text-sm font-semibold px-3 py-1.5 rounded-xl bg-[#0EA5E9]/10 text-[#0EA5E9] border border-[#0EA5E9]/20">
-                          {c}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Topraklanma */}
-                  <div className="bg-white/5 p-5 rounded-2xl border border-white/5 hover:border-[#D4AF37]/20 transition-all">
-                    <span className="text-xs text-mystic-text-muted font-bold block mb-1 tracking-wider uppercase">Topraklanma Süresi</span>
-                    <span className="text-lg font-bold text-white block mb-1">{transitData.holisticGuidance.groundingTime}</span>
-                    <p className="text-xs text-mystic-text-muted leading-relaxed">{transitData.holisticGuidance.reasoning}</p>
-                  </div>
-
-                  {/* Nefes */}
-                  <div className="bg-white/5 p-5 rounded-2xl border border-white/5 hover:border-[#0EA5E9]/20 transition-all">
-                    <span className="text-xs text-mystic-text-muted font-bold block mb-1 tracking-wider uppercase">Nefes Çalışması</span>
-                    <span className="text-lg font-bold text-white block mb-1">{transitData.holisticGuidance.breathWork.split(' (')[0]}</span>
-                    <p className="text-xs text-mystic-text-muted leading-relaxed">
-                      {transitData.holisticGuidance.breathWork.includes(' (') 
-                        ? transitData.holisticGuidance.breathWork.substring(transitData.holisticGuidance.breathWork.indexOf(' (') + 2, transitData.holisticGuidance.breathWork.length - 1)
-                        : 'Günün enerjisini dengelemek için bu çalışmayı uygulayın.'}
-                    </p>
-                  </div>
-
-                  {/* Bilinçaltı */}
-                  <div className="bg-white/5 p-5 rounded-2xl border border-white/5 hover:border-[#D4AF37]/20 transition-all">
-                    <span className="text-xs text-mystic-text-muted font-bold block mb-1 tracking-wider uppercase">Bilinçaltı Odağı</span>
-                    <p className="text-sm text-gray-200 leading-relaxed font-semibold">{transitData.holisticGuidance.subconsciousFocus}</p>
-                  </div>
-                </div>
-
-                {/* Günlük Olumlama */}
-                <div className="mt-6 bg-[#D4AF37]/5 border border-[#D4AF37]/20 p-5 rounded-2xl flex flex-col md:flex-row items-center gap-4">
-                  <div className="flex-1">
-                    <span className="text-xs text-[#D4AF37] font-bold block tracking-wider uppercase mb-1">Günün Bilinçaltı Kodlaması / Olumlaması</span>
-                    <p className="text-lg font-bold text-white italic">"{transitData.holisticGuidance.dailyAffirmation}"</p>
-                  </div>
-                  <button 
-                    onClick={() => setSelectedInterp({
-                      title: "Günün Olumlaması ve Bilinçaltı Çalışması",
-                      interpretation: `Bu olumlamayı gün içerisinde aklınıza geldikçe içinizden veya sesli olarak tekrarlayın. \n\nTransit gezegenlerin ve ev yerleşimlerinizin tetiklediği bilinçaltı alanlarında yeni nöral yollar inşa etmek ve Gaia ile uyumlanmak için harika bir çalışmadır.\n\nÖnerilen Egzersiz:\n1. 41 dakika boyunca yalın ayak çim veya toprağa basın.\n2. Bu esnada önerilen nefes çalışmasını uygulayın.\n3. Nefesi verirken bu olumlamayı içinizden tekrarlayarak bilinçaltınıza kaydedin.`
-                    })}
-                    className="px-6 py-3 rounded-2xl bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30 hover:bg-[#D4AF37]/30 transition-all font-semibold text-sm whitespace-nowrap"
-                  >
-                    Nasıl Uygulanır?
-                  </button>
-                </div>
-              </div>
-            )}
-
             {/* Analysis Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               
               {/* Transitlerin Düştüğü Evler */}
               <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-8 rounded-3xl shadow-2xl">
@@ -600,52 +522,6 @@ export default function TransitsPage() {
                         </div>
                       </div>
                     ))
-                  )}
-                </div>
-              </div>
-
-              {/* Gökyüzünün Kendi Açıları (Genel Hava Durumu) */}
-              <div className="bg-black/50 backdrop-blur-md border border-[#D4AF37]/30 p-8 rounded-3xl shadow-2xl">
-                <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Kolektif Gökyüzü Açıları (Hava Durumu)</h3>
-                <p className="text-sm text-mystic-text-muted mb-4">Gezegenlerin gökyüzünde kendi aralarında yaptığı ve dünya genelini etkileyen güncel açılar.</p>
-                <div className="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
-                  {!transitData.transitTransitAspects || transitData.transitTransitAspects.length === 0 ? (
-                    <p className="text-mystic-text-muted text-center py-4">Şu an gökyüzünde majör bir göksel açı bulunmuyor.</p>
-                  ) : (
-                    transitData.transitTransitAspects.sort((a,b) => a.orb - b.orb).map((aspect, i) => {
-                      const p1House = transitData.transitPlanets.find(p => p.name === aspect.planet1)?.house;
-                      return (
-                        <div 
-                          key={`tta-${i}`} 
-                          className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-white/20 hover:bg-white/10 transition-colors cursor-pointer"
-                          onClick={() => setSelectedInterp(getTransitTransitAspectInterpretation(aspect.planet1, aspect.planet2, aspect.type, p1House))}
-                        >
-                          <div className="flex items-center gap-2">
-                            <span className="text-xl text-[#0EA5E9] font-bold w-6 text-center">{PLANET_SYMBOLS[aspect.planet1] || ''}</span>
-                            <span className="text-white font-medium text-sm">T.{aspect.planet1}</span>
-                          </div>
-                          
-                          <div className="flex flex-col items-center flex-1 px-2">
-                            <span className="text-xs font-bold px-2 py-1 rounded bg-white/10" style={{ color: ASPECT_COLORS[aspect.type] }}>
-                              {aspect.type}
-                            </span>
-                            <span className="text-[10px] text-mystic-text-muted mt-1">
-                              Orb: {aspect.orb.toFixed(1)}° {aspect.isExact && <span className="text-[#D4AF37]">(Tam)</span>}
-                            </span>
-                            {p1House && (
-                              <span className="text-[9px] text-[#0EA5E9] font-bold mt-0.5">
-                                {p1House}. Evinizde
-                              </span>
-                            )}
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <span className="text-white font-medium text-sm">T.{aspect.planet2}</span>
-                            <span className="text-xl text-[#0EA5E9] font-bold w-6 text-center">{PLANET_SYMBOLS[aspect.planet2] || ''}</span>
-                          </div>
-                        </div>
-                      );
-                    })
                   )}
                 </div>
               </div>

@@ -43,21 +43,11 @@ export interface TransitAspect {
   isExact: boolean;
 }
 
-export interface HolisticGuidanceData {
-  activeChakras: string[];
-  groundingTime: string;
-  breathWork: string;
-  subconsciousFocus: string;
-  dailyAffirmation: string;
-  reasoning: string;
-}
-
 export interface TransitChartData {
   natalChart: NatalChartData;
   transitPlanets: AstroPoint[];
   transitAspects: TransitAspect[];
   transitTransitAspects: AstroAspect[];
-  holisticGuidance?: HolisticGuidanceData;
 }
 
 export const ZODIAC_SIGNS: ZodiacSign[] = [
