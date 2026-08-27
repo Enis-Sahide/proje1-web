@@ -432,7 +432,7 @@ export const downloadKabbalahPDF = async (
     if (intercepted.length > 0) {
       interceptedText = `Kıstırılan (Intercepted) Burçlar: ${intercepted.join(' ve ')}. Bu burçlar, bu alemdeki en derin ve kilitli karmik potansiyellerinizi işaret eder.`;
     } else {
-      interceptedText = "Bu harita katmanında kıstırılmış burç bulunmamaktadır. Tüm enerjiler doğrudan ev alanlarınıza akmaktadır.";
+      interceptedText = "Bu harita boyutunda kıstırılmış burç bulunmamaktadır. Tüm enerjiler doğrudan ev alanlarınıza akmaktadır.";
     }
     const splitIntercepted = doc.splitTextToSize(tr(interceptedText), 170);
     doc.text(splitIntercepted, 20, currentY);

@@ -3,9 +3,9 @@ export const ASTROLOGY_LESSONS: Record<string, any> = {
   // SEVİYE 1: ÇIRAKLIK (Fiziksel Katman - Assiah)
   // ==============================
   '1_nedir': {
-    title: 'Ders 1: 4 Katmanlı Ezoterik Astrolojiye Giriş',
+    title: 'Ders 1: 4 Boyutlu Ezoterik Astrolojiye Giriş',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/astro_layers.png' },
-    content: 'Astroloji gökyüzündeki gezegenlerin bize ne yapacağını söyleyen deterministik (kaderci) bir kehanet sanatı değildir. Ezoterik Sırlar Okulu disiplininde Astroloji, ruhun evrimini gösteren muazzam bir "Kozmik Saat" ve şifre çözme sanatıdır.\n\nSıradan astroloji sadece fiziksel olaylarla ilgilenirken, gerçek bir inisiye haritayı 4 farklı boyutta okumayı öğrenir:\n1. Fiziksel Katman (Assiah): Olaylar, para, evlilik, beden sağlığı. "Ne oluyor?"\n2. Psikolojik Katman (Yetzirah): Arketipler, çocukluk, savunma mekanizmaları. "Neden böyle davranıyorum?"\n3. Karmik Katman (Briah): Ruhun geçmişi, Ay Düğümleri, atalardan gelen borçlar. "Buraya hangi dersi geçmeye geldim?"\n4. Ezoterik Katman (Atziluth): Ruhun evrensel hizmeti, tekamül amacı, Tanrısal bilince ulaşma. "Büyük plandaki görevim nedir?"\n\nBu eğitim boyunca evrenin bu 4 boyutlu şifresini adım adım çözeceksiniz.'
+    content: 'Astroloji gökyüzündeki gezegenlerin bize ne yapacağını söyleyen deterministik (kaderci) bir kehanet sanatı değildir. Ezoterik Sırlar Okulu disiplininde Astroloji, ruhun evrimini gösteren muazzam bir "Kozmik Saat" ve şifre çözme sanatıdır.\n\nSıradan astroloji sadece fiziksel olaylarla ilgilenirken, gerçek bir inisiye haritayı 4 farklı boyutta okumayı öğrenir:\n1. Fiziksel Boyut (Assiah): Olaylar, para, evlilik, beden sağlığı. "Ne oluyor?"\n2. Psikolojik Boyut (Yetzirah): Arketipler, çocukluk, savunma mekanizmaları. "Neden böyle davranıyorum?"\n3. Karmik Boyut (Briah): Ruhun geçmişi, Ay Düğümleri, atalardan gelen borçlar. "Buraya hangi dersi geçmeye geldim?"\n4. Ezoterik Boyut (Atziluth): Ruhun evrensel hizmeti, tekamül amacı, Tanrısal bilince ulaşma. "Büyük plandaki görevim nedir?"\n\nBu eğitim boyunca evrenin bu 4 boyutlu şifresini adım adım çözeceksiniz.'
   },
   '1_harita_nasil_okunur': {
     title: 'Ders 2: Astrolojik Harita Nasıl Okunur? (Sentez Formülü)',
@@ -13,8 +13,8 @@ export const ASTROLOGY_LESSONS: Record<string, any> = {
     content: 'Bir doğum haritası okurken parçaları ayrı ayrı değil, bir tiyatro sahnesi gibi sentezleyerek okumak zorundasınız. Bunun için altın kural şudur:\n\nGEZEGEN = KİM? (Aktör / İçsel Güç)\nBURÇ = NASIL? (Kostüm / Tarz)\nEV = NEREDE? (Sahne / Yaşam Alanı)\n\nÖrnek Sentez (Mars Koç\'ta 7. Evde):\n- Kim? Mars (Savaşçı / Öfke)\n- Nasıl? Koç (Sabırsız, Atılgan, Lider)\n- Nerede? 7. Ev (Evlilik, Ortaklık, Düşmanlar)\nOkuma: Kişi evliliklerinde veya ortaklıklarında oldukça sabırsız ve çatışmacı (rekabetçi) olabilir. Enerjisini ilişkiler arenasında harcayacaktır.\n\nAçılar (Aspects):\nGezegenlerin birbirleriyle yaptıkları açılar, bu aktörlerin sahnede kavga mı ettiklerini yoksa yardımlaştıklarını mı gösterir:\n- Kavuşum (0 Derece): İki enerjinin kaynaşmasıdır (Güçlü bir odak noktası).\n- Kare (90 Derece): İçsel gerilim, kriz, çatışma ve eyleme geçme zorunluluğu (Gelişim fırsatı).\n- Karşıt (180 Derece): Dış dünyada, özellikle ikili ilişkilerde yansıtılan açık çatışma veya tamamlanma ihtiyacı.\n- Üçgen (120 Derece): Doğuştan gelen, hiç çaba harcamadan akan rahat enerji ve yetenek.',
   },
   '1_evler_katman1': {
-    title: 'Ders 3: 12 Evin 1. Katman Anlamı (Fiziksel / Dünyevi)',
-    content: '1. Katman, dünyada 3 boyutlu illüzyon içinde (Maya) yaşarken deneyimlediğimiz fiziksel tezahürlerdir. Doğum haritasındaki 12 evin dünyevi (fiziksel olay) anlamları şunlardır:',
+    title: 'Ders 3: 12 Evin 1. Boyut Anlamı (Fiziksel / Dünyevi)',
+    content: '1. Boyut, dünyada 3 boyutlu illüzyon içinde (Maya) yaşarken deneyimlediğimiz fiziksel tezahürlerdir. Doğum haritasındaki 12 evin dünyevi (fiziksel olay) anlamları şunlardır:',
     items: [
       { title: '1. Ev (Yükselen)', content: 'Fiziksel görünümünüz, bedensel sağlığınız, doğduğunuz anki çevre şartlarınız ve dış dünyanın taktığı maskedir (Persona).' },
       { title: '2. Ev', content: 'Cüzdanınız, banka hesabınız, sahip olduğunuz taşınır mallar ve dünyevi yeteneklerinizle kazandığınız paradır.' },
@@ -36,11 +36,11 @@ export const ASTROLOGY_LESSONS: Record<string, any> = {
   },
 
   // ==============================
-  // SEVİYE 2: KALFALIK (Psikolojik ve Karmik Katman - Yetzirah & Briah)
+  // SEVİYE 2: KALFALIK (2. Boyut: Yetzirah - Psikolojik)
   // ==============================
   '2_evler_katman2': {
-    title: 'Ders 5: 12 Evin 2. Katman Anlamı (Psikolojik Arketipler)',
-    content: 'Bu katmanda haritayı artık olaylar üzerinden değil, psikolojik süreçler, çocukluk travmaları ve gölge yanlar üzerinden okuruz (Yetzirah).',
+    title: 'Ders 5: 12 Evin 2. Boyut Anlamı (Psikolojik Arketipler)',
+    content: 'Bu boyutta haritayı artık olaylar üzerinden değil, psikolojik süreçler, çocukluk travmaları ve gölge yanlar üzerinden okuruz (Yetzirah).',
     items: [
       { title: '1. Ev (Psikolojik)', content: 'Egonun dünyayla ilk karşılaşması. Bireyin hayatta kalmak için geliştirdiği birincil savunma mekanizmasıdır. Benliğin şekillenmesi.' },
       { title: '2. Ev (Psikolojik)', content: 'Özdeğer duygusudur. Kişinin "Ben değerli miyim?" sorusuna verdiği içsel yanıttır. Maddi birikim arzusu, aslında içsel boşluğu ve yetersizliği doldurma çabasıdır.' },
@@ -57,12 +57,12 @@ export const ASTROLOGY_LESSONS: Record<string, any> = {
     ]
   },
   '2_karmik_katman': {
-    title: 'Ders 6: Karmik Katman ve Ay Düğümleri',
-    content: '3. Katman (Briah), ruhun bu hayata neden geldiğinin ve geçmiş enkarnasyonlarından taşıdığı borçların okunduğu Karmik Katmandır.\n\nGüney Ay Düğümü (GAD):\nRuhun geçmiş yaşamlarında ustalaştığı, uzmanı olduğu ama artık onu aşağı çeken bir "Konfor Alanı"dır. GAD burcu ve evi, kişinin doğuştan getirdiği yetenekleri gösterir ancak bu hayatta ruh tekamül etmek için bu yetenekleri bırakıp zıt yöne gitmelidir.\n\nKuzey Ay Düğümü (KAD):\nRuhun bu hayattaki nihai sınavı, hiç bilmediği, korktuğu ama mutlaka öğrenmesi gereken hedef noktasıdır (Kutup Yıldızı). KAD\'ye gitmek zorlu ve sancılıdır ancak ruhsal tatmin sadece oradadır.\n\nRetro (Geri Giden) Gezegenler:\nDoğum anınızda bir gezegen Retro ise, o gezegenin temsil ettiği enerjide geçmiş yaşamlarda bir hata, israf veya tamamlanmamış bir ders (Karmik Borç) vardır. Örneğin Retro Venüs, geçmişte aşkta veya değerlerde yapılan haksızlıkları düzeltmek için kişiyi bu hayatta içsel sevgi sınavlarına sokar.\n\nKiron (Yaralı Şifacı):\nHaritanızda hiçbir zaman tam olarak iyileşmeyen, kanayan en derin ruhsal yaranızdır. Kiron, kişinin kendine merhem olamadığı ama başkalarını iyileştirerek (şifa dağıtarak) kendi yarasını uyuşturabildiği anahtardır.'
+    title: 'Ders 6: Karmik Boyut ve Ay Düğümleri',
+    content: '3. Boyut (Briah), ruhun bu hayata neden geldiğinin ve geçmiş enkarnasyonlarından taşıdığı borçların okunduğu Karmik Boyuttur.\n\nGüney Ay Düğümü (GAD):\nRuhun geçmiş yaşamlarında ustalaştığı, uzmanı olduğu ama artık onu aşağı çeken bir "Konfor Alanı"dır. GAD burcu ve evi, kişinin doğuştan getirdiği yetenekleri gösterir ancak bu hayatta ruh tekamül etmek için bu yetenekleri bırakıp zıt yöne gitmelidir.\n\nKuzey Ay Düğümü (KAD):\nRuhun bu hayattaki nihai sınavı, hiç bilmediği, korktuğu ama mutlaka öğrenmesi gereken hedef noktasıdır (Kutup Yıldızı). KAD\'ye gitmek zorlu ve sancılıdır ancak ruhsal tatmin sadece oradadır.\n\nRetro (Geri Giden) Gezegenler:\nDoğum anınızda bir gezegen Retro ise, o gezegenin temsil ettiği enerjide geçmiş yaşamlarda bir hata, israf veya tamamlanmamış bir ders (Karmik Borç) vardır. Örneğin Retro Venüs, geçmişte aşkta veya değerlerde yapılan haksızlıkları düzeltmek için kişiyi bu hayatta içsel sevgi sınavlarına sokar.\n\nKiron (Yaralı Şifacı):\nHaritanızda hiçbir zaman tam olarak iyileşmeyen, kanayan en derin ruhsal yaranızdır. Kiron, kişinin kendine merhem olamadığı ama başkalarını iyileştirerek (şifa dağıtarak) kendi yarasını uyuşturabildiği anahtardır.'
   },
   '2_evler_katman3': {
-    title: 'Ders 7: 12 Evin 3. Katman Anlamı (Karmik ve Ruhsal)',
-    content: 'Bu katmanda Evler, reenkarnasyon döngüsündeki sınavlar, geçmiş yaşam bağlantıları ve ruhun şifreleri olarak okunur.',
+    title: 'Ders 7: 12 Evin 3. Boyut Anlamı (Karmik ve Ruhsal)',
+    content: 'Bu boyutta Evler, reenkarnasyon döngüsündeki sınavlar, geçmiş yaşam bağlantıları ve ruhun şifreleri olarak okunur.',
     items: [
       { title: '1. Ev (Karmik)', content: 'Ruhun bu hayatta giydiği yeni kostümün kodları. Enkarnasyon anındaki ruhsal seçimi gösterir.' },
       { title: '2. Ev (Karmik)', content: 'Geçmiş yaşamdan getirilen ruhsal ve manevi yetenekler/değerler. Sadece para değil, ruhun hazinesidir.' },
@@ -79,13 +79,12 @@ export const ASTROLOGY_LESSONS: Record<string, any> = {
     ]
   },
 
-  // ==============================
-  // SEVİYE 3: ÜSTATLIK (Ezoterik Katman - Atziluth)
+  // SEVİYE 3: ÜSTATLIK (Ezoterik Boyut - Atziluth)
   // ==============================
   '3_ezoterik_katman': {
-    title: 'Ders 8: 4. Katman (Ezoterik/İlahi Plan)',
+    title: 'Ders 8: 4. Boyut (Ezoterik/İlahi Plan)',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/astro_aspects.png' },
-    content: 'Ezoterik Astroloji (Atziluth), Alice Bailey ve Tibetli Üstat Djwhal Khul öğretilerine dayanır. Bu katmanda "Ben" yoktur, "BİZ" vardır. Ruh, kişisel dertlerinden, para ve evlilik gibi kaygılarından arınmıştır. O artık Dünya gezegenine hizmet eden bir işçidir.\n\nSabit Yıldızlar (Fixed Stars):\nHaritanızda eğer bir gezegen Regulus, Sirius, Antares, Spica gibi sabit bir yıldıza temas ediyorsa; kişi dünyevi kaderinin ötesinde, tanrısal bir yetki (veya trajedi) ile donatılmıştır. Gökyüzündeki Tanrıların müdahalesidir.\n\nHeliocentric (Güneş Merkezli) Harita:\nBizler dünyadan gökyüzüne bakarak (Geocentric) harita çıkarırız (Ego haritası). Ancak merkezine Güneş\'i (Ruhu/Tanrıyı) alıp dünyanın da bir gezegen olduğu Heliocentric haritaya bakarsak, ruhun yüksek benliğinin galaksideki gerçek rotasını, öz amacını ve ilahi plandaki büyük görevini görürüz.\n\nEzoterik Yönetici Gezegenler:\nSıradan astrolojide Koç burcunu Mars yönetir (savaş ve rekabet). Ancak Ezoterik katmanda Koç burcunun yöneticisi Merkür\'dür; çünkü evrilmiş bir Koç, zihinsel aydınlanmayı cesaretle kitlelere getiren bir Işık Elçisidir.'
+    content: 'Ezoterik Astroloji (Atziluth), Alice Bailey ve Tibetli Üstat Djwhal Khul öğretilerine dayanır. Bu boyutta "Ben" yoktur, "BİZ" vardır. Ruh, kişisel dertlerinden, para ve evlilik gibi kaygılarından arınmıştır. O artık Dünya gezegenine hizmet eden bir işçidir.\n\nSabit Yıldızlar (Fixed Stars):\nHaritanızda eğer bir gezegen Regulus, Sirius, Antares, Spica gibi sabit bir yıldıza temas ediyorsa; kişi dünyevi kaderinin ötesinde, tanrısal bir yetki (veya trajedi) ile donatılmıştır. Gökyüzündeki Tanrıların müdahalesidir.\n\nHeliocentric (Güneş Merkezli) Harita:\nBizler dünyadan gökyüzüne bakarak (Geocentric) harita çıkarırız (Ego haritası). Ancak merkezine Güneş\'i (Ruhu/Tanrıyı) alıp dünyanın da bir gezegen olduğu Heliocentric haritaya bakarsak, ruhun yüksek benliğinin galaksideki gerçek rotasını, öz amacını ve ilahi plandaki büyük görevini görürüz.\n\nEzoterik Yönetici Gezegenler:\nSıradan astrolojide Koç burcunu Mars yönetir (savaş ve rekabet). Ancak Ezoterik boyutta Koç burcunun yöneticisi Merkür\'dür; çünkü evrilmiş bir Koç, zihinsel aydınlanmayı cesaretle kitlelere getiren bir Işık Elçisidir.'
   },
   '3_burclar_ezoterik': {
     title: 'Ders 9: 12 Burcun Ezoterik (Tekamül) Şifreleri',
@@ -106,13 +105,13 @@ export const ASTROLOGY_LESSONS: Record<string, any> = {
     ]
   },
   '3_harita_entegrasyonu': {
-    title: 'Ders 10: 4 Katmanlı Harita Entegrasyonu ve Ödevler',
-    content: 'Doğum haritasını bu 4 katman üzerinden okurken en önemli altın kural sırayı takip etmektir. Bir danışanın veya kendinizin fiziksel hayatındaki tıkanıklıkları (1. Katman: Asiyah) çözmeden ve psikolojik gölgelerini (2. Katman: Yetzirah) entegre etmeden, onu ezoterik amaçlarına (3. Katman: Briah) veya galaktik kökenlerine (4. Katman: Atziluth) yönlendirmek havada kalacaktır. Gerçek ezoterizm, yukarısı ile aşağısını birleştirmektir.\n\n4 Katmanlı Okuma Sentezi:\n1. Adım (Asiyah): Element dengesi ve ASC yöneticisi analiz edilerek fiziksel donanım belirlenir.\n2. Adım (Yetzirah): Ay, Merkür ve Chiron konumlarına bakılarak duygusal yaralar ve savunma mekanizmaları çözülür.\n3. Adım (Briah): Ezoterik yöneticiler ve Kuzey Ay Düğümü aksı incelenerek bu enkarnasyondaki ruhsal dersler ortaya çıkarılır.\n4. Adım (Atziluth): Sabit yıldızlar, Galaktik Merkez kavuşumları ve Yıldız Kökenleri (Starseed) hesaplanarak ilahi plandaki kozmik misyon ve Monad bağlantısı entegre edilir.',
+    title: 'Ders 10: 4 Boyutlu Harita Entegrasyonu ve Ödevler',
+    content: 'Doğum haritasını bu 4 boyut üzerinden okurken en önemli altın kural sırayı takip etmektir. Bir danışanın veya kendinizin fiziksel hayatındaki tıkanıklıkları (1. Boyut: Asiyah) çözmeden ve psikolojik gölgelerini (2. Boyut: Yetzirah) entegre etmeden, onu ezoterik amaçlarına (3. Boyut: Briah) veya galaktik kökenlerine (4. Boyut: Atziluth) yönlendirmek havada kalacaktır. Gerçek ezoterizm, yukarısı ile aşağısını birleştirmektir.\n\n4 Boyutlu Okuma Sentezi:\n1. Adım (Asiyah): Element dengesi ve ASC yöneticisi analiz edilerek fiziksel donanım belirlenir.\n2. Adım (Yetzirah): Ay, Merkür ve Chiron konumlarına bakılarak duygusal yaralar ve savunma mekanizmaları çözülür.\n3. Adım (Briah): Ezoterik yöneticiler ve Kuzey Ay Düğümü aksı incelenerek bu enkarnasyondaki ruhsal dersler ortaya çıkarılır.\n4. Adım (Atziluth): Sabit yıldızlar, Galaktik Merkez kavuşumları ve Yıldız Kökenleri (Starseed) hesaplanarak ilahi plandaki kozmik misyon ve Monad bağlantısı entegre edilir.',
     items: [
       { title: 'Ödev 1: Element & Köklenme Analizi', content: 'Kendi haritanızdaki element dağılımını çıkartın. Eksik elementi tespit edip dünyevi (Asiyah) düzeyde bunu dengelemek için 1 hafta boyunca somut pratikler yapın.' },
       { title: 'Ödev 2: Ay Burcu & Bilinçaltı İncelemesi', content: 'Ay burcunuzun yerleştiği evi ve açılarını inceleyin. Çocukluktan gelen en güçlü 3 savunma mekanizmanızı yazın ve Yetzirah planında gölge yönlerinizle yüzleşin.' },
       { title: 'Ödev 3: Ezoterik Yönetici Haritası', content: 'Haritanızdaki Güneş ve Kuzey Ay Düğümü\'nün ezoterik yöneticilerini bulun. Bu gezegenlerin konumlarına bakarak ruhsal amacınızın yol haritasını çizin.' },
-      { title: 'Ödev 4: Sabit Yıldız Kavuşumları', content: 'Haritanızdaki köşe noktaların ve kişisel gezegenlerin sabit yıldızlarla olan kavuşumlarını (1° orb ile) listeleyin. Kozmik Öz (Atziluth) seviyesindeki galaktik bağlantılarınızı araştırın.' }
+      { title: 'Ödev 4: Sabit Yıldız Kavuşumları', content: 'Haritanızdaki köşe noktaların ve kişisel gezegenlerin sabit yıldızlarla olan kavuşumlarını (1° orb ile) listeleyin. Kozmik Öz (Atziluth) boyutundaki galaktik bağlantılarınızı araştırın.' }
     ]
   }
 };

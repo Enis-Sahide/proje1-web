@@ -88,7 +88,7 @@ const INITIAL_TIERS: Tier[] = [
     price: '999 TL / Ay',
     description: 'Sırları çözün ve üstatlığa yükselin. Kadim Uygulamalar ve özel nefes çalışmaları.',
     benefits: [
-      '4 katmanlı harita analizi',
+      '4 boyutlu harita okuması',
       'Kadim uygulamalar',
       'Her dersin çıraklık, kalfa ve ustalık seviyesi',
       'Ustalık dersi sınavları',

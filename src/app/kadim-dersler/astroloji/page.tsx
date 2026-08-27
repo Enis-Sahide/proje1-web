@@ -119,7 +119,7 @@ export default function AstrolojiPage() {
             <h1 className="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-mystic-primary via-yellow-200 to-mystic-primary tracking-wide">
               Ezoterik Astroloji
             </h1>
-            <p className="text-mystic-text-muted mt-1 text-sm md:text-base italic">4 Katmanlı Ruhsal Harita Okuma Sanatı</p>
+            <p className="text-mystic-text-muted mt-1 text-sm md:text-base italic">4 Boyutlu Ruhsal Harita Okuma Sanatı</p>
           </div>
         </div>
 

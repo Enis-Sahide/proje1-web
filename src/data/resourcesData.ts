@@ -105,7 +105,7 @@ export const RESOURCES = [
     type: 'book',
     fileUrl: '',
     level: 2,
-    description: '4 katmanlı ruhsal harita okuma sanatı ve gezegenlerin ezoterik yöneticilerinin ruhun tekamülü üzerindeki etkilerini açıklayan temel kaynak.',
+    description: '4 boyutlu ruhsal harita okuma sanatı ve gezegenlerin ezoterik yöneticilerinin ruhun tekamülü üzerindeki etkilerini açıklayan temel kaynak.',
     sort: 13
   },
   {

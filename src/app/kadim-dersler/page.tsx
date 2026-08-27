@@ -71,7 +71,7 @@ export default function KadimDerslerPage() {
     { 
       id: 'astroloji', 
       title: 'Ezoterik Astroloji', 
-      desc: '4 katmanlı ruhsal doğum haritası okuma sanatı. Gezegenler, evler ve burçların derin ezoterik anlamları.',
+      desc: '4 boyutlu ruhsal doğum haritası okuma sanatı. Gezegenler, evler ve burçların derin ezoterik anlamları.',
       icon: <Compass size={28} className="text-blue-400" />, 
       route: '/kadim-dersler/astroloji'
     },

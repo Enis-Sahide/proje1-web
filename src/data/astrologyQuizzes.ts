@@ -3,11 +3,11 @@ import { Quiz } from './allQuizzes';
 export const astrologyQuiz1: Quiz = {
   id: "astroloji_1",
   title: "1. Derece: Çıraklık Sınavı",
-  description: "Fiziksel Katman (Assiah), harita okuma sentez kuralları, evlerin 1. katman dünyevi anlamları ve gezegen arketipleri sınavı. (20 Soru)",
+  description: "Fiziksel Boyut (Assiah), harita okuma sentez kuralları, evlerin 1. boyut dünyevi anlamları ve gezegen arketipleri sınavı. (20 Soru)",
   questions: [
     {
       id: "ast_1",
-      question: "Sıradan astroloji ile '4 Katmanlı Ezoterik Astroloji' arasındaki en temel fark nedir?",
+      question: "Sıradan astroloji ile '4 Boyutlu Ezoterik Astroloji' arasındaki en temel fark nedir?",
       options: [
         "Ezoterik haritanın sadece Ay burcuna odaklanması",
         "Sıradan astrolojinin sadece fiziksel (Assiah) olaylarla ilgilenmesi, ezoterik astrolojinin ise haritayı 4 derinlikte (Olay, Psikoloji, Karma, Ruhsal) okuması",
@@ -15,7 +15,7 @@ export const astrologyQuiz1: Quiz = {
         "Sıradan astrolojinin sadece Güneş merkezli (Heliocentric) hesaplama yapması"
       ],
       correctAnswerIndex: 1,
-      explanation: "Sıradan astroloji sadece dünyevi/fiziksel olayları (Ne olacak?) incelerken, ezoterik astroloji ruhun tekamülünü ve 4 farklı varoluş katmanını (Assiah, Yetzirah, Briah, Atziluth) sentezler."
+      explanation: "Sıradan astroloji sadece dünyevi/fiziksel olayları (Ne olacak?) incelerken, ezoterik astroloji ruhun tekamülünü ve 4 farklı varoluş boyutunu (Assiah, Yetzirah, Briah, Atziluth) sentezler."
     },
     {
       id: "ast_2",
@@ -499,11 +499,11 @@ export const astrologyQuiz2: Quiz = {
 export const astrologyQuiz3: Quiz = {
   id: "astroloji_3",
   title: "3. Derece: Üstatlık Sınavı",
-  description: "Ezoterik Katman (Atziluth), burçların tekamül şifreleri, sabit yıldızlar, heliocentric harita ve 4 katmanlı okuma sentez adımları. (20 Soru)",
+  description: "Ezoterik Boyut (Atziluth), burçların tekamül şifreleri, sabit yıldızlar, heliocentric harita ve 4 boyutlu okuma sentez adımları. (20 Soru)",
   questions: [
     {
       id: "ast_41",
-      question: "Ezoterik Astroloji katmanındaki (Atziluth) temel felsefi odak noktası nedir?",
+      question: "Ezoterik Astroloji boyutundaki (Atziluth) temel felsefi odak noktası nedir?",
       options: [
         "Bireyin daha zengin olması ve evlenmesi",
         "Kişisel egoyu (Ben) aşarak, kolektifin evrimine ve dünyaya hizmet eden bir ruh haline gelmek (Biz)",
@@ -695,10 +695,10 @@ export const astrologyQuiz3: Quiz = {
     },
     {
       id: "ast_57",
-      question: "4 Katmanlı Harita Entegrasyonundaki en temel altın kural hangisidir?",
+      question: "4 Boyutlu Harita Entegrasyonundaki en temel altın kural hangisidir?",
       options: [
-        "Sadece 4. katmandaki sabit yıldızları dikkate almak",
-        "Fiziksel (1. Katman) ve Psikolojik (2. Katman) tıkanıklıkları çözmeden, kişiyi doğrudan ezoterik ve ruhsal amaçlara yönlendirmemek",
+        "Sadece 4. boyuttaki sabit yıldızları dikkate almak",
+        "Fiziksel (1. Boyut) ve Psikolojik (2. Boyut) tıkanıklıkları çözmeden, kişiyi doğrudan ezoterik ve ruhsal amaçlara yönlendirmemek",
         "Yükselen burcu her zaman ihmal etmek",
         "Sadece retro gezegenlerin olduğu evleri okumak"
       ],
@@ -715,7 +715,7 @@ export const astrologyQuiz3: Quiz = {
         "İkiz alev kodlarını"
       ],
       correctAnswerIndex: 1,
-      explanation: "1. Adım dünyevi katmandır. Element dağılımı ve ASC yöneticisi analiz edilerek fiziksel donanım dengelenir."
+      explanation: "1. Adım dünyevi boyuttur. Element dağılımı ve ASC yöneticisi analiz edilerek fiziksel donanım dengelenir."
     },
     {
       id: "ast_59",
@@ -727,7 +727,7 @@ export const astrologyQuiz3: Quiz = {
         "Sadece Güney Ay Düğümünü"
       ],
       correctAnswerIndex: 1,
-      explanation: "2. Adım psikolojik katmandır. Ay, Merkür ve Chiron analiz edilerek bilinçaltı yaralar ve egonun savunma mekanizmaları çözülür."
+      explanation: "2. Adım psikolojik boyuttur. Ay, Merkür ve Chiron analiz edilerek bilinçaltı yaralar ve egonun savunma mekanizmaları çözülür."
     },
     {
       id: "ast_60",
