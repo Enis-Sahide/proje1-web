@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { ArrowLeft, Loader2, Search, Triangle, Star, Compass, AlertCircle, ChevronDown, CheckCircle2, Moon, Sun, MoonStar } from 'lucide-react';
+import { ArrowLeft, Loader2, Search, Triangle, Star, Compass, AlertCircle, ChevronDown, CheckCircle2, Moon, Sun, MoonStar, Sparkles } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ASTRO_CITIES, AstroPoint, NatalChartData, AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 // Interpretations are fetched from the backend API.
@@ -375,6 +375,36 @@ export default function KabbalahAnalysisPage() {
                   </div>
                 </div>
               </div>
+
+              {/* Aktif Bilinç Boyutu Kartı */}
+              {kabbalahAnalysis.activeConsciousness && (
+                <div className="p-8 rounded-2xl border border-[#0EA5E9]/30 bg-[#0EA5E9]/5 backdrop-blur-sm max-w-3xl mx-auto relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#0EA5E9] opacity-20 blur-[50px] pointer-events-none"></div>
+                  
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 rounded-xl bg-[#0EA5E9] text-black">
+                      <Sparkles size={24} />
+                    </div>
+                    <div>
+                      <h3 className="text-xl font-bold mb-1 text-[#0EA5E9]">
+                        Aktif Bilinç Boyutunuz (Gökyüzü Tetiklenmesi)
+                      </h3>
+                      <h4 className="text-lg font-bold text-white mb-3">
+                        {kabbalahAnalysis.activeConsciousness.title}
+                      </h4>
+                      <p className="text-white/90 leading-relaxed mb-4">
+                        {kabbalahAnalysis.activeConsciousness.reason}
+                      </p>
+                      <div className="p-4 bg-black/40 rounded-xl border border-white/5">
+                        <h5 className="text-sm font-bold text-[#0EA5E9] mb-1 uppercase tracking-wider">Mevcut Tekamül Tavsiyesi</h5>
+                        <p className="text-sm text-gray-300 leading-relaxed">
+                          {kabbalahAnalysis.activeConsciousness.explanation}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {chartData[selectedWorld]?.esoteric && (
                 <div className="p-8 rounded-2xl border bg-[#6A0DAD]/10 border-[#6A0DAD]/30 max-w-3xl mx-auto backdrop-blur-sm relative overflow-hidden">
