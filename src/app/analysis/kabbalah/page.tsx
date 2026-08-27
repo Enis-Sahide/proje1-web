@@ -381,8 +381,13 @@ export default function KabbalahAnalysisPage() {
                 <div className="p-8 rounded-2xl border border-[#0EA5E9]/30 bg-[#0EA5E9]/5 backdrop-blur-sm max-w-3xl mx-auto relative overflow-hidden">
                   <div className="absolute top-0 right-0 w-32 h-32 bg-[#0EA5E9] opacity-20 blur-[50px] pointer-events-none"></div>
                   
+                  {/* Güncel Gökyüzü Etkisi Etiketi */}
+                  <div className="absolute top-4 right-4 bg-[#0EA5E9]/20 text-[#0EA5E9] border border-[#0EA5E9]/30 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
+                    Güncel Gökyüzü Etkisi (Geçici)
+                  </div>
+
                   <div className="flex items-start gap-4">
-                    <div className="p-3 rounded-xl bg-[#0EA5E9] text-black">
+                    <div className="p-3 rounded-xl bg-[#0EA5E9] text-black shrink-0">
                       <Sparkles size={24} />
                     </div>
                     <div>
@@ -392,13 +397,24 @@ export default function KabbalahAnalysisPage() {
                       <h4 className="text-lg font-bold text-white mb-3">
                         {kabbalahAnalysis.activeConsciousness.title}
                       </h4>
-                      <p className="text-white/90 leading-relaxed mb-4">
+                      <p className="text-white/90 leading-relaxed mb-4 text-sm">
                         {kabbalahAnalysis.activeConsciousness.reason}
                       </p>
-                      <div className="p-4 bg-black/40 rounded-xl border border-white/5">
-                        <h5 className="text-sm font-bold text-[#0EA5E9] mb-1 uppercase tracking-wider">Mevcut Tekamül Tavsiyesi</h5>
-                        <p className="text-sm text-gray-300 leading-relaxed">
+                      
+                      <div className="p-4 bg-black/40 rounded-xl border border-white/5 mb-4">
+                        <h5 className="text-xs font-bold text-[#0EA5E9] mb-1 uppercase tracking-wider">Mevcut Tekamül Tavsiyesi</h5>
+                        <p className="text-xs text-gray-300 leading-relaxed">
                           {kabbalahAnalysis.activeConsciousness.explanation}
+                        </p>
+                      </div>
+
+                      {/* Bilgilendirme ve Mobil Reklam Dipnotları */}
+                      <div className="space-y-2 border-t border-white/10 pt-4 mt-2">
+                        <p className="text-[10px] text-mystic-text-muted leading-relaxed">
+                          ⚠️ <strong>Önemli Bilgilendirme:</strong> Raporunuzda yer alan genel Kabalistik analizleriniz (1., 2., 3. ve 4. Boyut yerleşimleriniz) doğum haritanızın ömür boyu değişmeyen kalıcı potansiyelleridir. Ancak yukarıdaki "Aktif Bilinç Boyutunuz" kartında sunulan bilgi, yalnızca sorgulama yaptığınız bugün ({new Date().toLocaleDateString('tr-TR')}) tarihindeki güncel gökyüzü hareketlerine göre hesaplanmış geçici ve dönemsel bir tekamül odak noktasıdır.
+                        </p>
+                        <p className="text-[10px] text-[#0EA5E9]/80 leading-relaxed font-medium">
+                          ✨ <strong>Kozmik İpucu:</strong> Gökyüzü sürekli hareket halindedir. Önümüzdeki aylarda bu tetiklenmenin nasıl değiştiğini görmek, yeni kapılarınızı keşfetmek ve güncel kozmik ödevlerinizi takip etmek için dilediğiniz zaman uygulamamıza girerek güncel durumunuzu ücretsiz kontrol edebilirsiniz.
                         </p>
                       </div>
                     </div>
