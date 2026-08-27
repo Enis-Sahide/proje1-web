@@ -101,7 +101,7 @@ export async function POST(req: NextRequest) {
         name: 'Assiah',
         title: 'Güncel Tekamül Odak Noktanız: Fiziksel ve Dünyevi Boyut (Assiah)',
         reason: asiyahCount > 0 
-          ? 'Gökyüzündeki güncel gezegen geçişleri doğrudan Yükselen (ASC), Tepe Noktası (MC) veya Güneş derecelerinizi tetikliyor. Bu durum, üst boyutlardaki (Beriyah/Atziluth) ruhsal potansiyelinizi yeryüzüne yansıtabilmeniz için şu an öncelikle kariyer, maddiyat, hedefler veya fiziksel sağlık gibi somut, dünyevi konuları (Assiah Boyutu) yapılandırmanız gerektiğine işaret eder.'
+          ? 'Güncel transitler sebebiyle; Yükselen (ASC), Tepe Noktası (MC) veya Güneş dereceleriniz tetikleniyor. Bu durum, üst boyutlardaki (Beriyah/Atziluth) ruhsal potansiyelinizi yeryüzüne yansıtabilmeniz için şu an öncelikle kariyer, maddiyat, hedefler veya fiziksel sağlık gibi somut, dünyevi konuları (Assiah Boyutu) yapılandırmanız gerektiğine işaret eder.'
           : 'Yaş döngünüz ve temel gökyüzü etkileriniz gereği, şu an enerjiniz fiziksel dünyaya köklenme, düzen kurma ve dünyevi sorumluluklar üzerinde çalışmaktadır.',
         explanation: 'Üst boyutlardaki ruhsal potansiyelinizi yeryüzünde daha güçlü hissedebilmek için, evren şu an sizi somut ve dünyevi konularla sınıyor olabilir. Bedeninize iyi bakmak, bütçenizi yönetmek ve dünyevi sorumluluklarınızı yüksek bir farkındalıkla ele almak, üst boyutların kapısını aralamanıza yardımcı olacak en temel tekamül adımıdır.'
       },
@@ -109,15 +109,15 @@ export async function POST(req: NextRequest) {
         name: 'Yetzirah',
         title: 'Güncel Tekamül Odak Noktanız: Psikolojik ve Duygusal Boyut (Yetzirah)',
         reason: yetzirahCount > 0
-          ? 'Güncel transit gezegenler Ay, Merkür veya Venüs derecelerinizi tetikliyor. Bu durum, bilinçaltı kalıplarınızın, ilişkilerinizi ve hücresel hafızanızdaki eski duygusal yaraları (Yetzirah Boyutu) şifalandırmanız gerektiğine işaret eder.'
-          : 'Güncel transit gezegenler Ay, Merkür veya Venüs derecelerinizi doğrudan tetiklemiyor olsa da, mevcut döngünüz gereği bilinçaltı kalıplarınızı, ilişkilerinizi ve hücresel hafızanızdaki eski duygusal yaraları (Yetzirah Boyutu) şifalandırmanız gerektiğine işaret eder.',
+          ? 'Güncel transitler sebebiyle; Ay, Merkür veya Venüs dereceleriniz tetikleniyor. Bu durum, bilinçaltı kalıplarınızın, ilişkilerinizi ve hücresel hafızanızdaki eski duygusal yaraları (Yetzirah Boyutu) şifalandırmanız gerektiğine işaret eder.'
+          : 'Güncel transitler sebebiyle; Ay, Merkür veya Venüs dereceleriniz doğrudan tetiklenmiyor olsa da, mevcut döngünüz gereği bilinçaltı kalıplarınızı, ilişkilerinizi ve hücresel hafızanızdaki eski duygusal yaraları (Yetzirah Boyutu) şifalandırmanız gerektiğine işaret eder.',
         explanation: 'Şu anki tekamül sınavınız duygusal ve psikolojik boyuttan (Yetzirah) geliyor olabilir. Bu dönemde karşınıza çıkan zihinsel karmaşaları veya ikili ilişkilerdeki zorlukları yüksek bir farkındalıkla yönetebilirseniz, üst haritalarınızın ruhsal potansiyelini yaşamınıza başarıyla entegre etmeye başladığınızı göreceksiniz.'
       },
       3: {
         name: 'Beriyah',
         title: 'Güncel Tekamül Odak Noktanız: Ruhsal Görevler ve Zihin Boyutu (Beriyah)',
         reason: beriyahCount > 0
-          ? 'Transitler şu an Mars, Jüpiter veya Satürn derecelerinizle etkileşimde. Bu durum, kişisel egonun ve duygusal dramaların ötesine geçerek, ruhunuzun bu dünyadaki ezoterik görevlerini, kadersel yolunu ve yaşam amacını (Beriyah Boyutu) inşa etmeniz gereken ana eşikte olduğunuzu gösterir.'
+          ? 'Güncel transitler sebebiyle; Mars, Jüpiter veya Satürn dereceleriniz tetikleniyor. Bu durum, kişisel egonun ve duygusal dramaların ötesine geçerek, ruhunuzun bu dünyadaki ezoterik görevlerini, kadersel yolunu ve yaşam amacını (Beriyah Boyutu) inşa etmeniz gereken ana eşikte olduğunuzu gösterir.'
           : 'Yaş döngünüz gereği (Satürn Dönüşü sonrası), artık hayatın sadece fiziksel veya duygusal yönüyle yetinemezsiniz; ruhsal görevlerinizi ciddiye alma ve kaderinizi yapılandırma zamanınız gelmiştir.',
         explanation: 'Şu anki tekamül odağınız doğrudan ruhsal görevleriniz ve zihin boyutunuzdan (Beriyah) geliyor olabilir. Bu dönemde karşınıza çıkan sorumlulukları ve yaşam amacınıza dair sorgulamaları yüksek bir olgunlukla ele alabilirseniz, üst haritalarınızın bilgelik gücünü yaşamınıza başarıyla entegre etmeye başladığınızı göreceksiniz.'
       },
@@ -125,7 +125,7 @@ export async function POST(req: NextRequest) {
         name: 'Atzilut',
         title: 'Güncel Tekamül Odak Noktanız: Kozmik ve İlahi Kudret Boyutu (Atzilut)',
         reason: atzilutCount > 0
-          ? 'Transit gezegenler haritanızdaki Uranüs, Neptün, Plüton veya Kiron derecelerinizi ve Sabit Yıldızlarınızı doğrudan tetikliyor. Bu durum, sizi dünyevi sınırların dışına çıkararak doğrudan ilahi akışa, kozmik uyanışa ve galaktik kökenlerinizle (Atziluth Boyutu) hizalanmaya davet ediyor.'
+          ? 'Güncel transitler sebebiyle; haritanızdaki Uranüs, Neptün, Plüton veya Kiron dereceleriniz ile Sabit Yıldızlarınız doğrudan tetikleniyor. Bu durum, sizi dünyevi sınırların dışına çıkararak doğrudan ilahi akışa, kozmik uyanışa ve galaktik kökenlerinizle (Atziluth Boyutu) hizalanmaya davet ediyor.'
           : 'Olgunluk yaş döngünüz (Uranüs Karşıtlığı ve Kiron Dönüşü sonrası), sizi dünyevi sınırların dışına çıkararak doğrudan ilahi akışa (Atzilut) bağlamaktadır.',
         explanation: 'Şu anki tekamül odağınız doğrudan en yüksek kozmik ve ilahi boyuttan (Atzilut) geliyor olabilir. Bu dönemde karşınıza çıkan mistik sorgulamaları veya ani uyanışları kişisel hırslardan uzak, yüksek bir teslimiyetle yönetebilirseniz, sabit yıldızlarınızın ve kozmik rehberlerinizin gücünü yaşamınıza başarıyla entegre etmeye başladığınızı göreceksiniz.'
       }
