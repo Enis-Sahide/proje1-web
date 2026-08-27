@@ -343,7 +343,15 @@ export const downloadKabbalahPDF = async (
   doc.setTextColor(grayText[0], grayText[1], grayText[2]);
   doc.text(`Konum: ${locationStr}   |   Doğum Bilgileri: ${dateStr}`, 20, 60);
 
-  currentY = 75;
+  // Objectivity/Software validation statement on Cover Page (Introductory Disclaimer)
+  doc.setFont('LiberationSans', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(148, 163, 184); // #94a3b8
+  const infoText = "Bu analiz raporu ezoterik kadim astroloji ve kabala kaynaklarından derlenmiş olup, tamamen algoritmik yazılım sistemi tarafından, insan yorumu ve kişisel önyargılardan bağımsız olarak objektif bir biçimde oluşturulmuştur.";
+  const splitInfo = doc.splitTextToSize(infoText, 170);
+  doc.text(splitInfo, 20, 66);
+
+  currentY = 86;
 
   // --- General Kabbalistic Overview ---
   checkSpace(70);
@@ -383,42 +391,36 @@ export const downloadKabbalahPDF = async (
     // Draw background rectangle (cyan/blue theme)
     doc.setFillColor(15, 30, 60); // Dark blue background
     doc.setDrawColor(14, 165, 233); // Cyan border
-    doc.rect(20, currentY, 170, 85, 'FD'); // Fill and border
+    doc.rect(20, currentY, 170, 100, 'FD'); // Fill and border
 
     doc.setTextColor(14, 165, 233);
-    doc.setFontSize(11);
+    doc.setFontSize(13); // Increased font size
     doc.setFont('LiberationSans', 'bold');
     doc.text(ac.title, 24, currentY + 8);
 
     doc.setTextColor(white[0], white[1], white[2]);
-    doc.setFontSize(9.5);
+    doc.setFontSize(10.5); // Increased font size
     doc.setFont('LiberationSans', 'normal');
     
-    let textY = drawTextWithBold(doc, ac.reason, 24, currentY + 16, 162, 5.5);
+    let textY = drawTextWithBold(doc, ac.reason, 24, currentY + 18, 162, 6.0); // Increased Y offset and line height
     
     doc.setTextColor(gold[0], gold[1], gold[2]);
     doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(10.5); // Increased font size
     doc.text("MEVCUT TEKAMÜL TAVSİYESİ", 24, textY + 2);
     doc.setFont('LiberationSans', 'normal');
     doc.setTextColor(220, 220, 220);
-    textY = drawTextWithBold(doc, ac.explanation, 24, textY + 8, 162, 5.0);
+    textY = drawTextWithBold(doc, ac.explanation, 24, textY + 8, 162, 6.0); // Increased line height
 
     // Render static vs transit warning footnote
     doc.setTextColor(160, 160, 160);
-    doc.setFontSize(7.5);
+    doc.setFontSize(8.5); // Increased font size
     const dateToday = new Date().toLocaleDateString('tr-TR');
     const warningText = `Önemli Bilgilendirme: Bu harita boyutları ömür boyu değişmeyen kalıcı potansiyellerinizdir. Ancak bu "Aktif Bilinç Boyutu" kartı, yalnızca sorgulama yapılan bugün (${dateToday}) tarihindeki güncel transit gezegen etkilerine göre hesaplanmış geçici bir dönem ödevidir. Canlı gökyüzü değişimlerini ve güncellenen ödevlerinizi takip etmek için dilediğiniz zaman uygulamamıza girerek güncel analizleri kontrol edebilirsiniz.`;
-    drawTextWithBold(doc, warningText, 24, textY + 2, 162, 4.0);
+    drawTextWithBold(doc, warningText, 24, textY + 2, 162, 4.5); // Increased line height
 
-    currentY += 92;
+    currentY += 107;
   }
-
-  // Objectivity/Software validation statement on Cover Page
-  doc.setFont('LiberationSans', 'normal');
-  doc.setFontSize(10);
-  doc.setTextColor(148, 163, 184); // #94a3b8
-  const infoText = "Bu analiz raporu ezoterik kadim astroloji ve kabala kaynaklarından derlenmiş olup, tamamen algoritmik yazılım sistemi tarafından, insan yorumu ve kişisel önyargılardan bağımsız olarak objektif bir biçimde oluşturulmuştur.";
-  doc.text(doc.splitTextToSize(infoText, 170), 20, 260);
 
   // --- 4 Worlds Analysis ---
   const worldKeys = ['assiah', 'yetzirah', 'beriyah', 'atzilut'] as const;
