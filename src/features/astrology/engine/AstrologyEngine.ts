@@ -27,7 +27,7 @@ async function getSwe(): Promise<SwissEph> {
   }
   
   // Ephemeris dosya yolunu geçerli dizin olarak ayarla
-  swe.swe_set_ephe_path('.');
+  swe.set_ephe_path('.');
   
   sweInstance = swe;
   return sweInstance;
