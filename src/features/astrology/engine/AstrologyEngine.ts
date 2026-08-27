@@ -14,8 +14,22 @@ async function getSwe(): Promise<SwissEph> {
   const wasmPath = path.join(process.cwd(), 'public', 'wasm', 'libswephe.wasm');
   const wasmBuffer = fs.readFileSync(wasmPath);
   const module = new WebAssembly.Module(wasmBuffer);
-  sweInstance = new SwissEph(module);
+  const swe = new SwissEph(module);
   
+  // Ephemeris dosyalarını oku ve WASM ortamına bağla (mount)
+  const filesToMount = ['sepl_18.se1', 'semo_18.se1', 'seas_18.se1'];
+  for (const filename of filesToMount) {
+    const filePath = path.join(process.cwd(), 'public', 'ephe', filename);
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath);
+      swe.mount(filename, content);
+    }
+  }
+  
+  // Ephemeris dosya yolunu geçerli dizin olarak ayarla
+  swe.swe_set_ephe_path('.');
+  
+  sweInstance = swe;
   return sweInstance;
 }
 
