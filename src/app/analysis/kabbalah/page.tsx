@@ -397,23 +397,23 @@ export default function KabbalahAnalysisPage() {
                       <h4 className="text-lg font-bold text-white mb-3">
                         {kabbalahAnalysis.activeConsciousness.title}
                       </h4>
-                      <p className="text-white/90 leading-relaxed mb-4 text-sm">
+                      <p className="text-white/90 leading-relaxed mb-4 text-sm md:text-base">
                         {kabbalahAnalysis.activeConsciousness.reason}
                       </p>
                       
                       <div className="p-4 bg-black/40 rounded-xl border border-white/5 mb-4">
-                        <h5 className="text-xs font-bold text-[#0EA5E9] mb-1 uppercase tracking-wider">Mevcut Tekamül Tavsiyesi</h5>
-                        <p className="text-xs text-gray-300 leading-relaxed">
+                        <h5 className="text-xs md:text-sm font-bold text-[#0EA5E9] mb-1 uppercase tracking-wider">Mevcut Tekamül Tavsiyesi</h5>
+                        <p className="text-sm md:text-base text-gray-300 leading-relaxed">
                           {kabbalahAnalysis.activeConsciousness.explanation}
                         </p>
                       </div>
 
                       {/* Bilgilendirme ve Mobil Reklam Dipnotları */}
                       <div className="space-y-2 border-t border-white/10 pt-4 mt-2">
-                        <p className="text-[10px] text-mystic-text-muted leading-relaxed">
+                        <p className="text-xs md:text-sm text-mystic-text-muted leading-relaxed">
                           ⚠️ <strong>Önemli Bilgilendirme:</strong> Raporunuzda yer alan genel Kabalistik analizleriniz (1., 2., 3. ve 4. Boyut yerleşimleriniz) doğum haritanızın ömür boyu değişmeyen kalıcı potansiyelleridir. Ancak yukarıdaki "Aktif Bilinç Boyutunuz" kartında sunulan bilgi, yalnızca sorgulama yaptığınız bugün ({new Date().toLocaleDateString('tr-TR')}) tarihindeki güncel gökyüzü hareketlerine göre hesaplanmış geçici ve dönemsel bir tekamül odak noktasıdır.
                         </p>
-                        <p className="text-[10px] text-[#0EA5E9]/80 leading-relaxed font-medium">
+                        <p className="text-xs md:text-sm text-[#0EA5E9]/80 leading-relaxed font-medium">
                           ✨ <strong>Kozmik İpucu:</strong> Gökyüzü sürekli hareket halindedir. Önümüzdeki aylarda bu tetiklenmenin nasıl değiştiğini görmek, yeni kapılarınızı keşfetmek ve güncel kozmik ödevlerinizi takip etmek için dilediğiniz zaman uygulamamıza girerek güncel durumunuzu ücretsiz kontrol edebilirsiniz.
                         </p>
                       </div>
