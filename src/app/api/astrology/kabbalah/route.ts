@@ -109,8 +109,8 @@ export async function POST(req: NextRequest) {
         name: 'Yetzirah',
         title: 'Güncel Tekamül Odak Noktanız: Psikolojik ve Duygusal Boyut (Yetzirah)',
         reason: yetzirahCount > 0
-          ? 'Güncel transit gezegenler Ay, Merkür veya Venüs derecelerinizi tetiklemüyor olsa da, mevcut döngünüz gereği bilinçaltı kalıplarınızı, ilişkilerinizi ve hücresel hafızanızdaki eski duygusal yaraları (Yetzirah Boyutu) şifalandırmanız gerektiğine işaret eder.'
-          : 'Mevcut astrolojik döngünüz, sizi geçmiş yaşam kalıplarınızı, atalardan gelen duygusal bağlarınızı ve korkularınızı çözmeye çağırmaktadır.',
+          ? 'Güncel transit gezegenler Ay, Merkür veya Venüs derecelerinizi tetikliyor. Bu durum, bilinçaltı kalıplarınızın, ilişkilerinizi ve hücresel hafızanızdaki eski duygusal yaraları (Yetzirah Boyutu) şifalandırmanız gerektiğine işaret eder.'
+          : 'Güncel transit gezegenler Ay, Merkür veya Venüs derecelerinizi doğrudan tetiklemiyor olsa da, mevcut döngünüz gereği bilinçaltı kalıplarınızı, ilişkilerinizi ve hücresel hafızanızdaki eski duygusal yaraları (Yetzirah Boyutu) şifalandırmanız gerektiğine işaret eder.',
         explanation: 'Şu anki tekamül sınavınız duygusal ve psikolojik boyuttan (Yetzirah) geliyor olabilir. Bu dönemde karşınıza çıkan zihinsel karmaşaları veya ikili ilişkilerdeki zorlukları yüksek bir farkındalıkla yönetebilirseniz, üst haritalarınızın ruhsal potansiyelini yaşamınıza başarıyla entegre etmeye başladığınızı göreceksiniz.'
       },
       3: {
