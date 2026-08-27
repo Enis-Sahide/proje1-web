@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
         reason: asiyahCount > 0 
           ? 'Gökyüzündeki güncel gezegen geçişleri doğrudan Yükselen (ASC), Tepe Noktası (MC) veya Güneş derecelerinizi tetikliyor. Bu durum, üst boyutlardaki (Beriyah/Atziluth) ruhsal potansiyelinizi yeryüzüne yansıtabilmeniz için şu an öncelikle kariyer, maddiyat, hedefler veya fiziksel sağlık gibi somut, dünyevi konuları (Assiah Boyutu) yapılandırmanız gerektiğine işaret eder.'
           : 'Yaş döngünüz ve temel gökyüzü etkileriniz gereği, şu an enerjiniz fiziksel dünyaya köklenme, düzen kurma ve dünyevi sorumluluklar üzerinde çalışmaktadır.',
-        explanation: 'Assiah alemi Malkut (Krallık) sefirasıyla yönetilir. Üst boyutlardaki ruhsal haritalarınız arka planda aktiftir. Ancak evren şu an sizi soyut teorilerle değil, pratik ve dünyevi eylemlerle sınamaktadır. Fiziksel bedeninize iyi bakmak, bütçenizi düzene sokmak ve somut kararlar almak, bu dönem üst boyutlara geçişinizi sağlayacak en temel tekamül anahtarınızdır.'
+        explanation: 'Assiah alemi Malkut (Krallık) sefirasıyla yönetilir. Üst boyutlardaki ruhsal haritalarınıza geçiş yapabilmek ve buralardaki potansiyelinizi yeryüzünde kalıcı kılabilmek için, evren şu an sizi soyut teorilerle değil, pratik ve dünyevi eylemlerle sınamaktadır. Fiziksel bedeninize iyi bakmak, bütçenizi düzene sokmak ve somut kararlar almak, bu dönem üst boyutların kapısını aralayacak en temel tekamül anahtarınızdır.'
       },
       2: {
         name: 'Yetzirah',
@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
         reason: yetzirahCount > 0
           ? 'Güncel transit gezegenler Ay, Merkür veya Venüs derecelerinizi tetikliyor. Bu durum, 3. ve 4. boyutlardaki ruhsal potansiyelinizi hayatınıza tam olarak akıtabilmeniz için şu an öncelikle bilinçaltı kalıplarınızı, ilişkilerinizi ve hücresel hafızanızdaki eski duygusal yaraları (Yetzirah Boyutu) şifalandırmanız gerektiğine işaret eder.'
           : 'Mevcut astrolojik döngünüz, sizi geçmiş yaşam kalıplarınızı, atalardan gelen duygusal bağlarınızı ve korkularınızı çözmeye çağırmaktadır.',
-        explanation: '3. haritanız (Beriyah - Ruhsal Yol) arka planda aktif olarak çalışmaktadır. Ancak gökyüzünün bu dönemdeki mesajı nettir: Ruhsal hedeflerinize ve yaşam amacınıza tıkanmadan yürüyebilmek için, şu an zihninizi veya ilişkilerinizi meşgul eden Yetzirah (Duygusal Boyut) sınavını başarıyla vermeli ve buradaki duygusal yükleri serbest bırakmalısınız.'
+        explanation: 'Potansiyel olarak üst boyutların (Beriyah/Atziluth) kapıları önünüzde açık olsa da, gökyüzünün bu dönemdeki mesajı nettir: Ruhsal hedeflerinize ve yaşam amacınıza tıkanmadan yürüyebilmek için, şu an zihninizi veya ilişkilerinizi meşgul eden Yetzirah (Duygusal Boyut) sınavını başarıyla vermeli ve buradaki duygusal yükleri serbest bırakmalısınız.'
       },
       3: {
         name: 'Beriyah',
