@@ -368,6 +368,51 @@ export const downloadKabbalahPDF = async (
   drawTextWithBold(doc, kabbalahAnalysis.shortcutMessage, 24, currentY + 16, 162, 5.5);
   currentY += 55;
 
+  // --- Active Consciousness Trigger Section ---
+  if ((kabbalahAnalysis as any).activeConsciousness) {
+    const ac = (kabbalahAnalysis as any).activeConsciousness;
+    currentY += 5;
+    
+    // Header for active consciousness
+    doc.setTextColor(gold[0], gold[1], gold[2]);
+    doc.setFontSize(13);
+    doc.setFont('LiberationSans', 'bold');
+    doc.text("Aktif Bilinç Boyutunuz (Gökyüzü Tetiklenmesi)", 20, currentY);
+    currentY += 6;
+
+    // Draw background rectangle (cyan/blue theme)
+    doc.setFillColor(15, 30, 60); // Dark blue background
+    doc.setDrawColor(14, 165, 233); // Cyan border
+    doc.rect(20, currentY, 170, 85, 'FD'); // Fill and border
+
+    doc.setTextColor(14, 165, 233);
+    doc.setFontSize(11);
+    doc.setFont('LiberationSans', 'bold');
+    doc.text(ac.title, 24, currentY + 8);
+
+    doc.setTextColor(white[0], white[1], white[2]);
+    doc.setFontSize(9.5);
+    doc.setFont('LiberationSans', 'normal');
+    
+    let textY = drawTextWithBold(doc, ac.reason, 24, currentY + 16, 162, 5.5);
+    
+    doc.setTextColor(gold[0], gold[1], gold[2]);
+    doc.setFont('LiberationSans', 'bold');
+    doc.text("MEVCUT TEKAMÜL TAVSİYESİ", 24, textY + 2);
+    doc.setFont('LiberationSans', 'normal');
+    doc.setTextColor(220, 220, 220);
+    textY = drawTextWithBold(doc, ac.explanation, 24, textY + 8, 162, 5.0);
+
+    // Render static vs transit warning footnote
+    doc.setTextColor(160, 160, 160);
+    doc.setFontSize(7.5);
+    const dateToday = new Date().toLocaleDateString('tr-TR');
+    const warningText = `Önemli Bilgilendirme: Bu harita boyutları ömür boyu değişmeyen kalıcı potansiyellerinizdir. Ancak bu "Aktif Bilinç Boyutu" kartı, yalnızca sorgulama yapılan bugün (${dateToday}) tarihindeki güncel transit gezegen etkilerine göre hesaplanmış geçici bir dönem ödevidir. Canlı gökyüzü değişimlerini ve güncellenen ödevlerinizi takip etmek için dilediğiniz zaman uygulamamıza girerek güncel analizleri kontrol edebilirsiniz.`;
+    drawTextWithBold(doc, warningText, 24, textY + 2, 162, 4.0);
+
+    currentY += 92;
+  }
+
   // Objectivity/Software validation statement on Cover Page
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(10);
