@@ -99,35 +99,35 @@ export async function POST(req: NextRequest) {
     const levels: Record<number, { name: string; title: string; reason: string; explanation: string }> = {
       1: {
         name: 'Assiah',
-        title: 'Fiziksel ve Dünyevi Boyut (Assiah)',
+        title: 'Güncel Tekamül Odak Noktanız: Fiziksel ve Dünyevi Boyut (Assiah)',
         reason: asiyahCount > 0 
-          ? 'Şu an gökyüzündeki transitler doğrudan Yükselen (ASC), Tepe Noktası (MC) veya Güneşinizi tetikliyor. Bu durum, yaşamınızda kariyer, maddiyat, hedefler veya sağlık gibi somut, fiziksel konuların en aktif sınav alanınız olduğunu gösteriyor.'
-          : 'Yaş döngünüz ve temel gökyüzü etkileriniz gereği, şu an enerjiniz fiziksel dünyaya köklenme, düzen kurma ve dünyevi hedefleriniz üzerinde çalışmaktadır.',
-        explanation: 'Assiah alemi Malkut (Krallık) sefirasıyla yönetilir. Şu an evren sizi soyut teorilerle değil, somut ve pratik eylemlerle sınamaktadır. Sağlığınıza dikkat etmek, bütçenizi yönetmek ve somut adımlar atmak bu dönemin en doğru tekamül anahtarıdır.'
+          ? 'Gökyüzündeki güncel gezegen geçişleri doğrudan Yükselen (ASC), Tepe Noktası (MC) veya Güneş derecelerinizi tetikliyor. Bu durum, üst boyutlardaki (Beriyah/Atziluth) ruhsal potansiyelinizi yeryüzüne yansıtabilmeniz için şu an öncelikle kariyer, maddiyat, hedefler veya fiziksel sağlık gibi somut, dünyevi konuları (Assiah Boyutu) yapılandırmanız gerektiğine işaret eder.'
+          : 'Yaş döngünüz ve temel gökyüzü etkileriniz gereği, şu an enerjiniz fiziksel dünyaya köklenme, düzen kurma ve dünyevi sorumluluklar üzerinde çalışmaktadır.',
+        explanation: 'Assiah alemi Malkut (Krallık) sefirasıyla yönetilir. Üst boyutlardaki ruhsal haritalarınız arka planda aktiftir. Ancak evren şu an sizi soyut teorilerle değil, pratik ve dünyevi eylemlerle sınamaktadır. Fiziksel bedeninize iyi bakmak, bütçenizi düzene sokmak ve somut kararlar almak, bu dönem üst boyutlara geçişinizi sağlayacak en temel tekamül anahtarınızdır.'
       },
       2: {
         name: 'Yetzirah',
-        title: 'Psikolojik ve Duygusal Boyut (Yetzirah)',
+        title: 'Güncel Tekamül Odak Noktanız: Psikolojik ve Duygusal Boyut (Yetzirah)',
         reason: yetzirahCount > 0
-          ? 'Transit gezegenler şu an Ay, Merkür veya Venüs derecelerinizi tetiklemekte. Bu durum, bilinçaltı kalıplarınızın, duygusal ilişkilerinizin ve hücresel hafızanızdaki eski yaraların en aktif uyanış döneminde olduğunu gösterir.'
+          ? 'Güncel transit gezegenler Ay, Merkür veya Venüs derecelerinizi tetikliyor. Bu durum, 3. ve 4. boyutlardaki ruhsal potansiyelinizi hayatınıza tam olarak akıtabilmeniz için şu an öncelikle bilinçaltı kalıplarınızı, ilişkilerinizi ve hücresel hafızanızdaki eski duygusal yaraları (Yetzirah Boyutu) şifalandırmanız gerektiğine işaret eder.'
           : 'Mevcut astrolojik döngünüz, sizi geçmiş yaşam kalıplarınızı, atalardan gelen duygusal bağlarınızı ve korkularınızı çözmeye çağırmaktadır.',
-        explanation: 'Yetzirah, Yesod (Bilinçaltı) ile yönetilen duygusal yansıma alanıdır. Şu an dünyevi başarılardan ziyade, iç dünyanızda ne hissettiğiniz, ilişkilerinizdeki tıkanıklıklar ve geçmişin yüklerini serbest bırakmak en büyük sınavınızdır. Duygusal dürüstlük bu aşamada kapıyı açar.'
+        explanation: '3. haritanız (Beriyah - Ruhsal Yol) arka planda aktif olarak çalışmaktadır. Ancak gökyüzünün bu dönemdeki mesajı nettir: Ruhsal hedeflerinize ve yaşam amacınıza tıkanmadan yürüyebilmek için, şu an zihninizi veya ilişkilerinizi meşgul eden Yetzirah (Duygusal Boyut) sınavını başarıyla vermeli ve buradaki duygusal yükleri serbest bırakmalısınız.'
       },
       3: {
         name: 'Beriyah',
-        title: 'Mental ve Ruhsal Görevler Boyutu (Beriyah)',
+        title: 'Güncel Tekamül Odak Noktanız: Ruhsal Görevler ve Zihin Boyutu (Beriyah)',
         reason: beriyahCount > 0
-          ? 'Transitler şu an Mars, Jüpiter veya Satürn derecelerinizle etkileşimde. Bu, yaşamınızda ilk Satürn Dönüşünü geçmiş olmanızla birlikte, ruhunuzun bu dünyadaki ezoterik görevlerini ve kadersel yolunu aktif olarak aradığını gösterir.'
+          ? 'Transitler şu an Mars, Jüpiter veya Satürn derecelerinizle etkileşimde. Bu durum, kişisel egonun ve duygusal dramaların ötesine geçerek, ruhunuzun bu dünyadaki ezoterik görevlerini, kadersel yolunu ve yaşam amacını (Beriyah Boyutu) inşa etmeniz gereken ana eşikte olduğunuzu gösterir.'
           : 'Yaş döngünüz gereği (Satürn Dönüşü sonrası), artık hayatın sadece fiziksel veya duygusal yönüyle yetinemezsiniz; ruhsal görevlerinizi ciddiye alma ve kaderinizi yapılandırma zamanınız gelmiştir.',
-        explanation: 'Beriyah alemi Tifaret (Güzellik/Kalp) ve yüksek zihin sefiralarıyla yönetilir. Sınavınız artık bireysel egonun ötesine geçip, ruhsal misyonunuzu dünyevi bir disiplin haline getirmektir. Bu süreçte karşılaştığınız zorluklar aslında sizi kadersel görevinize hizalayan birer rehberdir.'
+        explanation: 'İlk Satürn Dönüşünüzü tamamlamış olmanızla birlikte, ruhsal haritanız (Beriyah) en aktif fazındadır. Gökyüzü bu dönemde sizi doğrudan yaşam amacınızı yapılandırmaya, bilgiyi bilgeliğe dönüştürmeye ve dünyada kalıcı bir ruhsal sorumluluk almaya davet etmektedir. Karşılaştığınız engeller, sizi bu kadersel göreve hizalayan rehberlerdir.'
       },
       4: {
         name: 'Atzilut',
-        title: 'Kozmik ve İlahi Kudret Boyutu (Atzilut)',
+        title: 'Güncel Tekamül Odak Noktanız: Kozmik ve İlahi Kudret Boyutu (Atzilut)',
         reason: atzilutCount > 0
-          ? 'Transit gezegenler şu an haritanızdaki Uranüs, Neptün, Plüton veya Kiron derecelerinizi ve Sabit Yıldızlarınızı doğrudan tetikliyor. Bu, yaşamınızda sıra dışı, mistik ve galaktik bir uyanış sürecinde olduğunuzu kanıtlar.'
+          ? 'Transit gezegenler haritanızdaki Uranüs, Neptün, Plüton veya Kiron derecelerinizi ve Sabit Yıldızlarınızı doğrudan tetikliyor. Bu durum, sizi dünyevi sınırların dışına çıkararak doğrudan ilahi akışa, kozmik uyanışa ve galaktik kökenlerinizle (Atziluth Boyutu) hizalanmaya davet ediyor.'
           : 'Olgunluk yaş döngünüz (Uranüs Karşıtlığı ve Kiron Dönüşü sonrası), sizi dünyevi sınırların dışına çıkararak doğrudan ilahi akışa (Atzilut) bağlamaktadır.',
-        explanation: 'Atzilut, Keter (Kudret/İlahi Işık) boyutudur. Bu aşamada artık egosal hiçbir kimliğe tutunamazsınız; tamamen evrensel bilince teslim olup, dünyada bir kanal olarak var olmanız gerekir. Sabit yıldızlarınızın enerjisi bu boyutta tamamen açığa çıkar.'
+        explanation: 'Atzilut, Keter (Kudret/İlahi Işık) boyutudur. Bu aşamada artık egosal hiçbir kimliğe veya kişisel hırsa tutunamazsınız; tamamen evrensel bilince teslim olup, dünyada bir kanal olarak var olmanız gerekir. Sabit yıldızlarınızın enerjisi bu boyutta tamamen açığa çıkarak size rehberlik etmektedir.'
       }
     };
 
