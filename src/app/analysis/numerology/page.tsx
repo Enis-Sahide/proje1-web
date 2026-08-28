@@ -331,14 +331,14 @@ export default function NumerologyPage() {
             <span className="text-xl font-bold text-red-500 font-serif">{karmicCode}</span>
           </div>
           <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
-            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Ruh Kodu</span>
+            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Kişilik Kodu</span>
             <span className="text-xl font-bold text-white font-serif">{ruhKodu}</span>
           </div>
           <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
-            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Alan Kodu</span>
+            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Aura Koruma Kodu</span>
             <span className="text-xl font-bold text-yellow-400 font-serif">
               {alanKodu}
-              <span className="text-[9px] block text-mystic-text-muted font-sans font-normal mt-0.5">(Aura Sınır ve Koruma)</span>
+              <span className="text-[9px] block text-mystic-text-muted font-sans font-normal mt-0.5">(Sınır ve Koruma)</span>
             </span>
           </div>
           <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
