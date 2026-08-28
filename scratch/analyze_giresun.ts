@@ -3,7 +3,6 @@ import { AstroCity } from '../src/features/astrology/engine/AstrologyConstants';
 import moment from 'moment-timezone';
 
 async function runAnalysis() {
-  // Giresun coordinates
   const cityData: AstroCity = {
     name: 'Giresun',
     lat: 40.9128,
@@ -12,46 +11,39 @@ async function runAnalysis() {
     tz: 'Europe/Istanbul'
   };
 
-  // Birth Details
-  // Natal date: March 17, 1995 at 18:05 Local Time (UTC+2)
+  // Birth Details: March 17, 1995 at 18:05 UTC+2
   const natalMoment = moment.tz('1995-03-17 18:05:00', 'YYYY-MM-DD HH:mm:ss', cityData.tz);
   const natalDateObj = natalMoment.toDate();
 
   console.log(`Natal Date: ${natalMoment.format()} (UTC: ${natalDateObj.toISOString()})`);
-  console.log(`City: ${cityData.name} (Lat: ${cityData.lat}, Lon: ${cityData.lon})`);
+  console.log(`City: ${cityData.name}`);
   console.log('--------------------------------------------------\n');
 
-  // --- PERIOD 1: 1995 Birth 3-Months (1995-03-17 to 1995-06-17) ---
-  console.log('--- 1995 DÖNEMİ ANALİZİ (17 Mart 1995 - 17 Haziran 1995) ---');
-  await simulatePeriod(natalDateObj, cityData, '1995-03-17', '1995-06-17', 1995);
-
-  console.log('\n--------------------------------------------------\n');
-
-  // --- PERIOD 2: 2026 Current 3-Months (2026-08-28 to 2026-11-28) ---
-  console.log('--- 2026 DÖNEMİ ANALİZİ (28 Ağustos 2026 - 28 Kasım 2026) ---');
-  await simulatePeriod(natalDateObj, cityData, '2026-08-28', '2026-11-28', 1995);
-}
-
-async function simulatePeriod(natalDateObj: Date, cityData: AstroCity, startStr: string, endStr: string, birthYear: number) {
-  const startMoment = moment.tz(startStr, 'YYYY-MM-DD', cityData.tz).startOf('day');
-  const endMoment = moment.tz(endStr, 'YYYY-MM-DD', cityData.tz).startOf('day');
+  console.log('--- 2026 YILI 12 AYLIK AKTİVASYON ANALİZİ ---');
   
-  const daysCount = endMoment.diff(startMoment, 'days') + 1;
-  console.log(`Simülasyon Süresi: ${daysCount} gün`);
+  const startMoment = moment.tz('2026-01-01', 'YYYY-MM-DD', cityData.tz).startOf('day');
+  const endMoment = moment.tz('2026-12-31', 'YYYY-MM-DD', cityData.tz).startOf('day');
+  const totalDays = endMoment.diff(startMoment, 'days') + 1;
 
-  let levelCounts = { 1: 0, 2: 0, 3: 0, 4: 0 };
-  let levelDailyDetails: Record<number, { date: string, maxWeight: number, counts: any }[]> = { 1: [], 2: [], 3: [], 4: [] };
+  // Track counts by month (1 to 12)
+  // Each month will have counts for levels 1, 2, 3, 4
+  const monthlyCounts: Record<number, { 1: number, 2: number, 3: number, 4: number, total: number }> = {};
+  for (let m = 1; m <= 12; m++) {
+    monthlyCounts[m] = { 1: 0, 2: 0, 3: 0, 4: 0, total: 0 };
+  }
+
+  const yearlyCounts = { 1: 0, 2: 0, 3: 0, 4: 0, total: 0 };
 
   const currentMoment = startMoment.clone();
 
-  for (let i = 0; i < daysCount; i++) {
-    const transitDateObj = currentMoment.clone().hour(12).toDate(); // transit calculations usually at noon
-    const transitDateStr = currentMoment.format('YYYY-MM-DD');
+  for (let i = 0; i < totalDays; i++) {
+    const transitDateObj = currentMoment.clone().hour(12).toDate();
+    const month = currentMoment.month() + 1; // 1-indexed
 
     // Calculate age at transit date
-    let age = currentMoment.year() - birthYear;
-    const m = currentMoment.month() - 2; // March is index 2
-    if (m < 0 || (m === 0 && currentMoment.date() < 17)) {
+    let age = currentMoment.year() - 1995;
+    const mDiff = currentMoment.month() - 2; // March is index 2
+    if (mDiff < 0 || (mDiff === 0 && currentMoment.date() < 17)) {
       age--;
     }
 
@@ -108,29 +100,37 @@ async function simulatePeriod(natalDateObj: Date, cityData: AstroCity, startStr:
       }
     }
 
-    levelCounts[activeLevel as 1 | 2 | 3 | 4]++;
-    levelDailyDetails[activeLevel].push({
-      date: transitDateStr,
-      maxWeight,
-      counts: { asiyahCount, yetzirahCount, beriyahCount, atzilutCount }
-    });
+    monthlyCounts[month][activeLevel as 1 | 2 | 3 | 4]++;
+    monthlyCounts[month].total++;
+    
+    yearlyCounts[activeLevel as 1 | 2 | 3 | 4]++;
+    yearlyCounts.total++;
 
     currentMoment.add(1, 'day');
   }
 
-  console.log('\nHarita Aktivasyon Sayıları:');
-  console.log(`1. Harita (Assiah - Eylem/Fiziksel): ${levelCounts[1]} gün (%${((levelCounts[1] / daysCount) * 100).toFixed(1)})`);
-  console.log(`2. Harita (Yetzirah - Duygusal/Psikolojik): ${levelCounts[2]} gün (%${((levelCounts[2] / daysCount) * 100).toFixed(1)})`);
-  console.log(`3. Harita (Burç/Beriyah - Zihinsel/Ruhsal Görev): ${levelCounts[3]} gün (%${((levelCounts[3] / daysCount) * 100).toFixed(1)})`);
-  console.log(`4. Harita (Atzilut - Kozmik/İlahi): ${levelCounts[4]} gün (%${((levelCounts[4] / daysCount) * 100).toFixed(1)})`);
+  // Print Monthly Table
+  const monthNames = [
+    'Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran',
+    'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'
+  ];
 
-  const sortedLevels = Object.entries(levelCounts).sort((a, b) => b[1] - a[1]);
+  console.log('| Ay | Toplam Gün | 1. Harita (Assiah) | 2. Harita (Yetzirah) | 3. Harita (Beriyah) | 4. Harita (Atzilut) |');
+  console.log('| :--- | :---: | :---: | :---: | :---: | :---: |');
+  for (let m = 1; m <= 12; m++) {
+    const counts = monthlyCounts[m];
+    console.log(`| ${monthNames[m - 1]} | ${counts.total} | ${counts[1]} | ${counts[2]} | ${counts[3]} | ${counts[4]} |`);
+  }
+  console.log(`| **TOPLAM** | **${yearlyCounts.total}** | **${yearlyCounts[1]}** | **${yearlyCounts[2]}** | **${yearlyCounts[3]}** | **${yearlyCounts[4]}** |`);
+
+  const sortedLevels = Object.entries({ 1: yearlyCounts[1], 2: yearlyCounts[2], 3: yearlyCounts[3], 4: yearlyCounts[4] })
+    .sort((a, b) => b[1] - a[1]);
   const winnerLevel = sortedLevels[0][0];
   const winnerName = winnerLevel === '1' ? 'Assiah (1. Harita)' :
                      winnerLevel === '2' ? 'Yetzirah (2. Harita)' :
                      winnerLevel === '3' ? 'Beriyah (3. Harita)' : 'Atzilut (4. Harita)';
 
-  console.log(`\n=> En çok aktif çalıştırılan harita: ${winnerName} (${sortedLevels[0][1]} gün)`);
+  console.log(`\n=> 2026 Yılında En Çok Aktif Çalıştırılan Harita: ${winnerName} (${sortedLevels[0][1]} gün)`);
 }
 
 runAnalysis().catch(console.error);
