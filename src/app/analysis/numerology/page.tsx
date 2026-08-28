@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Hexagon, Loader2, Calendar, User, ArrowRight, Target, Heart, Sparkles, Wrench, Info, AlertCircle, Zap } from 'lucide-react';
-import { calculateLifePath, calculatePersonalYear, calculateArrows, getBirthdayNumber, calculateNameAnalysis } from '@/utils/numerologyCalculator';
+import { calculateLifePath, calculatePersonalYear, calculateArrows, getBirthdayNumber, calculateNameAnalysis, reduceToSingleDigit } from '@/utils/numerologyCalculator';
 import { lifePathData, birthdayData, arrowsData, emptyArrowsData, personalYearData, numerologyData } from '@/utils/numerologyData';
 
 const isMaster = (num: number) => num === 11 || num === 22 || num === 33;
