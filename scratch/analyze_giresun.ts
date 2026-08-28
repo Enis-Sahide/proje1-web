@@ -23,7 +23,7 @@ async function runAnalysis() {
     tz: 'Europe/Istanbul'
   };
 
-  // Birth Details: June 26, 1992 at 12:00 UTC+3 (or tz standard local)
+  // Birth Details: June 26, 1992 at 12:00 UTC+3
   const natalMoment = moment.tz('1992-06-26 12:00:00', 'YYYY-MM-DD HH:mm:ss', cityData.tz);
   const natalDateObj = natalMoment.toDate();
 
@@ -76,19 +76,11 @@ async function runAnalysis() {
       const transitsToBeriyah = calculateTransitAspects(transitChart.planets, beriyahChart.planets);
       const transitsToAtzilut = calculateTransitAspects(transitChartHelio.planets, atzilutChart.planets);
 
-      // Initialize counts with baseline padding (+2.5)
+      // Initialize counts (Formula C without age baseline padding)
       let asiyahCount = 0;
       let yetzirahCount = 0;
       let beriyahCount = 0;
       let atzilutCount = 0;
-
-      if (age < 28) {
-        yetzirahCount += 2.5;
-      } else if (age < 42) {
-        beriyahCount += 2.5;
-      } else {
-        atzilutCount += 2.5;
-      }
 
       // 1. Assiah Transits
       for (const aspect of transitsToAssiah) {
@@ -104,39 +96,35 @@ async function runAnalysis() {
         yetzirahCount += getPlanetWeight(aspect.natalPlanet);
       }
 
-      // 3. Beriyah Transits (only if age >= 28)
-      if (age >= 28) {
-        for (const aspect of transitsToBeriyah) {
-          if (aspect.orb > 2.5) continue;
-          if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
-          beriyahCount += getPlanetWeight(aspect.natalPlanet);
-        }
+      // 3. Beriyah Transits (No age locks!)
+      for (const aspect of transitsToBeriyah) {
+        if (aspect.orb > 2.5) continue;
+        if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
+        beriyahCount += getPlanetWeight(aspect.natalPlanet);
       }
 
-      // 4. Atzilut Transits (only if age >= 38)
-      if (age >= 38) {
-        for (const aspect of transitsToAtzilut) {
-          if (aspect.orb > 2.5) continue;
-          if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
-          atzilutCount += getPlanetWeight(aspect.natalPlanet);
-        }
+      // 4. Atzilut Transits (No age locks!)
+      for (const aspect of transitsToAtzilut) {
+        if (aspect.orb > 2.5) continue;
+        if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
+        atzilutCount += getPlanetWeight(aspect.natalPlanet);
+      }
 
-        // Add Fixed Stars transits (only if age >= 38)
-        const transitYear = currentMoment.year();
-        for (const tPlanet of transitChart.planets) {
-          for (const star of FIXED_STARS_2000) {
-            const starLon = mod360(star.longitude + (transitYear - 2000) * 0.01396);
-            let diff = Math.abs(tPlanet.longitude - starLon);
-            if (diff > 180) diff = 360 - diff;
+      // Add Fixed Stars transits (No age locks!)
+      const transitYear = currentMoment.year();
+      for (const tPlanet of transitChart.planets) {
+        for (const star of FIXED_STARS_2000) {
+          const starLon = mod360(star.longitude + (transitYear - 2000) * 0.01396);
+          let diff = Math.abs(tPlanet.longitude - starLon);
+          if (diff > 180) diff = 360 - diff;
 
-            if (diff <= 1.5 || Math.abs(diff - 180) <= 1.5) {
-              atzilutCount += 1.5;
-            }
+          if (diff <= 1.5 || Math.abs(diff - 180) <= 1.5) {
+            atzilutCount += 1.5;
           }
         }
       }
 
-      // Determine active level
+      // Determine active level (Pure Transit Comparison, No Age locks!)
       let activeLevel = 1;
       let maxWeight = asiyahCount;
 
@@ -144,13 +132,24 @@ async function runAnalysis() {
         activeLevel = 2;
         maxWeight = yetzirahCount;
       }
-      if (beriyahCount > maxWeight && age >= 28) {
+      if (beriyahCount > maxWeight) {
         activeLevel = 3;
         maxWeight = beriyahCount;
       }
-      if (atzilutCount > maxWeight && age >= 38) {
+      if (atzilutCount > maxWeight) {
         activeLevel = 4;
         maxWeight = atzilutCount;
+      }
+
+      // Fallback if all weights are 0 (very rare background default)
+      if (maxWeight === 0) {
+        if (age < 28) {
+          activeLevel = 2;
+        } else if (age < 42) {
+          activeLevel = 3;
+        } else {
+          activeLevel = 4;
+        }
       }
 
       yearlyCounts[activeLevel as 1 | 2 | 3 | 4]++;

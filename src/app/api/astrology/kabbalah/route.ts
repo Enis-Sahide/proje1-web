@@ -59,15 +59,6 @@ export async function POST(req: NextRequest) {
     let beriyahCount = 0;
     let atzilutCount = 0;
 
-    // Add baseline padding (+2.5) to the level corresponding to the current age phase (Formula C)
-    if (age < 28) {
-      yetzirahCount += 2.5;
-    } else if (age < 42) {
-      beriyahCount += 2.5;
-    } else {
-      atzilutCount += 2.5;
-    }
-
     const mod360 = (x: number) => ((x % 360) + 360) % 360;
     const FIXED_STARS_2000 = [
       { name: 'Sirius', longitude: 104.08 },     // 14°05' Cancer
@@ -98,34 +89,30 @@ export async function POST(req: NextRequest) {
       yetzirahCount += getPlanetWeight(aspect.natalPlanet);
     }
 
-    // 3. Beriyah Transits (only if age >= 28)
-    if (age >= 28) {
-      for (const aspect of transitsToBeriyah) {
-        if (aspect.orb > 2.5) continue;
-        if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
-        beriyahCount += getPlanetWeight(aspect.natalPlanet);
-      }
+    // 3. Beriyah Transits (No age locks!)
+    for (const aspect of transitsToBeriyah) {
+      if (aspect.orb > 2.5) continue;
+      if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
+      beriyahCount += getPlanetWeight(aspect.natalPlanet);
     }
 
-    // 4. Atzilut Transits (only if age >= 38)
-    if (age >= 38) {
-      for (const aspect of transitsToAtzilut) {
-        if (aspect.orb > 2.5) continue;
-        if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
-        atzilutCount += getPlanetWeight(aspect.natalPlanet);
-      }
+    // 4. Atzilut Transits (No age locks!)
+    for (const aspect of transitsToAtzilut) {
+      if (aspect.orb > 2.5) continue;
+      if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
+      atzilutCount += getPlanetWeight(aspect.natalPlanet);
+    }
 
-      // Add Fixed Stars transits (only if age >= 38)
-      const transitYear = now.getFullYear();
-      for (const tPlanet of transitChart.planets) {
-        for (const star of FIXED_STARS_2000) {
-          const starLon = mod360(star.longitude + (transitYear - 2000) * 0.01396);
-          let diff = Math.abs(tPlanet.longitude - starLon);
-          if (diff > 180) diff = 360 - diff;
+    // Add Fixed Stars transits (No age locks!)
+    const transitYear = now.getFullYear();
+    for (const tPlanet of transitChart.planets) {
+      for (const star of FIXED_STARS_2000) {
+        const starLon = mod360(star.longitude + (transitYear - 2000) * 0.01396);
+        let diff = Math.abs(tPlanet.longitude - starLon);
+        if (diff > 180) diff = 360 - diff;
 
-          if (diff <= 1.5 || Math.abs(diff - 180) <= 1.5) {
-            atzilutCount += 1.5;
-          }
+        if (diff <= 1.5 || Math.abs(diff - 180) <= 1.5) {
+          atzilutCount += 1.5;
         }
       }
     }
@@ -137,13 +124,24 @@ export async function POST(req: NextRequest) {
       activeLevel = 2;
       maxWeight = yetzirahCount;
     }
-    if (beriyahCount > maxWeight && age >= 28) {
+    if (beriyahCount > maxWeight) {
       activeLevel = 3;
       maxWeight = beriyahCount;
     }
-    if (atzilutCount > maxWeight && age >= 38) {
+    if (atzilutCount > maxWeight) {
       activeLevel = 4;
       maxWeight = atzilutCount;
+    }
+
+    // Fallback if all weights are 0
+    if (maxWeight === 0) {
+      if (age < 28) {
+        activeLevel = 2;
+      } else if (age < 42) {
+        activeLevel = 3;
+      } else {
+        activeLevel = 4;
+      }
     }
 
     const levels: Record<number, { name: string; title: string; reason: string; explanation: string }> = {
