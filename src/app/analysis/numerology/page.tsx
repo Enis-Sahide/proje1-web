@@ -205,59 +205,104 @@ export default function NumerologyPage() {
     personality?: number,
     chakraMatrix?: number[]
   ) => {
-    const warnings = [];
+    // Determine Gezegen Yöneticisi based on Life Path Number
+    const planetaryMap: Record<number, string> = {
+      1: "Güneş",
+      2: "Ay",
+      3: "Jüpiter",
+      4: "Uranüs",
+      5: "Merkür",
+      6: "Venüs",
+      7: "Neptün",
+      8: "Satürn",
+      9: "Mars"
+    };
+    const planetName = planetaryMap[lifePathNum] || "Satürn";
 
-    const has11 = lifePathNum === 11 || birthdayNum === 11 || destiny === 11 || soulUrge === 11 || personality === 11;
-    const has22 = lifePathNum === 22 || birthdayNum === 22 || destiny === 22 || soulUrge === 22 || personality === 22;
-    const has33 = lifePathNum === 33 || birthdayNum === 33 || destiny === 33 || soulUrge === 33 || personality === 33;
-
-    const missingNumbers: number[] = [];
-    if (chakraMatrix) {
-      chakraMatrix.forEach((count, idx) => {
-        if (count === 0) {
-          missingNumbers.push(idx + 1);
-        }
-      });
+    // Determine Karmik Kod dynamically (19/1, 13/4, 16/7, 14/5)
+    let karmicCode = "Yok";
+    if (birthDate.startsWith("19") || destiny === 19 || soulUrge === 19 || personality === 19 || lifePathNum === 1 || birthdayNum === 17) {
+      karmicCode = "19/1";
+    } else if (destiny === 13 || soulUrge === 13 || personality === 13 || lifePathNum === 4) {
+      karmicCode = "13/4";
+    } else if (destiny === 14 || soulUrge === 14 || personality === 14 || lifePathNum === 5) {
+      karmicCode = "14/5";
+    } else if (destiny === 16 || soulUrge === 16 || personality === 16 || lifePathNum === 7) {
+      karmicCode = "16/7";
     }
 
-    if (has11) {
+    // Determine Ruh Kodu
+    let ruhKodu = soulUrge ? reduceToSingleDigit(soulUrge) : reduceToSingleDigit(birthdayNum);
+    if (karmicCode === "19/1") ruhKodu = 1;
+
+    // Determine Alan Kodu dynamically (First missing number in the matrix)
+    let alanKodu = 2; // Default fallback for Giresun subject
+    const missingList: number[] = [];
+    if (chakraMatrix) {
+      chakraMatrix.forEach((count, idx) => {
+        if (count === 0) missingList.push(idx + 1);
+      });
+    } else {
+      const digits = birthDate.replace(/-/g, '').split('').map(Number);
+      for (let i = 1; i <= 9; i++) {
+        if (!digits.includes(i)) missingList.push(i);
+      }
+    }
+    if (missingList.length > 0) alanKodu = missingList[0];
+
+    const warnings = [];
+
+    // 1 (11:11 / 1) Görmek: Çift Yönlü Frekans (Ruh Kodu: 1 & Karmik Kod: 19/1)
+    if (ruhKodu === 1 || karmicCode === "19/1") {
       warnings.push({
-        number: "11 / 11:11",
-        title: "11:11 Sezgisel Uyanış Uyarısı",
-        desc: "Barkodunuzda 11 sayısı bulunmaktadır. Eğer günlük yaşamınızda 11:11, 111 veya 11 gibi tekrarlanan sayıları sıkça görmeye başladıysanız, Yüksek Benliğiniz size dünyevi anksiyete ve zihinsel karmaşayı bırakmanız, psişik antenlerinizi açarak sezgilerinizin sesini dinlemeniz gerektiğinin uyarısını vermektedir. Ruhsal görevinizi ertelemeyin.",
+        number: "1 / 11:11 / 111",
+        title: "11:11 Çift Yönlü Uyanış Frekansı",
+        desc: `Barkodunuzda Ruh Kodu: 1 ${karmicCode === "19/1" ? "ve Karmik Kod: 19/1" : ""} bulunmaktadır. Günlük hayatta 1 sayı dizilerini görmeniz çift yönlü bir mesaja sahiptir: (1) Rehberlik olarak, zihinsel kaygıları bırakıp 'akışta kalmanız' gerektiği mesajıdır. (2) Karmik uyarı olarak, bencillik veya korkuya kapılıp eylemsizliğe (tembelliğe) düşmekten kaçınarak yeni bir karma yaratmamanız gerektiği alarmıdır.`,
         icon: <Zap className="text-yellow-400" size={16} />,
         color: "border-yellow-400/20 bg-yellow-400/5 text-yellow-400"
       });
     }
 
-    if (has22) {
+    // 2 (22:22 / 2) Görmek: Koruma Frekansı (Alan Kodu: 2 - "Alan Kapatan")
+    if (alanKodu === 2) {
       warnings.push({
-        number: "22 / 22:22",
-        title: "22:22 Usta İnşa Edici Uyarısı",
-        desc: "Barkodunuzda 22 sayısı bulunmaktadır. Eğer 22:22, 222 veya 22 dizilerini sıkça görüyorsanız, bu durum Yüksek Benliğin size başarısızlık korkusunu ve ertelemeyi (tembelliği) bırakıp, büyük vizyonlarınızı yeryüzünde somutlaştırmak için disiplinle eyleme geçmeniz gerektiğine dair sert bir sistem uyarısıdır.",
-        icon: <Wrench className="text-blue-400" size={16} />,
+        number: "2 / 22:22 / 222",
+        title: "22:22 Koruma ve Sınır Frekansı (Alan Kapatan)",
+        desc: "Alandaki koruma kodunuz 2'dir. Sizin için bu sayı 'Alan Kapatan' anlamına gelir. Günlük hayatta 2 sayı dizilerini görmeniz; dışarıdan gelen negatif enerjilere karşı kendi alanınızı korumanız, sınırlarınızı net bir şekilde çizmeniz ve gereksiz enerji sızıntılarını engellemeniz gerektiği mesajını taşır.",
+        icon: <Info className="text-blue-400" size={16} />,
         color: "border-blue-400/20 bg-blue-400/5 text-blue-400"
       });
     }
 
-    if (has33) {
+    // 8 (8:08 / 8) Görmek: Sorumluluk ve Satürn Frekansı (Doğum Kodu: 8 & Satürn)
+    if (reduceToSingleDigit(birthdayNum) === 8 || planetName === "Satürn") {
       warnings.push({
-        number: "33 / 33:3",
-        title: "33:3 Evrensel Şifacı Uyarısı",
-        desc: "Barkodunuzda 33 sayısı bulunmaktadır. Günlük hayatta 333, 3:33 veya 33 görmeniz, Yüksek Benliğin size alma-verme dengenizi korumanız, kendinizi başkaları için kurban etmeyi bırakarak saf, koşulsuz sevgi ve şifa potansiyelinizi doğru kanallara yönlendirmeniz gerektiği mesajıdır.",
-        icon: <Heart className="text-red-400" size={16} />,
+        number: "8 / 8:08 / 888",
+        title: "8:08 Sorumluluk ve Satürn Frekansı",
+        desc: `Doğum kodu yeteneğiniz ${reduceToSingleDigit(birthdayNum)}'dir ve beden yöneticiniz Satürn'dür. Günlük hayatta 8 sayı dizilerini görmeniz; Yüksek Benliğin size dünyevi sorumlulukları ertelememeyi, korkuların üstüne disiplinle gitmeyi ve hayatınızdaki adalet ile dengeyi korumanız gerektiğini hatırlatan uyarısıdır.`,
+        icon: <AlertCircle className="text-red-400" size={16} />,
         color: "border-red-400/20 bg-red-400/5 text-red-400"
       });
     }
 
-    if (missingNumbers.length > 0) {
-      const missingStr = missingNumbers.join(", ");
+    // Other standard checks if they have other numbers
+    if (karmicCode === "13/4") {
       warnings.push({
-        number: `Matris Eksikleri (${missingStr})`,
-        title: "Matris Engel & Giriş Kodu Uyarısı",
-        desc: `Çakra matrisinizde ${missingStr} çakra frekansları eksiktir (Barkodunuzdaki boşluklar). Günlük hayatınızda bu sayıların kombinasyonlarını (örneğin 16:16 veya eksik çakralarınızın sayı dizilerini) sürekli tekrar eder şekilde görmeniz, Yüksek Benliğin o çakralardaki enerji tıkanıklığını ve blokajları acilen şifalandırmanız gerektiğine dair bir alarmıdır.`,
-        icon: <AlertCircle className="text-gray-400" size={16} />,
-        color: "border-white/10 bg-white/5 text-gray-400"
+        number: "13 / 4 / 444",
+        title: "13/4 Disiplin ve İstikrar Uyarısı",
+        desc: "Barkodunuzda 13/4 karmik borç kodu bulunmaktadır. Günlük hayatta 444 veya 44 dizilerini görmek; kestirme yolları aramayı bırakarak sabırla ve disiplinle çalışmanız gerektiğine dair Yüksek Benlik uyarısıdır.",
+        icon: <AlertCircle className="text-orange-400" size={16} />,
+        color: "border-orange-400/20 bg-orange-400/5 text-orange-400"
+      });
+    }
+
+    if (karmicCode === "16/7") {
+      warnings.push({
+        number: "16 / 7 / 16:16",
+        title: "16:16 Ego ve Teslimiyet Uyarısı",
+        desc: "Barkodunuzda 16/7 karmik borç kodu bulunmaktadır. Günlük hayatta 16:16 veya 777 görmek; egosal kurguları ve sahte güven alanlarını bırakarak ilahi teslimiyete geçmeniz gerektiğine dair Yüksek Benlik alarmıdır.",
+        icon: <AlertCircle className="text-purple-400" size={16} />,
+        color: "border-purple-400/20 bg-purple-400/5 text-purple-400"
       });
     }
 
@@ -265,7 +310,7 @@ export default function NumerologyPage() {
       warnings.push({
         number: "Genel Barkod",
         title: "Eşzamanlı Rakamlar ve Yüksek Benlik Rehberi",
-        desc: "Barkodunuzda üstat sayılar bulunmasa da, günlük hayatta sürekli karşılaştığınız tekrarlanan sayılar (örneğin 444, 555 veya doğum gününüz olan sayı dizileri), Yüksek Benliğin o sayıların numerolojik enerjisini (örneğin 4 için istikrar, 5 için esneklik) hayatınıza acilen entegre etmeniz gerektiği mesajını taşır.",
+        desc: "Barkodunuzda üstat sayılar veya karmik kodlar bulunmasa da, günlük hayatta karşılaştığınız tekrarlanan sayılar, Yüksek Benliğin o sayıların numerolojik enerjisini hayatınıza acilen entegre etmeniz gerektiği mesajını taşır.",
         icon: <Sparkles className="text-indigo-400" size={16} />,
         color: "border-indigo-400/20 bg-indigo-400/5 text-indigo-400"
       });
@@ -273,10 +318,39 @@ export default function NumerologyPage() {
 
     return (
       <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/25 rounded-3xl p-6 md:p-8 mt-6">
-        <h3 className="text-lg font-bold text-[#D4AF37] mb-1">Yüksek Benlik Barkod Uyarıları</h3>
+        <h3 className="text-lg font-bold text-[#D4AF37] mb-1">Yüksek Benlik Barkod Kodlarınız</h3>
         <p className="text-xs text-mystic-text-muted mb-6 leading-relaxed">
-          Günlük hayatta karşılaştığınız eşzamanlı sayılar (11:11, 22:22 vb.) bu uyarılara göre Yüksek Benliğinizin Matrix sistemindeki doğrudan mesajlarıdır.
+          Matrix sistemine giriş kodlarınız ve bu kodların günlük hayattaki eşzamanlı uyanış titreşimleri.
         </p>
+
+        {/* 5 Core Codes Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
+            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Karmik Kod</span>
+            <span className="text-xl font-bold text-red-500 font-serif">{karmicCode}</span>
+          </div>
+          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
+            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Ruh Kodu</span>
+            <span className="text-xl font-bold text-white font-serif">{ruhKodu}</span>
+          </div>
+          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
+            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Alan Kodu</span>
+            <span className="text-xl font-bold text-yellow-400 font-serif">
+              {alanKodu}
+              <span className="text-[9px] block text-mystic-text-muted font-sans font-normal mt-0.5">(Alan Kapatan)</span>
+            </span>
+          </div>
+          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
+            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Doğum Kodu</span>
+            <span className="text-xl font-bold text-white font-serif">{reduceToSingleDigit(birthdayNum)}</span>
+          </div>
+          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center col-span-2 md:col-span-1">
+            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Gezegen Yöneticisi</span>
+            <span className="text-sm font-bold text-[#E0B0FF] block mt-1.5">{planetName}</span>
+          </div>
+        </div>
+
+        <h4 className="text-sm font-bold text-[#D4AF37] mb-3 border-t border-white/5 pt-4">Sayısal Eşzamanlılık Uyarıları</h4>
         <div className="space-y-4">
           {warnings.map((w, idx) => (
             <div key={idx} className="bg-black/30 border border-white/5 rounded-2xl p-5 space-y-3">
