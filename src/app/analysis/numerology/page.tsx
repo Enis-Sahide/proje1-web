@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Hexagon, Loader2, Calendar, User, ArrowRight, Target, Heart, Sparkles, Wrench } from 'lucide-react';
+import { ArrowLeft, Hexagon, Loader2, Calendar, User, ArrowRight, Target, Heart, Sparkles, Wrench, Info, AlertCircle, Zap } from 'lucide-react';
 import { calculateLifePath, calculatePersonalYear, calculateArrows, getBirthdayNumber, calculateNameAnalysis } from '@/utils/numerologyCalculator';
 import { lifePathData, birthdayData, arrowsData, emptyArrowsData, personalYearData, numerologyData } from '@/utils/numerologyData';
 
@@ -183,6 +183,115 @@ export default function NumerologyPage() {
               <span>Element: <strong className="text-white font-medium">{data.element}</strong></span>
             </div>
           </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderDisclaimer = () => (
+    <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/25 rounded-2xl p-4 flex gap-3 items-start mt-6">
+      <Info size={18} className="text-[#D4AF37] shrink-0 mt-0.5" />
+      <p className="text-xs text-mystic-text-muted leading-relaxed">
+        Bu analizler, kadim Pisagor numerolojisi ve Kabbalistik astroloji modellerine dayanan algoritmik ve matematiksel yorumlamalardır. Kişisel farkındalık yolculuğunuzda size rehberlik etmek üzere tasarlanmıştır; kesin gelecek tahmini, tıbbi veya psikolojik teşhis amacı taşımaz.
+      </p>
+    </div>
+  );
+
+  const renderBarcodeWarnings = (
+    lifePathNum: number,
+    birthdayNum: number,
+    destiny?: number,
+    soulUrge?: number,
+    personality?: number,
+    chakraMatrix?: number[]
+  ) => {
+    const warnings = [];
+
+    const has11 = lifePathNum === 11 || birthdayNum === 11 || destiny === 11 || soulUrge === 11 || personality === 11;
+    const has22 = lifePathNum === 22 || birthdayNum === 22 || destiny === 22 || soulUrge === 22 || personality === 22;
+    const has33 = lifePathNum === 33 || birthdayNum === 33 || destiny === 33 || soulUrge === 33 || personality === 33;
+
+    const missingNumbers: number[] = [];
+    if (chakraMatrix) {
+      chakraMatrix.forEach((count, idx) => {
+        if (count === 0) {
+          missingNumbers.push(idx + 1);
+        }
+      });
+    }
+
+    if (has11) {
+      warnings.push({
+        number: "11 / 11:11",
+        title: "11:11 Sezgisel Uyanış Uyarısı",
+        desc: "Barkodunuzda 11 sayısı bulunmaktadır. Eğer günlük yaşamınızda 11:11, 111 veya 11 gibi tekrarlanan sayıları sıkça görmeye başladıysanız, Yüksek Benliğiniz size dünyevi anksiyete ve zihinsel karmaşayı bırakmanız, psişik antenlerinizi açarak sezgilerinizin sesini dinlemeniz gerektiğinin uyarısını vermektedir. Ruhsal görevinizi ertelemeyin.",
+        icon: <Zap className="text-yellow-400" size={16} />,
+        color: "border-yellow-400/20 bg-yellow-400/5 text-yellow-400"
+      });
+    }
+
+    if (has22) {
+      warnings.push({
+        number: "22 / 22:22",
+        title: "22:22 Usta İnşa Edici Uyarısı",
+        desc: "Barkodunuzda 22 sayısı bulunmaktadır. Eğer 22:22, 222 veya 22 dizilerini sıkça görüyorsanız, bu durum Yüksek Benliğin size başarısızlık korkusunu ve ertelemeyi (tembelliği) bırakıp, büyük vizyonlarınızı yeryüzünde somutlaştırmak için disiplinle eyleme geçmeniz gerektiğine dair sert bir sistem uyarısıdır.",
+        icon: <Wrench className="text-blue-400" size={16} />,
+        color: "border-blue-400/20 bg-blue-400/5 text-blue-400"
+      });
+    }
+
+    if (has33) {
+      warnings.push({
+        number: "33 / 33:3",
+        title: "33:3 Evrensel Şifacı Uyarısı",
+        desc: "Barkodunuzda 33 sayısı bulunmaktadır. Günlük hayatta 333, 3:33 veya 33 görmeniz, Yüksek Benliğin size alma-verme dengenizi korumanız, kendinizi başkaları için kurban etmeyi bırakarak saf, koşulsuz sevgi ve şifa potansiyelinizi doğru kanallara yönlendirmeniz gerektiği mesajıdır.",
+        icon: <Heart className="text-red-400" size={16} />,
+        color: "border-red-400/20 bg-red-400/5 text-red-400"
+      });
+    }
+
+    if (missingNumbers.length > 0) {
+      const missingStr = missingNumbers.join(", ");
+      warnings.push({
+        number: `Matris Eksikleri (${missingStr})`,
+        title: "Matris Engel & Giriş Kodu Uyarısı",
+        desc: `Çakra matrisinizde ${missingStr} çakra frekansları eksiktir (Barkodunuzdaki boşluklar). Günlük hayatınızda bu sayıların kombinasyonlarını (örneğin 16:16 veya eksik çakralarınızın sayı dizilerini) sürekli tekrar eder şekilde görmeniz, Yüksek Benliğin o çakralardaki enerji tıkanıklığını ve blokajları acilen şifalandırmanız gerektiğine dair bir alarmıdır.`,
+        icon: <AlertCircle className="text-gray-400" size={16} />,
+        color: "border-white/10 bg-white/5 text-gray-400"
+      });
+    }
+
+    if (warnings.length === 0) {
+      warnings.push({
+        number: "Genel Barkod",
+        title: "Eşzamanlı Rakamlar ve Yüksek Benlik Rehberi",
+        desc: "Barkodunuzda üstat sayılar bulunmasa da, günlük hayatta sürekli karşılaştığınız tekrarlanan sayılar (örneğin 444, 555 veya doğum gününüz olan sayı dizileri), Yüksek Benliğin o sayıların numerolojik enerjisini (örneğin 4 için istikrar, 5 için esneklik) hayatınıza acilen entegre etmeniz gerektiği mesajını taşır.",
+        icon: <Sparkles className="text-indigo-400" size={16} />,
+        color: "border-indigo-400/20 bg-indigo-400/5 text-indigo-400"
+      });
+    }
+
+    return (
+      <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/25 rounded-3xl p-6 md:p-8 mt-6">
+        <h3 className="text-lg font-bold text-[#D4AF37] mb-1">Yüksek Benlik Barkod Uyarıları</h3>
+        <p className="text-xs text-mystic-text-muted mb-6 leading-relaxed">
+          Günlük hayatta karşılaştığınız eşzamanlı sayılar (11:11, 22:22 vb.) bu uyarılara göre Yüksek Benliğinizin Matrix sistemindeki doğrudan mesajlarıdır.
+        </p>
+        <div className="space-y-4">
+          {warnings.map((w, idx) => (
+            <div key={idx} className="bg-black/30 border border-white/5 rounded-2xl p-5 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg border flex items-center justify-center shrink-0 ${w.color.split(' ').slice(0, 2).join(' ')}`}>
+                  {w.icon}
+                </div>
+                <div>
+                  <h4 className="font-bold text-white text-sm">{w.title}</h4>
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-mystic-text-muted">Eşleşen Kod: {w.number}</span>
+                </div>
+              </div>
+              <p className="text-gray-300 text-xs leading-relaxed">{w.desc}</p>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -385,6 +494,10 @@ export default function NumerologyPage() {
                   {renderAnalysisCard("İsim Numaranız (Kader)", nameResults.destiny, "description")}
                   {renderAnalysisCard("Ruhunuzu Tanımlama (Ruh Güdüsü)", nameResults.soulUrge, "soulUrgeDetails")}
                 </div>
+
+                {renderBarcodeWarnings(nameResults.lifePath, parseInt(birthDate.split('-')[2]), nameResults.destiny, nameResults.soulUrge, nameResults.personality, nameResults.chakraMatrix)}
+
+                {renderDisclaimer()}
               </>
             )}
 
@@ -536,6 +649,10 @@ export default function NumerologyPage() {
                     </div>
                   </div>
                 </div>
+
+                {renderBarcodeWarnings(lifePath!.number, birthday!)}
+
+                {renderDisclaimer()}
               </>
             )}
             
