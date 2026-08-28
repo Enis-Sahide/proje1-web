@@ -73,24 +73,24 @@ async function runAnalysis() {
       }
     }
 
-    // Determine active level
+    // Determine active level (Option 1: Kademeli Öncelik)
     let activeLevel = 1;
     let maxWeight = asiyahCount;
 
-    if (yetzirahCount > maxWeight) {
-      activeLevel = 2;
-      maxWeight = yetzirahCount;
-    }
-    if (beriyahCount > maxWeight && age >= 28) {
-      activeLevel = 3;
-      maxWeight = beriyahCount;
-    }
-    if (atzilutCount > maxWeight && age >= 38) {
+    if (age >= 38 && atzilutCount > 0) {
       activeLevel = 4;
       maxWeight = atzilutCount;
-    }
-
-    if (maxWeight === 0) {
+    } else if (age >= 28 && beriyahCount > 0) {
+      activeLevel = 3;
+      maxWeight = beriyahCount;
+    } else if (yetzirahCount > 0) {
+      activeLevel = 2;
+      maxWeight = yetzirahCount;
+    } else if (asiyahCount > 0) {
+      activeLevel = 1;
+      maxWeight = asiyahCount;
+    } else {
+      maxWeight = 0;
       if (age < 28) {
         activeLevel = 2;
       } else if (age < 42) {
