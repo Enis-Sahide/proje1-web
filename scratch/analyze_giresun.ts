@@ -1,4 +1,4 @@
-import { generateTransitChart } from '../src/features/astrology/engine/AstrologyEngine';
+import { generateAstrologyChart, calculateDraconicChart, calculateHarmonicChart, calculateTransitAspects } from '../src/features/astrology/engine/AstrologyEngine';
 import { AstroCity } from '../src/features/astrology/engine/AstrologyConstants';
 import moment from 'moment-timezone';
 
@@ -31,9 +31,22 @@ async function runAnalysis() {
   console.log(`City: ${cityData.name}`);
   console.log('--------------------------------------------------\n');
 
+  // Generate 4 natal charts
+  const assiahChart = await generateAstrologyChart(natalDateObj, cityData, false);
+  const yetzirahChart = calculateDraconicChart(assiahChart);
+  const beriyahChart = calculateHarmonicChart(assiahChart, 9);
+  const atzilutChart = await generateAstrologyChart(natalDateObj, cityData, true); // Heliocentric
+
   console.log('--- 2017 - 2030 YILLARI ARASI HARİTA AKTİVASYON ANALİZİ ---');
   console.log('| Yıl | Toplam Gün | 1. Harita (Assiah) | 2. Harita (Yetzirah) | 3. Harita (Beriyah) | 4. Harita (Atzilut) | En Aktif Harita |');
   console.log('| :--- | :---: | :---: | :---: | :---: | :---: | :--- |');
+
+  const getPlanetWeight = (name: string) => {
+    if (name === 'Yükselen (ASC)' || name === 'Tepe Noktası (MC)' || name === 'Güneş') return 1.5;
+    if (name === 'Ay' || name === 'Merkür' || name === 'Venüs') return 1.2;
+    if (name === 'Mars' || name === 'Jüpiter' || name === 'Satürn') return 1.0;
+    return 1.2; // Uranus, Neptune, Pluto, Chiron, Lilith, North Node etc.
+  };
 
   for (let year = 2017; year <= 2030; year++) {
     const startMoment = moment.tz(`${year}-01-01`, 'YYYY-MM-DD', cityData.tz).startOf('day');
@@ -53,17 +66,22 @@ async function runAnalysis() {
         age--;
       }
 
-      // Generate transit chart
-      const transitChartData = await generateTransitChart(natalDateObj, transitDateObj, cityData);
-      const transitAspects = transitChartData.transitAspects;
+      // Generate Transit Charts
+      const transitChart = await generateAstrologyChart(transitDateObj, cityData, false);
+      const transitChartHelio = await generateAstrologyChart(transitDateObj, cityData, true);
 
-      // Calculate level weights (Formula C)
+      // Calculate transit aspects to each respective chart
+      const transitsToAssiah = calculateTransitAspects(transitChart.planets, assiahChart.planets);
+      const transitsToYetzirah = calculateTransitAspects(transitChart.planets, yetzirahChart.planets);
+      const transitsToBeriyah = calculateTransitAspects(transitChart.planets, beriyahChart.planets);
+      const transitsToAtzilut = calculateTransitAspects(transitChartHelio.planets, atzilutChart.planets);
+
+      // Initialize counts with baseline padding (+2.5)
       let asiyahCount = 0;
       let yetzirahCount = 0;
       let beriyahCount = 0;
       let atzilutCount = 0;
 
-      // 1. Add age baseline padding (+2.5)
       if (age < 28) {
         yetzirahCount += 2.5;
       } else if (age < 42) {
@@ -72,32 +90,45 @@ async function runAnalysis() {
         atzilutCount += 2.5;
       }
 
-      // 2. Transits to Natal planets
-      for (const aspect of transitAspects) {
+      // 1. Assiah Transits
+      for (const aspect of transitsToAssiah) {
         if (aspect.orb > 2.5) continue;
         if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
+        asiyahCount += getPlanetWeight(aspect.natalPlanet);
+      }
 
-        const n = aspect.natalPlanet;
-        if (n === 'Yükselen (ASC)' || n === 'Tepe Noktası (MC)' || n === 'Güneş') {
-          asiyahCount += 1.5;
-        } else if (n === 'Ay' || n === 'Merkür' || n === 'Venüs') {
-          yetzirahCount += 1.2;
-        } else if (n === 'Mars' || n === 'Jüpiter' || n === 'Satürn') {
-          beriyahCount += 1.0;
-        } else if (n === 'Uranüs' || n === 'Neptün' || n === 'Plüton' || n === 'Kiron') {
-          atzilutCount += 1.2;
+      // 2. Yetzirah Transits
+      for (const aspect of transitsToYetzirah) {
+        if (aspect.orb > 2.5) continue;
+        if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
+        yetzirahCount += getPlanetWeight(aspect.natalPlanet);
+      }
+
+      // 3. Beriyah Transits (only if age >= 28)
+      if (age >= 28) {
+        for (const aspect of transitsToBeriyah) {
+          if (aspect.orb > 2.5) continue;
+          if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
+          beriyahCount += getPlanetWeight(aspect.natalPlanet);
         }
       }
 
-      // 3. Transits to Fixed Stars (Atzilut - only if age >= 38)
+      // 4. Atzilut Transits (only if age >= 38)
       if (age >= 38) {
-        for (const tPlanet of transitChartData.transitPlanets) {
+        for (const aspect of transitsToAtzilut) {
+          if (aspect.orb > 2.5) continue;
+          if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
+          atzilutCount += getPlanetWeight(aspect.natalPlanet);
+        }
+
+        // Add Fixed Stars transits (only if age >= 38)
+        const transitYear = currentMoment.year();
+        for (const tPlanet of transitChart.planets) {
           for (const star of FIXED_STARS_2000) {
-            const starLon = mod360(star.longitude + (currentMoment.year() - 2000) * 0.01396);
+            const starLon = mod360(star.longitude + (transitYear - 2000) * 0.01396);
             let diff = Math.abs(tPlanet.longitude - starLon);
             if (diff > 180) diff = 360 - diff;
 
-            // Conjunction or Opposition with tight orb
             if (diff <= 1.5 || Math.abs(diff - 180) <= 1.5) {
               atzilutCount += 1.5;
             }
@@ -105,7 +136,7 @@ async function runAnalysis() {
         }
       }
 
-      // Determine active level (Formula C Comparison)
+      // Determine active level
       let activeLevel = 1;
       let maxWeight = asiyahCount;
 
