@@ -51,6 +51,15 @@ async function runAnalysis() {
       let beriyahCount = 0;
       let atzilutCount = 0;
 
+      // Add baseline padding (+2.5) to the level corresponding to the current age phase (Formula C)
+      if (age < 28) {
+        yetzirahCount += 2.5;
+      } else if (age < 42) {
+        beriyahCount += 2.5;
+      } else {
+        atzilutCount += 2.5;
+      }
+
       for (const aspect of transitAspects) {
         if (aspect.orb > 2.5) continue;
         if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
@@ -67,31 +76,21 @@ async function runAnalysis() {
         }
       }
 
-      // Determine active level (Option 1: Kademeli Öncelik)
+      // Determine active level (Formula C)
       let activeLevel = 1;
       let maxWeight = asiyahCount;
 
-      if (age >= 38 && atzilutCount > 0) {
-        activeLevel = 4;
-        maxWeight = atzilutCount;
-      } else if (age >= 28 && beriyahCount > 0) {
-        activeLevel = 3;
-        maxWeight = beriyahCount;
-      } else if (yetzirahCount > 0) {
+      if (yetzirahCount > maxWeight) {
         activeLevel = 2;
         maxWeight = yetzirahCount;
-      } else if (asiyahCount > 0) {
-        activeLevel = 1;
-        maxWeight = asiyahCount;
-      } else {
-        maxWeight = 0;
-        if (age < 28) {
-          activeLevel = 2;
-        } else if (age < 42) {
-          activeLevel = 3;
-        } else {
-          activeLevel = 4;
-        }
+      }
+      if (beriyahCount > maxWeight && age >= 28) {
+        activeLevel = 3;
+        maxWeight = beriyahCount;
+      }
+      if (atzilutCount > maxWeight && age >= 38) {
+        activeLevel = 4;
+        maxWeight = atzilutCount;
       }
 
       yearlyCounts[activeLevel as 1 | 2 | 3 | 4]++;
