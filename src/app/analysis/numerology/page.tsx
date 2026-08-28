@@ -252,12 +252,13 @@ export default function NumerologyPage() {
 
     const warnings = [];
 
-    // 1 (11:11 / 1) Görmek: Çift Yönlü Frekans (Ruh Kodu: 1 & Karmik Kod: 19/1)
+    // 1 (11:11 / 01:01 / 10:10 / 111 / 1) Görmek: Çift Yönlü Frekans (Ruh Kodu: 1 & Karmik Kod: 19/1)
     if (ruhKodu === 1 || karmicCode === "19/1") {
+      const isNestedKarmic = ruhKodu === 1 && karmicCode === "19/1";
       warnings.push({
-        number: "1 / 11:11 / 111",
+        number: "1 / 11:11 / 10:10",
         title: "11:11 Çift Yönlü Uyanış Frekansı",
-        desc: `Barkodunuzda Ruh Kodu: 1 ${karmicCode === "19/1" ? "ve Karmik Kod: 19/1" : ""} bulunmaktadır. Günlük hayatta 1 sayı dizilerini görmeniz çift yönlü bir mesaja sahiptir: (1) Rehberlik olarak, zihinsel kaygıları bırakıp 'akışta kalmanız' gerektiği mesajıdır. (2) Karmik uyarı olarak, bencillik veya korkuya kapılıp eylemsizliğe (tembelliğe) düşmekten kaçınarak yeni bir karma yaratmamanız gerektiği alarmıdır.`,
+        desc: `Barkodunuzda Ruh Kodu: 1 (Kişilik Kodu) ${isNestedKarmic ? "ve bu kodun içine gömülü olan Karmik Kod: 19/1" : ""} bulunmaktadır. ${isNestedKarmic ? "Ruh kodunuzun içinde karmik kilit çıkması (19/1), en az üç yaşamdır aynı hatayı tekrarladığınızı gösterir. Bu durum sizi zorlar; çünkü her yaşamda dönüp dolaşıp aynı hatayı yapmak, ezberlenmiş eski davranış kalıplarına düşmek demektir. " : ""}Günlük hayatta 1 sayı dizilerini görmeniz iki anlam taşır: (1) Rehberlik olarak; zihinsel kaygıları bırakıp lider, bağımsız ve öncü ruhunuzu aktif ederek 'akışta kalmanız' hatırlatılır. (2) Karmik uyarı olarak; geçmiş yaşam ezberlerinize (bencillik, korku, eylemsizlik) düşerek bu yaşamda yeni bir karma yaratmamanız gerektiği konusunda sert bir sistem alarmı verilir.`,
         icon: <Zap className="text-yellow-400" size={16} />,
         color: "border-yellow-400/20 bg-yellow-400/5 text-yellow-400"
       });
@@ -268,7 +269,7 @@ export default function NumerologyPage() {
       warnings.push({
         number: "2 / 22:22 / 222",
         title: "22:22 Koruma ve Sınır Frekansı (Alan Kapatan)",
-        desc: "Alandaki koruma kodunuz 2'dir. Sizin için bu sayı 'Alan Kapatan' anlamına gelir. Günlük hayatta 2 sayı dizilerini görmeniz; dışarıdan gelen negatif enerjilere karşı kendi alanınızı korumanız, sınırlarınızı net bir şekilde çizmeniz ve gereksiz enerji sızıntılarını engellemeniz gerektiği mesajını taşır.",
+        desc: "Alandaki koruma kodunuz 2'dir. Bu sayı sizin için 'Alan Kapatan' (enerji alanını koruyan/kapatan) anlamına gelir. Günlük hayatta 2 sayı dizilerini görmeniz; dışarıdan gelen negatif enerjilere karşı kendi alanınızı kapatmanız, sınırlarınızı net bir şekilde çizmeniz ve gereksiz enerji sızıntılarını engellemeniz gerektiği mesajını taşır.",
         icon: <Info className="text-blue-400" size={16} />,
         color: "border-blue-400/20 bg-blue-400/5 text-blue-400"
       });
@@ -279,7 +280,7 @@ export default function NumerologyPage() {
       warnings.push({
         number: "8 / 8:08 / 888",
         title: "8:08 Sorumluluk ve Satürn Frekansı",
-        desc: `Doğum kodu yeteneğiniz ${reduceToSingleDigit(birthdayNum)}'dir ve beden yöneticiniz Satürn'dür. Günlük hayatta 8 sayı dizilerini görmeniz; Yüksek Benliğin size dünyevi sorumlulukları ertelememeyi, korkuların üstüne disiplinle gitmeyi ve hayatınızdaki adalet ile dengeyi korumanız gerektiğini hatırlatan uyarısıdır.`,
+        desc: `Doğum kodu yeteneğiniz ${reduceToSingleDigit(birthdayNum)}'dir ve beden yöneticiniz Satürn'dür. Günlük hayatta 8 görmek; Yüksek Benliğin size dünyevi sorumlulukları ertelememeyi, korkuların üstüne disiplinle gitmeyi ve Satürn dengesini korumanız gerektiğini hatırlatan uyarısıdır.`,
         icon: <AlertCircle className="text-red-400" size={16} />,
         color: "border-red-400/20 bg-red-400/5 text-red-400"
       });
