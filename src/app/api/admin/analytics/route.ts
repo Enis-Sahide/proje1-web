@@ -45,13 +45,13 @@ export async function GET(request: Request) {
       LIMIT 10
     `);
 
-    // Bugünün verileri (Hızlı göstergeler için)
+    // Bugünün verileri (Hızlı göstergeler için, Türkiye saat diliminde)
     const todayStats = await db.execute(sql`
       SELECT 
         COUNT(*)::int as views,
         COUNT(DISTINCT ip_hash)::int as visitors
       FROM site_visits
-      WHERE created_at >= CURRENT_DATE
+      WHERE TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Istanbul', 'YYYY-MM-DD') = TO_CHAR(NOW() AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Istanbul', 'YYYY-MM-DD')
     `);
 
     // En çok ziyaretçi gelen şehirler (Son 14 gün)
