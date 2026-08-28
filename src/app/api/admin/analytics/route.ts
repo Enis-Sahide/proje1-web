@@ -45,13 +45,13 @@ export async function GET(request: Request) {
       LIMIT 10
     `);
 
-    // Bugünün verileri (Hızlı göstergeler için)
+    // Bugünün verileri (Hızlı göstergeler için, Türkiye saat diliminde)
     const todayStats = await db.execute(sql`
       SELECT 
         COUNT(*)::int as views,
         COUNT(DISTINCT ip_hash)::int as visitors
       FROM site_visits
-      WHERE created_at >= CURRENT_DATE
+      WHERE TO_CHAR(created_at AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Istanbul', 'YYYY-MM-DD') = TO_CHAR(NOW() AT TIME ZONE 'UTC' AT TIME ZONE 'Europe/Istanbul', 'YYYY-MM-DD')
     `);
 
     // En çok ziyaretçi gelen şehirler (Son 14 gün)
@@ -81,13 +81,21 @@ export async function GET(request: Request) {
       LIMIT 15
     `);
 
+    // Şu an aktif kullanıcı sayısı (Son 5 dakikada işlem yapan tekil IP'ler)
+    const activeUsersStats = await db.execute(sql`
+      SELECT COUNT(DISTINCT ip_hash)::int as active_users
+      FROM site_visits
+      WHERE created_at > NOW() - INTERVAL '5 minutes'
+    `);
+
     return json({
       daily: dailyStats.rows || [],
       total: totalStats.rows[0] || { total_page_views: 0, total_unique_visitors: 0 },
       topPages: topPages.rows || [],
       today: todayStats.rows[0] || { views: 0, visitors: 0 },
       topCities: topCities.rows || [],
-      recentMemberVisits: recentMemberVisits.rows || []
+      recentMemberVisits: recentMemberVisits.rows || [],
+      activeUsers: activeUsersStats.rows[0]?.active_users ?? 0
     });
   } catch (error: any) {
     console.error('Admin analytics fetch error:', error);
