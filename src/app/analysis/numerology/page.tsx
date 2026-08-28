@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Hexagon, Loader2, Calendar, User, ArrowRight, Target, Heart, Sparkles, Wrench, Info, AlertCircle, Zap } from 'lucide-react';
 import { calculateLifePath, calculatePersonalYear, calculateArrows, getBirthdayNumber, calculateNameAnalysis, reduceToSingleDigit } from '@/utils/numerologyCalculator';
@@ -19,7 +19,15 @@ const reduceNumber = (num: number): number => {
 
 export default function NumerologyPage() {
   const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      setIsAdmin(params.get('admin') === 'true');
+    }
+  }, []);
   const [showResult, setShowResult] = useState(false);
   const [activeTab, setActiveTab] = useState<'name' | 'date'>('name');
   const [name, setName] = useState('');
@@ -725,7 +733,14 @@ export default function NumerologyPage() {
                   </div>
                 </div>
 
-                {renderBarcodeWarnings(lifePath!.number, birthday!)}
+                {isAdmin && renderBarcodeWarnings(
+                  lifePath!.number,
+                  birthday!,
+                  nameResults?.destiny,
+                  nameResults?.soulUrge,
+                  nameResults?.personality,
+                  nameResults?.chakraMatrix
+                )}
 
                 {renderDisclaimer()}
               </>
