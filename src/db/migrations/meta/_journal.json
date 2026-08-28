@@ -57,6 +57,13 @@
       "when": 1784895910493,
       "tag": "0007_outgoing_ozymandias",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1787922306825,
+      "tag": "0008_bouncy_photon",
+      "breakpoints": true
     }
   ]
 }

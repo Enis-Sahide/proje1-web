@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Shield, Users, DollarSign, Store, CheckCircle, XCircle, ArrowLeft, Star, Search, Filter, RefreshCw, Award, UserCheck, BookOpen, Plus, Trash2, Edit, Activity, Calendar, TrendingUp, Eye } from 'lucide-react';
+import { Shield, Users, DollarSign, Store, CheckCircle, XCircle, ArrowLeft, Star, Search, Filter, RefreshCw, Award, UserCheck, BookOpen, Plus, Trash2, Edit, Activity, Calendar, TrendingUp, Eye, MapPin } from 'lucide-react';
 import { useMarketplace } from '@/lib/useContent';
 import { apiFetch } from '@/lib/apiClient';
 
@@ -908,7 +908,112 @@ export default function AdminDashboard() {
                   </div>
                 )}
               </div>
+            </div>
 
+            {/* New Analytics Rows: Top Cities and Recent Member Activity */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Top Cities (Son 14 Gün) */}
+              <div className="bg-mystic-surface/50 backdrop-blur-md border border-mystic-surface-light rounded-3xl p-6 shadow-xl flex flex-col">
+                <h3 className="text-base font-bold text-white mb-6 flex items-center gap-2 border-b border-white/5 pb-3">
+                  <MapPin size={18} className="text-mystic-primary" />
+                  Ziyaret Edilen Şehirler (Son 14 Gün)
+                </h3>
+
+                {isLoadingAnalytics && !analytics ? (
+                  <div className="flex flex-col items-center justify-center py-20 gap-3 my-auto">
+                    <RefreshCw className="animate-spin text-mystic-primary" size={32} />
+                    <p className="text-xs text-mystic-text-muted">Veriler yükleniyor...</p>
+                  </div>
+                ) : analyticsError ? (
+                  <div className="text-center py-12 text-red-400 text-sm my-auto">
+                    {analyticsError}
+                  </div>
+                ) : (!analytics?.topCities || analytics.topCities.length === 0) ? (
+                  <div className="text-center py-20 text-mystic-text-muted text-sm my-auto">
+                    Henüz şehir bazlı veri bulunmuyor.
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {analytics.topCities.map((city: any, idx: number) => {
+                      const maxViews = Math.max(...analytics.topCities.map((c: any) => c.visitors || 1), 1);
+                      const percent = Math.min(100, Math.round(((city.visitors || 0) / maxViews) * 100));
+
+                      return (
+                        <div key={idx} className="space-y-1.5 p-3 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-all">
+                          <div className="flex justify-between items-center text-xs">
+                            <span className="font-semibold text-white truncate max-w-[180px]">
+                              📍 {city.city || 'Bilinmeyen Şehir'}, {city.country || 'AB'}
+                            </span>
+                            <span className="text-mystic-accent font-bold">{city.visitors} tekil</span>
+                          </div>
+                          <div className="w-full bg-black/30 h-1.5 rounded-full overflow-hidden">
+                            <div 
+                              className="bg-emerald-500 h-full rounded-full" 
+                              style={{ width: `${percent}%` }}
+                            ></div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+
+              {/* Recent Member Activities (Kayıtlı Üyelerin Son Aktiviteleri) */}
+              <div className="lg:col-span-2 bg-mystic-surface/50 backdrop-blur-md border border-mystic-surface-light rounded-3xl p-6 shadow-xl flex flex-col">
+                <h3 className="text-base font-bold text-white mb-6 flex items-center gap-2 border-b border-white/5 pb-3">
+                  <UserCheck size={18} className="text-mystic-primary" />
+                  Kayıtlı Üyelerin Son Aktiviteleri
+                </h3>
+
+                {isLoadingAnalytics && !analytics ? (
+                  <div className="flex flex-col items-center justify-center py-20 gap-3 my-auto">
+                    <RefreshCw className="animate-spin text-mystic-primary" size={32} />
+                    <p className="text-xs text-mystic-text-muted">Veriler yükleniyor...</p>
+                  </div>
+                ) : analyticsError ? (
+                  <div className="text-center py-12 text-red-400 text-sm my-auto">
+                    {analyticsError}
+                  </div>
+                ) : (!analytics?.recentMemberVisits || analytics.recentMemberVisits.length === 0) ? (
+                  <div className="text-center py-20 text-mystic-text-muted text-sm my-auto">
+                    Kayıtlı üye aktivitesi henüz bulunmuyor.
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-sm">
+                      <thead>
+                        <tr className="border-b border-white/10 text-mystic-text-muted text-xs uppercase font-semibold">
+                          <th className="py-2.5 px-3">Kullanıcı</th>
+                          <th className="py-2.5 px-3">Sayfa</th>
+                          <th className="py-2.5 px-3">Zaman</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5 text-white">
+                        {analytics.recentMemberVisits.map((visit: any, idx: number) => {
+                          const date = new Date(visit.created_at);
+                          const timeStr = date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+                          const dateStr = date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+                          return (
+                            <tr key={idx} className="hover:bg-white/5 transition-colors">
+                              <td className="py-3 px-3">
+                                <div className="font-medium">{visit.full_name || 'İsimsiz Üye'}</div>
+                                <div className="text-[10px] text-mystic-text-muted">{visit.email}</div>
+                              </td>
+                              <td className="py-3 px-3 font-mono text-xs text-mystic-accent max-w-[200px] truncate" title={visit.path}>
+                                {visit.path}
+                              </td>
+                              <td className="py-3 px-3 text-xs text-mystic-text-muted">
+                                {dateStr}, {timeStr}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
