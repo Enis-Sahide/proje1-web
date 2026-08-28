@@ -63,6 +63,16 @@ export async function POST(req: NextRequest) {
       atzilutCount += 2.5;
     }
 
+    const mod360 = (x: number) => ((x % 360) + 360) % 360;
+    const FIXED_STARS_2000 = [
+      { name: 'Sirius', longitude: 104.08 },     // 14°05' Cancer
+      { name: 'Regulus', longitude: 149.83 },    // 29°50' Leo
+      { name: 'Antares', longitude: 249.77 },    // 9°46' Sagittarius
+      { name: 'Aldebaran', longitude: 69.78 },   // 9°47' Gemini
+      { name: 'Spica', longitude: 203.83 }       // 23°50' Libra
+    ];
+
+    // Transits to Natal planets
     for (const aspect of transitAspects) {
       if (aspect.orb > 2.5) continue;
       if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
@@ -76,6 +86,22 @@ export async function POST(req: NextRequest) {
         beriyahCount += 1.0;
       } else if (n === 'Uranüs' || n === 'Neptün' || n === 'Plüton' || n === 'Kiron') {
         atzilutCount += 1.2;
+      }
+    }
+
+    // Transits to Fixed Stars (Atzilut - only if age >= 38)
+    if (age >= 38) {
+      const transitYear = now.getFullYear();
+      for (const tPlanet of transitChart.planets) {
+        for (const star of FIXED_STARS_2000) {
+          const starLon = mod360(star.longitude + (transitYear - 2000) * 0.01396);
+          let diff = Math.abs(tPlanet.longitude - starLon);
+          if (diff > 180) diff = 360 - diff;
+
+          if (diff <= 1.5 || Math.abs(diff - 180) <= 1.5) {
+            atzilutCount += 1.5;
+          }
+        }
       }
     }
 

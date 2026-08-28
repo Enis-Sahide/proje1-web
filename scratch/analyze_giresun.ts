@@ -2,6 +2,18 @@ import { generateTransitChart } from '../src/features/astrology/engine/Astrology
 import { AstroCity } from '../src/features/astrology/engine/AstrologyConstants';
 import moment from 'moment-timezone';
 
+function mod360(x: number) {
+  return ((x % 360) + 360) % 360;
+}
+
+const FIXED_STARS_2000 = [
+  { name: 'Sirius', longitude: 104.08 },     // 14°05' Cancer
+  { name: 'Regulus', longitude: 149.83 },    // 29°50' Leo
+  { name: 'Antares', longitude: 249.77 },    // 9°46' Sagittarius
+  { name: 'Aldebaran', longitude: 69.78 },   // 9°47' Gemini
+  { name: 'Spica', longitude: 203.83 }       // 23°50' Libra
+];
+
 async function runAnalysis() {
   const cityData: AstroCity = {
     name: 'Giresun',
@@ -45,13 +57,13 @@ async function runAnalysis() {
       const transitChartData = await generateTransitChart(natalDateObj, transitDateObj, cityData);
       const transitAspects = transitChartData.transitAspects;
 
-      // Calculate level weights
+      // Calculate level weights (Formula C)
       let asiyahCount = 0;
       let yetzirahCount = 0;
       let beriyahCount = 0;
       let atzilutCount = 0;
 
-      // Add baseline padding (+2.5) to the level corresponding to the current age phase (Formula C)
+      // 1. Add age baseline padding (+2.5)
       if (age < 28) {
         yetzirahCount += 2.5;
       } else if (age < 42) {
@@ -60,6 +72,7 @@ async function runAnalysis() {
         atzilutCount += 2.5;
       }
 
+      // 2. Transits to Natal planets
       for (const aspect of transitAspects) {
         if (aspect.orb > 2.5) continue;
         if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
@@ -76,7 +89,23 @@ async function runAnalysis() {
         }
       }
 
-      // Determine active level (Formula C)
+      // 3. Transits to Fixed Stars (Atzilut - only if age >= 38)
+      if (age >= 38) {
+        for (const tPlanet of transitChartData.transitPlanets) {
+          for (const star of FIXED_STARS_2000) {
+            const starLon = mod360(star.longitude + (currentMoment.year() - 2000) * 0.01396);
+            let diff = Math.abs(tPlanet.longitude - starLon);
+            if (diff > 180) diff = 360 - diff;
+
+            // Conjunction or Opposition with tight orb
+            if (diff <= 1.5 || Math.abs(diff - 180) <= 1.5) {
+              atzilutCount += 1.5;
+            }
+          }
+        }
+      }
+
+      // Determine active level (Formula C Comparison)
       let activeLevel = 1;
       let maxWeight = asiyahCount;
 
