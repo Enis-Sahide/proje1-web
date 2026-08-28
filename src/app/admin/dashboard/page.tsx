@@ -322,7 +322,7 @@ export default function AdminDashboard() {
       <main className="max-w-6xl mx-auto p-6 mt-6 w-full max-w-full">
         
         {/* Global Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-10">
           <div className="bg-black/40 border border-white/5 p-6 rounded-2xl relative overflow-hidden">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-mystic-text-muted font-medium text-sm">Toplam Ciro</h3>
@@ -379,6 +379,21 @@ export default function AdminDashboard() {
               )}
             </p>
             <p className="text-[11px] text-mystic-text-muted mt-2">Bugünkü tekil ruh ziyareti</p>
+          </div>
+
+          <div className="bg-black/40 border border-white/5 p-6 rounded-2xl relative overflow-hidden">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-mystic-text-muted font-medium text-sm">Şu An Aktif</h3>
+              <div className="bg-orange-500/15 p-2 rounded-lg text-orange-400 animate-pulse"><Activity size={18} /></div>
+            </div>
+            <p className="text-2xl font-bold text-white">
+              {isLoadingAnalytics ? (
+                <span className="inline-block w-8 h-6 bg-white/10 animate-pulse rounded"></span>
+              ) : (
+                analytics?.activeUsers ?? 0
+              )}
+            </p>
+            <p className="text-[11px] text-mystic-text-muted mt-2">Son 5 dakikadaki tekil ruhlar</p>
           </div>
         </div>
 
