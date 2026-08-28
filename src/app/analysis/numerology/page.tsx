@@ -219,7 +219,7 @@ export default function NumerologyPage() {
     };
     const planetName = planetaryMap[lifePathNum] || "Satürn";
 
-    // Determine Karmik Kod dynamically (19/1, 13/4, 16/7, 14/5)
+    // Determine Karmik Borç Kodu dynamically (19/1, 13/4, 16/7, 14/5)
     let karmicCode = "Yok";
     if (birthDate.startsWith("19") || destiny === 19 || soulUrge === 19 || personality === 19 || lifePathNum === 1 || birthdayNum === 17) {
       karmicCode = "19/1";
@@ -252,24 +252,24 @@ export default function NumerologyPage() {
 
     const warnings = [];
 
-    // 1 (11:11 / 01:01 / 10:10 / 111 / 1) Görmek: Çift Yönlü Frekans (Ruh Kodu: 1 & Karmik Kod: 19/1)
+    // 1 (11:11 / 01:01 / 10:10 / 111 / 1) Görmek: Çift Yönlü Frekans (Ruh Kodu: 1 & Karmik Borç Kodu: 19/1)
     if (ruhKodu === 1 || karmicCode === "19/1") {
       const isNestedKarmic = ruhKodu === 1 && karmicCode === "19/1";
       warnings.push({
         number: "1 / 11:11 / 10:10",
         title: "11:11 Çift Yönlü Uyanış Frekansı",
-        desc: `Barkodunuzda Ruh Kodu: 1 (Kişilik Kodu) ${isNestedKarmic ? "ve bu kodun içine gömülü olan Karmik Kod: 19/1" : ""} bulunmaktadır. ${isNestedKarmic ? "Ruh kodunuzun içinde karmik kilit çıkması (19/1), yüz yaşamdır aynı hatayı tekrarladığınızı gösterir. Bu durum sizi zorlar; çünkü her yaşamda dönüp dolaşıp aynı hatayı yapmak, ezberlenmiş eski davranış kalıplarına düşmek demektir. " : ""}Günlük hayatta 1 sayı dizilerini görmeniz iki anlam taşır: (1) Rehberlik olarak; zihinsel kaygıları bırakıp lider, bağımsız ve öncü ruhunuzu aktif ederek 'akışta kalmanız' hatırlatılır. (2) Karmik uyarı olarak; geçmiş yaşam ezberlerinize (bencillik, korku, eylemsizlik) düşerek bu yaşamda yeni bir karma yaratmamanız gerektiği konusunda sert bir sistem alarmı verilir.`,
+        desc: `Haritanızda Ruh Kodu: 1 (Kişilik Kodu) ${isNestedKarmic ? "ve bu kodun içine gömülü olan Karmik Borç Kodu: 19/1" : ""} bulunmaktadır. ${isNestedKarmic ? "Ruh kodunuzun içinde karmik kilit çıkması (19/1), yüz yaşamdır aynı hatayı tekrarladığınızı gösterir. Bu durum sizi zorlar; çünkü her yaşamda dönüp dolaşıp aynı hatayı yapmak, ezberlenmiş eski davranış kalıplarına düşmek demektir. " : ""}Günlük hayatta 1 sayı dizilerini görmeniz iki anlam taşır: (1) Rehberlik olarak; zihinsel kaygıları bırakıp lider, bağımsız ve öncü ruhunuzu aktif ederek 'akışta kalmanız' hatırlatılır. (2) Karmik uyarı olarak; geçmiş yaşam ezberlerinize (bencillik, korku, eylemsizlik) düşerek bu yaşamda yeni bir karma yaratmamanız gerektiği konusunda sert bir sistem alarmı verilir.`,
         icon: <Zap className="text-yellow-400" size={16} />,
         color: "border-yellow-400/20 bg-yellow-400/5 text-yellow-400"
       });
     }
 
-    // 2 (22:22 / 2) Görmek: Koruma Frekansı (Alan Kodu: 2 - "Alan Kapatan")
+    // 2 (22:22 / 2) Görmek: Koruma Frekansı (Alan Kodu: 2 - "Aura Sınır ve Koruma")
     if (alanKodu === 2) {
       warnings.push({
         number: "2 / 22:22 / 222",
-        title: "22:22 Koruma ve Sınır Frekansı (Alan Kapatan)",
-        desc: "Alandaki koruma kodunuz 2'dir. Bu sayı sizin için 'Alan Kapatan' (enerji alanını koruyan/kapatan) anlamına gelir. Günlük hayatta 2 sayı dizilerini görmeniz; dışarıdan gelen negatif enerjilere karşı kendi alanınızı kapatmanız, sınırlarınızı net bir şekilde çizmeniz ve gereksiz enerji sızıntılarını engellemeniz gerektiği mesajını taşır.",
+        title: "22:22 Aura Sınır ve Koruma Frekansı",
+        desc: "Alandaki koruma kodunuz 2'dir. Bu sayı sizin için 'Aura Sınır ve Koruma' anlamına gelir. Günlük hayatta 2 sayı dizilerini görmeniz; dışarıdan gelen negatif enerjilere karşı kendi alanınızı kapatmanız, sınırlarınızı net bir şekilde çizmeniz ve gereksiz enerji sızıntılarını engellemeniz gerektiği mesajını taşır.",
         icon: <Info className="text-blue-400" size={16} />,
         color: "border-blue-400/20 bg-blue-400/5 text-blue-400"
       });
@@ -291,7 +291,7 @@ export default function NumerologyPage() {
       warnings.push({
         number: "13 / 4 / 444",
         title: "13/4 Disiplin ve İstikrar Uyarısı",
-        desc: "Barkodunuzda 13/4 karmik borç kodu bulunmaktadır. Günlük hayatta 444 veya 44 dizilerini görmek; kestirme yolları aramayı bırakarak sabırla ve disiplinle çalışmanız gerektiğine dair Yüksek Benlik uyarısıdır.",
+        desc: "Astro-numerolojik haritanızda 13/4 karmik borç kodu bulunmaktadır. Günlük hayatta 444 veya 44 dizilerini görmek; kestirme yolları aramayı bırakarak sabırla ve disiplinle çalışmanız gerektiğine dair Yüksek Benlik uyarısıdır.",
         icon: <AlertCircle className="text-orange-400" size={16} />,
         color: "border-orange-400/20 bg-orange-400/5 text-orange-400"
       });
@@ -301,7 +301,7 @@ export default function NumerologyPage() {
       warnings.push({
         number: "16 / 7 / 16:16",
         title: "16:16 Ego ve Teslimiyet Uyarısı",
-        desc: "Barkodunuzda 16/7 karmik borç kodu bulunmaktadır. Günlük hayatta 16:16 veya 777 görmek; egosal kurguları ve sahte güven alanlarını bırakarak ilahi teslimiyete geçmeniz gerektiğine dair Yüksek Benlik alarmıdır.",
+        desc: "Astro-numerolojik haritanızda 16/7 karmik borç kodu bulunmaktadır. Günlük hayatta 16:16 veya 777 görmek; egosal kurguları ve sahte güven alanlarını bırakarak ilahi teslimiyete geçmeniz gerektiğine dair Yüksek Benlik alarmıdır.",
         icon: <AlertCircle className="text-purple-400" size={16} />,
         color: "border-purple-400/20 bg-purple-400/5 text-purple-400"
       });
@@ -309,9 +309,9 @@ export default function NumerologyPage() {
 
     if (warnings.length === 0) {
       warnings.push({
-        number: "Genel Barkod",
+        number: "Genel Sayısal Hat",
         title: "Eşzamanlı Rakamlar ve Yüksek Benlik Rehberi",
-        desc: "Barkodunuzda üstat sayılar veya karmik kodlar bulunmasa da, günlük hayatta karşılaştığınız tekrarlanan sayılar, Yüksek Benliğin o sayıların numerolojik enerjisini hayatınıza acilen entegre etmeniz gerektiği mesajını taşır.",
+        desc: "Haritanızda üstat sayılar veya karmik borç kodları bulunmasa da, günlük hayatta karşılaştığınız tekrarlanan sayılar, Yüksek Benliğin o sayıların numerolojik enerjisini hayatınıza acilen entegre etmeniz gerektiği mesajını taşır.",
         icon: <Sparkles className="text-indigo-400" size={16} />,
         color: "border-indigo-400/20 bg-indigo-400/5 text-indigo-400"
       });
@@ -319,15 +319,15 @@ export default function NumerologyPage() {
 
     return (
       <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/25 rounded-3xl p-6 md:p-8 mt-6">
-        <h3 className="text-lg font-bold text-[#D4AF37] mb-1">Yüksek Benlik Barkod Kodlarınız</h3>
+        <h3 className="text-lg font-bold text-[#D4AF37] mb-1">Astro-Numerolojik Kişisel Kodlarınız</h3>
         <p className="text-xs text-mystic-text-muted mb-6 leading-relaxed">
-          Matrix sistemine giriş kodlarınız ve bu kodların günlük hayattaki eşzamanlı uyanış titreşimleri.
+          Kozmik evren sistemine giriş kodlarınız ve bu kodların günlük hayattaki eşzamanlı uyanış titreşimleri.
         </p>
 
         {/* 5 Core Codes Grid */}
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
-            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Karmik Kod</span>
+            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Karmik Borç Kodu</span>
             <span className="text-xl font-bold text-red-500 font-serif">{karmicCode}</span>
           </div>
           <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
@@ -338,7 +338,7 @@ export default function NumerologyPage() {
             <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Alan Kodu</span>
             <span className="text-xl font-bold text-yellow-400 font-serif">
               {alanKodu}
-              <span className="text-[9px] block text-mystic-text-muted font-sans font-normal mt-0.5">(Alan Kapatan)</span>
+              <span className="text-[9px] block text-mystic-text-muted font-sans font-normal mt-0.5">(Aura Sınır ve Koruma)</span>
             </span>
           </div>
           <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
@@ -351,7 +351,7 @@ export default function NumerologyPage() {
           </div>
         </div>
 
-        <h4 className="text-sm font-bold text-[#D4AF37] mb-3 border-t border-white/5 pt-4">Sayısal Eşzamanlılık Uyarıları</h4>
+        <h4 className="text-sm font-bold text-[#D4AF37] mb-3 border-t border-white/5 pt-4">Kozmik Eşzamanlılık Uyarıları</h4>
         <div className="space-y-4">
           {warnings.map((w, idx) => (
             <div key={idx} className="bg-black/30 border border-white/5 rounded-2xl p-5 space-y-3">
