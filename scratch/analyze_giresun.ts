@@ -68,8 +68,8 @@ async function runAnalysis() {
     tz: 'Europe/Istanbul'
   };
 
-  // Birth Details: June 26, 1992 at 12:00 UTC+3
-  const natalMoment = moment.tz('1992-06-26 12:00:00', 'YYYY-MM-DD HH:mm:ss', cityData.tz);
+  // Birth Details: March 17, 1995 at 18:05 UTC+2
+  const natalMoment = moment.tz('1995-03-17 18:05:00', 'YYYY-MM-DD HH:mm:ss', cityData.tz);
   const natalDateObj = natalMoment.toDate();
 
   console.log(`Natal Date: ${natalMoment.format()} (UTC: ${natalDateObj.toISOString()})`);
@@ -113,9 +113,9 @@ async function runAnalysis() {
       const transitDateObj = currentMoment.clone().hour(12).toDate();
 
       // Calculate age
-      let age = currentMoment.year() - 1992;
-      const mDiff = currentMoment.month() - 5;
-      if (mDiff < 0 || (mDiff === 0 && currentMoment.date() < 26)) {
+      let age = currentMoment.year() - 1995;
+      const mDiff = currentMoment.month() - 2; // March is index 2
+      if (mDiff < 0 || (mDiff === 0 && currentMoment.date() < 17)) {
         age--;
       }
 
