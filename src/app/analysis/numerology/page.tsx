@@ -735,11 +735,7 @@ export default function NumerologyPage() {
 
                 {isAdmin && renderBarcodeWarnings(
                   lifePath!.number,
-                  birthday!,
-                  nameResults?.destiny,
-                  nameResults?.soulUrge,
-                  nameResults?.personality,
-                  nameResults?.chakraMatrix
+                  birthday!
                 )}
 
                 {renderDisclaimer()}
