@@ -142,8 +142,17 @@ export const BLOG_POSTS = [
     imageUrl: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/uruz.png',
     category: 'Astroloji',
     published: true
+  },
+  {
+    title: 'Modern İllüzyon: Yapay Matematikten Kutsal Geometriye ve Özsel Arınmaya',
+    slug: 'modern-illuzyon-yapay-matematikten-kutsal-geometriye',
+    content: 'Modern dünyada Tanrı kavramına yaklaşmak, zihnimizin karmaşık labirentlerinde kolayca kaybolabilecek bir arayışa dönüştü. Pek çok dini ve felsefi tartışmanın odağında bir Yaratıcı gerçekliğinin varlığı sorgulanırken; aslında etrafımıza, evrenin işleyişine ve kendi varoluşumuza daha derin bir gözle baktığımızda, görünmez bir elin, üstün bir bilincin varlığını hissetmek kaçınılmaz hale geliyor. Yaratıcıyı kavrayabilmenin ilk ve en temel şartı, insanın kendini kavrayabilmesidir. Kendimizi anlamak ise doğayla, Gaia ile yani yaşamın bütünüyle bir olmaktan geçer.\n\nBugün gıdalarımızın genetiğiyle oynanması, sentetik tabanlı ayakkabılarla toprak temasımızın kesilmesi ve evlerimizde kullandığımız sentetik malzemeler bizi Yaratıcı\'nın kutsal geometrisinden uzaklaştırıyor. Kolaylık adı altında çamaşır ve bulaşık makinesi gibi icatlarla su temasımızı azaltıyor, en büyük arınma ve şifa kaynağımızdan mahrum kalıyoruz. Yaratıcı bu dünyayı kusursuz bir matematik üzerine kurmuştur. Ancak modern yaşamda bu kutsal matematiği bozarak basit, yapay bir matematik kuruyor ve alt bilinçlere düşüyoruz.\n\nTekrar yükselmek ve Yaratıcıya yaklaşmak için iğrenme duygusundan ve yargılardan arınarak, bedenimizin doğal döngülerini kabul etmeli ve Gaia ile bütünleşmeliyiz.',
+    imageUrl: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/fehu.png',
+    category: 'Kişisel Gelişim',
+    published: true
   }
 ];
+
 
 export const SCHUMANN_RULES = [
   {
