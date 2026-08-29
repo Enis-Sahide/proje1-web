@@ -107,6 +107,15 @@ export default function KabbalahAnalysisPage() {
     }
   };
 
+  const renderDisclaimer = () => (
+    <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/25 rounded-2xl p-4 flex gap-3 items-start mt-12 max-w-3xl mx-auto">
+      <AlertCircle size={18} className="text-[#D4AF37] shrink-0 mt-0.5" />
+      <p className="text-xs text-mystic-text-muted leading-relaxed">
+        Bu analizler, kadim Pisagor numerolojisi ve Kabbalistik astroloji modellerine dayanan algoritmik ve matematiksel yorumlamalardır. Kişisel farkındalık yolculuğunuzda size rehberlik etmek üzere tasarlanmıştır; kesin gelecek tahmini, tıbbi veya psikolojik teşhis amacı taşımaz.
+      </p>
+    </div>
+  );
+
   const renderSvgWheel = (currentChart: NatalChartData | null) => {
     if (!currentChart) return null;
 
@@ -619,6 +628,8 @@ export default function KabbalahAnalysisPage() {
                   );
                 })}
               </div>
+
+              {renderDisclaimer()}
 
               <div className="pt-8 pb-12 flex justify-center">
                 <button 

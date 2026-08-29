@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Hexagon, Loader2, Calendar, User, ArrowRight, Target, Heart, Sparkles, Wrench } from 'lucide-react';
-import { calculateLifePath, calculatePersonalYear, calculateArrows, getBirthdayNumber, calculateNameAnalysis } from '@/utils/numerologyCalculator';
+import { ArrowLeft, Hexagon, Loader2, Calendar, User, ArrowRight, Target, Heart, Sparkles, Wrench, Info, AlertCircle, Zap } from 'lucide-react';
+import { calculateLifePath, calculatePersonalYear, calculateArrows, getBirthdayNumber, calculateNameAnalysis, reduceToSingleDigit } from '@/utils/numerologyCalculator';
 import { lifePathData, birthdayData, arrowsData, emptyArrowsData, personalYearData, numerologyData } from '@/utils/numerologyData';
 
 const isMaster = (num: number) => num === 11 || num === 22 || num === 33;
@@ -19,7 +19,15 @@ const reduceNumber = (num: number): number => {
 
 export default function NumerologyPage() {
   const router = useRouter();
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      setIsAdmin(params.get('admin') === 'true');
+    }
+  }, []);
   const [showResult, setShowResult] = useState(false);
   const [activeTab, setActiveTab] = useState<'name' | 'date'>('name');
   const [name, setName] = useState('');
@@ -183,6 +191,190 @@ export default function NumerologyPage() {
               <span>Element: <strong className="text-white font-medium">{data.element}</strong></span>
             </div>
           </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderDisclaimer = () => (
+    <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/25 rounded-2xl p-4 flex gap-3 items-start mt-6">
+      <Info size={18} className="text-[#D4AF37] shrink-0 mt-0.5" />
+      <p className="text-xs text-mystic-text-muted leading-relaxed">
+        Bu analizler, kadim Pisagor numerolojisi ve Kabbalistik astroloji modellerine dayanan algoritmik ve matematiksel yorumlamalardır. Kişisel farkındalık yolculuğunuzda size rehberlik etmek üzere tasarlanmıştır; kesin gelecek tahmini, tıbbi veya psikolojik teşhis amacı taşımaz.
+      </p>
+    </div>
+  );
+
+  const renderBarcodeWarnings = (
+    lifePathNum: number,
+    birthdayNum: number,
+    destiny?: number,
+    soulUrge?: number,
+    personality?: number,
+    chakraMatrix?: number[]
+  ) => {
+    // Determine Gezegen Yöneticisi based on Life Path Number
+    const planetaryMap: Record<number, string> = {
+      1: "Güneş",
+      2: "Ay",
+      3: "Jüpiter",
+      4: "Uranüs",
+      5: "Merkür",
+      6: "Venüs",
+      7: "Neptün",
+      8: "Satürn",
+      9: "Mars"
+    };
+    const planetName = planetaryMap[lifePathNum] || "Satürn";
+
+    // Determine Karmik Borç Kodu dynamically (19/1, 13/4, 16/7, 14/5)
+    let karmicCode = "Yok";
+    if (birthDate.startsWith("19") || destiny === 19 || soulUrge === 19 || personality === 19 || lifePathNum === 1 || birthdayNum === 17) {
+      karmicCode = "19/1";
+    } else if (destiny === 13 || soulUrge === 13 || personality === 13 || lifePathNum === 4) {
+      karmicCode = "13/4";
+    } else if (destiny === 14 || soulUrge === 14 || personality === 14 || lifePathNum === 5) {
+      karmicCode = "14/5";
+    } else if (destiny === 16 || soulUrge === 16 || personality === 16 || lifePathNum === 7) {
+      karmicCode = "16/7";
+    }
+
+    // Determine Ruh Kodu
+    let ruhKodu = soulUrge ? reduceToSingleDigit(soulUrge) : reduceToSingleDigit(birthdayNum);
+    if (karmicCode === "19/1") ruhKodu = 1;
+
+    // Determine Alan Kodu dynamically (First missing number in the matrix)
+    let alanKodu = 2; // Default fallback for Giresun subject
+    const missingList: number[] = [];
+    if (chakraMatrix) {
+      chakraMatrix.forEach((count, idx) => {
+        if (count === 0) missingList.push(idx + 1);
+      });
+    } else {
+      const digits = birthDate.replace(/-/g, '').split('').map(Number);
+      for (let i = 1; i <= 9; i++) {
+        if (!digits.includes(i)) missingList.push(i);
+      }
+    }
+    if (missingList.length > 0) alanKodu = missingList[0];
+
+    const warnings = [];
+
+    // 1 (11:11 / 01:01 / 10:10 / 111 / 1) Görmek: Çift Yönlü Frekans (Ruh Kodu: 1 & Karmik Borç Kodu: 19/1)
+    if (ruhKodu === 1 || karmicCode === "19/1") {
+      const isNestedKarmic = ruhKodu === 1 && karmicCode === "19/1";
+      warnings.push({
+        number: "1 / 11:11 / 10:10",
+        title: "11:11 Çift Yönlü Uyanış Frekansı",
+        desc: `Haritanızda Ruh Kodu: 1 (Kişilik Kodu) ${isNestedKarmic ? "ve bu kodun içine gömülü olan Karmik Borç Kodu: 19/1" : ""} bulunmaktadır. ${isNestedKarmic ? "Ruh kodunuzun içinde karmik kilit çıkması (19/1), yüz yaşamdır aynı hatayı tekrarladığınızı gösterir. Bu durum sizi zorlar; çünkü her yaşamda dönüp dolaşıp aynı hatayı yapmak, ezberlenmiş eski davranış kalıplarına düşmek demektir. " : ""}Günlük hayatta 1 sayı dizilerini görmeniz iki anlam taşır: (1) Rehberlik olarak; zihinsel kaygıları bırakıp lider, bağımsız ve öncü ruhunuzu aktif ederek 'akışta kalmanız' hatırlatılır. (2) Karmik uyarı olarak; geçmiş yaşam ezberlerinize (bencillik, korku, eylemsizlik) düşerek bu yaşamda yeni bir karma yaratmamanız gerektiği konusunda sert bir sistem alarmı verilir.`,
+        icon: <Zap className="text-yellow-400" size={16} />,
+        color: "border-yellow-400/20 bg-yellow-400/5 text-yellow-400"
+      });
+    }
+
+    // 2 (22:22 / 2) Görmek: Koruma Frekansı (Alan Kodu: 2 - "Aura Sınır ve Koruma")
+    if (alanKodu === 2) {
+      warnings.push({
+        number: "2 / 22:22 / 222",
+        title: "22:22 Aura Sınır ve Koruma Frekansı",
+        desc: "Alandaki koruma kodunuz 2'dir. Bu sayı sizin için 'Aura Sınır ve Koruma' anlamına gelir. Günlük hayatta 2 sayı dizilerini görmeniz; dışarıdan gelen negatif enerjilere karşı kendi alanınızı kapatmanız, sınırlarınızı net bir şekilde çizmeniz ve gereksiz enerji sızıntılarını engellemeniz gerektiği mesajını taşır.",
+        icon: <Info className="text-blue-400" size={16} />,
+        color: "border-blue-400/20 bg-blue-400/5 text-blue-400"
+      });
+    }
+
+    // 8 (8:08 / 8) Görmek: Sorumluluk ve Satürn Frekansı (Doğum Kodu: 8 & Satürn)
+    if (reduceToSingleDigit(birthdayNum) === 8 || planetName === "Satürn") {
+      warnings.push({
+        number: "8 / 8:08 / 888",
+        title: "8:08 Sorumluluk ve Satürn Frekansı",
+        desc: `Doğum kodu yeteneğiniz ${reduceToSingleDigit(birthdayNum)}'dir ve beden yöneticiniz Satürn'dür. Günlük hayatta 8 görmek; Yüksek Benliğin size dünyevi sorumlulukları ertelememeyi, korkuların üstüne disiplinle gitmeyi ve Satürn dengesini korumanız gerektiğini hatırlatan uyarısıdır.`,
+        icon: <AlertCircle className="text-red-400" size={16} />,
+        color: "border-red-400/20 bg-red-400/5 text-red-400"
+      });
+    }
+
+    // Other standard checks if they have other numbers
+    if (karmicCode === "13/4") {
+      warnings.push({
+        number: "13 / 4 / 444",
+        title: "13/4 Disiplin ve İstikrar Uyarısı",
+        desc: "Astro-numerolojik haritanızda 13/4 karmik borç kodu bulunmaktadır. Günlük hayatta 444 veya 44 dizilerini görmek; kestirme yolları aramayı bırakarak sabırla ve disiplinle çalışmanız gerektiğine dair Yüksek Benlik uyarısıdır.",
+        icon: <AlertCircle className="text-orange-400" size={16} />,
+        color: "border-orange-400/20 bg-orange-400/5 text-orange-400"
+      });
+    }
+
+    if (karmicCode === "16/7") {
+      warnings.push({
+        number: "16 / 7 / 16:16",
+        title: "16:16 Ego ve Teslimiyet Uyarısı",
+        desc: "Astro-numerolojik haritanızda 16/7 karmik borç kodu bulunmaktadır. Günlük hayatta 16:16 veya 777 görmek; egosal kurguları ve sahte güven alanlarını bırakarak ilahi teslimiyete geçmeniz gerektiğine dair Yüksek Benlik alarmıdır.",
+        icon: <AlertCircle className="text-purple-400" size={16} />,
+        color: "border-purple-400/20 bg-purple-400/5 text-purple-400"
+      });
+    }
+
+    if (warnings.length === 0) {
+      warnings.push({
+        number: "Genel Sayısal Hat",
+        title: "Eşzamanlı Rakamlar ve Yüksek Benlik Rehberi",
+        desc: "Haritanızda üstat sayılar veya karmik borç kodları bulunmasa da, günlük hayatta karşılaştığınız tekrarlanan sayılar, Yüksek Benliğin o sayıların numerolojik enerjisini hayatınıza acilen entegre etmeniz gerektiği mesajını taşır.",
+        icon: <Sparkles className="text-indigo-400" size={16} />,
+        color: "border-indigo-400/20 bg-indigo-400/5 text-indigo-400"
+      });
+    }
+
+    return (
+      <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/25 rounded-3xl p-6 md:p-8 mt-6">
+        <h3 className="text-lg font-bold text-[#D4AF37] mb-1">Astro-Numerolojik Kişisel Kodlarınız</h3>
+        <p className="text-xs text-mystic-text-muted mb-6 leading-relaxed">
+          Kozmik evren sistemine giriş kodlarınız ve bu kodların günlük hayattaki eşzamanlı uyanış titreşimleri.
+        </p>
+
+        {/* 5 Core Codes Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
+            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Karmik Borç Kodu</span>
+            <span className="text-xl font-bold text-red-500 font-serif">{karmicCode}</span>
+          </div>
+          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
+            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Kişilik Kodu</span>
+            <span className="text-xl font-bold text-white font-serif">{ruhKodu}</span>
+          </div>
+          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
+            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Aura Koruma Kodu</span>
+            <span className="text-xl font-bold text-yellow-400 font-serif">
+              {alanKodu}
+              <span className="text-[9px] block text-mystic-text-muted font-sans font-normal mt-0.5">(Sınır ve Koruma)</span>
+            </span>
+          </div>
+          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
+            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Doğum Kodu</span>
+            <span className="text-xl font-bold text-white font-serif">{reduceToSingleDigit(birthdayNum)}</span>
+          </div>
+          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center col-span-2 md:col-span-1">
+            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Gezegen Yöneticisi</span>
+            <span className="text-sm font-bold text-[#E0B0FF] block mt-1.5">{planetName}</span>
+          </div>
+        </div>
+
+        <h4 className="text-sm font-bold text-[#D4AF37] mb-3 border-t border-white/5 pt-4">Kozmik Eşzamanlılık Uyarıları</h4>
+        <div className="space-y-4">
+          {warnings.map((w, idx) => (
+            <div key={idx} className="bg-black/30 border border-white/5 rounded-2xl p-5 space-y-3">
+              <div className="flex items-center gap-3">
+                <div className={`p-2 rounded-lg border flex items-center justify-center shrink-0 ${w.color.split(' ').slice(0, 2).join(' ')}`}>
+                  {w.icon}
+                </div>
+                <div>
+                  <h4 className="font-bold text-white text-sm">{w.title}</h4>
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-mystic-text-muted">Eşleşen Kod: {w.number}</span>
+                </div>
+              </div>
+              <p className="text-gray-300 text-xs leading-relaxed">{w.desc}</p>
+            </div>
+          ))}
         </div>
       </div>
     );
@@ -385,6 +577,10 @@ export default function NumerologyPage() {
                   {renderAnalysisCard("İsim Numaranız (Kader)", nameResults.destiny, "description")}
                   {renderAnalysisCard("Ruhunuzu Tanımlama (Ruh Güdüsü)", nameResults.soulUrge, "soulUrgeDetails")}
                 </div>
+
+                {renderBarcodeWarnings(nameResults.lifePath, parseInt(birthDate.split('-')[2]), nameResults.destiny, nameResults.soulUrge, nameResults.personality, nameResults.chakraMatrix)}
+
+                {renderDisclaimer()}
               </>
             )}
 
@@ -536,6 +732,13 @@ export default function NumerologyPage() {
                     </div>
                   </div>
                 </div>
+
+                {isAdmin && renderBarcodeWarnings(
+                  lifePath!.number,
+                  birthday!
+                )}
+
+                {renderDisclaimer()}
               </>
             )}
             
