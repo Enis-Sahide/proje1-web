@@ -260,6 +260,7 @@ export default function BlogDetailPage() {
               </button>
             </div>
           </div>
+        </div>
       </article>
     </div>
   );
