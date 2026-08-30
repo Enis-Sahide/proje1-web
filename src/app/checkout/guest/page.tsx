@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeft, CreditCard, ShieldCheck, Loader2, Sparkles, CheckCircle2 } from 'lucide-react';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { AstroCity } from '@/features/astrology/engine/AstrologyConstants';
+import { useAuth } from '@/context/AuthContext';
 
 function GuestCheckoutForm() {
   const router = useRouter();
@@ -323,6 +324,46 @@ function GuestCheckoutForm() {
 }
 
 export default function GuestCheckoutPage() {
+  const router = useRouter();
+  const { role, isLoading } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#05050A] text-white flex items-center justify-center p-6 relative font-sans">
+        <div className="text-center">
+          <Loader2 className="animate-spin text-[#D4AF37] mx-auto mb-4" size={32} />
+          <p className="text-mystic-text-muted">Yükleniyor...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (role !== 'admin') {
+    return (
+      <div className="min-h-screen bg-[#05050A] text-white flex items-center justify-center p-6 relative z-10 font-sans">
+        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay pointer-events-none z-0"></div>
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#D4AF37] opacity-5 blur-[150px] rounded-full pointer-events-none"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#6A0DAD] opacity-10 blur-[150px] rounded-full pointer-events-none"></div>
+        
+        <div className="max-w-md w-full bg-black/80 backdrop-blur-xl border border-red-500/20 p-8 rounded-3xl text-center shadow-[0_0_50px_rgba(239,68,68,0.1)] flex flex-col items-center z-10">
+          <div className="w-16 h-16 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center mb-6 text-red-500">
+            <ShieldCheck size={32} />
+          </div>
+          <h2 className="text-2xl font-bold text-white mb-4">Ödeme Altyapısı Aktif Değil</h2>
+          <p className="text-mystic-text-muted text-sm leading-relaxed mb-6">
+            Satın alma altyapısı şu anda test aşamasındadır. Bu sayfa sadece yöneticiler (admin) tarafından görüntülenebilir.
+          </p>
+          <button 
+            onClick={() => router.push('/')}
+            className="w-full bg-white/5 hover:bg-white/10 rounded-xl py-3 text-white transition-colors border border-white/10"
+          >
+            Ana Sayfaya Dön
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-[#05050A] text-white flex items-center justify-center p-6 relative font-sans">
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay pointer-events-none z-0"></div>

@@ -456,23 +456,32 @@ export default function AstrologyPage() {
                      {(isDownloading || renderPrintable) ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />} 
                      {(isDownloading || renderPrintable) ? "Görsel Hazırlanıyor..." : "Haritayı İndir (PNG)"}
                    </button>
-                   <button 
-                     onClick={async () => {
-                       if (isApprenticeOrAbove) {
-                         await downloadChartPDF(
-                           chartData,
-                           cityKey ? cityKey.name : '',
-                           `${dateStr.split('-').reverse().join('.')} ${timeStr}`
-                         );
-                       } else {
-                         router.push(`/checkout/guest?type=astrology&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}&country=${encodeURIComponent(cityKey?.country || '')}`);
-                       }
-                     }}
-                     className="flex-1 sm:flex-initial text-xs sm:text-sm px-4 py-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] rounded-full text-black font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2"
-                   >
-                     <Download size={16} />
-                     {isApprenticeOrAbove ? "PDF Raporu İndir" : "PDF Raporu Satın Al (50 TL)"}
-                   </button>
+                   {isApprenticeOrAbove && (
+                      <button 
+                        onClick={async () => {
+                          await downloadChartPDF(
+                            chartData,
+                            cityKey ? cityKey.name : '',
+                            `${dateStr.split('-').reverse().join('.')} ${timeStr}`
+                          );
+                        }}
+                        className="flex-1 sm:flex-initial text-xs sm:text-sm px-4 py-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] rounded-full text-black font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2"
+                      >
+                        <Download size={16} />
+                        PDF Raporu İndir
+                      </button>
+                    )}
+                    {role === 'admin' && (
+                      <button 
+                        onClick={async () => {
+                          router.push(`/checkout/guest?type=astrology&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}&country=${encodeURIComponent(cityKey?.country || '')}`);
+                        }}
+                        className="flex-1 sm:flex-initial text-xs sm:text-sm px-4 py-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] rounded-full text-black font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2"
+                      >
+                        <Download size={16} />
+                        PDF Raporu Satın Al (50 TL)
+                      </button>
+                    )}
                    <button onClick={() => setChartData(null)} className="flex-1 sm:flex-initial text-xs sm:text-sm px-4 py-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap text-center">
                      Yeni Harita
                    </button>
@@ -707,15 +716,17 @@ export default function AstrologyPage() {
               Dilerseniz kayıt olmadan analiz raporunu PDF olarak satın alabilir veya üyeliğinizi Çıraklık seviyesine yükseltebilirsiniz.
             </p>
             <div className="flex flex-col gap-3">
-              <button 
-                onClick={() => {
-                  setShowLockModal(false);
-                  router.push(`/checkout/guest?type=astrology&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}&country=${encodeURIComponent(cityKey?.country || '')}`);
-                }}
-                className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all shadow-lg shadow-[#D4AF37]/10"
-              >
-                Misafir Olarak PDF Satın Al (50 TL)
-              </button>
+              {role === 'admin' && (
+                <button 
+                  onClick={() => {
+                    setShowLockModal(false);
+                    router.push(`/checkout/guest?type=astrology&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}&country=${encodeURIComponent(cityKey?.country || '')}`);
+                  }}
+                  className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all shadow-lg shadow-[#D4AF37]/10"
+                >
+                  Misafir Olarak PDF Satın Al (50 TL)
+                </button>
+              )}
               <button 
                 onClick={() => {
                   setShowLockModal(false);

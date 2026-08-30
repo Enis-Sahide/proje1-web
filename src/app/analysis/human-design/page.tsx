@@ -706,24 +706,33 @@ export default function HumanDesignPage() {
                   <h2 className="text-3xl font-serif text-white mb-2">Kişisel Haritanız</h2>
                   <p className="text-mystic-text-muted mb-4">{dateStr} • {timeStr} • {city ? city.name : ''}</p>
                   <div className="flex flex-wrap items-center gap-3">
-                    <button 
-                      onClick={async () => {
-                        if (isApprenticeOrAbove) {
+                    {isApprenticeOrAbove && (
+                      <button 
+                        onClick={async () => {
                           await downloadHumanDesignPDF(
                             chart,
                             city ? city.name : '',
                             `${dateStr.split('-').reverse().join('.')} ${timeStr}`,
                             gatesData || undefined
                           );
-                        } else {
+                        }}
+                        className="text-xs sm:text-sm px-5 py-2.5 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] rounded-full text-black font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2"
+                      >
+                        <Download size={16} />
+                        PDF Raporu İndir
+                      </button>
+                    )}
+                    {role === 'admin' && (
+                      <button 
+                        onClick={async () => {
                           router.push(`/checkout/guest?type=human-design&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(city?.name || '')}&lat=${city?.lat || ''}&lon=${city?.lon || ''}&tz=${city?.tz || ''}&country=${encodeURIComponent(city?.country || '')}`);
-                        }
-                      }}
-                      className="text-xs sm:text-sm px-5 py-2.5 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] rounded-full text-black font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2"
-                    >
-                      <Download size={16} />
-                      {isApprenticeOrAbove ? "PDF Raporu İndir" : "PDF Raporu Satın Al (500 TL)"}
-                    </button>
+                        }}
+                        className="text-xs sm:text-sm px-5 py-2.5 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] rounded-full text-black font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2"
+                      >
+                        <Download size={16} />
+                        PDF Raporu Satın Al (500 TL)
+                      </button>
+                    )}
                     <button onClick={() => setChart(null)} className="text-xs sm:text-sm px-5 py-2.5 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap text-center">
                       Yeni Hesaplama
                     </button>
