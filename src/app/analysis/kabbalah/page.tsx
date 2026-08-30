@@ -345,9 +345,9 @@ export default function KabbalahAnalysisPage() {
                 <p className="text-mystic-text-muted text-center max-w-xl mt-4">
                   Yükselen Burcunuz: <strong className="text-white">{chartData.assiah.ascendant.sign}</strong>
                 </p>
-                <button
-                  onClick={() => {
-                    if (isMasterOrAdmin) {
+                {isMasterOrAdmin && (
+                  <button
+                    onClick={() => {
                       downloadKabbalahPDF(
                         chartData,
                         kabbalahAnalysis,
@@ -355,14 +355,22 @@ export default function KabbalahAnalysisPage() {
                         cityKey ? cityKey.name : '',
                         `${dateStr.split('-').reverse().join('.')} ${timeStr}`
                       );
-                    } else {
+                    }}
+                    className="mt-6 flex items-center gap-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-2.5 px-6 rounded-xl transition-all shadow-md shadow-[#D4AF37]/10"
+                  >
+                    PDF Raporu İndir
+                  </button>
+                )}
+                {role === 'admin' && (
+                  <button
+                    onClick={() => {
                       router.push(`/checkout/guest?type=kabbalah&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}&country=${encodeURIComponent(cityKey?.country || '')}`);
-                    }
-                  }}
-                  className="mt-6 flex items-center gap-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-2.5 px-6 rounded-xl transition-all shadow-md shadow-[#D4AF37]/10"
-                >
-                  {isMasterOrAdmin ? 'PDF Raporu İndir' : 'PDF Raporu Satın Al (500 TL)'}
-                </button>
+                    }}
+                    className="mt-6 flex items-center gap-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-2.5 px-6 rounded-xl transition-all shadow-md shadow-[#D4AF37]/10"
+                  >
+                    PDF Raporu Satın Al (500 TL)
+                  </button>
+                )}
               </div>
 
               <div className={`p-8 rounded-2xl border max-w-3xl mx-auto ${kabbalahAnalysis.shortcutLevel > 0 ? 'bg-[#D4AF37]/10 border-[#D4AF37]/30' : 'bg-white/5 border-white/10'} backdrop-blur-sm relative overflow-hidden`}>
@@ -658,15 +666,17 @@ export default function KabbalahAnalysisPage() {
               Dilerseniz kayıt olmadan analiz raporunuzu PDF olarak satın alabilir veya üyeliğinizi Usta seviyesine yükseldebilirsiniz.
             </p>
             <div className="flex flex-col gap-3">
-              <button 
-                onClick={() => {
-                  setShowLockModal(false);
-                  router.push(`/checkout/guest?type=kabbalah&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}&country=${encodeURIComponent(cityKey?.country || '')}`);
-                }}
-                className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all shadow-lg shadow-[#D4AF37]/10"
-              >
-                Misafir Olarak PDF Satın Al (500 TL)
-              </button>
+              {role === 'admin' && (
+                <button 
+                  onClick={() => {
+                    setShowLockModal(false);
+                    router.push(`/checkout/guest?type=kabbalah&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}&country=${encodeURIComponent(cityKey?.country || '')}`);
+                  }}
+                  className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all shadow-lg shadow-[#D4AF37]/10"
+                >
+                  Misafir Olarak PDF Satın Al (500 TL)
+                </button>
+              )}
               <button 
                 onClick={() => {
                   setShowLockModal(false);
