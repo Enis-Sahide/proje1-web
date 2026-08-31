@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Hexagon, Loader2, Calendar, User, ArrowRight, Target, Heart, Sparkles, Wrench, Info, AlertCircle, Zap } from 'lucide-react';
+import { ArrowLeft, Hexagon, Loader2, Calendar, User, ArrowRight, Target, Heart, Sparkles, Wrench, Info, AlertCircle, Zap, Lock } from 'lucide-react';
 import { calculateLifePath, calculatePersonalYear, calculateArrows, getBirthdayNumber, calculateNameAnalysis, reduceToSingleDigit } from '@/utils/numerologyCalculator';
 import { lifePathData, birthdayData, arrowsData, emptyArrowsData, personalYearData, numerologyData } from '@/utils/numerologyData';
+import { useAuth } from '@/context/AuthContext';
 
 const isMaster = (num: number) => num === 11 || num === 22 || num === 33;
 
@@ -19,6 +20,8 @@ const reduceNumber = (num: number): number => {
 
 export default function NumerologyPage() {
   const router = useRouter();
+  const { role } = useAuth();
+  const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
@@ -360,21 +363,38 @@ export default function NumerologyPage() {
         </div>
 
         <h4 className="text-sm font-bold text-[#D4AF37] mb-3 border-t border-white/5 pt-4">Kozmik Eşzamanlılık Uyarıları</h4>
-        <div className="space-y-4">
-          {warnings.map((w, idx) => (
-            <div key={idx} className="bg-black/30 border border-white/5 rounded-2xl p-5 space-y-3">
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg border flex items-center justify-center shrink-0 ${w.color.split(' ').slice(0, 2).join(' ')}`}>
-                  {w.icon}
+        <div className="relative">
+          <div className={!isApprenticeOrAbove ? "space-y-4 filter blur-sm select-none pointer-events-none" : "space-y-4"}>
+            {warnings.map((w, idx) => (
+              <div key={idx} className="bg-black/30 border border-white/5 rounded-2xl p-5 space-y-3">
+                <div className="flex items-center gap-3">
+                  <div className={`p-2 rounded-lg border flex items-center justify-center shrink-0 ${w.color.split(' ').slice(0, 2).join(' ')}`}>
+                    {w.icon}
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-white text-sm">{w.title}</h4>
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-mystic-text-muted">Eşleşen Kod: {w.number}</span>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-bold text-white text-sm">{w.title}</h4>
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-mystic-text-muted">Eşleşen Kod: {w.number}</span>
-                </div>
+                <p className="text-gray-300 text-xs leading-relaxed">{w.desc}</p>
               </div>
-              <p className="text-gray-300 text-xs leading-relaxed">{w.desc}</p>
+            ))}
+          </div>
+          {!isApprenticeOrAbove && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-black/60 rounded-2xl border border-[#D4AF37]/20 backdrop-blur-[2px] text-center z-10">
+              <Lock className="text-[#D4AF37] mb-3 animate-bounce" size={32} />
+              <h5 className="text-white font-bold mb-1 text-sm">Kozmik Eşzamanlılık Uyarıları Kilitli</h5>
+              <p className="text-mystic-text-muted text-xs max-w-sm mb-4">
+                Karmik borç uyanış frekansları ve aura koruma kodlarının derin rehberlik detayları Çıraklık Seviyesi (Apprentice) ve üzeri üyelere özeldir.
+              </p>
+              <button 
+                onClick={() => router.push('/membership')}
+                className="bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-2 px-5 rounded-full text-xs transition-all shadow-lg"
+              >
+                Çıraklık Seviyesine Yüksel
+              </button>
             </div>
-          ))}
+          )}
         </div>
       </div>
     );
