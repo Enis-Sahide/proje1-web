@@ -1,5 +1,5 @@
 import React from 'react';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { blogPosts } from '@/db/schema';
 import BlogDetailClient from './BlogDetailClient';
@@ -80,6 +80,12 @@ export default async function BlogDetailPage({ params }: { params: Promise<{ slu
   }
 
   const post = rows[0];
+
+  // Increment view count
+  await db
+    .update(blogPosts)
+    .set({ views: sql`${blogPosts.views} + 1` })
+    .where(eq(blogPosts.id, post.id));
 
   return <BlogDetailClient post={post} />;
 }

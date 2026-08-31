@@ -1,8 +1,8 @@
 "use client";
 
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Moon, Wind, BookOpen, Sparkles, Lock, MoonStar, Wrench } from 'lucide-react';
+import { Moon, Wind, BookOpen, Sparkles, Lock, MoonStar, Wrench, AlertCircle, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -77,8 +77,10 @@ const exploreItems: ExploreItem[] = [
 
 export default function ExploreSection() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { role, user } = useAuth();
   const isLoggedIn = !!user;
+  const isMasterOrAdmin = role === 'master' || role === 'admin';
+  const [showLockModal, setShowLockModal] = useState(false);
 
   const handleItemClick = (e: React.MouseEvent, item: any) => {
     if (item.status === 'LOCKED') {
@@ -87,6 +89,11 @@ export default function ExploreSection() {
       if (item.requiresAuth && !isLoggedIn && item.lockMessage === 'Üyelik Gerektirir') {
         router.push('/auth/login');
       }
+      return;
+    }
+    if (item.href === '/analysis/kabbalah' && !isMasterOrAdmin) {
+      e.preventDefault();
+      setShowLockModal(true);
       return;
     }
     if (item.requiresAuth && !isLoggedIn) {
@@ -127,7 +134,12 @@ export default function ExploreSection() {
               
               <div className="w-16 h-16 rounded-full bg-mystic-surface-light flex items-center justify-center mb-6 relative">
                 <item.icon size={32} className="text-mystic-text" />
-                {item.requiresAuth && !isLoggedIn && item.status !== 'LOCKED' && (
+                {item.href === '/analysis/kabbalah' && !isMasterOrAdmin && (
+                  <div className="absolute -top-2 -right-2 bg-mystic-dark p-1 rounded-full border border-mystic-surface-light text-[#D4AF37]">
+                    <Lock size={12} />
+                  </div>
+                )}
+                {item.requiresAuth && !isLoggedIn && item.status !== 'LOCKED' && item.href !== '/analysis/kabbalah' && (
                   <div className="absolute -top-2 -right-2 bg-mystic-dark p-1 rounded-full border border-mystic-surface-light">
                     <Lock size={12} className="text-mystic-accent" />
                   </div>
@@ -151,6 +163,40 @@ export default function ExploreSection() {
           </Link>
         ))}
       </div>
+
+      {/* Premium Lock Modal */}
+      {showLockModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowLockModal(false)}>
+          <div 
+            className="bg-[#111] border border-[#D4AF37]/30 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl relative animate-in fade-in zoom-in duration-300"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="text-[#D4AF37] mx-auto mb-4 flex justify-center"><AlertCircle size={48} /></div>
+            <h3 className="text-xl font-bold text-white mb-2">Analiz Kilitli</h3>
+            <p className="text-mystic-text-muted text-sm mb-6">
+              Kabalistik 4 Alem analizi en yüksek düzeyde ruhsal sentez içerdiğinden sadece Usta Seviyesi (Master) ve üzeri üyelere özeldir.
+              Dilerseniz üyeliğinizi Usta seviyesine yükselterek bu analize ve tüm premium içeriklere erişim sağlayabilirsiniz.
+            </p>
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={() => {
+                  setShowLockModal(false);
+                  router.push(`/membership`);
+                }}
+                className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all shadow-lg"
+              >
+                Usta Seviyesine Yüksel
+              </button>
+              <button 
+                onClick={() => setShowLockModal(false)}
+                className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 font-bold py-3 px-4 rounded-xl transition-all"
+              >
+                Kapat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }

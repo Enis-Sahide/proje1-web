@@ -1,4 +1,4 @@
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { blogPosts } from '@/db/schema';
 import { json, errorJson, preflight } from '@/lib/http/cors';
@@ -32,7 +32,15 @@ export async function GET(
       return errorJson('Blog yazısı bulunamadı.', 404);
     }
 
-    return json(rows[0]);
+    const post = rows[0];
+
+    // Increment view count
+    await db
+      .update(blogPosts)
+      .set({ views: sql`${blogPosts.views} + 1` })
+      .where(eq(blogPosts.id, post.id));
+
+    return json(post);
   } catch (error: any) {
     console.error('Blog Detail API Error:', error);
     return errorJson('Yazı yüklenirken hata oluştu.', 500);

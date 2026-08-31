@@ -762,6 +762,7 @@ export default function AdminDashboard() {
                         <th className="p-4 font-semibold">Kategori</th>
                         <th className="p-4 font-semibold">Slug (URL)</th>
                         <th className="p-4 font-semibold">Durum</th>
+                        <th className="p-4 font-semibold">Erişim</th>
                         <th className="p-4 font-semibold text-right">İşlemler</th>
                       </tr>
                     </thead>
@@ -795,6 +796,9 @@ export default function AdminDashboard() {
                             ) : (
                               <span className="text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full text-xs font-semibold">Taslak</span>
                             )}
+                          </td>
+                          <td className="p-4 text-xs font-semibold text-mystic-primary">
+                            {blog.views || 0} Görüntülenme
                           </td>
                           <td className="p-4 text-right">
                             <div className="flex items-center justify-end gap-3">
