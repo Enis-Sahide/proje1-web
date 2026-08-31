@@ -12,7 +12,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const category = searchParams.get('category');
 
-    let conditions = [eq(blogPosts.published, true)];
+    const isDev = process.env.NODE_ENV === 'development';
+    let conditions = isDev ? [] : [eq(blogPosts.published, true)];
     if (category && category !== 'all') {
       conditions.push(eq(blogPosts.category, category));
     }
