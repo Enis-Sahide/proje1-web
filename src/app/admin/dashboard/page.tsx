@@ -1112,6 +1112,7 @@ export default function AdminDashboard() {
                     <option value="Nefes" className="bg-mystic-surface">Nefes</option>
                     <option value="Ritüeller" className="bg-mystic-surface">Ritüeller</option>
                     <option value="Kişisel Gelişim" className="bg-mystic-surface">Kişisel Gelişim</option>
+                    <option value="Ruhsal Gelişim" className="bg-mystic-surface">Ruhsal Gelişim</option>
                     <option value="Çakra Dengeleme" className="bg-mystic-surface">Çakra Dengeleme</option>
                   </select>
                 </div>
