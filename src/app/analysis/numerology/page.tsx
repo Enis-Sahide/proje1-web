@@ -329,42 +329,42 @@ export default function NumerologyPage() {
     }
 
     return (
-      <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/25 rounded-3xl p-6 md:p-8 mt-6">
-        <h3 className="text-lg font-bold text-[#D4AF37] mb-1">Astro-Numerolojik Kişisel Kodlarınız</h3>
-        <p className="text-xs text-mystic-text-muted mb-6 leading-relaxed">
-          Kozmik evren sistemine giriş kodlarınız ve bu kodların günlük hayattaki eşzamanlı uyanış titreşimleri.
-        </p>
+      <div className="relative mt-6">
+        <div className={!isApprenticeOrAbove ? "bg-[#D4AF37]/5 border border-[#D4AF37]/25 rounded-3xl p-6 md:p-8 filter blur-sm select-none pointer-events-none" : "bg-[#D4AF37]/5 border border-[#D4AF37]/25 rounded-3xl p-6 md:p-8"}>
+          <h3 className="text-lg font-bold text-[#D4AF37] mb-1">Astro-Numerolojik Kişisel Kodlarınız</h3>
+          <p className="text-xs text-mystic-text-muted mb-6 leading-relaxed">
+            Kozmik evren sistemine giriş kodlarınız ve bu kodların günlük hayattaki eşzamanlı uyanış titreşimleri.
+          </p>
 
-        {/* 5 Core Codes Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
-            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Karmik Borç Kodu</span>
-            <span className="text-xl font-bold text-red-500 font-serif">{karmicCode}</span>
+          {/* 5 Core Codes Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
+            <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
+              <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Karmik Borç Kodu</span>
+              <span className="text-xl font-bold text-red-500 font-serif">{karmicCode}</span>
+            </div>
+            <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
+              <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Kişilik Kodu</span>
+              <span className="text-xl font-bold text-white font-serif">{ruhKodu}</span>
+            </div>
+            <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
+              <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Aura Koruma Kodu</span>
+              <span className="text-xl font-bold text-yellow-400 font-serif">
+                {alanKodu}
+                <span className="text-[9px] block text-mystic-text-muted font-sans font-normal mt-0.5">(Sınır ve Koruma)</span>
+              </span>
+            </div>
+            <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
+              <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Doğum Kodu</span>
+              <span className="text-xl font-bold text-white font-serif">{reduceToSingleDigit(birthdayNum)}</span>
+            </div>
+            <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center col-span-2 md:col-span-1">
+              <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Gezegen Yöneticisi</span>
+              <span className="text-sm font-bold text-[#E0B0FF] block mt-1.5">{planetName}</span>
+            </div>
           </div>
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
-            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Kişilik Kodu</span>
-            <span className="text-xl font-bold text-white font-serif">{ruhKodu}</span>
-          </div>
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
-            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Aura Koruma Kodu</span>
-            <span className="text-xl font-bold text-yellow-400 font-serif">
-              {alanKodu}
-              <span className="text-[9px] block text-mystic-text-muted font-sans font-normal mt-0.5">(Sınır ve Koruma)</span>
-            </span>
-          </div>
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
-            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Doğum Kodu</span>
-            <span className="text-xl font-bold text-white font-serif">{reduceToSingleDigit(birthdayNum)}</span>
-          </div>
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center col-span-2 md:col-span-1">
-            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Gezegen Yöneticisi</span>
-            <span className="text-sm font-bold text-[#E0B0FF] block mt-1.5">{planetName}</span>
-          </div>
-        </div>
 
-        <h4 className="text-sm font-bold text-[#D4AF37] mb-3 border-t border-white/5 pt-4">Kozmik Eşzamanlılık Uyarıları</h4>
-        <div className="relative">
-          <div className={!isApprenticeOrAbove ? "space-y-4 filter blur-sm select-none pointer-events-none" : "space-y-4"}>
+          <h4 className="text-sm font-bold text-[#D4AF37] mb-3 border-t border-white/5 pt-4">Kozmik Eşzamanlılık Uyarıları</h4>
+          <div className="space-y-4">
             {warnings.map((w, idx) => (
               <div key={idx} className="bg-black/30 border border-white/5 rounded-2xl p-5 space-y-3">
                 <div className="flex items-center gap-3">
@@ -380,22 +380,22 @@ export default function NumerologyPage() {
               </div>
             ))}
           </div>
-          {!isApprenticeOrAbove && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-black/60 rounded-2xl border border-[#D4AF37]/20 backdrop-blur-[2px] text-center z-10">
-              <Lock className="text-[#D4AF37] mb-3 animate-bounce" size={32} />
-              <h5 className="text-white font-bold mb-1 text-sm">Kozmik Eşzamanlılık Uyarıları Kilitli</h5>
-              <p className="text-mystic-text-muted text-xs max-w-sm mb-4">
-                Karmik borç uyanış frekansları ve aura koruma kodlarının derin rehberlik detayları Çıraklık Seviyesi (Apprentice) ve üzeri üyelere özeldir.
-              </p>
-              <button 
-                onClick={() => router.push('/membership')}
-                className="bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-2 px-5 rounded-full text-xs transition-all shadow-lg"
-              >
-                Çıraklık Seviyesine Yüksel
-              </button>
-            </div>
-          )}
         </div>
+        {!isApprenticeOrAbove && (
+          <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-black/60 rounded-3xl border border-[#D4AF37]/20 backdrop-blur-[2px] text-center z-10">
+            <Lock className="text-[#D4AF37] mb-3 animate-bounce" size={32} />
+            <h5 className="text-white font-bold mb-1 text-sm">Astro-Numerolojik Kişisel Kodlarınız Kilitli</h5>
+            <p className="text-mystic-text-muted text-xs max-w-sm mb-4">
+              Kişisel karmik borç kodları, uyanış frekansları, koruma kodları ve gezegen yöneticilerinin derin rehberlik detayları Çıraklık Seviyesi (Apprentice) ve üzeri üyelere özeldir.
+            </p>
+            <button 
+              onClick={() => router.push('/membership')}
+              className="bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-2 px-5 rounded-full text-xs transition-all shadow-lg"
+            >
+              Çıraklık Seviyesine Yüksel
+            </button>
+          </div>
+        )}
       </div>
     );
   };
