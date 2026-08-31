@@ -8,10 +8,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   try {
     const { slug } = await params;
     if (slug) {
+      const isDev = process.env.NODE_ENV === 'development';
+      const condition = isDev
+        ? eq(blogPosts.slug, slug)
+        : and(eq(blogPosts.slug, slug), eq(blogPosts.published, true));
+
       const rows = await db
         .select({ title: blogPosts.title, content: blogPosts.content })
         .from(blogPosts)
-        .where(and(eq(blogPosts.slug, slug), eq(blogPosts.published, true)))
+        .where(condition)
         .limit(1);
 
       if (rows.length > 0) {

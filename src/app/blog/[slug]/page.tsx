@@ -10,10 +10,15 @@ export const dynamic = 'force-dynamic';
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
+  const isDev = process.env.NODE_ENV === 'development';
+  const condition = isDev
+    ? eq(blogPosts.slug, slug)
+    : and(eq(blogPosts.slug, slug), eq(blogPosts.published, true));
+
   const rows = await db
     .select()
     .from(blogPosts)
-    .where(and(eq(blogPosts.slug, slug), eq(blogPosts.published, true)))
+    .where(condition)
     .limit(1);
 
   if (rows.length === 0) {
@@ -59,10 +64,15 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function BlogDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
 
+  const isDev = process.env.NODE_ENV === 'development';
+  const condition = isDev
+    ? eq(blogPosts.slug, slug)
+    : and(eq(blogPosts.slug, slug), eq(blogPosts.published, true));
+
   const rows = await db
     .select()
     .from(blogPosts)
-    .where(and(eq(blogPosts.slug, slug), eq(blogPosts.published, true)))
+    .where(condition)
     .limit(1);
 
   if (rows.length === 0) {

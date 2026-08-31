@@ -17,10 +17,15 @@ export async function GET(
       return errorJson('Geçersiz parametre.', 400);
     }
 
+    const isDev = process.env.NODE_ENV === 'development';
+    const condition = isDev
+      ? eq(blogPosts.slug, slug)
+      : and(eq(blogPosts.slug, slug), eq(blogPosts.published, true));
+
     const rows = await db
       .select()
       .from(blogPosts)
-      .where(and(eq(blogPosts.slug, slug), eq(blogPosts.published, true)))
+      .where(condition)
       .limit(1);
 
     if (rows.length === 0) {
