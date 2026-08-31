@@ -63,6 +63,35 @@ export default function AdminDashboard() {
     published: true
   });
   const [isSavingBlog, setIsSavingBlog] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const res = await fetch('/api/admin/upload', {
+        method: 'POST',
+        body: formData,
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setBlogForm((prev) => ({ ...prev, imageUrl: data.url }));
+      } else {
+        alert(data.error || 'Görsel yüklenemedi.');
+      }
+    } catch (err) {
+      console.error('Upload error:', err);
+      alert('Görsel yüklenirken bir hata oluştu.');
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
 
 
   // Marketplace (mağazalar) içeriği API'den
@@ -1089,14 +1118,31 @@ export default function AdminDashboard() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-mystic-text mb-2 uppercase tracking-wide">Destekleyici Görsel URL'si</label>
-                <input 
-                  type="text"
-                  value={blogForm.imageUrl}
-                  onChange={(e) => setBlogForm({ ...blogForm, imageUrl: e.target.value })}
-                  placeholder="https://example.com/images/blog-image.jpg veya /gorsel.jpg"
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-mystic-primary transition-colors"
-                />
+                <label className="block text-xs font-bold text-mystic-text mb-2 uppercase tracking-wide">Destekleyici Görsel URL'si veya Yükleme</label>
+                <div className="flex gap-3">
+                  <input 
+                    type="text"
+                    value={blogForm.imageUrl}
+                    onChange={(e) => setBlogForm({ ...blogForm, imageUrl: e.target.value })}
+                    placeholder="https://example.com/images/blog-image.jpg veya /gorsel.jpg"
+                    className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-mystic-primary transition-colors"
+                  />
+                  <button
+                    type="button"
+                    disabled={isUploadingImage}
+                    onClick={() => fileInputRef.current?.click()}
+                    className="px-5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-mystic-text hover:bg-white/10 hover:border-[#D4AF37] transition-all cursor-pointer flex items-center justify-center shrink-0 disabled:opacity-50"
+                  >
+                    {isUploadingImage ? 'Yükleniyor...' : 'Görsel Seç'}
+                  </button>
+                  <input 
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleImageUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                </div>
               </div>
 
               <div>
