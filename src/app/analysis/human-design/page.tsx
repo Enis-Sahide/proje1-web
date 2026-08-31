@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, CheckCircle2, Loader2, Zap, Search, X, Download } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Loader2, Zap, Search, X, Download, AlertCircle } from 'lucide-react';
 import moment from 'moment-timezone';
 import { generateChart, HumanDesignChart, CenterCode, PLANET_SYMBOLS, CHANNELS } from '@/utils/HumanDesignEngine';
 import { useContent } from '@/lib/useContent';
@@ -407,6 +407,7 @@ export default function HumanDesignPage() {
   const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  const [showLockModal, setShowLockModal] = useState(false);
   
   const [name, setName] = useState('');
   const [dateStr, setDateStr] = useState('');
@@ -581,16 +582,20 @@ export default function HumanDesignPage() {
           key={center} 
           className="cursor-pointer hover:opacity-85 transition-opacity"
           onClick={() => {
-            setActiveGateId(null);
-            const isDefined = chart.definedCenters.includes(center as CenterCode);
-            const centerName = CENTER_NAMES[center as CenterCode];
-            const desc = CENTER_DESCRIPTIONS[center as CenterCode][isDefined ? 'defined' : 'undefined'];
-            setActiveDetail({
-              title: centerName,
-              subtitle: "Enerji Merkezi",
-              badge: isDefined ? "Tanımlı (Renkli)" : "Tanımsız (Beyaz)",
-              description: `Bu merkez haritanızda ${isDefined ? 'TANIMLI' : 'TANIMSIZ'} durumdadır.\n\n${desc}`
-            });
+            if (isApprenticeOrAbove) {
+              setActiveGateId(null);
+              const isDefined = chart.definedCenters.includes(center as CenterCode);
+              const centerName = CENTER_NAMES[center as CenterCode];
+              const desc = CENTER_DESCRIPTIONS[center as CenterCode][isDefined ? 'defined' : 'undefined'];
+              setActiveDetail({
+                title: centerName,
+                subtitle: "Enerji Merkezi",
+                badge: isDefined ? "Tanımlı (Renkli)" : "Tanımsız (Beyaz)",
+                description: `Bu merkez haritanızda ${isDefined ? 'TANIMLI' : 'TANIMSIZ'} durumdadır.\n\n${desc}`
+              });
+            } else {
+              setShowLockModal(true);
+            }
           }}
         >
           {drawShape()}
@@ -615,8 +620,12 @@ export default function HumanDesignPage() {
           key={`glabel-${gateId}`} 
           className="cursor-pointer hover:opacity-80 transition-opacity"
           onClick={() => {
-            setActiveDetail(null);
-            setActiveGateId(gNum);
+            if (isApprenticeOrAbove) {
+              setActiveDetail(null);
+              setActiveGateId(gNum);
+            } else {
+              setShowLockModal(true);
+            }
           }}
         >
           {isActive && <circle cx={textX} cy={textY} r={5.5} fill="#000" stroke="none" />}
@@ -748,8 +757,12 @@ export default function HumanDesignPage() {
                       key={`unc-${i}`} 
                       className="flex items-center justify-between px-2 py-1 bg-white/5 rounded border border-white/5 cursor-pointer hover:bg-white/10 hover:border-[#E63946]/30 transition-all"
                       onClick={() => {
-                        setActiveDetail(null);
-                        setActiveGateId(p.gate);
+                        if (isApprenticeOrAbove) {
+                          setActiveDetail(null);
+                          setActiveGateId(p.gate);
+                        } else {
+                          setShowLockModal(true);
+                        }
                       }}
                     >
                       <span className="text-xl font-bold text-[#E63946]">{PLANET_SYMBOLS[p.planet]}</span>
@@ -775,8 +788,12 @@ export default function HumanDesignPage() {
                       key={`con-${i}`} 
                       className="flex items-center justify-between px-2 py-1 bg-white/5 rounded border border-white/5 cursor-pointer hover:bg-white/10 hover:border-white/20 transition-all"
                       onClick={() => {
-                        setActiveDetail(null);
-                        setActiveGateId(p.gate);
+                        if (isApprenticeOrAbove) {
+                          setActiveDetail(null);
+                          setActiveGateId(p.gate);
+                        } else {
+                          setShowLockModal(true);
+                        }
                       }}
                     >
                       <span className="text-sm font-bold text-white">{p.gate}.{p.line}</span>
@@ -790,13 +807,17 @@ export default function HumanDesignPage() {
                 <div 
                   className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
                   onClick={() => {
-                    setActiveGateId(null);
-                    const match = HD_DETAILS_MAP[normalizeHDKey(chart.type)];
-                    setActiveDetail({
-                      title: chart.type,
-                      subtitle: match?.subtitle || "Tür / Tip",
-                      description: match?.description || ""
-                    });
+                    if (isApprenticeOrAbove) {
+                      setActiveGateId(null);
+                      const match = HD_DETAILS_MAP[normalizeHDKey(chart.type)];
+                      setActiveDetail({
+                        title: chart.type,
+                        subtitle: match?.subtitle || "Tür / Tip",
+                        description: match?.description || ""
+                      });
+                    } else {
+                      setShowLockModal(true);
+                    }
                   }}
                 >
                   <span className="block text-mystic-text-muted text-sm mb-1">Tür</span>
@@ -805,13 +826,17 @@ export default function HumanDesignPage() {
                 <div 
                   className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
                   onClick={() => {
-                    setActiveGateId(null);
-                    const match = HD_DETAILS_MAP[normalizeHDKey(chart.authority)];
-                    setActiveDetail({
-                      title: chart.authority,
-                      subtitle: match?.subtitle || "İç Otorite",
-                      description: match?.description || ""
-                    });
+                    if (isApprenticeOrAbove) {
+                      setActiveGateId(null);
+                      const match = HD_DETAILS_MAP[normalizeHDKey(chart.authority)];
+                      setActiveDetail({
+                        title: chart.authority,
+                        subtitle: match?.subtitle || "İç Otorite",
+                        description: match?.description || ""
+                      });
+                    } else {
+                      setShowLockModal(true);
+                    }
                   }}
                 >
                   <span className="block text-mystic-text-muted text-sm mb-1">İç Otorite</span>
@@ -820,13 +845,17 @@ export default function HumanDesignPage() {
                 <div 
                   className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
                   onClick={() => {
-                    setActiveGateId(null);
-                    const match = HD_DETAILS_MAP[normalizeHDKey(chart.strategy)];
-                    setActiveDetail({
-                      title: chart.strategy,
-                      subtitle: match?.subtitle || "Strateji",
-                      description: match?.description || ""
-                    });
+                    if (isApprenticeOrAbove) {
+                      setActiveGateId(null);
+                      const match = HD_DETAILS_MAP[normalizeHDKey(chart.strategy)];
+                      setActiveDetail({
+                        title: chart.strategy,
+                        subtitle: match?.subtitle || "Strateji",
+                        description: match?.description || ""
+                      });
+                    } else {
+                      setShowLockModal(true);
+                    }
                   }}
                 >
                   <span className="block text-mystic-text-muted text-sm mb-1">Strateji</span>
@@ -835,13 +864,17 @@ export default function HumanDesignPage() {
                 <div 
                   className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
                   onClick={() => {
-                    setActiveGateId(null);
-                    const match = getProfileDetails(chart.profile);
-                    setActiveDetail({
-                      title: `Profil ${chart.profile}`,
-                      subtitle: match.subtitle,
-                      description: match.description
-                    });
+                    if (isApprenticeOrAbove) {
+                      setActiveGateId(null);
+                      const match = getProfileDetails(chart.profile);
+                      setActiveDetail({
+                        title: `Profil ${chart.profile}`,
+                        subtitle: match.subtitle,
+                        description: match.description
+                      });
+                    } else {
+                      setShowLockModal(true);
+                    }
                   }}
                 >
                   <span className="block text-mystic-text-muted text-sm mb-1">Profil</span>
@@ -850,13 +883,17 @@ export default function HumanDesignPage() {
                 <div 
                   className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
                   onClick={() => {
-                    setActiveGateId(null);
-                    const match = HD_DETAILS_MAP[normalizeHDKey(chart.signature)];
-                    setActiveDetail({
-                      title: chart.signature,
-                      subtitle: match?.subtitle || "İmza (Hizalanma Ödülü)",
-                      description: match?.description || ""
-                    });
+                    if (isApprenticeOrAbove) {
+                      setActiveGateId(null);
+                      const match = HD_DETAILS_MAP[normalizeHDKey(chart.signature)];
+                      setActiveDetail({
+                        title: chart.signature,
+                        subtitle: match?.subtitle || "İmza (Hizalanma Ödülü)",
+                        description: match?.description || ""
+                      });
+                    } else {
+                      setShowLockModal(true);
+                    }
                   }}
                 >
                   <span className="block text-mystic-text-muted text-sm mb-1">İmza</span>
@@ -865,13 +902,17 @@ export default function HumanDesignPage() {
                 <div 
                   className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
                   onClick={() => {
-                    setActiveGateId(null);
-                    const match = HD_DETAILS_MAP[normalizeHDKey(chart.notSelfTheme, chart.type)];
-                    setActiveDetail({
-                      title: chart.notSelfTheme,
-                      subtitle: match?.subtitle || "Benlik Olmayan Tema",
-                      description: match?.description || ""
-                    });
+                    if (isApprenticeOrAbove) {
+                      setActiveGateId(null);
+                      const match = HD_DETAILS_MAP[normalizeHDKey(chart.notSelfTheme, chart.type)];
+                      setActiveDetail({
+                        title: chart.notSelfTheme,
+                        subtitle: match?.subtitle || "Benlik Olmayan Tema",
+                        description: match?.description || ""
+                      });
+                    } else {
+                      setShowLockModal(true);
+                    }
                   }}
                 >
                   <span className="block text-mystic-text-muted text-sm mb-1">Benlik Olmayan Tema</span>
@@ -880,13 +921,17 @@ export default function HumanDesignPage() {
                 <div 
                   className="bg-white/5 p-4 rounded-2xl border border-white/10 lg:col-span-2 cursor-pointer hover:bg-white/10 transition-colors"
                   onClick={() => {
-                    setActiveGateId(null);
-                    const match = getIncarnationCrossDetails(chart.incarnationCross);
-                    setActiveDetail({
-                      title: chart.incarnationCross,
-                      subtitle: match.subtitle,
-                      description: match.description
-                    });
+                    if (isApprenticeOrAbove) {
+                      setActiveGateId(null);
+                      const match = getIncarnationCrossDetails(chart.incarnationCross);
+                      setActiveDetail({
+                        title: chart.incarnationCross,
+                        subtitle: match.subtitle,
+                        description: match.description
+                      });
+                    } else {
+                      setShowLockModal(true);
+                    }
                   }}
                 >
                   <span className="block text-mystic-text-muted text-sm mb-1">Enkarnasyon Haçı</span>
@@ -1026,6 +1071,51 @@ export default function HumanDesignPage() {
           </div>
         )}
       </div>
+
+      {/* Premium Lock Modal */}
+      {showLockModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowLockModal(false)}>
+          <div 
+            className="bg-[#111] border border-[#32D74B]/30 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl relative animate-in fade-in zoom-in duration-300"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="text-[#32D74B] mx-auto mb-4 flex justify-center"><AlertCircle size={48} /></div>
+            <h3 className="text-xl font-bold text-white mb-2">Detaylı Analiz Kilitli</h3>
+            <p className="text-mystic-text-muted text-sm mb-6">
+              Human Design haritanızdaki kapılar, enerji merkezleri, tip, otorite ve profil yorumlarının derin detayları Çıraklık Seviyesi (Apprentice) ve üzeri üyelere özeldir.
+              Dilerseniz üyeliğinizi Çıraklık seviyesine yükselterek bu analizleri ve PDF indirme özelliğini açabilirsiniz.
+            </p>
+            <div className="flex flex-col gap-3">
+              {role === 'admin' && (
+                <button 
+                  onClick={() => {
+                    setShowLockModal(false);
+                    router.push(`/checkout/guest?type=human-design&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(city?.name || '')}&lat=${city?.lat || ''}&lon=${city?.lon || ''}&tz=${city?.tz || ''}&country=${encodeURIComponent(city?.country || '')}`);
+                  }}
+                  className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all shadow-lg"
+                >
+                  Misafir Olarak PDF Satın Al (500 TL)
+                </button>
+              )}
+              <button 
+                onClick={() => {
+                  setShowLockModal(false);
+                  router.push(`/membership`);
+                }}
+                className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 font-bold py-3 px-4 rounded-xl transition-all"
+              >
+                Çıraklık Seviyesine Yüksel
+              </button>
+              <button 
+                onClick={() => setShowLockModal(false)}
+                className="w-full text-mystic-text-muted hover:text-white text-sm transition-colors mt-2"
+              >
+                Kapat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

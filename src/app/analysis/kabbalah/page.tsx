@@ -48,11 +48,11 @@ const RADIUS = CENTER - 85;
 export default function KabbalahAnalysisPage() {
   const router = useRouter();
   const { role, user } = useAuth();
-  const isMasterOrAdmin = role === 'master' || role === 'admin';
+  const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
   const [showLockModal, setShowLockModal] = useState(false);
 
   const handleInterpClick = (interp: any) => {
-    if (isMasterOrAdmin) {
+    if (isApprenticeOrAbove) {
       setSelectedInterp(interp || null);
     } else {
       setShowLockModal(true);
@@ -345,7 +345,7 @@ export default function KabbalahAnalysisPage() {
                 <p className="text-mystic-text-muted text-center max-w-xl mt-4">
                   Yükselen Burcunuz: <strong className="text-white">{chartData.assiah.ascendant.sign}</strong>
                 </p>
-                {isMasterOrAdmin && (
+                {isApprenticeOrAbove && (
                   <button
                     onClick={() => {
                       downloadKabbalahPDF(

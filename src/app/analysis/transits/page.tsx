@@ -6,6 +6,7 @@ import { ArrowLeft, Compass, Loader2, Sparkles, AlertCircle, Star, X } from 'luc
 import { getTransitHouseInterpretation, getTransitAspectInterpretation } from '@/features/astrology/engine/TransitInterpretations';
 import { AstroCity, TransitChartData } from '@/features/astrology/engine/AstrologyConstants';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
+import { useAuth } from '@/context/AuthContext';
 
 interface AstroPoint {
   name: string;
@@ -70,10 +71,13 @@ const RADIUS = CENTER - 85;
 
 export default function TransitsPage() {
   const router = useRouter();
+  const { role, user } = useAuth();
+  const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [transitData, setTransitData] = useState<TransitChartData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedInterp, setSelectedInterp] = useState<{title: string, content: string} | null>(null);
+  const [showLockModal, setShowLockModal] = useState(false);
 
   const [natalDateStr, setNatalDateStr] = useState('1990-01-01');
   const [natalTimeStr, setNatalTimeStr] = useState('12:00');
@@ -358,7 +362,13 @@ export default function TransitsPage() {
                     <div 
                       key={`th-${i}`} 
                       className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-[#0EA5E9]/30 hover:bg-white/10 transition-colors cursor-pointer"
-                      onClick={() => setSelectedInterp(getTransitHouseInterpretation(p.name, p.house))}
+                      onClick={() => {
+                        if (isApprenticeOrAbove) {
+                          setSelectedInterp(getTransitHouseInterpretation(p.name, p.house));
+                        } else {
+                          setShowLockModal(true);
+                        }
+                      }}
                     >
                       <div className="flex items-center gap-3 w-1/3">
                         <span className="text-2xl text-[#0EA5E9] font-bold w-8 text-center">{PLANET_SYMBOLS[p.name] || ''}</span>
@@ -387,7 +397,13 @@ export default function TransitsPage() {
                       <div 
                         key={`ta-${i}`} 
                         className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-white/20 hover:bg-white/10 transition-colors cursor-pointer"
-                        onClick={() => setSelectedInterp(getTransitAspectInterpretation(aspect.transitPlanet, aspect.natalPlanet, aspect.type))}
+                        onClick={() => {
+                          if (isApprenticeOrAbove) {
+                            setSelectedInterp(getTransitAspectInterpretation(aspect.transitPlanet, aspect.natalPlanet, aspect.type));
+                          } else {
+                            setShowLockModal(true);
+                          }
+                        }}
                       >
                         <div className="flex items-center gap-2">
                           <span className="text-xl text-[#0EA5E9] font-bold w-6 text-center">{PLANET_SYMBOLS[aspect.transitPlanet] || ''}</span>
@@ -429,6 +445,51 @@ export default function TransitsPage() {
             </div>
             <div className="text-gray-300 leading-relaxed whitespace-pre-wrap">
               {selectedInterp.content}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Premium Lock Modal */}
+      {showLockModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowLockModal(false)}>
+          <div 
+            className="bg-[#111] border border-[#0EA5E9]/30 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl relative animate-in fade-in zoom-in duration-300"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="text-[#0EA5E9] mx-auto mb-4 flex justify-center"><AlertCircle size={48} /></div>
+            <h3 className="text-xl font-bold text-white mb-2">Detaylı Analiz Kilitli</h3>
+            <p className="text-mystic-text-muted text-sm mb-6">
+              Transit geçişlerinin doğum haritanızdaki evlere ve gezegenlerinize yaptığı kadersel etkilerin detaylı yorumları Çıraklık Seviyesi (Apprentice) ve üzeri üyelere özeldir.
+              Dilerseniz üyeliğinizi Çıraklık seviyesine yükselterek bu detayları ve tüm transit analiz yorumlarını açabilirsiniz.
+            </p>
+            <div className="flex flex-col gap-3">
+              {role === 'admin' && (
+                <button 
+                  onClick={() => {
+                    setShowLockModal(false);
+                    router.push(`/checkout/guest?type=transits&email=${encodeURIComponent(user?.email || '')}&date=${transitDateStr}&time=${transitTimeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}&country=${encodeURIComponent(cityKey?.country || '')}`);
+                  }}
+                  className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all shadow-lg"
+                >
+                  Misafir Olarak PDF Satın Al (500 TL)
+                </button>
+              )}
+              <button 
+                onClick={() => {
+                  setShowLockModal(false);
+                  router.push(`/membership`);
+                }}
+                className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 font-bold py-3 px-4 rounded-xl transition-all"
+              >
+                Çıraklık Seviyesine Yüksel
+              </button>
+              <button 
+                onClick={() => setShowLockModal(false)}
+                className="w-full text-mystic-text-muted hover:text-white text-sm transition-colors mt-2"
+              >
+                Kapat
+              </button>
             </div>
           </div>
         </div>
