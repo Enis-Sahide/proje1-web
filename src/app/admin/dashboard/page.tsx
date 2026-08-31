@@ -1091,10 +1091,10 @@ export default function AdminDashboard() {
               <div>
                 <label className="block text-xs font-bold text-mystic-text mb-2 uppercase tracking-wide">Destekleyici Görsel URL'si</label>
                 <input 
-                  type="url"
+                  type="text"
                   value={blogForm.imageUrl}
                   onChange={(e) => setBlogForm({ ...blogForm, imageUrl: e.target.value })}
-                  placeholder="https://example.com/images/blog-image.jpg"
+                  placeholder="https://example.com/images/blog-image.jpg veya /gorsel.jpg"
                   className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-mystic-primary transition-colors"
                 />
               </div>
