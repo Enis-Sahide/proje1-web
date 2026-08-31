@@ -53,7 +53,7 @@ Başta Alice A. Bailey ve C.W. Leadbeater olmak üzere önemli teozofların kayn
 ## 7. Katman: Bodhisattva / Avatar Seviyesi
 
 *   **Odak Noktası:** İlahi Plan ile tam uyum ve mutlak kozmik hizmet.
-*   **Anlamı:** Fiziksel planda (dünya okulunda) alınabilecek en yüksek inisiyasyon katmanıdır. Taç çakra (Sahasrara) tamamen ve kesintisiz olarak aktiftir. Bu seviyeye ulaşan varlıklar birer **Bodhisattva** (Budizm) veya **Avatar** (Hinduizm) olarak anılırlar. Onlar, insanlığa rehberlik etmek ve karanlık dönemlerde bilinci yükseltmek için yeryüzüne inen büyük ruhsal öğretmenler, ilahi ışığın somutlaşmış halleridir.
+*   **Anlamı:** Fiziksel planda (dünya okulunda) alınabilecek en yüksek inisiyasyon katmanıdır. Taç çakra (Sahasrara) tamamen ve kesintisiz olarak aktiftir. Ancak bu aşama sadece fiziksel araçların zirvesi değildir; tam aktive olan taç çakra, aynı zamanda insanın standart beden sınırlarının da ötesindeki daha yüksek boyutlu kozmik çakralara (8., 9., 10. ve 11. çakralar gibi) açılan kozmik bir kapı (portal) vazifesi görür. Bu seviyeye ulaşan varlıklar birer **Bodhisattva** (Budizm) veya **Avatar** (Hinduizm) olarak anılırlar. Onlar, insanlığa rehberlik etmek ve karanlık dönemlerde bilinci yükseltmek için yeryüzüne inen büyük ruhsal öğretmenler, ilahi ışığın somutlaşmış halleridir.
 
 ---
 
@@ -61,4 +61,4 @@ Başta Alice A. Bailey ve C.W. Leadbeater olmak üzere önemli teozofların kayn
 
 Sitemizin ana sayfasında yer alan *"Gerçek katman katmandır ve yapman gereken unuttuklarını hatırlayarak katmanları açmaktır..."* felsefesi, tam olarak bu 7 inisiyasyon basamağını anlatır. Bizler dünyaya geldiğimizde ruhsal hafızamızı yitiririz. Tekâmül yolculuğu, bu 7 katmanı tek tek aşarak unuttuğumuz ilahi doğamızı hatırlama ve nihayetinde ışığın kaynağına dönme sürecidir.
 
-Kendi fiziksel bedeninizi eğiterek, duygularınızı yatıştırarak ve zihninizi berraklaştırarak siz de bu inisiyasyon katmanlarını açmaya ve kendi uyanış yolculuğunuzu gerçekleştirmeye başlayabilirsiniz. 7Layers, bu kadim yolda pusulanız olmak için tasarlanmıştır.
+Kendi fiziksel bedeninizi eğiterek, duygularınızı yatıştırarak ve zihninizi berraklaştırarak siz de bu inisiyasyon katmanlarını açmaya ve kendi uyanış yolculuğunuzu gerçekleştirmeye başlayabilirsiniz. 7Layers, bu kadim yolda pusulanız olmak için tasarlanmıştır ve sürekli kendini geliştirmektedir.
