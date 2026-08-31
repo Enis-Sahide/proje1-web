@@ -40,6 +40,9 @@ const renderContent = (content: string) => {
         </h1>
       );
     }
+    if (trimmed === '---') {
+      return <hr key={index} className="border-white/5 my-6" />;
+    }
     if (!trimmed) {
       return <div key={index} className="h-2" />;
     }
