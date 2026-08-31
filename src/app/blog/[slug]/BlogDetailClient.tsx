@@ -4,38 +4,65 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, Calendar, User, Sparkles, BookOpen, Share2, Link } from 'lucide-react';
 
+const parseBoldText = (text: string) => {
+  const parts = text.split('**');
+  return parts.map((part, index) => {
+    if (index % 2 === 1) {
+      return <strong key={index} className="font-extrabold text-white">{part}</strong>;
+    }
+    return part;
+  });
+};
+
 const renderContent = (content: string) => {
   if (!content) return null;
   const paragraphs = content.split('\n');
   return paragraphs.map((para, index) => {
-    const trimmed = para.trim();
+    let trimmed = para.trim();
     if (trimmed.startsWith('### ')) {
       return (
-        <h3 key={index} className="text-base sm:text-lg font-bold text-mystic-primary mt-6 mb-2 tracking-wide uppercase">
-          {trimmed.replace('### ', '')}
+        <h3 key={index} className="text-sm sm:text-base font-bold text-mystic-primary mt-6 mb-2 tracking-wide uppercase">
+          {parseBoldText(trimmed.replace('### ', ''))}
         </h3>
       );
     }
     if (trimmed.startsWith('## ')) {
       return (
-        <h2 key={index} className="text-lg sm:text-xl font-bold text-white mt-8 mb-3 tracking-wide uppercase border-b border-white/5 pb-2">
-          {trimmed.replace('## ', '')}
+        <h2 key={index} className="text-base sm:text-lg font-bold text-mystic-primary mt-8 mb-3 tracking-wide uppercase border-b border-white/5 pb-2">
+          {parseBoldText(trimmed.replace('## ', ''))}
         </h2>
       );
     }
     if (trimmed.startsWith('# ')) {
       return (
         <h1 key={index} className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-mystic-primary to-mystic-accent mt-8 mb-4 uppercase tracking-wider">
-          {trimmed.replace('# ', '')}
+          {parseBoldText(trimmed.replace('# ', ''))}
         </h1>
       );
     }
     if (!trimmed) {
       return <div key={index} className="h-2" />;
     }
+
+    let isListItem = false;
+    const listMatch = trimmed.match(/^[\*\-]\s+(.*)$/);
+    if (listMatch) {
+      trimmed = listMatch[1];
+      isListItem = true;
+    }
+
+    if (isListItem) {
+      return (
+        <div key={index} className="flex gap-2 text-white/85 leading-relaxed mb-3 text-sm sm:text-base pl-2">
+          <span className="text-mystic-primary select-none">•</span>
+          <span>{parseBoldText(trimmed)}</span>
+        </div>
+      );
+    }
+
     return (
       <p key={index} className="text-white/85 leading-relaxed mb-4 text-sm sm:text-base">
-        {para}
+        {parseBoldText(para)}
       </p>
     );
   });
