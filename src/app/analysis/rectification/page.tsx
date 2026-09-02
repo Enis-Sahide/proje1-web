@@ -262,7 +262,7 @@ export default function RectificationPage() {
     
     const svgPoints = points.map((pt, i) => {
       const x = (i / (points.length - 1)) * width;
-      const y = height - (pt.probabilityPercent / 100) * (height - 40) - 20;
+      const y = height - (pt.probabilityPercent / 100) * (height - 45) - 20;
       return { x, y };
     });
 
@@ -719,7 +719,7 @@ export default function RectificationPage() {
           </div>
         )}
 
-        {/* STEP 4: 24 SAATLİK KOZMİK REZONANS DALGA GRAFİĞİ & BELİRGİN ZİRVELER */}
+        {/* STEP 4: ORGANİK GAUSS KOZMİK REZONANS DALGA GRAFİĞİ & ZİRVELER */}
         {currentStep === 4 && result && selectedPeak && (
           <div className="space-y-8 animate-in fade-in zoom-in duration-500">
             
@@ -729,13 +729,13 @@ export default function RectificationPage() {
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/10 pb-4">
                 <div>
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-bold uppercase tracking-wider mb-2">
-                    <TrendingUp size={14} /> Kozmik Rezonans Spektrumu
+                    <TrendingUp size={14} /> Kozmik Rezonans Spektrumu (Organik Dalga)
                   </div>
                   <h2 className="text-xl sm:text-2xl font-bold text-white">
                     Doğum Saati Olasılık Dağılım Grafiği
                   </h2>
                   <p className="text-xs text-white/50 mt-1">
-                    Kadersel olaylarınızın gökyüzüyle oluşturduğu rezonans dalgaları ve ana zirveler aşağıdadır. İncelemek istediğiniz tepeye tıklayabilirsiniz.
+                    Kadersel olaylarınızın gökyüzüyle oluşturduğu rezonans dalgaları ve ana tepe noktaları pürüzsüz dalga formunda aşağıdadır.
                   </p>
                 </div>
 
@@ -757,12 +757,18 @@ export default function RectificationPage() {
                   <div className="w-full text-[10px] text-right font-mono">%0</div>
                 </div>
 
-                {/* SVG Curves */}
+                {/* SVG Smooth Curves */}
                 {(() => {
                   const { pathData, fillData } = renderWavePath(result.timelinePoints, 800, 240);
                   const totalPts = result.timelinePoints.length;
                   const startHour = result.timelinePoints[0]?.hour ?? 0;
+                  const startMin = result.timelinePoints[0]?.minute ?? 0;
                   const endHour = result.timelinePoints[totalPts - 1]?.hour ?? 24;
+                  const endMin = result.timelinePoints[totalPts - 1]?.minute ?? 0;
+
+                  const startTotalMin = startHour * 60 + startMin;
+                  const endTotalMin = endHour * 60 + endMin;
+                  const totalRange = Math.max(1, endTotalMin - startTotalMin);
 
                   return (
                     <svg 
@@ -781,18 +787,16 @@ export default function RectificationPage() {
                       </defs>
 
                       <path d={fillData} fill="url(#waveGradient)" />
-                      <path d={pathData} fill="none" stroke="#D4AF37" strokeWidth="3" className="drop-shadow-[0_0_10px_rgba(212,175,55,0.8)]" />
+                      <path d={pathData} fill="none" stroke="#D4AF37" strokeWidth="3.5" className="drop-shadow-[0_0_12px_rgba(212,175,55,0.85)]" />
 
-                      {/* TEMİZ VE FERAH ZİRVE NOKTASI İŞARETLERİ */}
+                      {/* TEMİZ, ÇAKIŞMAYAN ZİRVE DORUKLARI */}
                       {result.topCandidates.map((cand, idx) => {
                         const totalMins = cand.hour * 60 + cand.minute;
-                        const startMins = startHour * 60;
-                        const totalRange = Math.max(1, (endHour - startHour) * 60);
-                        const x = Math.max(20, Math.min(780, ((totalMins - startMins) / totalRange) * 800));
+                        const x = Math.max(25, Math.min(775, ((totalMins - startTotalMin) / totalRange) * 800));
 
-                        const pt = result.timelinePoints.find(p => p.hour === cand.hour && Math.abs(p.minute - cand.minute) < 5);
-                        const percent = pt?.probabilityPercent || 80;
-                        const y = 240 - (percent / 100) * (240 - 40) - 20;
+                        const pt = result.timelinePoints.find(p => p.hour === cand.hour && Math.abs(p.minute - cand.minute) < 4);
+                        const percent = pt?.probabilityPercent || 85;
+                        const y = 240 - (percent / 100) * (240 - 45) - 20;
 
                         const isSelected = selectedPeak.timeStr === cand.timeStr;
 
@@ -803,22 +807,22 @@ export default function RectificationPage() {
                               y1={y} 
                               x2={x} 
                               y2={240} 
-                              stroke={isSelected ? "#FFD700" : "rgba(255,255,255,0.25)"} 
-                              strokeDasharray="3 3" 
+                              stroke={isSelected ? "#FFD700" : "rgba(255,255,255,0.3)"} 
+                              strokeDasharray="4 4" 
                               strokeWidth={isSelected ? "2" : "1"} 
                             />
                             <circle 
                               cx={x} 
                               cy={y} 
-                              r={isSelected ? "8" : "5"} 
+                              r={isSelected ? "9" : "6"} 
                               fill={isSelected ? "#FFD700" : "#10B981"} 
                               stroke="#ffffff" 
-                              strokeWidth="2" 
+                              strokeWidth="2.5" 
                               className={isSelected ? "animate-pulse" : ""}
                             />
                             <text 
                               x={x} 
-                              y={y - 12} 
+                              y={y - 14} 
                               textAnchor="middle" 
                               fill={isSelected ? "#FFD700" : "#ffffff"} 
                               fontSize="12" 
@@ -874,8 +878,8 @@ export default function RectificationPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 mt-4">
                 {result.topCandidates.map((cand, idx) => {
                   const isSelected = selectedPeak.timeStr === cand.timeStr;
-                  const pt = result.timelinePoints.find(p => p.hour === cand.hour && Math.abs(p.minute - cand.minute) < 5);
-                  const wavePercent = pt?.probabilityPercent || 80;
+                  const pt = result.timelinePoints.find(p => p.hour === cand.hour && Math.abs(p.minute - cand.minute) < 4);
+                  const wavePercent = pt?.probabilityPercent || 85;
 
                   return (
                     <button

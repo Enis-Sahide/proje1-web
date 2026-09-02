@@ -108,7 +108,7 @@ export interface TimelinePoint {
 
 export interface RectificationResult {
   bestCandidate: CandidateScore;
-  topCandidates: CandidateScore[]; // Belirgin yerel zirveler
+  topCandidates: CandidateScore[]; // Belirgin yumuşatılmış zirveler
   timelinePoints: TimelinePoint[];
   chartData: NatalChartData;
   totalEventsProcessed: number;
@@ -259,15 +259,13 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
     });
   }
 
-  const candidateScores: CandidateScore[] = [];
-  const timelinePoints: TimelinePoint[] = [];
+  const rawPoints: TimelinePoint[] = [];
+  const candidateScoresMap: Map<string, CandidateScore> = new Map();
 
   const startMinute = Math.round(startH * 60);
   const endMinute = Math.min(1440, Math.round(endH * 60));
 
-  let maxObservedScore = 1;
-
-  for (let m = startMinute; m < endMinute; m++) {
+  for (let m = startMinute; m <= endMinute; m += 4) {
     const hourVal = m / 60.0;
     const utcHour = hourVal - tzOffsetHours;
     let calcDay = bDay;
@@ -330,7 +328,7 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
     if (input.profile?.elementTemperament) {
       const allowedSigns = ELEMENT_SIGNS[input.profile.elementTemperament] || [];
       if (allowedSigns.includes(ascSignData.sign)) {
-        temperamentScore += 30;
+        temperamentScore += 25;
       }
     }
     candidateTotalScore += temperamentScore;
@@ -347,7 +345,7 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
       let bestEventMatchScore = 0;
       let bestMatchDetail: EventMatchDetail | null = null;
 
-      // 1. Çift Yönlü Solar Arc (Gauss Sürekli Ağırlıklandırması)
+      // 1. Çift Yönlü Solar Arc (Gauss Rezonansı)
       for (const pName of affinity.planets) {
         const natalP = natalPlanets[pName];
         if (natalP === undefined) continue;
@@ -358,8 +356,8 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
             const diff = Math.abs(mod360(dirPlanet - ang.pos) - aspDeg);
             const orb = Math.min(diff, Math.abs(360 - diff));
 
-            if (orb <= 2.2) {
-              const gaussianWeight = Math.exp(-0.5 * Math.pow(orb / 0.85, 2));
+            if (orb <= 2.5) {
+              const gaussianWeight = Math.exp(-0.5 * Math.pow(orb / 0.9, 2));
               const score = Math.round(130 * affinity.primaryWeight * gaussianWeight);
 
               if (score > bestEventMatchScore) {
@@ -386,8 +384,8 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
             const diff = Math.abs(mod360(dirAng - natalP) - aspDeg);
             const orb = Math.min(diff, Math.abs(360 - diff));
 
-            if (orb <= 2.2) {
-              const gaussianWeight = Math.exp(-0.5 * Math.pow(orb / 0.85, 2));
+            if (orb <= 2.5) {
+              const gaussianWeight = Math.exp(-0.5 * Math.pow(orb / 0.9, 2));
               const score = Math.round(110 * affinity.primaryWeight * gaussianWeight);
 
               if (score > bestEventMatchScore) {
@@ -415,8 +413,8 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
           const diff = Math.abs(mod360(evCalc.progMoonLon - ang.pos) - aspDeg);
           const orb = Math.min(diff, Math.abs(360 - diff));
 
-          if (orb <= 2.0) {
-            const gaussianWeight = Math.exp(-0.5 * Math.pow(orb / 0.85, 2));
+          if (orb <= 2.2) {
+            const gaussianWeight = Math.exp(-0.5 * Math.pow(orb / 0.9, 2));
             const score = Math.round(95 * affinity.primaryWeight * gaussianWeight);
 
             if (score > bestEventMatchScore) {
@@ -447,8 +445,8 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
             const diff = Math.abs(mod360(trPos - ang.pos) - aspDeg);
             const orb = Math.min(diff, Math.abs(360 - diff));
 
-            if (orb <= 2.0) {
-              const gaussianWeight = Math.exp(-0.5 * Math.pow(orb / 0.85, 2));
+            if (orb <= 2.2) {
+              const gaussianWeight = Math.exp(-0.5 * Math.pow(orb / 0.9, 2));
               const score = Math.round(85 * affinity.primaryWeight * gaussianWeight);
 
               if (score > bestEventMatchScore) {
@@ -477,10 +475,6 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
       }
     }
 
-    if (candidateTotalScore > maxObservedScore) {
-      maxObservedScore = candidateTotalScore;
-    }
-
     const curH = Math.floor(m / 60);
     const curM = m % 60;
     const timeStr = `${String(curH).padStart(2, '0')}:${String(curM).padStart(2, '0')}:00`;
@@ -506,46 +500,94 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
       temperamentMatchScore: temperamentScore
     };
 
-    candidateScores.push(candidateObj);
+    candidateScoresMap.set(`${curH}:${curM}`, candidateObj);
 
-    // Her 5 dakikada bir veri noktası kaydet (288 nokta)
-    if (m % 5 === 0) {
-      timelinePoints.push({
-        timeStr: `${String(curH).padStart(2, '0')}:${String(curM).padStart(2, '0')}`,
-        hour: curH,
-        minute: curM,
-        score: candidateTotalScore,
-        probabilityPercent: 0,
-        ascSign: ascSignData.sign,
-        ascDegree: Number(ascDeg.toFixed(1)),
-        mcSign: mcSignData.sign,
-        mcDegree: Number(mcDeg.toFixed(1)),
-        topMatchExplanation: matches[0]?.explanation
-      });
+    rawPoints.push({
+      timeStr: `${String(curH).padStart(2, '0')}:${String(curM).padStart(2, '0')}`,
+      hour: curH,
+      minute: curM,
+      score: candidateTotalScore,
+      probabilityPercent: 0,
+      ascSign: ascSignData.sign,
+      ascDegree: Number(ascDeg.toFixed(1)),
+      mcSign: mcSignData.sign,
+      mcDegree: Number(mcDeg.toFixed(1)),
+      topMatchExplanation: matches[0]?.explanation
+    });
+  }
+
+  // GAUSS DALGA DÜZLEŞTİRME FİLTRESİ (1D Kernel Density Estimation - sigma = 20 dakika)
+  const smoothedPoints: TimelinePoint[] = rawPoints.map(pt => ({ ...pt }));
+  const sigmaMinutes = 20;
+  const stepMinutes = 4;
+  const radiusSteps = Math.ceil((2.5 * sigmaMinutes) / stepMinutes);
+
+  for (let i = 0; i < rawPoints.length; i++) {
+    let weightSum = 0;
+    let valueSum = 0;
+
+    for (let j = Math.max(0, i - radiusSteps); j <= Math.min(rawPoints.length - 1, i + radiusSteps); j++) {
+      const distMin = (j - i) * stepMinutes;
+      const weight = Math.exp(-0.5 * Math.pow(distMin / sigmaMinutes, 2));
+      weightSum += weight;
+      valueSum += rawPoints[j].score * weight;
+    }
+
+    smoothedPoints[i].score = weightSum > 0 ? valueSum / weightSum : rawPoints[i].score;
+  }
+
+  const maxSmoothedScore = Math.max(1, ...smoothedPoints.map(p => p.score));
+  for (const pt of smoothedPoints) {
+    pt.probabilityPercent = Number(((pt.score / maxSmoothedScore) * 100).toFixed(1));
+  }
+
+  // DÜZLEŞTİRİLMİŞ DALGA ÜZERİNDEKİ GERÇEK TEPE NOKTALARI (Crest Finding)
+  const crestCandidates: CandidateScore[] = [];
+  for (let i = 1; i < smoothedPoints.length - 1; i++) {
+    const prev = smoothedPoints[i - 1].probabilityPercent;
+    const curr = smoothedPoints[i].probabilityPercent;
+    const next = smoothedPoints[i + 1].probabilityPercent;
+
+    if (curr >= prev && curr >= next && curr > 25) {
+      const pt = smoothedPoints[i];
+      const cand = candidateScoresMap.get(`${pt.hour}:${pt.minute}`) || {
+        timeStr: `${pt.timeStr}:00`,
+        hour: pt.hour,
+        minute: pt.minute,
+        second: 0,
+        ascDegree: pt.ascDegree,
+        ascSign: pt.ascSign,
+        mcDegree: pt.mcDegree,
+        mcSign: pt.mcSign,
+        totalScore: Math.round(pt.score),
+        confidencePercent: Math.min(99.4, Number((75 + (curr / 100) * 24.4).toFixed(1))),
+        eventMatches: [],
+        temperamentMatchScore: 0
+      };
+      cand.confidencePercent = Math.min(99.4, Number((75 + (curr / 100) * 24.4).toFixed(1)));
+      crestCandidates.push(cand);
     }
   }
 
-  // Olasılık yüzdelerini normalize et
-  for (const pt of timelinePoints) {
-    pt.probabilityPercent = Number(((pt.score / Math.max(1, maxObservedScore)) * 100).toFixed(1));
-  }
+  // Zirveleri yükseklik sırasına göre sırala ve birbirine çok yakın olanları filtrele (min 60 dk mesafe)
+  crestCandidates.sort((a, b) => b.totalScore - a.totalScore);
+  const finalProminentPeaks: CandidateScore[] = [];
 
-  // EN BELİRGİN VE ÇAKIŞMAYAN ZİRVE NOKTALARINI FİLTRELE (Prominent Peaks Filter)
-  candidateScores.sort((a, b) => b.totalScore - a.totalScore);
-  const prominentPeaks: CandidateScore[] = [];
-  
-  for (const cand of candidateScores) {
-    // En az 75 dakika aralıklı gerçek ana zirveleri topla
-    const isCloseToExisting = prominentPeaks.some(p => Math.abs((p.hour * 60 + p.minute) - (cand.hour * 60 + cand.minute)) < 75);
-    if (!isCloseToExisting) {
-      if (cand.totalScore >= maxObservedScore * 0.4 || prominentPeaks.length < 3) {
-        prominentPeaks.push(cand);
-      }
+  for (const cand of crestCandidates) {
+    const isClose = finalProminentPeaks.some(p => Math.abs((p.hour * 60 + p.minute) - (cand.hour * 60 + cand.minute)) < 60);
+    if (!isClose) {
+      finalProminentPeaks.push(cand);
     }
-    if (prominentPeaks.length >= 5) break; // En fazla 5 temiz zirve
+    if (finalProminentPeaks.length >= 4) break;
   }
 
-  const best = prominentPeaks[0] || candidateScores[0] || {
+  // Eğer tepe bulunamadıysa en yüksek skora sahip olanı al
+  if (finalProminentPeaks.length === 0) {
+    const bestRaw = [...candidateScoresMap.values()].sort((a, b) => b.totalScore - a.totalScore)[0];
+    if (bestRaw) finalProminentPeaks.push(bestRaw);
+  }
+
+  const best = finalProminentPeaks[0] || {
     timeStr: "12:00:00",
     hour: 12,
     minute: 0,
@@ -576,10 +618,10 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
 
   return {
     bestCandidate: best,
-    topCandidates: prominentPeaks,
-    timelinePoints,
+    topCandidates: finalProminentPeaks,
+    timelinePoints: smoothedPoints,
     chartData,
     totalEventsProcessed: input.events.length,
-    methodologyNote: `Bu rektifikasyon analizi; seçili zaman aralığında (${String(startH).padStart(2, '0')}:00 - ${String(endH).padStart(2, '0')}:00) Gauss sürekli rezonans eğrisi hesaplayarak kadersel olaylarla en yüksek korelasyona sahip zirveleri tespit etmiştir.`
+    methodologyNote: `Bu rektifikasyon analizi; seçili zaman aralığında (${String(startH).padStart(2, '0')}:00 - ${String(endH).padStart(2, '0')}:00) Gauss Sürekli Dalga Düzleştirme Filtresi (Kernel Density Estimation) uygulayarak, kadersel olaylarla en organik rezonansı oluşturan tepe doruk noktalarını tespit etmiştir.`
   };
 }
