@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   Clock, 
@@ -22,10 +22,13 @@ import {
   Zap, 
   RotateCcw,
   UserCheck,
-  BookmarkCheck
+  BookmarkCheck,
+  TrendingUp,
+  Award,
+  BarChart3
 } from 'lucide-react';
 import { ASTRO_CITIES, AstroCity } from '@/features/astrology/engine/AstrologyConstants';
-import { EventType, LifeEvent, RectificationResult } from '@/features/astrology/engine/RectificationEngine';
+import { EventType, LifeEvent, RectificationResult, TimelinePoint, CandidateScore } from '@/features/astrology/engine/RectificationEngine';
 
 interface EventTemplate {
   type: EventType;
@@ -146,8 +149,11 @@ export default function RectificationPage() {
   const [isCalculating, setIsCalculating] = useState<boolean>(false);
   const [result, setResult] = useState<RectificationResult | null>(null);
   const [errorMsg, setErrorMsg] = useState<string>('');
+  const [selectedPeak, setSelectedPeak] = useState<CandidateScore | null>(null);
+  const [hoveredPoint, setHoveredPoint] = useState<TimelinePoint | null>(null);
 
-  // Preset Yükleme
+  const chartContainerRef = useRef<HTMLDivElement>(null);
+
   const handleLoadPreset = (preset: BenchmarkPreset) => {
     setActivePreset(preset.id);
     setBirthDate(preset.birthDate);
@@ -157,10 +163,9 @@ export default function RectificationPage() {
     setElementTemperament(preset.element);
     setEvents([...preset.events]);
     setTimeWindowType('all');
-    setCurrentStep(3); // Doğrudan olaylar adımına geç
+    setCurrentStep(3);
   };
 
-  // Doğruluk Gücü Göstergesi
   const getAccuracyGauge = () => {
     const count = events.length;
     if (count === 0) return { percent: 40, label: 'Yetersiz Veri', color: 'bg-zinc-600', text: 'text-zinc-400' };
@@ -235,6 +240,7 @@ export default function RectificationPage() {
       }
 
       setResult(data.data);
+      setSelectedPeak(data.data.bestCandidate);
       setCurrentStep(4);
     } catch (err: any) {
       setErrorMsg(err.message || 'Hesaplama sırasında bir hata oluştu.');
@@ -246,6 +252,39 @@ export default function RectificationPage() {
   const filteredCities = ASTRO_CITIES.filter(c => 
     c.name.toLowerCase().includes(citySearch.toLowerCase())
   ).slice(0, 8);
+
+  const renderWavePath = (points: TimelinePoint[], width: number, height: number) => {
+    if (!points || points.length === 0) return { pathData: '', fillData: '' };
+    
+    const svgPoints = points.map((pt, i) => {
+      const x = (i / (points.length - 1)) * width;
+      const y = height - (pt.probabilityPercent / 100) * (height - 35) - 18;
+      return { x, y };
+    });
+
+    let pathData = `M ${svgPoints[0].x} ${svgPoints[0].y}`;
+    for (let i = 1; i < svgPoints.length; i++) {
+      const prev = svgPoints[i - 1];
+      const cur = svgPoints[i];
+      const cx = (prev.x + cur.x) / 2;
+      pathData += ` C ${cx} ${prev.y}, ${cx} ${cur.y}, ${cur.x} ${cur.y}`;
+    }
+
+    const fillData = `${pathData} L ${width} ${height} L 0 ${height} Z`;
+    return { pathData, fillData };
+  };
+
+  const handleMouseMoveChart = (e: React.MouseEvent<SVGSVGElement>) => {
+    if (!result?.timelinePoints || !chartContainerRef.current) return;
+    const rect = chartContainerRef.current.getBoundingClientRect();
+    const mouseX = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+    const ratio = mouseX / rect.width;
+    const index = Math.round(ratio * (result.timelinePoints.length - 1));
+    const pt = result.timelinePoints[index];
+    if (pt) {
+      setHoveredPoint(pt);
+    }
+  };
 
   return (
     <div className="min-h-screen pt-28 pb-24 px-4 sm:px-6 relative text-white">
@@ -260,7 +299,7 @@ export default function RectificationPage() {
             Akıllı Doğum Saati Belirleme
           </h1>
           <p className="text-sm sm:text-base text-mystic-text-muted max-w-2xl mx-auto">
-            Doğum saatinizi tam bilmiyor musunuz? Hayatınızdaki dönüm noktası olaylar ve astronomik tersine mühendislik ile kesin doğum dakikanızı hesaplayın.
+            24 saatlik günün tüm zaman dilimini kadersel olaylarınızla tarayarak **Kozmik Rezonans ve Olasılık Dalga Grafiğini** çıkarın.
           </p>
         </div>
 
@@ -272,7 +311,7 @@ export default function RectificationPage() {
             </div>
           </div>
           <p className="text-xs text-mystic-text-muted mb-4">
-            Algoritmanın doğruluğunu test etmek için aşağıdaki dünyaca ünlü kişilerden birine tıklayınız; doğum bilgileri ve resmi olayları otomatik yüklenecektir:
+            Algoritmanın 24 saatlik dalga grafiğini test etmek için aşağıdaki kişilerden birine tıklayınız; resmi doğum bilgileri otomatik yüklenecektir:
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {BENCHMARK_PRESETS.map(preset => (
@@ -663,12 +702,12 @@ export default function RectificationPage() {
                 {isCalculating ? (
                   <>
                     <RotateCcw className="animate-spin" size={18} />
-                    Kozmik Eksenler Hesaplanıyor (1440 Dakika Taranıyor)...
+                    24 Saatlik Kozmik Rezonans Dalga Grafiği Çıkarılıyor...
                   </>
                 ) : (
                   <>
-                    <Sparkles size={18} />
-                    Kesin Doğum Saatini Hesapla
+                    <TrendingUp size={18} />
+                    24 Saatlik Olasılık Dalga Grafiğini Hesapla
                   </>
                 )}
               </button>
@@ -676,51 +715,205 @@ export default function RectificationPage() {
           </div>
         )}
 
-        {/* STEP 4: SONUÇ RAPORU */}
-        {currentStep === 4 && result && (
+        {/* STEP 4: 24 SAATLİK KOZMİK REZONANS DALGA GRAFİĞİ & TÜM ZİRVELER */}
+        {currentStep === 4 && result && selectedPeak && (
           <div className="space-y-8 animate-in fade-in zoom-in duration-500">
             
-            <div className="bg-gradient-to-b from-[#181818] to-black border-2 border-[#D4AF37]/50 rounded-3xl p-8 text-center relative overflow-hidden shadow-[0_0_50px_rgba(212,175,55,0.2)]">
-              <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-extrabold uppercase tracking-widest mb-4">
-                <CheckCircle2 size={16} /> Rektifikasyon Başarıyla Tamamlandı
+            {/* 24 SAATLİK İNTERAKTİF SVG DALGA GRAFİĞİ KARTI */}
+            <div className="bg-[#121212]/95 border-2 border-[#D4AF37]/40 rounded-3xl p-6 sm:p-8 backdrop-blur-2xl shadow-[0_0_50px_rgba(212,175,55,0.15)] space-y-6">
+              
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/10 pb-4">
+                <div>
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-bold uppercase tracking-wider mb-2">
+                    <TrendingUp size={14} /> 24 Saatlik Kozmik Rezonans Spektrumu
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-bold text-white">
+                    Günün Doğum Saati Olasılık Dağılımı
+                  </h2>
+                  <p className="text-xs text-white/50 mt-1">
+                    Günün 24 saatindeki tüm olası rezonans tepeleri ve yükseklikleri aşağıda işaretlenmiştir. İncelemek istediğiniz zirveye tıklayabilirsiniz.
+                  </p>
+                </div>
+
+                <div className="px-5 py-3 rounded-2xl bg-white/5 border border-[#D4AF37]/30 text-right">
+                  <span className="text-[10px] uppercase font-bold text-[#D4AF37] block">Seçili Zirve Saati</span>
+                  <span className="text-2xl sm:text-3xl font-black text-white">{selectedPeak.timeStr.slice(0, 5)}</span>
+                </div>
               </div>
 
-              <h2 className="text-sm font-semibold text-white/60 uppercase tracking-widest mb-2">
-                Tespit Edilen Kesin Doğum Saatiniz
-              </h2>
+              {/* SVG Area Chart */}
+              <div ref={chartContainerRef} className="relative w-full h-72 sm:h-80 bg-black/60 rounded-2xl p-4 border border-white/10 overflow-hidden">
+                
+                {/* Y-Axis Grid Lines */}
+                <div className="absolute inset-0 flex flex-col justify-between p-4 pointer-events-none opacity-20">
+                  <div className="border-b border-white/20 w-full text-[10px] text-right font-mono">%100</div>
+                  <div className="border-b border-white/20 w-full text-[10px] text-right font-mono">%75</div>
+                  <div className="border-b border-white/20 w-full text-[10px] text-right font-mono">%50</div>
+                  <div className="border-b border-white/20 w-full text-[10px] text-right font-mono">%25</div>
+                  <div className="w-full text-[10px] text-right font-mono">%0</div>
+                </div>
 
-              <div className="text-5xl sm:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-white to-[#D4AF37] tracking-tight my-4">
-                {result.bestCandidate.timeStr.slice(0, 5)}
+                {/* SVG Curves */}
+                {(() => {
+                  const { pathData, fillData } = renderWavePath(result.timelinePoints, 800, 240);
+                  return (
+                    <svg 
+                      viewBox="0 0 800 240" 
+                      className="w-full h-full cursor-crosshair relative z-10"
+                      preserveAspectRatio="none"
+                      onMouseMove={handleMouseMoveChart}
+                      onMouseLeave={() => setHoveredPoint(null)}
+                    >
+                      <defs>
+                        <linearGradient id="waveGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#D4AF37" stopOpacity="0.45" />
+                          <stop offset="50%" stopColor="#10B981" stopOpacity="0.2" />
+                          <stop offset="100%" stopColor="#000000" stopOpacity="0.0" />
+                        </linearGradient>
+                      </defs>
+
+                      <path d={fillData} fill="url(#waveGradient)" />
+                      <path d={pathData} fill="none" stroke="#D4AF37" strokeWidth="3" className="drop-shadow-[0_0_10px_rgba(212,175,55,0.8)]" />
+
+                      {/* TÜM BELİRGİN ZİRVE NOKTALARININ İŞARETLERİ */}
+                      {result.topCandidates.map((cand, idx) => {
+                        const totalMins = cand.hour * 60 + cand.minute;
+                        const x = (totalMins / 1440) * 800;
+                        const pt = result.timelinePoints.find(p => p.hour === cand.hour && Math.abs(p.minute - cand.minute) < 5);
+                        const percent = pt?.probabilityPercent || 75;
+                        const y = 240 - (percent / 100) * (240 - 35) - 18;
+
+                        const isSelected = selectedPeak.timeStr === cand.timeStr;
+
+                        return (
+                          <g key={idx} className="cursor-pointer group" onClick={() => setSelectedPeak(cand)}>
+                            {/* Vertical Line to Peak */}
+                            <line 
+                              x1={x} 
+                              y1={y} 
+                              x2={x} 
+                              y2={240} 
+                              stroke={isSelected ? "#FFD700" : "rgba(255,255,255,0.2)"} 
+                              strokeDasharray="3 3" 
+                              strokeWidth={isSelected ? "2" : "1"} 
+                            />
+                            {/* Peak Circle Marker */}
+                            <circle 
+                              cx={x} 
+                              cy={y} 
+                              r={isSelected ? "8" : "5"} 
+                              fill={isSelected ? "#FFD700" : "#10B981"} 
+                              stroke="#ffffff" 
+                              strokeWidth="2" 
+                              className={isSelected ? "animate-pulse" : ""}
+                            />
+                            {/* Peak Time & Percentage Label */}
+                            <text 
+                              x={x} 
+                              y={y - 12} 
+                              textAnchor="middle" 
+                              fill={isSelected ? "#FFD700" : "#ffffff"} 
+                              fontSize="11" 
+                              fontWeight="bold"
+                            >
+                              {cand.timeStr.slice(0, 5)} (%{percent})
+                            </text>
+                          </g>
+                        );
+                      })}
+                    </svg>
+                  );
+                })()}
+
+                {/* Live Tooltip on Hover */}
+                {hoveredPoint && (
+                  <div className="absolute top-3 left-4 pointer-events-none bg-[#1a1a1a]/95 border border-[#D4AF37]/50 rounded-xl px-4 py-2 shadow-2xl z-20 backdrop-blur-md">
+                    <div className="flex items-center gap-2">
+                      <span className="font-mono text-sm font-bold text-white">Saat: {hoveredPoint.timeStr}</span>
+                      <span className="px-2 py-0.5 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] text-[10px] font-bold">
+                        Rezonans Yüksekliği: %{hoveredPoint.probabilityPercent}
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-white/70 mt-0.5">
+                      Yükselen: <span className="text-white font-bold">{hoveredPoint.ascSign} ({hoveredPoint.ascDegree}°)</span> • MC: {hoveredPoint.mcSign}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <div className="flex flex-wrap justify-center gap-4 sm:gap-8 mt-6 pt-6 border-t border-white/10 text-xs sm:text-sm">
-                <div>
-                  <span className="text-white/40 block">Yükselen Burç (ASC)</span>
-                  <span className="font-bold text-white text-base">{result.bestCandidate.ascSign} ({result.bestCandidate.ascDegree.toFixed(1)}°)</span>
-                </div>
-                <div>
-                  <span className="text-white/40 block">Kariyer Noktası (MC)</span>
-                  <span className="font-bold text-white text-base">{result.bestCandidate.mcSign} ({result.bestCandidate.mcDegree.toFixed(1)}°)</span>
-                </div>
-                <div>
-                  <span className="text-white/40 block">Matematiksel Güvenilirlik</span>
-                  <span className="font-bold text-[#D4AF37] text-base">%{result.bestCandidate.confidencePercent}</span>
-                </div>
+              {/* X-Axis Timeline Labels */}
+              <div className="flex justify-between text-[11px] font-mono text-white/40 px-2 pt-1 border-t border-white/5">
+                <span>00:00 (Gece)</span>
+                <span>04:00</span>
+                <span>08:00 (Sabah)</span>
+                <span>12:00 (Öğle)</span>
+                <span>16:00 (İkindi)</span>
+                <span>20:00 (Akşam)</span>
+                <span>23:59</span>
               </div>
             </div>
 
-            {/* Kadersel Kanıt Matrisi Tablosu */}
+            {/* 24 SAATTEKİ TÜM BELİRGİN ZİRVELERİN LİSTESİ */}
+            <div className="bg-[#121212]/90 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-xl shadow-xl space-y-4">
+              <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                <BarChart3 className="text-[#D4AF37]" size={20} />
+                24 Saatteki Tüm Olası Rezonans Zirveleri ({result.topCandidates.length} Zirve)
+              </h3>
+              <p className="text-xs text-mystic-text-muted">
+                Kadersel olaylarınızın gün boyunca oluşturduğu tüm yerel tepe noktaları yükseklik sırasına göre aşağıdadır. İncelemek istediğiniz zirveye tıklayınız:
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 mt-4">
+                {result.topCandidates.map((cand, idx) => {
+                  const isSelected = selectedPeak.timeStr === cand.timeStr;
+                  const pt = result.timelinePoints.find(p => p.hour === cand.hour && Math.abs(p.minute - cand.minute) < 5);
+                  const wavePercent = pt?.probabilityPercent || 70;
+
+                  return (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedPeak(cand)}
+                      className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
+                        isSelected 
+                          ? 'bg-[#D4AF37]/20 border-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.2)]' 
+                          : 'bg-white/5 border-white/10 hover:border-white/20 hover:bg-white/10'
+                      }`}
+                    >
+                      <div className="flex justify-between items-center mb-1.5">
+                        <span className="text-xs font-bold text-[#D4AF37]">
+                          {idx === 0 ? '🏆 1. Ana Zirve' : `${idx + 1}. Zirve Noktası`}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full bg-white/10 text-emerald-400 text-[10px] font-mono font-bold">
+                          Rezonans: %{wavePercent}
+                        </span>
+                      </div>
+
+                      <div className="text-2xl font-black text-white my-1">
+                        {cand.timeStr.slice(0, 5)}
+                      </div>
+
+                      <div className="space-y-0.5 text-xs text-white/70 mt-2 pt-2 border-t border-white/10">
+                        <div>Yükselen (ASC): <strong className="text-white">{cand.ascSign} ({cand.ascDegree.toFixed(1)}°)</strong></div>
+                        <div>Tepe Noktası (MC): <strong className="text-white">{cand.mcSign}</strong></div>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* SEÇİLİ ZİRVENİN KADERSEL KANIT MATRİSİ */}
             <div className="bg-[#121212]/90 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-xl shadow-xl space-y-4">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
                 <ShieldCheck className="text-[#D4AF37]" size={20} />
-                Kadersel Açı ve Olay Eşleşme Kanıtları
+                {selectedPeak.timeStr.slice(0, 5)} Zirvesi İçin Kadersel Açı Kanıtları
               </h3>
               <p className="text-xs text-mystic-text-muted">
-                Girmiş olduğunuz yaşam olaylarının bu saatteki Solar Arc ve Transit köşe açılarıyla nasıl dakikası dakikasına kilitlendiğini gösterir:
+                Seçtiğiniz bu saatteki Solar Arc ve Transit kilitlenmelerinin detaylı dökümü:
               </p>
 
               <div className="space-y-3 mt-4">
-                {result.bestCandidate.eventMatches.map((m, idx) => (
+                {selectedPeak.eventMatches.map((m, idx) => (
                   <div key={idx} className="p-4 bg-white/5 border border-white/10 rounded-2xl space-y-1.5">
                     <div className="flex justify-between items-center text-xs font-bold">
                       <span className="text-[#D4AF37] flex items-center gap-1.5">
@@ -738,10 +931,11 @@ export default function RectificationPage() {
               </div>
             </div>
 
+            {/* BUTONLAR */}
             <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
               <button
                 onClick={() => setCurrentStep(1)}
-                className="py-3 px-6 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white transition-all flex items-center justify-center gap-2"
+                className="py-3.5 px-6 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white transition-all flex items-center justify-center gap-2"
               >
                 <RotateCcw size={16} /> Farklı Bilgilerle Yeniden Hesapla
               </button>
@@ -752,7 +946,7 @@ export default function RectificationPage() {
                 }}
                 className="py-3.5 px-8 rounded-xl bg-[#D4AF37] hover:bg-[#E5C158] text-xs font-black text-black transition-all shadow-lg shadow-[#D4AF37]/20 flex items-center justify-center gap-2"
               >
-                <Sparkles size={16} /> Bu Saat ile Doğum Haritasını Aç
+                <Sparkles size={16} /> {selectedPeak.timeStr.slice(0, 5)} Saatiyle Doğum Haritasını Aç
               </button>
             </div>
 

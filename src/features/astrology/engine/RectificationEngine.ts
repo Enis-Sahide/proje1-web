@@ -93,9 +93,23 @@ export interface CandidateScore {
   temperamentMatchScore: number;
 }
 
+export interface TimelinePoint {
+  timeStr: string;
+  hour: number;
+  minute: number;
+  score: number;
+  probabilityPercent: number;
+  ascSign: string;
+  ascDegree: number;
+  mcSign: string;
+  mcDegree: number;
+  topMatchExplanation?: string;
+}
+
 export interface RectificationResult {
   bestCandidate: CandidateScore;
-  topCandidates: CandidateScore[];
+  topCandidates: CandidateScore[]; // Tüm belirgin yerel zirveler
+  timelinePoints: TimelinePoint[];
   chartData: NatalChartData;
   totalEventsProcessed: number;
   methodologyNote: string;
@@ -108,7 +122,6 @@ interface AxisAffinity {
   primaryWeight: number;
 }
 
-// KADERSEL HEDEF EKSEN HİYERARŞİSİ (Strict Event-to-Axis Specificity)
 const STRICT_EVENT_AFFINITY: Record<EventType, AxisAffinity> = {
   marriage: {
     targetAngleKeys: ['DSC', 'ASC', 'MC'],
@@ -197,7 +210,6 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
   const baseJd = swe.swe_julday(bYear, bMonth, bDay, 12.0 - tzOffsetHours, Constants.SE_GREG_CAL);
   const baseSun = mod360(swe.swe_calc_ut(baseJd, Constants.SE_SUN, Constants.SEFLG_SWIEPH).xx[0]);
 
-  // Her olay için Solar Arc derecesini ve transitleri hazırla
   const eventCalculations: Array<{
     event: LifeEvent;
     arcDegree: number;
@@ -247,13 +259,15 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
     });
   }
 
-  // Aday dakikaları tara
   const candidateScores: CandidateScore[] = [];
-  const stepMinutes = 1;
+  const timelinePoints: TimelinePoint[] = [];
+
   const startMinute = Math.round(startH * 60);
   const endMinute = Math.min(1440, Math.round(endH * 60));
 
-  for (let m = startMinute; m < endMinute; m += stepMinutes) {
+  let maxObservedScore = 1;
+
+  for (let m = startMinute; m < endMinute; m++) {
     const hourVal = m / 60.0;
     const utcHour = hourVal - tzOffsetHours;
     let calcDay = bDay;
@@ -290,7 +304,6 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
     const ascSignData = getSignAndDegree(ascDeg);
     const mcSignData = getSignAndDegree(mcDeg);
 
-    // Natal gezegenler
     const natalPlanets: Record<string, number> = {};
     const nList = [
       { name: 'Güneş', id: Constants.SE_SUN },
@@ -313,7 +326,6 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
     const matches: EventMatchDetail[] = [];
     let matchedEventsCount = 0;
 
-    // Mizaç / Element Uyumu
     let temperamentScore = 0;
     if (input.profile?.elementTemperament) {
       const allowedSigns = ELEMENT_SIGNS[input.profile.elementTemperament] || [];
@@ -323,7 +335,6 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
     }
     candidateTotalScore += temperamentScore;
 
-    // Her kadersel olayı SADECE kendi hedef eksenlerine kilitlenerek test et
     for (const evCalc of eventCalculations) {
       const affinity = STRICT_EVENT_AFFINITY[evCalc.event.type] || {
         targetAngleKeys: ['ASC', 'MC', 'DSC', 'IC'],
@@ -333,16 +344,14 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
       };
 
       const targetAngles = affinity.targetAngleKeys.map(k => angleMap[k]).filter(Boolean);
-
       let bestEventMatchScore = 0;
       let bestMatchDetail: EventMatchDetail | null = null;
 
-      // 1. ÇİFT YÖNLÜ SOLAR ARC (Sadece Hedef Eksenlere)
+      // 1. Çift Yönlü Solar Arc
       for (const pName of affinity.planets) {
         const natalP = natalPlanets[pName];
         if (natalP === undefined) continue;
 
-        // A) İlerletilmiş Gezegen -> Hedef Eksen (En Güçlü Yönelim)
         const dirPlanet = mod360(natalP + evCalc.arcDegree);
         for (const ang of targetAngles) {
           for (const aspDeg of affinity.aspectTypes) {
@@ -364,14 +373,13 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
                   matchedPoint: `İlerletilmiş ${pName} -> ${ang.name}`,
                   orb: Number(orb.toFixed(2)),
                   score,
-                  explanation: `${evCalc.event.title} tarihinde Solar Arc ilerletimli ${pName}, doğrudan kadersel ekseniniz olan ${ang.name} noktasına ${orb.toFixed(2)}° orb ile ${aspectName} yaptı.`
+                  explanation: `${evCalc.event.title} tarihinde Solar Arc ilerletimli ${pName}, kadersel ekseniniz olan ${ang.name} noktasına ${orb.toFixed(2)}° orb ile ${aspectName} yaptı.`
                 };
               }
             }
           }
         }
 
-        // B) İlerletilmiş Hedef Eksen -> Natal Gezegen
         for (const ang of targetAngles) {
           const dirAng = mod360(ang.pos + evCalc.arcDegree);
           for (const aspDeg of affinity.aspectTypes) {
@@ -393,7 +401,7 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
                   matchedPoint: `İlerletilmiş ${ang.name} -> Natal ${pName}`,
                   orb: Number(orb.toFixed(2)),
                   score,
-                  explanation: `${evCalc.event.title} tarihinde Solar Arc ilerletimli ${ang.name} ile Natal ${pName} arasında ${orb.toFixed(2)}° kesin orb ile ${aspectName} gerçekleşti.`
+                  explanation: `${evCalc.event.title} tarihinde Solar Arc ilerletimli ${ang.name} ile Natal ${pName} arasında ${orb.toFixed(2)}° orb ile ${aspectName} gerçekleşti.`
                 };
               }
             }
@@ -401,7 +409,7 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
         }
       }
 
-      // 2. İKİNCİL İLERLETİLMİŞ AY (PROGRESSED MOON)
+      // 2. İkincil İlerletilmiş Ay
       for (const ang of targetAngles) {
         for (const aspDeg of [0, 60, 90, 120, 180]) {
           const diff = Math.abs(mod360(evCalc.progMoonLon - ang.pos) - aspDeg);
@@ -429,7 +437,7 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
         }
       }
 
-      // 3. TRANSİTLER
+      // 3. Transitler
       for (const pName of affinity.planets) {
         const trPos = evCalc.eventTransitPlanets[pName];
         if (trPos === undefined) continue;
@@ -454,7 +462,7 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
                   matchedPoint: `Transit ${pName} -> ${ang.name}`,
                   orb: Number(orb.toFixed(2)),
                   score,
-                  explanation: `${evCalc.event.title} tarihinde Transit ${pName}, haritanızın ${ang.name} eksenine ${orb.toFixed(2)}° orb ile ${aspectName} teması yaptı.`
+                  explanation: `${evCalc.event.title} tarihinde Transit ${pName}, ${ang.name} eksenine ${orb.toFixed(2)}° orb ile ${aspectName} teması yaptı.`
                 };
               }
             }
@@ -469,6 +477,10 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
       }
     }
 
+    if (candidateTotalScore > maxObservedScore) {
+      maxObservedScore = candidateTotalScore;
+    }
+
     const curH = Math.floor(m / 60);
     const curM = m % 60;
     const timeStr = `${String(curH).padStart(2, '0')}:${String(curM).padStart(2, '0')}:00`;
@@ -479,7 +491,7 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
       confidencePercent = Math.min(88, Number((50 + matchRatio * 38).toFixed(1)));
     }
 
-    candidateScores.push({
+    const candidateObj: CandidateScore = {
       timeStr,
       hour: curH,
       minute: curM,
@@ -492,11 +504,48 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
       confidencePercent,
       eventMatches: matches,
       temperamentMatchScore: temperamentScore
-    });
+    };
+
+    candidateScores.push(candidateObj);
+
+    // Her 5 dakikada bir dalga grafiği veri noktası kaydet (288 nokta)
+    if (m % 5 === 0) {
+      timelinePoints.push({
+        timeStr: `${String(curH).padStart(2, '0')}:${String(curM).padStart(2, '0')}`,
+        hour: curH,
+        minute: curM,
+        score: candidateTotalScore,
+        probabilityPercent: 0,
+        ascSign: ascSignData.sign,
+        ascDegree: Number(ascDeg.toFixed(1)),
+        mcSign: mcSignData.sign,
+        mcDegree: Number(mcDeg.toFixed(1)),
+        topMatchExplanation: matches[0]?.explanation
+      });
+    }
   }
 
+  // Dalga grafiği olasılık yüzdelerini %0 ile %100 arasına normalize et
+  for (const pt of timelinePoints) {
+    pt.probabilityPercent = Number(((pt.score / Math.max(1, maxObservedScore)) * 100).toFixed(1));
+  }
+
+  // TÜM BELİRGİN YEREL ZİRVELERİ TESPİT ET (Peak Detection - Sınırlandırma Yok)
   candidateScores.sort((a, b) => b.totalScore - a.totalScore);
-  const best = candidateScores[0] || {
+  const allDistinctPeaks: CandidateScore[] = [];
+  
+  for (const cand of candidateScores) {
+    // Aynı tepe noktasının hemen yanındaki dakikalar yerine en az 35 dakika aralıklı belirgin zirveleri topla
+    const isCloseToExisting = allDistinctPeaks.some(p => Math.abs((p.hour * 60 + p.minute) - (cand.hour * 60 + cand.minute)) < 35);
+    if (!isCloseToExisting) {
+      // Yalnızca anlamlı bir rezonans üreten tepeleri ekle
+      if (cand.totalScore >= maxObservedScore * 0.35 || allDistinctPeaks.length < 5) {
+        allDistinctPeaks.push(cand);
+      }
+    }
+  }
+
+  const best = allDistinctPeaks[0] || candidateScores[0] || {
     timeStr: "12:00:00",
     hour: 12,
     minute: 0,
@@ -527,9 +576,10 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
 
   return {
     bestCandidate: best,
-    topCandidates: candidateScores.slice(0, 3),
+    topCandidates: allDistinctPeaks, // 24 saatteki TÜM belirgin zirveler
+    timelinePoints,
     chartData,
     totalEventsProcessed: input.events.length,
-    methodologyNote: `Bu rektifikasyon analizi; girilen ${input.events.length} kadersel yaşam olayı üzerinden Kadersel Hedef Eksenlere kilitlenmiş Çift Yönlü Solar Arc, İkincil İlerletim ve Transit açıları ile hesaplanarak, 1440 aday dakika arasından en yüksek matematiksel korelasyona (%${best.confidencePercent}) sahip saat olarak tespit edilmiştir.`
+    methodologyNote: `Bu rektifikasyon analizi; günün 24 saatlik (00:00 - 23:59) tüm zaman spektrumunu tarayarak her dakikanın kadersel olaylarla rezonans gücünü hesaplamış ve 24 saatteki tüm yerel zirve noktalarını dalga grafiği üzerinde görselleştirmiştir.`
   };
 }
