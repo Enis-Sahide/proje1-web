@@ -54,41 +54,39 @@ export default function Home() {
 
           <h2 className="text-2xl font-bold text-mystic-accent text-center mb-6">7 İnisiyasyon Katmanı</h2>
 
-          {/* Mobile App Download Prompt Banner (Yalnızca Adminlere Açık) */}
-          {isAdmin && (
-            <div className="max-w-md mx-auto mb-12 w-full flex flex-col gap-3">
-              <Link 
-                href="/android"
+          {/* Mobile App Download Prompt Banner */}
+          <div className="max-w-md mx-auto mb-12 w-full flex flex-col gap-3">
+            <Link 
+              href="/android"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 bg-gradient-to-r from-mystic-primary/20 via-mystic-accent/15 to-mystic-primary/20 border border-mystic-primary/30 rounded-2xl p-4 shadow-[0_0_20px_rgba(212,175,55,0.15)] hover:border-mystic-primary/60 transition-all duration-300 hover:scale-[1.01]"
+            >
+              <div className="p-2.5 bg-mystic-primary/10 text-mystic-primary rounded-xl border border-mystic-primary/20 shrink-0">
+                <Smartphone size={20} className="animate-pulse" />
+              </div>
+              <div className="flex-grow text-left">
+                <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
+                  7LAYERS Android Uygulaması Yayında!
+                  <Sparkles className="text-mystic-accent shrink-0" size={14} />
+                </h4>
+                <p className="text-[11px] text-mystic-text-muted mt-0.5 leading-snug">
+                  Mobil uygulamamızı hemen Google Play'den indirmek için tıklayın.
+                </p>
+              </div>
+              <ChevronRight size={18} className="text-mystic-primary" />
+            </Link>
+            <div className="flex justify-center">
+              <a
+                href="https://api.whatsapp.com/send?text=Merhaba!%207LAYERS%20Android%20mobil%20uygulamasını%20Google%20Play'den%20indirebilirsin:%20https://www.7layers.tr/android"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-4 bg-gradient-to-r from-mystic-primary/20 via-mystic-accent/15 to-mystic-primary/20 border border-mystic-primary/30 rounded-2xl p-4 shadow-[0_0_20px_rgba(212,175,55,0.15)] hover:border-mystic-primary/60 transition-all duration-300 hover:scale-[1.01]"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 text-xs font-semibold rounded-xl transition-all duration-300 border border-emerald-500/20 hover:border-emerald-500/40 cursor-pointer shadow-md"
               >
-                <div className="p-2.5 bg-mystic-primary/10 text-mystic-primary rounded-xl border border-mystic-primary/20 shrink-0">
-                  <Smartphone size={20} className="animate-pulse" />
-                </div>
-                <div className="flex-grow text-left">
-                  <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
-                    7LAYERS Android Uygulaması Yayında!
-                    <Sparkles className="text-mystic-accent shrink-0" size={14} />
-                  </h4>
-                  <p className="text-[11px] text-mystic-text-muted mt-0.5 leading-snug">
-                    Mobil uygulamamızı hemen Google Play'den indirmek için tıklayın.
-                  </p>
-                </div>
-                <ChevronRight size={18} className="text-mystic-primary" />
-              </Link>
-              <div className="flex justify-center">
-                <a
-                  href="https://api.whatsapp.com/send?text=Merhaba!%207LAYERS%20Android%20mobil%20uygulamasını%20Google%20Play'den%20indirebilirsin:%20https://www.7layers.tr/android"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 text-xs font-semibold rounded-xl transition-all duration-300 border border-emerald-500/20 hover:border-emerald-500/40 cursor-pointer shadow-md"
-                >
-                  <span>WhatsApp'ta Arkadaşlarınla Paylaş</span>
-                </a>
-              </div>
+                <span>WhatsApp'ta Arkadaşlarınla Paylaş</span>
+              </a>
             </div>
-          )}
+          </div>
 
           {/* Main Layout Grid */}
           <div className="mb-20 flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12 w-full">
