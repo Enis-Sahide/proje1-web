@@ -307,14 +307,14 @@ export default function RectificationPage() {
           </div>
           <div className="flex items-center justify-center gap-2 mb-2">
             <h1 className="text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-white to-[#D4AF37] tracking-tight">
-              Doğum Saati Belirleme
+              Doğum Saati Keşfi & Olasılık Analizi
             </h1>
             <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold uppercase tracking-wider">
               Beta
             </span>
           </div>
           <p className="text-sm sm:text-base text-mystic-text-muted max-w-2xl mx-auto">
-            Doğum zaman aralığınızı kadersel olaylarınızla tarayarak **Kozmik Rezonans ve Olasılık Dalga Grafiğini** çıkarın.
+            Doğum zaman aralığınızı kadersel olaylarınızla tarayarak <span className="text-[#D4AF37] font-semibold">Kozmik Rezonans ve Olasılık Dalga Grafiğini</span> çıkarın.
           </p>
         </div>
 

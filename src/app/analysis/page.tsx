@@ -24,8 +24,8 @@ export default function AnalysisPage() {
   const tools: ToolItem[] = [
     {
       id: 'rectification',
-      title: 'Doğum Saati Belirleme',
-      description: 'Doğum saatinizi tam bilmiyor musunuz? Yaşam olaylarınızla kesin doğum dakikanızı hesaplayın.',
+      title: 'Doğum Saati Keşfi (Beta)',
+      description: 'Doğum saatinizi tam bilmiyor musunuz? Yaşam olaylarınızla günün olası kozmik rezonans spektrumunu çıkarın.',
       icon: <Clock size={32} />,
       color: '#E0AA3E',
       link: '/analysis/rectification'
