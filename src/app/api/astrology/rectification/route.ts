@@ -9,10 +9,22 @@ export async function OPTIONS() {
 export async function POST(req: NextRequest) {
   try {
     const body = (await req.json()) as RectificationInput;
-    const { birthDate, birthCity, events } = body;
+    const { dateMode = 'exact', birthDate, birthYear, birthMonth, birthSeason, birthCity, events } = body;
 
-    if (!birthDate || !birthCity) {
-      return errorJson('Doğum tarihi ve doğum şehri zorunludur.', 400);
+    if (!birthCity) {
+      return errorJson('Doğum şehri seçimi zorunludur.', 400);
+    }
+
+    if (dateMode === 'exact' && !birthDate) {
+      return errorJson('Doğum tarihi zorunludur.', 400);
+    }
+
+    if (dateMode === 'month' && (!birthYear || !birthMonth)) {
+      return errorJson('Doğum yılı ve ayı zorunludur.', 400);
+    }
+
+    if (dateMode === 'season' && (!birthYear || !birthSeason)) {
+      return errorJson('Doğum yılı ve mevsimi zorunludur.', 400);
     }
 
     if (!events || !Array.isArray(events) || events.length === 0) {
