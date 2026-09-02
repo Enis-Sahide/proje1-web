@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Lock, Activity, AlertCircle, X } from 'lucide-react';
+import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Lock, Activity, AlertCircle, X, Clock } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 interface ToolItem {
@@ -22,6 +22,14 @@ export default function AnalysisPage() {
   const [showLockModal, setShowLockModal] = useState(false);
 
   const tools: ToolItem[] = [
+    {
+      id: 'rectification',
+      title: 'Doğum Saati Belirleme',
+      description: 'Doğum saatinizi tam bilmiyor musunuz? Yaşam olaylarınızla kesin doğum dakikanızı hesaplayın.',
+      icon: <Clock size={32} />,
+      color: '#E0AA3E',
+      link: '/analysis/rectification'
+    },
     {
       id: 'kabbalah',
       title: 'Kabalistik 4 Alem',
@@ -83,8 +91,6 @@ export default function AnalysisPage() {
 
   return (
     <div className="min-h-screen pt-32 pb-24 px-6 relative">
-      {/* Backgrounds */}
-            
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center p-3 rounded-full bg-mystic-primary/10 border border-mystic-primary/30 text-mystic-primary mb-6">
@@ -106,53 +112,46 @@ export default function AnalysisPage() {
                 if (tool.isLocked && !isMasterOrAdmin) {
                   e.preventDefault();
                   setShowLockModal(true);
-                } else {
-                  router.push(tool.link);
+                  return;
                 }
+                router.push(tool.link);
               }}
-              className="group relative bg-black/40 backdrop-blur-md border border-white/10 rounded-3xl p-8 overflow-hidden transition-all duration-500 hover:-translate-y-2 hover:shadow-[0_10px_40px_-10px_rgba(212,175,55,0.3)] cursor-pointer"
-              style={{ borderColor: `rgba(255,255,255,0.1)` }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = `${tool.color}60`;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = `rgba(255,255,255,0.1)`;
-              }}
+              className="bg-mystic-surface/40 backdrop-blur-md rounded-3xl p-8 border border-mystic-surface-light hover:border-mystic-primary/40 transition-all duration-300 hover:shadow-[0_0_30px_rgba(212,175,55,0.15)] group relative overflow-hidden flex flex-col justify-between cursor-pointer"
             >
-              {tool.isLocked && (
-                <div className="absolute top-6 right-6 bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1.5 backdrop-blur-sm z-10 animate-pulse">
-                  <Lock size={12} /> Usta Seviyesi
+              <div className="flex items-start justify-between mb-6">
+                <div 
+                  className="p-4 rounded-2xl bg-white/5 border border-white/10 transition-transform duration-300 group-hover:scale-110"
+                  style={{ color: tool.color }}
+                >
+                  {tool.icon}
                 </div>
-              )}
-              <div 
-                className="absolute top-0 right-0 w-48 h-48 rounded-full blur-3xl -mr-20 -mt-20 opacity-20 transition-opacity duration-500 group-hover:opacity-40"
-                style={{ backgroundColor: tool.color }}
-              />
-              
-              <div 
-                className="w-16 h-16 rounded-2xl flex items-center justify-center mb-6 border transition-colors duration-300"
-                style={{ backgroundColor: `${tool.color}15`, borderColor: `${tool.color}40`, color: tool.color }}
-              >
-                {tool.icon}
+                {tool.isLocked && !isMasterOrAdmin && (
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-mystic-text-muted text-xs font-semibold">
+                    <Lock size={12} className="text-mystic-primary" />
+                    <span>Usta Seviyesi</span>
+                  </div>
+                )}
               </div>
-              
-              <h2 className="text-2xl font-bold text-white mb-3 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-white group-hover:to-gray-400 transition-all">
-                {tool.title}
-              </h2>
-              
-              <p className="text-mystic-text-muted leading-relaxed">
-                {tool.description}
-              </p>
 
-              <div className="mt-8 flex items-center text-sm font-bold tracking-widest uppercase transition-colors" style={{ color: tool.color }}>
-                Analize Başla <span className="ml-2 group-hover:translate-x-2 transition-transform">→</span>
+              <div>
+                <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-mystic-accent transition-colors flex items-center gap-2">
+                  {tool.title}
+                </h3>
+                <p className="text-mystic-text-muted text-sm leading-relaxed mb-6">
+                  {tool.description}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 text-sm font-semibold text-mystic-primary group-hover:text-mystic-accent transition-colors">
+                <span>Analizi Başlat</span>
+                <span className="transform group-hover:translate-x-1 transition-transform">→</span>
               </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Premium Lock Modal */}
+      {/* Lock Modal */}
       {showLockModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowLockModal(false)}>
           <div 
@@ -160,28 +159,16 @@ export default function AnalysisPage() {
             onClick={e => e.stopPropagation()}
           >
             <div className="text-[#D4AF37] mx-auto mb-4 flex justify-center"><AlertCircle size={48} /></div>
-            <h3 className="text-xl font-bold text-white mb-2">Analiz Kilitli</h3>
-            <p className="text-mystic-text-muted text-sm mb-6">
-              Kabalistik 4 Alem analizi en yüksek düzeyde ruhsal sentez içerdiğinden sadece Usta Seviyesi (Master) ve üzeri üyelere özeldir.
-              Dilerseniz üyeliğinizi Usta seviyesine yükselterek bu analize ve tüm premium içeriklere erişim sağlayabilirsiniz.
+            <h3 className="text-xl font-bold text-white mb-2">Usta Seviyesi Gerekli</h3>
+            <p className="text-mystic-text-muted text-sm mb-6 leading-relaxed">
+              Bu derin ezoterik analiz Usta Seviyesi (Master) üyelere özeldir. Bu derin analiz seviye sistemine özeldir, yakında açılacaktır.
             </p>
-            <div className="flex flex-col gap-3">
-              <button 
-                onClick={() => {
-                  setShowLockModal(false);
-                  router.push(`/membership`);
-                }}
-                className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all shadow-lg"
-              >
-                Usta Seviyesine Yüksel
-              </button>
-              <button 
-                onClick={() => setShowLockModal(false)}
-                className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 font-bold py-3 px-4 rounded-xl transition-all"
-              >
-                Kapat
-              </button>
-            </div>
+            <button 
+              onClick={() => setShowLockModal(false)}
+              className="w-full bg-[#D4AF37] hover:bg-[#E5C158] text-black font-bold py-3 px-4 rounded-xl transition-all cursor-pointer shadow-lg shadow-[#D4AF37]/10"
+            >
+              Anladım
+            </button>
           </div>
         </div>
       )}
