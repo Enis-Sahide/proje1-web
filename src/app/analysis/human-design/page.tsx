@@ -731,17 +731,6 @@ export default function HumanDesignPage() {
                         PDF Raporu İndir
                       </button>
                     )}
-                    {role === 'admin' && (
-                      <button 
-                        onClick={async () => {
-                          router.push(`/checkout/guest?type=human-design&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(city?.name || '')}&lat=${city?.lat || ''}&lon=${city?.lon || ''}&tz=${city?.tz || ''}&country=${encodeURIComponent(city?.country || '')}`);
-                        }}
-                        className="text-xs sm:text-sm px-5 py-2.5 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] rounded-full text-black font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2"
-                      >
-                        <Download size={16} />
-                        PDF Raporu Satın Al (500 TL)
-                      </button>
-                    )}
                     <button onClick={() => setChart(null)} className="text-xs sm:text-sm px-5 py-2.5 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap text-center">
                       Yeni Hesaplama
                     </button>
@@ -1081,36 +1070,15 @@ export default function HumanDesignPage() {
           >
             <div className="text-[#32D74B] mx-auto mb-4 flex justify-center"><AlertCircle size={48} /></div>
             <h3 className="text-xl font-bold text-white mb-2">Detaylı Analiz Kilitli</h3>
-            <p className="text-mystic-text-muted text-sm mb-6">
-              Human Design haritanızdaki kapılar, enerji merkezleri, tip, otorite ve profil yorumlarının derin detayları Çıraklık Seviyesi (Apprentice) ve üzeri üyelere özeldir.
-              Dilerseniz üyeliğinizi Çıraklık seviyesine yükselterek bu analizleri ve PDF indirme özelliğini açabilirsiniz.
+            <p className="text-mystic-text-muted text-sm mb-6 leading-relaxed">
+              Human Design haritanızdaki kapılar, enerji merkezleri, tip, otorite ve profil yorumlarının derin detayları Çıraklık Seviyesi (Apprentice) ve üzeri üyelere özeldir. Bu derin analiz seviye sistemine özeldir, yakında açılacaktır.
             </p>
             <div className="flex flex-col gap-3">
-              {role === 'admin' && (
-                <button 
-                  onClick={() => {
-                    setShowLockModal(false);
-                    router.push(`/checkout/guest?type=human-design&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(city?.name || '')}&lat=${city?.lat || ''}&lon=${city?.lon || ''}&tz=${city?.tz || ''}&country=${encodeURIComponent(city?.country || '')}`);
-                  }}
-                  className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all shadow-lg"
-                >
-                  Misafir Olarak PDF Satın Al (500 TL)
-                </button>
-              )}
-              <button 
-                onClick={() => {
-                  setShowLockModal(false);
-                  router.push(`/membership`);
-                }}
-                className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 font-bold py-3 px-4 rounded-xl transition-all"
-              >
-                Çıraklık Seviyesine Yüksel
-              </button>
               <button 
                 onClick={() => setShowLockModal(false)}
-                className="w-full text-mystic-text-muted hover:text-white text-sm transition-colors mt-2"
+                className="w-full bg-[#32D74B] hover:bg-[#28B83E] text-black font-bold py-3 px-4 rounded-xl transition-all cursor-pointer shadow-lg shadow-[#32D74B]/10"
               >
-                Kapat
+                Anladım
               </button>
             </div>
           </div>

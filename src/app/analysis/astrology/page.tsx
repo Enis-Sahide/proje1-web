@@ -471,22 +471,11 @@ export default function AstrologyPage() {
                         PDF Raporu İndir
                       </button>
                     )}
-                    {role === 'admin' && (
-                      <button 
-                        onClick={async () => {
-                          router.push(`/checkout/guest?type=astrology&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}&country=${encodeURIComponent(cityKey?.country || '')}`);
-                        }}
-                        className="flex-1 sm:flex-initial text-xs sm:text-sm px-4 py-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] rounded-full text-black font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2"
-                      >
-                        <Download size={16} />
-                        PDF Raporu Satın Al (50 TL)
-                      </button>
-                    )}
-                   <button onClick={() => setChartData(null)} className="flex-1 sm:flex-initial text-xs sm:text-sm px-4 py-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap text-center">
-                     Yeni Harita
-                   </button>
-                 </div>
-              </div>
+                    <button onClick={() => setChartData(null)} className="flex-1 sm:flex-initial text-xs sm:text-sm px-4 py-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap text-center">
+                      Yeni Harita
+                    </button>
+                  </div>
+               </div>
               {renderSvgWheel()}
             </div>
 
@@ -711,36 +700,15 @@ export default function AstrologyPage() {
           >
             <div className="text-[#D4AF37] mx-auto mb-4 flex justify-center"><AlertCircle size={48} /></div>
             <h3 className="text-xl font-bold text-white mb-2">Detaylı Analiz Kilitli</h3>
-            <p className="text-mystic-text-muted text-sm mb-6">
-              Doğum haritasındaki gezegen yerleşimleri, ev ve açı yorumlarının derin detayları Çıraklık Seviyesi (Apprentice) ve üzeri üyelere özeldir.
-              Dilerseniz kayıt olmadan analiz raporunu PDF olarak satın alabilir veya üyeliğinizi Çıraklık seviyesine yükseltebilirsiniz.
+            <p className="text-mystic-text-muted text-sm mb-6 leading-relaxed">
+              Doğum haritasındaki gezegen yerleşimleri, ev ve açı yorumlarının derin detayları Çıraklık Seviyesi (Apprentice) ve üzeri üyelere özeldir. Bu derin analiz seviye sistemine özeldir, yakında açılacaktır.
             </p>
             <div className="flex flex-col gap-3">
-              {role === 'admin' && (
-                <button 
-                  onClick={() => {
-                    setShowLockModal(false);
-                    router.push(`/checkout/guest?type=astrology&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}&country=${encodeURIComponent(cityKey?.country || '')}`);
-                  }}
-                  className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all shadow-lg shadow-[#D4AF37]/10"
-                >
-                  Misafir Olarak PDF Satın Al (50 TL)
-                </button>
-              )}
-              <button 
-                onClick={() => {
-                  setShowLockModal(false);
-                  router.push(`/membership`);
-                }}
-                className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 font-bold py-3 px-4 rounded-xl transition-all"
-              >
-                Çıraklık Seviyesine Yüksel
-              </button>
               <button 
                 onClick={() => setShowLockModal(false)}
-                className="w-full text-mystic-text-muted hover:text-white text-sm transition-colors mt-2"
+                className="w-full bg-[#D4AF37] hover:bg-[#E5C158] text-black font-bold py-3 px-4 rounded-xl transition-all cursor-pointer shadow-lg shadow-[#D4AF37]/10"
               >
-                Kapat
+                Anladım
               </button>
             </div>
           </div>

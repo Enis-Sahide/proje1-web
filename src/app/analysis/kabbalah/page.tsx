@@ -361,16 +361,6 @@ export default function KabbalahAnalysisPage() {
                     PDF Raporu İndir
                   </button>
                 )}
-                {role === 'admin' && (
-                  <button
-                    onClick={() => {
-                      router.push(`/checkout/guest?type=kabbalah&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}&country=${encodeURIComponent(cityKey?.country || '')}`);
-                    }}
-                    className="mt-6 flex items-center gap-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-2.5 px-6 rounded-xl transition-all shadow-md shadow-[#D4AF37]/10"
-                  >
-                    PDF Raporu Satın Al (500 TL)
-                  </button>
-                )}
               </div>
 
               <div className={`p-8 rounded-2xl border max-w-3xl mx-auto ${kabbalahAnalysis.shortcutLevel > 0 ? 'bg-[#D4AF37]/10 border-[#D4AF37]/30' : 'bg-white/5 border-white/10'} backdrop-blur-sm relative overflow-hidden`}>
@@ -661,36 +651,15 @@ export default function KabbalahAnalysisPage() {
           >
             <div className="text-[#D4AF37] mx-auto mb-4 flex justify-center"><AlertCircle size={48} /></div>
             <h3 className="text-xl font-bold text-white mb-2">Detaylı Analiz Kilitli</h3>
-            <p className="text-mystic-text-muted text-sm mb-6">
-              Kabalistik gezegen yerleşimlerinin derin ezoterik analizleri Usta Seviyesi (Master) üyelere özeldir. 
-              Dilerseniz kayıt olmadan analiz raporunuzu PDF olarak satın alabilir veya üyeliğinizi Usta seviyesine yükseldebilirsiniz.
+            <p className="text-mystic-text-muted text-sm mb-6 leading-relaxed">
+              Kabalistik gezegen yerleşimlerinin derin ezoterik analizleri Usta Seviyesi (Master) üyelere özeldir. Bu derin analiz seviye sistemine özeldir, yakında açılacaktır.
             </p>
             <div className="flex flex-col gap-3">
-              {role === 'admin' && (
-                <button 
-                  onClick={() => {
-                    setShowLockModal(false);
-                    router.push(`/checkout/guest?type=kabbalah&email=${encodeURIComponent(user?.email || '')}&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}&country=${encodeURIComponent(cityKey?.country || '')}`);
-                  }}
-                  className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all shadow-lg shadow-[#D4AF37]/10"
-                >
-                  Misafir Olarak PDF Satın Al (500 TL)
-                </button>
-              )}
-              <button 
-                onClick={() => {
-                  setShowLockModal(false);
-                  router.push(`/membership`);
-                }}
-                className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 font-bold py-3 px-4 rounded-xl transition-all"
-              >
-                Ustalık Seviyesine Yüksel
-              </button>
               <button 
                 onClick={() => setShowLockModal(false)}
-                className="w-full text-mystic-text-muted hover:text-white text-sm transition-colors mt-2"
+                className="w-full bg-[#D4AF37] hover:bg-[#E5C158] text-black font-bold py-3 px-4 rounded-xl transition-all cursor-pointer shadow-lg shadow-[#D4AF37]/10"
               >
-                Kapat
+                Anladım
               </button>
             </div>
           </div>

@@ -459,36 +459,15 @@ export default function TransitsPage() {
           >
             <div className="text-[#0EA5E9] mx-auto mb-4 flex justify-center"><AlertCircle size={48} /></div>
             <h3 className="text-xl font-bold text-white mb-2">Detaylı Analiz Kilitli</h3>
-            <p className="text-mystic-text-muted text-sm mb-6">
-              Transit geçişlerinin doğum haritanızdaki evlere ve gezegenlerinize yaptığı kadersel etkilerin detaylı yorumları Çıraklık Seviyesi (Apprentice) ve üzeri üyelere özeldir.
-              Dilerseniz üyeliğinizi Çıraklık seviyesine yükselterek bu detayları ve tüm transit analiz yorumlarını açabilirsiniz.
+            <p className="text-mystic-text-muted text-sm mb-6 leading-relaxed">
+              Transit geçişlerinin doğum haritanızdaki evlere ve gezegenlerinize yaptığı kadersel etkilerin detaylı yorumları Çıraklık Seviyesi (Apprentice) ve üzeri üyelere özeldir. Bu derin analiz seviye sistemine özeldir, yakında açılacaktır.
             </p>
             <div className="flex flex-col gap-3">
-              {role === 'admin' && (
-                <button 
-                  onClick={() => {
-                    setShowLockModal(false);
-                    router.push(`/checkout/guest?type=transits&email=${encodeURIComponent(user?.email || '')}&date=${transitDateStr}&time=${transitTimeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}&country=${encodeURIComponent(cityKey?.country || '')}`);
-                  }}
-                  className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all shadow-lg"
-                >
-                  Misafir Olarak PDF Satın Al (500 TL)
-                </button>
-              )}
-              <button 
-                onClick={() => {
-                  setShowLockModal(false);
-                  router.push(`/membership`);
-                }}
-                className="w-full bg-white/5 hover:bg-white/10 text-white border border-white/10 font-bold py-3 px-4 rounded-xl transition-all"
-              >
-                Çıraklık Seviyesine Yüksel
-              </button>
               <button 
                 onClick={() => setShowLockModal(false)}
-                className="w-full text-mystic-text-muted hover:text-white text-sm transition-colors mt-2"
+                className="w-full bg-[#0EA5E9] hover:bg-[#38BDF8] text-black font-bold py-3 px-4 rounded-xl transition-all cursor-pointer shadow-lg shadow-[#0EA5E9]/10"
               >
-                Kapat
+                Anladım
               </button>
             </div>
           </div>
