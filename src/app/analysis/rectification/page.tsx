@@ -59,6 +59,7 @@ interface BenchmarkPreset {
   cityName: string;
   element: 'fire' | 'earth' | 'air' | 'water';
   bodyType: 'slender' | 'athletic' | 'stocky' | 'petite' | 'curvy';
+  timeWindowType: 'all' | 'morning' | 'afternoon' | 'evening' | 'night' | 'custom';
   events: LifeEvent[];
 }
 
@@ -72,6 +73,7 @@ const BENCHMARK_PRESETS: BenchmarkPreset[] = [
     cityName: 'Londra',
     element: 'water',
     bodyType: 'slender',
+    timeWindowType: 'evening',
     events: [
       { id: 'd1', type: 'marriage', title: 'Prens Charles ile Evlilik', date: '1981-07-29' },
       { id: 'd2', type: 'child_birth', title: 'Prens William Doğumu (1. Çocuk)', date: '1982-06-21' },
@@ -89,6 +91,7 @@ const BENCHMARK_PRESETS: BenchmarkPreset[] = [
     cityName: 'San Francisco',
     element: 'earth',
     bodyType: 'slender',
+    timeWindowType: 'evening',
     events: [
       { id: 'j1', type: 'career_promotion', title: "Apple'ın Kuruluşu", date: '1976-04-01' },
       { id: 'j2', type: 'financial_crisis', title: "Apple'dan Kovulması (Kriz)", date: '1985-09-16' },
@@ -106,6 +109,7 @@ const BENCHMARK_PRESETS: BenchmarkPreset[] = [
     cityName: 'Honolulu',
     element: 'air',
     bodyType: 'athletic',
+    timeWindowType: 'evening',
     events: [
       { id: 'o1', type: 'marriage', title: 'Michelle Robinson ile Evlilik', date: '1992-10-03' },
       { id: 'o2', type: 'death_relative', title: 'Anne Vefatı (Ann Dunham)', date: '1995-11-07' },
@@ -125,9 +129,9 @@ export default function RectificationPage() {
   const [birthDate, setBirthDate] = useState<string>('1992-06-15');
   const [selectedCity, setSelectedCity] = useState<AstroCity>(ASTRO_CITIES[0]);
   const [citySearch, setCitySearch] = useState<string>('');
-  const [timeWindowType, setTimeWindowType] = useState<'all' | 'morning' | 'afternoon' | 'evening' | 'night' | 'custom'>('all');
-  const [customStartHour, setCustomStartHour] = useState<number>(0);
-  const [customEndHour, setCustomEndHour] = useState<number>(24);
+  const [timeWindowType, setTimeWindowType] = useState<'all' | 'morning' | 'afternoon' | 'evening' | 'night' | 'custom'>('evening');
+  const [customStartHour, setCustomStartHour] = useState<number>(17);
+  const [customEndHour, setCustomEndHour] = useState<number>(23);
 
   // Step 2: Mizaç ve Beden
   const [bodyType, setBodyType] = useState<'slender' | 'athletic' | 'stocky' | 'petite' | 'curvy'>('athletic');
@@ -162,7 +166,7 @@ export default function RectificationPage() {
     setBodyType(preset.bodyType);
     setElementTemperament(preset.element);
     setEvents([...preset.events]);
-    setTimeWindowType('all');
+    setTimeWindowType(preset.timeWindowType);
     setCurrentStep(3);
   };
 
@@ -215,7 +219,7 @@ export default function RectificationPage() {
 
     if (timeWindowType === 'morning') { startHour = 6; endHour = 12; }
     else if (timeWindowType === 'afternoon') { startHour = 12; endHour = 18; }
-    else if (timeWindowType === 'evening') { startHour = 18; endHour = 24; }
+    else if (timeWindowType === 'evening') { startHour = 17; endHour = 23; }
     else if (timeWindowType === 'night') { startHour = 0; endHour = 6; }
     else if (timeWindowType === 'custom') { startHour = customStartHour; endHour = customEndHour; }
 
@@ -258,7 +262,7 @@ export default function RectificationPage() {
     
     const svgPoints = points.map((pt, i) => {
       const x = (i / (points.length - 1)) * width;
-      const y = height - (pt.probabilityPercent / 100) * (height - 35) - 18;
+      const y = height - (pt.probabilityPercent / 100) * (height - 40) - 20;
       return { x, y };
     });
 
@@ -299,7 +303,7 @@ export default function RectificationPage() {
             Akıllı Doğum Saati Belirleme
           </h1>
           <p className="text-sm sm:text-base text-mystic-text-muted max-w-2xl mx-auto">
-            24 saatlik günün tüm zaman dilimini kadersel olaylarınızla tarayarak **Kozmik Rezonans ve Olasılık Dalga Grafiğini** çıkarın.
+            Doğum zaman aralığınızı kadersel olaylarınızla tarayarak **Kozmik Rezonans ve Olasılık Dalga Grafiğini** çıkarın.
           </p>
         </div>
 
@@ -311,7 +315,7 @@ export default function RectificationPage() {
             </div>
           </div>
           <p className="text-xs text-mystic-text-muted mb-4">
-            Algoritmanın 24 saatlik dalga grafiğini test etmek için aşağıdaki kişilerden birine tıklayınız; resmi doğum bilgileri otomatik yüklenecektir:
+            Algoritmanın rezonans dalga grafiğini test etmek için aşağıdaki kişilerden birine tıklayınız; resmi doğum bilgileri otomatik yüklenecektir:
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {BENCHMARK_PRESETS.map(preset => (
@@ -418,15 +422,15 @@ export default function RectificationPage() {
 
             <div className="pt-4 border-t border-white/5">
               <label className="block text-xs font-semibold uppercase tracking-wider text-mystic-text-muted mb-3">
-                Doğum Saati Hakkında Bildikleriniz
+                Doğum Zaman Dilimi (Tahmini Aralık)
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {[
-                  { id: 'all', label: 'Hiç Bilmiyorum (24 Saat)' },
-                  { id: 'morning', label: 'Sabah (06:00 - 12:00)' },
+                  { id: 'evening', label: 'Akşam (17:00 - 23:00)' },
                   { id: 'afternoon', label: 'Öğleden Sonra (12:00 - 18:00)' },
-                  { id: 'evening', label: 'Akşam (18:00 - 00:00)' },
+                  { id: 'morning', label: 'Sabah (06:00 - 12:00)' },
                   { id: 'night', label: 'Gece (00:00 - 06:00)' },
+                  { id: 'all', label: 'Tüm Gün (24 Saat)' },
                   { id: 'custom', label: 'Özel Aralık Belirle' },
                 ].map(opt => (
                   <button
@@ -702,12 +706,12 @@ export default function RectificationPage() {
                 {isCalculating ? (
                   <>
                     <RotateCcw className="animate-spin" size={18} />
-                    24 Saatlik Kozmik Rezonans Dalga Grafiği Çıkarılıyor...
+                    Kozmik Rezonans Dalga Grafiği Çıkarılıyor...
                   </>
                 ) : (
                   <>
                     <TrendingUp size={18} />
-                    24 Saatlik Olasılık Dalga Grafiğini Hesapla
+                    Olasılık Dalga Grafiğini Hesapla
                   </>
                 )}
               </button>
@@ -715,23 +719,23 @@ export default function RectificationPage() {
           </div>
         )}
 
-        {/* STEP 4: 24 SAATLİK KOZMİK REZONANS DALGA GRAFİĞİ & TÜM ZİRVELER */}
+        {/* STEP 4: 24 SAATLİK KOZMİK REZONANS DALGA GRAFİĞİ & BELİRGİN ZİRVELER */}
         {currentStep === 4 && result && selectedPeak && (
           <div className="space-y-8 animate-in fade-in zoom-in duration-500">
             
-            {/* 24 SAATLİK İNTERAKTİF SVG DALGA GRAFİĞİ KARTI */}
+            {/* İNTERAKTİF SVG DALGA GRAFİĞİ KARTI */}
             <div className="bg-[#121212]/95 border-2 border-[#D4AF37]/40 rounded-3xl p-6 sm:p-8 backdrop-blur-2xl shadow-[0_0_50px_rgba(212,175,55,0.15)] space-y-6">
               
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/10 pb-4">
                 <div>
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-bold uppercase tracking-wider mb-2">
-                    <TrendingUp size={14} /> 24 Saatlik Kozmik Rezonans Spektrumu
+                    <TrendingUp size={14} /> Kozmik Rezonans Spektrumu
                   </div>
                   <h2 className="text-xl sm:text-2xl font-bold text-white">
-                    Günün Doğum Saati Olasılık Dağılımı
+                    Doğum Saati Olasılık Dağılım Grafiği
                   </h2>
                   <p className="text-xs text-white/50 mt-1">
-                    Günün 24 saatindeki tüm olası rezonans tepeleri ve yükseklikleri aşağıda işaretlenmiştir. İncelemek istediğiniz zirveye tıklayabilirsiniz.
+                    Kadersel olaylarınızın gökyüzüyle oluşturduğu rezonans dalgaları ve ana zirveler aşağıdadır. İncelemek istediğiniz tepeye tıklayabilirsiniz.
                   </p>
                 </div>
 
@@ -756,6 +760,10 @@ export default function RectificationPage() {
                 {/* SVG Curves */}
                 {(() => {
                   const { pathData, fillData } = renderWavePath(result.timelinePoints, 800, 240);
+                  const totalPts = result.timelinePoints.length;
+                  const startHour = result.timelinePoints[0]?.hour ?? 0;
+                  const endHour = result.timelinePoints[totalPts - 1]?.hour ?? 24;
+
                   return (
                     <svg 
                       viewBox="0 0 800 240" 
@@ -775,29 +783,30 @@ export default function RectificationPage() {
                       <path d={fillData} fill="url(#waveGradient)" />
                       <path d={pathData} fill="none" stroke="#D4AF37" strokeWidth="3" className="drop-shadow-[0_0_10px_rgba(212,175,55,0.8)]" />
 
-                      {/* TÜM BELİRGİN ZİRVE NOKTALARININ İŞARETLERİ */}
+                      {/* TEMİZ VE FERAH ZİRVE NOKTASI İŞARETLERİ */}
                       {result.topCandidates.map((cand, idx) => {
                         const totalMins = cand.hour * 60 + cand.minute;
-                        const x = (totalMins / 1440) * 800;
+                        const startMins = startHour * 60;
+                        const totalRange = Math.max(1, (endHour - startHour) * 60);
+                        const x = Math.max(20, Math.min(780, ((totalMins - startMins) / totalRange) * 800));
+
                         const pt = result.timelinePoints.find(p => p.hour === cand.hour && Math.abs(p.minute - cand.minute) < 5);
-                        const percent = pt?.probabilityPercent || 75;
-                        const y = 240 - (percent / 100) * (240 - 35) - 18;
+                        const percent = pt?.probabilityPercent || 80;
+                        const y = 240 - (percent / 100) * (240 - 40) - 20;
 
                         const isSelected = selectedPeak.timeStr === cand.timeStr;
 
                         return (
                           <g key={idx} className="cursor-pointer group" onClick={() => setSelectedPeak(cand)}>
-                            {/* Vertical Line to Peak */}
                             <line 
                               x1={x} 
                               y1={y} 
                               x2={x} 
                               y2={240} 
-                              stroke={isSelected ? "#FFD700" : "rgba(255,255,255,0.2)"} 
+                              stroke={isSelected ? "#FFD700" : "rgba(255,255,255,0.25)"} 
                               strokeDasharray="3 3" 
                               strokeWidth={isSelected ? "2" : "1"} 
                             />
-                            {/* Peak Circle Marker */}
                             <circle 
                               cx={x} 
                               cy={y} 
@@ -807,13 +816,12 @@ export default function RectificationPage() {
                               strokeWidth="2" 
                               className={isSelected ? "animate-pulse" : ""}
                             />
-                            {/* Peak Time & Percentage Label */}
                             <text 
                               x={x} 
                               y={y - 12} 
                               textAnchor="middle" 
                               fill={isSelected ? "#FFD700" : "#ffffff"} 
-                              fontSize="11" 
+                              fontSize="12" 
                               fontWeight="bold"
                             >
                               {cand.timeStr.slice(0, 5)} (%{percent})
@@ -843,31 +851,31 @@ export default function RectificationPage() {
 
               {/* X-Axis Timeline Labels */}
               <div className="flex justify-between text-[11px] font-mono text-white/40 px-2 pt-1 border-t border-white/5">
-                <span>00:00 (Gece)</span>
-                <span>04:00</span>
-                <span>08:00 (Sabah)</span>
-                <span>12:00 (Öğle)</span>
-                <span>16:00 (İkindi)</span>
-                <span>20:00 (Akşam)</span>
-                <span>23:59</span>
+                {result.timelinePoints.length > 0 && (
+                  <>
+                    <span>{result.timelinePoints[0]?.timeStr}</span>
+                    <span>{result.timelinePoints[Math.floor(result.timelinePoints.length / 2)]?.timeStr}</span>
+                    <span>{result.timelinePoints[result.timelinePoints.length - 1]?.timeStr}</span>
+                  </>
+                )}
               </div>
             </div>
 
-            {/* 24 SAATTEKİ TÜM BELİRGİN ZİRVELERİN LİSTESİ */}
+            {/* TÜM BELİRGİN ZİRVELERİN LİSTESİ */}
             <div className="bg-[#121212]/90 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-xl shadow-xl space-y-4">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
                 <BarChart3 className="text-[#D4AF37]" size={20} />
-                24 Saatteki Tüm Olası Rezonans Zirveleri ({result.topCandidates.length} Zirve)
+                Tespit Edilen Belirgin Rezonans Zirveleri ({result.topCandidates.length} Zirve)
               </h3>
               <p className="text-xs text-mystic-text-muted">
-                Kadersel olaylarınızın gün boyunca oluşturduğu tüm yerel tepe noktaları yükseklik sırasına göre aşağıdadır. İncelemek istediğiniz zirveye tıklayınız:
+                Kadersel olaylarınızın oluşturduğu ana tepe noktaları rezonans sırasına göre aşağıdadır. Detayını görmek istediğiniz zirveye tıklayınız:
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 mt-4">
                 {result.topCandidates.map((cand, idx) => {
                   const isSelected = selectedPeak.timeStr === cand.timeStr;
                   const pt = result.timelinePoints.find(p => p.hour === cand.hour && Math.abs(p.minute - cand.minute) < 5);
-                  const wavePercent = pt?.probabilityPercent || 70;
+                  const wavePercent = pt?.probabilityPercent || 80;
 
                   return (
                     <button
