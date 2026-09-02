@@ -25,7 +25,12 @@ import {
   BookmarkCheck,
   TrendingUp,
   Award,
-  BarChart3
+  BarChart3,
+  FlaskConical,
+  BookOpen,
+  Info,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 import { ASTRO_CITIES, AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 import { EventType, LifeEvent, RectificationResult, TimelinePoint, CandidateScore } from '@/features/astrology/engine/RectificationEngine';
@@ -124,6 +129,7 @@ export default function RectificationPage() {
 
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [activePreset, setActivePreset] = useState<string | null>(null);
+  const [isMethodologyOpen, setIsMethodologyOpen] = useState<boolean>(true);
 
   // Step 1: Doğum Bilgileri
   const [birthDate, setBirthDate] = useState<string>('1992-06-15');
@@ -295,16 +301,76 @@ export default function RectificationPage() {
       <div className="max-w-4xl mx-auto">
         
         {/* Header Title */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] mb-4 shadow-[0_0_20px_rgba(212,175,55,0.15)]">
             <Clock size={32} className="animate-pulse" />
           </div>
-          <h1 className="text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-white to-[#D4AF37] tracking-tight mb-3">
-            Akıllı Doğum Saati Belirleme
-          </h1>
+          <div className="flex items-center justify-center gap-2 mb-2">
+            <h1 className="text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-white to-[#D4AF37] tracking-tight">
+              Doğum Saati Belirleme
+            </h1>
+            <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-xs font-bold uppercase tracking-wider">
+              Beta
+            </span>
+          </div>
           <p className="text-sm sm:text-base text-mystic-text-muted max-w-2xl mx-auto">
             Doğum zaman aralığınızı kadersel olaylarınızla tarayarak **Kozmik Rezonans ve Olasılık Dalga Grafiğini** çıkarın.
           </p>
+        </div>
+
+        {/* BETA & BİLİMSEL/EZOTERİK METODOLOJİ BİLGİLENDİRME PANOLARI */}
+        <div className="mb-8 bg-gradient-to-br from-[#1c1810] via-[#141414] to-[#1a150c] border border-amber-500/30 rounded-3xl p-5 sm:p-6 backdrop-blur-xl shadow-2xl">
+          <div 
+            className="flex items-center justify-between cursor-pointer select-none"
+            onClick={() => setIsMethodologyOpen(!isMethodologyOpen)}
+          >
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-xl bg-amber-500/20 text-amber-400">
+                <FlaskConical size={18} />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-amber-300 flex items-center gap-2">
+                  Metodoloji & Bilimsel/Astrolojik Şeffaflık Rehberi
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-normal">
+                    Önemli Bilgilendirme
+                  </span>
+                </h3>
+                <p className="text-xs text-white/60">
+                  Bu modülün çalışma prensibi, kullanılan uluslararası ekoller ve olasılık spektrumu hakkında.
+                </p>
+              </div>
+            </div>
+            <button className="text-amber-400 p-1 hover:bg-white/5 rounded-lg transition-colors">
+              {isMethodologyOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+            </button>
+          </div>
+
+          {isMethodologyOpen && (
+            <div className="mt-4 pt-4 border-t border-white/10 space-y-3.5 text-xs text-white/80 leading-relaxed">
+              <div className="flex items-start gap-2.5">
+                <Info className="text-amber-400 shrink-0 mt-0.5" size={16} />
+                <div>
+                  <strong className="text-amber-200">Tek Bir Mutlak Saat Dayatmaz:</strong> Bu sistem, doğum saatini tam bilmeyen veya yaklaşık bir aralık bilen kullanıcılar için geliştirilmiş bir **Kozmik Olasılık ve Araştırma Modelidir (Beta)**. Girdiğiniz kadersel olayların günün hangi saatlerinde gökyüzüyle en yüksek rezonansı ürettiğini gösterir.
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <BookOpen className="text-amber-400 shrink-0 mt-0.5" size={16} />
+                <div>
+                  <strong className="text-amber-200">Kullanılan Uluslararası Kaynaklar & Ekoller:</strong>
+                  <ul className="list-disc list-inside mt-1.5 space-y-1 text-white/70">
+                    <li><span className="text-white font-semibold">Solar Arc Directions (Noel Tyl & Frank Glahn Ekolü):</span> Yılda yaklaşık 1° ilerleme kuralıyla evlilik, kariyer, vefat ve çocuk gibi kadersel dönüm noktalarının köşe evlere (ASC, MC, DSC, IC) kilitlenmesi.</li>
+                    <li><span className="text-white font-semibold">İkincil İlerletimler (Alan Leo / Secondary Progressions):</span> Gün = Yıl kuralıyla progresif Ay ve Güneş döngüleri.</li>
+                    <li><span className="text-white font-semibold">NASA Swiss Ephemeris Altyapısı:</span> Saniyenin binde biri hassasiyetinde yüksek doğruluklu gök mekaniği.</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="p-3 bg-white/5 rounded-2xl border border-white/10 text-[11px] text-white/60">
+                <strong className="text-amber-300">Astrolojik Şeffaflık Notu:</strong> Astroloji tarihinde tek ve mutlak bir "rektifikasyon formülü" bulunmamaktadır; Helenistik, Vedik, Hermetik (Hermes Trutine) ve Modern ekoller haritaları farklı açılardan yorumlar. Bu araç, en güçlü rezonansa sahip zaman pencerelerini incelemeniz için bir kılavuzdur.
+              </div>
+            </div>
+          )}
         </div>
 
         {/* HAZIR REFERANS TEST VAKALARI SEÇİCİSİ */}
@@ -729,13 +795,13 @@ export default function RectificationPage() {
               <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-white/10 pb-4">
                 <div>
                   <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-bold uppercase tracking-wider mb-2">
-                    <TrendingUp size={14} /> Kozmik Rezonans Spektrumu (Organik Dalga)
+                    <TrendingUp size={14} /> Kozmik Rezonans Spektrumu (Beta)
                   </div>
                   <h2 className="text-xl sm:text-2xl font-bold text-white">
                     Doğum Saati Olasılık Dağılım Grafiği
                   </h2>
                   <p className="text-xs text-white/50 mt-1">
-                    Kadersel olaylarınızın gökyüzüyle oluşturduğu rezonans dalgaları ve ana tepe noktaları pürüzsüz dalga formunda aşağıdadır.
+                    Kadersel olaylarınızın Solar Arc ve Transit yönelimleriyle oluşturduğu pürüzsüz rezonans dalgaları aşağıdadır.
                   </p>
                 </div>
 
