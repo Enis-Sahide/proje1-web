@@ -20,8 +20,9 @@ import {
   Home, 
   Flame, 
   Zap, 
-  HelpCircle,
-  RotateCcw
+  RotateCcw,
+  UserCheck,
+  BookmarkCheck
 } from 'lucide-react';
 import { ASTRO_CITIES, AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 import { EventType, LifeEvent, RectificationResult } from '@/features/astrology/engine/RectificationEngine';
@@ -46,11 +47,76 @@ const EVENT_TEMPLATES: EventTemplate[] = [
   { type: 'spiritual_awakening', label: 'Ruhsal Uyanış / Dönüm Noktası', icon: <Sparkles className="text-indigo-400" size={16} />, hint: 'Hayat görüşünüzü kökten değiştiren spiritüel kırılma' },
 ];
 
+interface BenchmarkPreset {
+  id: string;
+  name: string;
+  title: string;
+  officialTime: string;
+  birthDate: string;
+  cityName: string;
+  element: 'fire' | 'earth' | 'air' | 'water';
+  bodyType: 'slender' | 'athletic' | 'stocky' | 'petite' | 'curvy';
+  events: LifeEvent[];
+}
+
+const BENCHMARK_PRESETS: BenchmarkPreset[] = [
+  {
+    id: 'diana',
+    name: 'Prenses Diana',
+    title: 'İngiltere Prensesi',
+    officialTime: '19:45 (Resmi Belge)',
+    birthDate: '1961-07-01',
+    cityName: 'Londra',
+    element: 'water',
+    bodyType: 'slender',
+    events: [
+      { id: 'd1', type: 'marriage', title: 'Prens Charles ile Evlilik', date: '1981-07-29' },
+      { id: 'd2', type: 'child_birth', title: 'Prens William Doğumu (1. Çocuk)', date: '1982-06-21' },
+      { id: 'd3', type: 'child_birth', title: 'Prens Harry Doğumu (2. Çocuk)', date: '1984-09-15' },
+      { id: 'd4', type: 'death_relative', title: 'Baba Vefatı (John Spencer)', date: '1992-03-29' },
+      { id: 'd5', type: 'divorce', title: 'Resmi Boşanma', date: '1996-08-28' },
+    ]
+  },
+  {
+    id: 'jobs',
+    name: 'Steve Jobs',
+    title: 'Apple Kurucusu',
+    officialTime: '19:15 (Resmi Belge)',
+    birthDate: '1955-02-24',
+    cityName: 'San Francisco',
+    element: 'earth',
+    bodyType: 'slender',
+    events: [
+      { id: 'j1', type: 'career_promotion', title: "Apple'ın Kuruluşu", date: '1976-04-01' },
+      { id: 'j2', type: 'financial_crisis', title: "Apple'dan Kovulması (Kriz)", date: '1985-09-16' },
+      { id: 'j3', type: 'marriage', title: 'Laurene Powell ile Evlilik', date: '1991-03-18' },
+      { id: 'j4', type: 'career_promotion', title: "Apple'a CEO Olarak Dönüşü", date: '1997-09-16' },
+      { id: 'j5', type: 'accident_surgery', title: 'Kanser Ameliyatı', date: '2004-07-31' },
+    ]
+  },
+  {
+    id: 'obama',
+    name: 'Barack Obama',
+    title: 'ABD 44. Başkanı',
+    officialTime: '19:24 (Resmi Belge)',
+    birthDate: '1961-08-04',
+    cityName: 'Honolulu',
+    element: 'air',
+    bodyType: 'athletic',
+    events: [
+      { id: 'o1', type: 'marriage', title: 'Michelle Robinson ile Evlilik', date: '1992-10-03' },
+      { id: 'o2', type: 'death_relative', title: 'Anne Vefatı (Ann Dunham)', date: '1995-11-07' },
+      { id: 'o3', type: 'child_birth', title: 'Malia Doğumu (1. Çocuk)', date: '1998-07-04' },
+      { id: 'o4', type: 'career_promotion', title: 'ABD Başkanı Seçilmesi', date: '2008-11-04' },
+    ]
+  }
+];
+
 export default function RectificationPage() {
   const router = useRouter();
 
-  // Wizard Steps: 1 -> Doğum & Şehir, 2 -> Mizaç/Beden, 3 -> Olaylar, 4 -> Sonuç
   const [currentStep, setCurrentStep] = useState<number>(1);
+  const [activePreset, setActivePreset] = useState<string | null>(null);
 
   // Step 1: Doğum Bilgileri
   const [birthDate, setBirthDate] = useState<string>('1992-06-15');
@@ -81,6 +147,19 @@ export default function RectificationPage() {
   const [result, setResult] = useState<RectificationResult | null>(null);
   const [errorMsg, setErrorMsg] = useState<string>('');
 
+  // Preset Yükleme
+  const handleLoadPreset = (preset: BenchmarkPreset) => {
+    setActivePreset(preset.id);
+    setBirthDate(preset.birthDate);
+    const targetCity = ASTRO_CITIES.find(c => c.name.toLowerCase() === preset.cityName.toLowerCase()) || selectedCity;
+    setSelectedCity(targetCity);
+    setBodyType(preset.bodyType);
+    setElementTemperament(preset.element);
+    setEvents([...preset.events]);
+    setTimeWindowType('all');
+    setCurrentStep(3); // Doğrudan olaylar adımına geç
+  };
+
   // Doğruluk Gücü Göstergesi
   const getAccuracyGauge = () => {
     const count = events.length;
@@ -93,7 +172,6 @@ export default function RectificationPage() {
 
   const accuracy = getAccuracyGauge();
 
-  // Olay Ekle
   const handleAddEvent = () => {
     if (!newEventDate) {
       alert('Lütfen olayın gerçekleştiği tarihi seçiniz.');
@@ -114,12 +192,10 @@ export default function RectificationPage() {
     setNewEventDate('');
   };
 
-  // Olay Sil
   const handleRemoveEvent = (id: string) => {
     setEvents(prev => prev.filter(e => e.id !== id));
   };
 
-  // Hesaplamayı Başlat
   const handleCalculate = async () => {
     if (events.length === 0) {
       setErrorMsg('Lütfen en az 1 kadersel yaşam olayı ekleyiniz.');
@@ -176,7 +252,7 @@ export default function RectificationPage() {
       <div className="max-w-4xl mx-auto">
         
         {/* Header Title */}
-        <div className="text-center mb-10">
+        <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center p-3 rounded-2xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] mb-4 shadow-[0_0_20px_rgba(212,175,55,0.15)]">
             <Clock size={32} className="animate-pulse" />
           </div>
@@ -186,6 +262,44 @@ export default function RectificationPage() {
           <p className="text-sm sm:text-base text-mystic-text-muted max-w-2xl mx-auto">
             Doğum saatinizi tam bilmiyor musunuz? Hayatınızdaki dönüm noktası olaylar ve astronomik tersine mühendislik ile kesin doğum dakikanızı hesaplayın.
           </p>
+        </div>
+
+        {/* HAZIR REFERANS TEST VAKALARI SEÇİCİSİ */}
+        <div className="mb-8 p-4 sm:p-5 bg-gradient-to-r from-[#181818] via-black to-[#181818] border border-[#D4AF37]/30 rounded-3xl backdrop-blur-xl shadow-xl">
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#D4AF37]">
+              <BookmarkCheck size={16} /> Resmi Doğum Belgesiyle Kanıtlanmış Referans Vakalar (Canlı Test)
+            </div>
+          </div>
+          <p className="text-xs text-mystic-text-muted mb-4">
+            Algoritmanın doğruluğunu test etmek için aşağıdaki dünyaca ünlü kişilerden birine tıklayınız; doğum bilgileri ve resmi olayları otomatik yüklenecektir:
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {BENCHMARK_PRESETS.map(preset => (
+              <button
+                key={preset.id}
+                onClick={() => handleLoadPreset(preset)}
+                className={`p-3.5 rounded-2xl border text-left transition-all group cursor-pointer ${
+                  activePreset === preset.id
+                    ? 'bg-[#D4AF37]/20 border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.2)]'
+                    : 'bg-white/5 border-white/10 hover:border-[#D4AF37]/40 hover:bg-white/10'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-1">
+                  <span className="font-bold text-sm text-white group-hover:text-[#D4AF37] transition-colors">
+                    {preset.name}
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/10 text-[#D4AF37] font-semibold">
+                    {preset.cityName}
+                  </span>
+                </div>
+                <div className="text-[11px] text-white/50">{preset.title}</div>
+                <div className="mt-2 text-[10px] font-mono text-emerald-400 flex items-center gap-1">
+                  <UserCheck size={12} /> Saat: {preset.officialTime}
+                </div>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Step Navigation Bar */}
@@ -214,7 +328,6 @@ export default function RectificationPage() {
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              {/* Doğum Tarihi */}
               <div>
                 <label className="block text-xs font-semibold uppercase tracking-wider text-mystic-text-muted mb-2">
                   Doğum Tarihi
@@ -222,12 +335,14 @@ export default function RectificationPage() {
                 <input 
                   type="date"
                   value={birthDate}
-                  onChange={e => setBirthDate(e.target.value)}
+                  onChange={e => {
+                    setBirthDate(e.target.value);
+                    setActivePreset(null);
+                  }}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
                 />
               </div>
 
-              {/* Doğum Şehri */}
               <div className="relative">
                 <label className="block text-xs font-semibold uppercase tracking-wider text-mystic-text-muted mb-2">
                   Doğum Şehri (Seçili: {selectedCity.name})
@@ -235,7 +350,7 @@ export default function RectificationPage() {
                 <div className="relative">
                   <input 
                     type="text"
-                    placeholder="Şehir ara (örn: İstanbul, Ankara, İzmir)..."
+                    placeholder="Şehir ara (örn: İstanbul, Londra, San Francisco)..."
                     value={citySearch}
                     onChange={e => setCitySearch(e.target.value)}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#D4AF37] focus:outline-none transition-colors pl-10"
@@ -250,6 +365,7 @@ export default function RectificationPage() {
                         onClick={() => {
                           setSelectedCity(c);
                           setCitySearch('');
+                          setActivePreset(null);
                         }}
                         className="w-full text-left px-4 py-2.5 text-sm hover:bg-[#D4AF37]/20 hover:text-[#D4AF37] transition-colors border-b border-white/5"
                       >
@@ -261,7 +377,6 @@ export default function RectificationPage() {
               </div>
             </div>
 
-            {/* Bilinen Zaman Penceresi */}
             <div className="pt-4 border-t border-white/5">
               <label className="block text-xs font-semibold uppercase tracking-wider text-mystic-text-muted mb-3">
                 Doğum Saati Hakkında Bildikleriniz
@@ -329,7 +444,7 @@ export default function RectificationPage() {
           </div>
         )}
 
-        {/* STEP 2: Mizaç ve Beden Yapısı */}
+        {/* STEP 2: Mizaç ve Beden */}
         {currentStep === 2 && (
           <div className="bg-[#121212]/90 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl space-y-6">
             <h2 className="text-xl font-bold flex items-center gap-2 text-white">
@@ -340,7 +455,6 @@ export default function RectificationPage() {
               Yükselen burcun fiziksel beden ve mizaç üzerindeki etkisini eşleştirmek için size en yakın seçenekleri belirleyin.
             </p>
 
-            {/* Element Mizacı */}
             <div>
               <label className="block text-xs font-semibold uppercase tracking-wider text-mystic-text-muted mb-3">
                 Doğal Karakter & Mizaç Eğiliminiz
@@ -368,7 +482,6 @@ export default function RectificationPage() {
               </div>
             </div>
 
-            {/* Beden Yapısı */}
             <div className="pt-4 border-t border-white/5">
               <label className="block text-xs font-semibold uppercase tracking-wider text-mystic-text-muted mb-3">
                 Fiziksel Beden Yapınız
@@ -415,11 +528,10 @@ export default function RectificationPage() {
           </div>
         )}
 
-        {/* STEP 3: Kadersel Yaşam Olayları (Precision Event Matrix) */}
+        {/* STEP 3: Kadersel Yaşam Olayları */}
         {currentStep === 3 && (
           <div className="bg-[#121212]/90 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl space-y-6">
             
-            {/* Accuracy Bar Header */}
             <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
               <div className="flex justify-between items-center mb-2">
                 <span className="text-xs font-semibold text-white/80">Hesaplama Gücü & Güvenilirlik</span>
@@ -431,15 +543,16 @@ export default function RectificationPage() {
                   style={{ width: `${accuracy.percent}%` }}
                 />
               </div>
-              <p className="text-[11px] text-white/40 mt-2">
-                💡 İpucu: Ne kadar çok kesin tarihli olay (evlilik, çocuk, ameliyat, vefat, taşınma vb.) eklerseniz, doğum dakikanız o kadar %100 kesinleşir.
-              </p>
             </div>
 
-            {/* Mevcut Olaylar Listesi */}
             <div>
               <h3 className="text-sm font-bold text-white uppercase tracking-wider mb-3 flex items-center justify-between">
                 <span>Eklenmiş Yaşam Olayları ({events.length})</span>
+                {activePreset && (
+                  <span className="text-xs font-normal text-emerald-400">
+                    ✓ {BENCHMARK_PRESETS.find(p => p.id === activePreset)?.name} verileri yüklendi
+                  </span>
+                )}
               </h3>
 
               {events.length === 0 ? (
@@ -482,7 +595,6 @@ export default function RectificationPage() {
               </h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                {/* Olay Türü */}
                 <div>
                   <label className="block text-[10px] text-white/50 mb-1 uppercase font-semibold">Olay Türü</label>
                   <select
@@ -498,7 +610,6 @@ export default function RectificationPage() {
                   </select>
                 </div>
 
-                {/* Başlık / İsim */}
                 <div>
                   <label className="block text-[10px] text-white/50 mb-1 uppercase font-semibold">Olay Başlığı (Opsiyonel)</label>
                   <input
@@ -510,7 +621,6 @@ export default function RectificationPage() {
                   />
                 </div>
 
-                {/* Kesin Tarih */}
                 <div>
                   <label className="block text-[10px] text-white/50 mb-1 uppercase font-semibold">Olay Tarihi (Gün/Ay/Yıl)</label>
                   <input
@@ -536,7 +646,6 @@ export default function RectificationPage() {
               </div>
             )}
 
-            {/* Aksiyon Butonları */}
             <div className="flex justify-between pt-4">
               <button
                 onClick={() => setCurrentStep(2)}
@@ -567,11 +676,10 @@ export default function RectificationPage() {
           </div>
         )}
 
-        {/* STEP 4: SONUÇ RAPORU (REKTİFİKASYON KANIT RAPORU) */}
+        {/* STEP 4: SONUÇ RAPORU */}
         {currentStep === 4 && result && (
           <div className="space-y-8 animate-in fade-in zoom-in duration-500">
             
-            {/* Ana Sonuç Kartı */}
             <div className="bg-gradient-to-b from-[#181818] to-black border-2 border-[#D4AF37]/50 rounded-3xl p-8 text-center relative overflow-hidden shadow-[0_0_50px_rgba(212,175,55,0.2)]">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-extrabold uppercase tracking-widest mb-4">
                 <CheckCircle2 size={16} /> Rektifikasyon Başarıyla Tamamlandı
@@ -630,7 +738,6 @@ export default function RectificationPage() {
               </div>
             </div>
 
-            {/* Yeniden Hesapla / Doğum Haritasına Git Butonları */}
             <div className="flex flex-col sm:flex-row justify-center gap-4 pt-4">
               <button
                 onClick={() => setCurrentStep(1)}

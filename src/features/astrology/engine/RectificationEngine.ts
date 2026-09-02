@@ -101,17 +101,16 @@ export interface RectificationResult {
   methodologyNote: string;
 }
 
-// Olay Türüne Göre İlgili Noktalar ve Ağırlıklar
 const EVENT_AFFINITY: Record<EventType, { primaryHouses: number[]; planets: string[]; aspectTypes: number[] }> = {
   marriage: {
-    primaryHouses: [7, 1, 4, 10], // 7th house DSC, 1st ASC
-    planets: ['Venüs', 'Jüpiter', 'Güneş', 'Ay'],
-    aspectTypes: [0, 60, 120, 180] // Kavuşum, Sekstil, Üçgen, Karşıt
+    primaryHouses: [7, 1, 4, 10, 5],
+    planets: ['Venüs', 'Jüpiter', 'Güneş', 'Ay', 'Kuzey Ay Düğümü'],
+    aspectTypes: [0, 60, 120, 180]
   },
   divorce: {
     primaryHouses: [7, 1, 8, 4],
     planets: ['Uranüs', 'Satürn', 'Mars', 'Plüton'],
-    aspectTypes: [0, 90, 180] // Kavuşum, Kare, Karşıt
+    aspectTypes: [0, 90, 180]
   },
   child_birth: {
     primaryHouses: [5, 1, 4, 10],
@@ -120,7 +119,7 @@ const EVENT_AFFINITY: Record<EventType, { primaryHouses: number[]; planets: stri
   },
   death_relative: {
     primaryHouses: [4, 8, 10, 12],
-    planets: ['Satürn', 'Plüton', 'Mars', 'Ay'],
+    planets: ['Satürn', 'Plüton', 'Mars', 'Ay', 'Güneş'],
     aspectTypes: [0, 90, 180]
   },
   accident_surgery: {
@@ -129,8 +128,8 @@ const EVENT_AFFINITY: Record<EventType, { primaryHouses: number[]; planets: stri
     aspectTypes: [0, 90, 180]
   },
   career_promotion: {
-    primaryHouses: [10, 1, 6, 2],
-    planets: ['Güneş', 'Jüpiter', 'Satürn', 'Merkür'],
+    primaryHouses: [10, 1, 6, 2, 9],
+    planets: ['Güneş', 'Jüpiter', 'Satürn', 'Merkür', 'Mars'],
     aspectTypes: [0, 60, 120, 180]
   },
   relocation: {
@@ -170,7 +169,6 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
   const cityName = typeof cityInput === 'string' ? cityInput : (cityInput && typeof cityInput === 'object' ? cityInput.name : 'İstanbul');
   const city = ASTRO_CITIES.find(c => c.name.toLowerCase() === cityName.toLowerCase()) || ASTRO_CITIES[0];
   
-  // 1. Dinamik Tarihsel Saat Dilimi ve Yaz Saati (DST) Hesabı
   const tzName = city.tz || 'Europe/Istanbul';
   const momentBirth = moment.tz(`${input.birthDate} 12:00:00`, tzName);
   const tzOffsetHours = momentBirth.utcOffset() / 60.0;
@@ -178,11 +176,10 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
   const startH = input.timeWindow?.startHour ?? 0;
   const endH = input.timeWindow?.endHour ?? 24;
 
-  // 2. Doğum Anı Referans Güneş Konumu (Öğle Vakti)
   const baseJd = swe.swe_julday(bYear, bMonth, bDay, 12.0 - tzOffsetHours, Constants.SE_GREG_CAL);
   const baseSun = mod360(swe.swe_calc_ut(baseJd, Constants.SE_SUN, Constants.SEFLG_SWIEPH).xx[0]);
 
-  // 3. Her Bir Yaşam Olayı İçin Gerçek Astronomik Solar Arc & Progresyon Konumlarını Hesapla
+  // Her olay için Solar Arc derecesini ve transitleri hazırla
   const eventCalculations: Array<{
     event: LifeEvent;
     arcDegree: number;
@@ -196,26 +193,18 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
     const eventTzOffset = eventMoment.utcOffset() / 60.0;
     const eventJd = swe.swe_julday(eYear, eMonth, eDay, 12.0 - eventTzOffset, Constants.SE_GREG_CAL);
     
-    // Doğum ile Olay Arasındaki Kesin Tropikal Yıl (Yaş)
     const ageInDays = eventJd - baseJd;
     const ageInYears = ageInDays / 365.242199;
-
-    // İkincil İlerletim Zamanı (1 Gün = 1 Yıl Prensibi)
     const progJd = baseJd + ageInYears;
 
-    // İlerletilmiş Güneş ve Ay Konumları
     const progSun = mod360(swe.swe_calc_ut(progJd, Constants.SE_SUN, Constants.SEFLG_SWIEPH).xx[0]);
     const progMoon = mod360(swe.swe_calc_ut(progJd, Constants.SE_MOON, Constants.SEFLG_SWIEPH).xx[0]);
 
-    // Gerçek Solar Arc: Doğumdan olaya kadar Güneş'in kat ettiği net ilerleme derecesi
-    // (Örn: 20 yaşındayken yaklaşık 20 * 0.9856° = ~19.71°)
     let trueSolarArc = mod360(progSun - baseSun);
     if (trueSolarArc > 180 && ageInYears < 100) {
-      // Sayısal düzeltme: Güneş her yıl ileri hareket eder
       trueSolarArc = ageInYears * 0.985647;
     }
 
-    // Olay Günündeki Transit Ağır ve Orta Gezegenler
     const transitPlanets: Record<string, number> = {};
     const checkPlanets = [
       { name: 'Jüpiter', id: Constants.SE_JUPITER },
@@ -240,9 +229,9 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
     });
   }
 
-  // 4. Aday Zamanları Tara (1'er Dakikalık İnce Çözünürlük)
+  // Aday dakikaları tara
   const candidateScores: CandidateScore[] = [];
-  const stepMinutes = 1; // 1'er dakikalık tam hassasiyet
+  const stepMinutes = 1;
   const startMinute = Math.round(startH * 60);
   const endMinute = Math.min(1440, Math.round(endH * 60));
 
@@ -267,10 +256,15 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
     const dscDeg = mod360(ascDeg + 180);
     const icDeg = mod360(mcDeg + 180);
 
+    const cuspDegrees: number[] = new Array(13).fill(0);
+    for (let i = 1; i <= 12; i++) {
+      cuspDegrees[i] = mod360(cusps[i]);
+    }
+
     const ascSignData = getSignAndDegree(ascDeg);
     const mcSignData = getSignAndDegree(mcDeg);
 
-    // Temel natal gezegen konumları
+    // Natal gezegenler
     const natalPlanets: Record<string, number> = {};
     const nList = [
       { name: 'Güneş', id: Constants.SE_SUN },
@@ -289,7 +283,6 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
       natalPlanets[p.name] = mod360(swe.swe_calc_ut(jd, p.id, Constants.SEFLG_SWIEPH).xx[0]);
     }
 
-    // Skorlama ve Eşleştirme
     let candidateTotalScore = 0;
     const matches: EventMatchDetail[] = [];
     let matchedEventsCount = 0;
@@ -304,7 +297,14 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
     }
     candidateTotalScore += temperamentScore;
 
-    // Her Yaşam Olayını Test Et
+    const natalAngles = [
+      { name: 'Yükselen (ASC)', pos: ascDeg },
+      { name: 'Tepe Noktası (MC)', pos: mcDeg },
+      { name: 'Alçalan (DSC)', pos: dscDeg },
+      { name: 'Dip Noktası (IC)', pos: icDeg }
+    ];
+
+    // Her olayı test et
     for (const evCalc of eventCalculations) {
       const affinity = EVENT_AFFINITY[evCalc.event.type] || {
         primaryHouses: [1, 10, 7, 4],
@@ -315,31 +315,21 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
       let bestEventMatchScore = 0;
       let bestMatchDetail: EventMatchDetail | null = null;
 
-      // 1. Solar Arc ile İlerletilmiş Köşe Noktaları -> Natal Gezegenlere
-      const dirAsc = mod360(ascDeg + evCalc.arcDegree);
-      const dirMc = mod360(mcDeg + evCalc.arcDegree);
-      const dirDsc = mod360(dscDeg + evCalc.arcDegree);
-      const dirIc = mod360(icDeg + evCalc.arcDegree);
-
-      const directedPoints = [
-        { name: 'İlerletilmiş Yükselen (Dir. ASC)', pos: dirAsc },
-        { name: 'İlerletilmiş Tepe Noktası (Dir. MC)', pos: dirMc },
-        { name: 'İlerletilmiş Alçalan (Dir. DSC)', pos: dirDsc },
-        { name: 'İlerletilmiş Dip Noktası (Dir. IC)', pos: dirIc }
-      ];
-
+      // 1. ÇİFT YÖNLÜ SOLAR ARC YÖNELİMLERİ (Dir. Gezegen -> Natal Açı & Dir. Açı -> Natal Gezegen)
       for (const pName of affinity.planets) {
         const natalP = natalPlanets[pName];
         if (natalP === undefined) continue;
 
-        for (const dp of directedPoints) {
+        // A) İlerletilmiş Gezegen -> Natal Köşe Eksenlerine (En güçlü yönelim)
+        const dirPlanet = mod360(natalP + evCalc.arcDegree);
+        for (const ang of natalAngles) {
           for (const aspDeg of affinity.aspectTypes) {
-            const diff = Math.abs(mod360(dp.pos - natalP) - aspDeg);
+            const diff = Math.abs(mod360(dirPlanet - ang.pos) - aspDeg);
             const orb = Math.min(diff, Math.abs(360 - diff));
 
             if (orb <= 1.0) {
-              let score = Math.round(100 * (1 - orb / 1.0));
-              if (orb <= 0.20) score += 40; // Partil orb bonusu
+              let score = Math.round(110 * (1 - orb / 1.0));
+              if (orb <= 0.20) score += 45;
 
               if (score > bestEventMatchScore) {
                 bestEventMatchScore = score;
@@ -349,10 +339,39 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
                   eventTitle: evCalc.event.title,
                   technique: 'Solar Arc',
                   aspect: aspectName,
-                  matchedPoint: `${dp.name} -> Natal ${pName}`,
+                  matchedPoint: `İlerletilmiş ${pName} -> Natal ${ang.name}`,
                   orb: Number(orb.toFixed(2)),
                   score,
-                  explanation: `${evCalc.event.title} tarihinde Solar Arc ${dp.name} ile Natal ${pName} arasında ${orb.toFixed(2)}° orb ile tam ${aspectName} açısı kilitlendi.`
+                  explanation: `${evCalc.event.title} tarihinde Solar Arc ile ilerletilmiş ${pName}, haritanızın ${ang.name} eksenine ${orb.toFixed(2)}° orb ile tam ${aspectName} yaptı.`
+                };
+              }
+            }
+          }
+        }
+
+        // B) İlerletilmiş Köşe Noktası -> Natal Gezegene
+        for (const ang of natalAngles) {
+          const dirAng = mod360(ang.pos + evCalc.arcDegree);
+          for (const aspDeg of affinity.aspectTypes) {
+            const diff = Math.abs(mod360(dirAng - natalP) - aspDeg);
+            const orb = Math.min(diff, Math.abs(360 - diff));
+
+            if (orb <= 1.0) {
+              let score = Math.round(100 * (1 - orb / 1.0));
+              if (orb <= 0.20) score += 40;
+
+              if (score > bestEventMatchScore) {
+                bestEventMatchScore = score;
+                const aspectName = aspDeg === 0 ? 'Kavuşum' : aspDeg === 90 ? 'Kare' : aspDeg === 120 ? 'Üçgen' : aspDeg === 180 ? 'Karşıt' : `${aspDeg}°`;
+                bestMatchDetail = {
+                  eventId: evCalc.event.id,
+                  eventTitle: evCalc.event.title,
+                  technique: 'Solar Arc',
+                  aspect: aspectName,
+                  matchedPoint: `İlerletilmiş ${ang.name} -> Natal ${pName}`,
+                  orb: Number(orb.toFixed(2)),
+                  score,
+                  explanation: `${evCalc.event.title} tarihinde Solar Arc ilerletimli ${ang.name} ile Natal ${pName} arasında ${orb.toFixed(2)}° kesin orb ile ${aspectName} gerçekleşti.`
                 };
               }
             }
@@ -360,14 +379,7 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
         }
       }
 
-      // 2. İkincil İlerletilmiş Ay (Prog. Moon) -> Natal Köşe Noktalarına
-      const natalAngles = [
-        { name: 'Yükselen (ASC)', pos: ascDeg },
-        { name: 'Tepe Noktası (MC)', pos: mcDeg },
-        { name: 'Alçalan (DSC)', pos: dscDeg },
-        { name: 'Dip Noktası (IC)', pos: icDeg }
-      ];
-
+      // 2. İKİNCİL İLERLETİLMİŞ AY (PROGRESSED MOON)
       for (const ang of natalAngles) {
         for (const aspDeg of [0, 60, 90, 120, 180]) {
           const diff = Math.abs(mod360(evCalc.progMoonLon - ang.pos) - aspDeg);
@@ -388,14 +400,14 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
                 matchedPoint: `Progresif Ay -> ${ang.name}`,
                 orb: Number(orb.toFixed(2)),
                 score,
-                explanation: `${evCalc.event.title} tarihinde İkincil İlerletilmiş Ay, haritanızın ana köşe ekseni olan ${ang.name} noktasına ${orb.toFixed(2)}° kesin orb ile ${aspectName} yaptı.`
+                explanation: `${evCalc.event.title} tarihinde İkincil İlerletilmiş Ay, ${ang.name} eksenine ${orb.toFixed(2)}° orb ile ${aspectName} teması yaptı.`
               };
             }
           }
         }
       }
 
-      // 3. Olay Günü Transit Ağır Gezegenler -> Natal Köşe Noktalarına
+      // 3. TRANSİTLER
       for (const pName of affinity.planets) {
         const trPos = evCalc.eventTransitPlanets[pName];
         if (trPos === undefined) continue;
@@ -420,7 +432,7 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
                   matchedPoint: `Transit ${pName} -> ${ang.name}`,
                   orb: Number(orb.toFixed(2)),
                   score,
-                  explanation: `${evCalc.event.title} tarihinde Transit ${pName}, haritanızın ${ang.name} eksenine ${orb.toFixed(2)}° orb ile ${aspectName} teması gerçekleştirdi.`
+                  explanation: `${evCalc.event.title} tarihinde Transit ${pName}, haritanızın ${ang.name} eksenine ${orb.toFixed(2)}° orb ile ${aspectName} teması yaptı.`
                 };
               }
             }
@@ -439,9 +451,7 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
     const curM = m % 60;
     const timeStr = `${String(curH).padStart(2, '0')}:${String(curM).padStart(2, '0')}:00`;
 
-    // Güvenilirlik Normalizasyonu
     const matchRatio = eventCalculations.length > 0 ? matchedEventsCount / eventCalculations.length : 0;
-    // Çoklu olay girildiğinde (4+ olay) ve %60+ eşleşme olduğunda güvenilirlik %96 - %99.8 seviyesine yükselir
     let confidencePercent = Math.min(99.8, Number((82 + (matchRatio * 17.8)).toFixed(1)));
     if (eventCalculations.length < 3) {
       confidencePercent = Math.min(88, Number((50 + matchRatio * 38).toFixed(1)));
@@ -463,7 +473,6 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
     });
   }
 
-  // 5. En Yüksek Skorlu Adayı Sırala ve Seç
   candidateScores.sort((a, b) => b.totalScore - a.totalScore);
   const best = candidateScores[0] || {
     timeStr: "12:00:00",
@@ -480,7 +489,6 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
     temperamentMatchScore: 0
   };
 
-  // 6. En İyi Aday İçin Tam Doğum Haritasını Çıkar
   const finalLocalHours = best.hour + (best.minute / 60.0) - tzOffsetHours;
   let finalDay = bDay;
   let finalUtcHour = finalLocalHours;
@@ -500,6 +508,6 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
     topCandidates: candidateScores.slice(0, 3),
     chartData,
     totalEventsProcessed: input.events.length,
-    methodologyNote: `Bu rektifikasyon analizi; girilen ${input.events.length} kadersel yaşam olayı üzerinden Solar Arc (Güneş Yayı), İkincil İlerletim (Progresif Ay) ve Ağır Gezegen Transitleri köşe eksenleri (ASC/MC) ile eşleştirilerek, 1440 aday dakika arasından en yüksek matematiksel korelasyona (%${best.confidencePercent}) sahip saat olarak tespit edilmiştir.`
+    methodologyNote: `Bu rektifikasyon analizi; girilen ${input.events.length} kadersel yaşam olayı üzerinden Çift Yönlü Solar Arc (Güneş Yayı), İkincil İlerletim (Progresif Ay) ve Ağır Gezegen Transitleri köşe eksenleri (ASC/MC) ile eşleştirilerek, 1440 aday dakika arasından en yüksek matematiksel korelasyona (%${best.confidencePercent}) sahip saat olarak tespit edilmiştir.`
   };
 }
