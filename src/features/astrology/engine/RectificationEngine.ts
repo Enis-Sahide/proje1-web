@@ -57,7 +57,11 @@ export interface PhysicalProfile {
 }
 
 export interface RectificationInput {
-  birthDate: string; // YYYY-MM-DD
+  dateMode?: 'exact' | 'month' | 'season';
+  birthDate?: string; // YYYY-MM-DD (Tam tarih modunda)
+  birthYear?: number;
+  birthMonth?: number; // 1-12
+  birthSeason?: 'spring' | 'summer' | 'autumn' | 'winter';
   birthCity: string | AstroCity;
   timeWindow?: {
     startHour: number; // 0-24
@@ -106,9 +110,24 @@ export interface TimelinePoint {
   topMatchExplanation?: string;
 }
 
+export interface DayCandidate {
+  dateStr: string;
+  day: number;
+  month: number;
+  year: number;
+  score: number;
+  probabilityPercent: number;
+  sunSign: string;
+  moonSign: string;
+}
+
 export interface RectificationResult {
+  isDateRangeMode: boolean;
+  selectedDateStr: string;
+  topDateCandidates?: DayCandidate[];
+  dayTimelinePoints?: DayCandidate[];
   bestCandidate: CandidateScore;
-  topCandidates: CandidateScore[]; // Belirgin yumuşatılmış zirveler
+  topCandidates: CandidateScore[];
   timelinePoints: TimelinePoint[];
   chartData: NatalChartData;
   totalEventsProcessed: number;
@@ -194,14 +213,126 @@ const ELEMENT_SIGNS: Record<string, string[]> = {
 
 export async function runAutomatedRectification(input: RectificationInput): Promise<RectificationResult> {
   const swe = await getSwe();
-  const [bYear, bMonth, bDay] = input.birthDate.split('-').map(Number);
   
   const cityInput = input.birthCity;
   const cityName = typeof cityInput === 'string' ? cityInput : (cityInput && typeof cityInput === 'object' ? cityInput.name : 'İstanbul');
   const city = ASTRO_CITIES.find(c => c.name.toLowerCase() === cityName.toLowerCase()) || ASTRO_CITIES[0];
-  
   const tzName = city.tz || 'Europe/Istanbul';
-  const momentBirth = moment.tz(`${input.birthDate} 12:00:00`, tzName);
+
+  const dateMode = input.dateMode || 'exact';
+  let targetDates: string[] = [];
+
+  if (dateMode === 'exact') {
+    targetDates = [input.birthDate || '1992-06-15'];
+  } else if (dateMode === 'month') {
+    const y = input.birthYear || 1991;
+    const m = input.birthMonth || 4;
+    const daysInMonth = new Date(y, m, 0).getDate();
+    for (let d = 1; d <= daysInMonth; d++) {
+      targetDates.push(`${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`);
+    }
+  } else if (dateMode === 'season') {
+    const y = input.birthYear || 1991;
+    const season = input.birthSeason || 'spring';
+    let startM = 3, endM = 5;
+    if (season === 'summer') { startM = 6; endM = 8; }
+    else if (season === 'autumn') { startM = 9; endM = 11; }
+    else if (season === 'winter') { startM = 12; endM = 2; }
+
+    if (season === 'winter') {
+      // 1-31 Dec of year, 1-28 Feb of next year or same year
+      for (let d = 1; d <= 31; d++) targetDates.push(`${y}-12-${String(d).padStart(2, '0')}`);
+      for (let d = 1; d <= 31; d++) targetDates.push(`${y}-01-${String(d).padStart(2, '0')}`);
+      for (let d = 1; d <= 28; d++) targetDates.push(`${y}-02-${String(d).padStart(2, '0')}`);
+    } else {
+      for (let m = startM; m <= endM; m++) {
+        const daysInM = new Date(y, m, 0).getDate();
+        for (let d = 1; d <= daysInM; d++) {
+          targetDates.push(`${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`);
+        }
+      }
+    }
+  }
+
+  // 1. EĞER TARİH ARALIĞI MODUNDAYSA: GÜNLERİ TARA VE EN İYİ GÜNLERİ BUL
+  const dayEvaluations: DayCandidate[] = [];
+
+  for (const dateStr of targetDates) {
+    const [dYear, dMonth, dDay] = dateStr.split('-').map(Number);
+    const momentBirth = moment.tz(`${dateStr} 12:00:00`, tzName);
+    const tzOffsetHours = momentBirth.utcOffset() / 60.0;
+    const noonJd = swe.swe_julday(dYear, dMonth, dDay, 12.0 - tzOffsetHours, Constants.SE_GREG_CAL);
+    
+    const noonSun = mod360(swe.swe_calc_ut(noonJd, Constants.SE_SUN, Constants.SEFLG_SWIEPH).xx[0]);
+    const noonMoon = mod360(swe.swe_calc_ut(noonJd, Constants.SE_MOON, Constants.SEFLG_SWIEPH).xx[0]);
+    const sunSign = getSignAndDegree(noonSun).sign;
+    const moonSign = getSignAndDegree(noonMoon).sign;
+
+    let dayScore = 0;
+
+    // Mizaç ve Güneş/Ay burcu uyumu
+    if (input.profile?.elementTemperament) {
+      const allowed = ELEMENT_SIGNS[input.profile.elementTemperament] || [];
+      if (allowed.includes(sunSign)) dayScore += 60;
+      if (allowed.includes(moonSign)) dayScore += 40;
+    }
+
+    // Olayların Solar Arc ve transit uyumu
+    for (const ev of input.events) {
+      const [eYear, eMonth, eDay] = ev.date.split('-').map(Number);
+      const evMoment = moment.tz(`${ev.date} 12:00:00`, tzName);
+      const evJd = swe.swe_julday(eYear, eMonth, eDay, 12.0 - (evMoment.utcOffset() / 60.0), Constants.SE_GREG_CAL);
+      const ageInYears = (evJd - noonJd) / 365.242199;
+      const arc = ageInYears * 0.985647;
+
+      const progSun = mod360(noonSun + arc);
+      const trJupiter = mod360(swe.swe_calc_ut(evJd, Constants.SE_JUPITER, Constants.SEFLG_SWIEPH).xx[0]);
+      const trSaturn = mod360(swe.swe_calc_ut(evJd, Constants.SE_SATURN, Constants.SEFLG_SWIEPH).xx[0]);
+
+      // Güneş ve Ay'a major transitler
+      for (const trP of [trJupiter, trSaturn]) {
+        for (const asp of [0, 60, 90, 120, 180]) {
+          const diffSun = Math.abs(mod360(trP - noonSun) - asp);
+          const orbSun = Math.min(diffSun, Math.abs(360 - diffSun));
+          if (orbSun <= 2.5) {
+            dayScore += Math.round(50 * Math.exp(-0.5 * Math.pow(orbSun / 0.9, 2)));
+          }
+
+          const diffMoon = Math.abs(mod360(trP - noonMoon) - asp);
+          const orbMoon = Math.min(diffMoon, Math.abs(360 - diffMoon));
+          if (orbMoon <= 3.0) {
+            dayScore += Math.round(40 * Math.exp(-0.5 * Math.pow(orbMoon / 1.0, 2)));
+          }
+        }
+      }
+    }
+
+    dayEvaluations.push({
+      dateStr,
+      day: dDay,
+      month: dMonth,
+      year: dYear,
+      score: dayScore,
+      probabilityPercent: 0,
+      sunSign,
+      moonSign
+    });
+  }
+
+  const maxDayScore = Math.max(1, ...dayEvaluations.map(d => d.score));
+  for (const d of dayEvaluations) {
+    d.probabilityPercent = Number(((d.score / maxDayScore) * 100).toFixed(1));
+  }
+
+  const sortedDays = [...dayEvaluations].sort((a, b) => b.score - a.score);
+  const bestDay = sortedDays[0] || dayEvaluations[0];
+  const topDateCandidates = sortedDays.slice(0, 3);
+
+  // 2. EN İYİ GÜN ÜZERİNDEN 24 SAATLİK DİLİMİ TARA
+  const finalBirthDate = dateMode === 'exact' ? (input.birthDate || '1992-06-15') : bestDay.dateStr;
+  const [bYear, bMonth, bDay] = finalBirthDate.split('-').map(Number);
+  
+  const momentBirth = moment.tz(`${finalBirthDate} 12:00:00`, tzName);
   const tzOffsetHours = momentBirth.utcOffset() / 60.0;
 
   const startH = input.timeWindow?.startHour ?? 0;
@@ -345,7 +476,7 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
       let bestEventMatchScore = 0;
       let bestMatchDetail: EventMatchDetail | null = null;
 
-      // 1. Çift Yönlü Solar Arc (Gauss Rezonansı)
+      // 1. Çift Yönlü Solar Arc
       for (const pName of affinity.planets) {
         const natalP = natalPlanets[pName];
         if (natalP === undefined) continue;
@@ -516,7 +647,7 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
     });
   }
 
-  // GAUSS DALGA DÜZLEŞTİRME FİLTRESİ (1D Kernel Density Estimation - sigma = 20 dakika)
+  // GAUSS DALGA DÜZLEŞTİRME FİLTRESİ
   const smoothedPoints: TimelinePoint[] = rawPoints.map(pt => ({ ...pt }));
   const sigmaMinutes = 20;
   const stepMinutes = 4;
@@ -541,7 +672,7 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
     pt.probabilityPercent = Number(((pt.score / maxSmoothedScore) * 100).toFixed(1));
   }
 
-  // DÜZLEŞTİRİLMİŞ DALGA ÜZERİNDEKİ GERÇEK TEPE NOKTALARI (Crest Finding)
+  // DÜZLEŞTİRİLMİŞ DALGA ÜZERİNDEKİ GERÇEK TEPE NOKTALARI
   const crestCandidates: CandidateScore[] = [];
   for (let i = 1; i < smoothedPoints.length - 1; i++) {
     const prev = smoothedPoints[i - 1].probabilityPercent;
@@ -569,7 +700,6 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
     }
   }
 
-  // Zirveleri yükseklik sırasına göre sırala ve birbirine çok yakın olanları filtrele (min 60 dk mesafe)
   crestCandidates.sort((a, b) => b.totalScore - a.totalScore);
   const finalProminentPeaks: CandidateScore[] = [];
 
@@ -581,7 +711,6 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
     if (finalProminentPeaks.length >= 4) break;
   }
 
-  // Eğer tepe bulunamadıysa en yüksek skora sahip olanı al
   if (finalProminentPeaks.length === 0) {
     const bestRaw = [...candidateScoresMap.values()].sort((a, b) => b.totalScore - a.totalScore)[0];
     if (bestRaw) finalProminentPeaks.push(bestRaw);
@@ -617,11 +746,15 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
   const chartData = await generateAstrologyChart(birthDateObj, city);
 
   return {
+    isDateRangeMode: dateMode !== 'exact',
+    selectedDateStr: finalBirthDate,
+    topDateCandidates: dateMode !== 'exact' ? topDateCandidates : undefined,
+    dayTimelinePoints: dateMode !== 'exact' ? dayEvaluations : undefined,
     bestCandidate: best,
     topCandidates: finalProminentPeaks,
     timelinePoints: smoothedPoints,
     chartData,
     totalEventsProcessed: input.events.length,
-    methodologyNote: `Bu rektifikasyon analizi; seçili zaman aralığında (${String(startH).padStart(2, '0')}:00 - ${String(endH).padStart(2, '0')}:00) Gauss Sürekli Dalga Düzleştirme Filtresi (Kernel Density Estimation) uygulayarak, kadersel olaylarla en organik rezonansı oluşturan tepe doruk noktalarını tespit etmiştir.`
+    methodologyNote: `Bu rektifikasyon analizi; ${dateMode !== 'exact' ? `${targetDates.length} günlük tarih aralığını ve ` : ''}seçili zaman dilimini Gauss rezonans filtresi ile tarayarak kadersel olaylarla en yüksek korelasyona sahip doğum tarihi ve saatini tespit etmiştir.`
   };
 }

@@ -30,10 +30,12 @@ import {
   BookOpen,
   Info,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  CalendarDays,
+  Sun
 } from 'lucide-react';
 import { ASTRO_CITIES, AstroCity } from '@/features/astrology/engine/AstrologyConstants';
-import { EventType, LifeEvent, RectificationResult, TimelinePoint, CandidateScore } from '@/features/astrology/engine/RectificationEngine';
+import { EventType, LifeEvent, RectificationResult, TimelinePoint, CandidateScore, DayCandidate } from '@/features/astrology/engine/RectificationEngine';
 
 interface EventTemplate {
   type: EventType;
@@ -53,6 +55,28 @@ const EVENT_TEMPLATES: EventTemplate[] = [
   { type: 'divorce', label: 'Boşanma / Ciddi Ayrılık', icon: <Zap className="text-orange-400" size={16} />, hint: 'Resmi boşanma veya uzun ilişkinin kesin bitişi' },
   { type: 'financial_crisis', label: 'Maddi Kriz / İflas', icon: <Flame className="text-yellow-600" size={16} />, hint: 'Büyük maddi kayıp veya iflas dönüm noktası' },
   { type: 'spiritual_awakening', label: 'Ruhsal Uyanış / Dönüm Noktası', icon: <Sparkles className="text-indigo-400" size={16} />, hint: 'Hayat görüşünüzü kökten değiştiren spiritüel kırılma' },
+];
+
+const MONTHS_LIST = [
+  { value: 1, label: 'Ocak' },
+  { value: 2, label: 'Şubat' },
+  { value: 3, label: 'Mart' },
+  { value: 4, label: 'Nisan' },
+  { value: 5, label: 'Mayıs' },
+  { value: 6, label: 'Haziran' },
+  { value: 7, label: 'Temmuz' },
+  { value: 8, label: 'Ağustos' },
+  { value: 9, label: 'Eylül' },
+  { value: 10, label: 'Ekim' },
+  { value: 11, label: 'Kasım' },
+  { value: 12, label: 'Aralık' },
+];
+
+const SEASONS_LIST = [
+  { value: 'spring', label: '🌸 İlkbahar (Mart, Nisan, Mayıs)' },
+  { value: 'summer', label: '☀️ Yaz (Haziran, Temmuz, Ağustos)' },
+  { value: 'autumn', label: '🍂 Sonbahar (Eylül, Ekim, Kasım)' },
+  { value: 'winter', label: '❄️ Kış (Aralık, Ocak, Şubat)' },
 ];
 
 interface BenchmarkPreset {
@@ -129,10 +153,15 @@ export default function RectificationPage() {
 
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [activePreset, setActivePreset] = useState<string | null>(null);
-  const [isMethodologyOpen, setIsMethodologyOpen] = useState<boolean>(true);
+  const [isMethodologyOpen, setIsMethodologyOpen] = useState<boolean>(false);
 
-  // Step 1: Doğum Bilgileri
+  // Step 1: Tarih Bilgisi Modu
+  const [dateKnowledgeMode, setDateKnowledgeMode] = useState<'exact' | 'month' | 'season'>('exact');
   const [birthDate, setBirthDate] = useState<string>('1992-06-15');
+  const [birthYear, setBirthYear] = useState<number>(1991);
+  const [birthMonth, setBirthMonth] = useState<number>(4);
+  const [birthSeason, setBirthSeason] = useState<'spring' | 'summer' | 'autumn' | 'winter'>('spring');
+
   const [selectedCity, setSelectedCity] = useState<AstroCity>(ASTRO_CITIES[0]);
   const [citySearch, setCitySearch] = useState<string>('');
   const [timeWindowType, setTimeWindowType] = useState<'all' | 'morning' | 'afternoon' | 'evening' | 'night' | 'custom'>('evening');
@@ -166,6 +195,7 @@ export default function RectificationPage() {
 
   const handleLoadPreset = (preset: BenchmarkPreset) => {
     setActivePreset(preset.id);
+    setDateKnowledgeMode('exact');
     setBirthDate(preset.birthDate);
     const targetCity = ASTRO_CITIES.find(c => c.name.toLowerCase() === preset.cityName.toLowerCase()) || selectedCity;
     setSelectedCity(targetCity);
@@ -231,7 +261,11 @@ export default function RectificationPage() {
 
     try {
       const payload = {
-        birthDate,
+        dateMode: dateKnowledgeMode,
+        birthDate: dateKnowledgeMode === 'exact' ? birthDate : undefined,
+        birthYear: dateKnowledgeMode !== 'exact' ? birthYear : undefined,
+        birthMonth: dateKnowledgeMode === 'month' ? birthMonth : undefined,
+        birthSeason: dateKnowledgeMode === 'season' ? birthSeason : undefined,
         birthCity: selectedCity,
         timeWindow: { startHour, endHour },
         profile: { bodyType, elementTemperament },
@@ -318,7 +352,7 @@ export default function RectificationPage() {
           </p>
         </div>
 
-        {/* BETA & BİLİMSEL/EZOTERİK METODOLOJİ BİLGİLENDİRME PANOLARI */}
+        {/* BETA & BİLİMSEL/EZOTERİK METODOLOJİ BİLGİLENDİRME PANOSU */}
         <div className="mb-8 bg-gradient-to-br from-[#1c1810] via-[#141414] to-[#1a150c] border border-amber-500/30 rounded-3xl p-5 sm:p-6 backdrop-blur-xl shadow-2xl">
           <div 
             className="flex items-center justify-between cursor-pointer select-none"
@@ -350,7 +384,7 @@ export default function RectificationPage() {
               <div className="flex items-start gap-2.5">
                 <Info className="text-amber-400 shrink-0 mt-0.5" size={16} />
                 <div>
-                  <strong className="text-amber-200">Tek Bir Mutlak Saat Dayatmaz:</strong> Bu sistem, doğum saatini tam bilmeyen veya yaklaşık bir aralık bilen kullanıcılar için geliştirilmiş bir **Kozmik Olasılık ve Araştırma Modelidir (Beta)**. Girdiğiniz kadersel olayların günün hangi saatlerinde gökyüzüyle en yüksek rezonansı ürettiğini gösterir.
+                  <strong className="text-amber-200">Tek Bir Mutlak Saat Dayatmaz:</strong> Bu sistem, doğum saatini veya gününü tam bilmeyen kullanıcılar için geliştirilmiş bir **Kozmik Olasılık ve Araştırma Modelidir (Beta)**. Girdiğiniz kadersel olayların günün hangi saatlerinde gökyüzüyle en yüksek rezonansı ürettiğini gösterir.
                 </div>
               </div>
 
@@ -428,29 +462,127 @@ export default function RectificationPage() {
           </div>
         )}
 
-        {/* STEP 1: Doğum Tarihi, Şehir ve Zaman Penceresi */}
+        {/* STEP 1: Doğum Tarihi Modu, Şehir ve Zaman Penceresi */}
         {currentStep === 1 && (
           <div className="bg-[#121212]/90 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl space-y-6">
             <h2 className="text-xl font-bold flex items-center gap-2 text-white">
               <Calendar className="text-[#D4AF37]" size={20} />
-              Doğum Bilgileri ve Zaman Penceresi
+              Doğum Tarihi Bilginiz ve Zaman Penceresi
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-xs font-semibold uppercase tracking-wider text-mystic-text-muted mb-2">
-                  Doğum Tarihi
-                </label>
-                <input 
-                  type="date"
-                  value={birthDate}
-                  onChange={e => {
-                    setBirthDate(e.target.value);
-                    setActivePreset(null);
-                  }}
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
-                />
+            {/* 3 Tarih Bilgi Seviyesi Sekmeleri */}
+            <div>
+              <label className="block text-xs font-semibold uppercase tracking-wider text-mystic-text-muted mb-2.5">
+                Doğum Tarihi Hakkında Ne Kadar Bilginiz Var?
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {[
+                  { id: 'exact', label: '📅 Tam Tarihi Biliyorum', desc: 'Gün / Ay / Yıl tam biliniyor' },
+                  { id: 'month', label: '🗓️ Sadece Ay & Yılı Biliyorum', desc: 'Örn: Nisan 1991 (30 gün taranır)' },
+                  { id: 'season', label: '🌸 Sadece Mevsim & Yılı Biliyorum', desc: 'Örn: 1991 İlkbahar (3 ay taranır)' },
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    onClick={() => {
+                      setDateKnowledgeMode(tab.id as any);
+                      setActivePreset(null);
+                    }}
+                    className={`p-3.5 rounded-2xl border text-left transition-all ${
+                      dateKnowledgeMode === tab.id
+                        ? 'bg-[#D4AF37]/20 border-[#D4AF37] text-white shadow-[0_0_15px_rgba(212,175,55,0.2)]'
+                        : 'bg-white/5 border-white/10 text-white/70 hover:border-white/20'
+                    }`}
+                  >
+                    <div className="font-bold text-xs text-[#D4AF37] mb-1">{tab.label}</div>
+                    <div className="text-[11px] text-white/50">{tab.desc}</div>
+                  </button>
+                ))}
               </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 pt-2">
+              
+              {/* Tarih Giriş Alanları */}
+              {dateKnowledgeMode === 'exact' && (
+                <div>
+                  <label className="block text-xs font-semibold uppercase tracking-wider text-mystic-text-muted mb-2">
+                    Doğum Tarihi (Gün/Ay/Yıl)
+                  </label>
+                  <input 
+                    type="date"
+                    value={birthDate}
+                    onChange={e => {
+                      setBirthDate(e.target.value);
+                      setActivePreset(null);
+                    }}
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#D4AF37] focus:outline-none transition-colors"
+                  />
+                </div>
+              )}
+
+              {dateKnowledgeMode === 'month' && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-mystic-text-muted mb-2">
+                      Doğum Yılı
+                    </label>
+                    <input 
+                      type="number"
+                      min="1920"
+                      max="2030"
+                      value={birthYear}
+                      onChange={e => setBirthYear(Number(e.target.value))}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#D4AF37] focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-mystic-text-muted mb-2">
+                      Doğum Ayı
+                    </label>
+                    <select
+                      value={birthMonth}
+                      onChange={e => setBirthMonth(Number(e.target.value))}
+                      className="w-full bg-[#181818] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#D4AF37] focus:outline-none"
+                    >
+                      {MONTHS_LIST.map(m => (
+                        <option key={m.value} value={m.value}>{m.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
+
+              {dateKnowledgeMode === 'season' && (
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-mystic-text-muted mb-2">
+                      Doğum Yılı
+                    </label>
+                    <input 
+                      type="number"
+                      min="1920"
+                      max="2030"
+                      value={birthYear}
+                      onChange={e => setBirthYear(Number(e.target.value))}
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#D4AF37] focus:outline-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold uppercase tracking-wider text-mystic-text-muted mb-2">
+                      Doğum Mevsimi
+                    </label>
+                    <select
+                      value={birthSeason}
+                      onChange={e => setBirthSeason(e.target.value as any)}
+                      className="w-full bg-[#181818] border border-white/10 rounded-xl px-4 py-3 text-white focus:border-[#D4AF37] focus:outline-none"
+                    >
+                      {SEASONS_LIST.map(s => (
+                        <option key={s.value} value={s.value}>{s.label}</option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              )}
 
               <div className="relative">
                 <label className="block text-xs font-semibold uppercase tracking-wider text-mystic-text-muted mb-2">
@@ -558,10 +690,10 @@ export default function RectificationPage() {
           <div className="bg-[#121212]/90 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-xl shadow-2xl space-y-6">
             <h2 className="text-xl font-bold flex items-center gap-2 text-white">
               <Sparkles className="text-[#D4AF37]" size={20} />
-              Beden Yapısı ve Temel Mizaç (Yükselen Filtresi)
+              Beden Yapısı ve Temel Mizaç (Güneş / Yükselen Filtresi)
             </h2>
             <p className="text-xs text-mystic-text-muted">
-              Yükselen burcun fiziksel beden ve mizaç üzerindeki etkisini eşleştirmek için size en yakın seçenekleri belirleyin.
+              Doğum gününüzü ve yükseleninizi daraltmak için doğal karakter yapınızı ve mizaç eğiliminizi seçin.
             </p>
 
             <div>
@@ -772,12 +904,12 @@ export default function RectificationPage() {
                 {isCalculating ? (
                   <>
                     <RotateCcw className="animate-spin" size={18} />
-                    Kozmik Rezonans Dalga Grafiği Çıkarılıyor...
+                    {dateKnowledgeMode !== 'exact' ? 'Tarih Aralığı ve Saat Spektrumu Taranıyor...' : 'Kozmik Rezonans Dalga Grafiği Çıkarılıyor...'}
                   </>
                 ) : (
                   <>
                     <TrendingUp size={18} />
-                    Olasılık Dalga Grafiğini Hesapla
+                    {dateKnowledgeMode !== 'exact' ? 'Tarih & Saat Spektrumunu Hesapla' : 'Olasılık Dalga Grafiğini Hesapla'}
                   </>
                 )}
               </button>
@@ -785,10 +917,54 @@ export default function RectificationPage() {
           </div>
         )}
 
-        {/* STEP 4: ORGANİK GAUSS KOZMİK REZONANS DALGA GRAFİĞİ & ZİRVELER */}
+        {/* STEP 4: SONUÇ EKRANI (TARİH VE SAAT SPEKTRUMU) */}
         {currentStep === 4 && result && selectedPeak && (
           <div className="space-y-8 animate-in fade-in zoom-in duration-500">
             
+            {/* EĞER TARİH ARALIĞI MODUNDAYSA: TESPİT EDİLEN EN OLASI DOĞUM GÜNLERİ */}
+            {result.isDateRangeMode && result.topDateCandidates && (
+              <div className="bg-[#121212]/95 border-2 border-[#D4AF37]/50 rounded-3xl p-6 sm:p-8 backdrop-blur-2xl shadow-2xl space-y-4">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-[#D4AF37]">
+                  <CalendarDays size={18} /> Tarih Aralığı Analiz Sonucu
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold text-white">
+                  Tespit Edilen En Olası Doğum Günleri
+                </h3>
+                <p className="text-xs text-mystic-text-muted">
+                  Kadersel olaylarınızın gökyüzü transitleri ve mizaç uyumuyla oluşturduğu en güçlü doğum tarihleri aşağıdadır:
+                </p>
+
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 mt-4">
+                  {result.topDateCandidates.map((d, idx) => (
+                    <div 
+                      key={idx}
+                      className={`p-4 rounded-2xl border text-left ${
+                        idx === 0
+                          ? 'bg-[#D4AF37]/20 border-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.2)]'
+                          : 'bg-white/5 border-white/10'
+                      }`}
+                    >
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-xs font-bold text-[#D4AF37]">
+                          {idx === 0 ? '🏆 En Olası Tarih' : `${idx + 1}. Aday Tarih`}
+                        </span>
+                        <span className="px-2 py-0.5 rounded-full bg-white/10 text-emerald-400 text-[10px] font-mono font-bold">
+                          %{d.probabilityPercent}
+                        </span>
+                      </div>
+                      <div className="text-xl font-extrabold text-white my-1">
+                        {d.day} {MONTHS_LIST.find(m => m.value === d.month)?.label} {d.year}
+                      </div>
+                      <div className="text-xs text-white/70 mt-2 pt-2 border-t border-white/10 flex justify-between">
+                        <span>Güneş: <strong className="text-white">{d.sunSign}</strong></span>
+                        <span>Ay: <strong className="text-white">{d.moonSign}</strong></span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* İNTERAKTİF SVG DALGA GRAFİĞİ KARTI */}
             <div className="bg-[#121212]/95 border-2 border-[#D4AF37]/40 rounded-3xl p-6 sm:p-8 backdrop-blur-2xl shadow-[0_0_50px_rgba(212,175,55,0.15)] space-y-6">
               
@@ -798,7 +974,7 @@ export default function RectificationPage() {
                     <TrendingUp size={14} /> Kozmik Rezonans Spektrumu (Beta)
                   </div>
                   <h2 className="text-xl sm:text-2xl font-bold text-white">
-                    Doğum Saati Olasılık Dağılım Grafiği
+                    {result.selectedDateStr} Doğum Saati Olasılık Dağılım Grafiği
                   </h2>
                   <p className="text-xs text-white/50 mt-1">
                     Kadersel olaylarınızın Solar Arc ve Transit yönelimleriyle oluşturduğu pürüzsüz rezonans dalgaları aşağıdadır.
