@@ -368,19 +368,22 @@ export default function TransitTimelineChart({
                         }}
                       >
                         <span className="text-[10px] font-extrabold truncate drop-shadow-sm flex items-center gap-1">
+                          {item.isStartedInPast && <span className="text-[10px] opacity-75 mr-0.5 font-black">◀</span>}
                           {item.type} ({item.durationDays}g)
                         </span>
 
-                        {/* Peak Point Glowing Marker */}
-                        <div 
-                          className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-white shadow-[0_0_10px_#fff] border-2 border-black flex items-center justify-center z-20 group-hover:scale-125 transition-transform"
-                          style={{
-                            left: `${Math.max(8, Math.min(widthPercent - 8, ((peakPercent - leftPercent) / widthPercent) * 100))}%`
-                          }}
-                          title={`Zirve (0° Partil): ${item.peakDate}`}
-                        >
-                          <span className="w-1.5 h-1.5 rounded-full bg-black"></span>
-                        </div>
+                        {/* Peak Point Glowing Marker (only if peak falls within range) */}
+                        {!item.isPeakInPast && peakPercent >= leftPercent && peakPercent <= (leftPercent + widthPercent) && (
+                          <div 
+                            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-white shadow-[0_0_10px_#fff] border-2 border-black flex items-center justify-center z-20 group-hover:scale-125 transition-transform"
+                            style={{
+                              left: `${Math.max(8, Math.min(widthPercent - 8, ((peakPercent - leftPercent) / widthPercent) * 100))}%`
+                            }}
+                            title={`Zirve (0° Partil): ${item.peakDate}`}
+                          >
+                            <span className="w-1.5 h-1.5 rounded-full bg-black"></span>
+                          </div>
+                        )}
                       </div>
 
                     </div>
@@ -407,7 +410,7 @@ export default function TransitTimelineChart({
             {/* Header */}
             <div className="flex items-start justify-between border-b border-white/10 pb-5 mb-5">
               <div>
-                <div className="flex items-center gap-2 mb-1.5">
+                <div className="flex flex-wrap items-center gap-2 mb-2">
                   <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border ${
                     selectedItem.isHarmonious 
                       ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
@@ -417,10 +420,25 @@ export default function TransitTimelineChart({
                   }`}>
                     {selectedItem.category} Transit • {selectedItem.type}
                   </span>
+                  
+                  {/* Phase Badge */}
+                  <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full border ${
+                    selectedItem.phase === 'YAKLASAN'
+                      ? 'bg-amber-500/15 text-amber-300 border-amber-500/30'
+                      : selectedItem.phase === 'ZIRVE'
+                      ? 'bg-purple-500/20 text-purple-300 border-purple-500/30 animate-pulse'
+                      : 'bg-sky-500/15 text-sky-300 border-sky-500/30'
+                  }`}>
+                    {selectedItem.phase === 'YAKLASAN' && '📈 Zirveye Yaklaşıyor'}
+                    {selectedItem.phase === 'ZIRVE' && '⚡ Tam Zirvede (0°)'}
+                    {selectedItem.phase === 'UZAKLASAN' && '📉 Zirvesi Geçti (Çözülüyor)'}
+                  </span>
+
                   <span className="text-xs text-mystic-text-muted">
                     Min Orb: <strong className="text-white">{selectedItem.minOrb}°</strong>
                   </span>
                 </div>
+
                 <h3 className="text-xl font-bold text-white flex items-center gap-2">
                   <span className="text-mystic-primary">{PLANET_SYMBOLS[selectedItem.transitPlanet]}</span>
                   {selectedItem.title}
@@ -435,21 +453,28 @@ export default function TransitTimelineChart({
               </button>
             </div>
 
-            {/* Key Dates Badge Box */}
+            {/* Key Dates Badge Box with Historical Accuracy */}
             <div className="grid grid-cols-3 gap-3 bg-black/50 p-4 rounded-2xl border border-white/5 mb-5 text-center">
               <div>
-                <span className="text-[10px] text-mystic-text-muted block uppercase tracking-wider">Başlangıç</span>
-                <span className="text-xs font-bold text-gray-200">{selectedItem.startDate}</span>
+                <span className="text-[10px] text-mystic-text-muted block uppercase tracking-wider mb-0.5">Başlangıç</span>
+                <span className="text-xs font-bold text-gray-200 block">{selectedItem.startDate}</span>
+                {selectedItem.isStartedInPast && (
+                  <span className="text-[9px] text-amber-400 font-semibold block mt-0.5">Geçmişte başladı</span>
+                )}
               </div>
               <div className="border-x border-white/10">
-                <span className="text-[10px] text-mystic-primary font-extrabold block uppercase tracking-wider flex items-center justify-center gap-1">
+                <span className="text-[10px] text-mystic-primary font-extrabold block uppercase tracking-wider flex items-center justify-center gap-1 mb-0.5">
                   <Sparkles size={10} /> Zirve (0°)
                 </span>
-                <span className="text-xs font-black text-[#D4AF37]">{selectedItem.peakDate}</span>
+                <span className="text-xs font-black text-[#D4AF37] block">{selectedItem.peakDate}</span>
+                <span className={`text-[9px] font-semibold block mt-0.5 ${selectedItem.isPeakInPast ? 'text-sky-400' : 'text-emerald-400'}`}>
+                  {selectedItem.isPeakInPast ? 'Zirvesi tamamlandı' : 'Zirve bekleniyor'}
+                </span>
               </div>
               <div>
-                <span className="text-[10px] text-mystic-text-muted block uppercase tracking-wider">Bitiş</span>
-                <span className="text-xs font-bold text-gray-200">{selectedItem.endDate}</span>
+                <span className="text-[10px] text-mystic-text-muted block uppercase tracking-wider mb-0.5">Bitiş</span>
+                <span className="text-xs font-bold text-gray-200 block">{selectedItem.endDate}</span>
+                <span className="text-[9px] text-mystic-text-muted block mt-0.5">Toplam {selectedItem.durationDays} gün</span>
               </div>
             </div>
 

@@ -19,6 +19,10 @@ export interface TransitTimelineItem {
   advice: string;
   chakraLayer: string;
   durationDays: number;
+  status: 'ACTIVE' | 'UPCOMING' | 'COMPLETED';
+  phase: 'YAKLASAN' | 'ZIRVE' | 'UZAKLASAN';
+  isStartedInPast: boolean;
+  isPeakInPast: boolean;
 }
 
 interface AspectConfig {
@@ -145,6 +149,7 @@ function getInterpretationDetails(tPlanet: string, nPlanet: string, aspect: stri
 
 /**
  * Calculates all transit aspect intervals (Gantt bars) for a natal chart over a date range.
+ * Includes a lookback window (to find true historical start and peak dates) and lookahead window.
  */
 export async function calculateTransitTimeline(
   natalPlanets: AstroPoint[],
@@ -153,15 +158,12 @@ export async function calculateTransitTimeline(
   options?: {
     categoryFilter?: 'ALL' | 'KADERSEL' | 'KISISEL';
     onlyMajorAspects?: boolean;
+    lookbackDays?: number;
+    lookaheadDays?: number;
   }
 ): Promise<TransitTimelineItem[]> {
   const swe = await getSwe();
   const flags = Constants.SEFLG_SWIEPH | Constants.SEFLG_SPEED;
-
-  const totalDays = Math.max(1, Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)));
-  
-  // Choose sample step: 1 day for <= 45 days, 2 days for <= 120 days, 3 days for longer
-  const stepDays = totalDays <= 45 ? 1 : totalDays <= 120 ? 2 : 3;
 
   // Filter transit bodies
   const bodiesToScan = TRANSIT_BODIES.filter(b => {
@@ -171,11 +173,20 @@ export async function calculateTransitTimeline(
     return true;
   });
 
-  // Calculate planetary positions for each sampled day
+  // Lookback buffer: 90 days for slow planets, 30 days for fast planets.
+  // Using 90 days uniformly gives complete historical start and peak dates for all ongoing transits.
+  const lookbackDays = options?.lookbackDays ?? 90;
+  const lookaheadDays = options?.lookaheadDays ?? 45;
+
+  const scanStartDate = new Date(startDate.getTime() - lookbackDays * 24 * 60 * 60 * 1000);
+  const scanEndDate = new Date(endDate.getTime() + lookaheadDays * 24 * 60 * 60 * 1000);
+
+  // Daily sampling: step 1 day for entire scan range so we never miss an exact partile peak
   const samples: { date: Date; dateStr: string; planets: Record<string, number> }[] = [];
-  let cur = new Date(startDate.getTime());
-  
-  while (cur <= endDate) {
+  let cur = new Date(Date.UTC(scanStartDate.getUTCFullYear(), scanStartDate.getUTCMonth(), scanStartDate.getUTCDate(), 12, 0, 0));
+  const scanEndUtc = new Date(Date.UTC(scanEndDate.getUTCFullYear(), scanEndDate.getUTCMonth(), scanEndDate.getUTCDate(), 12, 0, 0));
+
+  while (cur <= scanEndUtc) {
     const year = cur.getUTCFullYear();
     const month = cur.getUTCMonth() + 1;
     const day = cur.getUTCDate();
@@ -195,7 +206,7 @@ export async function calculateTransitTimeline(
       planets: planetPositions
     });
 
-    cur = new Date(cur.getTime() + stepDays * 24 * 60 * 60 * 1000);
+    cur = new Date(cur.getTime() + 24 * 60 * 60 * 1000);
   }
 
   // Natal target planets
@@ -204,8 +215,9 @@ export async function calculateTransitTimeline(
   );
 
   const timelineItems: TransitTimelineItem[] = [];
+  const startDayTime = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate())).getTime();
+  const endDayTime = new Date(Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate(), 23, 59, 59)).getTime();
 
-  // For each transit body, aspect, and natal body, track orb intervals
   for (const tBody of bodiesToScan) {
     for (const nPlanet of validNatalTargets) {
       for (const aspect of ASPECTS) {
@@ -214,6 +226,55 @@ export async function calculateTransitTimeline(
         let intervalEnd: Date | null = null;
         let peakDate: Date | null = null;
         let minOrb = 999;
+
+        const processInterval = (startD: Date, endD: Date, peakD: Date, peakOrb: number) => {
+          const sTime = startD.getTime();
+          const eTime = endD.getTime();
+
+          // Interval must overlap with the user requested [startDate, endDate] window
+          if (eTime >= startDayTime && sTime <= endDayTime) {
+            const durationDays = Math.max(1, Math.round((eTime - sTime) / (1000 * 60 * 60 * 24)));
+            const interp = getInterpretationDetails(tBody.name, nPlanet.name, aspect.name);
+            const startStr = formatDate(startD);
+            const peakStr = formatDate(peakD);
+            const endStr = formatDate(endD);
+
+            const isStartedInPast = sTime < startDayTime;
+            const isPeakInPast = peakD.getTime() < startDayTime;
+
+            let status: 'ACTIVE' | 'UPCOMING' | 'COMPLETED' = 'ACTIVE';
+            if (sTime > startDayTime) status = 'UPCOMING';
+            else if (eTime < startDayTime) status = 'COMPLETED';
+
+            let phase: 'YAKLASAN' | 'ZIRVE' | 'UZAKLASAN' = 'YAKLASAN';
+            if (peakStr === formatDate(startDate)) phase = 'ZIRVE';
+            else if (isPeakInPast) phase = 'UZAKLASAN';
+            else phase = 'YAKLASAN';
+
+            timelineItems.push({
+              id: `${tBody.name}-${aspect.name}-${nPlanet.name}-${startStr}`,
+              transitPlanet: tBody.name,
+              natalPlanet: nPlanet.name,
+              type: aspect.name,
+              isHarmonious: aspect.isHarmonious,
+              startDate: startStr,
+              peakDate: peakStr,
+              endDate: endStr,
+              minOrb: Number(peakOrb.toFixed(2)),
+              category: tBody.category,
+              title: `Transit ${tBody.name} ${aspect.name} Natal ${nPlanet.name}`,
+              summary: interp.summary,
+              details: interp.details,
+              advice: interp.advice,
+              chakraLayer: getChakraLayer(tBody.name, nPlanet.name),
+              durationDays,
+              status,
+              phase,
+              isStartedInPast,
+              isPeakInPast
+            });
+          }
+        };
 
         for (let i = 0; i < samples.length; i++) {
           const sample = samples[i];
@@ -238,29 +299,7 @@ export async function calculateTransitTimeline(
             intervalEnd = sample.date;
           } else {
             if (inInterval && intervalStart && intervalEnd && peakDate) {
-              // Interval ended
-              const durationDays = Math.max(1, Math.round((intervalEnd.getTime() - intervalStart.getTime()) / (1000 * 60 * 60 * 24)));
-              const interp = getInterpretationDetails(tBody.name, nPlanet.name, aspect.name);
-
-              timelineItems.push({
-                id: `${tBody.name}-${aspect.name}-${nPlanet.name}-${formatDate(intervalStart)}`,
-                transitPlanet: tBody.name,
-                natalPlanet: nPlanet.name,
-                type: aspect.name,
-                isHarmonious: aspect.isHarmonious,
-                startDate: formatDate(intervalStart),
-                peakDate: formatDate(peakDate),
-                endDate: formatDate(intervalEnd),
-                minOrb: Number(minOrb.toFixed(2)),
-                category: tBody.category,
-                title: `Transit ${tBody.name} ${aspect.name} Natal ${nPlanet.name}`,
-                summary: interp.summary,
-                details: interp.details,
-                advice: interp.advice,
-                chakraLayer: getChakraLayer(tBody.name, nPlanet.name),
-                durationDays
-              });
-
+              processInterval(intervalStart, intervalEnd, peakDate, minOrb);
               inInterval = false;
               intervalStart = null;
               intervalEnd = null;
@@ -270,29 +309,8 @@ export async function calculateTransitTimeline(
           }
         }
 
-        // Close any ongoing interval at the end of the range
         if (inInterval && intervalStart && intervalEnd && peakDate) {
-          const durationDays = Math.max(1, Math.round((intervalEnd.getTime() - intervalStart.getTime()) / (1000 * 60 * 60 * 24)));
-          const interp = getInterpretationDetails(tBody.name, nPlanet.name, aspect.name);
-
-          timelineItems.push({
-            id: `${tBody.name}-${aspect.name}-${nPlanet.name}-${formatDate(intervalStart)}`,
-            transitPlanet: tBody.name,
-            natalPlanet: nPlanet.name,
-            type: aspect.name,
-            isHarmonious: aspect.isHarmonious,
-            startDate: formatDate(intervalStart),
-            peakDate: formatDate(peakDate),
-            endDate: formatDate(intervalEnd),
-            minOrb: Number(minOrb.toFixed(2)),
-            category: tBody.category,
-            title: `Transit ${tBody.name} ${aspect.name} Natal ${nPlanet.name}`,
-            summary: interp.summary,
-            details: interp.details,
-            advice: interp.advice,
-            chakraLayer: getChakraLayer(tBody.name, nPlanet.name),
-            durationDays
-          });
+          processInterval(intervalStart, intervalEnd, peakDate, minOrb);
         }
       }
     }
@@ -300,11 +318,12 @@ export async function calculateTransitTimeline(
 
   // Sort timeline items:
   // 1. Kadersel (outer) planets first, then Kişisel
-  // 2. Chronologically by startDate
+  // 2. Active now, then Upcoming
+  // 3. Chronologically by peakDate
   return timelineItems.sort((a, b) => {
     if (a.category !== b.category) {
       return a.category === 'Kadersel' ? -1 : 1;
     }
-    return new Date(a.startDate).getTime() - new Date(b.startDate).getTime();
+    return new Date(a.peakDate).getTime() - new Date(b.peakDate).getTime();
   });
 }
