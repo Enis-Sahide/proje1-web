@@ -1,7 +1,3 @@
-## Sevginin Sessiz Tuzağı: Beklenti İllüzyonu ve Koşulsuz Sevmenin Özgürlüğü
-
----
-
 ### I. "En Güvendiğim İnsan Yanımda Olmadı": Kırgınlığın Doğuşu
 
 İnsan hayatının en kırılgan anları, yeni bir hayale adım attığı veya sırtındaki yükün altında ezildiği anlardır. Yeni bir iş kurarsınız, üniversitede ya da kariyerinizde kritik bir projeye girişirsiniz, maddi veya manevi bir çıkmaza girersiniz... O anda gözlerinizin ilk aradığı kimseler kimdir? Yabancılar değil; en çok sevdikleriniz, canınız bildikleriniz, *"O beni asla yalnız bırakmaz"* dediğiniz en yakınlarınızdır.
