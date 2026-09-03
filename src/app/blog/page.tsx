@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { BookOpen, Search, Calendar, ArrowRight, Sparkles, HelpCircle } from 'lucide-react';
 import { useContent } from '@/lib/useContent';
 
-const CATEGORIES = ['Tümü', 'Astroloji', 'Nefes', 'Ritüeller', 'Kişisel Gelişim', 'Ruhsal Gelişim', 'Çakra Dengeleme'];
+const CATEGORIES = ['Tümü', 'Ezoterik', 'Astroloji', 'Nefes', 'Ritüeller', 'Kişisel Gelişim', 'Ruhsal Gelişim', 'Çakra Dengeleme'];
 
 export default function BlogListPage() {
   const router = useRouter();
