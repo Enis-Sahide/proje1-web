@@ -1,3 +1,5 @@
+Kadim inisiyasyon okullarının mabet kapılarına kazıdığı "Kendini Bil" (Nosce Te Ipsum) düsturu, insanın mikro-kozmik mimarisini ve varoluş katmanları arasındaki dikey geçiş yollarını çözmesini emreden mutlak bir çağrıdır. Göksel taslağımız olan doğum haritamız ve Kabalistik Hayat Ağacı üzerindeki 10 Sefira ile 7 Çakra, kader mahkûmiyetimiz değil; bilincimizin seyahat ettiği bir frekans spektrumudur. Peki gündelik hayatımızda, projelerimizde ve ilişkilerimizde biz hangi haritayı çalıştırıyoruz?
+
 ### I. Giriş: Göksel Taslak vs. Canlı Hakikat – Haritanın İki Yüzü
 
 Kadim inisiyasyon okullarının mabet kapılarına kazıdığı *"Kendini Bil"* (Nosce Te Ipsum) düsturu, modern insanın sandığı gibi psikolojik bir kendini teselli etme yöntemi değildir. Bu düstur, insanın kendi mikro-kozmik mimarisini, göksel koordinatlarını ve varoluş katmanları arasındaki dikey geçiş yollarını çözmesini emreden mutlak bir çağrıdır. Mistik Kabala geleneğinde Dion Fortune’un veciz bir şekilde belirttiği üzere; *Hayat Ağacı (Etz Chaim), zihnin Tanrı’yı, evreni ve insanın kendi ruhunu temaşa edebileceği en kusursuz kozmik gliftir.*

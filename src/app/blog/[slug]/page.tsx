@@ -4,6 +4,7 @@ import { db } from '@/db/client';
 import { blogPosts } from '@/db/schema';
 import BlogDetailClient from './BlogDetailClient';
 import { notFound } from 'next/navigation';
+import { getCleanExcerpt } from '@/lib/blogUtils';
 
 export const dynamic = 'force-dynamic';
 
@@ -28,6 +29,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
 
   const post = rows[0];
+  const cleanDescription = getCleanExcerpt(post.content, 160);
   const ogImageUrl = post.imageUrl
     ? post.imageUrl.startsWith('http')
       ? post.imageUrl
@@ -36,10 +38,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 
   return {
     title: `${post.title} - 7Layers Blog`,
-    description: post.content.substring(0, 160) + '...',
+    description: cleanDescription,
     openGraph: {
       title: post.title,
-      description: post.content.substring(0, 160) + '...',
+      description: cleanDescription,
       url: `https://www.7layers.tr/blog/${post.slug}`,
       siteName: '7Layers',
       images: [
@@ -55,7 +57,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     twitter: {
       card: 'summary_large_image',
       title: post.title,
-      description: post.content.substring(0, 160) + '...',
+      description: cleanDescription,
       images: [ogImageUrl],
     },
   };

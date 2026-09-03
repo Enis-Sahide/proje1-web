@@ -1,3 +1,5 @@
+Sevgi, insan ruhunun en yüce ve dönüştürücü gücüyken; farkında olmadan içine düştüğümüz beklentiler, bu saf duyguyu gizli bir ticaret sözleşmesine çevirebilir. En güvendiğimiz insanların bile bizi hayal kırıklığına uğrattığını düşündüğümüz anlarda, asıl incinen şey kalbimiz mi yoksa karşı tarafa yüklediğimiz kurtarıcı rolü müdür? Gerçek özgürleşme, sevgiyi beklenti zincirlerinden kurtarıp koşulsuzluğun hafifliğine bırakmakla başlar.
+
 ### I. "En Güvendiğim İnsan Yanımda Olmadı": Kırgınlığın Doğuşu
 
 İnsan hayatının en kırılgan anları, yeni bir hayale adım attığı veya sırtındaki yükün altında ezildiği anlardır. Yeni bir iş kurarsınız, üniversitede ya da kariyerinizde kritik bir projeye girişirsiniz, maddi veya manevi bir çıkmaza girersiniz... O anda gözlerinizin ilk aradığı kimseler kimdir? Yabancılar değil; en çok sevdikleriniz, canınız bildikleriniz, *"O beni asla yalnız bırakmaz"* dediğiniz en yakınlarınızdır.
