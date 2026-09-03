@@ -538,6 +538,8 @@ export default function TransitsPage() {
                     fetchTimeline(newRange);
                   }}
                   isLoading={isTimelineLoading}
+                  isPremium={isApprenticeOrAbove}
+                  onRequirePremium={() => setShowLockModal(true)}
                 />
               )
             )}

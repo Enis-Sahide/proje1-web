@@ -14,7 +14,8 @@ import {
   TrendingUp, 
   Search,
   ChevronRight,
-  Info
+  Info,
+  Lock
 } from 'lucide-react';
 import { TransitTimelineItem } from '@/features/astrology/engine/TransitTimelineEngine';
 
@@ -25,6 +26,8 @@ interface TransitTimelineChartProps {
   range: string;
   onRangeChange?: (newRange: '1m' | '3m' | '6m' | '1y') => void;
   isLoading?: boolean;
+  isPremium?: boolean;
+  onRequirePremium?: () => void;
 }
 
 const PLANET_SYMBOLS: Record<string, string> = {
@@ -48,7 +51,9 @@ export default function TransitTimelineChart({
   endDateStr,
   range,
   onRangeChange,
-  isLoading = false
+  isLoading = false,
+  isPremium = false,
+  onRequirePremium
 }: TransitTimelineChartProps) {
   const [selectedItem, setSelectedItem] = useState<TransitTimelineItem | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<'ALL' | 'KADERSEL' | 'KISISEL'>('ALL');
@@ -124,21 +129,30 @@ export default function TransitTimelineChart({
           </span>
           <div className="flex bg-black/40 p-1 rounded-xl border border-white/5">
             {[
-              { id: '1m', label: '1 Ay' },
-              { id: '3m', label: '3 Ay' },
-              { id: '6m', label: '6 Ay' },
-              { id: '1y', label: '1 Yıl' },
+              { id: '1m', label: '1 Ay', isLocked: false },
+              { id: '3m', label: '3 Ay', isLocked: !isPremium },
+              { id: '6m', label: '6 Ay', isLocked: !isPremium },
+              { id: '1y', label: '1 Yıl', isLocked: !isPremium },
             ].map(r => (
               <button
                 key={r.id}
-                onClick={() => onRangeChange?.(r.id as any)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                onClick={() => {
+                  if (r.isLocked) {
+                    onRequirePremium?.();
+                  } else {
+                    onRangeChange?.(r.id as any);
+                  }
+                }}
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
                   range === r.id 
                     ? 'bg-mystic-primary text-black shadow-md' 
+                    : r.isLocked
+                    ? 'text-mystic-text-muted/60 hover:text-mystic-primary/80 hover:bg-white/5 cursor-pointer'
                     : 'text-mystic-text-muted hover:text-white'
                 }`}
               >
-                {r.label}
+                <span>{r.label}</span>
+                {r.isLocked && <Lock size={10} className="text-[#D4AF37]" />}
               </button>
             ))}
           </div>
@@ -478,36 +492,85 @@ export default function TransitTimelineChart({
               </div>
             </div>
 
-            {/* 7Layers Chakra & Body Layer Connection */}
-            <div className="bg-gradient-to-r from-purple-900/20 to-indigo-900/20 border border-purple-500/30 p-4 rounded-2xl mb-5 flex items-start gap-3">
-              <Layers className="text-purple-400 shrink-0 mt-0.5" size={20} />
-              <div>
-                <span className="text-xs font-extrabold text-purple-300 block mb-0.5">
-                  7Layers İnisiyasyon & Katman Etkisi
-                </span>
-                <p className="text-xs text-purple-100/90 leading-relaxed">
-                  {selectedItem.chakraLayer}
-                </p>
-              </div>
+            {/* Dönemin Temel Özeti (Herkese Açık) */}
+            <div className="p-4 bg-white/5 rounded-2xl border border-white/5 mb-5">
+              <strong className="text-white text-xs block mb-1.5 uppercase tracking-wider font-extrabold flex items-center gap-1.5">
+                <Info size={14} className="text-mystic-primary" /> Dönemin Temel Özeti:
+              </strong>
+              <p className="text-xs text-gray-300 leading-relaxed">{selectedItem.summary}</p>
             </div>
 
-            {/* Content & Interpretation */}
-            <div className="space-y-4 text-sm text-gray-300 leading-relaxed mb-6">
-              <div className="p-3.5 bg-white/5 rounded-xl border border-white/5">
-                <strong className="text-white block mb-1">Dönemin Ana Teması:</strong>
-                <p className="text-xs text-gray-300 leading-relaxed">{selectedItem.summary}</p>
-              </div>
-              <div>
-                <strong className="text-white block mb-1 text-xs uppercase tracking-wider">Kadersel & Psikolojik Dinamik:</strong>
-                <p className="text-xs text-mystic-text-muted leading-relaxed whitespace-pre-wrap">{selectedItem.details}</p>
-              </div>
-              {selectedItem.advice && (
-                <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl">
-                  <strong className="text-emerald-400 block mb-1.5 text-xs uppercase tracking-wider">Rehberlik & Tavsiye:</strong>
-                  <p className="text-xs text-emerald-100 leading-relaxed whitespace-pre-line">{selectedItem.advice}</p>
+            {/* 7Layers Çakra Reçetesi & Derin Dinamikler (Premium veya Kilitli) */}
+            {isPremium ? (
+              <>
+                {/* 7Layers Chakra & Body Layer Connection */}
+                <div className="bg-gradient-to-r from-purple-900/20 to-indigo-900/20 border border-purple-500/30 p-4 rounded-2xl mb-5 flex items-start gap-3">
+                  <Layers className="text-purple-400 shrink-0 mt-0.5" size={20} />
+                  <div>
+                    <span className="text-xs font-extrabold text-purple-300 block mb-0.5">
+                      7Layers İnisiyasyon & Katman Etkisi
+                    </span>
+                    <p className="text-xs text-purple-100/90 leading-relaxed">
+                      {selectedItem.chakraLayer}
+                    </p>
+                  </div>
                 </div>
-              )}
-            </div>
+
+                {/* Content & Interpretation */}
+                <div className="space-y-4 text-sm text-gray-300 leading-relaxed mb-6">
+                  <div>
+                    <strong className="text-white block mb-1 text-xs uppercase tracking-wider">Kadersel & Psikolojik Dinamik:</strong>
+                    <p className="text-xs text-mystic-text-muted leading-relaxed whitespace-pre-wrap">{selectedItem.details}</p>
+                  </div>
+                  {selectedItem.advice && (
+                    <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl">
+                      <strong className="text-emerald-400 block mb-1.5 text-xs uppercase tracking-wider">Rehberlik & Tavsiye:</strong>
+                      <p className="text-xs text-emerald-100 leading-relaxed whitespace-pre-line">{selectedItem.advice}</p>
+                    </div>
+                  )}
+                </div>
+              </>
+            ) : (
+              /* Kilitli Freemium Kartı */
+              <div className="relative rounded-2xl overflow-hidden border border-white/10 mb-6 shadow-xl">
+                {/* Arka plan bulanık içerik simülasyonu */}
+                <div className="filter blur-sm select-none opacity-25 pointer-events-none p-5 space-y-4 bg-black/50">
+                  <div className="h-14 bg-purple-900/30 rounded-xl border border-purple-500/30 p-3">
+                    <span className="h-3 w-32 bg-purple-400/50 block rounded mb-2"></span>
+                    <span className="h-2 w-48 bg-purple-200/30 block rounded"></span>
+                  </div>
+                  <div className="space-y-2">
+                    <span className="h-3 w-40 bg-white/40 block rounded"></span>
+                    <span className="h-2 w-full bg-white/20 block rounded"></span>
+                    <span className="h-2 w-3/4 bg-white/20 block rounded"></span>
+                  </div>
+                  <div className="h-16 bg-emerald-500/10 rounded-xl border border-emerald-500/20 p-3">
+                    <span className="h-3 w-28 bg-emerald-400/50 block rounded mb-2"></span>
+                    <span className="h-2 w-5/6 bg-emerald-200/30 block rounded"></span>
+                  </div>
+                </div>
+
+                {/* Ön plan Kilit Daveti */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-black/80 backdrop-blur-md">
+                  <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-[#D4AF37]/20 to-[#0EA5E9]/20 border border-[#D4AF37]/40 flex items-center justify-center text-[#D4AF37] mb-3 shadow-lg">
+                    <Lock size={22} />
+                  </div>
+                  <h4 className="text-white font-bold text-sm mb-1.5">7Layers İnisiyasyon & Derin Rehberlik Kilitli</h4>
+                  <p className="text-[11px] text-mystic-text-muted max-w-xs mb-4 leading-relaxed">
+                    Bu kadersel transitin Çakra/Sefirot katman etkisi, derin psikolojik dinamikleri ve eylem adımları <strong>Çıraklık (Apprentice)</strong> seviyesi ve üzeri üyelere özeldir.
+                  </p>
+                  <button
+                    onClick={() => {
+                      setSelectedItem(null);
+                      onRequirePremium?.();
+                    }}
+                    className="bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] hover:opacity-95 text-black font-extrabold text-xs px-5 py-2.5 rounded-xl shadow-lg transition-all transform hover:scale-105"
+                  >
+                    Seviyeni Yükselt & Kilidi Aç
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Close button */}
             <button
