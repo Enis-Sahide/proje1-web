@@ -7,6 +7,7 @@ import { getTransitHouseInterpretation, getTransitAspectInterpretation } from '@
 import { AstroCity, TransitChartData } from '@/features/astrology/engine/AstrologyConstants';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { useAuth } from '@/context/AuthContext';
+import TransitTimelineChart from '@/features/astrology/components/TransitTimelineChart';
 
 interface AstroPoint {
   name: string;
@@ -90,6 +91,38 @@ export default function TransitsPage() {
   const [transitDateStr, setTransitDateStr] = useState(defaultTDate);
   const [transitTimeStr, setTransitTimeStr] = useState(defaultTTime);
 
+  // Timeline (Gantt) states
+  const [activeTab, setActiveTab] = useState<'BIWHEEL' | 'TIMELINE'>('BIWHEEL');
+  const [timelineData, setTimelineData] = useState<any>(null);
+  const [timelineRange, setTimelineRange] = useState<'1m' | '3m' | '6m' | '1y'>('1m');
+  const [isTimelineLoading, setIsTimelineLoading] = useState(false);
+
+  const fetchTimeline = async (rangeToFetch: '1m' | '3m' | '6m' | '1y' = timelineRange) => {
+    if (!cityKey) return;
+    setIsTimelineLoading(true);
+    try {
+      const res = await fetch('/api/astrology/transit-timeline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          natalDate: natalDateStr,
+          natalTime: natalTimeStr,
+          cityData: cityKey,
+          range: rangeToFetch,
+          startDateStr: transitDateStr
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setTimelineData(data.data);
+      }
+    } catch (err) {
+      console.error('Timeline fetch error:', err);
+    } finally {
+      setIsTimelineLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!cityKey) {
@@ -99,6 +132,7 @@ export default function TransitsPage() {
     setIsAnalyzing(true);
     setError(null);
     setTransitData(null);
+    setTimelineData(null);
 
     try {
       const res = await fetch('/api/astrology/calculate-transit', {
@@ -119,6 +153,9 @@ export default function TransitsPage() {
       }
 
       setTransitData(data.data);
+
+      // Proactively fetch 1-month timeline so it is ready immediately
+      fetchTimeline('1m');
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -309,31 +346,80 @@ export default function TransitsPage() {
             </form>
           </div>
         ) : (
-          <div className="space-y-12 animate-in fade-in slide-in-from-bottom-8 duration-700">
-            <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-8 rounded-3xl shadow-2xl flex flex-col items-center">
-              <div className="flex w-full flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-6 mb-8 gap-4">
-                 <div>
-                   <h2 className="text-2xl font-bold text-white flex items-center gap-3 mb-2">
-                     <Compass className="text-[#0EA5E9]" /> Çift Çemberli Transit Haritası
-                   </h2>
-                   <div className="flex flex-col gap-1 text-sm">
-                     <p className="text-[#D4AF37] flex items-center gap-2">
-                       <span className="w-2 h-2 rounded-full bg-[#D4AF37]"></span>
-                       Natal: {cityKey ? cityKey.name : ''} • {natalDateStr.split('-').reverse().join('.')} {natalTimeStr}
-                     </p>
-                     <p className="text-[#0EA5E9] flex items-center gap-2">
-                       <span className="w-3 h-3 rounded-full bg-[#0EA5E9] inline-block"></span>
-                       Transit (Dış Çember): {transitDateStr.split('-').reverse().join('.')} {transitTimeStr}
-                     </p>
-                   </div>
-                 </div>
-                 <button onClick={() => setTransitData(null)} className="text-sm px-4 py-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap">
-                   Yeni Harita Seç
-                 </button>
+          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
+            {/* View Navigation Tabs & Map Info */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-black/40 p-4 rounded-3xl border border-white/10 backdrop-blur-md">
+              <div className="flex items-center bg-black/60 p-1.5 rounded-2xl border border-white/10 shadow-lg">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('BIWHEEL')}
+                  className={`flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+                    activeTab === 'BIWHEEL'
+                      ? 'bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] text-black shadow-lg shadow-cyan-500/20'
+                      : 'text-mystic-text-muted hover:text-white'
+                  }`}
+                >
+                  <Compass size={16} />
+                  <span>Anlık Çift Çember</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveTab('TIMELINE');
+                    if (!timelineData && !isTimelineLoading) {
+                      fetchTimeline(timelineRange);
+                    }
+                  }}
+                  className={`flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+                    activeTab === 'TIMELINE'
+                      ? 'bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] text-black shadow-lg shadow-cyan-500/20'
+                      : 'text-mystic-text-muted hover:text-white'
+                  }`}
+                >
+                  <Sparkles size={16} />
+                  <span>Zaman Çizelgesi (Gantt)</span>
+                </button>
               </div>
 
-              {renderBiWheel()}
+              <div className="flex items-center gap-3">
+                <div className="text-right hidden md:block">
+                  <span className="text-[11px] text-mystic-text-muted block">Harita Sahibi</span>
+                  <span className="text-xs font-bold text-white">{cityKey?.name} • {natalDateStr}</span>
+                </div>
+                <button 
+                  type="button"
+                  onClick={() => { setTransitData(null); setTimelineData(null); }} 
+                  className="text-xs px-4 py-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap"
+                >
+                  Yeni Harita Seç
+                </button>
+              </div>
             </div>
+
+            {/* Tab 1: Bi-Wheel Anlık Harita */}
+            {activeTab === 'BIWHEEL' && (
+              <div className="space-y-10">
+                <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-8 rounded-3xl shadow-2xl flex flex-col items-center">
+                  <div className="flex w-full flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-6 mb-8 gap-4">
+                     <div>
+                       <h2 className="text-2xl font-bold text-white flex items-center gap-3 mb-2">
+                         <Compass className="text-[#0EA5E9]" /> Çift Çemberli Transit Haritası
+                       </h2>
+                       <div className="flex flex-col gap-1 text-sm">
+                         <p className="text-[#D4AF37] flex items-center gap-2">
+                           <span className="w-2 h-2 rounded-full bg-[#D4AF37]"></span>
+                           Natal: {cityKey ? cityKey.name : ''} • {natalDateStr.split('-').reverse().join('.')} {natalTimeStr}
+                         </p>
+                         <p className="text-[#0EA5E9] flex items-center gap-2">
+                           <span className="w-3 h-3 rounded-full bg-[#0EA5E9] inline-block"></span>
+                           Transit (Dış Çember): {transitDateStr.split('-').reverse().join('.')} {transitTimeStr}
+                         </p>
+                       </div>
+                     </div>
+                  </div>
+
+                  {renderBiWheel()}
+                </div>
 
 
 
@@ -430,6 +516,31 @@ export default function TransitsPage() {
               </div>
 
             </div>
+          </div>
+        )}
+
+            {/* Tab 2: Kozmik Zaman Çizelgesi (Gantt) */}
+            {activeTab === 'TIMELINE' && (
+              isTimelineLoading && !timelineData ? (
+                <div className="py-24 text-center bg-black/40 rounded-3xl border border-white/5">
+                  <Loader2 className="mx-auto text-mystic-primary animate-spin mb-4" size={40} />
+                  <h4 className="text-white font-bold text-lg mb-1">Kozmik Zaman Çizelgesi Hesaplanıyor...</h4>
+                  <p className="text-mystic-text-muted text-sm">Gezegenlerin gökyüzü yörüngeleri ve açı başlangıç-bitiş tarihleri taranıyor.</p>
+                </div>
+              ) : (
+                <TransitTimelineChart
+                  items={timelineData?.items || []}
+                  startDateStr={timelineData?.startDate || transitDateStr}
+                  endDateStr={timelineData?.endDate || transitDateStr}
+                  range={timelineRange}
+                  onRangeChange={(newRange) => {
+                    setTimelineRange(newRange);
+                    fetchTimeline(newRange);
+                  }}
+                  isLoading={isTimelineLoading}
+                />
+              )
+            )}
           </div>
         )}
       </div>

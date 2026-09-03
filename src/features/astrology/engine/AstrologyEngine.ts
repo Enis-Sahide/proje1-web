@@ -7,7 +7,7 @@ export { ASTRO_CITIES };
 
 
 let sweInstance: SwissEph | null = null;
-async function getSwe(): Promise<SwissEph> {
+export async function getSwe(): Promise<SwissEph> {
   if (sweInstance) return sweInstance;
   
   // Wasm modülünü yükle
