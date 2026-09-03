@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, Calendar, User, Sparkles, BookOpen, Share2, Link } from 'lucide-react';
 
 const parseItalics = (text: string) => {
+  if (!text) return '';
   const parts = text.split('*');
   return parts.map((part, index) => {
     if (index % 2 === 1) {
@@ -14,72 +15,178 @@ const parseItalics = (text: string) => {
   });
 };
 
-const parseInlineMarkdown = (text: string) => {
+const parseInlineCode = (text: string) => {
   if (!text) return '';
-  const parts = text.split('**');
+  const parts = text.split('`');
   return parts.map((part, index) => {
     if (index % 2 === 1) {
-      return <strong key={index} className="font-extrabold text-white">{parseItalics(part)}</strong>;
+      return (
+        <code key={index} className="px-1.5 py-0.5 rounded bg-white/10 font-mono text-mystic-primary text-xs border border-white/10">
+          {part}
+        </code>
+      );
     }
     return parseItalics(part);
   });
 };
 
+const parseInlineMarkdown = (text: string) => {
+  if (!text) return '';
+  const parts = text.split('**');
+  return parts.map((part, index) => {
+    if (index % 2 === 1) {
+      return <strong key={index} className="font-extrabold text-white">{parseInlineCode(part)}</strong>;
+    }
+    return parseInlineCode(part);
+  });
+};
+
 const renderContent = (content: string) => {
   if (!content) return null;
-  const paragraphs = content.split('\n');
-  return paragraphs.map((para, index) => {
-    let trimmed = para.trim();
+  const lines = content.split('\n');
+  const elements: React.ReactNode[] = [];
+  let inCodeBlock = false;
+  let codeLines: string[] = [];
+  let codeBlockIndex = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    // Code block handling (```)
+    if (trimmed.startsWith('```')) {
+      if (inCodeBlock) {
+        elements.push(
+          <div key={`code-${codeBlockIndex}`} className="my-6 rounded-2xl bg-black/70 border border-mystic-primary/30 p-4 sm:p-5 overflow-x-auto shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+            <pre className="font-mono text-xs sm:text-sm text-mystic-primary/95 leading-relaxed">
+              {codeLines.join('\n')}
+            </pre>
+          </div>
+        );
+        codeLines = [];
+        inCodeBlock = false;
+      } else {
+        inCodeBlock = true;
+        codeBlockIndex = i;
+      }
+      continue;
+    }
+
+    if (inCodeBlock) {
+      codeLines.push(line);
+      continue;
+    }
+
+    // Blank line
+    if (!trimmed) {
+      elements.push(<div key={`space-${i}`} className="h-3" />);
+      continue;
+    }
+
+    // Horizontal Rule (---)
+    if (trimmed === '---') {
+      elements.push(<hr key={`hr-${i}`} className="border-white/10 my-8" />);
+      continue;
+    }
+
+    // Blockquote (> )
+    if (trimmed.startsWith('> ') || trimmed === '>') {
+      const quoteText = trimmed.replace(/^>\s*/, '');
+      elements.push(
+        <blockquote key={`quote-${i}`} className="my-5 border-l-4 border-mystic-primary bg-mystic-primary/10 pl-4 sm:pl-6 py-3.5 pr-4 rounded-r-2xl text-white/95 text-sm sm:text-base leading-relaxed italic shadow-sm backdrop-blur-sm">
+          {parseInlineMarkdown(quoteText)}
+        </blockquote>
+      );
+      continue;
+    }
+
+    // Heading 4 (#### )
+    if (trimmed.startsWith('#### ')) {
+      elements.push(
+        <h4 key={`h4-${i}`} className="text-sm sm:text-base font-bold text-mystic-primary mt-6 mb-2 tracking-wide uppercase flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-mystic-primary inline-block"></span>
+          <span>{parseInlineMarkdown(trimmed.replace('#### ', ''))}</span>
+        </h4>
+      );
+      continue;
+    }
+
+    // Heading 3 (### )
     if (trimmed.startsWith('### ')) {
-      return (
-        <h3 key={index} className="text-sm sm:text-base font-bold text-mystic-primary mt-6 mb-2 tracking-wide uppercase">
+      elements.push(
+        <h3 key={`h3-${i}`} className="text-base sm:text-lg font-bold text-white mt-8 mb-3 tracking-wide border-l-2 border-mystic-primary pl-3">
           {parseInlineMarkdown(trimmed.replace('### ', ''))}
         </h3>
       );
+      continue;
     }
+
+    // Heading 2 (## )
     if (trimmed.startsWith('## ')) {
-      return (
-        <h2 key={index} className="text-base sm:text-lg font-bold text-mystic-primary mt-8 mb-3 tracking-wide uppercase border-b border-white/5 pb-2">
+      elements.push(
+        <h2 key={`h2-${i}`} className="text-lg sm:text-xl font-extrabold text-mystic-primary mt-10 mb-4 tracking-wider border-b border-white/10 pb-2">
           {parseInlineMarkdown(trimmed.replace('## ', ''))}
         </h2>
       );
+      continue;
     }
+
+    // Heading 1 (# )
     if (trimmed.startsWith('# ')) {
-      return (
-        <h1 key={index} className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-mystic-primary to-mystic-accent mt-8 mb-4 uppercase tracking-wider">
+      elements.push(
+        <h1 key={`h1-${i}`} className="text-xl sm:text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-mystic-primary via-white to-mystic-accent mt-10 mb-4 tracking-wider">
           {parseInlineMarkdown(trimmed.replace('# ', ''))}
         </h1>
       );
-    }
-    if (trimmed === '---') {
-      return <hr key={index} className="border-white/5 my-6" />;
-    }
-    if (!trimmed) {
-      return <div key={index} className="h-2" />;
+      continue;
     }
 
-    let isListItem = false;
-    const listMatch = trimmed.match(/^[\*\-]\s+(.*)$/);
-    if (listMatch) {
-      trimmed = listMatch[1];
-      isListItem = true;
-    }
-
-    if (isListItem) {
-      return (
-        <div key={index} className="flex gap-2 text-white/85 leading-relaxed mb-3 text-sm sm:text-base pl-2">
-          <span className="text-mystic-primary select-none">•</span>
-          <span>{parseInlineMarkdown(trimmed)}</span>
+    // Numbered list items (1. 2. etc.)
+    const numMatch = trimmed.match(/^(\d+)\.\s+(.*)$/);
+    if (numMatch) {
+      elements.push(
+        <div key={`num-${i}`} className="flex items-start gap-3 text-white/90 leading-relaxed mb-3 text-sm sm:text-base pl-2">
+          <span className="font-bold text-mystic-primary text-xs sm:text-sm mt-0.5 bg-mystic-primary/15 px-2 py-0.5 rounded-lg border border-mystic-primary/30 select-none">
+            {numMatch[1]}
+          </span>
+          <span className="flex-1">{parseInlineMarkdown(numMatch[2])}</span>
         </div>
       );
+      continue;
     }
 
-    return (
-      <p key={index} className="text-white/85 leading-relaxed mb-4 text-sm sm:text-base">
-        {parseInlineMarkdown(para)}
+    // Bullet list items (* or -)
+    const listMatch = trimmed.match(/^[\*\-]\s+(.*)$/);
+    if (listMatch) {
+      elements.push(
+        <div key={`li-${i}`} className="flex items-start gap-2.5 text-white/90 leading-relaxed mb-2.5 text-sm sm:text-base pl-3">
+          <span className="text-mystic-primary text-xs select-none mt-1.5">✦</span>
+          <span className="flex-1">{parseInlineMarkdown(listMatch[1])}</span>
+        </div>
+      );
+      continue;
+    }
+
+    // Standard paragraph
+    elements.push(
+      <p key={`p-${i}`} className="text-white/85 leading-relaxed mb-4 text-sm sm:text-base">
+        {parseInlineMarkdown(line)}
       </p>
     );
-  });
+  }
+
+  // Gracefully close any open code block
+  if (inCodeBlock && codeLines.length > 0) {
+    elements.push(
+      <div key={`code-${codeBlockIndex}`} className="my-6 rounded-2xl bg-black/70 border border-mystic-primary/30 p-4 sm:p-5 overflow-x-auto shadow-[0_4px_20px_rgba(0,0,0,0.5)]">
+        <pre className="font-mono text-xs sm:text-sm text-mystic-primary/95 leading-relaxed">
+          {codeLines.join('\n')}
+        </pre>
+      </div>
+    );
+  }
+
+  return elements;
 };
 
 export default function BlogDetailClient({ post }: { post: any }) {

@@ -1,4 +1,3 @@
-# Kozmik Matris ve Yaşam Ağacı: Hangi Haritayı Çalıştırıyorsun?
 ## 10 Sefira, 7 Çakra ve Yaratımın Ezoterik Anatomisi
 
 ---
@@ -7,23 +6,21 @@
 
 Kadim inisiyasyon okullarının mabet kapılarına kazıdığı *"Kendini Bil"* (Nosce Te Ipsum) düsturu, modern insanın sandığı gibi psikolojik bir kendini teselli etme yöntemi değildir. Bu düstur, insanın kendi mikro-kozmik mimarisini, göksel koordinatlarını ve varoluş katmanları arasındaki dikey geçiş yollarını çözmesini emreden mutlak bir çağrıdır. Mistik Kabala geleneğinde Dion Fortune’un veciz bir şekilde belirttiği üzere; *Hayat Ağacı (Etz Chaim), zihnin Tanrı’yı, evreni ve insanın kendi ruhunu temaşa edebileceği en kusursuz kozmik gliftir.*
 
-İnsan dünyaya gözlerini açtığı an, gökyüzünün geometrisi dondurulur ve o kişinin doğum haritası (natal chart) olarak mühürlenir. Aynı şekilde Kabalistik gelenekte her ruh, 10 Sefira ve 22 İbrani harfinin oluşturduğu 32 Bilgelik Yolu’nun kesişiminde özel bir akit ile bedenlenir. Ancak burada ezoterizmin en derin ve en çok göz ardı edilen sırrı yatar: 
+İnsan dünyaya gözlerini açtığı an, gökyüzünün geometrisi dondurulur ve o kişinin doğum haritası (natal chart) olarak mühürlenir. Aynı şekilde Kabalistik gelenekte her ruh, 10 Sefira ve 22 İbrani harfinin oluşturduğu 32 Bilgelik Yolu’nun kesişiminde özel bir akit ile bedenlenir. Ancak burada ezoterizmin en derin ve en çok göz ardı edilen sırrı yatar:
 
-> **Doğum haritan veya kabalistik yapın, senin kader mahkûmiyetin değil; bilincinin üzerinde seyahat ettiği bir frekans spektrumudur.**
+> Doğum haritan veya kabalistik yapın, senin kader mahkûmiyetin değil; bilincinin üzerinde seyahat ettiği bir frekans spektrumudur.
 
-Asıl can alıcı soru şudur: **Sen hangi haritayı çalıştırıyorsun?** 
+Asıl can alıcı soru şudur: **Sen hangi haritayı çalıştırıyorsun?**
 
 Aynı harita, onu işleten bilincin ulaştığı katmana göre iki taban tabana zıt kutupta tezahür eder:
 
-1. **Alt / Reaktif Oktav (Assiah’ın Katı Kabuğu ve Klipot Gölgeleri):**
-   Kişi haritasını yalnızca hayvansal can (Nefesh) ve ego savunma mekanizmaları düzeyinde çalıştırır. Burada gezegenler ve Sefirot ilkeleri birer korku, hırs, doyumsuzluk ve reaktif çatışma jeneratörüdür. 
+1. **Alt / Reaktif Oktav (Assiah’ın Katı Kabuğu ve Klipot Gölgeleri):** Kişi haritasını yalnızca hayvansal can (Nefesh) ve ego savunma mekanizmaları düzeyinde çalıştırır. Burada gezegenler ve Sefirot ilkeleri birer korku, hırs, doyumsuzluk ve reaktif çatışma jeneratörüdür.
    - Kişi **Mars** enerjisini sadece öfke, şiddet, kıskançlık ve yıkım olarak çalıştırır.
    - **Venüs** enerjisini bağımlılık, doyumsuz şehvet ve sahte onay arayışı olarak tüketir.
    - **Satürn**’ü hayatını donduran bir kısıtlanma, iflas, melankoli ve çaresizlik duvarı olarak deneyimler.
-   - Bu durumdaki insan, haritasının efendisi değil, göksel tesirlerin ve Klipot (kabuklar / karanlık yansımalar) aleminin mekanik bir kölesidir.
+   - Bu durumdaki insan, haritasının efendisi değil; göksel tesirlerin ve Klipot (kabuklar / karanlık yansımalar) aleminin mekanik bir kölesidir.
 
-2. **Üst / Manevi Oktav (Beriyah ve Atzilut Işınları):**
-   Kişi haritasını Yüksek Benliğin (*Neshamah*) ilahi tekâmül pusulası ve kozmik görev haritası olarak çalıştırır.
+2. **Üst / Manevi Oktav (Beriyah ve Atzilut Işınları):** Kişi haritasını Yüksek Benliğin (*Neshamah*) ilahi tekâmül pusulası ve kozmik görev haritası olarak çalıştırır.
    - **Mars**, *Gevurah*’ın arındırıcı ilahi adaletine, nefis terbiyesine ve hakikati koruyan ruhani disipline dönüşür.
    - **Venüs**, *Netsah*’ın ilahi aşkına, estetiğe, kozmik sevgiye ve yaratıcı ilhama evrilir.
    - **Satürn**, *Binah*’ın kozmik anlayışına, ruhu pişiren yüce sabra ve form veren kutsal bilgeliğe mühürlenir.
@@ -34,28 +31,29 @@ Harita aynı haritadır; değişen şey, o haritayı çalıştıran bilincin han
 
 ### II. 7 Katmanın Enerji Boyutu ile Manevi Boyutu Arasındaki Ontolojik Uçurum
 
-Platformumuzun temel felsefesini oluşturan **7 Katman (7Layers)** modeli; fiziksel plandan kaynağın saf ışığına kadar uzanan yedi süptil bedeni (Fiziksel, Eterik, Astral, Mental, Kozal, Sezgisel/Budik ve Ruhsal/Atmik) tarif eder. Ancak günümüz yeniçağ (New Age) yanılgılarında sıklıkla birbirine karıştırılan ölümcül bir ayrım vardır: **Enerji boyutunda çalışmak ile Manevi boyutta çalışmak aynı şey değildir.**
+Platformumuzun temel felsefesini oluşturan **7 Katman (7Layers)** modeli; fiziksel plandan kaynağın saf ışığına kadar uzanan yedi süptil bedeni (Fiziksel, Eterik, Astral, Mental, Kozal, Sezgisel/Budik ve Ruhsal/Atmik) tarif eder. Ancak günümüz yeniçağ yanılgılarında sıklıkla birbirine karıştırılan ölümcül bir ayrım vardır: **Enerji boyutunda çalışmak ile Manevi boyutta çalışmak aynı şey değildir.**
 
 ```
-       [ MANEVİ BOYUT (ŞUUR & İNİSİYASYON) ]
-            ▲  • Nefis Terbiyesi (Bittul / Benliği Yok Etme)
-            │  • İlahi Hizmet (Lehashpia - Vermek İçin Alma)
-            │  • Kalıcı Bilinç Sıçraması & Ahlaki Erdem
-────────────┼─────────────────────────────────────────────
-            │  • Prana / Chi Akışı & Çakra Döndürme
-            │  • Psişik Vizyonlar & Astral Algılar
-            ▼  • "Spiritüel Ego" Riski (Yüksek Frekans, Düşük Şuur)
-       [ ENERJİ BOYUTU (FREKANS & PSİŞİK TECELLİ) ]
+[ MANEVİ BOYUT: ŞUUR VE İNİSİYASYON ]
+^  - Nefis Terbiyesi (Bittul / Benliği Yok Etme)
+|  - İlahi Hizmet (Lehashpia / Karşılıksız Verme)
+|  - Kalıcı Bilinç Sıçraması ve Ahlaki Erdem
++---------------------------------------------------
+|  - Prana / Chi Akışı ve Çakra Aktivasyonu
+|  - Psişik Sezgiler ve Astral Algılar
+v  - "Spiritüel Ego" Riski (Yüksek Voltaj, Ham Kap)
+[ ENERJİ BOYUTU: FREKANS VE PSİŞİK TECELLİ ]
 ```
 
 #### 1. Enerji Boyutunda Çalıştırma (Frekans & Psişik Seviye)
-Bir insan meditasyonlarla, nefes teknikleriyle veya biyoenerji çalışmalarıyla süptil enerji bedenlerini ve çakralarını uyarabilir. Kundalini enerjisi uyanabilir, aurası genişleyebilir, üçüncü göz bölgesinde vizyonlar ve psişik hassasiyetler belirebilir. 
+Bir insan meditasyonlarla, nefes teknikleriyle veya biyoenerji çalışmalarıyla süptil enerji bedenlerini ve çakralarını uyarabilir. Kundalini enerjisi uyanabilir, aurası genişleyebilir, üçüncü göz bölgesinde vizyonlar ve psişik hassasiyetler belirebilir.
 
-Fakat eğer bu uyanış, ahlaki bir arınma ve nefis terbiyesi ile mühürlenmemişse ortaya son derece tehlikeli bir durum çıkar: **"Spiritüel Ego" (Kabalistik tabirle Luciferian Işık Hırsızlığı).** 
+Fakat eğer bu uyanış, ahlaki bir arınma ve nefis terbiyesi ile mühürlenmemişse ortaya son derece tehlikeli bir durum çıkar: **"Spiritüel Ego" (Kabalistik tabirle Luciferian Işık Hırsızlığı).**
+
 Kişi çakralarını döndürdüğü ve yüksek frekans hissettiği için kendini "ermiş", "seçilmiş" veya "aydınlanmış" zanneder. Oysa alt benliğinde hâlâ kibir, hırs, öfke, üstünlük taslama ve dünyevi manipülasyon arzusu barındırmaktadır. Enerji akımı artmıştır ama kabın (*Keli*) kalitesi değişmemiştir; yüksek voltaj kirli bir ampule verilmiştir ve sonuç ancak patlama veya illüzyondur.
 
 #### 2. Manevi Boyutta Çalıştırma (Şuur & Hakiki İnisiyasyon Seviyesi)
-Manevi boyutta çalıştırma, enerjiyi biriktirmek veya onunla gösteri yapmak değil; **kabı arındırarak ışığın (Ohr) kaynağıyla bir olmaktır.** Kabala'da buna *Bittul* (kendi bencil varlığını İlahi İrade karşısında hiçleme, şeffaflaşma) denir. 
+Manevi boyutta çalıştırma, enerjiyi biriktirmek veya onunla gösteri yapmak değil; **kabı arındırarak ışığın (Ohr) kaynağıyla bir olmaktır.** Kabala'da buna *Bittul* (kendi bencil varlığını İlahi İrade karşısında hiçleme, şeffaflaşma) denir.
 
 Burada çakralar ve süptil katmanlar birer enerji santrali olmaktan çıkar; birer **ilahi ahlak kapısı** haline gelir. Kalp çakrası sadece göğüste dönen yeşil bir ışık vorteksi değil; karşılıksız merhametin, fedakârlığın ve Mesih bilincinin ete kemiğe bürünmüş halidir. Enerjinin gücü değil, şuurun teslimiyeti esastır. Titreşim yükselmesi bir amaç değil, arınmanın doğal bir yan ürünüdür.
 
@@ -64,58 +62,58 @@ Burada çakralar ve süptil katmanlar birer enerji santrali olmaktan çıkar; bi
 ### III. 10 Sefira ve 7 Çakranın Çift Boyutlu Entegrasyonu
 
 Mistik Kabala’da evren ve insan, **Dört Alem (Olamot)** boyunca kademelenir:
-*   **Atzilut (Yakınlık / Yayılım Alemi - Ateş):** Saf İlahi İrade ve Keter-Hokmah-Binah'ın kökleri.
-*   **Beriyah (Yaratım Alemi - Hava):** Başmelekler, kozmik zihin, Hesed-Gevurah-Tifaret üçlüsü.
-*   **Yetzirah (Oluşum Alemi - Su):** Melekler, duygular, astral kalıplar, Netsah-Hod-Yesod.
-*   **Assiah (Eylem ve Madde Alemi - Toprak):** Fiziksel evren, beden ve Malkut.
+- **Atzilut (Yakınlık / Yayılım Alemi - Ateş):** Saf İlahi İrade ve Keter-Hokmah-Binah'ın kökleri.
+- **Beriyah (Yaratım Alemi - Hava):** Başmelekler, kozmik zihin, Hesed-Gevurah-Tifaret üçlüsü.
+- **Yetzirah (Oluşum Alemi - Su):** Melekler, duygular, astral kalıplar, Netsah-Hod-Yesod.
+- **Assiah (Eylem ve Madde Alemi - Toprak):** Fiziksel evren, beden ve Malkut.
 
 İnsandaki 7 temel çakra, Hayat Ağacı’nın 10 Sefira'sıyla ve bu 4 alemle doğrudan rezonans halindedir. Her bir merkez hem **Enerji Titreşimi** (alt oktav) hem de **Manevi Mertebe** (üst oktav) olarak iki düzeyde çalışır:
 
 ```
-[KETER] ─────────────── Taç Çakra (Sahasrara) ─────────────── Vahdet & Saf İrade
-   │
-[DA'AT / BİNAH-HOKMAH] ── Üçüncü Göz (Ajna) ────────────────── Hikmet & Uçurumun Aşılması
-   │
-[HESED - GEVURAH] ───── Boğaz Çakrası (Vishuddha) ─────────── Hakikat Kelamı & İlahi Denge
-   │
-[TİFARET] ───────────── Kalp Çakrası (Anahata) ────────────── Mesih Bilinci & Kalp Güneşi
-   │
-[NETSAH - HOD] ──────── Solar Pleksus (Manipura) ──────────── Aşk-Akıl / İrade Dengesi
-   │
-[YESOD] ─────────────── Sakral Çakra (Svadhisthana) ───────── Astral Kalıp & Saflık
-   │
-[MALKUT] ────────────── Kök Çakra (Muladhara) ─────────────── Şekina & Maddeye Işık İndirme
+[KETER]               -->  Taç Çakra (Sahasrara)        : Vahdet & Saf İrade
+   |
+[DA'AT / BİNAH-HOKMAH]-->  Üçüncü Göz (Ajna)            : Hikmet & İdrak Birliği
+   |
+[HESED - GEVURAH]     -->  Boğaz Çakrası (Vishuddha)    : Hakikat Dili & İlahi Denge
+   |
+[TİFARET]             -->  Kalp Çakrası (Anahata)       : Mesih Bilinci & Kalp Güneşi
+   |
+[NETSAH - HOD]        -->  Solar Pleksus (Manipura)     : Aşk-Akıl & İrade Dengesi
+   |
+[YESOD]               -->  Sakral Çakra (Svadhisthana)  : Astral Kalıp & Saflık
+   |
+[MALKUT]              -->  Kök Çakra (Muladhara)        : Şekina & Yeryüzü Mabedi
 ```
 
 #### 1. Malkut (Krallık / Şekina) – Kök Çakra (Muladhara)
-*   **Enerji Titreşimi:** Fiziksel beden sağlığı, biyolojik hayatta kalma dürtüsü, topraklanma ve madde dünyasındaki tutunma hissi.
-*   **Manevi Mertebe:** Şekina’nın (Tanrı'nın yeryüzündeki dişil mevcudiyetinin) sürgünden kurtarılması. Yeryüzünü ve maddeyi kirli veya aşağılık görmeyip, ilahi nurun indiği nihai mabet olduğunu idrak etmek. Maddeyi ruhun hizmetkârı kılmak.
+- **Enerji Titreşimi:** Fiziksel beden sağlığı, biyolojik hayatta kalma dürtüsü, topraklanma ve madde dünyasındaki tutunma hissi.
+- **Manevi Mertebe:** Şekina’nın (Tanrı'nın yeryüzündeki dişil mevcudiyetinin) sürgünden kurtarılması. Yeryüzünü ve maddeyi kirli veya aşağılık görmeyip, ilahi nurun indiği nihai mabet olduğunu idrak etmek. Maddeyi ruhun hizmetkârı kılmak.
 
 #### 2. Yesod (Temel) – Sakral Çakra (Svadhisthana)
-*   **Enerji Titreşimi:** Cinsel çekim gücü, üreme enerjisi, eterik yaşam enerjisi (prana deposu), rüyalar ve manyetik cazibe.
-*   **Manevi Mertebe:** *Tzaddik* (Kamil/Adil İnsan) bilinci. Cinsel ve yaratıcı enerjinin aşağı doğru israf edilmeyip, orta sütun boyunca yukarıya, Tifaret ve Keter’e doğru süblime edilmesi (Simyasal Dönüşüm). Bilinçaltının arınması ve niyetlerin safiyeti (*Tahara*).
+- **Enerji Titreşimi:** Cinsel çekim gücü, üreme enerjisi, eterik yaşam enerjisi (prana deposu), rüyalar ve manyetik cazibe.
+- **Manevi Mertebe:** *Tzaddik* (Kamil/Adil İnsan) bilinci. Cinsel ve yaratıcı enerjinin aşağı doğru israf edilmeyip, orta sütun boyunca yukarıya, Tifaret ve Keter’e doğru süblime edilmesi (Simyasal Dönüşüm). Bilinçaltının arınması ve niyetlerin safiyeti (*Tahara*).
 
 #### 3. Netsah (Zafer) & Hod (Görkem) – Solar Pleksus Çakrası (Manipura)
 Solar Pleksus, Hayat Ağacı'nın sağ ve sol sütunundaki bu iki tamamlayıcı kutbun kesişimidir:
-*   **Enerji Titreşimi:** Egonun güç arzusu, hırs, tartışma kabiliyeti, insanları zihinle manipüle etme (Hod) ya da duygusal şehvetle peşinden sürükleme (Netsah).
-*   **Manevi Mertebe:** *Hod*, zihnin ilahi vahiy karşısında eğilmesidir (Entelektüel tevazu). *Netsah*, hakikat yolunda sarsılmaz bir sebat, ilahi aşk ve vecd halidir. Bu iki sefira dengelendiğinde kişi, nefsin bencil güç savaşlarını terk eder; zihnini ve duygularını İlahi İrade’nin emrine verir.
+- **Enerji Titreşimi:** Egonun güç arzusu, hırs, tartışma kabiliyeti, insanları zihinle manipüle etme (Hod) ya da duygusal şehvetle peşinden sürükleme (Netsah).
+- **Manevi Mertebe:** *Hod*, zihnin ilahi vahiy karşısında eğilmesidir (Entelektüel tevazu). *Netsah*, hakikat yolunda sarsılmaz bir sebat, ilahi aşk ve vecd halidir. Bu iki sefira dengelendiğinde kişi, nefsin bencil güç savaşlarını terk eder; zihnini ve duygularını İlahi İrade’nin emrine verir.
 
 #### 4. Tifaret (Güzellik / Uyum) – Kalp Çakrası (Anahata)
 Hayat Ağacı’nın tam kalbinde, tüm yolların kesiştiği merkezde yer alan Güneş Sefirasıdır.
-*   **Enerji Titreşimi:** Romantik heyecanlar, geçici duygusal genişleme, astral sevgi hissi.
-*   **Manevi Mertebe:** Mesih Bilinci (*Christ Consciousness / Tifaret Güneşi*). Kişisel egonun (*Nefesh*) tahttan inip, yerine Yüksek Benliğin (*Neshamah*) geçtiği kutsal mihver. Alt alemler ile üst alemler arasındaki yegane kapıdır. Burası açılmadan hiç kimse Keter’e ulaşamaz. Koşulsuz şefkat, birlik bilinci ve varoluşu olduğu gibi kucaklayan ilahi ahenktir.
+- **Enerji Titreşimi:** Romantik heyecanlar, geçici duygusal genişleme, astral sevgi hissi.
+- **Manevi Mertebe:** Mesih Bilinci (*Christ Consciousness / Tifaret Güneşi*). Kişisel egonun (*Nefesh*) tahttan inip, yerine Yüksek Benliğin (*Neshamah*) geçtiği kutsal mihver. Alt alemler ile üst alemler arasındaki yegane kapıdır. Burası açılmadan hiç kimse Keter’e ulaşamaz. Koşulsuz şefkat, birlik bilinci ve varoluşu olduğu gibi kucaklayan ilahi ahenktir.
 
 #### 5. Hesed (Merhamet) & Gevurah (Kudret / Yargı) – Boğaz Çakrası (Vishuddha)
-*   **Enerji Titreşimi:** İkna etme gücü, emir verme arzusu, aşırı konuşma veya sınır çizemeyip herkese boyun eğme uçları.
-*   **Manevi Mertebe:** *Logos*’un (Yaratıcı Kelâmın) uyanışı. Hesed’in sınırsız bağışlayıcılığı ve sevgisi ile Gevurah’ın şaşmaz adaleti, disiplini ve sınır koyma gücünün boğazda birleşmesi. Ağızdan çıkan her kelimenin bir yaratım yemini olması; gıybetten, yalandan ve lüzumsuz sözden tamamen arınmış "Hakikat Dili".
+- **Enerji Titreşimi:** İkna etme gücü, emir verme arzusu, aşırı konuşma veya sınır çizemeyip herkese boyun eğme uçları.
+- **Manevi Mertebe:** *Logos*’un (Yaratıcı Kelâmın) uyanışı. Hesed’in sınırsız bağışlayıcılığı ve sevgisi ile Gevurah’ın şaşmaz adaleti, disiplini ve sınır koyma gücünün boğazda birleşmesi. Ağızdan çıkan her kelimenin bir yaratım yemini olması; gıybetten, yalandan ve lüzumsuz sözden tamamen arınmış "Hakikat Dili".
 
 #### 6. Da'at (Gizli Sefira / Kozmik Bilgi) & Binah-Hokmah – Üçüncü Göz (Ajna)
-*   **Enerji Titreşimi:** Durugörü, psişik vizyonlar, zihinsel illüzyonlar, geleceği görme hevesi.
-*   **Manevi Mertebe:** Uçurumun (*The Abyss*) aşılması. İkiliğin (özne-nesne ayrımının) çöküşü. Hokmah’ın saf eril kıvılcımı (Hikmet) ile Binah’ın dişil derinliğinin (Kozmik Anlayış/Matris) birleşerek Da'at kapısını açması. Kişi artık "hakkında düşünmez", doğrudan "O olur ve bilir".
+- **Enerji Titreşimi:** Durugörü, psişik vizyonlar, zihinsel illüzyonlar, geleceği görme hevesi.
+- **Manevi Mertebe:** Uçurumun (*The Abyss*) aşılması. İkiliğin (özne-nesne ayrımının) çöküşü. Hokmah’ın saf eril kıvılcımı (Hikmet) ile Binah’ın dişil derinliğinin (Kozmik Anlayış/Matris) birleşerek Da'at kapısını açması. Kişi artık "hakkında düşünmez", doğrudan "O olur ve bilir".
 
 #### 7. Keter (Taç) – Taç Çakra (Sahasrara)
-*   **Enerji Titreşimi:** Başın tepe noktasında basınç, elektriksel karıncalanmalar, boşluk hissi.
-*   **Manevi Mertebe:** *Ayin Sof*’un (Sonsuz ve Şekilsiz Işığın) tecellisi. "Ben" iddiasının mutlak yok oluşu, sadece BİR olanın varlığı. İnsanın ilahi niyetle tam bir rezonansa girmesi. Yaratımın başlangıç ve bitiş noktası.
+- **Enerji Titreşimi:** Başın tepe noktasında basınç, elektriksel karıncalanmalar, boşluk hissi.
+- **Manevi Mertebe:** *Ayin Sof*’un (Sonsuz ve Şekilsiz Işığın) tecellisi. "Ben" iddiasının mutlak yok oluşu, sadece BİR olanın varlığı. İnsanın ilahi niyetle tam bir rezonansa girmesi. Yaratımın başlangıç ve bitiş noktası.
 
 ---
 
@@ -127,25 +125,25 @@ Birçok insan Kabala’yı soyut, antik ve pratik hayattan kopuk bir teori zanne
 Evren yukarıdan aşağıya nasıl tezahür ediyorsa, senin bir projeyi hayata geçirmen de aynı basamaklardan geçmek zorundadır:
 
 ```
-[ KETER ]  ──── Fikrin zihne ilk saf tohum / ilham olarak düşmesi
-    │
-[ HOKMAH ] ──── "Bunu yapmalıyım!" diyen ham yaratıcı heyecan
-    │
-[ BİNAH ]  ──── Fizibilite, planlama, mimari sınırları ve yapıyı çizme
-    │
-[ HESED ]  ──── Vizyonu genişletme, cömertçe bütçe/kaynak ayırma
-    │
-[ GEVURAH ] ─── Bütçe kısıtı, gereksizleri budama, teslim tarihi disiplini
-    │
-[ TİFARET ] ─── Projenin ana gayesi, kalbi, etik değeri ve ruhu
-    │
-[ NETSAH ] ──── Tutku, pazarlama ateşi, görsel estetik, heyecan yayma
-    │
-[ HOD ]    ──── Teknik kodlama, dokümantasyon, sözleşmeler, analiz
-    │
-[ YESOD ]  ──── Prototip, test ortamı, eterik kalıp, yayına alma provası
-    │
-[ MALKUT ] ──── Satış, fiziksel ürün, imza, para, mezuniyet, somut sonuç!
+[KETER]   -->  İlham Tohumu: "Fikrin zihne ilk saf düşüş anı"
+   |
+[HOKMAH]  -->  Yaratıcı Şimşek: "Bunu yapmalıyım!" diyen ham tutku
+   |
+[BİNAH]   -->  Kavramsal Matris: Fizibilite, planlama ve mimari çerçeve
+   |
+[HESED]   -->  Vizyoner Genişleme: Cömert kaynak ve büyüme arzusu
+   |
+[GEVURAH] -->  Disiplin ve Sınır: Bütçe kısıtı, eleme ve teslim tarihi
+   |
+[TİFARET] -->  Projenin Kalbi: Amaç, denge, etik ve ruh
+   |
+[NETSAH]  -->  Pazarlama ve Estetik: İnsanları peşinden sürükleyen cazibe
+   |
+[HOD]     -->  Teknik ve Analiz: Kodlama, dokümantasyon, ince işçilik
+   |
+[YESOD]   -->  Altyapı ve Prototip: Test ortamı, prova ve son kalıp
+   |
+[MALKUT]  -->  Fiziksel Tezahür: Satış, teslimat, diploma, somut ürün!
 ```
 
 Gündelik yaşamdaki tıkanıklıklarımızın tamamı, bu sefirotik akıştaki kesintilerden kaynaklanır:
@@ -168,12 +166,12 @@ Büyük bir tutkuyla spora, yeni bir yazılıma veya yabancı dil öğrenmeye ba
 
 Bu derin ezoterik anatominin bize öğrettiği en büyük ders şudur: **Hayatında yaşadığın krizler, dış dünyanın sana bir komplosu değil; senin kendi mikro-kozmik ağacındaki bir sefiranın gölgede (alt oktavda) kalmasıdır.**
 
-*   Maddi zorluklar ve bedensel tükenmişlik mi yaşıyorsun? **Malkut** ve kök çakranla barış; toprağa dokun, maddeyi ilahi olanın tecellisi bil.
-*   Sürekli duygusal krizler ve bağımlılıklar içinde misin? **Yesod** sularını arındır; bilinçaltındaki zehirli kalıpları ve cinsel enerjini yüksek ülkülerle süblime et.
-*   Zihnin durmaksızın vesvese ve endişe mi üretiyor? **Hod** ve **Netsah** arasındaki kutupluluğu durdur; mantığını kalbin (Tifaret) rehberliğine teslim et.
-*   Hayatında sınırlar ihlal ediliyor, enerjin sömürülüyor mu? **Gevurah** kılıcını kuşan; kutsal "Hayır"ın gücünü devreye sok.
-*   Geleceğini göremiyor, karanlıkta mı hissediyorsun? **Binah**'ın sabrına sığın ve **Da'at** uçurumunda teslimiyeti öğren.
+- Maddi zorluklar ve bedensel tükenmişlik mi yaşıyorsun? **Malkut** ve kök çakranla barış; toprağa dokun, maddeyi ilahi olanın tecellisi bil.
+- Sürekli duygusal krizler ve bağımlılıklar içinde misin? **Yesod** sularını arındır; bilinçaltındaki zehirli kalıpları ve cinsel enerjini yüksek ülkülerle süblime et.
+- Zihnin durmaksızın vesvese ve endişe mi üretiyor? **Hod** ve **Netsah** arasındaki kutupluluğu durdur; mantığını kalbin (Tifaret) rehberliğine teslim et.
+- Hayatında sınırlar ihlal ediliyor, enerjin sömürülüyor mu? **Gevurah** kılıcını kuşan; kutsal "Hayır"ın gücünü devreye sok.
+- Geleceğini göremiyor, karanlıkta mı hissediyorsun? **Binah**'ın sabrına sığın ve **Da'at** uçurumunda teslimiyeti öğren.
 
-7Layers yolculuğu, unuttuğumuz bu kadim haritayı yeniden hatırlama sanatıdır. Haritanı gezegenlerin ve nefsin mekanik bir kuklası olarak değil; 10 Sefira'nın ışığıyla taçlanmış, her çakrası erdemle mühürlenmiş canlı bir mabet olarak çalıştır. 
+7Layers yolculuğu, unuttuğumuz bu kadim haritayı yeniden hatırlama sanatıdır. Haritanı gezegenlerin ve nefsin mekanik bir kuklası olarak değil; 10 Sefira'nın ışığıyla taçlanmış, her çakrası erdemle mühürlenmiş canlı bir mabet olarak çalıştır.
 
 Unutma: **Aşağıda olan yukarısı gibidir; ve içeride olan dışarısı gibidir.** Kendi içindeki Hayat Ağacı'nı dengelediğinde, dışındaki dünya da o ilahi nizamın önünde selam duracaktır.
