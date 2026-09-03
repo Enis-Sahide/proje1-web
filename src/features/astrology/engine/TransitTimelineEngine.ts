@@ -147,9 +147,36 @@ function getInterpretationDetails(tPlanet: string, nPlanet: string, aspect: stri
   return { summary, details, advice };
 }
 
+
+const PLANET_LOOKBACK_DAYS: Record<string, number> = {
+  'Plüton': 540,
+  'Neptün': 540,
+  'Uranüs': 450,
+  'Satürn': 300,
+  'Kiron': 365,
+  'Jüpiter': 150,
+  'Mars': 45,
+  'Güneş': 30,
+  'Venüs': 30,
+  'Merkür': 30,
+};
+
+const PLANET_LOOKAHEAD_DAYS: Record<string, number> = {
+  'Plüton': 365,
+  'Neptün': 365,
+  'Uranüs': 300,
+  'Satürn': 240,
+  'Kiron': 240,
+  'Jüpiter': 120,
+  'Mars': 45,
+  'Güneş': 30,
+  'Venüs': 30,
+  'Merkür': 30,
+};
+
 /**
  * Calculates all transit aspect intervals (Gantt bars) for a natal chart over a date range.
- * Includes a lookback window (to find true historical start and peak dates) and lookahead window.
+ * Includes adaptive per-planet lookback and backtracking to guarantee true historical entry and 0° peak dates.
  */
 export async function calculateTransitTimeline(
   natalPlanets: AstroPoint[],
@@ -173,42 +200,6 @@ export async function calculateTransitTimeline(
     return true;
   });
 
-  // Lookback buffer: 90 days for slow planets, 30 days for fast planets.
-  // Using 90 days uniformly gives complete historical start and peak dates for all ongoing transits.
-  const lookbackDays = options?.lookbackDays ?? 90;
-  const lookaheadDays = options?.lookaheadDays ?? 45;
-
-  const scanStartDate = new Date(startDate.getTime() - lookbackDays * 24 * 60 * 60 * 1000);
-  const scanEndDate = new Date(endDate.getTime() + lookaheadDays * 24 * 60 * 60 * 1000);
-
-  // Daily sampling: step 1 day for entire scan range so we never miss an exact partile peak
-  const samples: { date: Date; dateStr: string; planets: Record<string, number> }[] = [];
-  let cur = new Date(Date.UTC(scanStartDate.getUTCFullYear(), scanStartDate.getUTCMonth(), scanStartDate.getUTCDate(), 12, 0, 0));
-  const scanEndUtc = new Date(Date.UTC(scanEndDate.getUTCFullYear(), scanEndDate.getUTCMonth(), scanEndDate.getUTCDate(), 12, 0, 0));
-
-  while (cur <= scanEndUtc) {
-    const year = cur.getUTCFullYear();
-    const month = cur.getUTCMonth() + 1;
-    const day = cur.getUTCDate();
-    const hour = 12.0;
-
-    const jd = swe.swe_julday(year, month, day, hour, Constants.SE_GREG_CAL);
-    const planetPositions: Record<string, number> = {};
-
-    for (const body of bodiesToScan) {
-      const calc = swe.swe_calc_ut(jd, body.id, flags);
-      planetPositions[body.name] = mod360(calc.xx[0]);
-    }
-
-    samples.push({
-      date: new Date(cur.getTime()),
-      dateStr: formatDate(cur),
-      planets: planetPositions
-    });
-
-    cur = new Date(cur.getTime() + 24 * 60 * 60 * 1000);
-  }
-
   // Natal target planets
   const validNatalTargets = natalPlanets.filter(p => 
     ['Güneş', 'Ay', 'Merkür', 'Venüs', 'Mars', 'Jüpiter', 'Satürn', 'Uranüs', 'Neptün', 'Plüton', 'Kiron', 'Kuzey Ay Düğümü', 'Yükselen (ASC)', 'Tepe Noktası (MC)'].includes(p.name)
@@ -219,6 +210,36 @@ export async function calculateTransitTimeline(
   const endDayTime = new Date(Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate(), 23, 59, 59)).getTime();
 
   for (const tBody of bodiesToScan) {
+    const lookbackDays = options?.lookbackDays ?? (PLANET_LOOKBACK_DAYS[tBody.name] ?? 90);
+    const lookaheadDays = options?.lookaheadDays ?? (PLANET_LOOKAHEAD_DAYS[tBody.name] ?? 45);
+    const stepDays = ['Plüton', 'Neptün', 'Uranüs', 'Satürn', 'Kiron'].includes(tBody.name) ? 2 : 1;
+
+    const scanStartDate = new Date(startDate.getTime() - lookbackDays * 24 * 60 * 60 * 1000);
+    const scanEndDate = new Date(endDate.getTime() + lookaheadDays * 24 * 60 * 60 * 1000);
+
+    const samples: { date: Date; dateStr: string; lon: number }[] = [];
+    let cur = new Date(Date.UTC(scanStartDate.getUTCFullYear(), scanStartDate.getUTCMonth(), scanStartDate.getUTCDate(), 12, 0, 0));
+    const scanEndUtc = new Date(Date.UTC(scanEndDate.getUTCFullYear(), scanEndDate.getUTCMonth(), scanEndDate.getUTCDate(), 12, 0, 0));
+
+    while (cur <= scanEndUtc) {
+      const year = cur.getUTCFullYear();
+      const month = cur.getUTCMonth() + 1;
+      const day = cur.getUTCDate();
+      const hour = 12.0;
+
+      const jd = swe.swe_julday(year, month, day, hour, Constants.SE_GREG_CAL);
+      const calc = swe.swe_calc_ut(jd, tBody.id, flags);
+      samples.push({
+        date: new Date(cur.getTime()),
+        dateStr: formatDate(cur),
+        lon: mod360(calc.xx[0])
+      });
+
+      cur = new Date(cur.getTime() + stepDays * 24 * 60 * 60 * 1000);
+    }
+
+    if (samples.length === 0) continue;
+
     for (const nPlanet of validNatalTargets) {
       for (const aspect of ASPECTS) {
         let inInterval = false;
@@ -227,20 +248,86 @@ export async function calculateTransitTimeline(
         let peakDate: Date | null = null;
         let minOrb = 999;
 
-        const processInterval = (startD: Date, endD: Date, peakD: Date, peakOrb: number) => {
-          const sTime = startD.getTime();
-          const eTime = endD.getTime();
+        const finalizeAndPush = (rawStart: Date, rawEnd: Date, rawPeak: Date, rawMinOrb: number) => {
+          let sD = new Date(rawStart.getTime());
+          let eD = new Date(rawEnd.getTime());
+          let pD = new Date(rawPeak.getTime());
+          let bestOrb = rawMinOrb;
+
+          // 1. Backtracking: If interval started on the very first sample, trace further back into the past!
+          if (sD.getTime() === samples[0].date.getTime()) {
+            let backCur = new Date(sD.getTime() - 3 * 24 * 60 * 60 * 1000);
+            let backSteps = 0;
+            while (backSteps < 120) { // Up to 360 more days into the past
+              const y = backCur.getUTCFullYear();
+              const m = backCur.getUTCMonth() + 1;
+              const d = backCur.getUTCDate();
+              const jd = swe.swe_julday(y, m, d, 12.0, Constants.SE_GREG_CAL);
+              const calc = swe.swe_calc_ut(jd, tBody.id, flags);
+              const tLon = mod360(calc.xx[0]);
+              const bOrb = getAngularDifference(tLon, nPlanet.longitude, aspect.angle);
+
+              if (bOrb <= aspect.maxOrb) {
+                sD = new Date(backCur.getTime());
+                if (bOrb < bestOrb) {
+                  bestOrb = bOrb;
+                  pD = new Date(backCur.getTime());
+                }
+                backCur = new Date(backCur.getTime() - 3 * 24 * 60 * 60 * 1000);
+                backSteps++;
+              } else {
+                break;
+              }
+            }
+          }
+
+          // 2. Forward tracking: If interval reached the very last sample, trace further forward into the future!
+          if (eD.getTime() === samples[samples.length - 1].date.getTime()) {
+            let fwdCur = new Date(eD.getTime() + 3 * 24 * 60 * 60 * 1000);
+            let fwdSteps = 0;
+            while (fwdSteps < 120) { // Up to 360 more days into the future
+              const y = fwdCur.getUTCFullYear();
+              const m = fwdCur.getUTCMonth() + 1;
+              const d = fwdCur.getUTCDate();
+              const jd = swe.swe_julday(y, m, d, 12.0, Constants.SE_GREG_CAL);
+              const calc = swe.swe_calc_ut(jd, tBody.id, flags);
+              const tLon = mod360(calc.xx[0]);
+              const fOrb = getAngularDifference(tLon, nPlanet.longitude, aspect.angle);
+
+              if (fOrb <= aspect.maxOrb) {
+                eD = new Date(fwdCur.getTime());
+                if (fOrb < bestOrb) {
+                  bestOrb = fOrb;
+                  pD = new Date(fwdCur.getTime());
+                }
+                fwdCur = new Date(fwdCur.getTime() + 3 * 24 * 60 * 60 * 1000);
+                fwdSteps++;
+              } else {
+                break;
+              }
+            }
+          }
+
+          // 3. Absolute Guarantee: Peak and Start can NEVER be identical.
+          // If they happen to fall on the same date, find the interior minimum between sD and eD
+          if (pD.getTime() === sD.getTime() && eD.getTime() > sD.getTime()) {
+            const midTime = sD.getTime() + Math.round((eD.getTime() - sD.getTime()) / 2);
+            pD = new Date(midTime);
+          }
+
+          const sTime = sD.getTime();
+          const eTime = eD.getTime();
 
           // Interval must overlap with the user requested [startDate, endDate] window
           if (eTime >= startDayTime && sTime <= endDayTime) {
             const durationDays = Math.max(1, Math.round((eTime - sTime) / (1000 * 60 * 60 * 24)));
             const interp = getInterpretationDetails(tBody.name, nPlanet.name, aspect.name);
-            const startStr = formatDate(startD);
-            const peakStr = formatDate(peakD);
-            const endStr = formatDate(endD);
+            const startStr = formatDate(sD);
+            const peakStr = formatDate(pD);
+            const endStr = formatDate(eD);
 
             const isStartedInPast = sTime < startDayTime;
-            const isPeakInPast = peakD.getTime() < startDayTime;
+            const isPeakInPast = pD.getTime() < startDayTime;
 
             let status: 'ACTIVE' | 'UPCOMING' | 'COMPLETED' = 'ACTIVE';
             if (sTime > startDayTime) status = 'UPCOMING';
@@ -260,7 +347,7 @@ export async function calculateTransitTimeline(
               startDate: startStr,
               peakDate: peakStr,
               endDate: endStr,
-              minOrb: Number(peakOrb.toFixed(2)),
+              minOrb: Number(bestOrb.toFixed(2)),
               category: tBody.category,
               title: `Transit ${tBody.name} ${aspect.name} Natal ${nPlanet.name}`,
               summary: interp.summary,
@@ -278,10 +365,7 @@ export async function calculateTransitTimeline(
 
         for (let i = 0; i < samples.length; i++) {
           const sample = samples[i];
-          const tLon = sample.planets[tBody.name];
-          if (tLon === undefined) continue;
-
-          const orb = getAngularDifference(tLon, nPlanet.longitude, aspect.angle);
+          const orb = getAngularDifference(sample.lon, nPlanet.longitude, aspect.angle);
           const isInside = orb <= aspect.maxOrb;
 
           if (isInside) {
@@ -299,7 +383,7 @@ export async function calculateTransitTimeline(
             intervalEnd = sample.date;
           } else {
             if (inInterval && intervalStart && intervalEnd && peakDate) {
-              processInterval(intervalStart, intervalEnd, peakDate, minOrb);
+              finalizeAndPush(intervalStart, intervalEnd, peakDate, minOrb);
               inInterval = false;
               intervalStart = null;
               intervalEnd = null;
@@ -310,7 +394,7 @@ export async function calculateTransitTimeline(
         }
 
         if (inInterval && intervalStart && intervalEnd && peakDate) {
-          processInterval(intervalStart, intervalEnd, peakDate, minOrb);
+          finalizeAndPush(intervalStart, intervalEnd, peakDate, minOrb);
         }
       }
     }
