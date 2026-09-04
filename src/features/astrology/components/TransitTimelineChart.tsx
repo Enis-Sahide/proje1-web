@@ -60,9 +60,17 @@ export default function TransitTimelineChart({
   const [aspectFilter, setAspectFilter] = useState<'ALL' | 'HARMONIOUS' | 'CHALLENGING'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const rangeStart = useMemo(() => new Date(startDateStr).getTime(), [startDateStr]);
-  const rangeEnd = useMemo(() => new Date(endDateStr).getTime(), [endDateStr]);
-  const totalRangeMs = Math.max(1, rangeEnd - rangeStart);
+  const rangeStart = useMemo(() => {
+    const t = new Date(startDateStr).getTime();
+    return isNaN(t) ? Date.now() : t;
+  }, [startDateStr]);
+
+  const rangeEnd = useMemo(() => {
+    const t = new Date(endDateStr).getTime();
+    return isNaN(t) ? rangeStart + 30 * 24 * 60 * 60 * 1000 : Math.max(t, rangeStart + 24 * 60 * 60 * 1000);
+  }, [endDateStr, rangeStart]);
+
+  const totalRangeMs = Math.max(86400000, rangeEnd - rangeStart);
 
   const today = useMemo(() => {
     const t = new Date();
@@ -82,11 +90,13 @@ export default function TransitTimelineChart({
     for (let i = 0; i <= numCols; i++) {
       const time = rangeStart + (i / numCols) * totalRangeMs;
       const d = new Date(time);
-      const day = d.getDate();
+      const day = d.getDate() || 1;
+      const mIdx = isNaN(d.getMonth()) ? 0 : d.getMonth();
       const monthNames = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
+      const dateStr = !isNaN(d.getTime()) ? d.toISOString().split('T')[0] : '';
       cols.push({
-        label: `${day} ${monthNames[d.getMonth()]}`,
-        dateStr: d.toISOString().split('T')[0],
+        label: `${day} ${monthNames[mIdx]}`,
+        dateStr,
         percent: (i / numCols) * 100
       });
     }
@@ -107,9 +117,9 @@ export default function TransitTimelineChart({
       // Search query
       if (searchQuery.trim()) {
         const q = searchQuery.toLowerCase();
-        const matchTitle = item.title.toLowerCase().includes(q);
-        const matchSummary = item.summary.toLowerCase().includes(q);
-        const matchChakra = item.chakraLayer.toLowerCase().includes(q);
+        const matchTitle = (item.title || '').toLowerCase().includes(q);
+        const matchSummary = (item.summary || '').toLowerCase().includes(q);
+        const matchChakra = (item.chakraLayer || '').toLowerCase().includes(q);
         if (!matchTitle && !matchSummary && !matchChakra) return false;
       }
 
@@ -120,14 +130,14 @@ export default function TransitTimelineChart({
   return (
     <div className="w-full flex flex-col gap-6">
       {/* Top Filter Bar */}
-      <div className="bg-mystic-surface/60 backdrop-blur-md border border-mystic-surface-light p-6 rounded-3xl shadow-xl flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+      <div className="bg-mystic-surface/60 backdrop-blur-md border border-mystic-surface-light p-4 sm:p-6 rounded-3xl shadow-xl flex flex-col xl:flex-row items-stretch xl:items-center justify-between gap-4">
         
         {/* Left: Range Selector */}
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-semibold text-mystic-text-muted mr-1 flex items-center gap-1.5">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-semibold text-mystic-text-muted mr-1 flex items-center gap-1.5 whitespace-nowrap">
             <Calendar size={14} className="text-mystic-primary" /> Zaman Aralığı:
           </span>
-          <div className="flex bg-black/40 p-1 rounded-xl border border-white/5">
+          <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 overflow-x-auto max-w-full">
             {[
               { id: '1m', label: '1 Ay', isLocked: false },
               { id: '3m', label: '3 Ay', isLocked: !isPremium },
@@ -143,7 +153,7 @@ export default function TransitTimelineChart({
                     onRangeChange?.(r.id as any);
                   }
                 }}
-                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 whitespace-nowrap ${
                   range === r.id 
                     ? 'bg-mystic-primary text-black shadow-md' 
                     : r.isLocked
@@ -161,26 +171,26 @@ export default function TransitTimelineChart({
         {/* Center: Category & Aspect Filters */}
         <div className="flex flex-wrap items-center gap-2">
           {/* Category */}
-          <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 text-xs">
+          <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 text-xs overflow-x-auto max-w-full">
             <button
               onClick={() => setCategoryFilter('ALL')}
-              className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
+              className={`px-2.5 py-1 rounded-lg font-medium transition-all whitespace-nowrap ${
                 categoryFilter === 'ALL' ? 'bg-white/20 text-white font-bold' : 'text-mystic-text-muted hover:text-white'
               }`}
             >
-              Tüm Gezegenler
+              Tümü
             </button>
             <button
               onClick={() => setCategoryFilter('KADERSEL')}
-              className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
+              className={`px-2.5 py-1 rounded-lg font-medium transition-all whitespace-nowrap ${
                 categoryFilter === 'KADERSEL' ? 'bg-[#9333EA]/30 text-purple-300 font-bold border border-purple-500/30' : 'text-mystic-text-muted hover:text-white'
               }`}
             >
-              Kadersel (Jüpiter/Satürn/Plüton...)
+              Kadersel (Jüpiter/Satürn...)
             </button>
             <button
               onClick={() => setCategoryFilter('KISISEL')}
-              className={`px-2.5 py-1 rounded-lg font-medium transition-all ${
+              className={`px-2.5 py-1 rounded-lg font-medium transition-all whitespace-nowrap ${
                 categoryFilter === 'KISISEL' ? 'bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30' : 'text-mystic-text-muted hover:text-white'
               }`}
             >
@@ -189,10 +199,10 @@ export default function TransitTimelineChart({
           </div>
 
           {/* Aspect Harmony */}
-          <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 text-xs">
+          <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 text-xs overflow-x-auto max-w-full">
             <button
               onClick={() => setAspectFilter('ALL')}
-              className={`px-2.5 py-1 rounded-lg transition-all ${
+              className={`px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
                 aspectFilter === 'ALL' ? 'bg-white/10 text-white font-bold' : 'text-mystic-text-muted'
               }`}
             >
@@ -200,53 +210,53 @@ export default function TransitTimelineChart({
             </button>
             <button
               onClick={() => setAspectFilter('HARMONIOUS')}
-              className={`px-2.5 py-1 rounded-lg transition-all ${
+              className={`px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
                 aspectFilter === 'HARMONIOUS' ? 'bg-emerald-500/20 text-emerald-400 font-bold' : 'text-mystic-text-muted'
               }`}
             >
-              Destekler (🟢)
+              Destek (🟢)
             </button>
             <button
               onClick={() => setAspectFilter('CHALLENGING')}
-              className={`px-2.5 py-1 rounded-lg transition-all ${
+              className={`px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
                 aspectFilter === 'CHALLENGING' ? 'bg-rose-500/20 text-rose-400 font-bold' : 'text-mystic-text-muted'
               }`}
             >
-              Sınavlar (🔴)
+              Sınav (🔴)
             </button>
           </div>
         </div>
 
         {/* Right: Search Box */}
-        <div className="relative">
+        <div className="relative w-full xl:w-auto">
           <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-mystic-text-muted" />
           <input
             type="text"
             placeholder="Gezegen veya katman ara..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="bg-black/50 border border-white/10 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-mystic-text-muted/60 focus:outline-none focus:border-mystic-primary/60 w-full md:w-48"
+            className="bg-black/50 border border-white/10 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-mystic-text-muted/60 focus:outline-none focus:border-mystic-primary/60 w-full xl:w-48"
           />
         </div>
 
       </div>
 
       {/* Main Gantt Timeline Container */}
-      <div className="bg-mystic-surface/75 backdrop-blur-md border border-mystic-surface-light rounded-3xl p-6 shadow-2xl overflow-hidden flex flex-col">
+      <div className="bg-mystic-surface/75 backdrop-blur-md border border-mystic-surface-light rounded-3xl p-4 sm:p-6 shadow-2xl overflow-hidden flex flex-col w-full max-w-full">
         
         {/* Timeline Header Info */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-white/10 gap-2 mb-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between pb-4 border-b border-white/10 gap-3 mb-4">
           <div>
-            <h3 className="text-lg font-bold text-white flex items-center gap-2">
-              <Compass className="text-mystic-primary" size={20} />
+            <h3 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+              <Compass className="text-mystic-primary shrink-0" size={20} />
               Kozmik Zaman Çizelgesi (Gantt)
             </h3>
-            <p className="text-xs text-mystic-text-muted">
-              Yatay çubuklar açının etki süresini, parlayan işaretler ise açının doruk noktasını (0° Partil) temsil eder.
+            <p className="text-xs text-mystic-text-muted mt-0.5">
+              Yatay çubuklar açının etki süresini, parlayan işaretler doruk noktasını (0° Partil) temsil eder.
             </p>
           </div>
 
-          <div className="flex items-center gap-4 text-xs">
+          <div className="flex flex-wrap items-center gap-3 text-[11px] sm:text-xs">
             <span className="flex items-center gap-1.5 text-emerald-400">
               <span className="w-2.5 h-2.5 rounded-sm bg-emerald-500 inline-block"></span> Destek
             </span>
@@ -259,153 +269,160 @@ export default function TransitTimelineChart({
           </div>
         </div>
 
-        {/* Gantt Chart Body with Calendar Grid */}
-        <div className="relative w-full overflow-x-auto select-none min-w-[700px]">
+        {/* Mobile Horizontal Scroll Cue */}
+        <div className="flex sm:hidden items-center justify-between text-[11px] text-mystic-primary/90 bg-white/[0.03] px-3 py-1.5 rounded-xl border border-white/5 mb-3">
+          <span>👈 Takvimi parmağınızla sağa-sola kaydırın 👉</span>
+        </div>
+
+        {/* Gantt Chart Body with Calendar Grid - Overflow isolated to inner canvas */}
+        <div className="relative w-full overflow-x-auto select-none custom-scrollbar touch-pan-x pb-3">
+          <div className="min-w-[660px] sm:min-w-[760px] relative">
           
-          {/* Calendar Dates Axis Header */}
-          <div className="relative h-10 border-b border-white/10 flex items-center mb-3">
-            <div className="w-48 shrink-0 text-xs font-bold text-mystic-text-muted pl-2">
-              Transit & Açı
-            </div>
-            <div className="relative flex-grow h-full">
-              {dateColumns.map((col, idx) => (
-                <div 
-                  key={`col-${idx}`} 
-                  className="absolute top-0 bottom-0 flex flex-col justify-center text-[10px] font-semibold text-mystic-text-muted"
-                  style={{ left: `${col.percent}%`, transform: 'translateX(-50%)' }}
-                >
-                  <span>{col.label}</span>
-                </div>
-              ))}
-
-              {/* Today vertical indicator */}
-              {todayPercent >= 0 && todayPercent <= 100 && (
-                <div 
-                  className="absolute top-0 bottom-0 z-30 flex flex-col items-center"
-                  style={{ left: `${todayPercent}%`, transform: 'translateX(-50%)' }}
-                >
-                  <span className="bg-mystic-primary text-black text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-md">
-                    Bugün
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Vertical Grid Guidelines & Content Rows */}
-          <div className="relative flex flex-col gap-2.5 py-2">
-            
-            {/* Background Grid Lines */}
-            <div className="absolute inset-0 left-48 pointer-events-none z-0">
-              {dateColumns.map((col, idx) => (
-                <div 
-                  key={`grid-${idx}`} 
-                  className="absolute top-0 bottom-0 border-l border-white/5"
-                  style={{ left: `${col.percent}%` }}
-                />
-              ))}
-
-              {/* Today Line */}
-              {todayPercent >= 0 && todayPercent <= 100 && (
-                <div 
-                  className="absolute top-0 bottom-0 border-l-2 border-dashed border-mystic-primary/60 z-20"
-                  style={{ left: `${todayPercent}%` }}
-                />
-              )}
-            </div>
-
-            {/* Rows */}
-            {filteredItems.length === 0 ? (
-              <div className="py-16 text-center text-mystic-text-muted text-sm">
-                Seçilen kriterlere uygun aktif bir transit bulunamadı.
+            {/* Calendar Dates Axis Header */}
+            <div className="relative h-10 border-b border-white/10 flex items-center mb-3">
+              <div className="w-36 sm:w-44 shrink-0 text-xs font-bold text-mystic-text-muted pl-2 sticky left-0 bg-[#0F172A] z-30 py-2 border-r border-white/5">
+                Transit & Açı
               </div>
-            ) : (
-              filteredItems.map(item => {
-                const itemStart = new Date(item.startDate).getTime();
-                const itemEnd = new Date(item.endDate).getTime();
-                const itemPeak = new Date(item.peakDate).getTime();
-
-                // Compute relative percentages
-                const startClamped = Math.max(itemStart, rangeStart);
-                const endClamped = Math.min(itemEnd, rangeEnd);
-
-                const leftPercent = Math.max(0, ((startClamped - rangeStart) / totalRangeMs) * 100);
-                const widthPercent = Math.max(1.5, ((endClamped - startClamped) / totalRangeMs) * 100);
-                const peakPercent = Math.max(0, Math.min(100, ((itemPeak - rangeStart) / totalRangeMs) * 100));
-
-                // Color styles
-                let barColor = 'from-emerald-500/80 to-teal-500/80 border-emerald-400/40 text-emerald-100';
-                let iconColor = 'text-emerald-300';
-                if (item.type === 'Kavuşum') {
-                  barColor = 'from-amber-500/80 to-yellow-500/80 border-amber-300/40 text-amber-100';
-                  iconColor = 'text-amber-300';
-                } else if (!item.isHarmonious) {
-                  barColor = 'from-rose-600/80 to-red-500/80 border-rose-400/40 text-rose-100';
-                  iconColor = 'text-rose-300';
-                }
-
-                return (
+              <div className="relative flex-grow h-full">
+                {dateColumns.map((col, idx) => (
                   <div 
-                    key={item.id} 
-                    className="relative flex items-center h-9 hover:bg-white/[0.03] rounded-xl transition-colors cursor-pointer group z-10"
-                    onClick={() => setSelectedItem(item)}
+                    key={`col-${idx}`} 
+                    className="absolute top-0 bottom-0 flex flex-col justify-center text-[10px] font-semibold text-mystic-text-muted"
+                    style={{ left: `${col.percent}%`, transform: 'translateX(-50%)' }}
                   >
-                    {/* Left Column Label */}
-                    <div className="w-48 shrink-0 flex items-center gap-2 pl-2 pr-4 overflow-hidden">
-                      <span className="text-base font-bold text-mystic-primary w-5 text-center shrink-0">
-                        {PLANET_SYMBOLS[item.transitPlanet] || '•'}
-                      </span>
-                      <span className="text-xs font-semibold text-white truncate">
-                        T.{item.transitPlanet}
-                      </span>
-                      <span className="text-xs font-black text-mystic-accent shrink-0">
-                        {ASPECT_SYMBOLS[item.type] || item.type}
-                      </span>
-                      <span className="text-xs font-semibold text-gray-300 truncate">
-                        N.{item.natalPlanet}
-                      </span>
-                      <span className="text-base font-bold text-[#D4AF37] w-5 text-center shrink-0">
-                        {PLANET_SYMBOLS[item.natalPlanet] || '•'}
-                      </span>
-                    </div>
+                    <span>{col.label}</span>
+                  </div>
+                ))}
 
-                    {/* Right Column: Bar Track */}
-                    <div className="relative flex-grow h-full flex items-center">
-                      
-                      {/* Bar */}
-                      <div 
-                        className={`absolute h-7 rounded-xl bg-gradient-to-r ${barColor} border shadow-lg flex items-center justify-between px-2 transition-all duration-300 group-hover:scale-[1.01] group-hover:shadow-[0_0_15px_rgba(212,175,55,0.3)]`}
-                        style={{
-                          left: `${leftPercent}%`,
-                          width: `${widthPercent}%`,
-                          minWidth: '36px'
-                        }}
-                      >
-                        <span className="text-[10px] font-extrabold truncate drop-shadow-sm flex items-center gap-1">
-                          {item.isStartedInPast && <span className="text-[10px] opacity-75 mr-0.5 font-black">◀</span>}
-                          {item.type} ({item.durationDays}g)
+                {/* Today vertical indicator */}
+                {todayPercent >= 0 && todayPercent <= 100 && (
+                  <div 
+                    className="absolute top-0 bottom-0 z-30 flex flex-col items-center"
+                    style={{ left: `${todayPercent}%`, transform: 'translateX(-50%)' }}
+                  >
+                    <span className="bg-mystic-primary text-black text-[9px] font-black px-1.5 py-0.5 rounded-full shadow-md">
+                      Bugün
+                    </span>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Vertical Grid Guidelines & Content Rows */}
+            <div className="relative flex flex-col gap-2.5 py-2">
+              
+              {/* Background Grid Lines */}
+              <div className="absolute inset-0 left-36 sm:left-44 pointer-events-none z-0">
+                {dateColumns.map((col, idx) => (
+                  <div 
+                    key={`grid-${idx}`} 
+                    className="absolute top-0 bottom-0 border-l border-white/5"
+                    style={{ left: `${col.percent}%` }}
+                  />
+                ))}
+
+                {/* Today Line */}
+                {todayPercent >= 0 && todayPercent <= 100 && (
+                  <div 
+                    className="absolute top-0 bottom-0 border-l-2 border-dashed border-mystic-primary/60 z-20"
+                    style={{ left: `${todayPercent}%` }}
+                  />
+                )}
+              </div>
+
+              {/* Rows */}
+              {filteredItems.length === 0 ? (
+                <div className="py-16 text-center text-mystic-text-muted text-sm">
+                  Seçilen kriterlere uygun aktif bir transit bulunamadı.
+                </div>
+              ) : (
+                filteredItems.map(item => {
+                  const itemStart = new Date(item.startDate).getTime();
+                  const itemEnd = new Date(item.endDate).getTime();
+                  const itemPeak = new Date(item.peakDate).getTime();
+
+                  // Compute relative percentages safely
+                  const startClamped = Math.max(isNaN(itemStart) ? rangeStart : itemStart, rangeStart);
+                  const endClamped = Math.min(isNaN(itemEnd) ? rangeEnd : itemEnd, rangeEnd);
+
+                  const leftPercent = Math.max(0, ((startClamped - rangeStart) / totalRangeMs) * 100);
+                  const widthPercent = Math.max(1.5, ((endClamped - startClamped) / totalRangeMs) * 100);
+                  const peakPercent = Math.max(0, Math.min(100, isNaN(itemPeak) ? 0 : ((itemPeak - rangeStart) / totalRangeMs) * 100));
+
+                  // Color styles
+                  let barColor = 'from-emerald-500/80 to-teal-500/80 border-emerald-400/40 text-emerald-100';
+                  let iconColor = 'text-emerald-300';
+                  if (item.type === 'Kavuşum') {
+                    barColor = 'from-amber-500/80 to-yellow-500/80 border-amber-300/40 text-amber-100';
+                    iconColor = 'text-amber-300';
+                  } else if (!item.isHarmonious) {
+                    barColor = 'from-rose-600/80 to-red-500/80 border-rose-400/40 text-rose-100';
+                    iconColor = 'text-rose-300';
+                  }
+
+                  return (
+                    <div 
+                      key={item.id} 
+                      className="relative flex items-center h-9 hover:bg-white/[0.03] rounded-xl transition-colors cursor-pointer group z-10"
+                      onClick={() => setSelectedItem(item)}
+                    >
+                      {/* Left Column Label (Sticky for easy navigation on small screens) */}
+                      <div className="w-36 sm:w-44 shrink-0 flex items-center gap-1 sm:gap-2 pl-1.5 sm:pl-2 pr-2 sm:pr-4 overflow-hidden sticky left-0 bg-[#0A0A0F] z-20 py-1 rounded-l-lg border-r border-white/5">
+                        <span className="text-sm sm:text-base font-bold text-mystic-primary w-4 sm:w-5 text-center shrink-0">
+                          {PLANET_SYMBOLS[item.transitPlanet] || '•'}
                         </span>
-
-                        {/* Peak Point Glowing Marker (only if peak falls within range) */}
-                        {!item.isPeakInPast && peakPercent >= leftPercent && peakPercent <= (leftPercent + widthPercent) && (
-                          <div 
-                            className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-white shadow-[0_0_10px_#fff] border-2 border-black flex items-center justify-center z-20 group-hover:scale-125 transition-transform"
-                            style={{
-                              left: `${Math.max(8, Math.min(widthPercent - 8, ((peakPercent - leftPercent) / widthPercent) * 100))}%`
-                            }}
-                            title={`Zirve (0° Partil): ${item.peakDate}`}
-                          >
-                            <span className="w-1.5 h-1.5 rounded-full bg-black"></span>
-                          </div>
-                        )}
+                        <span className="text-[11px] sm:text-xs font-semibold text-white truncate">
+                          T.{item.transitPlanet}
+                        </span>
+                        <span className="text-[10px] sm:text-xs font-black text-mystic-accent shrink-0">
+                          {ASPECT_SYMBOLS[item.type] || item.type}
+                        </span>
+                        <span className="text-[11px] sm:text-xs font-semibold text-gray-300 truncate">
+                          N.{item.natalPlanet}
+                        </span>
+                        <span className="text-sm sm:text-base font-bold text-[#D4AF37] w-4 sm:w-5 text-center shrink-0">
+                          {PLANET_SYMBOLS[item.natalPlanet] || '•'}
+                        </span>
                       </div>
 
-                    </div>
-                  </div>
-                );
-              })
-            )}
+                      {/* Right Column: Bar Track */}
+                      <div className="relative flex-grow h-full flex items-center">
+                        
+                        {/* Bar */}
+                        <div 
+                          className={`absolute h-7 rounded-xl bg-gradient-to-r ${barColor} border shadow-lg flex items-center justify-between px-2 transition-all duration-300 group-hover:scale-[1.01] group-hover:shadow-[0_0_15px_rgba(212,175,55,0.3)]`}
+                          style={{
+                            left: `${leftPercent}%`,
+                            width: `${widthPercent}%`,
+                            minWidth: '36px'
+                          }}
+                        >
+                          <span className="text-[10px] font-extrabold truncate drop-shadow-sm flex items-center gap-1">
+                            {item.isStartedInPast && <span className="text-[10px] opacity-75 mr-0.5 font-black">◀</span>}
+                            {item.type} ({item.durationDays}g)
+                          </span>
 
+                          {/* Peak Point Glowing Marker (only if peak falls within range) */}
+                          {!item.isPeakInPast && peakPercent >= leftPercent && peakPercent <= (leftPercent + widthPercent) && (
+                            <div 
+                              className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-white shadow-[0_0_10px_#fff] border-2 border-black flex items-center justify-center z-20 group-hover:scale-125 transition-transform"
+                              style={{
+                                left: `${Math.max(8, Math.min(widthPercent - 8, ((peakPercent - leftPercent) / widthPercent) * 100))}%`
+                              }}
+                              title={`Zirve (0° Partil): ${item.peakDate}`}
+                            >
+                              <span className="w-1.5 h-1.5 rounded-full bg-black"></span>
+                            </div>
+                          )}
+                        </div>
+
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+
+            </div>
           </div>
         </div>
 

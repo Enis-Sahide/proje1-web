@@ -348,19 +348,19 @@ export default function TransitsPage() {
         ) : (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
             {/* View Navigation Tabs & Map Info */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-black/40 p-4 rounded-3xl border border-white/10 backdrop-blur-md">
-              <div className="flex items-center bg-black/60 p-1.5 rounded-2xl border border-white/10 shadow-lg">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-black/40 p-3 sm:p-4 rounded-3xl border border-white/10 backdrop-blur-md">
+              <div className="grid grid-cols-2 sm:flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 shadow-lg w-full sm:w-auto">
                 <button
                   type="button"
                   onClick={() => setActiveTab('BIWHEEL')}
-                  className={`flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+                  className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all text-center ${
                     activeTab === 'BIWHEEL'
                       ? 'bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] text-black shadow-lg shadow-cyan-500/20'
                       : 'text-mystic-text-muted hover:text-white'
                   }`}
                 >
-                  <Compass size={16} />
-                  <span>Anlık Çift Çember</span>
+                  <Compass size={15} className="shrink-0" />
+                  <span className="truncate">Çift Çember</span>
                 </button>
                 <button
                   type="button"
@@ -370,26 +370,26 @@ export default function TransitsPage() {
                       fetchTimeline(timelineRange);
                     }
                   }}
-                  className={`flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+                  className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all text-center ${
                     activeTab === 'TIMELINE'
                       ? 'bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] text-black shadow-lg shadow-cyan-500/20'
                       : 'text-mystic-text-muted hover:text-white'
                   }`}
                 >
-                  <Sparkles size={16} />
-                  <span>Zaman Çizelgesi (Gantt)</span>
+                  <Sparkles size={15} className="shrink-0" />
+                  <span className="truncate">Zaman Çizelgesi</span>
                 </button>
               </div>
 
-              <div className="flex items-center gap-3">
-                <div className="text-right hidden md:block">
-                  <span className="text-[11px] text-mystic-text-muted block">Harita Sahibi</span>
-                  <span className="text-xs font-bold text-white">{cityKey?.name} • {natalDateStr}</span>
+              <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
+                <div className="text-left sm:text-right">
+                  <span className="text-[10px] text-mystic-text-muted block">Harita Sahibi</span>
+                  <span className="text-[11px] sm:text-xs font-bold text-white truncate max-w-[180px] block">{cityKey?.name || 'Seçildi'} • {natalDateStr}</span>
                 </div>
                 <button 
                   type="button"
                   onClick={() => { setTransitData(null); setTimelineData(null); }} 
-                  className="text-xs px-4 py-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap"
+                  className="text-xs px-3.5 py-1.5 sm:py-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap shrink-0"
                 >
                   Yeni Harita Seç
                 </button>
@@ -399,20 +399,20 @@ export default function TransitsPage() {
             {/* Tab 1: Bi-Wheel Anlık Harita */}
             {activeTab === 'BIWHEEL' && (
               <div className="space-y-10">
-                <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-8 rounded-3xl shadow-2xl flex flex-col items-center">
+                <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-8 rounded-3xl shadow-2xl flex flex-col items-center w-full max-w-full overflow-hidden">
                   <div className="flex w-full flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-6 mb-8 gap-4">
                      <div>
-                       <h2 className="text-2xl font-bold text-white flex items-center gap-3 mb-2">
-                         <Compass className="text-[#0EA5E9]" /> Çift Çemberli Transit Haritası
+                       <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-3 mb-2">
+                         <Compass className="text-[#0EA5E9] shrink-0" /> Çift Çemberli Transit Haritası
                        </h2>
-                       <div className="flex flex-col gap-1 text-sm">
+                       <div className="flex flex-col gap-1 text-xs sm:text-sm">
                          <p className="text-[#D4AF37] flex items-center gap-2">
-                           <span className="w-2 h-2 rounded-full bg-[#D4AF37]"></span>
-                           Natal: {cityKey ? cityKey.name : ''} • {natalDateStr.split('-').reverse().join('.')} {natalTimeStr}
+                           <span className="w-2 h-2 rounded-full bg-[#D4AF37] shrink-0"></span>
+                           Natal: {cityKey ? cityKey.name : ''} • {natalDateStr ? natalDateStr.split('-').reverse().join('.') : ''} {natalTimeStr}
                          </p>
                          <p className="text-[#0EA5E9] flex items-center gap-2">
-                           <span className="w-3 h-3 rounded-full bg-[#0EA5E9] inline-block"></span>
-                           Transit (Dış Çember): {transitDateStr.split('-').reverse().join('.')} {transitTimeStr}
+                           <span className="w-2.5 h-2.5 rounded-full bg-[#0EA5E9] inline-block shrink-0"></span>
+                           Transit (Dış Çember): {transitDateStr ? transitDateStr.split('-').reverse().join('.') : ''} {transitTimeStr}
                          </p>
                        </div>
                      </div>
