@@ -268,6 +268,43 @@ export default function NumerolojiPage() {
                 <p>• <strong>Hiç 8 yoksa:</strong> Parayı yönetme ve otorite kurma dersi.</p>
               </div>
             </div>
+
+            <div className="bg-mystic-surface/50 p-6 border-l-4 border-mystic-primary rounded-r-2xl border-y border-r border-white/10 backdrop-blur-md">
+              <h3 className="text-lg font-bold text-mystic-primary mb-3">4. Harflerin Mahreçleri ve Çakra Titreşimi</h3>
+              <p className="text-sm text-mystic-text leading-relaxed mb-4">
+                Harfler yalnızca kağıt üzerindeki semboller değildir; nefesin insan bedenindeki mahreçlerinden (çıkış kapılarından) geçerken evrenin farklı elementleriyle rezonansa giren kutsal ses dalgalarıdır:
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-mystic-text">
+                <div className="bg-black/30 p-3 rounded-xl border border-red-500/20">
+                  <p className="font-bold text-red-400 mb-1">Gırtlak &amp; Boğaz (Ateş / Güneş):</p>
+                  <p className="text-gray-300"><strong>A, E, H...</strong> Doğrudan derin ciğerden engelsiz çıkar. Görünürlük, sahneye çıkış, şöhret ve &quot;Ben buradayım&quot; frekansıdır.</p>
+                </div>
+                <div className="bg-black/30 p-3 rounded-xl border border-green-500/20">
+                  <p className="font-bold text-green-400 mb-1">Dudak &amp; Ağız (Toprak &amp; Su / Mülk):</p>
+                  <p className="text-gray-300"><strong>B, M, P, V...</strong> Ağzın kapanmasıyla titreşir. Mem (Mülk, Mal, Maya, Para) köküdür. Soyut fikri somut servete ve kazanca dönüştürür.</p>
+                </div>
+                <div className="bg-black/30 p-3 rounded-xl border border-blue-500/20">
+                  <p className="font-bold text-blue-400 mb-1">Damak &amp; Dil (Hava / Zeka):</p>
+                  <p className="text-gray-300"><strong>C, Ç, D, K, L, N, R, T...</strong> Hızlı hava akışı sağlar. İletişim, ticari zeka, network ve bilginin kitlelere yayılımını yönetir.</p>
+                </div>
+                <div className="bg-black/30 p-3 rounded-xl border border-purple-500/20">
+                  <p className="font-bold text-purple-400 mb-1">Diş &amp; Islık (Aura / Manyetizma):</p>
+                  <p className="text-gray-300"><strong>S, Ş, Z, J...</strong> Samekh ve Zayin enerjisidir. Manyetik çekim, odaklanmış güç ve negatif enerjileri savuşturan koruyucu bir aura kalkanı kurar.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-mystic-surface/50 p-6 border-l-4 border-mystic-primary rounded-r-2xl border-y border-r border-white/10 backdrop-blur-md">
+              <h3 className="text-lg font-bold text-mystic-primary mb-3">5. İsim Simülasyonu ve Ek İsimle Çakra Dengeleme</h3>
+              <p className="text-sm text-mystic-text leading-relaxed mb-4">
+                Kadim gelenekte bir insanın isminde eksik olan çakralar, hayatındaki tıkanıklık alanlarını (parasızlık, yalnızlık, ifade güçlüğü) gösterir. Bu eksiklikler bilinçli bir &quot;İkinci İsim&quot; eklenerek rezonans düzeyinde kapatılabilir:
+              </p>
+              <div className="bg-black/30 p-4 rounded-xl text-xs text-mystic-text space-y-2">
+                <p>• <strong>Bolluk &amp; Bereket Hedefi:</strong> 2 (Ortaklık), 3 (İrade), 4 (Mülk - Mem) ve 8 (Büyük Finans) çakralarını taşıyan isimler (Örn: <em>Melis, Burak, Berk, Demir, Banu</em>).</p>
+                <p>• <strong>Görünürlük &amp; Şöhret Hedefi:</strong> 1 (Liderlik - Alef), 5 (Boğaz - İfade) ve 9 (Evrensel Yayılım) çakralarını taşıyan isimler (Örn: <em>Arya, Aras, Ege, Rana, Sera</em>).</p>
+                <p>• <strong>Aşk &amp; Uyum Hedefi:</strong> 2 (Sakral Çekim) ve 4-6 (Kalp ve Estetik) çakralarını taşıyan isimler (Örn: <em>Defne, Can, Filiz, Deniz, Oya</em>).</p>
+              </div>
+            </div>
           </div>
         )}
 
@@ -324,10 +361,31 @@ export default function NumerolojiPage() {
             </div>
 
             <div className="bg-mystic-surface/50 p-6 border-l-4 border-mystic-primary rounded-r-2xl border-y border-r border-white/10 backdrop-blur-md">
-              <h3 className="text-lg font-bold text-mystic-primary mb-3">4. Temel Taşı ve Zirve Taşı</h3>
-              <p className="text-sm text-mystic-text leading-relaxed">
-                Bir kişinin ismindeki <strong>İlk Harf (Temel Taşı - Cornerstone)</strong> onun hayata karşı ilk reaksiyonunu, ilk savunma mekanizmasını gösterir. <strong>Son Harf (Zirve Taşı - Capstone)</strong> ise bir projeyi nasıl tamamladığını veya sorunları nasıl sonlandırdığını gösterir. İlk Sesli Harf ise ruhun dünyevi dünyaya bakan ilk penceresidir.
+              <h3 className="text-lg font-bold text-mystic-primary mb-3">4. Temel Taşı, Zirve Taşı ve Ouroboros Geometrisi</h3>
+              <p className="text-sm text-mystic-text leading-relaxed mb-4">
+                Bir ismin ilk harfi <strong>Temel Taşı (Cornerstone)</strong>, son harfi ise <strong>Zirve Taşı (Capstone)</strong> olarak adlandırılır. Bu iki harfin birbiriyle ilişkisi, enerjinin akışını ya da kilitlenmesini belirler.
               </p>
+              <div className="bg-black/30 p-4 rounded-xl text-xs text-mystic-text space-y-2">
+                <p>• <strong>Kutsal Döngü (Ouroboros Kalkanı):</strong> İsmin aynı harfle başlayıp aynı harfle bitmesi (Örn: <em>Omnia Studio</em> - O...O veya A...A) paranın ve enerjinin dışarı kaçmasını önleyen kapalı bir bereket aurası çizer.</p>
+                <p>• <strong>Dönüştürücü Akış:</strong> İsmin gırtlaktan (Ateş/Güneş) başlayıp dudakta (Toprak/Mem) bitmesi, fikirlerin hızla fiziksel servete dönüşmesini sağlar.</p>
+              </div>
+            </div>
+
+            <div className="bg-mystic-surface/50 p-6 border-l-4 border-mystic-primary rounded-r-2xl border-y border-r border-white/10 backdrop-blur-md">
+              <h3 className="text-lg font-bold text-mystic-primary mb-3">5. Ticari Şirket ve Marka Akustiği Sırrı</h3>
+              <p className="text-sm text-mystic-text leading-relaxed mb-4">
+                Başarılı küresel markalar incelendiğinde harf frekanslarının tesadüfi olmadığı görülür:
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-mystic-text">
+                <div className="bg-black/30 p-3 rounded-xl">
+                  <strong className="text-yellow-400 block mb-1">Finans &amp; E-Ticaret:</strong>
+                  M (Mem - Mülk), B (Bet - Kap), L (Genişleme) ve 8 (Zayin - Otorite) harfleriyle müşterinin güvenle para harcaması ve kârın kasada kalması sağlanır.
+                </div>
+                <div className="bg-black/30 p-3 rounded-xl">
+                  <strong className="text-indigo-400 block mb-1">Sanat &amp; Görsel Tasarım:</strong>
+                  6. Çakra (O, F) ve 2. Çakra (B, K, T) harfleriyle estetik arzu, ilham ve görsel çekicilik manyetizması yaratılır.
+                </div>
+              </div>
             </div>
           </div>
         )}
