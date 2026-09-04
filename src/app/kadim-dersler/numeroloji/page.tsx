@@ -270,26 +270,26 @@ export default function NumerolojiPage() {
             </div>
 
             <div className="bg-mystic-surface/50 p-6 border-l-4 border-mystic-primary rounded-r-2xl border-y border-r border-white/10 backdrop-blur-md">
-              <h3 className="text-lg font-bold text-mystic-primary mb-3">4. Harflerin Mahreçleri ve Çakra Titreşimi</h3>
+              <h3 className="text-lg font-bold text-mystic-primary mb-3">4. Sesin Doğduğu 4 Bedensel Rezonans Merkezi</h3>
               <p className="text-sm text-mystic-text leading-relaxed mb-4">
-                Harfler yalnızca kağıt üzerindeki semboller değildir; nefesin insan bedenindeki mahreçlerinden (çıkış kapılarından) geçerken evrenin farklı elementleriyle rezonansa giren kutsal ses dalgalarıdır:
+                Ezoterik ses tıbbında ve Sufi Letaif ilminde beden bir müzik aletidir. Harfler ağızda şekillenmeden önce bedenin derin boşluklarında rezone olur:
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-mystic-text">
-                <div className="bg-black/30 p-3 rounded-xl border border-red-500/20">
-                  <p className="font-bold text-red-400 mb-1">Gırtlak &amp; Boğaz (Ateş / Güneş):</p>
-                  <p className="text-gray-300"><strong>A, E, H...</strong> Doğrudan derin ciğerden engelsiz çıkar. Görünürlük, sahneye çıkış, şöhret ve &quot;Ben buradayım&quot; frekansıdır.</p>
+                <div className="bg-black/30 p-3 rounded-xl border border-green-500/30">
+                  <p className="font-bold text-green-400 mb-1">🫀 Kalp &amp; Göğüs Rezonansı (Sevgi &amp; Bereket):</p>
+                  <p className="text-gray-300"><strong>M, A, L, D, V...</strong> Göğüs kafesini davul gibi titreten seslerdir. <strong>A (Alef)</strong> kalpten doğan saf varoluş ve sevgi feryadıdır; boğazla kalp arasında açık köprü kurar. <strong>M (Mem)</strong> ise göğüste uğuldayan mülk, para ve kalıcı bereketin mühür sesidir.</p>
                 </div>
-                <div className="bg-black/30 p-3 rounded-xl border border-green-500/20">
-                  <p className="font-bold text-green-400 mb-1">Dudak &amp; Ağız (Toprak &amp; Su / Mülk):</p>
-                  <p className="text-gray-300"><strong>B, M, P, V...</strong> Ağzın kapanmasıyla titreşir. Mem (Mülk, Mal, Maya, Para) köküdür. Soyut fikri somut servete ve kazanca dönüştürür.</p>
+                <div className="bg-black/30 p-3 rounded-xl border border-yellow-500/30">
+                  <p className="font-bold text-yellow-400 mb-1">🔥 Karın &amp; Mide Rezonansı (İrade &amp; Eylem):</p>
+                  <p className="text-gray-300"><strong>U, Ü, O, Ö, K, Ç, C, T...</strong> Söylerken karın kaslarının ve diyaframın kasıldığını hissedersiniz. Solar Pleksus ateşidir; cesareti, ticari atılımı, eyleme geçme iradesini yönetir.</p>
                 </div>
-                <div className="bg-black/30 p-3 rounded-xl border border-blue-500/20">
-                  <p className="font-bold text-blue-400 mb-1">Damak &amp; Dil (Hava / Zeka):</p>
-                  <p className="text-gray-300"><strong>C, Ç, D, K, L, N, R, T...</strong> Hızlı hava akışı sağlar. İletişim, ticari zeka, network ve bilginin kitlelere yayılımını yönetir.</p>
+                <div className="bg-black/30 p-3 rounded-xl border border-cyan-500/30">
+                  <p className="font-bold text-cyan-400 mb-1">🗣️ Boğaz Rezonansı (İfade &amp; Görünürlük):</p>
+                  <p className="text-gray-300"><strong>E, H, N, B, P...</strong> Boğaz kanalında şekillenen seslerdir. <strong>E (He)</strong> boğazın doğal artikülasyonudur; içerideki duyguyu dış dünyaya tercüme eder, kitlelere hitap ve dijital ağ yayılımı sağlar.</p>
                 </div>
-                <div className="bg-black/30 p-3 rounded-xl border border-purple-500/20">
-                  <p className="font-bold text-purple-400 mb-1">Diş &amp; Islık (Aura / Manyetizma):</p>
-                  <p className="text-gray-300"><strong>S, Ş, Z, J...</strong> Samekh ve Zayin enerjisidir. Manyetik çekim, odaklanmış güç ve negatif enerjileri savuşturan koruyucu bir aura kalkanı kurar.</p>
+                <div className="bg-black/30 p-3 rounded-xl border border-purple-500/30">
+                  <p className="font-bold text-purple-400 mb-1">🧠 Kafa &amp; Zihin Rezonansı (Sezgi &amp; Manyetizma):</p>
+                  <p className="text-gray-300"><strong>I, İ, Y, S, Ş, Z, F, J, R...</strong> Sinüs boşluklarında ve epifiz bezinde mikrotitreşim yapar. Yüksek analitik zeka, strateji ve negatif enerjileri savuran manyetik bir kalkan oluşturur.</p>
                 </div>
               </div>
             </div>

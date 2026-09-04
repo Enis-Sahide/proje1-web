@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { 
   ArrowLeft, Hexagon, Loader2, Calendar, User, ArrowRight, Target, Heart, 
   Sparkles, Info, AlertCircle, Zap, Briefcase, Award, ShieldCheck, 
-  CheckCircle2, TrendingUp, Compass, Flame, Droplets, Wind, Mountain
+  CheckCircle2, TrendingUp, Compass, Flame, Droplets, Wind, Mountain,
+  Brain, MessageSquare
 } from 'lucide-react';
 import { calculateLifePath, calculatePersonalYear, calculateArrows, getBirthdayNumber, calculateNameAnalysis, reduceToSingleDigit } from '@/utils/numerologyCalculator';
 import { lifePathData, birthdayData, arrowsData, emptyArrowsData, personalYearData, numerologyData } from '@/utils/numerologyData';
@@ -13,10 +14,12 @@ import { useAuth } from '@/context/AuthContext';
 import { 
   PhoneticChakraEngine, 
   CHAKRA_METADATA, 
+  BODY_CENTERS_METADATA,
   TargetGoal, 
   SimulationComparison, 
   BrandAnalysisResult, 
-  SuggestedNameItem 
+  SuggestedNameItem,
+  BodyCenter
 } from '@/features/numerology/engine/PhoneticChakraEngine';
 
 const isMaster = (num: number) => num === 11 || num === 22 || num === 33;
@@ -392,7 +395,7 @@ export default function NumerologyPage() {
           </div>
           <div>
             <h1 className="text-3xl font-bold text-white">Numeroloji & Harf Akustiği</h1>
-            <p className="text-mystic-text-muted">Pisagor, Kabala & Ses Mahreçlerine Göre Titreşimsel Analiz</p>
+            <p className="text-mystic-text-muted">Pisagor, Kabala & Beden Rezonans Merkezlerine Göre Titreşimsel Analiz</p>
           </div>
         </div>
 
@@ -438,8 +441,8 @@ export default function NumerologyPage() {
             {isAnalyzing && (
               <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center text-[#AF52DE]">
                 <Loader2 size={48} className="animate-spin mb-4" />
-                <h3 className="text-xl font-bold mb-2 animate-pulse">Kozmik Ses ve Çakra Frekansları Titreşiyor...</h3>
-                <p className="text-sm text-white/60">Mahreçler, Ouroboros aurası ve sayı sekansları taranıyor</p>
+                <h3 className="text-xl font-bold mb-2 animate-pulse">Kozmik Ses ve Beden Rezonansları Titreşiyor...</h3>
+                <p className="text-sm text-white/60">Kalp, Karın, Boğaz ve Zihin merkezleri taranıyor</p>
               </div>
             )}
             
@@ -479,10 +482,10 @@ export default function NumerologyPage() {
 
                   <div className="p-4 bg-white/5 border border-white/10 rounded-2xl text-xs text-mystic-text-muted space-y-1">
                     <p className="font-semibold text-white flex items-center gap-1.5">
-                      <Sparkles size={14} className="text-[#AF52DE]" /> Ek İsim Simülasyonu Hakkında
+                      <Sparkles size={14} className="text-[#AF52DE]" /> Ek İsim Simülasyonu & Beden Rezonansı
                     </p>
                     <p>
-                      Mevcut isminizi analiz ettikten sonra raporda açılacak <strong>Simülatör</strong> ile düşündüğünüz ek isimleri deneyebilir, eksik çakralarınızı kapatıp kapatmadığını canlı görebilirsiniz.
+                      Mevcut isminizi analiz ettikten sonra raporda açılacak <strong>Simülatör</strong> ile düşündüğünüz ek isimleri deneyebilir, Kalp, Karın, Boğaz veya Zihin merkezlerinizin nasıl güçlendiğini canlı görebilirsiniz.
                     </p>
                   </div>
 
@@ -525,9 +528,9 @@ export default function NumerologyPage() {
                       <Award size={14} /> Şirket İsmi Akustiği Neler Sağlar?
                     </p>
                     <p>
+                      • <strong>Beden Rezonans Merkezleri:</strong> İsmin Kalp (Güven/Mülk), Karın (İrade/Satış), Boğaz (Yayılım) veya Zihin (Strateji) dengesi.<br />
                       • <strong>Ouroboros Geometrisi:</strong> İsmin ilk ve son harfinin parayı içeride tutma kabiliyeti.<br />
-                      • <strong>Mahreç Analizi:</strong> Gırtlak (Görünürlük/Şöhret) vs Dudak (Mülk/Para/Satış) dengesi.<br />
-                      • <strong>Sektörel Başarı Puanları:</strong> Finans, Görsel Sanat, Akademi/Eğitim veya Teknoloji uyumu.
+                      • <strong>Sektörel Başarı Puanları:</strong> Finans, Görsel Sanat, Akademi veya Teknoloji uyumu.
                     </p>
                   </div>
 
@@ -599,6 +602,134 @@ export default function NumerologyPage() {
                   </div>
                 </div>
 
+                {/* Dominant Body Center Banner */}
+                <div className="bg-[#D4AF37]/10 border border-[#D4AF37]/30 p-5 rounded-3xl flex items-start gap-3">
+                  <Sparkles className="text-[#D4AF37] shrink-0 mt-0.5" size={22} />
+                  <div>
+                    <h4 className="text-sm font-bold text-[#D4AF37] mb-1">İsmin Bedensel Konuşma Tarzı:</h4>
+                    <p className="text-xs md:text-sm text-gray-200 leading-relaxed font-medium">
+                      {brandResult.dominantBodyVerdict}
+                    </p>
+                  </div>
+                </div>
+
+                {/* 4 BÜYÜK BEDENSEL REZONANS MERKEZİ (Sesin Doğduğu Beden Organları) */}
+                <div>
+                  <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
+                    <Compass size={20} className="text-[#D4AF37]" />
+                    <span>Bedensel Rezonans Merkezleri (Sesin Doğduğu Organlar)</span>
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* 1. Kalp & Göğüs */}
+                    <div className="bg-black/40 border border-green-500/20 rounded-2xl p-5 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-xl bg-green-500/10 text-green-400">
+                            <Heart size={20} />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-white text-sm">Kalp & Göğüs Rezonansı</h4>
+                            <span className="text-[10px] text-green-400 font-semibold">Sevgi, Güven & Bereket (Mülk)</span>
+                          </div>
+                        </div>
+                        <span className="text-xl font-bold text-green-400">
+                          %{brandResult.bodyResonance.heart.percentage}
+                        </span>
+                      </div>
+                      <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-green-500 transition-all duration-500 rounded-full" 
+                          style={{ width: `${brandResult.bodyResonance.heart.percentage}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-300 leading-relaxed">
+                        Harfler: <strong>A, M, L, D, V</strong>. Göğüs kafesini titreterek müşteride sarsılmaz güven, aidiyet ve kalıcı mülk hissi uyandırır.
+                      </p>
+                    </div>
+
+                    {/* 2. Karın & Mide */}
+                    <div className="bg-black/40 border border-yellow-500/20 rounded-2xl p-5 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-xl bg-yellow-500/10 text-yellow-400">
+                            <Flame size={20} />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-white text-sm">Karın & Mide Rezonansı</h4>
+                            <span className="text-[10px] text-yellow-400 font-semibold">Solar Pleksus İradesi & Eylem</span>
+                          </div>
+                        </div>
+                        <span className="text-xl font-bold text-yellow-400">
+                          %{brandResult.bodyResonance.stomach.percentage}
+                        </span>
+                      </div>
+                      <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-yellow-500 transition-all duration-500 rounded-full" 
+                          style={{ width: `${brandResult.bodyResonance.stomach.percentage}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-300 leading-relaxed">
+                        Harfler: <strong>U, Ü, O, Ö, K, Ç, C, T</strong>. Diyaframdan patlayan bu sesler satın alma eylemini, cesareti ve ticari iradeyi tetikler.
+                      </p>
+                    </div>
+
+                    {/* 3. Boğaz & İfade */}
+                    <div className="bg-black/40 border border-cyan-500/20 rounded-2xl p-5 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-400">
+                            <MessageSquare size={20} />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-white text-sm">Boğaz & İfade Rezonansı</h4>
+                            <span className="text-[10px] text-cyan-400 font-semibold">İfade Köprüsü & Görünürlük</span>
+                          </div>
+                        </div>
+                        <span className="text-xl font-bold text-cyan-400">
+                          %{brandResult.bodyResonance.throat.percentage}
+                        </span>
+                      </div>
+                      <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-cyan-500 transition-all duration-500 rounded-full" 
+                          style={{ width: `${brandResult.bodyResonance.throat.percentage}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-300 leading-relaxed">
+                        Harfler: <strong>E, H, N, B, P</strong>. Ses tellerinden kitlelere uzanan ifade köprüsüdür; ağızdan ağıza ve dijitalde hızlı yayılım sağlar.
+                      </p>
+                    </div>
+
+                    {/* 4. Kafa & Zihin */}
+                    <div className="bg-black/40 border border-purple-500/20 rounded-2xl p-5 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400">
+                            <Brain size={20} />
+                          </div>
+                          <div>
+                            <h4 className="font-bold text-white text-sm">Kafa & Zihin Rezonansı</h4>
+                            <span className="text-[10px] text-purple-400 font-semibold">Sezgi, Epifiz & Manyetik Kalkan</span>
+                          </div>
+                        </div>
+                        <span className="text-xl font-bold text-purple-400">
+                          %{brandResult.bodyResonance.head.percentage}
+                        </span>
+                      </div>
+                      <div className="h-2 bg-white/5 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-purple-500 transition-all duration-500 rounded-full" 
+                          style={{ width: `${brandResult.bodyResonance.head.percentage}%` }}
+                        />
+                      </div>
+                      <p className="text-xs text-gray-300 leading-relaxed">
+                        Harfler: <strong>I, İ, Y, S, Ş, Z, F, J, R</strong>. Sinüslerde ve epifiz bezinde çınlayarak markaya zihinsel prestij, strateji ve koruma aurası verir.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 {/* Ouroboros Aura Rozeti */}
                 <div className={`p-6 rounded-3xl border ${
                   brandResult.ouroboros.isClosed 
@@ -625,57 +756,12 @@ export default function NumerologyPage() {
                       </p>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs bg-black/40 p-3 rounded-xl border border-white/5 font-mono">
                         <div>
-                          <strong className="text-mystic-primary">Temel Taşı (İlk Harf):</strong> {brandResult.cornerstone.char} ({brandResult.cornerstone.mahrecName} - {brandResult.cornerstone.element})
+                          <strong className="text-mystic-primary">Temel Taşı (İlk Harf):</strong> {brandResult.cornerstone.char} ({brandResult.cornerstone.bodyCenterName} - {brandResult.cornerstone.element})
                         </div>
                         <div>
-                          <strong className="text-mystic-primary">Zirve Taşı (Son Harf):</strong> {brandResult.capstone.char} ({brandResult.capstone.mahrecName} - {brandResult.capstone.element})
+                          <strong className="text-mystic-primary">Zirve Taşı (Son Harf):</strong> {brandResult.capstone.char} ({brandResult.capstone.bodyCenterName} - {brandResult.capstone.element})
                         </div>
                       </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Mahreç Dağılımı (Seslerin Anatomisi) */}
-                <div>
-                  <h3 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                    <Compass size={20} className="text-[#D4AF37]" />
-                    <span>Fonetik Mahreç Dağılımı (Sesin Çıktığı Merkezler)</span>
-                  </h3>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="bg-black/40 border border-white/10 rounded-2xl p-4">
-                      <div className="flex items-center justify-between text-xs text-mystic-text-muted mb-1">
-                        <span className="flex items-center gap-1 text-red-400"><Flame size={14} /> Gırtlak & Boğaz</span>
-                        <span className="font-bold text-white">%{brandResult.mahrecStats.throat.percentage}</span>
-                      </div>
-                      <p className="text-xs text-gray-300 font-semibold mt-1">Ateş & Güneş</p>
-                      <p className="text-[11px] text-white/50 mt-1 leading-snug">Görünürlük, sahneye çıkış ve şöhret.</p>
-                    </div>
-
-                    <div className="bg-black/40 border border-white/10 rounded-2xl p-4">
-                      <div className="flex items-center justify-between text-xs text-mystic-text-muted mb-1">
-                        <span className="flex items-center gap-1 text-green-400"><Mountain size={14} /> Dudak & Ağız</span>
-                        <span className="font-bold text-white">%{brandResult.mahrecStats.lip.percentage}</span>
-                      </div>
-                      <p className="text-xs text-gray-300 font-semibold mt-1">Toprak & Mülk</p>
-                      <p className="text-[11px] text-white/50 mt-1 leading-snug">Mal, para, kazancı kasada tutma.</p>
-                    </div>
-
-                    <div className="bg-black/40 border border-white/10 rounded-2xl p-4">
-                      <div className="flex items-center justify-between text-xs text-mystic-text-muted mb-1">
-                        <span className="flex items-center gap-1 text-blue-400"><Wind size={14} /> Damak & Dil</span>
-                        <span className="font-bold text-white">%{brandResult.mahrecStats.palate.percentage}</span>
-                      </div>
-                      <p className="text-xs text-gray-300 font-semibold mt-1">Hava & Zeka</p>
-                      <p className="text-[11px] text-white/50 mt-1 leading-snug">İletişim, hızlı yayılma ve network.</p>
-                    </div>
-
-                    <div className="bg-black/40 border border-white/10 rounded-2xl p-4">
-                      <div className="flex items-center justify-between text-xs text-mystic-text-muted mb-1">
-                        <span className="flex items-center gap-1 text-purple-400"><Droplets size={14} /> Diş & Islık</span>
-                        <span className="font-bold text-white">%{brandResult.mahrecStats.dental.percentage}</span>
-                      </div>
-                      <p className="text-xs text-gray-300 font-semibold mt-1">Aura & Odak</p>
-                      <p className="text-[11px] text-white/50 mt-1 leading-snug">Manyetik çekim ve koruyucu kalkan.</p>
                     </div>
                   </div>
                 </div>
@@ -687,7 +773,6 @@ export default function NumerologyPage() {
                     <span>Sektörel Başarı & Çekim Endeksi</span>
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Finans */}
                     <div className="bg-black/40 border border-white/10 rounded-2xl p-5 space-y-3">
                       <div className="flex items-center justify-between">
                         <h4 className="font-bold text-white text-base">💰 Finans, E-Ticaret & Satış</h4>
@@ -703,7 +788,6 @@ export default function NumerologyPage() {
                       </p>
                     </div>
 
-                    {/* Sanat & Görsel */}
                     <div className="bg-black/40 border border-white/10 rounded-2xl p-5 space-y-3">
                       <div className="flex items-center justify-between">
                         <h4 className="font-bold text-white text-base">🎨 Sanat, Görsel Tasarım & AI</h4>
@@ -719,7 +803,6 @@ export default function NumerologyPage() {
                       </p>
                     </div>
 
-                    {/* Eğitim & Bilgelik */}
                     <div className="bg-black/40 border border-white/10 rounded-2xl p-5 space-y-3">
                       <div className="flex items-center justify-between">
                         <h4 className="font-bold text-white text-base">📚 Eğitim, Akademi & Ruhsal Danışmanlık</h4>
@@ -735,7 +818,6 @@ export default function NumerologyPage() {
                       </p>
                     </div>
 
-                    {/* Teknoloji */}
                     <div className="bg-black/40 border border-white/10 rounded-2xl p-5 space-y-3">
                       <div className="flex items-center justify-between">
                         <h4 className="font-bold text-white text-base">⚡ Teknoloji, Yazılım & İnovasyon</h4>
@@ -841,7 +923,7 @@ export default function NumerologyPage() {
                         <Sparkles className="text-[#AF52DE]" /> Ek İsim Simülatörü & Çakra Tamamlama
                       </h3>
                       <p className="text-xs text-mystic-text-muted mt-1">
-                        İsminize ikinci bir isim eklediğinizde eksik çakralarınızın nasıl kapandığını ve enerjinizin nasıl yükseldiğini anlık test edin.
+                        İsminize ikinci bir isim eklediğinizde eksik çakralarınızın ve beden merkezlerinizin nasıl güçlendiğini canlı test edin.
                       </p>
                     </div>
 
@@ -894,16 +976,72 @@ export default function NumerologyPage() {
                   {/* Simulation Comparative Status */}
                   {simulationData && (
                     <div className="space-y-4">
-                      {/* Ouroboros Status with Additional Name */}
-                      <div className="p-4 rounded-2xl bg-black/40 border border-white/10 flex items-start gap-3 text-xs">
-                        <ShieldCheck size={20} className={simulationData.ouroborosInfo.isClosed ? 'text-green-400 shrink-0' : 'text-mystic-primary shrink-0'} />
+                      {/* Dominant Body Center Verdict */}
+                      <div className="p-4 rounded-2xl bg-[#AF52DE]/10 border border-[#AF52DE]/30 flex items-center gap-3 text-xs">
+                        <Sparkles size={20} className="text-[#AF52DE] shrink-0" />
                         <div>
                           <span className="font-bold text-white block mb-0.5">
-                            {simulationData.simulatedFullName} $\rightarrow$ {simulationData.ouroborosInfo.title}
+                            İsminizin Beden Rezonansı: {simulationData.dominantBodyVerdict}
                           </span>
-                          <p className="text-gray-300 leading-relaxed">
-                            {simulationData.ouroborosInfo.description}
-                          </p>
+                        </div>
+                      </div>
+
+                      {/* Body Center Gains Badges */}
+                      {simulationData.bodyCenterGains.length > 0 && (
+                        <div className="flex flex-wrap gap-2">
+                          {simulationData.bodyCenterGains.map((gain, gIdx) => (
+                            <span key={gIdx} className="text-xs font-bold bg-green-500/15 text-green-400 border border-green-500/30 px-3 py-1 rounded-full flex items-center gap-1.5">
+                              <CheckCircle2 size={14} />
+                              {gain}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      {/* 4 Bedensel Rezonans Merkezi Barları */}
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        <div className="bg-black/40 border border-green-500/20 p-3 rounded-xl">
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-green-400 font-bold flex items-center gap-1"><Heart size={14} /> Kalp & Göğüs</span>
+                            <span className="text-white font-bold">%{simulationData.simulatedBodyResonance.heart.percentage}</span>
+                          </div>
+                          <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div className="h-full bg-green-500 rounded-full" style={{ width: `${simulationData.simulatedBodyResonance.heart.percentage}%` }} />
+                          </div>
+                          <span className="text-[10px] text-gray-400 block mt-1">A, M, L, D, V</span>
+                        </div>
+
+                        <div className="bg-black/40 border border-yellow-500/20 p-3 rounded-xl">
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-yellow-400 font-bold flex items-center gap-1"><Flame size={14} /> Karın & Mide</span>
+                            <span className="text-white font-bold">%{simulationData.simulatedBodyResonance.stomach.percentage}</span>
+                          </div>
+                          <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div className="h-full bg-yellow-500 rounded-full" style={{ width: `${simulationData.simulatedBodyResonance.stomach.percentage}%` }} />
+                          </div>
+                          <span className="text-[10px] text-gray-400 block mt-1">U, Ü, O, K, Ç, C, T</span>
+                        </div>
+
+                        <div className="bg-black/40 border border-cyan-500/20 p-3 rounded-xl">
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-cyan-400 font-bold flex items-center gap-1"><MessageSquare size={14} /> Boğaz & İfade</span>
+                            <span className="text-white font-bold">%{simulationData.simulatedBodyResonance.throat.percentage}</span>
+                          </div>
+                          <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div className="h-full bg-cyan-500 rounded-full" style={{ width: `${simulationData.simulatedBodyResonance.throat.percentage}%` }} />
+                          </div>
+                          <span className="text-[10px] text-gray-400 block mt-1">E, H, N, B, P</span>
+                        </div>
+
+                        <div className="bg-black/40 border border-purple-500/20 p-3 rounded-xl">
+                          <div className="flex items-center justify-between text-xs mb-1">
+                            <span className="text-purple-400 font-bold flex items-center gap-1"><Brain size={14} /> Kafa & Zihin</span>
+                            <span className="text-white font-bold">%{simulationData.simulatedBodyResonance.head.percentage}</span>
+                          </div>
+                          <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
+                            <div className="h-full bg-purple-500 rounded-full" style={{ width: `${simulationData.simulatedBodyResonance.head.percentage}%` }} />
+                          </div>
+                          <span className="text-[10px] text-gray-400 block mt-1">I, İ, Y, S, Ş, Z, F, J, R</span>
                         </div>
                       </div>
 
@@ -1021,8 +1159,12 @@ export default function NumerologyPage() {
                           <div>
                             <div className="flex items-center justify-between mb-2">
                               <h5 className="text-lg font-bold text-white group-hover:text-[#AF52DE] transition-colors">{item.name}</h5>
-                              <span className="text-[10px] uppercase font-bold text-mystic-text-muted bg-white/5 px-2 py-0.5 rounded-md">
-                                {item.mahrecType === 'lip' ? 'Dudak' : item.mahrecType === 'throat' ? 'Gırtlak' : item.mahrecType === 'dental' ? 'Diş' : 'Damak'}
+                              <span className={`text-[10px] uppercase font-bold px-2 py-0.5 rounded-md ${
+                                item.bodyCenter === 'heart' ? 'bg-green-500/20 text-green-400' :
+                                item.bodyCenter === 'stomach' ? 'bg-yellow-500/20 text-yellow-400' :
+                                item.bodyCenter === 'throat' ? 'bg-cyan-500/20 text-cyan-400' : 'bg-purple-500/20 text-purple-400'
+                              }`}>
+                                {item.bodyCenter === 'heart' ? 'Kalp' : item.bodyCenter === 'stomach' ? 'Karın' : item.bodyCenter === 'throat' ? 'Boğaz' : 'Zihin'}
                               </span>
                             </div>
                             <p className="text-xs text-gray-300 leading-relaxed mb-3">
