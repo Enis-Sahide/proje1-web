@@ -2,11 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { 
   ArrowLeft, Hexagon, Loader2, Calendar, User, ArrowRight, Target, Heart, 
   Sparkles, Info, AlertCircle, Zap, Briefcase, Award, ShieldCheck, 
   CheckCircle2, TrendingUp, Compass, Flame, Droplets, Wind, Mountain,
-  Brain, MessageSquare
+  Brain, MessageSquare, Lock, LogIn, UserPlus
 } from 'lucide-react';
 import { calculateLifePath, calculatePersonalYear, calculateArrows, getBirthdayNumber, calculateNameAnalysis, reduceToSingleDigit } from '@/utils/numerologyCalculator';
 import { lifePathData, birthdayData, arrowsData, emptyArrowsData, personalYearData, numerologyData } from '@/utils/numerologyData';
@@ -35,7 +36,8 @@ const reduceNumber = (num: number): number => {
 
 export default function NumerologyPage() {
   const router = useRouter();
-  const { role } = useAuth();
+  const { role, user } = useAuth();
+  const isLoggedIn = !!user;
   const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -495,7 +497,43 @@ export default function NumerologyPage() {
                 </>
               )}
 
-              {activeTab === 'brand' && (
+              {activeTab === 'brand' && !isLoggedIn && (
+                <div className="bg-gradient-to-br from-[#D4AF37]/15 via-black/70 to-black/90 border border-[#D4AF37]/40 rounded-3xl p-6 md:p-8 text-center space-y-5 shadow-2xl relative overflow-hidden">
+                  <div className="w-16 h-16 rounded-2xl bg-[#D4AF37]/15 border border-[#D4AF37]/30 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(212,175,55,0.2)]">
+                    <Lock className="text-[#D4AF37]" size={32} />
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase font-bold tracking-widest text-[#D4AF37] block mb-1">
+                      Özel Kariyer & Şirket Aracı
+                    </span>
+                    <h3 className="text-xl md:text-2xl font-bold text-white">
+                      Marka & Şirket Akustiği Analizi
+                    </h3>
+                    <p className="text-xs md:text-sm text-mystic-text-muted mt-2 max-w-lg mx-auto leading-relaxed">
+                      Firma, şirket ve proje isimlerinizin <strong>akustik gücünü (0-100)</strong>, <strong>Ouroboros aura kalkanını</strong>, <strong>4 bedensel rezonans merkezini</strong> ve <strong>4 sektörel başarı puanını</strong> analiz edebilmek için lütfen ücretsiz giriş yapın veya yeni bir hesap oluşturun.
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                    <Link
+                      href="/auth/login"
+                      className="w-full sm:w-auto px-8 py-3 rounded-xl bg-[#D4AF37] hover:bg-[#b8972e] text-black font-bold text-sm transition-all shadow-[0_0_20px_rgba(212,175,55,0.3)] flex items-center justify-center gap-2"
+                    >
+                      <LogIn size={16} />
+                      <span>Giriş Yap</span>
+                    </Link>
+                    <Link
+                      href="/auth/register"
+                      className="w-full sm:w-auto px-8 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm transition-all border border-white/10 flex items-center justify-center gap-2"
+                    >
+                      <UserPlus size={16} />
+                      <span>Ücretsiz Hesap Aç</span>
+                    </Link>
+                  </div>
+                </div>
+              )}
+
+              {activeTab === 'brand' && isLoggedIn && (
                 <>
                   <div>
                     <label className="block text-sm font-medium text-mystic-text-muted mb-2">Firma, Şirket veya Proje İsmi *</label>
@@ -570,7 +608,7 @@ export default function NumerologyPage() {
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
             
             {/* BRAND RESULTS */}
-            {activeTab === 'brand' && brandResult && (
+            {activeTab === 'brand' && brandResult && isLoggedIn && (
               <div className="space-y-8">
                 {/* Brand Header & Score */}
                 <div className="bg-gradient-to-br from-[#D4AF37]/15 via-black/50 to-black/80 border border-[#D4AF37]/40 rounded-3xl p-6 md:p-8 relative overflow-hidden shadow-2xl">
@@ -1011,7 +1049,42 @@ export default function NumerologyPage() {
                 {renderBarcodeWarnings(nameResults.lifePath, parseInt(birthDate.split('-')[2]), nameResults.destiny, nameResults.soulUrge, nameResults.personality, nameResults.chakraMatrix)}
 
                 {/* INTERACTIVE ADDITIONAL NAME SIMULATOR */}
-                <div className="bg-gradient-to-br from-[#AF52DE]/15 via-black/60 to-black/90 border border-[#AF52DE]/40 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6 mt-6">
+                {!isLoggedIn ? (
+                  <div className="bg-gradient-to-br from-[#AF52DE]/15 via-black/70 to-black/90 border border-[#AF52DE]/40 rounded-3xl p-6 md:p-8 text-center space-y-5 shadow-2xl mt-6 relative overflow-hidden">
+                    <div className="w-16 h-16 rounded-2xl bg-[#AF52DE]/15 border border-[#AF52DE]/30 flex items-center justify-center mx-auto shadow-[0_0_20px_rgba(175,82,222,0.2)]">
+                      <Lock className="text-[#AF52DE]" size={32} />
+                    </div>
+                    <div>
+                      <span className="text-[10px] uppercase font-bold tracking-widest text-[#AF52DE] block mb-1">
+                        Özel Laboratuvar
+                      </span>
+                      <h3 className="text-xl md:text-2xl font-bold text-white">
+                        Ek İsim Simülatörü & Beden Rezonansı
+                      </h3>
+                      <p className="text-xs md:text-sm text-mystic-text-muted mt-2 max-w-lg mx-auto leading-relaxed">
+                        İsminize ikinci bir isim ekleyerek eksik çakralarınızı kapatma, <strong>4 bedensel rezonans merkezini</strong> dengeleme ve hedefinize uygun akıllı isim önerilerini canlı test edebilmek için lütfen ücretsiz giriş yapın veya yeni bir hesap oluşturun.
+                      </p>
+                    </div>
+
+                    <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                      <Link
+                        href="/auth/login"
+                        className="w-full sm:w-auto px-8 py-3 rounded-xl bg-[#AF52DE] hover:bg-[#8e3ec2] text-white font-bold text-sm transition-all shadow-[0_0_20px_rgba(175,82,222,0.3)] flex items-center justify-center gap-2"
+                      >
+                        <LogIn size={16} />
+                        <span>Giriş Yap</span>
+                      </Link>
+                      <Link
+                        href="/auth/register"
+                        className="w-full sm:w-auto px-8 py-3 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-sm transition-all border border-white/10 flex items-center justify-center gap-2"
+                      >
+                        <UserPlus size={16} />
+                        <span>Ücretsiz Hesap Aç</span>
+                      </Link>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="bg-gradient-to-br from-[#AF52DE]/15 via-black/60 to-black/90 border border-[#AF52DE]/40 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6 mt-6">
                   <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-white/10 pb-4">
                     <div>
                       <span className="text-xs uppercase tracking-widest text-[#AF52DE] font-bold block mb-1">
@@ -1282,6 +1355,7 @@ export default function NumerologyPage() {
                     </div>
                   </div>
                 </div>
+              )}
 
                 {renderDisclaimer()}
               </>
