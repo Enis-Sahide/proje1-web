@@ -912,8 +912,106 @@ export default function NumerologyPage() {
                   </span>
                 </div>
 
+                {/* Özet Tablosu */}
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
+                    <span className="text-xs uppercase tracking-wider text-mystic-text-muted block mb-1">Hayat Kulvarı</span>
+                    <span className="text-2xl font-bold text-white font-serif">{nameResults.lifePathRaw}</span>
+                  </div>
+                  <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
+                    <span className="text-xs uppercase tracking-wider text-mystic-text-muted block mb-1">Kişilik Rakamı</span>
+                    <span className="text-2xl font-bold text-white font-serif">{nameResults.personality}</span>
+                  </div>
+                  <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
+                    <span className="text-xs uppercase tracking-wider text-mystic-text-muted block mb-1">İsim Numarası</span>
+                    <span className="text-2xl font-bold text-white font-serif">{nameResults.destiny}</span>
+                  </div>
+                  <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
+                    <span className="text-xs uppercase tracking-wider text-mystic-text-muted block mb-1">En Büyük Sınav</span>
+                    <span className="text-2xl font-bold text-red-500 font-serif">{nameResults.challenges}</span>
+                  </div>
+                  <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
+                    <span className="text-xs uppercase tracking-wider text-mystic-text-muted block mb-1">Ruhunu Tanımlama</span>
+                    <span className="text-2xl font-bold text-white font-serif">{nameResults.soulUrge}</span>
+                  </div>
+                  <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
+                    <span className="text-xs uppercase tracking-wider text-mystic-text-muted block mb-1">Varoluş Amacı</span>
+                    <span className="text-2xl font-bold text-white font-serif">{nameResults.purpose}</span>
+                  </div>
+                </div>
+
+                {/* Çakra Sütunu Ve Açıklaması */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start mt-4">
+                  <div className="md:col-span-5 border border-white/10 bg-black/30 rounded-2xl overflow-hidden">
+                    <div className="bg-white/5 py-3 text-center border-b border-white/10">
+                      <span className="text-sm font-bold text-[#AF52DE]">Çakra Sütunu</span>
+                    </div>
+                    <div className="divide-y divide-white/5">
+                      {[9, 8, 7, 6, 5, 4, 3, 2, 1].map((c) => {
+                        const count = nameResults.chakraMatrix[c - 1];
+                        return (
+                          <div key={c} className="flex items-center justify-between px-4 py-2.5 text-sm">
+                            <span className="text-mystic-text-muted">{c}. Çakra</span>
+                            <span className={`font-semibold ${
+                              count === 0 ? 'text-red-500' : 
+                              count === 2 ? 'text-green-400' :
+                              count === 3 ? 'text-yellow-400' :
+                              count >= 4 ? 'text-[#AF52DE]' : 'text-white'
+                            }`}>
+                              {getMatrixText(count)}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="md:col-span-7 space-y-4">
+                    <div className="bg-[#AF52DE]/10 border border-[#AF52DE]/20 px-3 py-1.5 rounded-lg inline-flex items-center gap-2 text-xs font-bold text-[#AF52DE]">
+                      <Sparkles size={14} />
+                      <span>Enerji Meridyenleri</span>
+                    </div>
+                    <p className="text-sm text-mystic-text-muted leading-relaxed">
+                      Bu tablo, isminizi oluşturan harflerin 9 temel çakranıza ne kadar enerji (frekans) gönderdiğini gösterir. Bu dağılım, doğuştan gelen ruhsal yeteneklerinizi ve bu hayatta öğrenmeniz gereken karmik dersleri belirler.
+                    </p>
+                    <div className="space-y-2.5 pt-2">
+                      <div className="flex items-start gap-3 text-xs leading-relaxed text-mystic-text-muted">
+                        <span className="w-3 h-3 rounded-full bg-red-500 shrink-0 mt-0.5"></span>
+                        <p><strong className="text-red-500">Eksik:</strong> Bu yaşamdaki karmik sınavınızdır. Ek isim simülasyonu ile bu frekansı dengeleyebilirsiniz.</p>
+                      </div>
+                      <div className="flex items-start gap-3 text-xs leading-relaxed text-mystic-text-muted">
+                        <span className="w-3 h-3 rounded-full bg-white/40 shrink-0 mt-0.5"></span>
+                        <p><strong className="text-white">1 Harf:</strong> Doğal ve dengeli bir enerji akışı vardır.</p>
+                      </div>
+                      <div className="flex items-start gap-3 text-xs leading-relaxed text-mystic-text-muted">
+                        <span className="w-3 h-3 rounded-full bg-green-400 shrink-0 mt-0.5"></span>
+                        <p><strong className="text-green-400">2 Harf:</strong> Güçlü ve verimli bir enerji hattıdır.</p>
+                      </div>
+                      <div className="flex items-start gap-3 text-xs leading-relaxed text-mystic-text-muted">
+                        <span className="w-3 h-3 rounded-full bg-yellow-400 shrink-0 mt-0.5"></span>
+                        <p><strong className="text-yellow-400">3 Harf:</strong> Baskın güçtür. Seçimlerinizi güçlü bir şekilde yönlendirir.</p>
+                      </div>
+                      <div className="flex items-start gap-3 text-xs leading-relaxed text-mystic-text-muted">
+                        <span className="w-3 h-3 rounded-full bg-[#AF52DE] shrink-0 mt-0.5"></span>
+                        <p><strong className="text-[#AF52DE]">4+ Harf:</strong> Ana taşıyıcı kolonunuz olan yeteneğinizdir.</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Detaylı Analizler */}
+                <div className="space-y-6 pt-4">
+                  <h3 className="text-xl font-bold text-white tracking-wide border-b border-white/5 pb-2">Detaylı Analiz Raporları</h3>
+                  {renderAnalysisCard("Hayat Kulvarı (Yaşam Yolu)", nameResults.lifePath, "lifePathDetails")}
+                  {renderAnalysisCard("En Ön Plandaki Kişilik", nameResults.personality, "personalityDetails")}
+                  {renderAnalysisCard("İsim Numaranız (Kader)", nameResults.destiny, "description")}
+                  {renderAnalysisCard("Ruhunuzu Tanımlama (Ruh Güdüsü)", nameResults.soulUrge, "soulUrgeDetails")}
+                </div>
+
+                {renderBarcodeWarnings(nameResults.lifePath, parseInt(birthDate.split('-')[2]), nameResults.destiny, nameResults.soulUrge, nameResults.personality, nameResults.chakraMatrix)}
+
                 {/* INTERACTIVE ADDITIONAL NAME SIMULATOR */}
-                <div className="bg-gradient-to-br from-[#AF52DE]/15 via-black/60 to-black/90 border border-[#AF52DE]/40 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6">
+                <div className="bg-gradient-to-br from-[#AF52DE]/15 via-black/60 to-black/90 border border-[#AF52DE]/40 rounded-3xl p-6 md:p-8 shadow-2xl space-y-6 mt-6">
                   <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-white/10 pb-4">
                     <div>
                       <span className="text-xs uppercase tracking-widest text-[#AF52DE] font-bold block mb-1">
@@ -1184,104 +1282,6 @@ export default function NumerologyPage() {
                     </div>
                   </div>
                 </div>
-
-                {/* Özet Tablosu */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
-                    <span className="text-xs uppercase tracking-wider text-mystic-text-muted block mb-1">Hayat Kulvarı</span>
-                    <span className="text-2xl font-bold text-white font-serif">{nameResults.lifePathRaw}</span>
-                  </div>
-                  <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
-                    <span className="text-xs uppercase tracking-wider text-mystic-text-muted block mb-1">Kişilik Rakamı</span>
-                    <span className="text-2xl font-bold text-white font-serif">{nameResults.personality}</span>
-                  </div>
-                  <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
-                    <span className="text-xs uppercase tracking-wider text-mystic-text-muted block mb-1">İsim Numarası</span>
-                    <span className="text-2xl font-bold text-white font-serif">{nameResults.destiny}</span>
-                  </div>
-                  <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
-                    <span className="text-xs uppercase tracking-wider text-mystic-text-muted block mb-1">En Büyük Sınav</span>
-                    <span className="text-2xl font-bold text-red-500 font-serif">{nameResults.challenges}</span>
-                  </div>
-                  <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
-                    <span className="text-xs uppercase tracking-wider text-mystic-text-muted block mb-1">Ruhunu Tanımlama</span>
-                    <span className="text-2xl font-bold text-white font-serif">{nameResults.soulUrge}</span>
-                  </div>
-                  <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
-                    <span className="text-xs uppercase tracking-wider text-mystic-text-muted block mb-1">Varoluş Amacı</span>
-                    <span className="text-2xl font-bold text-white font-serif">{nameResults.purpose}</span>
-                  </div>
-                </div>
-
-                {/* Çakra Sütunu Ve Açıklaması */}
-                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start mt-4">
-                  <div className="md:col-span-5 border border-white/10 bg-black/30 rounded-2xl overflow-hidden">
-                    <div className="bg-white/5 py-3 text-center border-b border-white/10">
-                      <span className="text-sm font-bold text-[#AF52DE]">Çakra Sütunu</span>
-                    </div>
-                    <div className="divide-y divide-white/5">
-                      {[9, 8, 7, 6, 5, 4, 3, 2, 1].map((c) => {
-                        const count = nameResults.chakraMatrix[c - 1];
-                        return (
-                          <div key={c} className="flex items-center justify-between px-4 py-2.5 text-sm">
-                            <span className="text-mystic-text-muted">{c}. Çakra</span>
-                            <span className={`font-semibold ${
-                              count === 0 ? 'text-red-500' : 
-                              count === 2 ? 'text-green-400' :
-                              count === 3 ? 'text-yellow-400' :
-                              count >= 4 ? 'text-[#AF52DE]' : 'text-white'
-                            }`}>
-                              {getMatrixText(count)}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  <div className="md:col-span-7 space-y-4">
-                    <div className="bg-[#AF52DE]/10 border border-[#AF52DE]/20 px-3 py-1.5 rounded-lg inline-flex items-center gap-2 text-xs font-bold text-[#AF52DE]">
-                      <Sparkles size={14} />
-                      <span>Enerji Meridyenleri</span>
-                    </div>
-                    <p className="text-sm text-mystic-text-muted leading-relaxed">
-                      Bu tablo, isminizi oluşturan harflerin 9 temel çakranıza ne kadar enerji (frekans) gönderdiğini gösterir. Bu dağılım, doğuştan gelen ruhsal yeteneklerinizi ve bu hayatta öğrenmeniz gereken karmik dersleri belirler.
-                    </p>
-                    <div className="space-y-2.5 pt-2">
-                      <div className="flex items-start gap-3 text-xs leading-relaxed text-mystic-text-muted">
-                        <span className="w-3 h-3 rounded-full bg-red-500 shrink-0 mt-0.5"></span>
-                        <p><strong className="text-red-500">Eksik:</strong> Bu yaşamdaki karmik sınavınızdır. Ek isim simülasyonu ile bu frekansı dengeleyebilirsiniz.</p>
-                      </div>
-                      <div className="flex items-start gap-3 text-xs leading-relaxed text-mystic-text-muted">
-                        <span className="w-3 h-3 rounded-full bg-white/40 shrink-0 mt-0.5"></span>
-                        <p><strong className="text-white">1 Harf:</strong> Doğal ve dengeli bir enerji akışı vardır.</p>
-                      </div>
-                      <div className="flex items-start gap-3 text-xs leading-relaxed text-mystic-text-muted">
-                        <span className="w-3 h-3 rounded-full bg-green-400 shrink-0 mt-0.5"></span>
-                        <p><strong className="text-green-400">2 Harf:</strong> Güçlü ve verimli bir enerji hattıdır.</p>
-                      </div>
-                      <div className="flex items-start gap-3 text-xs leading-relaxed text-mystic-text-muted">
-                        <span className="w-3 h-3 rounded-full bg-yellow-400 shrink-0 mt-0.5"></span>
-                        <p><strong className="text-yellow-400">3 Harf:</strong> Baskın güçtür. Seçimlerinizi güçlü bir şekilde yönlendirir.</p>
-                      </div>
-                      <div className="flex items-start gap-3 text-xs leading-relaxed text-mystic-text-muted">
-                        <span className="w-3 h-3 rounded-full bg-[#AF52DE] shrink-0 mt-0.5"></span>
-                        <p><strong className="text-[#AF52DE]">4+ Harf:</strong> Ana taşıyıcı kolonunuz olan yeteneğinizdir.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Detaylı Analizler */}
-                <div className="space-y-6 pt-4">
-                  <h3 className="text-xl font-bold text-white tracking-wide border-b border-white/5 pb-2">Detaylı Analiz Raporları</h3>
-                  {renderAnalysisCard("Hayat Kulvarı (Yaşam Yolu)", nameResults.lifePath, "lifePathDetails")}
-                  {renderAnalysisCard("En Ön Plandaki Kişilik", nameResults.personality, "personalityDetails")}
-                  {renderAnalysisCard("İsim Numaranız (Kader)", nameResults.destiny, "description")}
-                  {renderAnalysisCard("Ruhunuzu Tanımlama (Ruh Güdüsü)", nameResults.soulUrge, "soulUrgeDetails")}
-                </div>
-
-                {renderBarcodeWarnings(nameResults.lifePath, parseInt(birthDate.split('-')[2]), nameResults.destiny, nameResults.soulUrge, nameResults.personality, nameResults.chakraMatrix)}
 
                 {renderDisclaimer()}
               </>
