@@ -504,7 +504,7 @@ export default function NumerologyPage() {
                       <input 
                         required 
                         type="text" 
-                        placeholder="Örn: Omnia Studio, 7Layers Labs, Arcana Digital"
+                        placeholder="Örn: 7Layers, Omnia Studio, Arcana Digital"
                         value={brandName}
                         onChange={(e) => setBrandName(e.target.value)}
                         className="w-full bg-white/5 border border-white/10 rounded-xl pl-12 pr-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors" 
@@ -516,7 +516,7 @@ export default function NumerologyPage() {
                     <label className="block text-sm font-medium text-mystic-text-muted mb-2">Slogan veya Ek Unvan (İsteğe Bağlı)</label>
                     <input 
                       type="text" 
-                      placeholder="Örn: Kadim Bilgiler, Creative Labs, Digital Solutions"
+                      placeholder="Örn: Ancient Knowledge School, Kadim Bilgiler Okulu, Creative Labs"
                       value={brandSlogan}
                       onChange={(e) => setBrandSlogan(e.target.value)}
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors" 

@@ -42,6 +42,10 @@ export default function Home() {
       <section className="flex-grow flex flex-col justify-center items-center py-12 md:py-24 px-4 relative z-10 min-h-screen">
         <div className="max-w-7xl w-full">
           <div className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-mystic-primary/10 border border-mystic-primary/30 text-mystic-primary text-xs font-semibold tracking-wider uppercase mb-4 shadow-[0_0_15px_rgba(212,175,55,0.15)]">
+              <Sparkles size={14} className="text-mystic-accent" />
+              <span>Ancient Knowledge School • Kadim Bilgiler Okulu</span>
+            </div>
             <h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-mystic-accent via-mystic-text to-mystic-primary mb-4 tracking-tight drop-shadow-lg py-2">
               İçsel Uyanış
             </h1>
@@ -188,6 +192,20 @@ export default function Home() {
 
       <ExploreSection />
       
+      {/* Brand Footer Signature */}
+      <footer className="py-8 border-t border-mystic-surface-light text-center relative z-10 text-xs text-mystic-text-muted">
+        <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2">
+            <span className="font-bold text-mystic-primary">7LAYERS</span>
+            <span className="text-white/40">•</span>
+            <span>Ancient Knowledge School</span>
+            <span className="text-white/40">•</span>
+            <span className="text-mystic-accent">Kadim Bilgiler Okulu</span>
+          </div>
+          <p>© {new Date().getFullYear()} 7Layers Ancient Knowledge School. Tüm hakları saklıdır.</p>
+        </div>
+      </footer>
+
       {isNavigating && (
         <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md flex flex-col items-center justify-center text-white transition-opacity duration-300 animate-fadeIn">
           <div className="flex flex-col items-center p-8 rounded-3xl bg-mystic-dark/80 border border-mystic-primary/20 shadow-2xl max-w-sm w-full mx-4 text-center">

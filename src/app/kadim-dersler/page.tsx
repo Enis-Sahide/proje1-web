@@ -153,6 +153,10 @@ export default function KadimDerslerPage() {
 
         {/* Header */}
         <div className="text-center mb-16 animate-in fade-in duration-1000">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-semibold tracking-wider uppercase mb-4 shadow-[0_0_15px_rgba(212,175,55,0.15)]">
+            <Sparkles size={14} className="text-[#D4AF37]" />
+            <span>7Layers Ancient Knowledge School • Kadim Bilgiler Okulu</span>
+          </div>
           <h1 className="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-yellow-200 to-[#D4AF37] py-4 mb-4 tracking-wider uppercase leading-normal">
             Okült İlimler Kütüphanesi
           </h1>

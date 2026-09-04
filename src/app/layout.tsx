@@ -16,12 +16,15 @@ const inter = Inter({
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.7layers.tr'),
   title: {
-    default: "7Layers - Kadim Bilgiler, İnsan Tasarımı & Çakra Analizi",
-    template: "%s | 7Layers"
+    default: "7Layers Ancient Knowledge School | Kadim Bilgiler Okulu",
+    template: "%s | 7Layers Ancient Knowledge School"
   },
-  description: "İnsan Tasarımı (Human Design), Çakra Analizi, Schumann Rezonansı, Gezegen Saatleri ve Kadim Bilgiler platformu. Kendinizi ve kozmik enerjileri keşfedin.",
+  description: "7Layers Ancient Knowledge School (Kadim Bilgiler Okulu) - İnsan Tasarımı (Human Design), Çakra Analizi, Schumann Rezonansı, Gezegen Saatleri ve Kadim İlimler platformu. Kendinizi ve kozmik enerjileri keşfedin.",
   keywords: [
     "7layers",
+    "7layers ancient knowledge school",
+    "ancient knowledge school",
+    "kadim bilgiler okulu",
     "insan tasarımı",
     "human design türkçe",
     "çakra analizi",
@@ -32,7 +35,7 @@ export const metadata: Metadata = {
     "kadim bilgiler",
     "7layers android"
   ],
-  authors: [{ name: "7Layers" }],
+  authors: [{ name: "7Layers Ancient Knowledge School" }],
   creator: "7Layers",
   verification: {
     google: 'a15kbuAKAeY4DSM8hNw31SrHZjIoSb1IIyMFTBEhq14',
@@ -43,16 +46,16 @@ export const metadata: Metadata = {
     apple: '/logo.png',
   },
   openGraph: {
-    title: "7Layers - Kadim Bilgiler, İnsan Tasarımı & Çakra Analizi",
-    description: "İnsan Tasarımı, Çakra Analizi, Schumann Rezonansı ve Gezegen Saatleri platformu. Kendinizi ve kozmik enerjileri keşfedin.",
+    title: "7Layers Ancient Knowledge School | Kadim Bilgiler Okulu",
+    description: "İnsan Tasarımı, Çakra Analizi, Schumann Rezonansı, Gezegen Saatleri ve Kadim İlimler Okulu. Kendinizi ve kozmik enerjileri keşfedin.",
     url: 'https://www.7layers.tr',
-    siteName: '7Layers',
+    siteName: '7Layers Ancient Knowledge School',
     images: [
       {
         url: '/logo.png',
         width: 512,
         height: 512,
-        alt: '7Layers Logo',
+        alt: '7Layers Ancient Knowledge School Logo',
       },
     ],
     locale: 'tr_TR',
@@ -60,8 +63,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: "7Layers - Kadim Bilgiler ve Analizler",
-    description: "İnsan Tasarımı, Çakra Analizi, Schumann Rezonansı ve Gezegen Saatleri.",
+    title: "7Layers Ancient Knowledge School | Kadim Bilgiler Okulu",
+    description: "İnsan Tasarımı, Çakra Analizi, Schumann Rezonansı ve Kadim İlimler Okulu.",
     images: ['/logo.png'],
   },
 };

@@ -76,13 +76,18 @@ export default function Navigation() {
     >
       <div className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         {/* Logo */}
-        <Link href={isAdmin ? "/admin/dashboard" : "/"} className="flex items-center gap-3 group shrink-0 mr-2 lg:mr-4 xl:mr-8">
+        <Link href={isAdmin ? "/admin/dashboard" : "/"} className="flex items-center gap-2.5 group shrink-0 mr-2 lg:mr-4 xl:mr-8">
           <div className="relative rounded-full p-[2px] bg-gradient-to-tr from-mystic-primary via-mystic-accent to-mystic-primary shadow-[0_0_8px_rgba(212,175,55,0.9),0_0_16px_rgba(212,175,55,0.5),0_0_32px_rgba(212,175,55,0.15)] group-hover:shadow-[0_0_12px_rgba(212,175,55,1),0_0_24px_rgba(212,175,55,0.7),0_0_40px_rgba(212,175,55,0.3)] transition-all duration-500">
-            <Image src="/logo.png" alt="7Layers Logo" width={32} height={32} className="rounded-full bg-mystic-dark block" />
+            <Image src="/logo.png" alt="7Layers Ancient Knowledge School" width={34} height={34} className="rounded-full bg-mystic-dark block" />
           </div>
-          <span className="text-xl xl:text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-mystic-primary to-mystic-accent whitespace-nowrap">
-            7LAYERS
-          </span>
+          <div className="flex flex-col">
+            <span className="text-lg xl:text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-mystic-primary via-mystic-accent to-mystic-primary whitespace-nowrap tracking-wide leading-none">
+              7LAYERS
+            </span>
+            <span className="text-[7.5px] xl:text-[8.5px] tracking-[0.16em] uppercase text-mystic-primary/80 font-medium whitespace-nowrap mt-1 group-hover:text-mystic-accent transition-colors">
+              Ancient Knowledge School
+            </span>
+          </div>
         </Link>
 
         {/* Mobile Profile / Auth (Mobile Viewports) */}
