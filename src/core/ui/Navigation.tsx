@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { Menu, X, Sparkles, User, LogIn, ShoppingCart, Store, Shield, Lock, Wrench, LogOut, Home, Compass, Activity } from 'lucide-react';
+import { Menu, X, Sparkles, User, LogIn, Shield, Lock, Wrench, LogOut, Home, Compass, Activity } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 
@@ -55,7 +55,6 @@ export default function Navigation() {
     { name: 'Nefes', href: '/breathwork' },
     { name: 'Analiz', href: '/analysis' },
     { name: 'Blog', href: '/blog' },
-    { name: 'Keşfet', href: '/explore', isUnderConstruction: true },
     { name: 'Dersler', href: '/kadim-dersler', requiresAuth: true },
     { name: 'Seviyeler', href: '/membership', requiresAuth: true, isLockedForNonAdmin: true },
   ];

@@ -48,18 +48,3 @@ export function useContent<T = any>(path: string | null) {
 
   return { data, loading, error };
 }
-
-export function useMarketplace() {
-  const { data, loading, error } = useContent<{
-    categories: any[];
-    vendors: any[];
-    products: any[];
-  }>('/api/content/marketplace');
-  return {
-    categories: data?.categories ?? [],
-    vendors: data?.vendors ?? [],
-    products: data?.products ?? [],
-    loading,
-    error,
-  };
-}

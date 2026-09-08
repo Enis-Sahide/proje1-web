@@ -2,36 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Shield, Users, DollarSign, Store, CheckCircle, XCircle, ArrowLeft, Star, Search, Filter, RefreshCw, Award, UserCheck, BookOpen, Plus, Trash2, Edit, Activity, Calendar, TrendingUp, Eye, MapPin } from 'lucide-react';
-import { useMarketplace } from '@/lib/useContent';
+import { Shield, Users, ArrowLeft, Search, Filter, RefreshCw, UserCheck, BookOpen, Plus, Trash2, Edit, Activity, Calendar, TrendingUp, MapPin } from 'lucide-react';
 import { apiFetch } from '@/lib/apiClient';
-
-// Mock mapping of users who own stores based on their Supabase IDs or names
-const MOCK_USER_STORES: Record<string, { id: string; name: string }> = {
-  // baha (ID) -> Şifa Taşı Dükkanı
-  "1dde7856-c331-4277-a43f-fb975808c3c0": { id: "sifa-tasi", name: "Şifa Taşı Dükkanı" }
-};
-
-// Helper function to dynamically check store relationship by user ID or user metadata (name/email)
-const getUserStore = (profile: any) => {
-  if (MOCK_USER_STORES[profile.id]) {
-    return MOCK_USER_STORES[profile.id];
-  }
-  
-  const name = (profile.full_name || '').toLowerCase();
-  
-  // enis@gmail.com için Kadim Kokular mağazası (isimde enis barındıran veya enis@gmail.com olan)
-  if (name.includes('enis') || name.includes('enis@')) {
-    return { id: "kadim-kokular", name: "Kadim Kokular" };
-  }
-  
-  // lalezar_28@hotmail.com için Mistik Yol mağazası (isimde lalezar barındıran veya lalezar_28 olan)
-  if (name.includes('lalezar') || name.includes('lalezar_28')) {
-    return { id: "mistik-yol", name: "Mistik Yol" };
-  }
-  
-  return null;
-};
 
 const ROLE_LABELS: Record<string, { label: string; style: string }> = {
   free: { label: 'Ücretsiz Üyelik', style: 'border-white/10 text-mystic-text-muted bg-white/5' },
@@ -44,8 +16,8 @@ const ROLE_LABELS: Record<string, { label: string; style: string }> = {
 export default function AdminDashboard() {
   const router = useRouter();
 
-  // Active tab state: 'stores' | 'members' | 'blog' | 'analytics'
-  const [activeTab, setActiveTab] = useState<'stores' | 'members' | 'blog' | 'analytics'>('stores');
+  // Active tab state: 'members' | 'blog' | 'analytics'
+  const [activeTab, setActiveTab] = useState<'members' | 'blog' | 'analytics'>('members');
 
   // Blog posts states
   const [blogs, setBlogs] = useState<any[]>([]);
@@ -94,22 +66,6 @@ export default function AdminDashboard() {
   };
 
 
-  // Marketplace (mağazalar) içeriği API'den
-  const { vendors: VENDORS } = useMarketplace();
-
-  // Global platform statistics (mocked)
-  const totalPlatformSales = 45000;
-  const platformCommission = totalPlatformSales * 0.10; // 10%
-  const activeStores = VENDORS.length;
-
-  // Vendors state
-  const [vendors, setVendors] = useState<any[]>([]);
-  useEffect(() => {
-    if (VENDORS.length > 0) {
-      setVendors(VENDORS.map(v => ({ ...v, status: 'approved' })));
-    }
-  }, [VENDORS]);
-
   // Profiles (members) state
   const [profiles, setProfiles] = useState<any[]>([]);
   const [isLoadingProfiles, setIsLoadingProfiles] = useState(true);
@@ -118,7 +74,6 @@ export default function AdminDashboard() {
   // Search & Filter state
   const [searchTerm, setSearchTerm] = useState('');
   const [roleFilter, setRoleFilter] = useState('all');
-  const [storeFilter, setStoreFilter] = useState('all');
   
   // Role updating loader state
   const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
@@ -174,6 +129,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     fetchProfiles();
     fetchAnalytics();
+    fetchBlogs();
   }, []);
 
   useEffect(() => {
@@ -252,25 +208,7 @@ export default function AdminDashboard() {
     }
   };
 
-
-  const handleToggleStatus = (id: string) => {
-    const vendor = vendors.find(v => v.id === id);
-    if (!vendor) return;
-
-    if (vendor.status === 'approved') {
-      const confirmClose = window.confirm(`"${vendor.name}" isimli mağazayı kapatmak istediğinize emin misiniz?`);
-      if (!confirmClose) return;
-    }
-
-    setVendors(vendors.map(v => {
-      if (v.id === id) {
-        return { ...v, status: v.status === 'approved' ? 'banned' : 'approved' };
-      }
-      return v;
-    }));
-  };
-
-  // Change user role directly in Supabase profiles database
+  // Change user role directly in profiles database
   const handleUpdateRole = async (userId: string, newRole: string) => {
     const profile = profiles.find(p => p.id === userId);
     const userName = profile?.full_name || 'İsimsiz Üye';
@@ -284,8 +222,7 @@ export default function AdminDashboard() {
     };
     
     const confirmChange = window.confirm(
-      `"${userName}" isimli üyenin yetki seviyesini "${roleLabels[newRole]}" olarak değiştirmek istediğinize emin misiniz?\n\n` +
-      `Not: Bu işlem, üyenin bu seviye için vermesi gereken tüm sınavları otomatik olarak "geçti" olarak işaretleyecektir.`
+      `"${userName}" isimli üyenin yetki seviyesini "${roleLabels[newRole]}" olarak değiştirmek istediğinize emin misiniz?`
     );
     if (!confirmChange) return;
 
@@ -333,20 +270,15 @@ export default function AdminDashboard() {
 
   // Filter members list based on current filters
   const filteredProfiles = profiles.filter(p => {
+    const searchLower = searchTerm.toLowerCase();
     const matchesSearch = 
-      (p.full_name?.toLowerCase() || '').includes(searchTerm.toLowerCase()) ||
-      p.id.toLowerCase().includes(searchTerm.toLowerCase());
+      (p.full_name?.toLowerCase() || '').includes(searchLower) ||
+      (p.email?.toLowerCase() || '').includes(searchLower) ||
+      p.id.toLowerCase().includes(searchLower);
 
     const matchesRole = roleFilter === 'all' || p.role === roleFilter;
 
-    const userStore = getUserStore(p);
-    const hasStore = !!userStore;
-    const matchesStore = 
-      storeFilter === 'all' || 
-      (storeFilter === 'has_store' && hasStore) || 
-      (storeFilter === 'no_store' && !hasStore);
-
-    return matchesSearch && matchesRole && matchesStore;
+    return matchesSearch && matchesRole;
   });
 
   return (
@@ -372,35 +304,7 @@ export default function AdminDashboard() {
       <main className="max-w-6xl mx-auto p-6 mt-6 w-full max-w-full">
         
         {/* Global Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 mb-10">
-          <div className="bg-black/40 border border-white/5 p-6 rounded-2xl relative overflow-hidden">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-mystic-text-muted font-medium text-sm">Toplam Ciro</h3>
-              <div className="bg-white/5 p-2 rounded-lg text-white"><DollarSign size={18} /></div>
-            </div>
-            <p className="text-2xl font-bold text-white">{totalPlatformSales.toLocaleString('tr-TR')} ₺</p>
-            <p className="text-[11px] text-mystic-text-muted mt-2">Mağazaların toplam cirosu</p>
-          </div>
-
-          <div className="bg-mystic-primary/10 border border-mystic-primary/30 p-6 rounded-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-mystic-primary/10 rounded-full blur-2xl -mr-6 -mt-6"></div>
-            <div className="flex items-center justify-between mb-4 relative z-10">
-              <h3 className="text-mystic-primary font-bold text-sm">Net Gelir (%10)</h3>
-              <div className="bg-mystic-primary/20 p-2 rounded-lg text-mystic-primary"><Shield size={18} /></div>
-            </div>
-            <p className="text-2xl font-bold text-white relative z-10">{platformCommission.toLocaleString('tr-TR')} ₺</p>
-            <p className="text-[11px] text-mystic-primary/80 mt-2 relative z-10">Platform komisyon geliri</p>
-          </div>
-
-          <div className="bg-black/40 border border-white/5 p-6 rounded-2xl relative overflow-hidden">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-mystic-text-muted font-medium text-sm">Aktif Mağazalar</h3>
-              <div className="bg-blue-500/15 p-2 rounded-lg text-blue-400"><Store size={18} /></div>
-            </div>
-            <p className="text-2xl font-bold text-white">{activeStores}</p>
-            <p className="text-[11px] text-mystic-text-muted mt-2">Pazaryerindeki dükkanlar</p>
-          </div>
-
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
           <div className="bg-black/40 border border-white/5 p-6 rounded-2xl relative overflow-hidden">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-mystic-text-muted font-medium text-sm">Toplam Üye</h3>
@@ -445,19 +349,26 @@ export default function AdminDashboard() {
             </p>
             <p className="text-[11px] text-mystic-text-muted mt-2">Son 5 dakikadaki tekil ruhlar</p>
           </div>
+
+          <div className="bg-mystic-primary/10 border border-mystic-primary/30 p-6 rounded-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-mystic-primary/10 rounded-full blur-2xl -mr-6 -mt-6"></div>
+            <div className="flex items-center justify-between mb-4 relative z-10">
+              <h3 className="text-mystic-primary font-bold text-sm">Blog Kütüphanesi</h3>
+              <div className="bg-mystic-primary/20 p-2 rounded-lg text-mystic-primary"><BookOpen size={18} /></div>
+            </div>
+            <p className="text-2xl font-bold text-white relative z-10">
+              {isLoadingBlogs ? (
+                <span className="inline-block w-8 h-6 bg-white/10 animate-pulse rounded"></span>
+              ) : (
+                blogs.length
+              )}
+            </p>
+            <p className="text-[11px] text-mystic-primary/80 mt-2 relative z-10">Yayınlanan rehber ve yazılar</p>
+          </div>
         </div>
 
         {/* Tab Controls */}
         <div className="flex border-b border-white/10 mb-8 gap-2">
-          <button 
-            onClick={() => setActiveTab('stores')}
-            className={`px-6 py-3 font-semibold text-sm transition-all relative flex items-center gap-2 ${
-              activeTab === 'stores' ? 'text-mystic-primary border-b-2 border-mystic-primary' : 'text-mystic-text-muted hover:text-white'
-            }`}
-          >
-            <Store size={16} />
-            Mağaza Yönetimi
-          </button>
           <button 
             onClick={() => setActiveTab('members')}
             className={`px-6 py-3 font-semibold text-sm transition-all relative flex items-center gap-2 ${
@@ -497,67 +408,7 @@ export default function AdminDashboard() {
           </button>
         </div>
 
-
-        {/* Tab Content 1: Stores */}
-        {activeTab === 'stores' && (
-          <div className="w-full max-w-full overflow-hidden">
-            <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-              <Store className="text-mystic-primary" size={20} /> Kayıtlı Mağazalar ({vendors.length})
-            </h2>
-            
-            <div className="bg-black/40 border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead className="bg-white/5 text-mystic-text-muted text-xs uppercase tracking-wider border-b border-white/5">
-                    <tr>
-                      <th className="p-4 font-semibold">Mağaza Adı</th>
-                      <th className="p-4 font-semibold">Puan</th>
-                      <th className="p-4 font-semibold">Durum</th>
-                      <th className="p-4 font-semibold text-right">İşlem (Kapat/Aç)</th>
-                    </tr>
-                  </thead>
-                  <tbody className="text-white text-sm divide-y divide-white/5">
-                    {vendors.map(v => (
-                      <tr key={v.id} className={`transition-colors ${v.status === 'banned' ? 'opacity-50 bg-red-900/10' : 'hover:bg-white/5'}`}>
-                        <td className="p-4 flex items-center gap-3">
-                          <img src={v.avatar} className="w-10 h-10 rounded-full object-cover border border-white/10" />
-                          <div>
-                            <span className="font-bold block">{v.name}</span>
-                            <span className="text-xs text-mystic-text-muted">ID: {v.id}</span>
-                          </div>
-                        </td>
-                        <td className="p-4">
-                          <span className="flex items-center text-yellow-500 font-bold"><Star size={14} className="mr-1" fill="currentColor"/> {v.rating}</span>
-                        </td>
-                        <td className="p-4">
-                          {v.status === 'approved' ? (
-                            <span className="flex items-center text-green-400 bg-green-400/10 px-2 py-1 rounded-full w-max text-xs"><CheckCircle size={14} className="mr-1"/> Aktif</span>
-                          ) : (
-                            <span className="flex items-center text-red-400 bg-red-400/10 px-2 py-1 rounded-full w-max text-xs"><XCircle size={14} className="mr-1"/> Engellendi</span>
-                          )}
-                        </td>
-                        <td className="p-4 text-right">
-                          <button 
-                            onClick={() => handleToggleStatus(v.id)}
-                            className={`px-3 py-1.5 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
-                              v.status === 'approved' 
-                              ? 'border-red-500/50 text-red-400 hover:bg-red-500/20' 
-                              : 'border-green-500/50 text-green-400 hover:bg-green-500/20'
-                            }`}
-                          >
-                            {v.status === 'approved' ? 'Mağazayı Kapat' : 'Geri Aç'}
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Tab Content 2: Members */}
+        {/* Tab Content 1: Members */}
         {activeTab === 'members' && (
           <div className="w-full max-w-full overflow-hidden">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -575,7 +426,7 @@ export default function AdminDashboard() {
             </div>
 
             {/* Filter controls */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6" style={{ transform: 'translate3d(0,0,0)' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" style={{ transform: 'translate3d(0,0,0)' }}>
               {/* Search input */}
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-mystic-text-muted">
@@ -608,22 +459,6 @@ export default function AdminDashboard() {
                   <option value="admin" className="bg-mystic-dark">Yönetici (Admin)</option>
                 </select>
               </div>
-
-              {/* Store ownership filter */}
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-mystic-text-muted">
-                  <Store size={16} />
-                </div>
-                <select 
-                  value={storeFilter}
-                  onChange={(e) => setStoreFilter(e.target.value)}
-                  className="w-full bg-black/40 border border-white/5 rounded-xl py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-mystic-primary/50 transition-colors appearance-none"
-                >
-                  <option value="all" className="bg-mystic-dark">Mağaza Durumu (Tümü)</option>
-                  <option value="has_store" className="bg-mystic-dark">Mağazası Olanlar</option>
-                  <option value="no_store" className="bg-mystic-dark">Mağazası Olmayanlar</option>
-                </select>
-              </div>
             </div>
 
             {/* Profiles table */}
@@ -652,13 +487,11 @@ export default function AdminDashboard() {
                         <th className="p-4 font-semibold">Üye Bilgileri</th>
                         <th className="p-4 font-semibold">Kayıt Tarihi</th>
                         <th className="p-4 font-semibold">Seviye (Mühür)</th>
-                        <th className="p-4 font-semibold">Mağaza İlişkisi</th>
                         <th className="p-4 font-semibold text-right">Rol Yetkilendirme</th>
                       </tr>
                     </thead>
                     <tbody className="text-white text-sm divide-y divide-white/5">
                       {filteredProfiles.map(p => {
-                        const userStore = getUserStore(p);
                         const userRole = p.role || 'free';
                         const roleMeta = ROLE_LABELS[userRole] || ROLE_LABELS.free;
 
@@ -703,23 +536,6 @@ export default function AdminDashboard() {
                               <span className={`px-3 py-1 rounded-full border text-[11px] font-bold block w-max uppercase ${roleMeta.style}`}>
                                 {roleMeta.label}
                               </span>
-                            </td>
-
-                            {/* Store Relationship */}
-                            <td className="p-4">
-                              {userStore ? (
-                                <div className="flex items-center gap-2">
-                                  <span className="flex items-center text-blue-400 bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 rounded-full text-xs font-semibold">
-                                    <Store size={12} className="mr-1" />
-                                    Mağazalı
-                                  </span>
-                                  <span className="text-xs text-white/80 font-medium max-w-[120px] truncate" title={userStore.name}>
-                                    {userStore.name}
-                                  </span>
-                                </div>
-                              ) : (
-                                <span className="text-mystic-text-muted text-xs">Yok</span>
-                              )}
                             </td>
 
                             {/* Actions / Role select & Delete */}

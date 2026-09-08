@@ -10,10 +10,8 @@ const GUEST_PROTECTED_ROUTES = [
   '/profile',
   '/kadim-dersler', // Dersler
   '/tests', // Sınavlar
-  '/explore', // Keşfet
   '/vip-teknolojiler', // VIP (Kadim Uygulamalar)
   '/membership', // VIP Seviyeler
-  '/vendor', // Satıcı paneli
 ];
 
 // Rol seviyeleri (büyük = üst).
