@@ -393,7 +393,7 @@ function IframePaymentContent() {
 
 export default function IframePaymentPage() {
   return (
-    <div className="w-full min-h-screen bg-[#05050A] flex items-center justify-center p-2">
+    <div className="w-full h-full bg-[#05050A] flex flex-col items-center justify-center p-2 sm:p-3 overflow-hidden">
       <Suspense fallback={
         <div className="p-8 text-center text-white">
           <Loader2 className="animate-spin text-[#D4AF37] mx-auto mb-2" size={24} />
