@@ -2,9 +2,8 @@ import { eq } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { users, emailVerifications } from '@/db/schema';
 import { hashPassword } from '@/lib/auth/password';
-import { ensureProfileAndProgress } from '@/lib/auth/account';
 import { json, errorJson, preflight } from '@/lib/http/cors';
-import { isDisposableEmail, generateVerificationCode } from '@/lib/auth/validate';
+import { isDisposableEmail, checkDomainHasMx, generateVerificationCode } from '@/lib/auth/validate';
 import { sendVerificationCodeEmail } from '@/lib/mail/smtp';
 
 export const dynamic = 'force-dynamic';
@@ -32,61 +31,32 @@ export async function POST(request: Request) {
     return errorJson('Geçici veya tek kullanımlık e-posta adresleri kabul edilmemektedir. Lütfen geçerli bir e-posta kullanın.');
   }
 
-  if (String(password).length < 6) return errorJson('Şifre en az 6 karakter olmalıdır.');
-
-  const [existing] = await db.select().from(users).where(eq(users.email, normEmail));
-  if (existing) {
-    if (existing.emailVerified) {
-      return errorJson('Bu e-posta adresi zaten kayıtlıdır.', 409);
-    }
-    
-    // Kullanıcı daha önce kayıt olmuş fakat kodunu doğrulamamış
-    const passwordHash = await hashPassword(String(password));
-    await db
-      .update(users)
-      .set({ passwordHash, fullName: fullName ?? existing.fullName, updatedAt: new Date() })
-      .where(eq(users.id, existing.id));
-
-    const code = generateVerificationCode();
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 dakika
-
-    await db.delete(emailVerifications).where(eq(emailVerifications.email, normEmail));
-    await db.insert(emailVerifications).values({
-      email: normEmail,
-      code,
-      expiresAt,
-    });
-
-    await sendVerificationCodeEmail(normEmail, code);
-
-    return json({
-      requiresVerification: true,
-      email: normEmail,
-      message: 'Doğrulama kodu e-posta adresinize gönderildi.',
-    });
+  // 4. Alan adı (DNS MX) denetimi - var olmayan domainleri durdur
+  const domain = normEmail.split('@')[1];
+  const hasMx = await checkDomainHasMx(domain);
+  if (!hasMx) {
+    return errorJson('Girdiğiniz e-posta sağlayıcısına ait aktif bir posta sunucusu bulunamadı. Lütfen geçerli bir e-posta adresi girin.', 400);
   }
 
+  if (String(password).length < 6) return errorJson('Şifre en az 6 karakter olmalıdır.');
+
+  // 5. Kayıtlı kullanıcı kontrolü
+  const [existing] = await db.select().from(users).where(eq(users.email, normEmail));
+  if (existing) {
+    return errorJson('Bu e-posta adresi zaten kayıtlıdır.', 409);
+  }
+
+  // 6. Şifreyi hashle ve bilgileri geçici doğrulama tablosunda tut (users tablosuna HENÜZ yazma!)
   const passwordHash = await hashPassword(String(password));
-  const [u] = await db
-    .insert(users)
-    .values({
-      email: normEmail,
-      passwordHash,
-      fullName: fullName ?? null,
-      emailVerified: false,
-    })
-    .returning();
-
-  await ensureProfileAndProgress(u.id, u.email);
-
-  // 6 haneli OTP kodu üret ve kaydet
   const code = generateVerificationCode();
-  const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 dakika
+  const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 dakika geçerli
 
   await db.delete(emailVerifications).where(eq(emailVerifications.email, normEmail));
   await db.insert(emailVerifications).values({
     email: normEmail,
     code,
+    passwordHash,
+    fullName: fullName ?? null,
     expiresAt,
   });
 
@@ -96,7 +66,7 @@ export async function POST(request: Request) {
   return json({
     requiresVerification: true,
     email: normEmail,
-    message: 'Doğrulama kodu e-posta adresinize gönderildi.',
+    message: 'Eğer girdiğiniz e-posta adresi geçerliyse doğrulama kodu gönderilmiştir.',
   });
 }
 

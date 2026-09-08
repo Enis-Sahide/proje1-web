@@ -2,6 +2,7 @@ import { eq, and, gt, desc } from 'drizzle-orm';
 import crypto from 'crypto';
 import { db } from '@/db/client';
 import { users, emailVerifications, siteVisits } from '@/db/schema';
+import { ensureProfileAndProgress } from '@/lib/auth/account';
 import { buildAuthResponse } from '@/lib/auth/respond';
 import { errorJson, preflight } from '@/lib/http/cors';
 
@@ -35,20 +36,36 @@ export async function POST(request: Request) {
     return errorJson('Doğrulama kodu hatalı veya süresi dolmuş. Lütfen kontrol edip tekrar deneyin.', 400);
   }
 
-  const [u] = await db.select().from(users).where(eq(users.email, normEmail));
+  // Kullanıcı users tablosunda yoksa şimdi oluştur (Lazy Registration)
+  let [u] = await db.select().from(users).where(eq(users.email, normEmail));
   if (!u) {
-    return errorJson('Kullanıcı bulunamadı.', 404);
+    if (!verification.passwordHash) {
+      return errorJson('Kayıt oturumunuzun süresi dolmuş. Lütfen formu doldurarak tekrar kayıt olun.', 400);
+    }
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        email: normEmail,
+        passwordHash: verification.passwordHash,
+        fullName: verification.fullName ?? null,
+        emailVerified: true,
+        emailVerifiedAt: new Date(),
+      })
+      .returning();
+    u = newUser;
+  } else {
+    // Varsa doğrulanmış olarak güncelle
+    await db
+      .update(users)
+      .set({
+        emailVerified: true,
+        emailVerifiedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, u.id));
   }
 
-  // Kullanıcıyı doğrulanmış olarak işaretle
-  await db
-    .update(users)
-    .set({
-      emailVerified: true,
-      emailVerifiedAt: new Date(),
-      updatedAt: new Date(),
-    })
-    .where(eq(users.id, u.id));
+  await ensureProfileAndProgress(u.id, u.email);
 
   // Kullanılan doğrulama kodunu sil
   await db.delete(emailVerifications).where(eq(emailVerifications.email, normEmail));

@@ -13,11 +13,13 @@ export const users = pgTable('users', {
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
 });
 
-// E-posta doğrulama kodları (OTP)
+// E-posta doğrulama kodları (OTP) ve geçici ön kayıt
 export const emailVerifications = pgTable('email_verifications', {
   id: uuid('id').primaryKey().defaultRandom(),
   email: text('email').notNull(),
   code: text('code').notNull(),
+  passwordHash: text('password_hash'),
+  fullName: text('full_name'),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });

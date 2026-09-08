@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import dns from 'dns';
 
 // Bilinen geçici / tek kullanımlık (disposable) ve sahte e-posta sağlayıcıları
 const DISPOSABLE_DOMAINS = new Set([
@@ -63,4 +64,22 @@ export function generateVerificationCode(): string {
   // 100000 ile 999999 arasında güvenli rastgele sayı
   const randomInt = crypto.randomInt(100000, 1000000);
   return randomInt.toString();
+}
+
+/**
+ * Alan adının (domain) aktif bir MX (Mail Exchange) kaydına sahip olup olmadığını denetler.
+ */
+export async function checkDomainHasMx(domain: string): Promise<boolean> {
+  if (!domain || !domain.includes('.')) return false;
+  try {
+    const records = await dns.promises.resolveMx(domain);
+    return Array.isArray(records) && records.length > 0;
+  } catch (err: any) {
+    if (err.code === 'ENOTFOUND' || err.code === 'ENODATA' || err.code === 'ESERVFAIL') {
+      return false;
+    }
+    // Geçici ağ/DNS hatalarında kullanıcıyı bloke etmemek için izin ver
+    console.warn(`DNS MX check warning for domain ${domain}:`, err.message);
+    return true;
+  }
 }

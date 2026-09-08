@@ -141,7 +141,7 @@ function RegisterForm() {
         <p className="text-mystic-text-muted text-sm">
           {step === 'form'
             ? 'Kişisel analizleriniz ve ruhsal gelişiminiz için ilk adımı atın.'
-            : `${email} adresine 6 haneli bir onay kodu gönderdik.`}
+            : `Eğer e-posta adresi geçerliyse ${email} adresine 6 haneli bir onay kodu gönderdik. Lütfen gelen kutunuzu ve spam klasörünüzü kontrol edin.`}
         </p>
       </div>
 
