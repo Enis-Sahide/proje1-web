@@ -80,7 +80,7 @@ export async function GET(request: Request) {
 
     const recentMemberVisits = await db.execute(sql`
       SELECT 
-        sv.created_at as created_at,
+        TO_CHAR(sv.created_at AT TIME ZONE 'UTC', 'YYYY-MM-DD"T"HH24:MI:SS"Z"') as created_at,
         sv.path as path,
         u.full_name as full_name,
         u.email as email,

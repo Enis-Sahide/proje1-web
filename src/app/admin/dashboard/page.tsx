@@ -13,6 +13,29 @@ const ROLE_LABELS: Record<string, { label: string; style: string }> = {
   admin: { label: 'Yönetici', style: 'border-red-500/50 text-red-400 bg-red-400/10 shadow-[0_0_8px_rgba(239,68,68,0.15)]' }
 };
 
+function formatDateSafe(raw: any): { dateStr: string; timeStr: string } {
+  if (!raw) return { dateStr: '-', timeStr: '-' };
+  try {
+    let str = String(raw).trim();
+    if (/[+-]\d{2}$/.test(str)) {
+      str += ':00';
+    }
+    str = str.replace(' ', 'T');
+    const d = new Date(str);
+    if (!isNaN(d.getTime())) {
+      return {
+        dateStr: d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }),
+        timeStr: d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
+      };
+    }
+    const m = String(raw).match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);
+    if (m) {
+      return { dateStr: `${m[3]}.${m[2]}`, timeStr: `${m[4]}:${m[5]}` };
+    }
+  } catch (e) {}
+  return { dateStr: String(raw).slice(0, 10) || '-', timeStr: '' };
+}
+
 export default function AdminDashboard() {
   const router = useRouter();
 
@@ -961,16 +984,7 @@ export default function AdminDashboard() {
                       </thead>
                       <tbody className="divide-y divide-white/5 text-white">
                         {analytics.recentMemberVisits.map((visit: any, idx: number) => {
-                          let dateStr = '-';
-                          let timeStr = '-';
-                          try {
-                            const raw = visit.created_at;
-                            const d = new Date(typeof raw === 'string' ? raw.replace(' ', 'T') : raw);
-                            if (!isNaN(d.getTime())) {
-                              dateStr = d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
-                              timeStr = d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
-                            }
-                          } catch (e) {}
+                          const { dateStr, timeStr } = formatDateSafe(visit.created_at || visit.createdAt);
                           const roleMeta = ROLE_LABELS[visit.role] || ROLE_LABELS.free;
 
                           return (
