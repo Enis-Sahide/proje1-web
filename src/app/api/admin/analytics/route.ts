@@ -68,17 +68,28 @@ export async function GET(request: Request) {
       LIMIT 10
     `);
 
+    const { searchParams } = new URL(request.url);
+    const excludeAdmin = searchParams.get('excludeAdmin') !== 'false'; // default: true
+    const limitParam = parseInt(searchParams.get('limit') || '50', 10);
+    const limit = Math.min(Math.max(isNaN(limitParam) ? 50 : limitParam, 5), 100);
+
     // Son aktif kayıtlı kullanıcı hareketleri
+    const memberFilterSql = excludeAdmin
+      ? sql`WHERE u.role != 'admin' AND sv.path NOT LIKE '/admin%'`
+      : sql``;
+
     const recentMemberVisits = await db.execute(sql`
       SELECT 
         sv.created_at as created_at,
         sv.path as path,
         u.full_name as full_name,
-        u.email as email
+        u.email as email,
+        u.role as role
       FROM site_visits sv
       JOIN users u ON sv.user_id = u.id
+      ${memberFilterSql}
       ORDER BY sv.created_at DESC
-      LIMIT 15
+      LIMIT ${limit}
     `);
 
     // Şu an aktif kullanıcı sayısı (Son 5 dakikada işlem yapan tekil IP'ler)
@@ -95,7 +106,11 @@ export async function GET(request: Request) {
       today: todayStats.rows[0] || { views: 0, visitors: 0 },
       topCities: topCities.rows || [],
       recentMemberVisits: recentMemberVisits.rows || [],
-      activeUsers: activeUsersStats.rows[0]?.active_users ?? 0
+      activeUsers: activeUsersStats.rows[0]?.active_users ?? 0,
+      settings: {
+        excludeAdmin,
+        limit
+      }
     });
   } catch (error: any) {
     console.error('Admin analytics fetch error:', error);

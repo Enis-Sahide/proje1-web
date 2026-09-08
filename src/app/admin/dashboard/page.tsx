@@ -111,12 +111,14 @@ export default function AdminDashboard() {
   const [analytics, setAnalytics] = useState<any>(null);
   const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
   const [analyticsError, setAnalyticsError] = useState<string | null>(null);
+  const [excludeAdmin, setExcludeAdmin] = useState(true);
+  const [visitLimit, setVisitLimit] = useState(50);
 
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = async (exclude = excludeAdmin, limit = visitLimit) => {
     setIsLoadingAnalytics(true);
     setAnalyticsError(null);
     try {
-      const data = await apiFetch<any>('/api/admin/analytics');
+      const data = await apiFetch<any>(`/api/admin/analytics?excludeAdmin=${exclude}&limit=${limit}`);
       setAnalytics(data);
     } catch (err: any) {
       console.error("Analytics fetch error:", err);
@@ -124,6 +126,16 @@ export default function AdminDashboard() {
     } finally {
       setIsLoadingAnalytics(false);
     }
+  };
+
+  const handleToggleExcludeAdmin = (newVal: boolean) => {
+    setExcludeAdmin(newVal);
+    fetchAnalytics(newVal, visitLimit);
+  };
+
+  const handleChangeVisitLimit = (newLimit: number) => {
+    setVisitLimit(newLimit);
+    fetchAnalytics(excludeAdmin, newLimit);
   };
 
   useEffect(() => {
@@ -694,7 +706,7 @@ export default function AdminDashboard() {
                 <p className="text-xs text-mystic-text-muted">Son 14 günün trafik ve sayfa popülaritesi verileri.</p>
               </div>
               <button 
-                onClick={fetchAnalytics}
+                onClick={() => fetchAnalytics()}
                 className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white hover:bg-white/10 transition-colors cursor-pointer"
               >
                 <RefreshCw size={14} className={isLoadingAnalytics ? 'animate-spin' : ''} />
@@ -865,10 +877,50 @@ export default function AdminDashboard() {
 
               {/* Recent Member Activities (Kayıtlı Üyelerin Son Aktiviteleri) */}
               <div className="lg:col-span-2 bg-mystic-surface/50 backdrop-blur-md border border-mystic-surface-light rounded-3xl p-6 shadow-xl flex flex-col">
-                <h3 className="text-base font-bold text-white mb-6 flex items-center gap-2 border-b border-white/5 pb-3">
-                  <UserCheck size={18} className="text-mystic-primary" />
-                  Kayıtlı Üyelerin Son Aktiviteleri
-                </h3>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 border-b border-white/5 pb-4">
+                  <div className="flex items-center gap-2">
+                    <UserCheck size={18} className="text-mystic-primary" />
+                    <h3 className="text-base font-bold text-white">
+                      Kayıtlı Üyelerin Son Aktiviteleri
+                    </h3>
+                    {analytics?.recentMemberVisits && (
+                      <span className="text-xs text-mystic-text-muted bg-white/5 px-2 py-0.5 rounded-full">
+                        {analytics.recentMemberVisits.length}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Filters: Exclude Admin & Limit */}
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => handleToggleExcludeAdmin(!excludeAdmin)}
+                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all border ${
+                        excludeAdmin
+                          ? 'bg-mystic-primary/10 border-mystic-primary/40 text-mystic-primary'
+                          : 'bg-white/5 border-white/10 text-mystic-text-muted hover:text-white'
+                      }`}
+                      title={excludeAdmin ? "Yöneticiler gizli (sadece üyeler gösteriliyor)" : "Yöneticiler dahil"}
+                    >
+                      {excludeAdmin ? '🛡️ Yönetici Gizli' : '🛡️ Tümü Dahil'}
+                    </button>
+
+                    <div className="flex items-center bg-white/5 border border-white/10 rounded-lg p-0.5 text-xs">
+                      {[25, 50, 100].map((l) => (
+                        <button
+                          key={l}
+                          onClick={() => handleChangeVisitLimit(l)}
+                          className={`px-2 py-0.5 rounded font-medium transition-all ${
+                            visitLimit === l
+                              ? 'bg-mystic-primary text-black font-bold'
+                              : 'text-mystic-text-muted hover:text-white'
+                          }`}
+                        >
+                          {l}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
 
                 {isLoadingAnalytics && !analytics ? (
                   <div className="flex flex-col items-center justify-center py-20 gap-3 my-auto">
@@ -884,9 +936,9 @@ export default function AdminDashboard() {
                     Kayıtlı üye aktivitesi henüz bulunmuyor.
                   </div>
                 ) : (
-                  <div className="overflow-x-auto">
+                  <div className="overflow-x-auto max-h-[500px] overflow-y-auto pr-1">
                     <table className="w-full text-left text-sm">
-                      <thead>
+                      <thead className="sticky top-0 bg-mystic-surface/90 backdrop-blur-md z-10">
                         <tr className="border-b border-white/10 text-mystic-text-muted text-xs uppercase font-semibold">
                           <th className="py-2.5 px-3">Kullanıcı</th>
                           <th className="py-2.5 px-3">Sayfa</th>
@@ -898,16 +950,25 @@ export default function AdminDashboard() {
                           const date = new Date(visit.created_at);
                           const timeStr = date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
                           const dateStr = date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+                          const roleMeta = ROLE_LABELS[visit.role] || ROLE_LABELS.free;
+
                           return (
                             <tr key={idx} className="hover:bg-white/5 transition-colors">
                               <td className="py-3 px-3">
-                                <div className="font-medium">{visit.full_name || 'İsimsiz Üye'}</div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-medium">{visit.full_name || 'İsimsiz Üye'}</span>
+                                  {visit.role && visit.role !== 'free' && (
+                                    <span className={`text-[9px] px-1.5 py-0.5 rounded border ${roleMeta.style}`}>
+                                      {roleMeta.label}
+                                    </span>
+                                  )}
+                                </div>
                                 <div className="text-[10px] text-mystic-text-muted">{visit.email}</div>
                               </td>
                               <td className="py-3 px-3 font-mono text-xs text-mystic-accent max-w-[200px] truncate" title={visit.path}>
                                 {visit.path}
                               </td>
-                              <td className="py-3 px-3 text-xs text-mystic-text-muted">
+                              <td className="py-3 px-3 text-xs text-mystic-text-muted whitespace-nowrap">
                                 {dateStr}, {timeStr}
                               </td>
                             </tr>
