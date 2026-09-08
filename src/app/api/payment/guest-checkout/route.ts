@@ -22,7 +22,15 @@ export async function POST(request: Request) {
       paymentStatus: 'pending'
     });
     
-    return json({ success: true, orderId, amount });
+    // Treps or internal iFrame URL
+    const iframeUrl = `/checkout/iframe?orderId=${orderId}`;
+
+    return json({ 
+      success: true, 
+      orderId, 
+      amount,
+      iframeUrl
+    });
   } catch (error: any) {
     console.error('Guest checkout error:', error);
     return errorJson('Sipariş oluşturulamadı: ' + error.message, 500);
