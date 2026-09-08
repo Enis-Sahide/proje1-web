@@ -18,6 +18,14 @@ export async function POST(request: Request) {
   const ok = await verifyPassword(String(password), u.passwordHash);
   if (!ok) return errorJson('Geçersiz e-posta veya şifre', 401);
 
+  if (u.emailVerified === false) {
+    return errorJson(
+      'E-posta adresiniz henüz doğrulanmamıştır. Lütfen e-postanıza gönderilen doğrulama kodunu girin.',
+      403,
+      { requiresVerification: true, email: u.email }
+    );
+  }
+
   await ensureProfileAndProgress(u.id, u.email);
   return buildAuthResponse(u.id, request);
 }

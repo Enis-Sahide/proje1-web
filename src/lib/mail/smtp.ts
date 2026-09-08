@@ -310,3 +310,148 @@ export async function sendGuestDownloadEmail(email: string, token: string, analy
     return false;
   }
 }
+
+export async function sendVerificationCodeEmail(email: string, code: string): Promise<boolean> {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.7layers.tr';
+  const from = process.env.SMTP_FROM || '"7Layers" <noreply@7layers.tr>';
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="tr">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>7Layers E-posta Doğrulama Kodu</title>
+      <style>
+        body {
+          margin: 0;
+          padding: 0;
+          background-color: #0b0f19;
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          color: #e2e8f0;
+          -webkit-font-smoothing: antialiased;
+        }
+        .container {
+          max-width: 580px;
+          margin: 40px auto;
+          background-color: #111827;
+          border: 1px solid rgba(212, 175, 55, 0.25);
+          border-radius: 20px;
+          overflow: hidden;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        .header {
+          background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%);
+          padding: 40px 20px;
+          text-align: center;
+          border-bottom: 1px solid rgba(212, 175, 55, 0.15);
+        }
+        .logo-text {
+          font-size: 32px;
+          font-weight: bold;
+          color: #D4AF37;
+          letter-spacing: 3px;
+          text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+          margin: 0;
+        }
+        .logo-sub {
+          font-size: 11px;
+          color: #9ca3af;
+          letter-spacing: 4px;
+          text-transform: uppercase;
+          margin-top: 5px;
+          margin-bottom: 0;
+        }
+        .body {
+          padding: 40px 30px;
+          line-height: 1.6;
+        }
+        h2 {
+          color: #f1f5f9;
+          font-size: 22px;
+          margin-top: 0;
+          margin-bottom: 20px;
+        }
+        p {
+          color: #9ca3af;
+          font-size: 15px;
+          margin-bottom: 24px;
+        }
+        .code-box {
+          text-align: center;
+          margin: 30px 0;
+          padding: 24px;
+          background: rgba(212, 175, 55, 0.08);
+          border: 1px solid rgba(212, 175, 55, 0.3);
+          border-radius: 16px;
+        }
+        .code {
+          font-size: 38px;
+          font-weight: 800;
+          color: #D4AF37;
+          letter-spacing: 8px;
+          font-family: monospace, Courier, monospace;
+          margin: 0;
+          text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+        .code-hint {
+          font-size: 12px;
+          color: #9ca3af;
+          margin-top: 10px;
+          margin-bottom: 0;
+        }
+        .footer {
+          background-color: #0c0f17;
+          padding: 25px 20px;
+          text-align: center;
+          font-size: 12px;
+          color: #6b7280;
+          border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .footer a {
+          color: #D4AF37;
+          text-decoration: none;
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <div class="logo-text">7LAYERS</div>
+          <div class="logo-sub">KADİM BİLGİLER VE ANALİZLER</div>
+        </div>
+        <div class="body">
+          <h2>Hoş Geldiniz,</h2>
+          <p>7Layers platformuna kaydınızı tamamlamak ve hesabınızı güvenle aktif etmek için aşağıdaki 6 haneli doğrulama kodunu kullanın:</p>
+          
+          <div class="code-box">
+            <div class="code">${code}</div>
+            <p class="code-hint">Bu kod <strong>15 dakika</strong> boyunca geçerlidir.</p>
+          </div>
+          
+          <p>Eğer 7Layers'ta hesap oluşturma talebinde bulunmadıysanız, bu e-postayı güvenle yok sayabilirsiniz.</p>
+        </div>
+        <div class="footer">
+          <p>© 2026 7Layers. Tüm Hakları Saklıdır.<br>
+          <a href="${appUrl}">7layers.tr</a></p>
+        </div>
+      </div>
+    </body>
+    </html>
+  `;
+
+  try {
+    const client = getTransporter();
+    await client.sendMail({
+      from,
+      to: email,
+      subject: `7Layers - Doğrulama Kodunuz: ${code}`,
+      html,
+    });
+    console.log(`Verification code email sent successfully to ${email}`);
+    return true;
+  } catch (err) {
+    console.error("Failed to send verification code email:", err);
+    return false;
+  }
+}

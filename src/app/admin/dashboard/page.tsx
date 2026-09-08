@@ -310,6 +310,27 @@ export default function AdminDashboard() {
     }
   };
 
+  // Silme işlemi
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
+  const handleDeleteUser = async (userId: string, userName: string) => {
+    const confirmDelete = window.confirm(
+      `"${userName}" isimli kullanıcıyı ve tüm platform verilerini kalıcı olarak silmek istediğinize emin misiniz?`
+    );
+    if (!confirmDelete) return;
+
+    setDeletingUserId(userId);
+    try {
+      await apiFetch(`/api/admin/profiles/${userId}`, {
+        method: 'DELETE'
+      });
+      setProfiles(prev => prev.filter(p => p.id !== userId));
+    } catch (err: any) {
+      alert("Kullanıcı silinirken hata oluştu: " + err.message);
+    } finally {
+      setDeletingUserId(null);
+    }
+  };
+
   // Filter members list based on current filters
   const filteredProfiles = profiles.filter(p => {
     const matchesSearch = 
@@ -651,7 +672,18 @@ export default function AdminDashboard() {
                               <div>
                                 <span className="font-bold block">{p.full_name || 'İsimsiz Üye'}</span>
                                 <span className="text-xs text-white/70 block mt-0.5">{p.email}</span>
-                                <span className="text-[10px] text-mystic-text-muted block font-mono mt-0.5">ID: {p.id}</span>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <span className="text-[10px] text-mystic-text-muted font-mono">ID: {p.id.slice(0, 8)}...</span>
+                                  {p.email_verified ? (
+                                    <span className="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded font-medium">
+                                      ✓ Onaylı
+                                    </span>
+                                  ) : (
+                                    <span className="text-[10px] text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded font-medium">
+                                      ⏳ Onay Bekliyor
+                                    </span>
+                                  )}
+                                </div>
                               </div>
                             </td>
                             
@@ -690,7 +722,7 @@ export default function AdminDashboard() {
                               )}
                             </td>
 
-                            {/* Actions / Role select */}
+                            {/* Actions / Role select & Delete */}
                             <td className="p-4 text-right">
                               <div className="flex items-center justify-end gap-2">
                                 {updatingUserId === p.id && (
@@ -698,7 +730,7 @@ export default function AdminDashboard() {
                                 )}
                                 <select 
                                   value={p.role || 'free'}
-                                  disabled={updatingUserId === p.id}
+                                  disabled={updatingUserId === p.id || deletingUserId === p.id}
                                   onChange={(e) => handleUpdateRole(p.id, e.target.value)}
                                   className="bg-black/60 border border-white/10 rounded-xl px-2 py-1 text-xs text-white focus:outline-none focus:border-mystic-primary/50 transition-colors"
                                 >
@@ -708,6 +740,14 @@ export default function AdminDashboard() {
                                   <option value="master">Usta (Seviye 3)</option>
                                   <option value="admin">Yönetici (Admin)</option>
                                 </select>
+                                <button
+                                  onClick={() => handleDeleteUser(p.id, p.full_name || p.email)}
+                                  disabled={deletingUserId === p.id}
+                                  className="p-1.5 bg-white/5 text-red-400 hover:bg-red-500/20 border border-red-500/20 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
+                                  title="Üyeyi Kalıcı Olarak Sil"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
                               </div>
                             </td>
                           </tr>

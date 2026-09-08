@@ -1,5 +1,6 @@
+import { eq } from 'drizzle-orm';
 import { db } from '@/db/client';
-import { profiles, userProgress } from '@/db/schema';
+import { users, profiles, userProgress, emailVerifications } from '@/db/schema';
 import { json, errorJson, preflight } from '@/lib/http/cors';
 import { getAuthPayload } from '@/lib/auth/session';
 import { getAccount } from '@/lib/auth/account';
@@ -47,6 +48,33 @@ export async function PATCH(request: Request, ctx: { params: Promise<{ id: strin
     .onConflictDoUpdate({ target: profiles.userId, set: { role } });
 
   return json({ success: true });
+}
+
+// Admin: üyeyi sistemden ve veritabanından kalıcı olarak sil.
+export async function DELETE(request: Request, ctx: { params: Promise<{ id: string }> }) {
+  const payload = await getAuthPayload(request);
+  if (!payload) return errorJson('Yetkisiz', 401);
+  const me = await getAccount(payload.sub);
+  if (me?.role !== 'admin') return errorJson('Yetkisiz', 403);
+
+  const { id } = await ctx.params;
+  if (id === me.id) {
+    return errorJson('Kendi hesabınızı silemezsiniz.', 400);
+  }
+
+  const [targetUser] = await db.select().from(users).where(eq(users.id, id));
+  if (!targetUser) return errorJson('Kullanıcı bulunamadı.', 404);
+
+  if (targetUser.email.toLowerCase() === 'admin@7layers.tr') {
+    return errorJson('Ana yönetici hesabı silinemez.', 400);
+  }
+
+  // Varsa doğrulama kayıtlarını sil
+  await db.delete(emailVerifications).where(eq(emailVerifications.email, targetUser.email));
+  // Kullanıcıyı sil (bağlı profiller, oturumlar cascade ile silinir)
+  await db.delete(users).where(eq(users.id, id));
+
+  return json({ success: true, message: 'Kullanıcı hesabı başarıyla silindi.' });
 }
 
 export const OPTIONS = preflight;

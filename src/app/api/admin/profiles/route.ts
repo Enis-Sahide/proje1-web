@@ -19,6 +19,8 @@ export async function GET(request: Request) {
       id: users.id,
       full_name: users.fullName,
       email: users.email,
+      email_verified: users.emailVerified,
+      email_verified_at: users.emailVerifiedAt,
       role: profiles.role,
       created_at: users.createdAt,
     })

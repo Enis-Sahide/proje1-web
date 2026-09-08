@@ -61,9 +61,19 @@ function LoginContent() {
         )}
 
         {error && (
-          <div className="mb-6 bg-red-500/10 border border-red-500/50 rounded-xl p-4 flex items-center gap-3">
-            <AlertCircle className="text-red-500 shrink-0" size={20} />
-            <p className="text-sm text-red-500 font-medium">{error}</p>
+          <div className="mb-6 bg-red-500/10 border border-red-500/50 rounded-xl p-4 flex flex-col gap-2">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="text-red-500 shrink-0" size={20} />
+              <p className="text-sm text-red-400 font-medium">{error}</p>
+            </div>
+            {error.includes('doğrulanmamış') && email && (
+              <Link 
+                href={`/auth/register?email=${encodeURIComponent(email)}&verify=true`}
+                className="text-xs text-mystic-primary hover:text-mystic-accent underline pl-8 font-semibold transition-colors"
+              >
+                Doğrulama kodunu şimdi girmek için buraya tıklayın →
+              </Link>
+            )}
           </div>
         )}
 
