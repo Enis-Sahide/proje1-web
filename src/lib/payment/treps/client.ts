@@ -128,6 +128,18 @@ interface CachedToken {
 
 const tokenCache = new Map<string, CachedToken>();
 
+/**
+ * Treps'in metin sütunları varchar(50); sığmayan değer
+ * `22001: value too long for type character varying(50)` hatasına yol açar.
+ * Bu yüzden gönderdiğimiz her serbest metni kırpıyoruz.
+ */
+const TREPS_TEXT_MAX = 50;
+
+function cap(value: string | undefined | null, max = TREPS_TEXT_MAX): string {
+  const v = (value ?? '').trim();
+  return v.length > max ? v.slice(0, max) : v;
+}
+
 export class TrepsClient {
   private credentials: TrepsCredentials;
   private cacheKey: string;
@@ -218,23 +230,23 @@ export class TrepsClient {
       iframe_flag: 0,
       lang: 'tr',
       buyer: {
-        customer_id: params.buyer.customerId,
-        name: params.buyer.name,
-        surname: params.buyer.surname,
-        email: params.buyer.email,
-        phone_number: params.buyer.phoneNumber,
-        country: params.buyer.country || 'TUR',
-        city: params.buyer.city || '',
-        address: params.buyer.address || '',
-        zip_code: params.buyer.zipCode || '',
+        customer_id: cap(params.buyer.customerId),
+        name: cap(params.buyer.name),
+        surname: cap(params.buyer.surname),
+        email: cap(params.buyer.email, 100),
+        phone_number: cap(params.buyer.phoneNumber, 20),
+        country: cap(params.buyer.country || 'TUR', 3),
+        city: cap(params.buyer.city),
+        address: cap(params.buyer.address, 100),
+        zip_code: cap(params.buyer.zipCode, 10),
       },
       products: params.products.map((p) => ({
-        product_id: p.productId,
-        category: p.category,
-        name: p.name,
+        product_id: cap(p.productId),
+        category: cap(p.category),
+        name: cap(p.name),
         price: p.price,
         quantity: p.quantity,
-        description: p.description || '',
+        description: cap(p.description),
       })),
     };
 
