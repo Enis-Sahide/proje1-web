@@ -39,16 +39,6 @@ export const vipTechnologies = pgTable('vip_technologies', {
   sort: integer('sort').notNull().default(0),
 });
 
-// imece productSeries
-export const imeceProducts = pgTable('imece_products', {
-  id: serial('id').primaryKey(),
-  title: text('title').notNull(),
-  icon: text('icon'),
-  description: text('description'),
-  items: jsonb('items').notNull().default([]), // [{ name, desc }]
-  sort: integer('sort').notNull().default(0),
-});
-
 // MOON_PHASES_2026
 export const moonPhases = pgTable('moon_phases', {
   id: serial('id').primaryKey(),

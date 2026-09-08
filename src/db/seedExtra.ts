@@ -46,18 +46,6 @@ export const VIP = [
   { id: 'rahmani', title: 'Kimatik Zikir', description: 'Sufi nefesiyle esmaları titreştirerek hücrelerin geometrisini düzenleyin.', icon: 'Fingerprint', color: 'from-[#D4AF37]/20 to-yellow-600/20', borderColor: 'border-[#D4AF37]/50', textColor: 'text-[#D4AF37]', status: 'ACTIVE', path: '/vip-teknolojiler/rahmani' },
 ];
 
-export const IMECE = [
-  { title: 'SUP Gıda Takviyeleri (Jel Serisi)', icon: 'heart-outline', description: 'Bitkilerin, şifalı mantarların ve deniz bileşenlerinin gücünü jel formunda sunan, hücre savunması ve yenilenmesini destekleyen patentli seri.', items: [
-    { name: 'Sup Detoks Mix Jel', desc: 'Toksinlerin atılmasını ve karaciğer fonksiyonlarını destekleyen arındırıcı formül.' },
-    { name: 'Sup Propolis Mix Jel', desc: 'Bağışıklık sistemini güçlendiren hücresel savunma kalkanı.' },
-    { name: 'Sup Reishi & Spirulina Jelleri', desc: 'Stres dengesi, zengin protein, mineral ve hücresel enerji takviyesi.' },
-    { name: 'Sup Krill Mix Jel', desc: 'Hücre emilimi yüksek Omega-3, kalp ve beyin sağlığı desteği.' },
-  ] },
-  { title: 'Hyranus Kişisel Bakım', icon: 'sparkles-outline', description: 'Tene ve saça uyumlu, kimyasal koruyucular içermeyen özel saç ve cilt bakım serisi. Saç derisinin mikrobiyom dengesini korur.', items: [] },
-  { title: "Coffee's Şah & Şifalı Gıdalar", icon: 'cafe-outline', description: 'Kırmızı Reishi özlü kahve serisi ve içme suyunun alkali dengesini sağlayan Sup Alkali pH Damlası.', items: [] },
-  { title: 'Manyetik Biyoenerji Denge Serisi', icon: 'pulse-outline', description: 'Çevremizdeki elektromanyetik kirliliğin vücudumuz üzerindeki olumsuz etkilerini dengelemek üzere tasarlanmış biyoenerji takıları.', items: [] },
-];
-
 export const MOON_PHASES = [
   { utcDate: '2026-01-03T10:03:26.043Z', phase: 'full_moon', phaseName: 'Dolunay', sign: 'Yengeç', signSymbol: '♋', degree: '13°' },
   { utcDate: '2026-01-18T19:52:39.367Z', phase: 'new_moon', phaseName: 'Yeni Ay', sign: 'Oğlak', signSymbol: '♑', degree: '28°' },

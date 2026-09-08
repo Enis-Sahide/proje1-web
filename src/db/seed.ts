@@ -25,7 +25,6 @@ import gatesData from '../data/gates.json';
 import { DAILY_AFFIRMATIONS } from '../data/affirmations';
 import { GUIDELINES } from '../data/guidelinesData';
 import { RESOURCES } from '../data/resourcesData';
-import { CATEGORIES, VENDORS, PRODUCTS } from '../data/marketplaceData';
 // mobile-only (web'e kopyalandı)
 import { ASTROLOGY_LESSONS } from '../data/astrologyLessons';
 import { HUMAN_DESIGN_LESSONS } from '../data/humanDesignLessons';
@@ -46,7 +45,6 @@ import {
   BREATHWORK,
   MEDITATION,
   VIP,
-  IMECE,
   MOON_PHASES,
   racesWithAvatar,
   chakraHomeFor,
@@ -135,7 +133,6 @@ async function main() {
   const breathworkRows = BREATHWORK.map((b, i) => ({ ...b, sort: i }));
   const meditationRows = MEDITATION.map((m, i) => ({ ...m, hz: String(m.hz), sort: i }));
   const vipRows = VIP.map((v, i) => ({ ...v, sort: i }));
-  const imeceRows = IMECE.map((p, i) => ({ ...p, sort: i }));
   const moonRows = MOON_PHASES.map((m, i) => ({ ...m, sort: i }));
   const raceRows = racesWithAvatar;
 
@@ -319,34 +316,11 @@ async function main() {
     description: r.description ?? null,
   }));
 
-  const categoryRows = CATEGORIES.map((c) => ({ id: c.id, name: c.name, icon: c.icon }));
-  const vendorRows = VENDORS.map((v) => ({
-    id: v.id,
-    name: v.name,
-    description: v.description,
-    avatar: v.avatar,
-    rating: v.rating != null ? String(v.rating) : null,
-    isFeatured: !!v.isFeatured,
-  }));
-  const productRows = PRODUCTS.map((p) => ({
-    id: p.id,
-    vendorId: p.vendorId,
-    categoryId: p.categoryId,
-    name: p.name,
-    description: p.description,
-    price: p.price != null ? String(p.price) : null,
-    image: p.image,
-    stock: p.stock ?? 0,
-  }));
-
   // ── Transaction: temizle (çocuk→ebeveyn) + ekle (ebeveyn→çocuk) ──
   await db.transaction(async (tx) => {
     // delete children first
     await tx.delete(s.quizQuestions);
     await tx.delete(s.quizzes);
-    await tx.delete(s.products);
-    await tx.delete(s.vendors);
-    await tx.delete(s.productCategories);
     await tx.delete(s.chakraLessons);
     await tx.delete(s.chakraTopics);
     await tx.delete(s.chakras);
@@ -365,7 +339,6 @@ async function main() {
     await tx.delete(s.breathworkTechniques);
     await tx.delete(s.meditationFrequencies);
     await tx.delete(s.vipTechnologies);
-    await tx.delete(s.imeceProducts);
     await tx.delete(s.moonPhases);
     await tx.delete(s.races);
     await tx.delete(s.blogPosts);
@@ -386,16 +359,12 @@ async function main() {
     await chunkedInsert(tx, s.numerologyMeanings, numerologyMeaningRows);
     await chunkedInsert(tx, s.numerologyCalcData, calcRows);
     await chunkedInsert(tx, s.affirmations, affirmationRows);
-    await chunkedInsert(tx, s.productCategories, categoryRows);
-    await chunkedInsert(tx, s.vendors, vendorRows);
-    await chunkedInsert(tx, s.products, productRows);
     await chunkedInsert(tx, s.guidelines, guidelineRows);
     await chunkedInsert(tx, s.resources, resourceRows);
     // Faz 7 inline içerikler
     await chunkedInsert(tx, s.breathworkTechniques, breathworkRows);
     await chunkedInsert(tx, s.meditationFrequencies, meditationRows);
     await chunkedInsert(tx, s.vipTechnologies, vipRows);
-    await chunkedInsert(tx, s.imeceProducts, imeceRows);
     await chunkedInsert(tx, s.moonPhases, moonRows);
     await chunkedInsert(tx, s.races, raceRows);
     await chunkedInsert(tx, s.blogPosts, BLOG_POSTS);
@@ -421,13 +390,9 @@ async function main() {
     affirmations: affirmationRows.length,
     guidelines: guidelineRows.length,
     resources: resourceRows.length,
-    product_categories: categoryRows.length,
-    vendors: vendorRows.length,
-    products: productRows.length,
     breathwork_techniques: breathworkRows.length,
     meditation_frequencies: meditationRows.length,
     vip_technologies: vipRows.length,
-    imece_products: imeceRows.length,
     moon_phases: moonRows.length,
     races: raceRows.length,
     blog_posts: BLOG_POSTS.length,
