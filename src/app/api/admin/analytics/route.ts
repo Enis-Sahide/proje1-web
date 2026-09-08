@@ -75,7 +75,7 @@ export async function GET(request: Request) {
 
     // Son aktif kayıtlı kullanıcı hareketleri
     const memberFilterSql = excludeAdmin
-      ? sql`WHERE u.role != 'admin' AND sv.path NOT LIKE '/admin%'`
+      ? sql`WHERE (p.role IS NULL OR p.role != 'admin') AND sv.path NOT LIKE '/admin%'`
       : sql``;
 
     const recentMemberVisits = await db.execute(sql`
@@ -84,9 +84,10 @@ export async function GET(request: Request) {
         sv.path as path,
         u.full_name as full_name,
         u.email as email,
-        u.role as role
+        COALESCE(p.role, 'free') as role
       FROM site_visits sv
       JOIN users u ON sv.user_id = u.id
+      LEFT JOIN profiles p ON p.user_id = u.id
       ${memberFilterSql}
       ORDER BY sv.created_at DESC
       LIMIT ${limit}
