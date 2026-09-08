@@ -24,6 +24,14 @@ const ROLE_BADGE_STYLES: Record<string, string> = {
   admin: 'bg-red-500/10 border-red-500/30 text-red-400 border-red-500/20',
 };
 
+interface NavItem {
+  name: string;
+  href: string;
+  requiresAuth?: boolean;
+  isLockedForNonAdmin?: boolean;
+  isUnderConstruction?: boolean;
+}
+
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -49,7 +57,7 @@ export default function Navigation() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const baseLinks = [
+  const baseLinks: NavItem[] = [
     { name: 'Ana Sayfa', href: '/' },
     { name: 'Frekans Odası', href: '/meditation' },
     { name: 'Nefes', href: '/breathwork' },
@@ -61,7 +69,7 @@ export default function Navigation() {
 
   const isMaster = role === 'master';
 
-  const navLinks = [
+  const navLinks: NavItem[] = [
     ...(isAdmin ? [{ name: 'Admin Paneli', href: '/admin/dashboard' }] : []),
     ...((isAdmin || isMaster) ? [{ name: 'Kadim Uygulamalar', href: '/vip-teknolojiler' }] : []),
     ...baseLinks
