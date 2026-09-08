@@ -890,32 +890,46 @@ export default function AdminDashboard() {
                     )}
                   </div>
 
-                  {/* Filters: Exclude Admin & Limit */}
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => handleToggleExcludeAdmin(!excludeAdmin)}
-                      className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all border ${
-                        excludeAdmin
-                          ? 'bg-mystic-primary/10 border-mystic-primary/40 text-mystic-primary'
-                          : 'bg-white/5 border-white/10 text-mystic-text-muted hover:text-white'
-                      }`}
-                      title={excludeAdmin ? "Yöneticiler gizli (sadece üyeler gösteriliyor)" : "Yöneticiler dahil"}
-                    >
-                      {excludeAdmin ? '🛡️ Yönetici Gizli' : '🛡️ Tümü Dahil'}
-                    </button>
+                  {/* Filters: Exclude Admin Segment & Limit */}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex items-center bg-black/40 border border-white/10 rounded-xl p-1 text-xs">
+                      <button
+                        type="button"
+                        onClick={() => handleToggleExcludeAdmin(true)}
+                        className={`px-3 py-1 rounded-lg font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                          excludeAdmin
+                            ? 'bg-mystic-primary text-black font-bold shadow-[0_0_12px_rgba(212,175,55,0.3)]'
+                            : 'text-mystic-text-muted hover:text-white'
+                        }`}
+                      >
+                        👥 Sadece Üyeler
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleToggleExcludeAdmin(false)}
+                        className={`px-3 py-1 rounded-lg font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                          !excludeAdmin
+                            ? 'bg-mystic-primary text-black font-bold shadow-[0_0_12px_rgba(212,175,55,0.3)]'
+                            : 'text-mystic-text-muted hover:text-white'
+                        }`}
+                      >
+                        🛡️ Yöneticiler Dahil
+                      </button>
+                    </div>
 
-                    <div className="flex items-center bg-white/5 border border-white/10 rounded-lg p-0.5 text-xs">
+                    <div className="flex items-center bg-black/40 border border-white/10 rounded-xl p-1 text-xs">
                       {[25, 50, 100].map((l) => (
                         <button
                           key={l}
+                          type="button"
                           onClick={() => handleChangeVisitLimit(l)}
-                          className={`px-2 py-0.5 rounded font-medium transition-all ${
+                          className={`px-2.5 py-1 rounded-lg font-medium transition-all cursor-pointer ${
                             visitLimit === l
-                              ? 'bg-mystic-primary text-black font-bold'
+                              ? 'bg-white/20 text-white font-bold'
                               : 'text-mystic-text-muted hover:text-white'
                           }`}
                         >
-                          {l}
+                          {l} kayıt
                         </button>
                       ))}
                     </div>
@@ -933,7 +947,7 @@ export default function AdminDashboard() {
                   </div>
                 ) : (!analytics?.recentMemberVisits || analytics.recentMemberVisits.length === 0) ? (
                   <div className="text-center py-20 text-mystic-text-muted text-sm my-auto">
-                    Kayıtlı üye aktivitesi henüz bulunmuyor.
+                    {excludeAdmin ? 'Yönetici harici kayıtlı üye aktivitesi henüz bulunmuyor.' : 'Kayıtlı üye aktivitesi henüz bulunmuyor.'}
                   </div>
                 ) : (
                   <div className="overflow-x-auto max-h-[500px] overflow-y-auto pr-1">
@@ -947,9 +961,16 @@ export default function AdminDashboard() {
                       </thead>
                       <tbody className="divide-y divide-white/5 text-white">
                         {analytics.recentMemberVisits.map((visit: any, idx: number) => {
-                          const date = new Date(visit.created_at);
-                          const timeStr = date.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
-                          const dateStr = date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+                          let dateStr = '-';
+                          let timeStr = '-';
+                          try {
+                            const raw = visit.created_at;
+                            const d = new Date(typeof raw === 'string' ? raw.replace(' ', 'T') : raw);
+                            if (!isNaN(d.getTime())) {
+                              dateStr = d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' });
+                              timeStr = d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' });
+                            }
+                          } catch (e) {}
                           const roleMeta = ROLE_LABELS[visit.role] || ROLE_LABELS.free;
 
                           return (
