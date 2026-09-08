@@ -181,7 +181,7 @@ function GuestCheckoutForm() {
           </h1>
           
           <p className="text-mystic-text-muted text-xs md:text-sm leading-relaxed mb-6">
-            Kayıt olmadan, doğum parametrelerinizle anında hesaplanan profesyonel ve derinlikli PDF raporunuza güvenle erişin.
+            Doğum parametrelerinizle anında hesaplanan profesyonel ve derinlikli PDF raporunuza güvenle erişin; raporunuz e-postanıza iletilir ve profilinizde saklanır.
           </p>
 
           <div className="space-y-3 pt-6 border-t border-white/10 text-xs">
