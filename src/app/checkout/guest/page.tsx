@@ -6,10 +6,12 @@ import { ArrowLeft, ShieldCheck, Loader2, Sparkles, CheckCircle2, Lock, ArrowRig
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
 
 function GuestCheckoutForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { user } = useAuth();
   
   // Default type: kabbalah (500 TL), human-design (500 TL), or astrology (50 TL)
   const rawType = searchParams.get('type') || 'kabbalah';
@@ -52,7 +54,11 @@ function GuestCheckoutForm() {
     const pTz = searchParams.get('tz');
     const pCountry = searchParams.get('country');
     
-    if (pEmail) setEmail(decodeURIComponent(pEmail));
+    if (pEmail) {
+      setEmail(decodeURIComponent(pEmail));
+    } else if (user?.email) {
+      setEmail(user.email);
+    }
     if (pDate) setDateStr(pDate);
     if (pTime) setTimeStr(pTime);
     if (pCity && pLat && pLon && pTz) {
