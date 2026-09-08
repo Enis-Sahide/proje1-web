@@ -10,7 +10,7 @@ export default function TestBanner() {
   const router = useRouter();
 
   useEffect(() => {
-    if (pathname === '/test' || pathname.startsWith('/admin')) {
+    if (pathname === '/test' || pathname.startsWith('/admin') || pathname?.startsWith('/checkout/iframe')) {
       setIsVisible(false);
       return;
     }

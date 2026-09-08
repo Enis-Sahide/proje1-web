@@ -8,6 +8,7 @@ import RouteGuard from "@/core/ui/RouteGuard";
 import AnimatedBackground from "@/core/ui/AnimatedBackground";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
 import TestBanner from "@/components/TestBanner";
+import Footer from "@/core/ui/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -92,6 +93,7 @@ export default function RootLayout({
               <main className="flex-grow flex flex-col">
                 {children}
               </main>
+              <Footer />
             </RouteGuard>
           </AuthProvider>
         </ThemeProvider>

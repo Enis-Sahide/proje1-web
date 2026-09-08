@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, MoonStar, Star, CheckCircle2, Loader2, AlertCircle, X, ChevronUp, ChevronDown, Download } from 'lucide-react';
+import { ArrowLeft, MoonStar, Star, CheckCircle2, Loader2, AlertCircle, X, ChevronUp, ChevronDown, Download, Lock } from 'lucide-react';
 import { getFullPlanetInterpretation, getAspectInterpretation, getHouseCuspInterpretation } from '@/features/astrology/engine/AstrologyInterpretations';
 import { AstroPoint, AstroAspect, NatalChartData, ZodiacSign, Planet, AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 import * as htmlToImage from 'html-to-image';
@@ -11,6 +11,7 @@ import { PrintableChart } from '@/components/PrintableChart';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { useAuth } from '@/context/AuthContext';
 import { downloadChartPDF } from '@/utils/pdfGenerator';
+import AuthPromptModal from '@/components/AuthPromptModal';
 
 const ZODIAC_COLORS: Record<string, string> = {
   'Koç': '#FF453A', 'Aslan': '#FF453A', 'Yay': '#FF453A',
@@ -55,6 +56,7 @@ export default function AstrologyPage() {
   const { role, user } = useAuth();
   const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
   const [showLockModal, setShowLockModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [chartData, setChartData] = useState<NatalChartData | null>(null);
@@ -456,21 +458,46 @@ export default function AstrologyPage() {
                      {(isDownloading || renderPrintable) ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />} 
                      {(isDownloading || renderPrintable) ? "Görsel Hazırlanıyor..." : "Haritayı İndir (PNG)"}
                    </button>
-                   {isApprenticeOrAbove && (
-                      <button 
-                        onClick={async () => {
-                          await downloadChartPDF(
-                            chartData,
-                            cityKey ? cityKey.name : '',
-                            `${dateStr.split('-').reverse().join('.')} ${timeStr}`
-                          );
-                        }}
-                        className="flex-1 sm:flex-initial text-xs sm:text-sm px-4 py-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] rounded-full text-black font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2"
-                      >
-                        <Download size={16} />
-                        PDF Raporu İndir
-                      </button>
-                    )}
+                   {isApprenticeOrAbove ? (
+                       <button 
+                         onClick={async () => {
+                           await downloadChartPDF(
+                             chartData,
+                             cityKey ? cityKey.name : '',
+                             `${dateStr.split('-').reverse().join('.')} ${timeStr}`
+                           );
+                         }}
+                         className="flex-1 sm:flex-initial text-xs sm:text-sm px-4 py-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] rounded-full text-black font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2"
+                       >
+                         <Download size={16} />
+                         PDF Raporu İndir
+                       </button>
+                     ) : (
+                       <button 
+                         onClick={() => {
+                           const query = new URLSearchParams({
+                             type: 'astrology',
+                             date: dateStr,
+                             time: timeStr,
+                             city: cityKey?.name || '',
+                             lat: (cityKey?.lat || '').toString(),
+                             lon: (cityKey?.lon || '').toString(),
+                             tz: cityKey?.tz || '',
+                             email: user?.email || ''
+                           }).toString();
+
+                           if (!user) {
+                             setShowAuthModal(true);
+                             return;
+                           }
+                           router.push(`/checkout/guest?${query}`);
+                         }}
+                         className="flex-1 sm:flex-initial text-xs sm:text-sm px-4 py-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] rounded-full text-black font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2 shadow-lg shadow-[#D4AF37]/20 cursor-pointer"
+                       >
+                         <Lock size={14} />
+                         PDF Raporu Satın Al (50 TL)
+                       </button>
+                     )}
                     <button onClick={() => setChartData(null)} className="flex-1 sm:flex-initial text-xs sm:text-sm px-4 py-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap text-center">
                       Yeni Harita
                     </button>
@@ -729,6 +756,11 @@ export default function AstrologyPage() {
           )}
         </div>
 
+        <AuthPromptModal
+          isOpen={showAuthModal}
+          onClose={() => setShowAuthModal(false)}
+          redirectUrl={`/checkout/guest?type=astrology&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}`}
+        />
       </div>
     </div>
   );

@@ -20,7 +20,7 @@ async function main() {
     slug: 'icsel-frekans-jeneratoru-insan-sesiyle-432hz-ve-sifa-dalgalari',
     content: content,
     imageUrl: '/vocal_frequency_healing.jpg',
-    category: 'Ezoterik & Bilim',
+    category: 'Ezoterik',
     published: true,
   };
 

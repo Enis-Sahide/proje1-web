@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { ArrowLeft, Loader2, Search, Triangle, Star, Compass, AlertCircle, ChevronDown, CheckCircle2, Moon, Sun, MoonStar, Sparkles } from 'lucide-react';
+import { ArrowLeft, Loader2, Search, Triangle, Star, Compass, AlertCircle, ChevronDown, CheckCircle2, Moon, Sun, MoonStar, Sparkles, Download, Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ASTRO_CITIES, AstroPoint, NatalChartData, AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 // Interpretations are fetched from the backend API.
@@ -9,6 +9,7 @@ import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { X } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { downloadKabbalahPDF } from '@/utils/kabbalahPdfGenerator';
+import AuthPromptModal from '@/components/AuthPromptModal';
 
 const ZODIAC_COLORS: Record<string, string> = {
   'Koç': '#FF453A', 'Aslan': '#FF453A', 'Yay': '#FF453A',
@@ -50,6 +51,7 @@ export default function KabbalahAnalysisPage() {
   const { role, user } = useAuth();
   const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
   const [showLockModal, setShowLockModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleInterpClick = (interp: any) => {
     if (isApprenticeOrAbove) {
@@ -345,7 +347,7 @@ export default function KabbalahAnalysisPage() {
                 <p className="text-mystic-text-muted text-center max-w-xl mt-4">
                   Yükselen Burcunuz: <strong className="text-white">{chartData.assiah.ascendant.sign}</strong>
                 </p>
-                {isApprenticeOrAbove && (
+                {isApprenticeOrAbove ? (
                   <button
                     onClick={() => {
                       downloadKabbalahPDF(
@@ -358,7 +360,33 @@ export default function KabbalahAnalysisPage() {
                     }}
                     className="mt-6 flex items-center gap-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-2.5 px-6 rounded-xl transition-all shadow-md shadow-[#D4AF37]/10"
                   >
+                    <Download size={16} />
                     PDF Raporu İndir
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => {
+                      const query = new URLSearchParams({
+                        type: 'kabbalah',
+                        date: dateStr,
+                        time: timeStr,
+                        city: cityKey?.name || '',
+                        lat: (cityKey?.lat || '').toString(),
+                        lon: (cityKey?.lon || '').toString(),
+                        tz: cityKey?.tz || '',
+                        email: user?.email || ''
+                      }).toString();
+
+                      if (!user) {
+                        setShowAuthModal(true);
+                        return;
+                      }
+                      router.push(`/checkout/guest?${query}`);
+                    }}
+                    className="mt-6 flex items-center gap-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-2.5 px-6 rounded-xl transition-all shadow-md shadow-[#D4AF37]/20 cursor-pointer"
+                  >
+                    <Lock size={16} />
+                    Kabalistik 4 Alem Raporunu Satın Al (500 TL)
                   </button>
                 )}
               </div>
@@ -692,6 +720,12 @@ export default function KabbalahAnalysisPage() {
           </div>
         </div>
       )}
+
+      <AuthPromptModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        redirectUrl={`/checkout/guest?type=kabbalah&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}`}
+      />
     </div>
   );
 }

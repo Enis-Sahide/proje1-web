@@ -36,6 +36,12 @@ export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
+
+  // Do not render navigation inside payment iframes
+  if (pathname?.startsWith('/checkout/iframe')) {
+    return null;
+  }
+
   const { user, role, logout } = useAuth();
   const isLoggedIn = !!user;
   const isAdmin = role === 'admin';
