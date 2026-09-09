@@ -37,11 +37,6 @@ export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  // Yönetim paneli kendi kabuğunu (AdminSidebar) kullanır; ödeme iframe'inde de gizli.
-  if (pathname?.startsWith('/admin') || pathname?.startsWith('/checkout/iframe')) {
-    return null;
-  }
-
   const { user, role, logout } = useAuth();
   const isLoggedIn = !!user;
   const isAdmin = role === 'admin';
@@ -74,6 +69,15 @@ export default function Navigation() {
   ];
 
   const isMaster = role === 'master';
+
+  // Yönetim paneli kendi kabuğunu (AdminSidebar) kullanır; ödeme iframe'inde de gizli.
+  // ÖNEMLİ: Bu kontrol tüm hook çağrılarından SONRA gelmeli — aksi halde rota
+  // değiştiğinde render'lar arasında hook sayısı değişir ("Rendered fewer hooks
+  // than expected").
+  const hidden = pathname?.startsWith('/admin') || pathname?.startsWith('/checkout/iframe');
+  if (hidden) {
+    return null;
+  }
 
   const navLinks: NavItem[] = [
     ...(isAdmin ? [{ name: 'Admin Paneli', href: '/admin/dashboard' }] : []),
