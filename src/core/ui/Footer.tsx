@@ -8,8 +8,8 @@ import { usePathname } from 'next/navigation';
 export default function Footer() {
   const pathname = usePathname();
 
-  // Do not show footer inside iframe or specific standalone views
-  if (pathname?.startsWith('/checkout/iframe')) {
+  // Yönetim paneli ve ödeme iframe'i kendi bağımsız düzenlerini kullanır.
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/checkout/iframe')) {
     return null;
   }
 

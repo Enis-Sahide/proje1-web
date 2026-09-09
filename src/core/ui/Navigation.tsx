@@ -37,8 +37,8 @@ export default function Navigation() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
 
-  // Do not render navigation inside payment iframes
-  if (pathname?.startsWith('/checkout/iframe')) {
+  // Yönetim paneli kendi kabuğunu (AdminSidebar) kullanır; ödeme iframe'inde de gizli.
+  if (pathname?.startsWith('/admin') || pathname?.startsWith('/checkout/iframe')) {
     return null;
   }
 

@@ -1,1150 +1,176 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { Shield, Users, ArrowLeft, Search, Filter, RefreshCw, UserCheck, BookOpen, Plus, Trash2, Edit, Activity, Calendar, TrendingUp, MapPin } from 'lucide-react';
+import React, { useCallback, useEffect, useState } from 'react';
+import Link from 'next/link';
+import { Activity, ArrowRight, BookOpen, LayoutDashboard, Users } from 'lucide-react';
 import { apiFetch } from '@/lib/apiClient';
+import AdminPageHeader from '@/components/admin/AdminPageHeader';
+import { ADMIN_NAV } from '@/components/admin/AdminSidebar';
 
-const ROLE_LABELS: Record<string, { label: string; style: string }> = {
-  free: { label: 'Ücretsiz Üyelik', style: 'border-white/10 text-mystic-text-muted bg-white/5' },
-  apprentice: { label: 'Çıraklık (Seviye 1)', style: 'border-amber-700/50 text-amber-500 bg-amber-500/10 shadow-[0_0_8px_rgba(180,83,9,0.1)]' },
-  journeyman: { label: 'Kalfalık (Seviye 2)', style: 'border-blue-500/50 text-blue-400 bg-blue-400/10 shadow-[0_0_8px_rgba(59,130,246,0.1)]' },
-  master: { label: 'Ustalık (Seviye 3)', style: 'border-mystic-primary/50 text-mystic-primary bg-mystic-primary/10 shadow-[0_0_8px_rgba(212,175,55,0.15)]' },
-  admin: { label: 'Yönetici', style: 'border-red-500/50 text-red-400 bg-red-400/10 shadow-[0_0_8px_rgba(239,68,68,0.15)]' }
-};
-
-function formatDateSafe(raw: any): { dateStr: string; timeStr: string } {
-  if (!raw) return { dateStr: '-', timeStr: '-' };
-  try {
-    let str = String(raw).trim();
-    if (/[+-]\d{2}$/.test(str)) {
-      str += ':00';
-    }
-    str = str.replace(' ', 'T');
-    const d = new Date(str);
-    if (!isNaN(d.getTime())) {
-      return {
-        dateStr: d.toLocaleDateString('tr-TR', { day: 'numeric', month: 'short' }),
-        timeStr: d.toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })
-      };
-    }
-    const m = String(raw).match(/^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/);
-    if (m) {
-      return { dateStr: `${m[3]}.${m[2]}`, timeStr: `${m[4]}:${m[5]}` };
-    }
-  } catch (e) {}
-  return { dateStr: String(raw).slice(0, 10) || '-', timeStr: '' };
+interface Summary {
+  members: number | null;
+  blogs: number | null;
+  todayVisitors: number | null;
+  activeUsers: number | null;
 }
 
-export default function AdminDashboard() {
-  const router = useRouter();
+function StatCard({
+  label,
+  value,
+  hint,
+  icon: Icon,
+  tone,
+  href,
+}: {
+  label: string;
+  value: number | null;
+  hint: string;
+  icon: React.ElementType;
+  tone: string;
+  href: string;
+}) {
+  return (
+    <Link
+      href={href}
+      className="group relative overflow-hidden rounded-2xl border border-white/5 bg-black/40 p-6 transition-colors hover:border-white/15"
+    >
+      <div className="mb-4 flex items-center justify-between">
+        <h3 className="text-sm font-medium text-mystic-text-muted">{label}</h3>
+        <div className={`rounded-lg p-2 ${tone}`}>
+          <Icon size={18} />
+        </div>
+      </div>
+      <p className="text-2xl font-bold text-white">
+        {value === null ? (
+          <span className="inline-block h-6 w-8 animate-pulse rounded bg-white/10" />
+        ) : (
+          value
+        )}
+      </p>
+      <p className="mt-2 flex items-center gap-1 text-[11px] text-mystic-text-muted">
+        {hint}
+        <ArrowRight
+          size={11}
+          className="opacity-0 transition-opacity group-hover:opacity-100"
+        />
+      </p>
+    </Link>
+  );
+}
 
-  // Active tab state: 'members' | 'blog' | 'analytics'
-  const [activeTab, setActiveTab] = useState<'members' | 'blog' | 'analytics'>('members');
-
-  // Blog posts states
-  const [blogs, setBlogs] = useState<any[]>([]);
-  const [isLoadingBlogs, setIsLoadingBlogs] = useState(false);
-  const [blogError, setBlogError] = useState<string | null>(null);
-
-  const [isBlogModalOpen, setIsBlogModalOpen] = useState(false);
-  const [editingBlog, setEditingBlog] = useState<any>(null);
-  const [blogForm, setBlogForm] = useState({
-    title: '',
-    slug: '',
-    content: '',
-    category: 'Astroloji',
-    imageUrl: '',
-    published: true
+export default function AdminDashboardPage() {
+  const [summary, setSummary] = useState<Summary>({
+    members: null,
+    blogs: null,
+    todayVisitors: null,
+    activeUsers: null,
   });
-  const [isSavingBlog, setIsSavingBlog] = useState(false);
-  const [isUploadingImage, setIsUploadingImage] = useState(false);
-  const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  const load = useCallback(() => {
+    // Her uç bağımsız — biri düşerse diğer göstergeler yine dolar.
+    const members = apiFetch<unknown[]>('/api/admin/profiles')
+      .then((d) => d?.length ?? 0)
+      .catch(() => null);
+    const blogs = apiFetch<unknown[]>('/api/admin/blog')
+      .then((d) => d?.length ?? 0)
+      .catch(() => null);
+    const analytics = apiFetch<{ today?: { visitors?: number }; activeUsers?: number }>(
+      '/api/admin/analytics?excludeAdmin=true&limit=25',
+    ).catch(() => null);
 
-    setIsUploadingImage(true);
-    try {
-      const formData = new FormData();
-      formData.append('file', file);
-
-      const res = await fetch('/api/admin/upload', {
-        method: 'POST',
-        body: formData,
-      });
-      const data = await res.json();
-      if (res.ok && data.url) {
-        setBlogForm((prev) => ({ ...prev, imageUrl: data.url }));
-      } else {
-        alert(data.error || 'Görsel yüklenemedi.');
-      }
-    } catch (err) {
-      console.error('Upload error:', err);
-      alert('Görsel yüklenirken bir hata oluştu.');
-    } finally {
-      setIsUploadingImage(false);
-    }
-  };
-
-
-  // Profiles (members) state
-  const [profiles, setProfiles] = useState<any[]>([]);
-  const [isLoadingProfiles, setIsLoadingProfiles] = useState(true);
-  const [profilesError, setProfilesError] = useState<string | null>(null);
-
-  // Search & Filter state
-  const [searchTerm, setSearchTerm] = useState('');
-  const [roleFilter, setRoleFilter] = useState('all');
-  
-  // Role updating loader state
-  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
-
-  // Fetch profiles from Supabase profiles table
-  const fetchProfiles = async () => {
-    setIsLoadingProfiles(true);
-    setProfilesError(null);
-    try {
-      const data = await apiFetch<any[]>('/api/admin/profiles');
-      setProfiles(data || []);
-    } catch (err: any) {
-      console.error("Profiles fetch error:", err);
-      setProfilesError(err.message || 'Üyeler yüklenirken hata oluştu.');
-    } finally {
-      setIsLoadingProfiles(false);
-    }
-  };
-
-  const fetchBlogs = async () => {
-    setIsLoadingBlogs(true);
-    setBlogError(null);
-    try {
-      const data = await apiFetch<any[]>('/api/admin/blog');
-      setBlogs(data || []);
-    } catch (err: any) {
-      console.error("Blogs fetch error:", err);
-      setBlogError(err.message || 'Yazılar yüklenirken hata oluştu.');
-    } finally {
-      setIsLoadingBlogs(false);
-    }
-  };
-
-  // Analytics state
-  const [analytics, setAnalytics] = useState<any>(null);
-  const [isLoadingAnalytics, setIsLoadingAnalytics] = useState(false);
-  const [analyticsError, setAnalyticsError] = useState<string | null>(null);
-  const [excludeAdmin, setExcludeAdmin] = useState(true);
-  const [visitLimit, setVisitLimit] = useState(50);
-
-  const fetchAnalytics = async (exclude = excludeAdmin, limit = visitLimit) => {
-    setIsLoadingAnalytics(true);
-    setAnalyticsError(null);
-    try {
-      const data = await apiFetch<any>(`/api/admin/analytics?excludeAdmin=${exclude}&limit=${limit}`);
-      setAnalytics(data);
-    } catch (err: any) {
-      console.error("Analytics fetch error:", err);
-      setAnalyticsError(err.message || 'Analiz verileri yüklenirken hata oluştu.');
-    } finally {
-      setIsLoadingAnalytics(false);
-    }
-  };
-
-  const handleToggleExcludeAdmin = (newVal: boolean) => {
-    setExcludeAdmin(newVal);
-    fetchAnalytics(newVal, visitLimit);
-  };
-
-  const handleChangeVisitLimit = (newLimit: number) => {
-    setVisitLimit(newLimit);
-    fetchAnalytics(excludeAdmin, newLimit);
-  };
-
-  useEffect(() => {
-    fetchProfiles();
-    fetchAnalytics();
-    fetchBlogs();
+    return Promise.all([members, blogs, analytics])
+      .then(([m, b, a]) =>
+        setSummary({
+          members: m,
+          blogs: b,
+          todayVisitors: a?.today?.visitors ?? (a ? 0 : null),
+          activeUsers: a?.activeUsers ?? (a ? 0 : null),
+        }),
+      )
+      .finally(() => setRefreshing(false));
   }, []);
 
   useEffect(() => {
-    if (activeTab === 'blog') {
-      fetchBlogs();
-    }
-    if (activeTab === 'analytics') {
-      fetchAnalytics();
-    }
-  }, [activeTab]);
+    load();
+  }, [load]);
 
-  const handleOpenCreateBlog = () => {
-    setEditingBlog(null);
-    setBlogForm({
-      title: '',
-      slug: '',
-      content: '',
-      category: 'Astroloji',
-      imageUrl: '',
-      published: true
-    });
-    setIsBlogModalOpen(true);
-  };
-
-  const handleOpenEditBlog = (blog: any) => {
-    setEditingBlog(blog);
-    setBlogForm({
-      title: blog.title || '',
-      slug: blog.slug || '',
-      content: blog.content || '',
-      category: blog.category || 'Astroloji',
-      imageUrl: blog.imageUrl || '',
-      published: blog.published !== undefined ? blog.published : true
-    });
-    setIsBlogModalOpen(true);
-  };
-
-  const handleSaveBlog = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSavingBlog(true);
-    try {
-      if (editingBlog) {
-        // Update
-        const updated = await apiFetch<any>(`/api/admin/blog/${editingBlog.id}`, {
-          method: 'PUT',
-          body: JSON.stringify(blogForm)
-        });
-        setBlogs(blogs.map(b => b.id === editingBlog.id ? updated : b));
-      } else {
-        // Create
-        const created = await apiFetch<any>('/api/admin/blog', {
-          method: 'POST',
-          body: JSON.stringify(blogForm)
-        });
-        setBlogs([created, ...blogs]);
-      }
-      setIsBlogModalOpen(false);
-    } catch (err: any) {
-      alert("Yazı kaydedilirken hata oluştu: " + err.message);
-    } finally {
-      setIsSavingBlog(false);
-    }
-  };
-
-  const handleDeleteBlog = async (id: string, title: string) => {
-    const confirmDelete = window.confirm(`"${title}" isimli blog yazısını silmek istediğinize emin misiniz?`);
-    if (!confirmDelete) return;
-
-    try {
-      await apiFetch(`/api/admin/blog/${id}`, {
-        method: 'DELETE'
-      });
-      setBlogs(blogs.filter(b => b.id !== id));
-    } catch (err: any) {
-      alert("Yazı silinirken hata oluştu: " + err.message);
-    }
-  };
-
-  // Change user role directly in profiles database
-  const handleUpdateRole = async (userId: string, newRole: string) => {
-    const profile = profiles.find(p => p.id === userId);
-    const userName = profile?.full_name || 'İsimsiz Üye';
-    
-    const roleLabels: Record<string, string> = {
-      free: 'Ücretsiz Üye',
-      apprentice: 'Çırak (Seviye 1)',
-      journeyman: 'Kalfa (Seviye 2)',
-      master: 'Usta (Seviye 3)',
-      admin: 'Yönetici (Admin)'
-    };
-    
-    const confirmChange = window.confirm(
-      `"${userName}" isimli üyenin yetki seviyesini "${roleLabels[newRole]}" olarak değiştirmek istediğinize emin misiniz?`
-    );
-    if (!confirmChange) return;
-
-    setUpdatingUserId(userId);
-    try {
-      await apiFetch(`/api/admin/profiles/${userId}`, {
-        method: 'PATCH',
-        body: JSON.stringify({ role: newRole }),
-      });
-
-      // Update local profiles state
-      setProfiles(profiles.map(p => {
-        if (p.id === userId) {
-          return { ...p, role: newRole };
-        }
-        return p;
-      }));
-    } catch (err: any) {
-      alert("Rol güncellenirken bir hata oluştu: " + err.message);
-    } finally {
-      setUpdatingUserId(null);
-    }
-  };
-
-  // Silme işlemi
-  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
-  const handleDeleteUser = async (userId: string, userName: string) => {
-    const confirmDelete = window.confirm(
-      `"${userName}" isimli kullanıcıyı ve tüm platform verilerini kalıcı olarak silmek istediğinize emin misiniz?`
-    );
-    if (!confirmDelete) return;
-
-    setDeletingUserId(userId);
-    try {
-      await apiFetch(`/api/admin/profiles/${userId}`, {
-        method: 'DELETE'
-      });
-      setProfiles(prev => prev.filter(p => p.id !== userId));
-    } catch (err: any) {
-      alert("Kullanıcı silinirken hata oluştu: " + err.message);
-    } finally {
-      setDeletingUserId(null);
-    }
-  };
-
-  // Filter members list based on current filters
-  const filteredProfiles = profiles.filter(p => {
-    const searchLower = searchTerm.toLowerCase();
-    const matchesSearch = 
-      (p.full_name?.toLowerCase() || '').includes(searchLower) ||
-      (p.email?.toLowerCase() || '').includes(searchLower) ||
-      p.id.toLowerCase().includes(searchLower);
-
-    const matchesRole = roleFilter === 'all' || p.role === roleFilter;
-
-    return matchesSearch && matchesRole;
-  });
+  // Genel Bakış'ın kendisi hariç, panelin diğer bölümleri.
+  const sections = ADMIN_NAV.filter((item) => item.href !== '/admin/dashboard');
 
   return (
-    <div className="min-h-screen bg-mystic-dark pb-24">
-      {/* Header */}
-      <header className="bg-black/50 border-b border-mystic-primary/20 p-6 pt-28 relative md:sticky md:top-0 z-40" style={{ transform: 'translate3d(0,0,0)' }}>
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <button onClick={() => router.push('/')} className="p-2 bg-white/5 hover:bg-white/10 rounded-full transition-colors">
-              <ArrowLeft size={20} className="text-white" />
-            </button>
-            <div className="flex items-center gap-3 text-mystic-primary">
-              <Shield size={32} />
-              <div>
-                <h1 className="text-xl font-bold text-white">Sistem Yöneticisi</h1>
-                <p className="text-xs">Genel Yönetim ve Yetkilendirme Paneli</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </header>
+    <>
+      <AdminPageHeader
+        title="Genel Bakış"
+        description="Platformun anlık durumu ve yönetim bölümleri"
+        icon={LayoutDashboard}
+        refreshing={refreshing}
+        onRefresh={() => {
+          setRefreshing(true);
+          load();
+        }}
+      />
 
-      <main className="max-w-6xl mx-auto p-6 mt-6 w-full max-w-full">
-        
-        {/* Global Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-          <div className="bg-black/40 border border-white/5 p-6 rounded-2xl relative overflow-hidden">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-mystic-text-muted font-medium text-sm">Toplam Üye</h3>
-              <div className="bg-purple-500/15 p-2 rounded-lg text-purple-400"><Users size={18} /></div>
-            </div>
-            <p className="text-2xl font-bold text-white">
-              {isLoadingProfiles ? (
-                <span className="inline-block w-8 h-6 bg-white/10 animate-pulse rounded"></span>
-              ) : (
-                profiles.length
-              )}
-            </p>
-            <p className="text-[11px] text-mystic-text-muted mt-2">Platforma kayıtlı ruhlar</p>
-          </div>
+      <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <StatCard
+          label="Toplam Üye"
+          value={summary.members}
+          hint="Platforma kayıtlı ruhlar"
+          icon={Users}
+          tone="bg-purple-500/15 text-purple-400"
+          href="/admin/members"
+        />
+        <StatCard
+          label="Bugün Tekil Ziyaret"
+          value={summary.todayVisitors}
+          hint="Bugünkü tekil ruh ziyareti"
+          icon={Activity}
+          tone="bg-emerald-500/15 text-emerald-400"
+          href="/admin/analytics"
+        />
+        <StatCard
+          label="Şu An Aktif"
+          value={summary.activeUsers}
+          hint="Son 5 dakikadaki tekil ruhlar"
+          icon={Activity}
+          tone="bg-orange-500/15 text-orange-400"
+          href="/admin/analytics"
+        />
+        <StatCard
+          label="Blog Kütüphanesi"
+          value={summary.blogs}
+          hint="Rehber ve yazılar"
+          icon={BookOpen}
+          tone="bg-mystic-primary/20 text-mystic-primary"
+          href="/admin/blog"
+        />
+      </div>
 
-          <div className="bg-black/40 border border-white/5 p-6 rounded-2xl relative overflow-hidden">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-mystic-text-muted font-medium text-sm">Bugün Tekil Ziyaret</h3>
-              <div className="bg-emerald-500/15 p-2 rounded-lg text-emerald-400"><Activity size={18} /></div>
-            </div>
-            <p className="text-2xl font-bold text-white">
-              {isLoadingAnalytics ? (
-                <span className="inline-block w-8 h-6 bg-white/10 animate-pulse rounded"></span>
-              ) : (
-                analytics?.today?.visitors ?? 0
-              )}
-            </p>
-            <p className="text-[11px] text-mystic-text-muted mt-2">Bugünkü tekil ruh ziyareti</p>
-          </div>
-
-          <div className="bg-black/40 border border-white/5 p-6 rounded-2xl relative overflow-hidden">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-mystic-text-muted font-medium text-sm">Şu An Aktif</h3>
-              <div className="bg-orange-500/15 p-2 rounded-lg text-orange-400 animate-pulse"><Activity size={18} /></div>
-            </div>
-            <p className="text-2xl font-bold text-white">
-              {isLoadingAnalytics ? (
-                <span className="inline-block w-8 h-6 bg-white/10 animate-pulse rounded"></span>
-              ) : (
-                analytics?.activeUsers ?? 0
-              )}
-            </p>
-            <p className="text-[11px] text-mystic-text-muted mt-2">Son 5 dakikadaki tekil ruhlar</p>
-          </div>
-
-          <div className="bg-mystic-primary/10 border border-mystic-primary/30 p-6 rounded-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-mystic-primary/10 rounded-full blur-2xl -mr-6 -mt-6"></div>
-            <div className="flex items-center justify-between mb-4 relative z-10">
-              <h3 className="text-mystic-primary font-bold text-sm">Blog Kütüphanesi</h3>
-              <div className="bg-mystic-primary/20 p-2 rounded-lg text-mystic-primary"><BookOpen size={18} /></div>
-            </div>
-            <p className="text-2xl font-bold text-white relative z-10">
-              {isLoadingBlogs ? (
-                <span className="inline-block w-8 h-6 bg-white/10 animate-pulse rounded"></span>
-              ) : (
-                blogs.length
-              )}
-            </p>
-            <p className="text-[11px] text-mystic-primary/80 mt-2 relative z-10">Yayınlanan rehber ve yazılar</p>
-          </div>
-        </div>
-
-        {/* Tab Controls */}
-        <div className="flex border-b border-white/10 mb-8 gap-2">
-          <button 
-            onClick={() => setActiveTab('members')}
-            className={`px-6 py-3 font-semibold text-sm transition-all relative flex items-center gap-2 ${
-              activeTab === 'members' ? 'text-mystic-primary border-b-2 border-mystic-primary' : 'text-mystic-text-muted hover:text-white'
-            }`}
+      {/* Bölüm kısayolları */}
+      <h2 className="mb-4 text-sm font-bold uppercase tracking-wider text-mystic-text-muted">
+        Yönetim Bölümleri
+      </h2>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {sections.map(({ href, label, description, icon: Icon }) => (
+          <Link
+            key={href}
+            href={href}
+            className="group flex items-start gap-4 rounded-2xl border border-white/5 bg-black/40 p-5 transition-colors hover:border-mystic-primary/30 hover:bg-white/5"
           >
-            <Users size={16} />
-            Üye Yönetimi
-            {!isLoadingProfiles && (
-              <span className="bg-white/10 text-white text-xs px-2 py-0.5 rounded-full ml-1 font-normal">
-                {profiles.length}
-              </span>
-            )}
-          </button>
-          <button 
-            onClick={() => setActiveTab('blog')}
-            className={`px-6 py-3 font-semibold text-sm transition-all relative flex items-center gap-2 ${
-              activeTab === 'blog' ? 'text-mystic-primary border-b-2 border-mystic-primary' : 'text-mystic-text-muted hover:text-white'
-            }`}
-          >
-            <BookOpen size={16} />
-            Blog Yönetimi
-            {!isLoadingBlogs && (
-              <span className="bg-white/10 text-white text-xs px-2 py-0.5 rounded-full ml-1 font-normal">
-                {blogs.length}
-              </span>
-            )}
-          </button>
-          <button 
-            onClick={() => setActiveTab('analytics')}
-            className={`px-6 py-3 font-semibold text-sm transition-all relative flex items-center gap-2 ${
-              activeTab === 'analytics' ? 'text-mystic-primary border-b-2 border-mystic-primary' : 'text-mystic-text-muted hover:text-white'
-            }`}
-          >
-            <Activity size={16} />
-            Ziyaretçi Analitiği
-          </button>
-        </div>
-
-        {/* Tab Content 1: Members */}
-        {activeTab === 'members' && (
-          <div className="w-full max-w-full overflow-hidden">
-            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <Users className="text-mystic-primary" size={20} /> Kayıtlı Üyeler ({filteredProfiles.length})
-              </h2>
-              <button 
-                onClick={fetchProfiles} 
-                className="p-2 bg-white/5 hover:bg-white/10 rounded-lg text-mystic-text-muted hover:text-white transition-colors flex items-center gap-2 text-xs"
-                title="Yenile"
-              >
-                <RefreshCw size={14} className={isLoadingProfiles ? 'animate-spin' : ''} />
-                Yenile
-              </button>
+            <div className="rounded-xl bg-white/5 p-2.5 text-mystic-primary transition-colors group-hover:bg-mystic-primary/10">
+              <Icon size={18} />
             </div>
-
-            {/* Filter controls */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6" style={{ transform: 'translate3d(0,0,0)' }}>
-              {/* Search input */}
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-mystic-text-muted">
-                  <Search size={16} />
-                </div>
-                <input 
-                  type="text" 
-                  placeholder="İsim veya ID ile ara..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full bg-black/40 border border-white/5 rounded-xl py-2 pl-10 pr-4 text-sm text-white placeholder-mystic-text-muted focus:outline-none focus:border-mystic-primary/50 transition-colors"
-                />
-              </div>
-
-              {/* Role filter */}
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-mystic-text-muted">
-                  <Filter size={16} />
-                </div>
-                <select 
-                  value={roleFilter}
-                  onChange={(e) => setRoleFilter(e.target.value)}
-                  className="w-full bg-black/40 border border-white/5 rounded-xl py-2 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-mystic-primary/50 transition-colors appearance-none"
-                >
-                  <option value="all" className="bg-mystic-dark">Tüm Seviyeler</option>
-                  <option value="free" className="bg-mystic-dark">Ücretsiz Üyelik</option>
-                  <option value="apprentice" className="bg-mystic-dark">Çıraklık (Seviye 1)</option>
-                  <option value="journeyman" className="bg-mystic-dark">Kalfalık (Seviye 2)</option>
-                  <option value="master" className="bg-mystic-dark">Ustalık (Seviye 3)</option>
-                  <option value="admin" className="bg-mystic-dark">Yönetici (Admin)</option>
-                </select>
-              </div>
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-white">{label}</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-mystic-text-muted">{description}</p>
             </div>
-
-            {/* Profiles table */}
-            <div className="bg-black/40 border border-white/5 rounded-2xl overflow-hidden shadow-2xl relative">
-              {isLoadingProfiles ? (
-                <div className="py-20 flex flex-col items-center justify-center gap-4 text-mystic-text-muted">
-                  <div className="relative w-12 h-12">
-                    <div className="absolute inset-0 rounded-full border-2 border-mystic-primary/10"></div>
-                    <div className="absolute inset-0 rounded-full border-2 border-t-mystic-primary border-r-mystic-accent animate-spin"></div>
-                  </div>
-                  <p className="text-xs">Canlı üye verileri yükleniyor...</p>
-                </div>
-              ) : profilesError ? (
-                <div className="py-16 text-center text-red-400 text-sm">
-                  {profilesError}
-                </div>
-              ) : filteredProfiles.length === 0 ? (
-                <div className="py-20 text-center text-mystic-text-muted text-sm">
-                  Kriterlere uygun üye bulunamadı.
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead className="bg-white/5 text-mystic-text-muted text-xs uppercase tracking-wider border-b border-white/5">
-                      <tr>
-                        <th className="p-4 font-semibold">Üye Bilgileri</th>
-                        <th className="p-4 font-semibold">Kayıt Tarihi</th>
-                        <th className="p-4 font-semibold">Seviye (Mühür)</th>
-                        <th className="p-4 font-semibold text-right">Rol Yetkilendirme</th>
-                      </tr>
-                    </thead>
-                    <tbody className="text-white text-sm divide-y divide-white/5">
-                      {filteredProfiles.map(p => {
-                        const userRole = p.role || 'free';
-                        const roleMeta = ROLE_LABELS[userRole] || ROLE_LABELS.free;
-
-                        return (
-                          <tr key={p.id} className="hover:bg-white/5 transition-colors">
-                            {/* Member Info */}
-                            <td className="p-4 flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-mystic-primary/20 to-mystic-accent/20 border border-white/10 flex items-center justify-center font-bold text-mystic-primary uppercase text-sm">
-                                {p.full_name ? p.full_name.slice(0, 2) : 'ÜY'}
-                              </div>
-                              <div>
-                                <span className="font-bold block">{p.full_name || 'İsimsiz Üye'}</span>
-                                <span className="text-xs text-white/70 block mt-0.5">{p.email}</span>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <span className="text-[10px] text-mystic-text-muted font-mono">ID: {p.id.slice(0, 8)}...</span>
-                                  {p.email_verified ? (
-                                    <span className="text-[10px] text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-1.5 py-0.5 rounded font-medium">
-                                      ✓ Onaylı
-                                    </span>
-                                  ) : (
-                                    <span className="text-[10px] text-amber-400 bg-amber-500/10 border border-amber-500/20 px-1.5 py-0.5 rounded font-medium">
-                                      ⏳ Onay Bekliyor
-                                    </span>
-                                  )}
-                                </div>
-                              </div>
-                            </td>
-                            
-                            {/* Registration Date */}
-                            <td className="p-4 text-mystic-text-muted text-xs">
-                              {p.created_at ? new Date(p.created_at).toLocaleDateString('tr-TR', {
-                                year: 'numeric',
-                                month: 'long',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                              }) : 'Bilinmiyor'}
-                            </td>
-
-                            {/* Level Badge */}
-                            <td className="p-4">
-                              <span className={`px-3 py-1 rounded-full border text-[11px] font-bold block w-max uppercase ${roleMeta.style}`}>
-                                {roleMeta.label}
-                              </span>
-                            </td>
-
-                            {/* Actions / Role select & Delete */}
-                            <td className="p-4 text-right">
-                              <div className="flex items-center justify-end gap-2">
-                                {updatingUserId === p.id && (
-                                  <div className="w-4 h-4 rounded-full border border-mystic-primary/20 border-t-mystic-primary animate-spin"></div>
-                                )}
-                                <select 
-                                  value={p.role || 'free'}
-                                  disabled={updatingUserId === p.id || deletingUserId === p.id}
-                                  onChange={(e) => handleUpdateRole(p.id, e.target.value)}
-                                  className="bg-black/60 border border-white/10 rounded-xl px-2 py-1 text-xs text-white focus:outline-none focus:border-mystic-primary/50 transition-colors"
-                                >
-                                  <option value="free">Ücretsiz Üye</option>
-                                  <option value="apprentice">Çırak (Seviye 1)</option>
-                                  <option value="journeyman">Kalfa (Seviye 2)</option>
-                                  <option value="master">Usta (Seviye 3)</option>
-                                  <option value="admin">Yönetici (Admin)</option>
-                                </select>
-                                <button
-                                  onClick={() => handleDeleteUser(p.id, p.full_name || p.email)}
-                                  disabled={deletingUserId === p.id}
-                                  className="p-1.5 bg-white/5 text-red-400 hover:bg-red-500/20 border border-red-500/20 rounded-lg transition-colors cursor-pointer disabled:opacity-50"
-                                  title="Üyeyi Kalıcı Olarak Sil"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
-                              </div>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Tab Content 3: Blog */}
-        {activeTab === 'blog' && (
-          <div className="w-full max-w-full overflow-hidden">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-              <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                <BookOpen className="text-mystic-primary" size={20} /> Blog Kütüphanesi ({blogs.length})
-              </h2>
-              <button
-                onClick={handleOpenCreateBlog}
-                className="flex items-center gap-2 bg-mystic-primary text-black font-bold text-sm px-5 py-2.5 rounded-xl hover:bg-[#D4AF37] transition-all cursor-pointer shadow-[0_0_15px_rgba(212,175,55,0.2)] hover:scale-[1.02]"
-              >
-                <Plus size={16} /> Yeni Yazı Ekle
-              </button>
-            </div>
-            
-            <div className="bg-black/40 border border-white/5 rounded-2xl overflow-hidden shadow-2xl">
-              {isLoadingBlogs ? (
-                <div className="py-24 flex flex-col items-center justify-center gap-4 text-mystic-text-muted">
-                  <div className="relative w-12 h-12">
-                    <div className="absolute inset-0 rounded-full border-2 border-mystic-primary/10"></div>
-                    <div className="absolute inset-0 rounded-full border-2 border-t-mystic-primary border-r-mystic-accent animate-spin"></div>
-                  </div>
-                  <p className="text-xs">Blog yazıları yükleniyor...</p>
-                </div>
-              ) : blogError ? (
-                <div className="py-16 text-center text-red-400 text-sm">
-                  {blogError}
-                </div>
-              ) : blogs.length === 0 ? (
-                <div className="py-20 text-center text-mystic-text-muted text-sm">
-                  Henüz eklenmiş bir blog yazısı bulunmamaktadır.
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
-                    <thead className="bg-white/5 text-mystic-text-muted text-xs uppercase tracking-wider border-b border-white/5">
-                      <tr>
-                        <th className="p-4 font-semibold">Görsel / Başlık</th>
-                        <th className="p-4 font-semibold">Kategori</th>
-                        <th className="p-4 font-semibold">Slug (URL)</th>
-                        <th className="p-4 font-semibold">Durum</th>
-                        <th className="p-4 font-semibold">Erişim</th>
-                        <th className="p-4 font-semibold text-right">İşlemler</th>
-                      </tr>
-                    </thead>
-                    <tbody className="text-white text-sm divide-y divide-white/5">
-                      {blogs.map(blog => (
-                        <tr key={blog.id} className="hover:bg-white/5 transition-colors">
-                          <td className="p-4">
-                            <div className="flex items-center gap-4">
-                              {blog.imageUrl ? (
-                                <img src={blog.imageUrl} className="w-14 h-10 rounded-lg object-cover border border-white/10" />
-                              ) : (
-                                <div className="w-14 h-10 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-[10px] text-mystic-text-muted">Görsel Yok</div>
-                              )}
-                              <div>
-                                <span className="font-bold block text-sm line-clamp-1 max-w-[250px]">{blog.title}</span>
-                                <span className="text-[10px] text-mystic-text-muted block mt-0.5">Oluşturulma: {new Date(blog.createdAt).toLocaleDateString('tr-TR')}</span>
-                              </div>
-                            </div>
-                          </td>
-                          <td className="p-4">
-                            <span className="px-2.5 py-1 bg-white/5 border border-white/10 text-white rounded-full text-xs font-semibold">
-                              {blog.category}
-                            </span>
-                          </td>
-                          <td className="p-4 text-xs font-mono text-mystic-text-muted max-w-[120px] truncate">
-                            {blog.slug}
-                          </td>
-                          <td className="p-4">
-                            {blog.published ? (
-                              <span className="text-green-400 bg-green-500/10 border border-green-500/20 px-2 py-0.5 rounded-full text-xs font-semibold">Yayınlandı</span>
-                            ) : (
-                              <span className="text-amber-500 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full text-xs font-semibold">Taslak</span>
-                            )}
-                          </td>
-                          <td className="p-4 text-xs font-semibold text-mystic-primary">
-                            {blog.views || 0} Görüntülenme
-                          </td>
-                          <td className="p-4 text-right">
-                            <div className="flex items-center justify-end gap-3">
-                              <button
-                                onClick={() => handleOpenEditBlog(blog)}
-                                className="p-2 bg-white/5 text-blue-400 hover:bg-blue-400/10 border border-blue-500/20 rounded-lg transition-colors cursor-pointer"
-                                title="Düzenle"
-                              >
-                                <Edit size={14} />
-                              </button>
-                              <button
-                                onClick={() => handleDeleteBlog(blog.id, blog.title)}
-                                className="p-2 bg-white/5 text-red-400 hover:bg-red-400/10 border border-red-500/20 rounded-lg transition-colors cursor-pointer"
-                                title="Sil"
-                              >
-                                <Trash2 size={14} />
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Tab Content 4: Analytics */}
-        {activeTab === 'analytics' && (
-          <div className="space-y-8 animate-in fade-in duration-500">
-            {/* Analytics Header */}
-            <div className="flex justify-between items-center bg-mystic-surface/30 backdrop-blur-md border border-mystic-surface-light p-6 rounded-3xl">
-              <div>
-                <h2 className="text-xl font-bold text-white mb-1">Ziyaretçi Analitiği</h2>
-                <p className="text-xs text-mystic-text-muted">Son 14 günün trafik ve sayfa popülaritesi verileri.</p>
-              </div>
-              <button 
-                onClick={() => fetchAnalytics()}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-xs text-white hover:bg-white/10 transition-colors cursor-pointer"
-              >
-                <RefreshCw size={14} className={isLoadingAnalytics ? 'animate-spin' : ''} />
-                Yenile
-              </button>
-            </div>
-
-            {/* Daily stats table and top pages */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              
-              {/* Daily Traffic List (Son 14 Gün) */}
-              <div className="lg:col-span-2 bg-mystic-surface/50 backdrop-blur-md border border-mystic-surface-light rounded-3xl p-6 shadow-xl">
-                <h3 className="text-base font-bold text-white mb-6 flex items-center gap-2 border-b border-white/5 pb-3">
-                  <Calendar size={18} className="text-mystic-primary" />
-                  Günlük Trafik Akışı (Son 14 Gün)
-                </h3>
-
-                {isLoadingAnalytics && !analytics ? (
-                  <div className="flex flex-col items-center justify-center py-20 gap-3">
-                    <RefreshCw className="animate-spin text-mystic-primary" size={32} />
-                    <p className="text-xs text-mystic-text-muted">Veriler yükleniyor...</p>
-                  </div>
-                ) : analyticsError ? (
-                  <div className="text-center py-12 text-red-400 text-sm">
-                    {analyticsError}
-                  </div>
-                ) : (!analytics?.daily || analytics.daily.length === 0) ? (
-                  <div className="text-center py-20 text-mystic-text-muted text-sm">
-                    Henüz trafik verisi bulunmuyor.
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm">
-                      <thead>
-                        <tr className="border-b border-white/10 text-mystic-text-muted text-xs uppercase font-semibold">
-                          <th className="py-3 px-4">Tarih</th>
-                          <th className="py-3 px-4">Tekil Ziyaretçi</th>
-                          <th className="py-3 px-4">Sayfa Görüntüleme</th>
-                          <th className="py-3 px-4">Yoğunluk Oranı</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/5 text-white">
-                        {analytics.daily.map((day: any) => {
-                          const maxViews = Math.max(...analytics.daily.map((d: any) => d.page_views || 1), 1);
-                          const percent = Math.min(100, Math.round(((day.page_views || 0) / maxViews) * 100));
-                          
-                          return (
-                            <tr key={day.date} className="hover:bg-white/5 transition-colors">
-                              <td className="py-3.5 px-4 font-medium">{day.date}</td>
-                              <td className="py-3.5 px-4">{day.unique_visitors}</td>
-                              <td className="py-3.5 px-4 font-semibold text-mystic-accent">{day.page_views}</td>
-                              <td className="py-3.5 px-4 w-48">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-full bg-white/5 h-2 rounded-full overflow-hidden">
-                                    <div 
-                                      className="bg-gradient-to-r from-mystic-primary to-mystic-accent h-full rounded-full" 
-                                      style={{ width: `${percent}%` }}
-                                    ></div>
-                                  </div>
-                                  <span className="text-[10px] text-mystic-text-muted w-8 text-right">{percent}%</span>
-                                </div>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-
-              {/* Popular Pages (En Çok Tıklananlar) */}
-              <div className="bg-mystic-surface/50 backdrop-blur-md border border-mystic-surface-light rounded-3xl p-6 shadow-xl flex flex-col">
-                <h3 className="text-base font-bold text-white mb-6 flex items-center gap-2 border-b border-white/5 pb-3">
-                  <TrendingUp size={18} className="text-mystic-primary" />
-                  En Çok Ziyaret Edilen Sayfalar
-                </h3>
-
-                {isLoadingAnalytics && !analytics ? (
-                  <div className="flex flex-col items-center justify-center py-20 gap-3 my-auto">
-                    <RefreshCw className="animate-spin text-mystic-primary" size={32} />
-                    <p className="text-xs text-mystic-text-muted">Veriler yükleniyor...</p>
-                  </div>
-                ) : analyticsError ? (
-                  <div className="text-center py-12 text-red-400 text-sm my-auto">
-                    {analyticsError}
-                  </div>
-                ) : (!analytics?.topPages || analytics.topPages.length === 0) ? (
-                  <div className="text-center py-20 text-mystic-text-muted text-sm my-auto">
-                    Henüz popüler sayfa verisi bulunmuyor.
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {analytics.topPages.map((page: any) => {
-                      const maxViews = Math.max(...analytics.topPages.map((p: any) => p.views || 1), 1);
-                      const percent = Math.min(100, Math.round(((page.views || 0) / maxViews) * 100));
-
-                      return (
-                        <div key={page.path} className="space-y-1.5 p-3 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-all">
-                          <div className="flex justify-between items-center text-xs">
-                            <span className="font-semibold text-white truncate max-w-[180px]" title={page.path}>
-                              {page.path}
-                            </span>
-                            <span className="text-mystic-accent font-bold">{page.views} tık</span>
-                          </div>
-                          <div className="w-full bg-black/30 h-1.5 rounded-full overflow-hidden">
-                            <div 
-                              className="bg-mystic-accent h-full rounded-full" 
-                              style={{ width: `${percent}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* New Analytics Rows: Top Cities and Recent Member Activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Top Cities (Son 14 Gün) */}
-              <div className="bg-mystic-surface/50 backdrop-blur-md border border-mystic-surface-light rounded-3xl p-6 shadow-xl flex flex-col">
-                <h3 className="text-base font-bold text-white mb-6 flex items-center gap-2 border-b border-white/5 pb-3">
-                  <MapPin size={18} className="text-mystic-primary" />
-                  Ziyaret Edilen Şehirler (Son 14 Gün)
-                </h3>
-
-                {isLoadingAnalytics && !analytics ? (
-                  <div className="flex flex-col items-center justify-center py-20 gap-3 my-auto">
-                    <RefreshCw className="animate-spin text-mystic-primary" size={32} />
-                    <p className="text-xs text-mystic-text-muted">Veriler yükleniyor...</p>
-                  </div>
-                ) : analyticsError ? (
-                  <div className="text-center py-12 text-red-400 text-sm my-auto">
-                    {analyticsError}
-                  </div>
-                ) : (!analytics?.topCities || analytics.topCities.length === 0) ? (
-                  <div className="text-center py-20 text-mystic-text-muted text-sm my-auto">
-                    Henüz şehir bazlı veri bulunmuyor.
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {analytics.topCities.map((city: any, idx: number) => {
-                      const maxViews = Math.max(...analytics.topCities.map((c: any) => c.visitors || 1), 1);
-                      const percent = Math.min(100, Math.round(((city.visitors || 0) / maxViews) * 100));
-
-                      return (
-                        <div key={idx} className="space-y-1.5 p-3 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition-all">
-                          <div className="flex justify-between items-center text-xs">
-                            <span className="font-semibold text-white truncate max-w-[180px]">
-                              📍 {city.city || 'Bilinmeyen Şehir'}, {city.country || 'AB'}
-                            </span>
-                            <span className="text-mystic-accent font-bold">{city.visitors} tekil</span>
-                          </div>
-                          <div className="w-full bg-black/30 h-1.5 rounded-full overflow-hidden">
-                            <div 
-                              className="bg-emerald-500 h-full rounded-full" 
-                              style={{ width: `${percent}%` }}
-                            ></div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                )}
-              </div>
-
-              {/* Recent Member Activities (Kayıtlı Üyelerin Son Aktiviteleri) */}
-              <div className="lg:col-span-2 bg-mystic-surface/50 backdrop-blur-md border border-mystic-surface-light rounded-3xl p-6 shadow-xl flex flex-col">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6 border-b border-white/5 pb-4">
-                  <div className="flex items-center gap-2">
-                    <UserCheck size={18} className="text-mystic-primary" />
-                    <h3 className="text-base font-bold text-white">
-                      Kayıtlı Üyelerin Son Aktiviteleri
-                    </h3>
-                    {analytics?.recentMemberVisits && (
-                      <span className="text-xs text-mystic-text-muted bg-white/5 px-2 py-0.5 rounded-full">
-                        {analytics.recentMemberVisits.length}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Filters: Exclude Admin Segment & Limit */}
-                  <div className="flex flex-wrap items-center gap-3">
-                    <div className="flex items-center bg-black/40 border border-white/10 rounded-xl p-1 text-xs">
-                      <button
-                        type="button"
-                        onClick={() => handleToggleExcludeAdmin(true)}
-                        className={`px-3 py-1 rounded-lg font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
-                          excludeAdmin
-                            ? 'bg-mystic-primary text-black font-bold shadow-[0_0_12px_rgba(212,175,55,0.3)]'
-                            : 'text-mystic-text-muted hover:text-white'
-                        }`}
-                      >
-                        👥 Sadece Üyeler
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleToggleExcludeAdmin(false)}
-                        className={`px-3 py-1 rounded-lg font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
-                          !excludeAdmin
-                            ? 'bg-mystic-primary text-black font-bold shadow-[0_0_12px_rgba(212,175,55,0.3)]'
-                            : 'text-mystic-text-muted hover:text-white'
-                        }`}
-                      >
-                        🛡️ Yöneticiler Dahil
-                      </button>
-                    </div>
-
-                    <div className="flex items-center bg-black/40 border border-white/10 rounded-xl p-1 text-xs">
-                      {[25, 50, 100].map((l) => (
-                        <button
-                          key={l}
-                          type="button"
-                          onClick={() => handleChangeVisitLimit(l)}
-                          className={`px-2.5 py-1 rounded-lg font-medium transition-all cursor-pointer ${
-                            visitLimit === l
-                              ? 'bg-white/20 text-white font-bold'
-                              : 'text-mystic-text-muted hover:text-white'
-                          }`}
-                        >
-                          {l} kayıt
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-
-                {isLoadingAnalytics && !analytics ? (
-                  <div className="flex flex-col items-center justify-center py-20 gap-3 my-auto">
-                    <RefreshCw className="animate-spin text-mystic-primary" size={32} />
-                    <p className="text-xs text-mystic-text-muted">Veriler yükleniyor...</p>
-                  </div>
-                ) : analyticsError ? (
-                  <div className="text-center py-12 text-red-400 text-sm my-auto">
-                    {analyticsError}
-                  </div>
-                ) : (!analytics?.recentMemberVisits || analytics.recentMemberVisits.length === 0) ? (
-                  <div className="text-center py-20 text-mystic-text-muted text-sm my-auto">
-                    {excludeAdmin ? 'Yönetici harici kayıtlı üye aktivitesi henüz bulunmuyor.' : 'Kayıtlı üye aktivitesi henüz bulunmuyor.'}
-                  </div>
-                ) : (
-                  <div className="overflow-x-auto max-h-[500px] overflow-y-auto pr-1">
-                    <table className="w-full text-left text-sm">
-                      <thead className="sticky top-0 bg-mystic-surface/90 backdrop-blur-md z-10">
-                        <tr className="border-b border-white/10 text-mystic-text-muted text-xs uppercase font-semibold">
-                          <th className="py-2.5 px-3">Kullanıcı</th>
-                          <th className="py-2.5 px-3">Sayfa</th>
-                          <th className="py-2.5 px-3">Zaman</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-white/5 text-white">
-                        {analytics.recentMemberVisits.map((visit: any, idx: number) => {
-                          const { dateStr, timeStr } = formatDateSafe(visit.created_at || visit.createdAt);
-                          const roleMeta = ROLE_LABELS[visit.role] || ROLE_LABELS.free;
-
-                          return (
-                            <tr key={idx} className="hover:bg-white/5 transition-colors">
-                              <td className="py-3 px-3">
-                                <div className="flex items-center gap-2">
-                                  <span className="font-medium">{visit.full_name || 'İsimsiz Üye'}</span>
-                                  {visit.role && visit.role !== 'free' && (
-                                    <span className={`text-[9px] px-1.5 py-0.5 rounded border ${roleMeta.style}`}>
-                                      {roleMeta.label}
-                                    </span>
-                                  )}
-                                </div>
-                                <div className="text-[10px] text-mystic-text-muted">{visit.email}</div>
-                              </td>
-                              <td className="py-3 px-3 font-mono text-xs text-mystic-accent max-w-[200px] truncate" title={visit.path}>
-                                {visit.path}
-                              </td>
-                              <td className="py-3 px-3 text-xs text-mystic-text-muted whitespace-nowrap">
-                                {dateStr}, {timeStr}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-      </main>
-
-      {/* Blog Create/Edit Modal */}
-      {isBlogModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/85 backdrop-blur-md p-4 overflow-y-auto animate-in fade-in duration-300">
-          <div className="bg-mystic-surface border border-mystic-primary/30 w-full max-w-2xl rounded-3xl p-6 shadow-[0_0_50px_rgba(0,0,0,0.8)] relative max-h-[90vh] overflow-y-auto">
-            <h3 className="text-xl font-bold text-white mb-6 pb-4 border-b border-white/5 flex items-center gap-2">
-              <BookOpen size={20} className="text-mystic-primary" />
-              {editingBlog ? 'Blog Yazısını Düzenle' : 'Yeni Blog Yazısı Ekle'}
-            </h3>
-            
-            <form onSubmit={handleSaveBlog} className="space-y-5">
-              <div>
-                <label className="block text-xs font-bold text-mystic-text mb-2 uppercase tracking-wide">Yazı Başlığı <span className="text-red-400">*</span></label>
-                <input 
-                  type="text"
-                  required
-                  value={blogForm.title}
-                  onChange={(e) => {
-                    const titleVal = e.target.value;
-                    const slugVal = titleVal.toLowerCase().replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-');
-                    setBlogForm({ ...blogForm, title: titleVal, slug: slugVal });
-                  }}
-                  placeholder="Örn: Diyafram Nefesinin Mucizevi Faydaları"
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-mystic-primary transition-colors"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-                <div>
-                  <label className="block text-xs font-bold text-mystic-text mb-2 uppercase tracking-wide">URL Yolu (Slug) <span className="text-red-400">*</span></label>
-                  <input 
-                    type="text"
-                    required
-                    value={blogForm.slug}
-                    onChange={(e) => setBlogForm({ ...blogForm, slug: e.target.value })}
-                    placeholder="diyagram-nefesi-faydalari"
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-mystic-primary transition-colors font-mono"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold text-mystic-text mb-2 uppercase tracking-wide">Kategori <span className="text-red-400">*</span></label>
-                  <select 
-                    value={blogForm.category}
-                    onChange={(e) => setBlogForm({ ...blogForm, category: e.target.value })}
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-mystic-primary transition-colors"
-                  >
-                    <option value="Astroloji" className="bg-mystic-surface">Astroloji</option>
-                    <option value="Nefes" className="bg-mystic-surface">Nefes</option>
-                    <option value="Ritüeller" className="bg-mystic-surface">Ritüeller</option>
-                    <option value="Kişisel Gelişim" className="bg-mystic-surface">Kişisel Gelişim</option>
-                    <option value="Ruhsal Gelişim" className="bg-mystic-surface">Ruhsal Gelişim</option>
-                    <option value="Çakra Dengeleme" className="bg-mystic-surface">Çakra Dengeleme</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-mystic-text mb-2 uppercase tracking-wide">Destekleyici Görsel URL'si veya Yükleme</label>
-                <div className="flex gap-3">
-                  <input 
-                    type="text"
-                    value={blogForm.imageUrl}
-                    onChange={(e) => setBlogForm({ ...blogForm, imageUrl: e.target.value })}
-                    placeholder="https://example.com/images/blog-image.jpg veya /gorsel.jpg"
-                    className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-mystic-primary transition-colors"
-                  />
-                  <button
-                    type="button"
-                    disabled={isUploadingImage}
-                    onClick={() => fileInputRef.current?.click()}
-                    className="px-5 bg-white/5 border border-white/10 rounded-xl text-xs font-bold text-mystic-text hover:bg-white/10 hover:border-[#D4AF37] transition-all cursor-pointer flex items-center justify-center shrink-0 disabled:opacity-50"
-                  >
-                    {isUploadingImage ? 'Yükleniyor...' : 'Görsel Seç'}
-                  </button>
-                  <input 
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleImageUpload}
-                    accept="image/*"
-                    className="hidden"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-mystic-text mb-2 uppercase tracking-wide">İçerik <span className="text-red-400">*</span></label>
-                <textarea 
-                  required
-                  rows={8}
-                  value={blogForm.content}
-                  onChange={(e) => setBlogForm({ ...blogForm, content: e.target.value })}
-                  placeholder="Blog içeriğini buraya girin (Yeni paragraflar için iki kere enter tuşuna basabilirsiniz)..."
-                  className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-mystic-primary transition-colors resize-y leading-relaxed"
-                />
-              </div>
-
-              <div className="flex items-center gap-3">
-                <input 
-                  type="checkbox"
-                  id="published_checkbox"
-                  checked={blogForm.published}
-                  onChange={(e) => setBlogForm({ ...blogForm, published: e.target.checked })}
-                  className="w-4 h-4 rounded border-white/10 text-mystic-primary focus:ring-mystic-primary bg-black/40"
-                />
-                <label htmlFor="published_checkbox" className="text-sm text-white font-semibold cursor-pointer select-none">Bu yazıyı hemen yayınla (Ziyaretçilere göster)</label>
-              </div>
-
-              <div className="flex justify-end gap-3 pt-4 border-t border-white/5">
-                <button
-                  type="button"
-                  onClick={() => setIsBlogModalOpen(false)}
-                  className="px-5 py-2.5 bg-white/5 text-white hover:bg-white/10 rounded-xl transition-all cursor-pointer font-bold text-sm"
-                >
-                  Vazgeç
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSavingBlog}
-                  className="px-5 py-2.5 bg-mystic-primary text-black hover:bg-[#D4AF37] disabled:opacity-50 rounded-xl transition-all cursor-pointer font-bold text-sm shadow-[0_0_10px_rgba(212,175,55,0.2)]"
-                >
-                  {isSavingBlog ? 'Kaydediliyor...' : 'Yazıyı Kaydet'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
+            <ArrowRight
+              size={16}
+              className="ml-auto mt-1 shrink-0 text-white/20 transition-transform group-hover:translate-x-0.5 group-hover:text-mystic-primary"
+            />
+          </Link>
+        ))}
+      </div>
+    </>
   );
 }

@@ -14,6 +14,7 @@ import {
   Save,
 } from 'lucide-react';
 import { apiFetch } from '@/lib/apiClient';
+import AdminPageHeader from '@/components/admin/AdminPageHeader';
 
 /** Hata nesnesinden okunabilir mesaj çıkarır. */
 function errText(e: unknown): string {
@@ -791,39 +792,36 @@ export default function AdminPaymentPage() {
   const [tab, setTab] = useState<Tab>('pos');
 
   return (
-    <div className="min-h-screen bg-[#05050A] text-white px-4 py-10 md:py-16">
-      <div className="max-w-5xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight mb-1">Ödeme & Faturalama</h1>
-          <p className="text-sm text-mystic-text-muted">
-            Treps sanal POS ve e-belge entegratör anahtarlarını buradan yönetin.
-          </p>
-        </div>
+    <>
+      <AdminPageHeader
+        title="Ödeme & Faturalama"
+        description="Treps sanal POS ve e-belge entegratör anahtarlarını buradan yönetin"
+        icon={CreditCard}
+      />
 
-        <div className="flex flex-wrap gap-2 mb-6 border-b border-white/10 pb-3">
-          {TABS.map(({ id, label, icon: Icon }) => (
-            <button
-              key={id}
-              onClick={() => setTab(id)}
-              className={`flex items-center gap-2 text-xs font-medium px-4 py-2 rounded-full border transition-colors ${
-                tab === id
-                  ? 'bg-[#D4AF37]/15 border-[#D4AF37]/40 text-[#D4AF37]'
-                  : 'bg-white/5 border-white/10 text-white/60 hover:text-white'
-              }`}
-            >
-              <Icon size={14} />
-              {label}
-            </button>
-          ))}
-        </div>
-
-        <div className="bg-black/50 border border-white/10 rounded-3xl p-6 md:p-8">
-          {tab === 'pos' && <PosTab />}
-          {tab === 'invoice' && <InvoiceTab />}
-          {tab === 'products' && <ProductsTab />}
-          {tab === 'transactions' && <TransactionsTab />}
-        </div>
+      <div className="mb-6 flex flex-wrap gap-2 border-b border-white/10 pb-3">
+        {TABS.map(({ id, label, icon: Icon }) => (
+          <button
+            key={id}
+            onClick={() => setTab(id)}
+            className={`flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-medium transition-colors ${
+              tab === id
+                ? 'border-[#D4AF37]/40 bg-[#D4AF37]/15 text-[#D4AF37]'
+                : 'border-white/10 bg-white/5 text-white/60 hover:text-white'
+            }`}
+          >
+            <Icon size={14} />
+            {label}
+          </button>
+        ))}
       </div>
-    </div>
+
+      <div className="rounded-3xl border border-white/10 bg-black/50 p-6 md:p-8">
+        {tab === 'pos' && <PosTab />}
+        {tab === 'invoice' && <InvoiceTab />}
+        {tab === 'products' && <ProductsTab />}
+        {tab === 'transactions' && <TransactionsTab />}
+      </div>
+    </>
   );
 }
