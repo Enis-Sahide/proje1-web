@@ -165,9 +165,26 @@ export class TrepsClient {
       }),
     });
 
-    const data = (await res.json()) as TrepsAuthResponse;
-    if (!data.status || !data.data?.access_token) {
-      throw new Error(data.errors || 'Treps kimlik doğrulaması başarısız');
+    // Yanlış base URL / WAF bloğu durumunda Treps yerine HTML dönebilir.
+    // Bunu `res.json()`'a vermek "Unexpected token '<'" gibi anlamsız bir
+    // hataya yol açtığı için önce gerçek durumu raporluyoruz.
+    const raw = await res.text();
+    let data: TrepsAuthResponse & { message?: string };
+    try {
+      data = JSON.parse(raw);
+    } catch {
+      const ct = res.headers.get('content-type') || 'bilinmiyor';
+      throw new Error(
+        `Treps JSON yerine ${ct} döndürdü (HTTP ${res.status}). ` +
+          `API adresini kontrol edin: ${this.credentials.apiBaseUrl}/api/auth`,
+      );
+    }
+
+    if (!res.ok || !data.status || !data.data?.access_token) {
+      const detail = Array.isArray(data.errors)
+        ? (data.errors as string[]).join(', ')
+        : data.errors || data.message;
+      throw new Error(detail || `Treps kimlik doğrulaması başarısız (HTTP ${res.status})`);
     }
 
     // expire_in saniye ya da epoch-ms olabilir.
