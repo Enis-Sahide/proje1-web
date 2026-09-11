@@ -7,6 +7,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import RouteGuard from "@/core/ui/RouteGuard";
 import AnimatedBackground from "@/core/ui/AnimatedBackground";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
+import ClarityProvider from "@/components/ClarityProvider";
 import TestBanner from "@/components/TestBanner";
 import Footer from "@/core/ui/Footer";
 
@@ -88,6 +89,7 @@ export default function RootLayout({
           <AuthProvider>
             <RouteGuard>
               <AnalyticsTracker />
+              <ClarityProvider />
               <TestBanner />
               <Navigation />
               <main className="flex-grow flex flex-col">
