@@ -5,7 +5,7 @@ import { json, errorJson, preflight } from '@/lib/http/cors';
 import { getAuthPayload } from '@/lib/auth/session';
 import { initiateHPPPayment } from '@/lib/payment/service';
 import { getReportProduct, normalizeProductType } from '@/lib/payment/settings';
-import { validateBilling, type BillingInput } from '@/lib/billing/validate';
+import { getProfile } from '@/lib/billing/profile-service';
 
 export const dynamic = 'force-dynamic';
 
@@ -20,8 +20,9 @@ export async function OPTIONS() {
  * Tutar daima sunucuda `report_products` üzerinden belirlenir; istemciden
  * gelen fiyat bilgisine güvenilmez.
  *
- * Gövde: `{ orderId, billing: { fullName, phone?, isCompany, companyTitle?, taxNumber?, taxOffice?, address, city, district } }`
- * Fatura bilgileri sunucuda doğrulanır (TCKN/VKN checksum, zorunlu il/ilçe).
+ * Gövde: `{ orderId, billingProfileId }`
+ * Fatura bilgileri kullanıcının kayıtlı fatura profilinden alınır ve işleme
+ * KOPYALANIR (profil sonradan değişse bile fatura sabit kalır).
  * @returns `{ redirectUrl }` — kullanıcı bu adrese yönlendirilmelidir.
  */
 export async function POST(request: Request) {
@@ -31,9 +32,14 @@ export async function POST(request: Request) {
 
     if (!orderId) return errorJson('Sipariş kimliği eksik', 400);
 
-    const billingCheck = validateBilling((body.billing ?? {}) as BillingInput);
-    if (!billingCheck.ok) return errorJson(billingCheck.error, 400);
-    const billing = billingCheck.value;
+    // Satın alma üyelik gerektirir; fatura profili kullanıcıya ait olmalı.
+    const payload = await getAuthPayload(request);
+    if (!payload) return errorJson('Fatura kesebilmek için giriş yapmalısınız', 401);
+
+    const billingProfileId = typeof body.billingProfileId === 'string' ? body.billingProfileId : '';
+    if (!billingProfileId) return errorJson('Fatura profili seçilmedi', 400);
+    const profile = await getProfile(payload.sub, billingProfileId);
+    if (!profile) return errorJson('Fatura profili bulunamadı', 404);
 
     const [order] = await db.select().from(guestOrders).where(eq(guestOrders.id, orderId));
     if (!order) return errorJson('Sipariş bulunamadı', 404);
@@ -60,33 +66,31 @@ export async function POST(request: Request) {
         .where(eq(guestOrders.id, orderId));
     }
 
-    // Üye girişi varsa işlemi kullanıcıya bağla (zorunlu değil).
-    const payload = await getAuthPayload(request);
-
     // Treps'e giden ad/soyad: kurumsalda ünvanı ad alanına koyarız.
-    const parts = billing.displayName.split(/\s+/);
+    const parts = profile.title.split(/\s+/);
 
     const result = await initiateHPPPayment({
       guestOrderId: order.id,
       productType,
       amount,
-      userId: payload?.sub ?? null,
+      userId: payload.sub,
       payer: {
-        customerId: payload?.sub || order.id,
+        customerId: payload.sub,
         name: parts[0] || 'Musteri',
         surname: parts.slice(1).join(' ') || '-',
-        email: order.email,
-        phone: billing.phone ?? undefined,
-        city: billing.city,
-        address: billing.address,
+        email: profile.email || order.email,
+        phone: profile.phone ?? undefined,
+        city: profile.city,
+        address: profile.address,
       },
       billing: {
-        isCompany: billing.isCompany,
-        taxNumber: billing.taxNumber,
-        taxOffice: billing.taxOffice,
-        address: billing.address,
-        city: billing.city,
-        district: billing.district,
+        profileId: profile.id,
+        isCompany: profile.type === 'company',
+        taxNumber: profile.taxNumber,
+        taxOffice: profile.taxOffice,
+        address: profile.address,
+        city: profile.city,
+        district: profile.district,
       },
     });
 

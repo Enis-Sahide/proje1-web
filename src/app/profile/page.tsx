@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { apiFetch } from '@/lib/apiClient';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, User, Mail, Check, Loader2, Award, Lock, LogOut } from 'lucide-react';
+import { ArrowLeft, User, Mail, Check, Loader2, Award, Lock, LogOut, Receipt, ChevronRight } from 'lucide-react';
 
 const ROLE_LABELS: Record<string, { label: string; style: string }> = {
   free: { label: 'Ücretsiz Üyelik', style: 'border-white/10 text-mystic-text-muted bg-white/5' },
@@ -272,6 +272,20 @@ export default function ProfilePage() {
             </form>
           )}
         </div>
+
+        {/* Faturalar */}
+        <button
+          type="button"
+          onClick={() => router.push('/profile/billing')}
+          className="w-full mt-4 bg-white/5 border border-white/10 hover:border-mystic-primary/40 hover:bg-white/10 text-white font-medium py-3.5 px-4 rounded-xl transition-all flex items-center gap-3 cursor-pointer text-sm"
+        >
+          <Receipt size={16} className="text-mystic-primary" />
+          <span className="flex-1 text-left">
+            Fatura Bilgileri & Faturalarım
+            <span className="block text-[10px] text-mystic-text-muted font-normal">Fatura profilleri, kesilen faturalar</span>
+          </span>
+          <ChevronRight size={16} className="text-mystic-text-muted" />
+        </button>
 
         <hr className="my-6 border-white/10" />
 

@@ -1,6 +1,5 @@
 /**
- * Fatura alıcı bilgileri için doğrulama yardımcıları.
- * Hem checkout API'sinde hem de istemci formunda kullanılabilir (server-only değil).
+ * TCKN / VKN doğrulama yardımcıları (server-only değil; istemcide de kullanılabilir).
  */
 
 /** TC Kimlik No algoritmik doğrulama (11 hane, ilk hane 0 olamaz, checksum). */
@@ -26,79 +25,4 @@ export function isValidVKN(value: string): boolean {
   }
   const check = (10 - (sum % 10)) % 10;
   return check === d[9];
-}
-
-export interface BillingInput {
-  fullName?: string;
-  phone?: string;
-  isCompany?: boolean;
-  companyTitle?: string;
-  taxNumber?: string;
-  taxOffice?: string;
-  address?: string;
-  city?: string;
-  district?: string;
-}
-
-export interface BillingInfo {
-  /** Bireyselde ad soyad, kurumsalda ünvan */
-  displayName: string;
-  phone: string | null;
-  isCompany: boolean;
-  taxNumber: string | null;
-  taxOffice: string | null;
-  address: string;
-  city: string;
-  district: string;
-}
-
-const str = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
-
-/**
- * Checkout'tan gelen ham fatura bilgilerini doğrular ve normalize eder.
- * @returns Hata mesajı (string) veya normalize edilmiş bilgi.
- */
-export function validateBilling(input: BillingInput): { ok: true; value: BillingInfo } | { ok: false; error: string } {
-  const isCompany = Boolean(input.isCompany);
-  const fullName = str(input.fullName);
-  const companyTitle = str(input.companyTitle);
-  const taxNumber = str(input.taxNumber).replace(/\s/g, '');
-  const taxOffice = str(input.taxOffice);
-  const address = str(input.address);
-  const city = str(input.city);
-  const district = str(input.district);
-  const phone = str(input.phone).replace(/[^\d+]/g, '');
-
-  if (!city || !district) return { ok: false, error: 'Fatura için il ve ilçe zorunludur.' };
-  if (!address || address.length < 5) return { ok: false, error: 'Fatura adresi eksik.' };
-
-  if (isCompany) {
-    if (!companyTitle) return { ok: false, error: 'Firma ünvanı zorunludur.' };
-    if (!isValidVKN(taxNumber)) return { ok: false, error: 'Vergi kimlik numarası geçersiz (10 hane).' };
-    if (!taxOffice) return { ok: false, error: 'Vergi dairesi zorunludur.' };
-    return {
-      ok: true,
-      value: { displayName: companyTitle, phone: phone || null, isCompany, taxNumber, taxOffice, address, city, district },
-    };
-  }
-
-  if (!fullName || fullName.split(/\s+/).length < 2) {
-    return { ok: false, error: 'Fatura için ad ve soyad zorunludur.' };
-  }
-  if (taxNumber && !isValidTCKN(taxNumber)) {
-    return { ok: false, error: 'TC kimlik numarası geçersiz.' };
-  }
-  return {
-    ok: true,
-    value: {
-      displayName: fullName,
-      phone: phone || null,
-      isCompany: false,
-      taxNumber: taxNumber || null,
-      taxOffice: null,
-      address,
-      city,
-      district,
-    },
-  };
 }

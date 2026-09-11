@@ -139,6 +139,7 @@ export async function issueInvoiceForTransaction(
     .values({
       posTransactionId,
       guestOrderId: tx.guestOrderId,
+      userId: tx.userId,
       invoiceNumber,
       ettn,
       buyerName: tx.payerName || tx.payerEmail || 'Nihai Tüketici',

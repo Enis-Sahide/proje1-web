@@ -51,6 +51,32 @@ export const reportProducts = pgTable('report_products', {
 });
 
 // ─────────────────────────────────────────────────────────────
+// Fatura profilleri — kullanıcı başına birden fazla (şahsi / şirket A / şirket B).
+// Ödeme anında seçilen profil pos_transactions'a KOPYALANIR; profil sonradan
+// değişse bile kesilmiş fatura etkilenmez.
+// ─────────────────────────────────────────────────────────────
+export const billingProfiles = pgTable('billing_profiles', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  userId: uuid('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  label: text('label').notNull(), // "Şahsi", "Şirketim" vb.
+  type: text('type').notNull().default('individual'), // individual | company
+  // individual: ad soyad; company: ünvan
+  title: text('title').notNull(),
+  taxNumber: text('tax_number'), // TCKN (11) / VKN (10); bireyselde boş olabilir
+  taxOffice: text('tax_office'),
+  address: text('address').notNull(),
+  city: text('city').notNull(),
+  district: text('district').notNull(),
+  phone: text('phone'),
+  email: text('email'), // fatura e-postası (boşsa hesap e-postası)
+  isDefault: boolean('is_default').notNull().default(false),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+// ─────────────────────────────────────────────────────────────
 // POS işlemleri — her HPP oturumu için bir satır.
 // external_order_id bizim ürettiğimiz referans, Treps tarafında da bu görünür.
 // ─────────────────────────────────────────────────────────────
@@ -79,7 +105,10 @@ export const posTransactions = pgTable('pos_transactions', {
   payerName: text('payer_name'),
   payerEmail: text('payer_email'),
   payerPhone: text('payer_phone'),
-  // Fatura için alıcı bilgileri — checkout formunda toplanır, invoices'a kopyalanır.
+  // Fatura için alıcı bilgileri — seçilen fatura profilinden kopyalanır, invoices'a taşınır.
+  billingProfileId: uuid('billing_profile_id').references(() => billingProfiles.id, {
+    onDelete: 'set null',
+  }),
   payerIsCompany: boolean('payer_is_company').notNull().default(false),
   payerTaxNumber: text('payer_tax_number'), // TCKN (11) veya VKN (10)
   payerTaxOffice: text('payer_tax_office'),
@@ -131,6 +160,8 @@ export const invoices = pgTable('invoices', {
   guestOrderId: text('guest_order_id').references(() => guestOrders.id, {
     onDelete: 'set null',
   }),
+  // Faturanın sahibi — "Faturalarım" listesi için.
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'set null' }),
   // Dahili sıra numarası (EAR2026000001). Entegratör kendi no'sunu atarsa
   // providerDocumentNo alanına yazılır.
   invoiceNumber: text('invoice_number').notNull().unique(),
