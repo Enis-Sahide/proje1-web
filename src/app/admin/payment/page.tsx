@@ -5,6 +5,7 @@ import {
   AlertCircle,
   CheckCircle2,
   CreditCard,
+  FileCheck,
   FileText,
   Loader2,
   Package,
@@ -26,11 +27,12 @@ function s(v: unknown): string {
   return v === null || v === undefined ? '' : String(v);
 }
 
-type Tab = 'pos' | 'invoice' | 'products' | 'transactions';
+type Tab = 'pos' | 'invoice' | 'invoices' | 'products' | 'transactions';
 
 const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
   { id: 'pos', label: 'Sanal POS (Treps)', icon: CreditCard },
   { id: 'invoice', label: 'Faturalama', icon: Receipt },
+  { id: 'invoices', label: 'Faturalar', icon: FileCheck },
   { id: 'products', label: 'Ürün & Fiyat', icon: Package },
   { id: 'transactions', label: 'İşlemler', icon: FileText },
 ];
@@ -786,6 +788,290 @@ function TransactionsTab() {
   );
 }
 
+// ─── Faturalar sekmesi ───────────────────────────────────────
+
+type InvoiceRow = {
+  id: string;
+  invoiceNumber: string;
+  invoiceDate: string;
+  buyerName: string;
+  buyerEmail: string | null;
+  buyerTaxNumber: string | null;
+  buyerTaxOffice: string | null;
+  buyerAddress: string | null;
+  buyerCity: string | null;
+  buyerDistrict: string | null;
+  total: string;
+  currency: string;
+  status: string; // draft | sent | error | cancelled
+  documentType: string;
+  providerDocumentNo: string | null;
+  pdfUrl: string | null;
+  errorMessage: string | null;
+  attemptCount: number;
+};
+
+const INVOICE_STATUS_STYLE: Record<string, string> = {
+  sent: 'bg-green-500/10 text-green-400 border-green-500/20',
+  draft: 'bg-yellow-500/10 text-yellow-300 border-yellow-500/20',
+  error: 'bg-red-500/10 text-red-400 border-red-500/20',
+  cancelled: 'bg-white/5 text-white/40 border-white/10',
+};
+
+const BUYER_FIELDS: { key: keyof InvoiceRow; label: string }[] = [
+  { key: 'buyerName', label: 'Alıcı adı / ünvan' },
+  { key: 'buyerEmail', label: 'E-posta' },
+  { key: 'buyerTaxNumber', label: 'TCKN / VKN' },
+  { key: 'buyerTaxOffice', label: 'Vergi dairesi' },
+  { key: 'buyerCity', label: 'İl' },
+  { key: 'buyerDistrict', label: 'İlçe' },
+  { key: 'buyerAddress', label: 'Adres' },
+];
+
+/** Eksik alıcı bilgisi var mı — entegratöre göndermeden önce uyarı için. */
+function missingBuyerInfo(r: InvoiceRow): string[] {
+  const out: string[] = [];
+  if (!r.buyerCity) out.push('il');
+  if (!r.buyerDistrict) out.push('ilçe');
+  if (!r.buyerAddress) out.push('adres');
+  if (r.buyerTaxNumber && r.buyerTaxNumber.length === 10 && !r.buyerTaxOffice) out.push('vergi dairesi');
+  return out;
+}
+
+function InvoicesTab() {
+  const [rows, setRows] = useState<InvoiceRow[]>([]);
+  const [filter, setFilter] = useState<'' | 'draft' | 'error' | 'sent'>('');
+  const [loading, setLoading] = useState(true);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [editing, setEditing] = useState<InvoiceRow | null>(null);
+  const [msg, setMsg] = useState<{ kind: 'ok' | 'err'; text: string } | null>(null);
+
+  const load = useCallback(() => {
+    const q = filter ? `?status=${filter}&limit=200` : '?limit=200';
+    apiFetch(`/api/admin/invoices${q}`)
+      .then((res) => setRows(res?.data ?? []))
+      .catch((e) => setMsg({ kind: 'err', text: errText(e) }))
+      .finally(() => setLoading(false));
+  }, [filter]);
+
+  useEffect(load, [load]);
+
+  const send = async (id: string) => {
+    setBusyId(id);
+    setMsg(null);
+    try {
+      await apiFetch('/api/admin/invoices', {
+        method: 'POST',
+        body: JSON.stringify({ action: 'send', invoiceId: id }),
+      });
+      setMsg({ kind: 'ok', text: 'Fatura entegratöre gönderildi.' });
+    } catch (e: unknown) {
+      setMsg({ kind: 'err', text: errText(e) });
+    } finally {
+      setBusyId(null);
+      load();
+    }
+  };
+
+  const saveBuyer = async () => {
+    if (!editing) return;
+    setBusyId(editing.id);
+    setMsg(null);
+    try {
+      await apiFetch('/api/admin/invoices', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          invoiceId: editing.id,
+          buyerName: editing.buyerName,
+          buyerEmail: editing.buyerEmail,
+          buyerTaxNumber: editing.buyerTaxNumber,
+          buyerTaxOffice: editing.buyerTaxOffice,
+          buyerAddress: editing.buyerAddress,
+          buyerCity: editing.buyerCity,
+          buyerDistrict: editing.buyerDistrict,
+        }),
+      });
+      setMsg({ kind: 'ok', text: 'Alıcı bilgileri güncellendi.' });
+      setEditing(null);
+      load();
+    } catch (e: unknown) {
+      setMsg({ kind: 'err', text: errText(e) });
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  if (loading) return <Loader2 className="animate-spin text-[#D4AF37]" />;
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-1.5">
+          {(['', 'draft', 'error', 'sent'] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => {
+                setLoading(true);
+                setFilter(f);
+              }}
+              className={`px-2.5 py-1 rounded-lg text-[11px] border transition-colors ${
+                filter === f
+                  ? 'bg-[#D4AF37]/15 border-[#D4AF37]/40 text-[#D4AF37]'
+                  : 'border-white/10 text-white/50 hover:text-white'
+              }`}
+            >
+              {f === '' ? 'Tümü' : f}
+            </button>
+          ))}
+          <span className="text-[11px] text-white/30 ml-2">{rows.length} fatura</span>
+        </div>
+        <button
+          onClick={() => {
+            setLoading(true);
+            load();
+          }}
+          className="flex items-center gap-1.5 text-xs text-[#D4AF37] hover:underline"
+        >
+          <RefreshCw size={13} /> Yenile
+        </button>
+      </div>
+
+      {msg && <Notice kind={msg.kind} text={msg.text} />}
+
+      {editing && (
+        <div className="rounded-2xl border border-[#D4AF37]/30 bg-[#D4AF37]/5 p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <p className="text-sm font-semibold text-white">
+              Alıcı bilgilerini düzenle —{' '}
+              <span className="font-mono text-[#D4AF37]">{editing.invoiceNumber}</span>
+            </p>
+            <button onClick={() => setEditing(null)} className="text-xs text-white/50 hover:text-white">
+              Kapat
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {BUYER_FIELDS.map((f) => (
+              <Field key={f.key} label={f.label}>
+                <input
+                  className={inputCls}
+                  value={s(editing[f.key])}
+                  onChange={(e) => setEditing({ ...editing, [f.key]: e.target.value })}
+                />
+              </Field>
+            ))}
+          </div>
+          <div className="flex gap-2 justify-end">
+            <button
+              onClick={saveBuyer}
+              disabled={busyId === editing.id}
+              className="flex items-center gap-1.5 bg-[#D4AF37] text-black text-xs font-semibold px-4 py-2 rounded-xl disabled:opacity-50"
+            >
+              <Save size={13} /> Kaydet
+            </button>
+          </div>
+        </div>
+      )}
+
+      {rows.length === 0 ? (
+        <p className="text-sm text-white/40">Fatura yok.</p>
+      ) : (
+        <div className="overflow-x-auto rounded-2xl border border-white/10">
+          <table className="w-full text-xs">
+            <thead className="bg-white/5 text-white/50">
+              <tr>
+                <th className="text-left font-medium px-3 py-2.5">Tarih</th>
+                <th className="text-left font-medium px-3 py-2.5">Fatura No</th>
+                <th className="text-left font-medium px-3 py-2.5">Alıcı</th>
+                <th className="text-right font-medium px-3 py-2.5">Tutar</th>
+                <th className="text-left font-medium px-3 py-2.5">Tür</th>
+                <th className="text-left font-medium px-3 py-2.5">Durum</th>
+                <th className="text-right font-medium px-3 py-2.5">İşlem</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => {
+                const missing = missingBuyerInfo(r);
+                return (
+                  <tr key={r.id} className="border-t border-white/5 text-white/80 align-top">
+                    <td className="px-3 py-2.5 whitespace-nowrap text-white/50">
+                      {new Date(r.invoiceDate).toLocaleDateString('tr-TR')}
+                    </td>
+                    <td className="px-3 py-2.5 font-mono text-[10px]">
+                      {r.invoiceNumber}
+                      {r.providerDocumentNo && <p className="text-white/40">{r.providerDocumentNo}</p>}
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <p className="text-white">{r.buyerName}</p>
+                      <p className="text-white/40">{r.buyerEmail || '—'}</p>
+                      {r.buyerTaxNumber && (
+                        <p className="font-mono text-[10px] text-white/50">
+                          {r.buyerTaxNumber}
+                          {r.buyerTaxOffice ? ` · ${r.buyerTaxOffice}` : ''}
+                        </p>
+                      )}
+                      {missing.length > 0 && r.status !== 'sent' && (
+                        <p className="text-[10px] text-yellow-300/70 mt-0.5">Eksik: {missing.join(', ')}</p>
+                      )}
+                    </td>
+                    <td className="px-3 py-2.5 text-right font-medium whitespace-nowrap">
+                      {Number(r.total).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} {r.currency}
+                    </td>
+                    <td className="px-3 py-2.5 text-white/60">{r.documentType}</td>
+                    <td className="px-3 py-2.5">
+                      <span
+                        className={`inline-block px-2 py-0.5 rounded-full border text-[10px] font-medium ${
+                          INVOICE_STATUS_STYLE[r.status] || INVOICE_STATUS_STYLE.cancelled
+                        }`}
+                      >
+                        {r.status}
+                      </span>
+                      {r.errorMessage && (
+                        <p className="text-[10px] text-red-300/60 mt-1 max-w-[220px]">{r.errorMessage}</p>
+                      )}
+                      {r.attemptCount > 0 && (
+                        <p className="text-[10px] text-white/30 mt-0.5">{r.attemptCount} deneme</p>
+                      )}
+                    </td>
+                    <td className="px-3 py-2.5 text-right whitespace-nowrap">
+                      {r.status === 'sent' ? (
+                        r.pdfUrl ? (
+                          <a href={r.pdfUrl} target="_blank" rel="noreferrer" className="text-[#D4AF37] hover:underline">
+                            PDF
+                          </a>
+                        ) : (
+                          <span className="text-white/30">—</span>
+                        )
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => setEditing(r)}
+                            disabled={busyId === r.id}
+                            className="text-white/70 hover:text-white hover:underline disabled:opacity-40"
+                          >
+                            Düzenle
+                          </button>
+                          <span className="text-white/20 mx-2">|</span>
+                          <button
+                            onClick={() => send(r.id)}
+                            disabled={busyId === r.id}
+                            className="text-[#D4AF37] hover:underline disabled:opacity-40"
+                          >
+                            {busyId === r.id ? 'Gönderiliyor...' : 'Gönder'}
+                          </button>
+                        </>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Sayfa ───────────────────────────────────────────────────
 
 export default function AdminPaymentPage() {
@@ -820,6 +1106,7 @@ export default function AdminPaymentPage() {
         {tab === 'pos' && <PosTab />}
         {tab === 'invoice' && <InvoiceTab />}
         {tab === 'products' && <ProductsTab />}
+        {tab === 'invoices' && <InvoicesTab />}
         {tab === 'transactions' && <TransactionsTab />}
       </div>
     </>

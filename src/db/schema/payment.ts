@@ -79,6 +79,13 @@ export const posTransactions = pgTable('pos_transactions', {
   payerName: text('payer_name'),
   payerEmail: text('payer_email'),
   payerPhone: text('payer_phone'),
+  // Fatura için alıcı bilgileri — checkout formunda toplanır, invoices'a kopyalanır.
+  payerIsCompany: boolean('payer_is_company').notNull().default(false),
+  payerTaxNumber: text('payer_tax_number'), // TCKN (11) veya VKN (10)
+  payerTaxOffice: text('payer_tax_office'),
+  payerAddress: text('payer_address'),
+  payerCity: text('payer_city'),
+  payerDistrict: text('payer_district'),
   rawResponse: jsonb('raw_response'),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),

@@ -23,6 +23,16 @@ export interface InitiateParams {
     city?: string;
     address?: string;
   };
+  /** Fatura alıcı bilgileri — checkout formunda toplanır. */
+  billing?: {
+    isCompany: boolean;
+    /** TCKN (11 hane) veya VKN (10 hane); bireyselde boş olabilir. */
+    taxNumber?: string | null;
+    taxOffice?: string | null;
+    address?: string | null;
+    city?: string | null;
+    district?: string | null;
+  };
   userId?: string | null;
 }
 
@@ -115,6 +125,12 @@ export async function initiateHPPPayment(params: InitiateParams): Promise<Initia
         payerName: `${params.payer.name} ${params.payer.surname}`.trim(),
         payerEmail: params.payer.email,
         payerPhone: params.payer.phone ?? null,
+        payerIsCompany: params.billing?.isCompany ?? false,
+        payerTaxNumber: params.billing?.taxNumber ?? null,
+        payerTaxOffice: params.billing?.taxOffice ?? null,
+        payerAddress: params.billing?.address ?? params.payer.address ?? null,
+        payerCity: params.billing?.city ?? params.payer.city ?? null,
+        payerDistrict: params.billing?.district ?? null,
       })
       .returning({ id: posTransactions.id });
 

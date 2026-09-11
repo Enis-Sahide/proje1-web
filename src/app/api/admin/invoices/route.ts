@@ -4,6 +4,7 @@ import { invoices } from '@/db/schema';
 import { json, errorJson, preflight } from '@/lib/http/cors';
 import { requireAdmin } from '@/lib/auth/requireAdmin';
 import { issueInvoiceForTransaction, sendInvoiceToProvider } from '@/lib/billing/invoice-service';
+import { isValidTCKN, isValidVKN } from '@/lib/billing/validate';
 
 export const dynamic = 'force-dynamic';
 
@@ -64,6 +65,53 @@ export async function POST(request: Request) {
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : 'Bilinmeyen hata';
     console.error('[admin invoices]', msg);
+    return errorJson(msg, 500);
+  }
+}
+
+/**
+ * PATCH /api/admin/invoices
+ *
+ * Gönderilmemiş (draft/error) bir faturanın alıcı bilgilerini düzeltir.
+ * Gövde: `{ invoiceId, buyerName?, buyerEmail?, buyerTaxNumber?, buyerTaxOffice?, buyerAddress?, buyerCity?, buyerDistrict? }`
+ */
+export async function PATCH(request: Request) {
+  try {
+    if (!(await requireAdmin(request))) return errorJson('Yetkisiz', 403);
+
+    const body = await request.json().catch(() => ({}) as Record<string, unknown>);
+    const invoiceId = typeof body.invoiceId === 'string' ? body.invoiceId : '';
+    if (!invoiceId) return errorJson('invoiceId zorunludur', 400);
+
+    const [invoice] = await db.select().from(invoices).where(eq(invoices.id, invoiceId));
+    if (!invoice) return errorJson('Fatura bulunamadı', 404);
+    if (invoice.status === 'sent') return errorJson('Gönderilmiş fatura düzenlenemez', 409);
+
+    const str = (v: unknown) => (typeof v === 'string' && v.trim() ? v.trim() : null);
+    const taxNumber = str(body.buyerTaxNumber)?.replace(/\s/g, '') ?? null;
+    if (taxNumber && !(isValidTCKN(taxNumber) || isValidVKN(taxNumber))) {
+      return errorJson('TCKN/VKN geçersiz', 400);
+    }
+
+    const [row] = await db
+      .update(invoices)
+      .set({
+        buyerName: str(body.buyerName) ?? invoice.buyerName,
+        buyerEmail: str(body.buyerEmail),
+        buyerTaxNumber: taxNumber,
+        buyerTaxOffice: str(body.buyerTaxOffice),
+        buyerAddress: str(body.buyerAddress),
+        buyerCity: str(body.buyerCity),
+        buyerDistrict: str(body.buyerDistrict),
+        updatedAt: new Date(),
+      })
+      .where(eq(invoices.id, invoiceId))
+      .returning();
+
+    return json({ success: true, data: row });
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : 'Bilinmeyen hata';
+    console.error('[admin invoices patch]', msg);
     return errorJson(msg, 500);
   }
 }

@@ -8,6 +8,9 @@ import { AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 
+const inputCls =
+  'w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#D4AF37] transition-colors';
+
 function GuestCheckoutForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -31,6 +34,17 @@ function GuestCheckoutForm() {
   const [timeStr, setTimeStr] = useState('12:00');
   const [cityKey, setCityKey] = useState<AstroCity | null>(null);
   const [agreedTerms, setAgreedTerms] = useState(true);
+
+  // Fatura bilgileri — e-Arşiv için ad soyad + il/ilçe + adres zorunlu.
+  const [fullName, setFullName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [billCity, setBillCity] = useState('');
+  const [billDistrict, setBillDistrict] = useState('');
+  const [billAddress, setBillAddress] = useState('');
+  const [isCompany, setIsCompany] = useState(false);
+  const [companyTitle, setCompanyTitle] = useState('');
+  const [taxNumber, setTaxNumber] = useState('');
+  const [taxOffice, setTaxOffice] = useState('');
 
   // Fiyat sunucudan okunur — istemcide sabit fiyat tutulmaz.
   const [amount, setAmount] = useState<number | null>(null);
@@ -94,6 +108,19 @@ function GuestCheckoutForm() {
       setError('Lütfen tüm doğum bilgilerini ve e-posta adresinizi doldurun.');
       return;
     }
+    if (!billCity || !billDistrict || !billAddress) {
+      setError('Fatura için il, ilçe ve adres bilgilerinizi doldurun.');
+      return;
+    }
+    if (isCompany) {
+      if (!companyTitle || !/^\d{10}$/.test(taxNumber) || !taxOffice) {
+        setError('Kurumsal fatura için ünvan, 10 haneli VKN ve vergi dairesi zorunludur.');
+        return;
+      }
+    } else if (fullName.trim().split(/\s+/).length < 2) {
+      setError('Fatura için ad ve soyadınızı girin.');
+      return;
+    }
     if (!agreedTerms) {
       setError('Lütfen Mesafeli Satış Sözleşmesi ve İade Koşullarını onaylayınız.');
       return;
@@ -128,7 +155,20 @@ function GuestCheckoutForm() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ orderId: checkoutData.orderId }),
+        body: JSON.stringify({
+          orderId: checkoutData.orderId,
+          billing: {
+            fullName,
+            phone,
+            isCompany,
+            companyTitle,
+            taxNumber,
+            taxOffice,
+            address: billAddress,
+            city: billCity,
+            district: billDistrict,
+          },
+        }),
       });
 
       const hppData = await hppRes.json();
@@ -279,6 +319,114 @@ function GuestCheckoutForm() {
                   Doğum Şehri
                 </label>
                 <LocationAutocomplete onSelect={setCityKey} />
+              </div>
+
+              {/* Fatura Bilgileri */}
+              <div className="pt-3 mt-1 border-t border-white/10 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 text-[11px] font-semibold text-[#D4AF37] uppercase tracking-wider">
+                    <FileText size={13} /> Fatura Bilgileri
+                  </div>
+                  <label className="flex items-center gap-1.5 text-[11px] text-white/70 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={isCompany}
+                      onChange={e => setIsCompany(e.target.checked)}
+                      className="accent-[#D4AF37]"
+                    />
+                    Kurumsal fatura
+                  </label>
+                </div>
+
+                {isCompany ? (
+                  <>
+                    <input
+                      type="text"
+                      value={companyTitle}
+                      onChange={e => setCompanyTitle(e.target.value)}
+                      placeholder="Firma ünvanı"
+                      className={inputCls}
+                      required
+                    />
+                    <div className="grid grid-cols-2 gap-3">
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        maxLength={10}
+                        value={taxNumber}
+                        onChange={e => setTaxNumber(e.target.value.replace(/\D/g, ''))}
+                        placeholder="Vergi No (10 hane)"
+                        className={inputCls}
+                        required
+                      />
+                      <input
+                        type="text"
+                        value={taxOffice}
+                        onChange={e => setTaxOffice(e.target.value)}
+                        placeholder="Vergi dairesi"
+                        className={inputCls}
+                        required
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      value={fullName}
+                      onChange={e => setFullName(e.target.value)}
+                      placeholder="Ad Soyad"
+                      className={inputCls}
+                      required
+                    />
+                    <input
+                      type="text"
+                      inputMode="numeric"
+                      maxLength={11}
+                      value={taxNumber}
+                      onChange={e => setTaxNumber(e.target.value.replace(/\D/g, ''))}
+                      placeholder="TC Kimlik No (isteğe bağlı)"
+                      className={inputCls}
+                    />
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-3">
+                  <input
+                    type="text"
+                    value={billCity}
+                    onChange={e => setBillCity(e.target.value)}
+                    placeholder="İl"
+                    className={inputCls}
+                    required
+                  />
+                  <input
+                    type="text"
+                    value={billDistrict}
+                    onChange={e => setBillDistrict(e.target.value)}
+                    placeholder="İlçe"
+                    className={inputCls}
+                    required
+                  />
+                </div>
+                <input
+                  type="text"
+                  value={billAddress}
+                  onChange={e => setBillAddress(e.target.value)}
+                  placeholder="Adres (mahalle, sokak, no)"
+                  className={inputCls}
+                  required
+                />
+                <input
+                  type="tel"
+                  value={phone}
+                  onChange={e => setPhone(e.target.value)}
+                  placeholder="Telefon (isteğe bağlı)"
+                  className={inputCls}
+                />
+                <p className="text-[10px] text-white/40 leading-relaxed">
+                  e-Arşiv faturanız ödeme sonrası e-posta adresinize gönderilir.
+                </p>
               </div>
 
               {/* Agreement Checkbox */}

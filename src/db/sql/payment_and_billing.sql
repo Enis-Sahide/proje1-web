@@ -66,6 +66,12 @@ CREATE TABLE IF NOT EXISTS "pos_transactions" (
   "payer_name" text,
   "payer_email" text,
   "payer_phone" text,
+  "payer_is_company" boolean DEFAULT false NOT NULL,
+  "payer_tax_number" text,
+  "payer_tax_office" text,
+  "payer_address" text,
+  "payer_city" text,
+  "payer_district" text,
   "raw_response" jsonb,
   "created_at" timestamp with time zone DEFAULT now() NOT NULL,
   "updated_at" timestamp with time zone DEFAULT now() NOT NULL

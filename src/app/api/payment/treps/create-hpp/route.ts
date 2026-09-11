@@ -5,6 +5,7 @@ import { json, errorJson, preflight } from '@/lib/http/cors';
 import { getAuthPayload } from '@/lib/auth/session';
 import { initiateHPPPayment } from '@/lib/payment/service';
 import { getReportProduct, normalizeProductType } from '@/lib/payment/settings';
+import { validateBilling, type BillingInput } from '@/lib/billing/validate';
 
 export const dynamic = 'force-dynamic';
 
@@ -19,16 +20,20 @@ export async function OPTIONS() {
  * Tutar daima sunucuda `report_products` üzerinden belirlenir; istemciden
  * gelen fiyat bilgisine güvenilmez.
  *
- * Gövde: `{ orderId, name?, phone?, city?, address? }`
+ * Gövde: `{ orderId, billing: { fullName, phone?, isCompany, companyTitle?, taxNumber?, taxOffice?, address, city, district } }`
+ * Fatura bilgileri sunucuda doğrulanır (TCKN/VKN checksum, zorunlu il/ilçe).
  * @returns `{ redirectUrl }` — kullanıcı bu adrese yönlendirilmelidir.
  */
 export async function POST(request: Request) {
   try {
-    const { orderId, name, phone, city, address } = await request
-      .json()
-      .catch(() => ({}) as Record<string, string>);
+    const body = await request.json().catch(() => ({}) as Record<string, unknown>);
+    const orderId = typeof body.orderId === 'string' ? body.orderId : '';
 
     if (!orderId) return errorJson('Sipariş kimliği eksik', 400);
+
+    const billingCheck = validateBilling((body.billing ?? {}) as BillingInput);
+    if (!billingCheck.ok) return errorJson(billingCheck.error, 400);
+    const billing = billingCheck.value;
 
     const [order] = await db.select().from(guestOrders).where(eq(guestOrders.id, orderId));
     if (!order) return errorJson('Sipariş bulunamadı', 404);
@@ -58,8 +63,8 @@ export async function POST(request: Request) {
     // Üye girişi varsa işlemi kullanıcıya bağla (zorunlu değil).
     const payload = await getAuthPayload(request);
 
-    const fullName = (name || order.email.split('@')[0] || 'Musteri').trim();
-    const parts = fullName.split(/\s+/);
+    // Treps'e giden ad/soyad: kurumsalda ünvanı ad alanına koyarız.
+    const parts = billing.displayName.split(/\s+/);
 
     const result = await initiateHPPPayment({
       guestOrderId: order.id,
@@ -71,9 +76,17 @@ export async function POST(request: Request) {
         name: parts[0] || 'Musteri',
         surname: parts.slice(1).join(' ') || '-',
         email: order.email,
-        phone,
-        city,
-        address,
+        phone: billing.phone ?? undefined,
+        city: billing.city,
+        address: billing.address,
+      },
+      billing: {
+        isCompany: billing.isCompany,
+        taxNumber: billing.taxNumber,
+        taxOffice: billing.taxOffice,
+        address: billing.address,
+        city: billing.city,
+        district: billing.district,
       },
     });
 
