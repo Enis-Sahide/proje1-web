@@ -74,8 +74,21 @@ export function mailProvider(): 'resend' | 'smtp' {
  * Tek gönderim noktası. Başarıda sağlayıcının mesaj id'sini döner.
  * @throws Sağlayıcı hatası — çağıran taraf yakalar ve false döner.
  */
+const DEFAULT_FROM_ADDRESS = 'noreply@7layers.tr';
+
+/**
+ * SMTP_FROM'u `Name <email>` biçimine normalize eder. Resend bu biçimi zorunlu
+ * tutar; env'de yalnızca isim (ör. "7Layers") varsa adres eklenir.
+ */
+export function resolveFrom(): string {
+  const raw = (process.env.SMTP_FROM || '').trim().replace(/^"|"$/g, '');
+  if (!raw) return `7Layers <${DEFAULT_FROM_ADDRESS}>`;
+  if (raw.includes('@')) return raw;
+  return `${raw} <${DEFAULT_FROM_ADDRESS}>`;
+}
+
 export async function sendMail(msg: MailMessage): Promise<string> {
-  const from = process.env.SMTP_FROM || '"7Layers" <noreply@7layers.tr>';
+  const from = resolveFrom();
 
   const client = getResend();
   if (client) {
