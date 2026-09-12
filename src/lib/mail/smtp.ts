@@ -453,15 +453,24 @@ export async function sendVerificationCodeEmail(email: string, code: string): Pr
     </html>
   `;
 
+  const text = `7Layers Kayıt Doğrulama Kodunuz: ${code}\n\nBu kod 15 dakika boyunca geçerlidir.\n\nEğer bu talebi siz yapmadıysanız bu e-postayı güvenle yok sayabilirsiniz.\n\n7layers.tr`;
+
   try {
     const client = getTransporter();
-    await client.sendMail({
+    const info = await client.sendMail({
       from,
       to: email,
+      replyTo: 'noreply@7layers.tr',
       subject: `7Layers - Doğrulama Kodunuz: ${code}`,
+      text,
       html,
+      headers: {
+        'X-Priority': '1 (Highest)',
+        'X-MSMail-Priority': 'High',
+        'Importance': 'High',
+      },
     });
-    console.log(`Verification code email sent successfully to ${email}`);
+    console.log(`Verification code email sent successfully to ${email}. MessageId: ${info?.messageId}`);
     return true;
   } catch (err) {
     console.error("Failed to send verification code email:", err);
