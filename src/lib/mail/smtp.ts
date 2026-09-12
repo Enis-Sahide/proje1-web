@@ -6,12 +6,18 @@ let transporter: nodemailer.Transporter | null = null;
 function getTransporter(): nodemailer.Transporter {
   if (transporter) return transporter;
 
-  const host = process.env.SMTP_HOST;
-  const port = parseInt(process.env.SMTP_PORT || '587', 10);
+  let host = process.env.SMTP_HOST;
+  const port = parseInt(process.env.SMTP_PORT || '465', 10);
   const user = process.env.SMTP_USER;
   const pass = process.env.SMTP_PASS;
 
-  if (!host || !user || !pass) {
+  // Cloudflare CDN mail.7layers.tr adresinde 465/587 portlarını proxy etmediği için
+  // canlıda host mail.7layers.tr tanımlı olsa dahi doğrudan gerçek sunucu IP'sine yönlendir
+  if (!host || host === 'mail.7layers.tr') {
+    host = '82.163.176.104';
+  }
+
+  if (!user || !pass) {
     console.warn("SMTP settings are incomplete! Mails will not be sent.");
   }
 
