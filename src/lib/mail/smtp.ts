@@ -1,4 +1,5 @@
 import nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 // Transporter lazily initialized to avoid connection issues on startup
 let transporter: nodemailer.Transporter | null = null;
@@ -41,10 +42,71 @@ function getTransporter(): nodemailer.Transporter {
   return transporter;
 }
 
+// ─────────────────────────────────────────────────────────────
+// Gönderim katmanı: RESEND_API_KEY tanımlıysa Resend (HTTP API),
+// değilse eski SMTP transport'a düşer. Şablon fonksiyonları yalnızca
+// bu yardımcıyı çağırır; sağlayıcı ayrıntısını bilmez.
+// ─────────────────────────────────────────────────────────────
+let resend: Resend | null = null;
+
+function getResend(): Resend | null {
+  const key = process.env.RESEND_API_KEY;
+  if (!key) return null;
+  if (!resend) resend = new Resend(key);
+  return resend;
+}
+
+export interface MailMessage {
+  to: string;
+  subject: string;
+  html: string;
+  text?: string;
+  replyTo?: string;
+  headers?: Record<string, string>;
+}
+
+/** Aktif sağlayıcı adı — loglar ve test endpoint'i için. */
+export function mailProvider(): 'resend' | 'smtp' {
+  return process.env.RESEND_API_KEY ? 'resend' : 'smtp';
+}
+
+/**
+ * Tek gönderim noktası. Başarıda sağlayıcının mesaj id'sini döner.
+ * @throws Sağlayıcı hatası — çağıran taraf yakalar ve false döner.
+ */
+export async function sendMail(msg: MailMessage): Promise<string> {
+  const from = process.env.SMTP_FROM || '"7Layers" <noreply@7layers.tr>';
+
+  const client = getResend();
+  if (client) {
+    const { data, error } = await client.emails.send({
+      from,
+      to: msg.to,
+      subject: msg.subject,
+      html: msg.html,
+      text: msg.text,
+      replyTo: msg.replyTo,
+      headers: msg.headers,
+    });
+    if (error) throw new Error(`Resend: ${error.name} — ${error.message}`);
+    return data?.id ?? '';
+  }
+
+  const info = await getTransporter().sendMail({
+    from,
+    to: msg.to,
+    subject: msg.subject,
+    html: msg.html,
+    text: msg.text,
+    replyTo: msg.replyTo,
+    headers: msg.headers,
+  });
+  return info?.messageId ?? '';
+}
+
 export async function sendResetPasswordEmail(email: string, token: string): Promise<boolean> {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.7layers.tr';
   const resetLink = `${appUrl}/auth/reset-password?token=${encodeURIComponent(token)}`;
-  const from = process.env.SMTP_FROM || '"7Layers" <noreply@7layers.tr>';
 
   const html = `
     <!DOCTYPE html>
@@ -164,14 +226,8 @@ export async function sendResetPasswordEmail(email: string, token: string): Prom
   `;
 
   try {
-    const client = getTransporter();
-    await client.sendMail({
-      from,
-      to: email,
-      subject: '7Layers - Şifre Sıfırlama İsteği',
-      html,
-    });
-    console.log(`Password reset mail sent successfully to ${email}`);
+    const id = await sendMail({ to: email, subject: '7Layers - Şifre Sıfırlama İsteği', html });
+    console.log(`[mail:${mailProvider()}] password reset → ${email} (${id})`);
     return true;
   } catch (err) {
     console.error("Failed to send reset password email:", err);
@@ -182,7 +238,6 @@ export async function sendResetPasswordEmail(email: string, token: string): Prom
 export async function sendGuestDownloadEmail(email: string, token: string, analysisType: string): Promise<boolean> {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.7layers.tr';
   const downloadLink = `${appUrl}/checkout/success?token=${encodeURIComponent(token)}`;
-  const from = process.env.SMTP_FROM || '"7Layers" <noreply@7layers.tr>';
   
   let reportName = 'Doğum Haritası Analizi Raporu';
   if (analysisType === 'kabbalah') {
@@ -309,14 +364,8 @@ export async function sendGuestDownloadEmail(email: string, token: string, analy
   `;
 
   try {
-    const client = getTransporter();
-    await client.sendMail({
-      from,
-      to: email,
-      subject: `7Layers - ${reportName} Hazır!`,
-      html,
-    });
-    console.log(`Guest report download email sent successfully to ${email}`);
+    const id = await sendMail({ to: email, subject: `7Layers - ${reportName} Hazır!`, html });
+    console.log(`[mail:${mailProvider()}] guest download → ${email} (${id})`);
     return true;
   } catch (err) {
     console.error("Failed to send guest download email:", err);
@@ -326,7 +375,6 @@ export async function sendGuestDownloadEmail(email: string, token: string, analy
 
 export async function sendVerificationCodeEmail(email: string, code: string): Promise<boolean> {
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.7layers.tr';
-  const from = process.env.SMTP_FROM || '"7Layers" <noreply@7layers.tr>';
 
   const html = `
     <!DOCTYPE html>
@@ -456,9 +504,7 @@ export async function sendVerificationCodeEmail(email: string, code: string): Pr
   const text = `7Layers Kayıt Doğrulama Kodunuz: ${code}\n\nBu kod 15 dakika boyunca geçerlidir.\n\nEğer bu talebi siz yapmadıysanız bu e-postayı güvenle yok sayabilirsiniz.\n\n7layers.tr`;
 
   try {
-    const client = getTransporter();
-    const info = await client.sendMail({
-      from,
+    const id = await sendMail({
       to: email,
       replyTo: 'noreply@7layers.tr',
       subject: `7Layers - Doğrulama Kodunuz: ${code}`,
@@ -467,10 +513,10 @@ export async function sendVerificationCodeEmail(email: string, code: string): Pr
       headers: {
         'X-Priority': '1 (Highest)',
         'X-MSMail-Priority': 'High',
-        'Importance': 'High',
+        Importance: 'High',
       },
     });
-    console.log(`Verification code email sent successfully to ${email}. MessageId: ${info?.messageId}`);
+    console.log(`[mail:${mailProvider()}] verification code → ${email} (${id})`);
     return true;
   } catch (err) {
     console.error("Failed to send verification code email:", err);
