@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
   let resetToken: string | undefined;
   if (u) {
-    resetToken = await signResetToken(u.id);
+    resetToken = await signResetToken(u.id, u.passwordHash);
     
     // SMTP ayarları varsa veya prod ortamındaysak e-posta gönder
     const smtpHost = process.env.SMTP_HOST;

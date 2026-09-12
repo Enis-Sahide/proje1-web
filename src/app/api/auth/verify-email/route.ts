@@ -1,4 +1,4 @@
-import { eq, and, gt, desc } from 'drizzle-orm';
+import { eq, and, gt, desc, sql } from 'drizzle-orm';
 import crypto from 'crypto';
 import { db } from '@/db/client';
 import { users, emailVerifications, siteVisits } from '@/db/schema';
@@ -7,6 +7,9 @@ import { buildAuthResponse } from '@/lib/auth/respond';
 import { errorJson, preflight } from '@/lib/http/cors';
 
 export const dynamic = 'force-dynamic';
+
+/** Bu kadar yanlış denemeden sonra kod geçersiz sayılır; kullanıcı yeni kod istemeli. */
+const MAX_OTP_ATTEMPTS = 5;
 
 export async function POST(request: Request) {
   try {
@@ -33,8 +36,32 @@ export async function POST(request: Request) {
       .orderBy(desc(emailVerifications.createdAt))
       .limit(1);
 
-    if (!verification || verification.code !== cleanCode) {
+    if (!verification) {
       return errorJson('Doğrulama kodu hatalı veya süresi dolmuş. Lütfen kontrol edip tekrar deneyin.', 400);
+    }
+
+    if (verification.attempts >= MAX_OTP_ATTEMPTS) {
+      await db.delete(emailVerifications).where(eq(emailVerifications.id, verification.id));
+      return errorJson('Çok fazla hatalı deneme yapıldı. Lütfen yeni bir doğrulama kodu isteyin.', 429);
+    }
+
+    // Zamanlama saldırılarına karşı sabit süreli karşılaştırma.
+    const codeMatches =
+      verification.code.length === cleanCode.length &&
+      crypto.timingSafeEqual(Buffer.from(verification.code), Buffer.from(cleanCode));
+
+    if (!codeMatches) {
+      const remaining = MAX_OTP_ATTEMPTS - verification.attempts - 1;
+      await db
+        .update(emailVerifications)
+        .set({ attempts: sql`${emailVerifications.attempts} + 1` })
+        .where(eq(emailVerifications.id, verification.id));
+      return errorJson(
+        remaining > 0
+          ? `Doğrulama kodu hatalı. ${remaining} deneme hakkınız kaldı.`
+          : 'Doğrulama kodu hatalı. Deneme hakkınız doldu, lütfen yeni kod isteyin.',
+        400,
+      );
     }
 
     // Kullanıcı users tablosunda yoksa şimdi oluştur (Lazy Registration)

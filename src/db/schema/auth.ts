@@ -1,5 +1,5 @@
 import { sql } from 'drizzle-orm';
-import { pgTable, uuid, text, timestamp, jsonb, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, uuid, text, timestamp, jsonb, boolean, integer } from 'drizzle-orm/pg-core';
 
 // Supabase auth yerine kendi kullanıcı tablomuz.
 export const users = pgTable('users', {
@@ -20,6 +20,8 @@ export const emailVerifications = pgTable('email_verifications', {
   code: text('code').notNull(),
   passwordHash: text('password_hash'),
   fullName: text('full_name'),
+  // Yanlış kod denemesi sayısı; MAX_OTP_ATTEMPTS'e ulaşınca kod iptal edilir.
+  attempts: integer('attempts').notNull().default(0),
   expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
   createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
 });

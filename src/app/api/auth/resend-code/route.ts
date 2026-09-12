@@ -57,6 +57,7 @@ export async function POST(request: Request) {
       .set({
         code,
         expiresAt,
+        attempts: 0, // yeni kodla deneme hakkı sıfırlanır
         createdAt: new Date(),
       })
       .where(eq(emailVerifications.id, pending.id));
