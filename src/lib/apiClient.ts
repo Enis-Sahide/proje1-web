@@ -55,7 +55,18 @@ export async function apiFetch<T = any>(path: string, opts: RequestInit = {}): P
   }
 
   const text = await res.text();
-  const data = text ? JSON.parse(text) : null;
+  let data: any = null;
+  if (text) {
+    try {
+      data = JSON.parse(text);
+    } catch {
+      if (!res.ok) {
+        throw new Error(`Sunucudan beklenmeyen bir yanıt alındı (${res.status}). Lütfen daha sonra tekrar deneyin.`);
+      }
+      throw new Error('Geçersiz sunucu yanıtı formatı.');
+    }
+  }
+
   if (!res.ok) {
     throw new Error((data && data.error) || `İstek başarısız (${res.status})`);
   }

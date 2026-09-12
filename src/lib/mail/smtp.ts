@@ -23,6 +23,13 @@ function getTransporter(): nodemailer.Transporter {
       user: user || '',
       pass: pass || '',
     },
+    connectionTimeout: 8000,
+    greetingTimeout: 8000,
+    socketTimeout: 8000,
+    tls: {
+      rejectUnauthorized: false,
+      servername: 'mail.7layers.tr',
+    },
   });
 
   return transporter;
