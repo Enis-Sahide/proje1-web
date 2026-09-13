@@ -121,13 +121,21 @@ function GuestCheckoutForm() {
     }
     if (pDate) setDateStr(pDate);
     if (pTime) setTimeStr(pTime);
-    if (pCity && pLat && pLon && pTz) {
+    if (pCity && pLat && pLon) {
       setCityKey({
         name: decodeURIComponent(pCity),
         lat: parseFloat(pLat),
         lon: parseFloat(pLon),
-        tz: pTz,
-        country: pCountry ? decodeURIComponent(pCountry) : ''
+        tz: pTz || 'Europe/Istanbul',
+        country: pCountry ? decodeURIComponent(pCountry) : 'Türkiye'
+      });
+    } else if (pCity) {
+      setCityKey({
+        name: decodeURIComponent(pCity),
+        lat: 41.0082,
+        lon: 28.9784,
+        tz: 'Europe/Istanbul',
+        country: pCountry ? decodeURIComponent(pCountry) : 'Türkiye'
       });
     }
   }, [searchParams]);
@@ -327,7 +335,11 @@ function GuestCheckoutForm() {
                 <label className="block text-[11px] font-semibold text-[#D4AF37] uppercase tracking-wider mb-1.5">
                   Doğum Şehri
                 </label>
-                <LocationAutocomplete onSelect={setCityKey} />
+                <LocationAutocomplete 
+                  onSelect={setCityKey} 
+                  defaultDisplay={cityKey?.name || ''} 
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#D4AF37] transition-colors"
+                />
               </div>
 
               {/* Fatura Profili */}

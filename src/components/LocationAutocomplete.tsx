@@ -17,6 +17,14 @@ export default function LocationAutocomplete({ onSelect, defaultDisplay = '', pl
   const [isLoading, setIsLoading] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
+  // defaultDisplay dışarıdan yüklendiğinde (örn. URL parametresinden veya state'ten) kutuyu otomatik doldur
+  useEffect(() => {
+    if (defaultDisplay && defaultDisplay !== query) {
+      setQuery(defaultDisplay);
+    }
+  }, [defaultDisplay]);
+
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (wrapperRef.current && !wrapperRef.current.contains(event.target as Node)) {
