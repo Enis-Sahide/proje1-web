@@ -199,3 +199,183 @@ function getChakraResonance(p1: string, p2: string): string {
   }
   return '7. Taç Çakrası (Sahasrara) - Kolektif Bilinç & Kozmik Uyum';
 }
+
+const SIGN_DATA: Record<string, { element: string; quality: string; theme: string; advice: string }> = {
+  'Koç': {
+    element: 'Ateş',
+    quality: 'Öncü',
+    theme: 'Cesaret, yeni başlangıçlar, sabırsızlık, bağımsızlık ve öncülük dürtüsü.',
+    advice: 'İnisiyatif alın, korkularınızın üzerine gidin ancak öfkeyle fevri köprüleri yakmamaya özen gösterin.'
+  },
+  'Boğa': {
+    element: 'Toprak',
+    quality: 'Sabit',
+    theme: 'Maddi güvenlik, kalıcılık, bedensel hazlar, sabır, değerler ve doğayla bağ.',
+    advice: 'Somut ve sağlam temeller atın, bütçenizi koruyun, acele etmeden adım adım ilerleyin.'
+  },
+  'İkizler': {
+    element: 'Hava',
+    quality: 'Değişken',
+    theme: 'Merak, çok yönlü iletişim, bilgi akışı, zihinsel hareketlilik ve sosyallik.',
+    advice: 'Yeni şeyler öğrenin, fikirlerinizi paylaşın; ancak zihinsel dağınıklığa ve dedikoduya kapılmayın.'
+  },
+  'Yengeç': {
+    element: 'Su',
+    quality: 'Öncü',
+    theme: 'Duygusal derinlik, aile, yuva, aidiyet, koruma içgüdüsü ve sezgisellik.',
+    advice: 'Sevdiklerinizi sarıp sarmalayın, iç sesinize kulak verin; geçmişin nostaljisine veya alınganlıklara takılıp kalmayın.'
+  },
+  'Aslan': {
+    element: 'Ateş',
+    quality: 'Sabit',
+    theme: 'Yaratıcılık, sahne, özgüven, liderlik, cömertlik ve yaşam sevinci.',
+    advice: 'Yeteneklerinizi cesurca sergileyin, kalbinizin sesini takip edin; kibir ve aşırı onay ihtiyacından kaçının.'
+  },
+  'Başak': {
+    element: 'Toprak',
+    quality: 'Değişken',
+    theme: 'Detaylar, düzen, pratik fayda, sağlık, hizmet bilinci ve mükemmeliyetçilik.',
+    advice: 'İşlerinizi organize edin, bedeninize ve beslenmenize özen gösterin; aşırı eleştirel olmaktan kaçının.'
+  },
+  'Terazi': {
+    element: 'Hava',
+    quality: 'Öncü',
+    theme: 'Denge, adalet, estetik, diplomasi, ikili ilişkiler ve uzlaşma arayışı.',
+    advice: 'İlişkilerinizde hakkaniyeti gözetin, zarif ve yapıcı olun; kararsızlık tuzağına düşmeyin.'
+  },
+  'Akrep': {
+    element: 'Su',
+    quality: 'Sabit',
+    theme: 'Derin dönüşüm, kriz yönetimi, sezgisel güç, tutku ve yüzleşmeler.',
+    advice: 'Korkularınızla yüzleşin, çürümüş olanı bırakın; takıntı ve intikam duygularından arının.'
+  },
+  'Yay': {
+    element: 'Ateş',
+    quality: 'Değişken',
+    theme: 'Yüksek vizyon, felsefe, uzak ufuklar, inanç, iyimserlik ve macera.',
+    advice: 'Ufkunuzu genişletin, yeni felsefeler keşfedin; aşırı fanatizm ve abartılı vaatlerden uzak durun.'
+  },
+  'Oğlak': {
+    element: 'Toprak',
+    quality: 'Öncü',
+    theme: 'Sorumluluk, disiplin, kariyer, uzun vadeli hedefler ve somut başarı.',
+    advice: 'Hedeflerinize sadık kalın, sabırla inşa edin; aşırı katılık ve karamsarlıktan sakının.'
+  },
+  'Kova': {
+    element: 'Hava',
+    quality: 'Sabit',
+    theme: 'Özgürlük, teknoloji, sıra dışı fikirler, kolektif idealler ve hümanizm.',
+    advice: 'Kalıpların dışına çıkın, toplumsal fayda üreten projelere katılın; duygusal olarak buz kesmeyin.'
+  },
+  'Balık': {
+    element: 'Su',
+    quality: 'Değişken',
+    theme: 'Koşulsuz sevgi, teslimiyet, ilham, rüyalar, maneviyat ve şifa.',
+    advice: 'Meditasyon ve sanatla ruhunuzu besleyin, akışa güvenin; kurban psikolojisine ve kaçışlara sapmayın.'
+  }
+};
+
+const PLANET_TRANSIT_THEMES: Record<string, { nature: string; focus: string; chakra: string }> = {
+  'Güneş': {
+    nature: 'Kozmik bilinç, yaşam enerjisi, canlılık ve kolektif odak noktası.',
+    focus: 'Güneş bu burçtan geçerken genel dikkat ve toplumun ana gündemi bu burcun nitelikleriyle aydınlanır.',
+    chakra: '3. Solar Pleksus (Manipura) - Benlik & İrade'
+  },
+  'Ay': {
+    nature: 'Kolektif duygulanım, anlık halk psikolojisi, sezgiler ve günlük ruh hali.',
+    focus: 'Ay bu burçtayken (yaklaşık 2.5 gün) duygusal tepkilerimiz ve içgüdüsel ihtiyaçlarımız bu burcun rengine bürünür.',
+    chakra: '4. Kalp Çakrası (Anahata) - Duygusal Denge'
+  },
+  'Merkür': {
+    nature: 'Zihinsel akış, iletişim dili, ticaret, haberleşme ve veri trafiği.',
+    focus: 'Merkür bu burçtayken kararlarımız, konuşma üslubumuz ve düşünce sistemimiz bu burcun filtreleriyle çalışır.',
+    chakra: '5. Boğaz Çakrası (Vishuddha) - İfade & Algı'
+  },
+  'Venüs': {
+    nature: 'İlişkiler, sevgi frekansı, estetik zevkler ve finansal değer algısı.',
+    focus: 'Venüs bu burçtayken insan ilişkilerinde aranan nitelikler ve para harcama eğilimleri bu burcun temasıyla şekillenir.',
+    chakra: '4. Kalp Çakrası (Anahata) - Sevgi & Değer'
+  },
+  'Mars': {
+    nature: 'Eylem gücü, cesaret, mücadele tarzı, libido ve fiziksel canlılık.',
+    focus: 'Mars bu burçtayken enerjimizi nasıl harcadığımız, hedeflere nasıl saldırdığımız ve çatışmaları nasıl yönettiğimiz belirlenir.',
+    chakra: '1. Kök & 3. Solar Pleksus - Harekete Geçiş'
+  },
+  'Jüpiter': {
+    nature: 'Büyüme, bereket, yüksek felsefe, şans ve inanç genişlemesi.',
+    focus: 'Jüpiter bu burçta kaldığı yaklaşık 1 yıl boyunca bu burcun temsil ettiği alanlarda kolektif büyüme ve fırsat pencereleri açar.',
+    chakra: '6. Üçüncü Göz (Ajna) - Vizyon & Bilgelik'
+  },
+  'Satürn': {
+    nature: 'Karmik sınavlar, olgunlaşma, zaman, sınırlar ve sistem inşası.',
+    focus: 'Satürn bu burçta kaldığı 2.5-3 yıl boyunca gevşek yapıları test eder, sorumluluk almayı öğretir ve kalıcı yapılar kurdurur.',
+    chakra: '1. Kök Çakra (Muladhara) - Disiplin & Sağlam Temel'
+  },
+  'Uranüs': {
+    nature: 'Ani uyanışlar, devrimler, teknolojik sıçramalar ve kalıp yıkıcı özgürlük.',
+    focus: 'Uranüs bu burçta kaldığı 7 yıl boyunca bu burcun tüm geleneksel kalıplarını şok dalgalarıyla sarsarak yeni çağa uyarlar.',
+    chakra: '5. Boğaz & 7. Taç - Deha & Özgürleşme'
+  },
+  'Neptün': {
+    nature: 'Ruhsal çözülme, ilahi aşk, sezgisel derinlik, sanat ve bazen yanılsamalar.',
+    focus: 'Neptün bu burçta kaldığı 14 yıl boyunca sınırları eritir, kolektif idealleri ve manevi arayışı bu burcun dilinden yükseltir.',
+    chakra: '6. Üçüncü Göz & 7. Taç - Mistik Birlik'
+  },
+  'Plüton': {
+    nature: 'Kökten dönüşüm, küllerinden doğuş, güç mücadeleleri ve kolektif krizler.',
+    focus: 'Plüton bu burçta kaldığı 15-20 yıl boyunca insanlık tarihinin temel paradigmalarını yıkarak baştan aşağı yeniden yapılandırır.',
+    chakra: '1. Kök & Kundalini - Atomik Yenilenme'
+  },
+  'Kiron': {
+    nature: 'Yaralı şifacı, ruhun en derin duyarlılığı ve bilgelik kapısı.',
+    focus: 'Kiron bu burçtayken kolektif hassasiyetlerimizi tetikleyerek yaralarımızdan şifa ve empati üretmemizi sağlar.',
+    chakra: '4. Kalp & 6. Üçüncü Göz - İçsel Şifa'
+  },
+  'Kuzey Ay Düğümü': {
+    nature: 'Ruhun kadersel tekamül rotası ve kolektifin gitmesi gereken evrimsel yön.',
+    focus: 'Ay Düğümü bu burçtayken insanlık bilincinin cesaretle adım atması ve öğrenmesi gereken yeni dersleri simgeler.',
+    chakra: '7. Taç Çakrası (Sahasrara) - Kadersel Akış'
+  }
+};
+
+export function getSkyPlanetSignInterpretation(
+  planetName: string,
+  signName: string,
+  degree: number,
+  minutes: number,
+  isRetrograde?: boolean
+): { title: string; content: string; extra?: string } {
+  const pInfo = PLANET_TRANSIT_THEMES[planetName] || {
+    nature: `${planetName} gezegeninin kozmik frekansı`,
+    focus: 'Gezegenin burç yerleşimi güncel enerjiyi etkiler.',
+    chakra: 'Kozmik Rezonans'
+  };
+
+  const sInfo = SIGN_DATA[signName] || {
+    element: 'Kozmik',
+    quality: 'Evrensel',
+    theme: `${signName} burcunun nitelikleri`,
+    advice: 'Dengede ve farkındalıkla kalın.'
+  };
+
+  const formattedPos = `${degree}° ${String(minutes).padStart(2, '0')}'`;
+  const retroTag = isRetrograde ? ' (Retro / Rx)' : '';
+  const title = `Transit ${planetName} ${signName} Burcunda ${formattedPos}${retroTag}`;
+
+  let retroSection = '';
+  if (isRetrograde) {
+    retroSection = `\n\n【Retro (Geri Hareket / Rx) Anlamı & Dersi】\n${planetName} şu anda gökyüzünde geri harekette (Rx) seyrediyor. Astrolojide gezegenlerin retro olması, o gezegenin temsil ettiği temaların dış dünyadan ziyade içsel dünyaya yönelmesi demektir. Bu süreçte:\n` +
+      `• Geçmişte tamamlanmamış konular, dersler veya yüzleşmeler tekrar önünüze gelebilir.\n` +
+      `• Dışarıda agresif yeni adımlar atmak yerine, mevcut durumu gözden geçirmek, tamir etmek, yeniden planlamak ve içsel muhasebe yapmak çok daha hayırlıdır.\n` +
+      `• Acele kararlar vermeyin; gecikmeler birer ceza değil, rotanızı doğru ayarlamanız için evrenin tanıdığı birer nefes alma molasıdır.`;
+  }
+
+  const content = `【Gezegen Doğası & Anlık Konum】\n${planetName}, astrolojide ${pInfo.nature} temsil eder. Şu anda ${signName} burcunun ${formattedPos} derecesinde seyrediyor.\n\n` +
+    `【Kolektif & Küresel Etki】\n${pInfo.focus}\n${signName} burcunun ${sInfo.element} elementi ve ${sInfo.quality} niteliğiyle birleştiğinde; toplumda ve dünyada ${sInfo.theme} temaları çok güçlü bir şekilde ön plana çıkar.\n\n` +
+    `【Bireysel Tavsiye & Kozmik Rehberlik】\n✓ ${sInfo.advice}\nBu enerjiyi günlük hayatınızda yapıcı kullanmak için ${signName} burcunun yüksek frekansını benimseyin, gölge yönlerinden uzak durun.${retroSection}`;
+
+  const extra = `${sInfo.element} Elementi • ${sInfo.quality} Nitelik • Çakra: ${pInfo.chakra}`;
+
+  return { title, content, extra };
+}
+

@@ -20,6 +20,7 @@ import {
   Info
 } from 'lucide-react';
 import { getTransitHouseInterpretation, getTransitAspectInterpretation } from '@/features/astrology/engine/TransitInterpretations';
+import { getSkyPlanetSignInterpretation } from '@/features/astrology/engine/SkyAspectInterpretations';
 import { AstroCity, TransitChartData, AstroPoint, AstroAspect } from '@/features/astrology/engine/AstrologyConstants';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { useAuth } from '@/context/AuthContext';
@@ -532,6 +533,16 @@ export default function TransitsPage() {
                             });
                           }
                         }}
+                        onSelectPlanet={(planet) => {
+                          const interp = getSkyPlanetSignInterpretation(
+                            planet.name,
+                            planet.sign,
+                            planet.degreeInSign,
+                            planet.minutes,
+                            planet.isRetrograde
+                          );
+                          setSelectedInterp(interp);
+                        }}
                       />
                     </div>
 
@@ -639,39 +650,67 @@ export default function TransitsPage() {
 
                   {/* Anlık Gezegen Burç Yerleşimleri Tablosu */}
                   <div className="bg-black/50 backdrop-blur-md border border-white/10 p-6 rounded-3xl shadow-2xl">
-                    <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
-                      <Layers className="text-[#38BDF8]" size={18} />
-                      Anlık Gökyüzü Gezegen Yerleşimleri
-                    </h3>
-                    <p className="text-xs text-mystic-text-muted mb-4">
-                      Gezegenlerin şu anda hangi burç ve derecede seyrettiği ve retro (geri hareket) durumları
-                    </p>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
+                      <div>
+                        <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                          <Layers className="text-[#38BDF8]" size={18} />
+                          Anlık Gökyüzü Gezegen Yerleşimleri
+                        </h3>
+                        <p className="text-xs text-mystic-text-muted">
+                          Gezegenlerin şu anda hangi burç ve derecede seyrettiği ve retro (geri hareket) durumları
+                        </p>
+                      </div>
+                      <span className="text-[11px] text-[#0EA5E9] bg-[#0EA5E9]/10 px-3 py-1 rounded-full border border-[#0EA5E9]/20 w-fit">
+                        💡 Detaylı kozmik analiz için gezegen kartına tıklayın
+                      </span>
+                    </div>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5">
                       {skyChartData.planets
                         .filter(p => ['Güneş', 'Ay', 'Merkür', 'Venüs', 'Mars', 'Jüpiter', 'Satürn', 'Uranüs', 'Neptün', 'Plüton', 'Kiron', 'Kuzey Ay Düğümü'].includes(p.name))
                         .map((p, idx) => (
                           <div 
                             key={`sky-pl-${idx}`}
-                            className="bg-white/5 border border-white/5 rounded-xl p-3 flex flex-col gap-1 hover:border-white/20 transition-colors"
+                            onClick={() => {
+                              const interp = getSkyPlanetSignInterpretation(
+                                p.name,
+                                p.sign,
+                                p.degreeInSign,
+                                p.minutes,
+                                p.isRetrograde
+                              );
+                              setSelectedInterp(interp);
+                            }}
+                            className="bg-white/5 border border-white/5 hover:border-[#0EA5E9]/50 hover:bg-white/10 hover:scale-[1.02] rounded-2xl p-3.5 flex flex-col justify-between transition-all cursor-pointer group shadow-sm relative overflow-hidden"
                           >
-                            <div className="flex items-center justify-between">
-                              <span className="text-base text-[#0EA5E9] font-bold">{PLANET_SYMBOLS[p.name] || ''}</span>
-                              <span className="text-xs font-bold text-white truncate">{p.name}</span>
+                            <div>
+                              <div className="flex items-center justify-between">
+                                <span className="text-lg text-[#0EA5E9] font-bold group-hover:scale-110 transition-transform">
+                                  {PLANET_SYMBOLS[p.name] || ''}
+                                </span>
+                                <span className="text-xs font-bold text-white truncate group-hover:text-[#0EA5E9] transition-colors">
+                                  {p.name}
+                                </span>
+                              </div>
+                              <div className="flex items-baseline justify-between mt-2">
+                                <span className="text-xs font-bold" style={{ color: ZODIAC_COLORS[p.sign] }}>
+                                  {p.sign}
+                                </span>
+                                <span className="text-[11px] text-gray-300 font-mono">
+                                  {p.degreeInSign}°{String(p.minutes).padStart(2, '0')}'
+                                </span>
+                              </div>
+                              {p.isRetrograde && (
+                                <span className="text-[10px] text-red-400 font-bold bg-red-500/10 px-1.5 py-0.5 rounded w-fit mt-1.5 block">
+                                  Rx (Retro)
+                                </span>
+                              )}
                             </div>
-                            <div className="flex items-baseline justify-between mt-1">
-                              <span className="text-xs font-bold" style={{ color: ZODIAC_COLORS[p.sign] }}>
-                                {p.sign}
-                              </span>
-                              <span className="text-[11px] text-gray-300">
-                                {p.degreeInSign}°{String(p.minutes).padStart(2, '0')}'
-                              </span>
+
+                            <div className="flex items-center justify-between mt-2.5 pt-1.5 border-t border-white/5 text-[10px] text-gray-400 group-hover:text-[#38BDF8] transition-colors">
+                              <span>Analizi Oku</span>
+                              <ChevronRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
                             </div>
-                            {p.isRetrograde && (
-                              <span className="text-[10px] text-red-400 font-bold bg-red-500/10 px-1.5 py-0.5 rounded w-fit mt-1">
-                                Rx (Retro)
-                              </span>
-                            )}
                           </div>
                         ))}
                     </div>
