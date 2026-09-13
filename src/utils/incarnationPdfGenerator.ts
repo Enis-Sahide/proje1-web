@@ -19,7 +19,7 @@ const drawTextWithBold = (
   x: number,
   y: number,
   maxWidth: number,
-  lineHeight: number = 7.8
+  lineHeight: number = 7.5
 ): number => {
   let curX = x;
   let curY = y;
@@ -148,7 +148,7 @@ export const downloadIncarnationPDF = async (
   // ================= PAGE 1 =================
   drawHeader();
 
-  // Big Title (Mobile friendly 24pt)
+  // Big Title
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(24);
   doc.setTextColor(...gold);
@@ -176,26 +176,30 @@ export const downloadIncarnationPDF = async (
   doc.setTextColor(...white);
   doc.text(`Tarih: ${birthInfo.localDate}   |   Saat: ${birthInfo.localTime}   |   Konum: ${birthInfo.cityName}, ${birthInfo.country}`, 22, 66);
 
-  // Soul Maturity Summary Banner
+  // Soul Maturity Summary Banner (Dynamic Height)
+  doc.setFont('LiberationSans', 'normal');
+  doc.setFontSize(11.5);
+  const mLines = doc.splitTextToSize(data.soulMaturity.description, 166);
+  const bannerHeight = 18 + (mLines.length * 6) + 4;
+
   doc.setFillColor(28, 36, 60);
-  doc.roundedRect(15, 80, 180, 42, 3, 3, 'F');
+  doc.roundedRect(15, 80, 180, bannerHeight, 3, 3, 'F');
   doc.setDrawColor(...gold);
   doc.setLineWidth(0.6);
-  doc.roundedRect(15, 80, 180, 42, 3, 3, 'D');
+  doc.roundedRect(15, 80, 180, bannerHeight, 3, 3, 'D');
 
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(13.5);
   doc.setTextColor(...gold);
-  doc.text(`RUHSAL OLGUNLUK SEVİYESİ: ${data.soulMaturity.tier.toUpperCase()} (${data.soulMaturity.score}/100)`, 22, 92);
+  doc.text(`RUHSAL OLGUNLUK SEVİYESİ: ${data.soulMaturity.tier.toUpperCase()} (${data.soulMaturity.score}/100)`, 22, 90);
 
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(11.5);
   doc.setTextColor(...white);
-  const mLines = doc.splitTextToSize(data.soulMaturity.description, 166);
-  doc.text(mLines, 22, 102);
+  doc.text(mLines, 22, 98);
 
   // SECTION 1: ÖNCEKİ ENKARNASYON & GAD
-  curY = 136;
+  curY = 80 + bannerHeight + 14;
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(19);
   doc.setTextColor(...gold);
@@ -222,16 +226,16 @@ export const downloadIncarnationPDF = async (
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(13.5);
   doc.setTextColor(...white);
-  curY = drawTextWithBold(doc, `**Önceki Yaşam Rolü:** ${data.gad.info.pastLifeRole}`, 15, curY, 180, 7.8);
+  curY = drawTextWithBold(doc, `**Önceki Yaşam Rolü:** ${data.gad.info.pastLifeRole}`, 15, curY, 180, 7.5);
 
   curY += 4;
-  curY = drawTextWithBold(doc, `**Konfor Alanı & Karmik Tuzak:** ${data.gad.info.comfortZoneTrap}`, 15, curY, 180, 7.8);
+  curY = drawTextWithBold(doc, `**Konfor Alanı & Karmik Tuzak:** ${data.gad.info.comfortZoneTrap}`, 15, curY, 180, 7.5);
 
   curY += 4;
-  curY = drawTextWithBold(doc, `**Geçmişten Taşınan Ruhsal Yetenek:** ${data.gad.info.karmicGift}`, 15, curY, 180, 7.8);
+  curY = drawTextWithBold(doc, `**Geçmişten Taşınan Ruhsal Yetenek:** ${data.gad.info.karmicGift}`, 15, curY, 180, 7.5);
 
   curY += 4;
-  curY = drawTextWithBold(doc, `**Karmik Cetvel (GAD Yöneticisi):** ${data.gad.karmicRuler.name} (${data.gad.karmicRuler.sign}, ${data.gad.karmicRuler.house}. Ev) - ${data.gad.karmicRuler.summary}`, 15, curY, 180, 7.8);
+  curY = drawTextWithBold(doc, `**Karmik Cetvel (GAD Yöneticisi):** ${data.gad.karmicRuler.name} (${data.gad.karmicRuler.sign}, ${data.gad.karmicRuler.house}. Ev) - ${data.gad.karmicRuler.summary}`, 15, curY, 180, 7.5);
 
   // ================= PAGE 2 =================
   doc.addPage();
@@ -259,13 +263,13 @@ export const downloadIncarnationPDF = async (
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(13.5);
   doc.setTextColor(...white);
-  curY = drawTextWithBold(doc, `**Son Nefes ve Kapanış Hissi:** ${data.twelfthHouse.lastBreathAtmosphere}`, 15, curY, 180, 7.8);
+  curY = drawTextWithBold(doc, `**Son Nefes ve Kapanış Hissi:** ${data.twelfthHouse.lastBreathAtmosphere}`, 15, curY, 180, 7.5);
 
   curY += 4;
-  curY = drawTextWithBold(doc, `**Bilinçaltı Koruma Armağanı:** ${data.twelfthHouse.subconsciousGift}`, 15, curY, 180, 7.8);
+  curY = drawTextWithBold(doc, `**Bilinçaltı Koruma Armağanı:** ${data.twelfthHouse.subconsciousGift}`, 15, curY, 180, 7.5);
 
   curY += 4;
-  curY = drawTextWithBold(doc, `**Gizli Karmik Korku:** ${data.twelfthHouse.hiddenFear}`, 15, curY, 180, 7.8);
+  curY = drawTextWithBold(doc, `**Gizli Karmik Korku:** ${data.twelfthHouse.hiddenFear}`, 15, curY, 180, 7.5);
 
   if (data.twelfthHouse.planetsIn12th.length > 0) {
     curY += 4;
@@ -279,7 +283,7 @@ export const downloadIncarnationPDF = async (
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(13);
       doc.setTextColor(...white);
-      curY = drawTextWithBold(doc, `• **${p.name} (${p.sign}):** ${p.meaning}`, 18, curY, 177, 7.5);
+      curY = drawTextWithBold(doc, `• **${p.name} (${p.sign}):** ${p.meaning}`, 18, curY, 177, 7.2);
       curY += 3;
     });
   }
@@ -308,29 +312,49 @@ export const downloadIncarnationPDF = async (
     curY += 20;
   } else {
     data.retroDebts.forEach(debt => {
-      ensureSpace(42);
+      // Split each text line to fit within card width (168mm)
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(11.5);
+      const pastLifeLines = doc.splitTextToSize(`Geçmiş Yaşam Nedeni: ${debt.pastLifeCause}`, 168);
+      const currentKarmaLines = doc.splitTextToSize(`Bu Yaşamdaki Borç: ${debt.currentLifeKarma}`, 168);
+      doc.setFont('LiberationSans', 'bold');
+      const dharmaLines = doc.splitTextToSize(`Dharma Reçetesi: ${debt.dharmaRemedy}`, 168);
 
+      const lineHeight = 5.6;
+      const totalTextLinesCount = pastLifeLines.length + currentKarmaLines.length + dharmaLines.length;
+      // title(8mm) + lines + padding
+      const cardHeight = 16 + (totalTextLinesCount * lineHeight) + 6;
+
+      ensureSpace(cardHeight + 6);
+
+      // Card Background & Border
       doc.setFillColor(...cardDark);
-      doc.roundedRect(15, curY - 2, 180, 36, 3, 3, 'F');
+      doc.roundedRect(15, curY, 180, cardHeight, 3, 3, 'F');
       doc.setDrawColor(230, 90, 90);
       doc.setLineWidth(0.5);
-      doc.roundedRect(15, curY - 2, 180, 36, 3, 3, 'D');
+      doc.roundedRect(15, curY, 180, cardHeight, 3, 3, 'D');
 
+      let textY = curY + 8;
       doc.setFont('LiberationSans', 'bold');
       doc.setFontSize(13.5);
       doc.setTextColor(...gold);
-      doc.text(`${debt.planet} Rx: ${debt.title}`, 20, curY + 6);
+      doc.text(`${debt.planet} Rx: ${debt.title}`, 20, textY);
+      textY += 7;
 
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(11.5);
       doc.setTextColor(...white);
-      doc.text(`Geçmiş Yaşam Nedeni: ${debt.pastLifeCause}`, 20, curY + 14);
-      doc.text(`Bu Yaşamdaki Borç: ${debt.currentLifeKarma}`, 20, curY + 21);
+      doc.text(pastLifeLines, 20, textY);
+      textY += pastLifeLines.length * lineHeight + 2;
+
+      doc.text(currentKarmaLines, 20, textY);
+      textY += currentKarmaLines.length * lineHeight + 2;
+
       doc.setFont('LiberationSans', 'bold');
       doc.setTextColor(110, 230, 160);
-      doc.text(`Dharma Reçetesi: ${debt.dharmaRemedy}`, 20, curY + 29);
+      doc.text(dharmaLines, 20, textY);
 
-      curY += 42;
+      curY += cardHeight + 6;
     });
   }
 
@@ -347,13 +371,13 @@ export const downloadIncarnationPDF = async (
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(13.5);
     doc.setTextColor(...white);
-    curY = drawTextWithBold(doc, `**Ruh Yarası:** ${data.chiron.wound.woundDescription}`, 15, curY, 180, 7.8);
+    curY = drawTextWithBold(doc, `**Ruh Yarası:** ${data.chiron.wound.woundDescription}`, 15, curY, 180, 7.5);
 
     curY += 4;
-    curY = drawTextWithBold(doc, `**Şifa Armağanı:** ${data.chiron.wound.healingGift}`, 15, curY, 180, 7.8);
+    curY = drawTextWithBold(doc, `**Şifa Armağanı:** ${data.chiron.wound.healingGift}`, 15, curY, 180, 7.5);
 
     curY += 4;
-    curY = drawTextWithBold(doc, `**Dönüşüm Anahtarı:** ${data.chiron.wound.soulRemedy}`, 15, curY, 180, 7.8);
+    curY = drawTextWithBold(doc, `**Dönüşüm Anahtarı:** ${data.chiron.wound.soulRemedy}`, 15, curY, 180, 7.5);
   }
 
   // ================= PAGE 4: DRACONIC CARDS =================
@@ -380,40 +404,45 @@ export const downloadIncarnationPDF = async (
 
   curY += 6;
 
-  // Render Draconic comparisons as large mobile-friendly cards
+  // Render Draconic comparisons with dynamic card height & word wrap
   data.draconicComparison.forEach(comp => {
-    ensureSpace(48);
+    doc.setFont('LiberationSans', 'normal');
+    doc.setFontSize(11.5);
+    const textLines = doc.splitTextToSize(comp.spiritualMeaning, 166);
+    const lineHeight = 5.8;
+    const cardHeight = 24 + (textLines.length * lineHeight) + 4;
+
+    ensureSpace(cardHeight + 6);
 
     doc.setFillColor(...cardDark);
-    doc.roundedRect(15, curY, 180, 44, 3, 3, 'F');
+    doc.roundedRect(15, curY, 180, cardHeight, 3, 3, 'F');
     doc.setDrawColor(...gold);
     doc.setLineWidth(0.4);
-    doc.roundedRect(15, curY, 180, 44, 3, 3, 'D');
+    doc.roundedRect(15, curY, 180, cardHeight, 3, 3, 'D');
 
     // Card Header
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(13.5);
     doc.setTextColor(...gold);
-    doc.text(comp.pointName, 22, curY + 9);
+    doc.text(comp.pointName, 22, curY + 8);
 
     // Tropical vs Draconic badges
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(12);
     doc.setTextColor(...white);
-    doc.text(`Dünyevi (Tropikal): ${comp.tropicalSign} (${comp.tropicalDegree}°)`, 22, curY + 18);
+    doc.text(`Dünyevi (Tropikal): ${comp.tropicalSign} (${comp.tropicalDegree}°)`, 22, curY + 16);
 
     doc.setFont('LiberationSans', 'bold');
     doc.setTextColor(255, 215, 0);
-    doc.text(`Ruhsal (Drakonik): ${comp.draconicSign} (${comp.draconicDegree}°)`, 105, curY + 18);
+    doc.text(`Ruhsal (Drakonik): ${comp.draconicSign} (${comp.draconicDegree}°)`, 105, curY + 16);
 
-    // Spiritual meaning
+    // Spiritual meaning (auto multi-line)
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(11.5);
     doc.setTextColor(...white);
-    const textLines = doc.splitTextToSize(comp.spiritualMeaning, 166);
-    doc.text(textLines, 22, curY + 26);
+    doc.text(textLines, 22, curY + 24);
 
-    curY += 50;
+    curY += cardHeight + 6;
   });
 
   // ================= PAGE 5: DHARMA & NEXT LIFE =================
@@ -441,13 +470,13 @@ export const downloadIncarnationPDF = async (
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(13.5);
   doc.setTextColor(...white);
-  curY = drawTextWithBold(doc, `**Bu Yaşamdaki Nihai Tekâmül Hedefi:** ${data.kad.seed.evolutionGoal}`, 15, curY, 180, 7.8);
+  curY = drawTextWithBold(doc, `**Bu Yaşamdaki Nihai Tekâmül Hedefi:** ${data.kad.seed.evolutionGoal}`, 15, curY, 180, 7.5);
 
   curY += 5;
-  curY = drawTextWithBold(doc, `**Gelecek Enkarnasyon Potansiyeli:** ${data.kad.seed.nextIncarnationPotential}`, 15, curY, 180, 7.8);
+  curY = drawTextWithBold(doc, `**Gelecek Enkarnasyon Potansiyeli:** ${data.kad.seed.nextIncarnationPotential}`, 15, curY, 180, 7.5);
 
   curY += 5;
-  curY = drawTextWithBold(doc, `**Kutsal Ruhsal Pratik:** ${data.kad.seed.sacredPractice}`, 15, curY, 180, 7.8);
+  curY = drawTextWithBold(doc, `**Kutsal Ruhsal Pratik:** ${data.kad.seed.sacredPractice}`, 15, curY, 180, 7.5);
 
   curY += 10;
   doc.setFont('LiberationSans', 'bold');
@@ -459,7 +488,7 @@ export const downloadIncarnationPDF = async (
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(13.5);
   doc.setTextColor(...white);
-  curY = drawTextWithBold(doc, data.eighthHouse.transformationGateway, 15, curY, 180, 7.8);
+  curY = drawTextWithBold(doc, data.eighthHouse.transformationGateway, 15, curY, 180, 7.5);
 
   // Bottom Notice
   curY += 12;
