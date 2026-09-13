@@ -47,6 +47,14 @@ export default function AnalysisPage() {
       link: '/analysis/kabbalah'
     },
     {
+      id: 'frekans-aynasi',
+      title: 'Frekans Aynası (Canlı)',
+      description: 'Günün gökyüzü transit sınavı karşısında 4 alemden (Madde, Duygu, Zihin, Kudret) hangi haritanızı çalıştırdığınızı anlık teşhis edin.',
+      icon: <Sparkles size={32} />,
+      color: '#0EA5E9',
+      link: '/analysis/frekans-aynasi'
+    },
+    {
       id: 'astrology',
       title: 'Doğum Haritası',
       description: 'Gezegenlerin doğum anınızdaki konumlarıyla ruhunuzun şifresini çözün.',

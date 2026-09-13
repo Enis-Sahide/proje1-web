@@ -409,6 +409,32 @@ export default function TransitsPage() {
           </div>
         </div>
 
+        {/* Frekans Aynası Mini Banner */}
+        <div className="max-w-4xl mx-auto mb-8 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#0EA5E9]/15 via-[#6A0DAD]/15 to-[#D4AF37]/15 border border-[#0EA5E9]/30 backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg">
+          <div className="flex items-center gap-3 text-center sm:text-left">
+            <div className="p-2 rounded-xl bg-[#0EA5E9]/20 text-[#0EA5E9] shrink-0 hidden sm:block">
+              <Sparkles size={18} />
+            </div>
+            <div>
+              <div className="flex items-center justify-center sm:justify-start gap-2">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#0EA5E9]/20 text-[#0EA5E9]">Frekans Aynası</span>
+                <span className="text-xs text-white/70">Bugün Hangi Haritanızı Çalıştırıyorsunuz?</span>
+              </div>
+              <p className="text-xs sm:text-sm font-semibold text-white mt-0.5">
+                Canlı gökyüzü transitlerinin haritanızı hangi temada sınadığını ve 4 alemdeki tutumunuzu teşhis edin.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => router.push('/analysis/frekans-aynasi')}
+            className="shrink-0 flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8] hover:from-[#38BDF8] hover:to-[#0EA5E9] text-black font-bold text-xs rounded-xl transition-all shadow-md cursor-pointer"
+          >
+            <span>Frekansınızı Teşhis Edin</span>
+            <ChevronRight size={14} />
+          </button>
+        </div>
+
         {error && (
           <div className="bg-red-500/10 border border-red-500/50 text-red-200 p-4 rounded-xl mb-6 flex items-center gap-3">
             <AlertCircle size={20} />
