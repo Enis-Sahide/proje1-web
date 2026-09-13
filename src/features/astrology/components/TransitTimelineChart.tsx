@@ -411,7 +411,7 @@ export default function TransitTimelineChart({
                               style={{
                                 left: `${Math.max(8, Math.min(widthPercent - 8, ((peakPercent - leftPercent) / widthPercent) * 100))}%`
                               }}
-                              title={`Zirve (0° Partil): ${item.peakDate}`}
+                              title={`Zirve (0° Partil): ${item.peakDate}${item.peakTime ? ` • Saat: ${item.peakTime}` : ''}`}
                             >
                               <span className="w-1.5 h-1.5 rounded-full bg-black"></span>
                             </div>
@@ -488,27 +488,54 @@ export default function TransitTimelineChart({
               </button>
             </div>
 
-            {/* Key Dates Badge Box with Historical Accuracy */}
+            {/* Key Dates Badge Box with Historical Accuracy & Hourly Precision */}
             <div className="grid grid-cols-3 gap-3 bg-black/50 p-4 rounded-2xl border border-white/5 mb-5 text-center">
               <div>
                 <span className="text-[10px] text-mystic-text-muted block uppercase tracking-wider mb-0.5">Başlangıç</span>
-                <span className="text-xs font-bold text-gray-200 block">{selectedItem.startDate}</span>
-                {selectedItem.isStartedInPast && (
+                <span className="text-xs font-bold text-gray-200 block">
+                  {selectedItem.startDate}
+                  {selectedItem.startTime && (
+                    <span className="text-[10px] text-gray-400 font-mono block sm:inline sm:ml-1 font-normal">
+                      ({selectedItem.startTime})
+                    </span>
+                  )}
+                </span>
+                {selectedItem.isStartedInPast ? (
                   <span className="text-[9px] text-amber-400 font-semibold block mt-0.5">Geçmişte başladı</span>
+                ) : selectedItem.startDate === new Date().toISOString().split('T')[0] ? (
+                  <span className="text-[9px] text-emerald-400 font-semibold block mt-0.5">
+                    Bugün {selectedItem.startTime ? `${selectedItem.startTime}'te ` : ''}başladı
+                  </span>
+                ) : (
+                  <span className="text-[9px] text-sky-400 font-semibold block mt-0.5">Başlaması bekleniyor</span>
                 )}
               </div>
               <div className="border-x border-white/10">
                 <span className="text-[10px] text-mystic-primary font-extrabold block uppercase tracking-wider flex items-center justify-center gap-1 mb-0.5">
                   <Sparkles size={10} /> Zirve (0°)
                 </span>
-                <span className="text-xs font-black text-[#D4AF37] block">{selectedItem.peakDate}</span>
+                <span className="text-xs font-black text-[#D4AF37] block">
+                  {selectedItem.peakDate}
+                  {selectedItem.peakTime && (
+                    <span className="text-[11px] text-amber-200/90 font-mono block sm:inline sm:ml-1 font-bold">
+                      • {selectedItem.peakTime}
+                    </span>
+                  )}
+                </span>
                 <span className={`text-[9px] font-semibold block mt-0.5 ${selectedItem.isPeakInPast ? 'text-sky-400' : 'text-emerald-400'}`}>
                   {selectedItem.isPeakInPast ? 'Zirvesi tamamlandı' : 'Zirve bekleniyor'}
                 </span>
               </div>
               <div>
                 <span className="text-[10px] text-mystic-text-muted block uppercase tracking-wider mb-0.5">Bitiş</span>
-                <span className="text-xs font-bold text-gray-200 block">{selectedItem.endDate}</span>
+                <span className="text-xs font-bold text-gray-200 block">
+                  {selectedItem.endDate}
+                  {selectedItem.endTime && (
+                    <span className="text-[10px] text-gray-400 font-mono block sm:inline sm:ml-1 font-normal">
+                      ({selectedItem.endTime})
+                    </span>
+                  )}
+                </span>
                 <span className="text-[9px] text-mystic-text-muted block mt-0.5">Toplam {selectedItem.durationDays} gün</span>
               </div>
             </div>

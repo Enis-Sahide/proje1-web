@@ -10,8 +10,11 @@ export interface TransitTimelineItem {
   type: 'Kavuşum' | 'Karşıt' | 'Kare' | 'Üçgen' | 'Sekstil';
   isHarmonious: boolean;
   startDate: string; // YYYY-MM-DD
+  startTime?: string; // HH:mm (e.g. "08:15")
   peakDate: string;  // YYYY-MM-DD
+  peakTime?: string; // HH:mm (e.g. "18:25")
   endDate: string;    // YYYY-MM-DD
+  endTime?: string;   // HH:mm (e.g. "21:45")
   minOrb: number;
   category: 'Kadersel' | 'Kişisel';
   title: string;
@@ -175,6 +178,223 @@ const PLANET_LOOKAHEAD_DAYS: Record<string, number> = {
   'Merkür': 30,
 };
 
+export const FAST_PLANETS = new Set(['Güneş', 'Ay', 'Merkür', 'Venüs', 'Mars']);
+
+/**
+ * Adaptive orb calculation:
+ * For fast/personal planets (Güneş, Ay, Merkür, Venüs, Mars), expands the approaching orb (4.0° - 4.5°)
+ * so daily influence is felt 3-4 days in advance as in classical astrology.
+ * For slow/outer planets, keeps 2.5° - 3.0° to maintain clarity and avoid overly long intervals.
+ */
+export function getMaxOrb(planet1: string, planet2: string, aspectName: string): number {
+  const isFastInvolved = FAST_PLANETS.has(planet1) || FAST_PLANETS.has(planet2);
+
+  if (isFastInvolved) {
+    switch (aspectName) {
+      case 'Kavuşum':
+        return 4.5;
+      case 'Karşıt':
+      case 'Kare':
+      case 'Üçgen':
+        return 4.0;
+      case 'Sekstil':
+        return 3.5;
+      default:
+        return 4.0;
+    }
+  }
+
+  switch (aspectName) {
+    case 'Kavuşum':
+    case 'Karşıt':
+    case 'Kare':
+    case 'Üçgen':
+      return 3.0;
+    case 'Sekstil':
+      return 2.5;
+    default:
+      return 3.0;
+  }
+}
+
+interface RefinedTiming {
+  startDateStr: string;
+  startTimeStr?: string;
+  peakDateStr: string;
+  peakTimeStr?: string;
+  endDateStr: string;
+  endTimeStr?: string;
+  exactMinOrb: number;
+}
+
+/**
+ * Executes high-precision hourly and 5-minute interpolation around start, peak, and end dates.
+ * Discovers the exact 0°00' peak minute and time of entry/exit into the aspect orb.
+ */
+function executeTimingRefinement(
+  getOrbAtUtc: (utcDate: Date) => number,
+  maxOrb: number,
+  rawStart: Date,
+  rawPeak: Date,
+  rawEnd: Date,
+  rawMinOrb: number,
+  tzOffsetHours = 3
+): RefinedTiming {
+  // 1. Refine Peak Time (finding absolute minimum orb / exact 0° partil)
+  let bestPeakUtc = new Date(rawPeak.getTime());
+  let bestOrb = rawMinOrb;
+
+  // Scan +/- 36 hours around rawPeak in 1-hour steps
+  const peakStartMs = rawPeak.getTime() - 36 * 3600 * 1000;
+  for (let hour = 0; hour <= 72; hour++) {
+    const testDate = new Date(peakStartMs + hour * 3600 * 1000);
+    const orb = getOrbAtUtc(testDate);
+    if (orb < bestOrb) {
+      bestOrb = orb;
+      bestPeakUtc = testDate;
+    }
+  }
+
+  // Refine in 5-minute steps around bestPeakUtc (+/- 45 minutes)
+  const finePeakMs = bestPeakUtc.getTime() - 45 * 60 * 1000;
+  for (let step = 0; step <= 18; step++) {
+    const testDate = new Date(finePeakMs + step * 5 * 60 * 1000);
+    const orb = getOrbAtUtc(testDate);
+    if (orb < bestOrb) {
+      bestOrb = orb;
+      bestPeakUtc = testDate;
+    }
+  }
+
+  const localPeak = new Date(bestPeakUtc.getTime() + tzOffsetHours * 3600 * 1000);
+  const peakDateStr = `${localPeak.getUTCFullYear()}-${String(localPeak.getUTCMonth() + 1).padStart(2, '0')}-${String(localPeak.getUTCDate()).padStart(2, '0')}`;
+  const peakTimeStr = `${String(localPeak.getUTCHours()).padStart(2, '0')}:${String(localPeak.getUTCMinutes()).padStart(2, '0')}`;
+
+  // 2. Refine Start Time (crossing into <= maxOrb)
+  let bestStartUtc: Date | null = null;
+  const startScanMs = rawStart.getTime() - 36 * 3600 * 1000;
+  for (let hour = 0; hour <= 72; hour++) {
+    const testDate = new Date(startScanMs + hour * 3600 * 1000);
+    const orb = getOrbAtUtc(testDate);
+    if (orb <= maxOrb) {
+      bestStartUtc = testDate;
+      // Step backward in 5-minute increments up to 60 mins to find first minute inside orb
+      for (let minStep = 1; minStep <= 12; minStep++) {
+        const subDate = new Date(testDate.getTime() - minStep * 5 * 60 * 1000);
+        if (getOrbAtUtc(subDate) <= maxOrb) {
+          bestStartUtc = subDate;
+        } else {
+          break;
+        }
+      }
+      break;
+    }
+  }
+
+  let startDateStr = formatDate(rawStart);
+  let startTimeStr: string | undefined = undefined;
+  if (bestStartUtc) {
+    const localStart = new Date(bestStartUtc.getTime() + tzOffsetHours * 3600 * 1000);
+    startDateStr = `${localStart.getUTCFullYear()}-${String(localStart.getUTCMonth() + 1).padStart(2, '0')}-${String(localStart.getUTCDate()).padStart(2, '0')}`;
+    startTimeStr = `${String(localStart.getUTCHours()).padStart(2, '0')}:${String(localStart.getUTCMinutes()).padStart(2, '0')}`;
+  }
+
+  // 3. Refine End Time (crossing out of <= maxOrb)
+  let bestEndUtc: Date | null = null;
+  const endScanMs = rawEnd.getTime() - 36 * 3600 * 1000;
+  let wasInside = false;
+  for (let hour = 0; hour <= 72; hour++) {
+    const testDate = new Date(endScanMs + hour * 3600 * 1000);
+    const orb = getOrbAtUtc(testDate);
+    if (orb <= maxOrb) {
+      wasInside = true;
+      bestEndUtc = testDate;
+    } else if (wasInside && orb > maxOrb) {
+      const startSub = testDate.getTime() - 60 * 60 * 1000;
+      for (let minStep = 1; minStep <= 12; minStep++) {
+        const subDate = new Date(startSub + minStep * 5 * 60 * 1000);
+        if (getOrbAtUtc(subDate) <= maxOrb) {
+          bestEndUtc = subDate;
+        } else {
+          break;
+        }
+      }
+      break;
+    }
+  }
+
+  let endDateStr = formatDate(rawEnd);
+  let endTimeStr: string | undefined = undefined;
+  if (bestEndUtc) {
+    const localEnd = new Date(bestEndUtc.getTime() + tzOffsetHours * 3600 * 1000);
+    endDateStr = `${localEnd.getUTCFullYear()}-${String(localEnd.getUTCMonth() + 1).padStart(2, '0')}-${String(localEnd.getUTCDate()).padStart(2, '0')}`;
+    endTimeStr = `${String(localEnd.getUTCHours()).padStart(2, '0')}:${String(localEnd.getUTCMinutes()).padStart(2, '0')}`;
+  }
+
+  return {
+    startDateStr,
+    startTimeStr,
+    peakDateStr,
+    peakTimeStr,
+    endDateStr,
+    endTimeStr,
+    exactMinOrb: Number(bestOrb.toFixed(2))
+  };
+}
+
+function refineNatalAspectTiming(
+  swe: any,
+  flags: number,
+  tBodyId: number,
+  nLon: number,
+  aspectAngle: number,
+  maxOrb: number,
+  rawStart: Date,
+  rawPeak: Date,
+  rawEnd: Date,
+  rawMinOrb: number,
+  tzOffsetHours = 3
+): RefinedTiming {
+  const getOrbAtUtc = (utcDate: Date): number => {
+    const y = utcDate.getUTCFullYear();
+    const m = utcDate.getUTCMonth() + 1;
+    const d = utcDate.getUTCDate();
+    const h = utcDate.getUTCHours() + utcDate.getUTCMinutes() / 60 + utcDate.getUTCSeconds() / 3600;
+    const jd = swe.swe_julday(y, m, d, h, Constants.SE_GREG_CAL);
+    const calc = swe.swe_calc_ut(jd, tBodyId, flags);
+    return getAngularDifference(mod360(calc.xx[0]), nLon, aspectAngle);
+  };
+
+  return executeTimingRefinement(getOrbAtUtc, maxOrb, rawStart, rawPeak, rawEnd, rawMinOrb, tzOffsetHours);
+}
+
+function refineMundaneAspectTiming(
+  swe: any,
+  flags: number,
+  b1Id: number,
+  b2Id: number,
+  aspectAngle: number,
+  maxOrb: number,
+  rawStart: Date,
+  rawPeak: Date,
+  rawEnd: Date,
+  rawMinOrb: number,
+  tzOffsetHours = 3
+): RefinedTiming {
+  const getOrbAtUtc = (utcDate: Date): number => {
+    const y = utcDate.getUTCFullYear();
+    const m = utcDate.getUTCMonth() + 1;
+    const d = utcDate.getUTCDate();
+    const h = utcDate.getUTCHours() + utcDate.getUTCMinutes() / 60 + utcDate.getUTCSeconds() / 3600;
+    const jd = swe.swe_julday(y, m, d, h, Constants.SE_GREG_CAL);
+    const calc1 = swe.swe_calc_ut(jd, b1Id, flags);
+    const calc2 = swe.swe_calc_ut(jd, b2Id, flags);
+    return getAngularDifference(mod360(calc1.xx[0]), mod360(calc2.xx[0]), aspectAngle);
+  };
+
+  return executeTimingRefinement(getOrbAtUtc, maxOrb, rawStart, rawPeak, rawEnd, rawMinOrb, tzOffsetHours);
+}
+
 /**
  * Calculates all transit aspect intervals (Gantt bars) for a natal chart over a date range.
  * Includes adaptive per-planet lookback and backtracking to guarantee true historical entry and 0° peak dates.
@@ -188,6 +408,7 @@ export async function calculateTransitTimeline(
     onlyMajorAspects?: boolean;
     lookbackDays?: number;
     lookaheadDays?: number;
+    tzOffsetHours?: number;
   }
 ): Promise<TransitTimelineItem[]> {
   const swe = await getSwe();
@@ -243,6 +464,7 @@ export async function calculateTransitTimeline(
 
     for (const nPlanet of validNatalTargets) {
       for (const aspect of ASPECTS) {
+        const maxOrb = getMaxOrb(tBody.name, nPlanet.name, aspect.name);
         let inInterval = false;
         let intervalStart: Date | null = null;
         let intervalEnd: Date | null = null;
@@ -268,7 +490,7 @@ export async function calculateTransitTimeline(
               const tLon = mod360(calc.xx[0]);
               const bOrb = getAngularDifference(tLon, nPlanet.longitude, aspect.angle);
 
-              if (bOrb <= aspect.maxOrb) {
+              if (bOrb <= maxOrb) {
                 sD = new Date(backCur.getTime());
                 if (bOrb < bestOrb) {
                   bestOrb = bOrb;
@@ -295,7 +517,7 @@ export async function calculateTransitTimeline(
               const tLon = mod360(calc.xx[0]);
               const fOrb = getAngularDifference(tLon, nPlanet.longitude, aspect.angle);
 
-              if (fOrb <= aspect.maxOrb) {
+              if (fOrb <= maxOrb) {
                 eD = new Date(fwdCur.getTime());
                 if (fOrb < bestOrb) {
                   bestOrb = fOrb;
@@ -310,7 +532,6 @@ export async function calculateTransitTimeline(
           }
 
           // 3. Absolute Guarantee: Peak and Start can NEVER be identical.
-          // If they happen to fall on the same date, find the interior minimum between sD and eD
           if (pD.getTime() === sD.getTime() && eD.getTime() > sD.getTime()) {
             const midTime = sD.getTime() + Math.round((eD.getTime() - sD.getTime()) / 2);
             pD = new Date(midTime);
@@ -321,34 +542,49 @@ export async function calculateTransitTimeline(
 
           // Interval must overlap with the user requested [startDate, endDate] window
           if (eTime >= startDayTime && sTime <= endDayTime) {
+            // Perform high-precision hourly & 5-minute interpolation
+            const timing = refineNatalAspectTiming(
+              swe,
+              flags,
+              tBody.id,
+              nPlanet.longitude,
+              aspect.angle,
+              maxOrb,
+              sD,
+              pD,
+              eD,
+              bestOrb,
+              options?.tzOffsetHours ?? 3
+            );
+
             const durationDays = Math.max(1, Math.round((eTime - sTime) / (1000 * 60 * 60 * 24)));
             const interp = getInterpretationDetails(tBody.name, nPlanet.name, aspect.name);
-            const startStr = formatDate(sD);
-            const peakStr = formatDate(pD);
-            const endStr = formatDate(eD);
 
             const isStartedInPast = sTime < startDayTime;
-            const isPeakInPast = pD.getTime() < startDayTime;
+            const isPeakInPast = new Date(timing.peakDateStr).getTime() < startDayTime;
 
             let status: 'ACTIVE' | 'UPCOMING' | 'COMPLETED' = 'ACTIVE';
             if (sTime > startDayTime) status = 'UPCOMING';
             else if (eTime < startDayTime) status = 'COMPLETED';
 
             let phase: 'YAKLASAN' | 'ZIRVE' | 'UZAKLASAN' = 'YAKLASAN';
-            if (peakStr === formatDate(startDate)) phase = 'ZIRVE';
+            if (timing.peakDateStr === formatDate(startDate)) phase = 'ZIRVE';
             else if (isPeakInPast) phase = 'UZAKLASAN';
             else phase = 'YAKLASAN';
 
             timelineItems.push({
-              id: `${tBody.name}-${aspect.name}-${nPlanet.name}-${startStr}`,
+              id: `${tBody.name}-${aspect.name}-${nPlanet.name}-${timing.startDateStr}`,
               transitPlanet: tBody.name,
               natalPlanet: nPlanet.name,
               type: aspect.name,
               isHarmonious: aspect.isHarmonious,
-              startDate: startStr,
-              peakDate: peakStr,
-              endDate: endStr,
-              minOrb: Number(bestOrb.toFixed(2)),
+              startDate: timing.startDateStr,
+              startTime: timing.startTimeStr,
+              peakDate: timing.peakDateStr,
+              peakTime: timing.peakTimeStr,
+              endDate: timing.endDateStr,
+              endTime: timing.endTimeStr,
+              minOrb: timing.exactMinOrb,
               category: tBody.category,
               title: `Transit ${tBody.name} ${aspect.name} Natal ${nPlanet.name}`,
               summary: interp.summary,
@@ -367,7 +603,7 @@ export async function calculateTransitTimeline(
         for (let i = 0; i < samples.length; i++) {
           const sample = samples[i];
           const orb = getAngularDifference(sample.lon, nPlanet.longitude, aspect.angle);
-          const isInside = orb <= aspect.maxOrb;
+          const isInside = orb <= maxOrb;
 
           if (isInside) {
             if (!inInterval) {
@@ -425,6 +661,7 @@ export async function calculateMundaneTimeline(
     onlyMajorAspects?: boolean;
     lookbackDays?: number;
     lookaheadDays?: number;
+    tzOffsetHours?: number;
   }
 ): Promise<TransitTimelineItem[]> {
   const swe = await getSwe();
@@ -493,6 +730,7 @@ export async function calculateMundaneTimeline(
       if (options?.categoryFilter === 'KISISEL' && category !== 'Kişisel') continue;
 
       for (const aspect of ASPECTS) {
+        const maxOrb = getMaxOrb(b1.name, b2.name, aspect.name);
         let inInterval = false;
         let intervalStart: Date | null = null;
         let intervalEnd: Date | null = null;
@@ -514,7 +752,7 @@ export async function calculateMundaneTimeline(
               const lon2 = getBodyLonAtDate(backCur, b2.id);
               const bOrb = getAngularDifference(lon1, lon2, aspect.angle);
 
-              if (bOrb <= aspect.maxOrb) {
+              if (bOrb <= maxOrb) {
                 sD = new Date(backCur.getTime());
                 if (bOrb < bestOrb) {
                   bestOrb = bOrb;
@@ -537,7 +775,7 @@ export async function calculateMundaneTimeline(
               const lon2 = getBodyLonAtDate(fwdCur, b2.id);
               const fOrb = getAngularDifference(lon1, lon2, aspect.angle);
 
-              if (fOrb <= aspect.maxOrb) {
+              if (fOrb <= maxOrb) {
                 eD = new Date(fwdCur.getTime());
                 if (fOrb < bestOrb) {
                   bestOrb = fOrb;
@@ -562,34 +800,49 @@ export async function calculateMundaneTimeline(
 
           // Must overlap requested window
           if (eTime >= startDayTime && sTime <= endDayTime) {
+            // High-precision mundane hourly & 5-minute refinement
+            const timing = refineMundaneAspectTiming(
+              swe,
+              flags,
+              b1.id,
+              b2.id,
+              aspect.angle,
+              maxOrb,
+              sD,
+              pD,
+              eD,
+              bestOrb,
+              options?.tzOffsetHours ?? 3
+            );
+
             const durationDays = Math.max(1, Math.round((eTime - sTime) / (1000 * 60 * 60 * 24)));
             const interp = getSkyAspectInterpretation(b1.name, b2.name, aspect.name);
-            const startStr = formatDate(sD);
-            const peakStr = formatDate(pD);
-            const endStr = formatDate(eD);
 
             const isStartedInPast = sTime < startDayTime;
-            const isPeakInPast = pD.getTime() < startDayTime;
+            const isPeakInPast = new Date(timing.peakDateStr).getTime() < startDayTime;
 
             let status: 'ACTIVE' | 'UPCOMING' | 'COMPLETED' = 'ACTIVE';
             if (sTime > startDayTime) status = 'UPCOMING';
             else if (eTime < startDayTime) status = 'COMPLETED';
 
             let phase: 'YAKLASAN' | 'ZIRVE' | 'UZAKLASAN' = 'YAKLASAN';
-            if (peakStr === formatDate(startDate)) phase = 'ZIRVE';
+            if (timing.peakDateStr === formatDate(startDate)) phase = 'ZIRVE';
             else if (isPeakInPast) phase = 'UZAKLASAN';
             else phase = 'YAKLASAN';
 
             timelineItems.push({
-              id: `sky-${b1.name}-${aspect.name}-${b2.name}-${startStr}`,
+              id: `sky-${b1.name}-${aspect.name}-${b2.name}-${timing.startDateStr}`,
               transitPlanet: b1.name,
               natalPlanet: b2.name,
               type: aspect.name,
               isHarmonious: aspect.isHarmonious,
-              startDate: startStr,
-              peakDate: peakStr,
-              endDate: endStr,
-              minOrb: Number(bestOrb.toFixed(2)),
+              startDate: timing.startDateStr,
+              startTime: timing.startTimeStr,
+              peakDate: timing.peakDateStr,
+              peakTime: timing.peakTimeStr,
+              endDate: timing.endDateStr,
+              endTime: timing.endTimeStr,
+              minOrb: timing.exactMinOrb,
               category,
               title: `${b1.name} ${aspect.name} ${b2.name}`,
               summary: interp.summary,
@@ -610,7 +863,7 @@ export async function calculateMundaneTimeline(
           const lon1 = sample.positions[b1.name];
           const lon2 = sample.positions[b2.name];
           const orb = getAngularDifference(lon1, lon2, aspect.angle);
-          const isInside = orb <= aspect.maxOrb;
+          const isInside = orb <= maxOrb;
 
           if (isInside) {
             if (!inInterval) {
