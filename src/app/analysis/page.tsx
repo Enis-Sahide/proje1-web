@@ -44,8 +44,7 @@ export default function AnalysisPage() {
       description: 'Sefirot ağacındaki kadersel sıçrama noktalarınızı bulun.',
       icon: <MoonStar size={32} />,
       color: '#D4AF37',
-      link: '/analysis/kabbalah',
-      isLocked: true
+      link: '/analysis/kabbalah'
     },
     {
       id: 'astrology',

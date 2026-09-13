@@ -658,14 +658,27 @@ export default function KabbalahAnalysisPage() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="space-y-2">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+                        {!isApprenticeOrAbove && (
+                          <div 
+                            className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/50 backdrop-blur-[2px] rounded-xl border border-white/5 cursor-pointer hover:bg-black/60 transition-colors p-4 text-center group"
+                            onClick={() => setShowLockModal(true)}
+                          >
+                            <div className="p-2.5 rounded-full bg-[#D4AF37]/10 text-[#D4AF37] mb-2 group-hover:scale-110 transition-transform">
+                              <Lock size={18} />
+                            </div>
+                            <span className="text-sm font-bold text-white mb-0.5">Derin Ezoterik Analiz Kilitli</span>
+                            <span className="text-xs text-[#D4AF37]">Çıraklık Seviyesi ve Üzeri Üyelere Özeldir</span>
+                          </div>
+                        )}
+
+                        <div className={`space-y-2 ${!isApprenticeOrAbove ? 'filter blur-sm select-none opacity-40' : ''}`}>
                           <h5 className="text-sm text-mystic-text-muted uppercase tracking-wider">Alem Tanımı</h5>
                           <p className="text-white/80 leading-relaxed text-sm">
                             {world.description}
                           </p>
                         </div>
-                        <div className="space-y-2">
+                        <div className={`space-y-2 ${!isApprenticeOrAbove ? 'filter blur-sm select-none opacity-40' : ''}`}>
                           <h5 className="text-sm text-mystic-text-muted uppercase tracking-wider">Ezoterik Şifre</h5>
                           <p className="text-white/80 leading-relaxed text-sm italic">
                             {world.thothInfo}
