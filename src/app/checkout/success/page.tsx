@@ -101,7 +101,7 @@ function CheckoutSuccessContent() {
     return (
       <div className="max-w-md w-full bg-black/80 backdrop-blur-xl border border-white/10 p-8 rounded-3xl text-center shadow-2xl flex flex-col items-center">
         <Loader2 className="animate-spin text-[#D4AF37] mb-4" size={32} />
-        <p className="text-mystic-text-muted">Doğum Haritanız Kaplanıp Analiz Ediliyor...</p>
+        <p className="text-mystic-text-muted">Raporunuz Hazırlanıyor ve Doğrulanıyor...</p>
       </div>
     );
   }
@@ -124,7 +124,13 @@ function CheckoutSuccessContent() {
     );
   }
 
-  const reportName = orderData.analysisType === 'kabbalah' ? 'Kabalistik 4 Alem Harita Raporu' : 'Doğum Haritası Raporu';
+  const reportName = orderData?.analysisType === 'kabbalah' 
+    ? 'Kabalistik 4 Alem Harita Analizi Raporu' 
+    : (orderData?.analysisType === 'human-design' || orderData?.analysisType === 'human_design')
+    ? 'Human Design Kapsamlı Yaşam Rehberi Raporu'
+    : (orderData?.analysisType === 'incarnation' || orderData?.analysisType === 'karmic')
+    ? 'Karmik & Enkarnasyon Analizi Raporu'
+    : 'Doğum Haritası Analizi Raporu';
 
   return (
     <div className="max-w-md w-full bg-black/80 backdrop-blur-xl border border-white/10 p-8 rounded-3xl text-center shadow-[0_0_50px_rgba(212,175,55,0.05)] flex flex-col items-center">

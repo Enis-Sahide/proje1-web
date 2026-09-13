@@ -257,6 +257,8 @@ export async function sendGuestDownloadEmail(email: string, token: string, analy
     reportName = 'Kabalistik 4 Alem Harita Analizi Raporu';
   } else if (analysisType === 'human-design' || analysisType === 'human_design') {
     reportName = 'Human Design Analizi Raporu';
+  } else if (analysisType === 'incarnation' || analysisType === 'karmic') {
+    reportName = 'Karmik & Enkarnasyon Analizi Raporu';
   }
 
   const html = `
