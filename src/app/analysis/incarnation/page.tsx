@@ -680,9 +680,34 @@ export default function IncarnationAnalysisPage() {
                         </div>
                       </div>
 
-                      <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed pt-2 ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
-                        {comp.spiritualMeaning}
-                      </p>
+                      <div className={`space-y-3 pt-2 text-xs sm:text-sm leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
+                        <div className="p-3.5 rounded-2xl bg-black/30 border border-white/5 space-y-1">
+                          <span className="text-[11px] font-bold text-[#E0E0E0] uppercase tracking-wider block">
+                            🎭 Dünyevi Maske (Tropikal {comp.tropicalSign})
+                          </span>
+                          <p className="text-mystic-text-muted leading-relaxed">
+                            {comp.tropicalMeaning || comp.spiritualMeaning}
+                          </p>
+                        </div>
+
+                        <div className="p-3.5 rounded-2xl bg-indigo-950/20 border border-indigo-500/20 space-y-1">
+                          <span className="text-[11px] font-bold text-indigo-300 uppercase tracking-wider block">
+                            ✨ Ruhsal Öz & Hakiki Arzu (Drakonik {comp.draconicSign})
+                          </span>
+                          <p className="text-mystic-text-muted leading-relaxed">
+                            {comp.draconicMeaning || comp.spiritualMeaning}
+                          </p>
+                        </div>
+
+                        <div className="p-3.5 rounded-2xl bg-[#D4AF37]/5 border border-[#D4AF37]/20 space-y-1">
+                          <span className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider block">
+                            🌌 Kozmik Sentez & Tekâmül Sırrı
+                          </span>
+                          <p className="text-white/80 leading-relaxed font-medium">
+                            {comp.synthesis || comp.spiritualMeaning}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   ))}
                 </div>

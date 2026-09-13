@@ -493,3 +493,75 @@ export const KAD_NEXT_LIFE_SEEDS: Record<ZodiacSign, NextLifeSeed> = {
     sacredPractice: 'Meditasyon, dua ve affetme yoluyla benlik sınırlarını eritebilmek.'
   }
 };
+
+// ==========================================
+// DRAKONİK HARİTA: TROPİKAL VS DRAKONİK DERİN ARKETİPLER
+// ==========================================
+
+export interface DraconicPointDetails {
+  pointName: string;
+  tropicalSign: ZodiacSign;
+  draconicSign: ZodiacSign;
+  tropicalMeaning: string;
+  draconicMeaning: string;
+  synthesis: string;
+  spiritualMeaning: string;
+}
+
+export const TROPICAL_PERSONA_DESCRIPTIONS: Record<ZodiacSign, string> = {
+  'Koç': 'Dünyevi planda Koç; öncü olma, rekabet etme, bağımsızlık, hız, ilk adımı atma ve doğrudan yüzleşme arzusudur. İnsanlar sizi dışarıdan cesur, tez canlı, kendi başına buyruk ve savaşçı bir enerjiyle algılar.',
+  'Boğa': 'Dünyevi planda Boğa; maddi güvence, somut istikrar, duyusal hazlar, sadakat ve konfor alanını koruma arzusudur. İnsanlar sizi dışarıdan sakin, güvenilir, köklü ve sarsılmaz bir kale gibi algılar.',
+  'İkizler': 'Dünyevi planda İkizler; zihinsel merak, çok yönlülük, sosyal iletişim, bilgi toplama ve sürekli hareket halinde olma arzusudur. İnsanlar sizi dışarıdan esprili, konuşkan, çevik ve zeki bir arayışçı olarak algılar.',
+  'Yengeç': 'Dünyevi planda Yengeç; duygusal güvence, aidiyet, ailesel bağlar, koruyuculuk ve şefkatli bir koza yaratma arzusudur. İnsanlar sizi dışarıdan duyarlı, empatik, anaç/babacan ve hassas bir sığınak olarak algılar.',
+  'Aslan': 'Dünyevi planda Aslan; görünürlük, sahnede olma, takdir edilme, onay görme, yaratıcı karizma sergileme ve liderlik arzusudur. İnsanlar sizi dışarıdan kendine güvenen, cömert, gururlu ve ortamın parlayan yıldızı olarak algılar.',
+  'Başak': 'Dünyevi planda Başak; pratik fayda, düzen, analiz, kusursuzluk, hizmet etme ve işleri mükemmel çalıştırma arzusudur. İnsanlar sizi dışarıdan titiz, çalışkan, güvenilir ve detaylara hakim bir usta olarak algılar.',
+  'Terazi': 'Dünyevi planda Terazi; estetik, sosyal ahenk, diplomasi, onaylanma, ortaklık kurma ve çatışmadan kaçınma arzusudur. İnsanlar sizi dışarıdan kibar, zarif, adil ve uyumlu bir diplomat olarak algılar.',
+  'Akrep': 'Dünyevi planda Akrep; güç, kontrol, gizem, derin duygusal bağlar, kriz yönetimi ve nüfuz sahibi olma arzusudur. İnsanlar sizi dışarıdan karizmatik, ketum, sezgisel ve sarsılmaz bir iradeye sahip olarak algılar.',
+  'Yay': 'Dünyevi planda Yay; özgürlük, macera, iyimserlik, büyük vizyonlar, felsefi keşif ve sınırları aşma arzusudur. İnsanlar sizi dışarıdan neşeli, coşkulu, bağımsız ve açık sözlü bir gezgin olarak algılar.',
+  'Oğlak': 'Dünyevi planda Oğlak; statü, saygınlık, somut başarı, disiplin, sorumluluk alma ve zirveye tırmanma arzusudur. İnsanlar sizi dışarıdan olgun, otoriter, ciddi ve dayanıklı bir yönetici olarak algılar.',
+  'Kova': 'Dünyevi planda Kova; özgünlük, bağımsızlık, marjinallik, toplumsal idealler, yenilik ve gelenekleri yıkma arzusudur. İnsanlar sizi dışarıdan vizyoner, entelektüel, mesafeli ve sıra dışı bir reformcu olarak algılar.',
+  'Balık': 'Dünyevi planda Balık; sınırsız empati, hayal gücü, fedakarlık, maneviyat ve katı dünyadan kaçış arzusudur. İnsanlar sizi dışarıdan şefkatli, gizemli, sanatsal ve ilahi akışa teslim bir ruh olarak algılar.'
+};
+
+export const DRACONIC_SOUL_DESCRIPTIONS: Record<ZodiacSign, string> = {
+  'Koç': 'Ruhunuzun derin ebedi arzusu Koç frekansındadır; dünyevi maskeniz ne kadar uyumlu olursa olsun, ruhunuz tekâmül etmek için korkusuzca kendi öz yolunu açmak, kimseye sormadan inisiyatif almak ve kendi ilahi iradesini ortaya koymak ister.',
+  'Boğa': 'Ruhunuzun derin ebedi arzusu Boğa frekansındadır; dış dünyanın tüm karmaşası içinde ruhunuz kendi içsel tapınağında sükuneti, doğayla tam birliği, kalıcı manevi değerleri ve ruhsal zenginliği inşa etmek ister.',
+  'İkizler': 'Ruhunuzun derin ebedi arzusu İkizler frekansındadır; alkıştan veya katı rollerden ziyade, ruhunuz zihinsel merak, evrensel bilgi arayışı, önyargısızca sorgulama ve hakikat tohumlarını kitlelere aktarma peşindedir.',
+  'Yengeç': 'Ruhunuzun derin ebedi arzusu Yengeç frekansındadır; dış dünyadaki başarılarınızın ötesinde, ruhunuz koşulsuz şefkati, kutsal anaç enerjiyi, duygusal köklerle barışmayı ve kalpleri bir yuva sıcaklığında kucaklamayı arar.',
+  'Aslan': 'Ruhunuzun derin ebedi arzusu Aslan frekansındadır; sahte tevazuyu bırakıp ilahi bir kraliyet çocuğu olduğunu hatırlamak, kalbin saf güneş ışığını korkusuzca yaymak ve ruhsal liderliğini yaratıcılıkla ortaya koymak ister.',
+  'Başak': 'Ruhunuzun derin ebedi arzusu Başak frekansındadır; ruhunuz dünyayı ilahi düzenin mikro şifalarıyla onarmak, kibri arındırmak, kutsal bir hizmet bilinci geliştirmek ve kaosu ışığın geometrisiyle hizalamak ister.',
+  'Terazi': 'Ruhunuzun derin ebedi arzusu Terazi frekansındadır; ego savaşlarını bir kenara bırakıp ilahi aşkın ve evrensel dengenin aracı olmak, ilişkiler aynasında Yaratıcı\'nın güzelliğini ve adaletini yansıtmak ister.',
+  'Akrep': 'Ruhunuzun derin ebedi arzusu Akrep frekansındadır; yüzeysel hiçbir teselliyle yetinmeyip ruhun en karanlık mağaralarını temizlemek, tabuları yıkmak, kadersel bir simya ile küllerinden yeniden doğmak ister.',
+  'Yay': 'Ruhunuzun derin ebedi arzusu Yay frekansındadır; dünyevi dogma ve dar kalıpları yırtarak evrenin yüksek yasalarına, mutlak hakikate ve ilahi bilgeliğe kanat açmak, kadersel bir ışık rehberi olmak ister.',
+  'Oğlak': 'Ruhunuzun derin ebedi arzusu Oğlak frekansındadır; gelip geçici hevesleri aşıp ruhun ebedi ustalığını, kadersel disiplinini kazanmak ve arkasında asırları aşan kutsal bir tekâmül mirası bırakmak ister.',
+  'Kova': 'Ruhunuzun derin ebedi arzusu Kova frekansındadır; kişisel hırslardan tamamen özgürleşerek tüm insanlığın uyanışına, kolektif bilincin sıçramasına ve yeni çağın kozmik kardeşliğine hizmet etmek ister.',
+  'Balık': 'Ruhunuzun derin ebedi arzusu Balık frekansındadır; dünya illüzyonunun ve ayrılık bilincinin ötesine geçip İlahi Kaynak ile bir olmak, koşulsuz sevgiyle affetmek ve kozmik şifa kanalı haline gelmek ister.'
+};
+
+export function getDraconicPointInterpretation(
+  pointName: string,
+  tropicalSign: ZodiacSign,
+  draconicSign: ZodiacSign
+): DraconicPointDetails {
+  const tropicalMeaning = TROPICAL_PERSONA_DESCRIPTIONS[tropicalSign] || TROPICAL_PERSONA_DESCRIPTIONS['Koç'];
+  const draconicMeaning = DRACONIC_SOUL_DESCRIPTIONS[draconicSign] || DRACONIC_SOUL_DESCRIPTIONS['Koç'];
+
+  let synthesis = '';
+  if (tropicalSign === draconicSign) {
+    synthesis = `Nadir bir kozmik hizalanma: ${pointName} noktanız hem dünyevi maskenizde hem de ebedi ruh boyutunuzda ${tropicalSign} burcunda buluşuyor! Bu durum, dünyevi kişiliğiniz ile ruhunuzun ebedi amacının tam bir uyum içinde olduğunu gösterir. Maske takmadan, olduğunuz gibi parlayarak tekâmül etmelisiniz.`;
+  } else {
+    synthesis = `Kozmik Sentez & Tekâmül Anahtarı: Dış dünyadaki ${tropicalSign} yetenek ve davranışlarınızı bir ego tatmin aracı olarak değil; ruhunuzun derinlerindeki ${draconicSign} hakikatini ve ebedi arzusunu dünyada somutlaştırmak için kutsal bir köprü olarak kullanmalısınız. Dünyevi ${tropicalSign} maskeniz, ruhunuzun ${draconicSign} cevherini koruyan ve ifade eden kutsal kadehtir.`;
+  }
+
+  const spiritualMeaning = `${tropicalMeaning} ${draconicMeaning} ${synthesis}`;
+
+  return {
+    pointName,
+    tropicalSign,
+    draconicSign,
+    tropicalMeaning,
+    draconicMeaning,
+    synthesis,
+    spiritualMeaning
+  };
+}

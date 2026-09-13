@@ -407,10 +407,14 @@ export const downloadIncarnationPDF = async (
   // Render Draconic comparisons with dynamic card height & word wrap
   data.draconicComparison.forEach(comp => {
     doc.setFont('LiberationSans', 'normal');
-    doc.setFontSize(11.5);
-    const textLines = doc.splitTextToSize(comp.spiritualMeaning, 166);
-    const lineHeight = 5.8;
-    const cardHeight = 24 + (textLines.length * lineHeight) + 4;
+    doc.setFontSize(10.5);
+    const tropLines = doc.splitTextToSize(`• Dünyevi Maske (${comp.tropicalSign}): ${comp.tropicalMeaning || comp.spiritualMeaning}`, 168);
+    const dracLines = doc.splitTextToSize(`• Ruhsal Öz (${comp.draconicSign}): ${comp.draconicMeaning || comp.spiritualMeaning}`, 168);
+    const synthLines = doc.splitTextToSize(`• Kozmik Sentez: ${comp.synthesis || comp.spiritualMeaning}`, 168);
+
+    const lineHeight = 5.2;
+    const totalLines = tropLines.length + dracLines.length + synthLines.length;
+    const cardHeight = 22 + (totalLines * lineHeight) + 6;
 
     ensureSpace(cardHeight + 6);
 
@@ -422,25 +426,34 @@ export const downloadIncarnationPDF = async (
 
     // Card Header
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(13.5);
+    doc.setFontSize(13);
     doc.setTextColor(...gold);
-    doc.text(comp.pointName, 22, curY + 8);
+    doc.text(comp.pointName, 20, curY + 7.5);
 
     // Tropical vs Draconic badges
     doc.setFont('LiberationSans', 'normal');
-    doc.setFontSize(12);
+    doc.setFontSize(11);
     doc.setTextColor(...white);
-    doc.text(`Dünyevi (Tropikal): ${comp.tropicalSign} (${comp.tropicalDegree}°)`, 22, curY + 16);
+    doc.text(`Dünyevi (Tropikal): ${comp.tropicalSign} (${comp.tropicalDegree}°)`, 20, curY + 14.5);
 
     doc.setFont('LiberationSans', 'bold');
     doc.setTextColor(255, 215, 0);
-    doc.text(`Ruhsal (Drakonik): ${comp.draconicSign} (${comp.draconicDegree}°)`, 105, curY + 16);
+    doc.text(`Ruhsal (Drakonik): ${comp.draconicSign} (${comp.draconicDegree}°)`, 105, curY + 14.5);
 
-    // Spiritual meaning (auto multi-line)
+    let textY = curY + 21;
     doc.setFont('LiberationSans', 'normal');
-    doc.setFontSize(11.5);
-    doc.setTextColor(...white);
-    doc.text(textLines, 22, curY + 24);
+    doc.setFontSize(10.5);
+    doc.setTextColor(215, 215, 225);
+    doc.text(tropLines, 20, textY);
+    textY += tropLines.length * lineHeight + 2;
+
+    doc.setTextColor(190, 215, 255);
+    doc.text(dracLines, 20, textY);
+    textY += dracLines.length * lineHeight + 2;
+
+    doc.setFont('LiberationSans', 'bold');
+    doc.setTextColor(...gold);
+    doc.text(synthLines, 20, textY);
 
     curY += cardHeight + 6;
   });

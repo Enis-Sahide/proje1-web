@@ -16,7 +16,8 @@ import {
   IncarnationHouseInfo,
   RetroKarmicDebt,
   ChironWound,
-  NextLifeSeed
+  NextLifeSeed,
+  getDraconicPointInterpretation
 } from './IncarnationInterpretations';
 
 export interface GADAspect {
@@ -33,6 +34,9 @@ export interface TropicalVsDraconicComparison {
   draconicSign: ZodiacSign;
   draconicDegree: number;
   spiritualMeaning: string;
+  tropicalMeaning: string;
+  draconicMeaning: string;
+  synthesis: string;
 }
 
 export interface IncarnationAnalysisResult {
@@ -275,17 +279,17 @@ export function calculateIncarnationAnalysis(natalChart: NatalChartData): Incarn
     }
 
     if (tropPoint && dracPoint) {
-      let spiritualMeaning = `Dünyevi kişilikte ${tropPoint.sign} ifadesini sergilerken, ruhunuzun ebedi titreşimi ${dracPoint.sign} frekansında yankılanır. İnsanlar sizi ${tropPoint.sign} olarak görür, ancak derinlerde ${dracPoint.sign} hakikatini ararsınız.`;
-      if (tropPoint.sign === dracPoint.sign) {
-        spiritualMeaning = `Nadir bir kozmik hizalanma: ${pt.name} noktanız hem dünyada hem de ruh boyutunda ${tropPoint.sign} burcunda! Bu durum, ruhunuzun dünyevi kişiliğinizle tam bir mutabakat içinde olduğunu ve maskesiz bir tekâmül yaşadığını gösterir.`;
-      }
+      const interp = getDraconicPointInterpretation(pt.name, tropPoint.sign, dracPoint.sign);
       draconicComparison.push({
         pointName: pt.label,
         tropicalSign: tropPoint.sign,
         tropicalDegree: tropPoint.degreeInSign,
         draconicSign: dracPoint.sign,
         draconicDegree: dracPoint.degreeInSign,
-        spiritualMeaning
+        spiritualMeaning: interp.spiritualMeaning,
+        tropicalMeaning: interp.tropicalMeaning,
+        draconicMeaning: interp.draconicMeaning,
+        synthesis: interp.synthesis
       });
     }
   });
