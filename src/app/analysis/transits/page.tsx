@@ -1,47 +1,30 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Compass, Loader2, Sparkles, AlertCircle, Star, X } from 'lucide-react';
+import { 
+  ArrowLeft, 
+  Compass, 
+  Loader2, 
+  Sparkles, 
+  AlertCircle, 
+  Star, 
+  X, 
+  Globe, 
+  Calendar, 
+  Clock, 
+  RefreshCw,
+  Orbit,
+  Layers,
+  ChevronRight,
+  Info
+} from 'lucide-react';
 import { getTransitHouseInterpretation, getTransitAspectInterpretation } from '@/features/astrology/engine/TransitInterpretations';
-import { AstroCity, TransitChartData } from '@/features/astrology/engine/AstrologyConstants';
+import { AstroCity, TransitChartData, AstroPoint, AstroAspect } from '@/features/astrology/engine/AstrologyConstants';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { useAuth } from '@/context/AuthContext';
 import TransitTimelineChart from '@/features/astrology/components/TransitTimelineChart';
-
-interface AstroPoint {
-  name: string;
-  longitude: number;
-  sign: string;
-  degreeInSign: number;
-  minutes: number;
-  house: number;
-  isRetrograde?: boolean;
-}
-
-interface AstroAspect {
-  planet1: string;
-  planet2: string;
-  type: string;
-  orb: number;
-  isExact: boolean;
-}
-
-interface TransitAspect {
-  transitPlanet: string;
-  natalPlanet: string;
-  type: string;
-  orb: number;
-  isExact: boolean;
-}
-
-interface NatalChartData {
-  planets: AstroPoint[];
-  ascendant: AstroPoint;
-  midheaven: AstroPoint;
-  houses: AstroPoint[]; 
-  aspects: AstroAspect[];
-}
+import MundaneSkyWheel from '@/features/astrology/components/MundaneSkyWheel';
 
 const ZODIAC_ORDER = ['Koç', 'Boğa', 'İkizler', 'Yengeç', 'Aslan', 'Başak', 'Terazi', 'Akrep', 'Yay', 'Oğlak', 'Kova', 'Balık'];
 const ZODIAC_COLORS: Record<string, string> = {
@@ -72,32 +55,116 @@ const RADIUS = CENTER - 85;
 
 export default function TransitsPage() {
   const router = useRouter();
-  const { role, user } = useAuth();
+  const { role } = useAuth();
   const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
+
+  // Mode Switch: MUNDANE (Kişiselden Bağımsız Gökyüzü) vs PERSONAL (Natal Bi-Wheel)
+  const [analysisMode, setAnalysisMode] = useState<'MUNDANE' | 'PERSONAL'>('MUNDANE');
+
+  // Shared Modals & Feedback
+  const [selectedInterp, setSelectedInterp] = useState<{title: string, content: string, extra?: string} | null>(null);
+  const [showLockModal, setShowLockModal] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Common Date defaults
+  const today = new Date();
+  const defaultTDate = today.toISOString().split('T')[0];
+  const defaultTTime = today.toTimeString().slice(0, 5);
+
+  // -------------------------------------------------------------
+  // 1. MUNDANE (Kolektif Gökyüzü) States
+  // -------------------------------------------------------------
+  const [skyDateStr, setSkyDateStr] = useState(defaultTDate);
+  const [skyTimeStr, setSkyTimeStr] = useState(defaultTTime);
+  const [skyTab, setSkyTab] = useState<'WHEEL' | 'TIMELINE'>('WHEEL');
+  const [isSkyLoading, setIsSkyLoading] = useState(false);
+  const [skyChartData, setSkyChartData] = useState<{
+    date: string;
+    time: string;
+    city: string;
+    planets: AstroPoint[];
+    ascendant: AstroPoint;
+    midheaven: AstroPoint;
+    houses: AstroPoint[];
+    aspects: any[];
+  } | null>(null);
+  const [skyAspectFilter, setSkyAspectFilter] = useState<'ALL' | 'HARMONIOUS' | 'CHALLENGING' | 'CONJUNCTION'>('ALL');
+
+  // Mundane Timeline states
+  const [skyTimelineData, setSkyTimelineData] = useState<any>(null);
+  const [skyTimelineRange, setSkyTimelineRange] = useState<'1m' | '3m' | '6m' | '1y'>('1m');
+  const [isSkyTimelineLoading, setIsSkyTimelineLoading] = useState(false);
+
+  // Fetch Mundane Sky Chart
+  const fetchSkyChart = async (dateStr = skyDateStr, timeStr = skyTimeStr) => {
+    setIsSkyLoading(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/astrology/sky-chart', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dateStr, timeStr })
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Gökyüzü haritası hesaplanamadı.');
+      }
+      setSkyChartData(data.data);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsSkyLoading(false);
+    }
+  };
+
+  // Fetch Mundane Timeline
+  const fetchSkyTimeline = async (rangeToFetch: '1m' | '3m' | '6m' | '1y' = skyTimelineRange, startDate = skyDateStr) => {
+    setIsSkyTimelineLoading(true);
+    try {
+      const res = await fetch('/api/astrology/sky-timeline', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          startDateStr: startDate,
+          range: rangeToFetch
+        })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setSkyTimelineData(data.data);
+      }
+    } catch (err) {
+      console.error('Sky timeline fetch error:', err);
+    } finally {
+      setIsSkyTimelineLoading(false);
+    }
+  };
+
+  // Auto-fetch Mundane chart on initial load
+  useEffect(() => {
+    if (!skyChartData) {
+      fetchSkyChart(skyDateStr, skyTimeStr);
+    }
+  }, []);
+
+  // -------------------------------------------------------------
+  // 2. PERSONAL (Natal Bi-Wheel) States
+  // -------------------------------------------------------------
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [transitData, setTransitData] = useState<TransitChartData | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [selectedInterp, setSelectedInterp] = useState<{title: string, content: string} | null>(null);
-  const [showLockModal, setShowLockModal] = useState(false);
-
   const [natalDateStr, setNatalDateStr] = useState('1990-01-01');
   const [natalTimeStr, setNatalTimeStr] = useState('12:00');
   const [cityKey, setCityKey] = useState<AstroCity | null>(null);
-
-  const today = new Date();
-  const defaultTDate = today.toISOString().split('T')[0];
-  const defaultTTime = today.toTimeString().slice(0,5);
-
   const [transitDateStr, setTransitDateStr] = useState(defaultTDate);
   const [transitTimeStr, setTransitTimeStr] = useState(defaultTTime);
 
-  // Timeline (Gantt) states
-  const [activeTab, setActiveTab] = useState<'BIWHEEL' | 'TIMELINE'>('BIWHEEL');
+  // Personal Timeline states
+  const [personalTab, setPersonalTab] = useState<'BIWHEEL' | 'TIMELINE'>('BIWHEEL');
   const [timelineData, setTimelineData] = useState<any>(null);
   const [timelineRange, setTimelineRange] = useState<'1m' | '3m' | '6m' | '1y'>('1m');
   const [isTimelineLoading, setIsTimelineLoading] = useState(false);
 
-  const fetchTimeline = async (rangeToFetch: '1m' | '3m' | '6m' | '1y' = timelineRange) => {
+  const fetchPersonalTimeline = async (rangeToFetch: '1m' | '3m' | '6m' | '1y' = timelineRange) => {
     if (!cityKey) return;
     setIsTimelineLoading(true);
     try {
@@ -123,11 +190,11 @@ export default function TransitsPage() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handlePersonalSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!cityKey) {
-        setError('Lütfen bir şehir seçin.');
-        return;
+      setError('Lütfen bir şehir seçin.');
+      return;
     }
     setIsAnalyzing(true);
     setError(null);
@@ -153,15 +220,22 @@ export default function TransitsPage() {
       }
 
       setTransitData(data.data);
-
-      // Proactively fetch 1-month timeline so it is ready immediately
-      fetchTimeline('1m');
+      fetchPersonalTimeline('1m');
     } catch (err: any) {
       setError(err.message);
     } finally {
       setIsAnalyzing(false);
     }
   };
+
+  // Filtered Mundane Aspects
+  const filteredSkyAspects = (skyChartData?.aspects || []).filter(asp => {
+    if (skyAspectFilter === 'ALL') return true;
+    if (skyAspectFilter === 'HARMONIOUS') return asp.type === 'Üçgen' || asp.type === 'Sekstil';
+    if (skyAspectFilter === 'CHALLENGING') return asp.type === 'Kare' || asp.type === 'Karşıt';
+    if (skyAspectFilter === 'CONJUNCTION') return asp.type === 'Kavuşum';
+    return true;
+  });
 
   const renderBiWheel = () => {
     if (!transitData) return null;
@@ -262,24 +336,56 @@ export default function TransitsPage() {
   };
 
   return (
-    <div className="min-h-screen pt-24 pb-24 px-6 relative">
-      
-      
-
+    <div className="min-h-screen pt-24 pb-24 px-4 sm:px-6 relative">
       <div className="max-w-6xl mx-auto">
-        <button onClick={() => router.back()} className="mb-8 flex items-center text-mystic-text-muted hover:text-white transition-colors">
+        <button onClick={() => router.back()} className="mb-6 flex items-center text-mystic-text-muted hover:text-white transition-colors">
           <ArrowLeft size={20} className="mr-2" /> Geri Dön
         </button>
 
-        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8">
+        {/* Main Title Header */}
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 rounded-full bg-[#0EA5E9]/10 border border-[#0EA5E9]/30 flex items-center justify-center text-[#0EA5E9]">
+            <div className="w-16 h-16 rounded-full bg-[#0EA5E9]/10 border border-[#0EA5E9]/30 flex items-center justify-center text-[#0EA5E9] shadow-[0_0_25px_rgba(14,165,233,0.2)]">
               <Compass size={32} />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-white">Transit Haritası (Bi-Wheel)</h1>
-              <p className="text-mystic-text-muted">Doğum haritanız üzerindeki güncel veya kadersel gezegen geçişleri</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-white flex items-center gap-3">
+                Kozmik Gökyüzü & Transitler
+              </h1>
+              <p className="text-sm text-mystic-text-muted">
+                Kişisel doğum haritanızdan bağımsız anlık gökyüzü açıları veya doğum haritası transit geçişleri
+              </p>
             </div>
+          </div>
+        </div>
+
+        {/* Mode Selector Segmented Switch */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex p-1.5 rounded-2xl bg-black/60 border border-white/10 backdrop-blur-xl shadow-2xl max-w-full overflow-x-auto">
+            <button
+              type="button"
+              onClick={() => setAnalysisMode('MUNDANE')}
+              className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${
+                analysisMode === 'MUNDANE'
+                  ? 'bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8] text-black shadow-lg shadow-cyan-500/25'
+                  : 'text-mystic-text-muted hover:text-white'
+              }`}
+            >
+              <Globe size={16} />
+              <span>Kolektif Gökyüzü Açıları (Bağımsız)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setAnalysisMode('PERSONAL')}
+              className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${
+                analysisMode === 'PERSONAL'
+                  ? 'bg-gradient-to-r from-[#D4AF37] to-[#F59E0B] text-black shadow-lg shadow-amber-500/25'
+                  : 'text-mystic-text-muted hover:text-white'
+              }`}
+            >
+              <Sparkles size={16} />
+              <span>Kişisel Transitler (Bi-Wheel Haritam)</span>
+            </button>
           </div>
         </div>
 
@@ -290,254 +396,311 @@ export default function TransitsPage() {
           </div>
         )}
 
-        {!transitData ? (
-          <div className="bg-black/50 backdrop-blur-md border border-white/10 p-8 rounded-3xl shadow-2xl relative overflow-hidden max-w-4xl mx-auto">
-            {isAnalyzing && (
-              <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center text-[#0EA5E9]">
-                <Loader2 size={48} className="animate-spin mb-4" />
-                <h3 className="text-xl font-bold mb-2 animate-pulse">Transitler Hesaplanıyor...</h3>
-                <p className="text-sm text-white/60">Gezegen geçişleri ve natal açılarınız analiz ediliyor.</p>
-              </div>
-            )}
-            
-            <form onSubmit={handleSubmit} className="space-y-8">
-              <div className="bg-white/5 p-6 rounded-2xl border border-white/5">
-                <h3 className="text-xl font-bold text-[#D4AF37] mb-4 flex items-center gap-2">
-                  <Star size={20}/> 1. Doğum Bilgileriniz (Natal)
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-mystic-text-muted mb-2">Doğum Tarihi *</label>
-                    <input required type="date" min="1900-01-01" max="2100-12-31" value={natalDateStr} onChange={e => setNatalDateStr(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-mystic-text-muted mb-2">Doğum Saati</label>
-                    <input required type="time" value={natalTimeStr} onChange={e => setNatalTimeStr(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-mystic-text-muted mb-2">Şehir *</label>
-                    <LocationAutocomplete
-                      onSelect={(c) => setCityKey(c)}
-                      className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-[#0EA5E9]/5 p-6 rounded-2xl border border-[#0EA5E9]/20">
-                <h3 className="text-xl font-bold text-[#0EA5E9] mb-4 flex items-center gap-2">
-                  <Compass size={20}/> 2. Transit (Geçiş) Tarihi
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div>
-                    <label className="block text-sm font-medium text-mystic-text-muted mb-2">Transit Tarihi *</label>
-                    <input required type="date" min="1900-01-01" max="2100-12-31" value={transitDateStr} onChange={e => setTransitDateStr(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#0EA5E9] transition-colors" />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-mystic-text-muted mb-2">Transit Saati</label>
-                    <input required type="time" value={transitTimeStr} onChange={e => setTransitTimeStr(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#0EA5E9] transition-colors" />
-                  </div>
-                </div>
-              </div>
-
-              <button type="submit" disabled={isAnalyzing} className="w-full bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] hover:opacity-90 disabled:opacity-50 text-black font-bold text-lg py-4 rounded-xl transition-all shadow-lg">
-                Transit Haritamı Hesapla
-              </button>
-            </form>
-          </div>
-        ) : (
-          <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
-            {/* View Navigation Tabs & Map Info */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-black/40 p-3 sm:p-4 rounded-3xl border border-white/10 backdrop-blur-md">
-              <div className="grid grid-cols-2 sm:flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 shadow-lg w-full sm:w-auto">
+        {/* ========================================================================= */}
+        {/* MODE 1: MUNDANE (Kolektif Gökyüzü Açıları - Kişisel Haritadan Bağımsız)   */}
+        {/* ========================================================================= */}
+        {analysisMode === 'MUNDANE' && (
+          <div className="space-y-8 animate-in fade-in duration-500">
+            {/* Top Toolbar: Date & Tab Control */}
+            <div className="bg-black/50 border border-white/10 backdrop-blur-md p-4 sm:p-6 rounded-3xl flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+              
+              {/* Left: View Tabs */}
+              <div className="flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 shadow-lg">
                 <button
                   type="button"
-                  onClick={() => setActiveTab('BIWHEEL')}
-                  className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all text-center ${
-                    activeTab === 'BIWHEEL'
-                      ? 'bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] text-black shadow-lg shadow-cyan-500/20'
+                  onClick={() => setSkyTab('WHEEL')}
+                  className={`flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+                    skyTab === 'WHEEL'
+                      ? 'bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8] text-black shadow-lg'
                       : 'text-mystic-text-muted hover:text-white'
                   }`}
                 >
-                  <Compass size={15} className="shrink-0" />
-                  <span className="truncate">Çift Çember</span>
+                  <Orbit size={15} />
+                  <span>Gökyüzü Çarkı & Açıları</span>
                 </button>
                 <button
                   type="button"
                   onClick={() => {
-                    setActiveTab('TIMELINE');
-                    if (!timelineData && !isTimelineLoading) {
-                      fetchTimeline(timelineRange);
+                    setSkyTab('TIMELINE');
+                    if (!skyTimelineData && !isSkyTimelineLoading) {
+                      fetchSkyTimeline(skyTimelineRange, skyDateStr);
                     }
                   }}
-                  className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all text-center ${
-                    activeTab === 'TIMELINE'
-                      ? 'bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] text-black shadow-lg shadow-cyan-500/20'
+                  className={`flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+                    skyTab === 'TIMELINE'
+                      ? 'bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8] text-black shadow-lg'
                       : 'text-mystic-text-muted hover:text-white'
                   }`}
                 >
-                  <Sparkles size={15} className="shrink-0" />
-                  <span className="truncate">Zaman Çizelgesi</span>
+                  <Calendar size={15} />
+                  <span>Kozmik Zaman Çizelgesi</span>
                 </button>
               </div>
 
-              <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
-                <div className="text-left sm:text-right">
-                  <span className="text-[10px] text-mystic-text-muted block">Harita Sahibi</span>
-                  <span className="text-[11px] sm:text-xs font-bold text-white truncate max-w-[180px] block">{cityKey?.name || 'Seçildi'} • {natalDateStr}</span>
+              {/* Right: Date Picker & Quick Actions */}
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-xl border border-white/10">
+                  <Clock size={14} className="text-[#0EA5E9]" />
+                  <input 
+                    type="date" 
+                    value={skyDateStr}
+                    onChange={(e) => setSkyDateStr(e.target.value)}
+                    className="bg-transparent text-white text-xs sm:text-sm focus:outline-none"
+                  />
+                  <input 
+                    type="time" 
+                    value={skyTimeStr}
+                    onChange={(e) => setSkyTimeStr(e.target.value)}
+                    className="bg-transparent text-white text-xs sm:text-sm focus:outline-none border-l border-white/10 pl-2"
+                  />
                 </div>
-                <button 
+
+                <button
                   type="button"
-                  onClick={() => { setTransitData(null); setTimelineData(null); }} 
-                  className="text-xs px-3.5 py-1.5 sm:py-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap shrink-0"
+                  onClick={() => {
+                    const nD = new Date().toISOString().split('T')[0];
+                    const nT = new Date().toTimeString().slice(0, 5);
+                    setSkyDateStr(nD);
+                    setSkyTimeStr(nT);
+                    fetchSkyChart(nD, nT);
+                    if (skyTab === 'TIMELINE') {
+                      fetchSkyTimeline(skyTimelineRange, nD);
+                    }
+                  }}
+                  className="px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-semibold border border-white/10 transition-colors"
                 >
-                  Yeni Harita Seç
+                  Şimdi
+                </button>
+
+                <button
+                  type="button"
+                  disabled={isSkyLoading}
+                  onClick={() => {
+                    fetchSkyChart(skyDateStr, skyTimeStr);
+                    if (skyTab === 'TIMELINE') {
+                      fetchSkyTimeline(skyTimelineRange, skyDateStr);
+                    }
+                  }}
+                  className="flex items-center gap-1.5 px-4 py-2 bg-[#0EA5E9] hover:bg-[#38BDF8] text-black font-bold rounded-xl text-xs transition-all shadow-md disabled:opacity-50"
+                >
+                  {isSkyLoading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+                  <span>Gökyüzünü Tara</span>
                 </button>
               </div>
             </div>
 
-            {/* Tab 1: Bi-Wheel Anlık Harita */}
-            {activeTab === 'BIWHEEL' && (
-              <div className="space-y-10">
-                <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-8 rounded-3xl shadow-2xl flex flex-col items-center w-full max-w-full overflow-hidden">
-                  <div className="flex w-full flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-6 mb-8 gap-4">
-                     <div>
-                       <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-3 mb-2">
-                         <Compass className="text-[#0EA5E9] shrink-0" /> Çift Çemberli Transit Haritası
-                       </h2>
-                       <div className="flex flex-col gap-1 text-xs sm:text-sm">
-                         <p className="text-[#D4AF37] flex items-center gap-2">
-                           <span className="w-2 h-2 rounded-full bg-[#D4AF37] shrink-0"></span>
-                           Natal: {cityKey ? cityKey.name : ''} • {natalDateStr ? natalDateStr.split('-').reverse().join('.') : ''} {natalTimeStr}
-                         </p>
-                         <p className="text-[#0EA5E9] flex items-center gap-2">
-                           <span className="w-2.5 h-2.5 rounded-full bg-[#0EA5E9] inline-block shrink-0"></span>
-                           Transit (Dış Çember): {transitDateStr ? transitDateStr.split('-').reverse().join('.') : ''} {transitTimeStr}
-                         </p>
-                       </div>
-                     </div>
-                  </div>
-
-                  {renderBiWheel()}
+            {/* Tab A: Gökyüzü Çarkı & Anlık Açı Listesi */}
+            {skyTab === 'WHEEL' && (
+              isSkyLoading && !skyChartData ? (
+                <div className="py-24 text-center bg-black/40 rounded-3xl border border-white/5">
+                  <Loader2 className="mx-auto text-[#0EA5E9] animate-spin mb-4" size={40} />
+                  <h4 className="text-white font-bold text-lg mb-1">Gökyüzü Açıları Hesaplanıyor...</h4>
+                  <p className="text-mystic-text-muted text-sm">Gezegenlerin ekliptik boylamları ve aralarındaki açı bağlantıları taranıyor.</p>
                 </div>
-
-
-
-            {/* Önemli Bilgilendirme Uyarı Kutusu */}
-            <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 p-6 rounded-3xl flex items-start gap-4">
-              <AlertCircle className="text-[#D4AF37] shrink-0 mt-0.5" size={24} />
-              <div>
-                <h4 className="text-sm font-bold text-white mb-2 uppercase tracking-wider">Önemli Bilgilendirme</h4>
-                <p className="text-xs text-mystic-text-muted leading-relaxed">
-                  Sistemimiz tarafından sunulan yorumlar, astrolojik hesaplama algoritmaları ile üretilmektedir. 
-                  Astrolojide hiçbir gösterge tek başına bir anlam ifade etmez. Haritanızdaki herhangi bir gezegen konumu, ev yerleşimi veya açı; 
-                  her zaman doğum haritanızın tamamı, diğer gezegen yerleşimleri ve gökyüzünün bütünsel bağlamı ile ilişkilendirilerek değerlendirilmelidir.
-                </p>
-              </div>
-            </div>
-
-            {/* Analysis Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              
-              {/* Transitlerin Düştüğü Evler */}
-              <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-8 rounded-3xl shadow-2xl">
-                <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Transit Gezegenler & Natal Evleriniz</h3>
-                <p className="text-sm text-mystic-text-muted mb-4">Gökyüzündeki gezegenler şu an doğum haritanızdaki hangi yaşam alanlarınızı (evlerinizi) tetikliyor?</p>
-                <div className="space-y-3">
-                  {transitData.transitPlanets.map((p, i) => (
-                    <div 
-                      key={`th-${i}`} 
-                      className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-[#0EA5E9]/30 hover:bg-white/10 transition-colors cursor-pointer"
-                      onClick={() => {
-                        if (isApprenticeOrAbove) {
-                          setSelectedInterp(getTransitHouseInterpretation(p.name, p.house));
-                        } else {
-                          setShowLockModal(true);
-                        }
-                      }}
-                    >
-                      <div className="flex items-center gap-3 w-1/3">
-                        <span className="text-2xl text-[#0EA5E9] font-bold w-8 text-center">{PLANET_SYMBOLS[p.name] || ''}</span>
-                        <span className="text-white font-medium">Transit {p.name}</span>
+              ) : skyChartData ? (
+                <div className="space-y-8">
+                  {/* Wheel & Aspects Split */}
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                    
+                    {/* Left: Mundane Sky Wheel (7 cols) */}
+                    <div className="lg:col-span-7 bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-6 rounded-3xl shadow-2xl flex flex-col items-center">
+                      <div className="w-full flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+                        <div>
+                          <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                            <Orbit className="text-[#0EA5E9]" size={20} />
+                            Anlık Gökyüzü Çarkı (Mundane Wheel)
+                          </h3>
+                          <p className="text-xs text-mystic-text-muted">
+                            {skyDateStr.split('-').reverse().join('.')} {skyTimeStr} • Gezegenlerin zodyaktaki anlık yerleşimleri
+                          </p>
+                        </div>
+                        <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#0EA5E9]/10 text-[#0EA5E9] border border-[#0EA5E9]/20">
+                          {skyChartData.aspects.length} Açı Aktif
+                        </span>
                       </div>
-                      <div className="w-1/3 text-center">
-                        <span className="font-bold text-white">{p.house}. Evinizde</span>
-                      </div>
-                      <div className="w-1/3 text-right text-mystic-text-muted text-sm">
-                        <span style={{ color: ZODIAC_COLORS[p.sign] }}>{p.sign}</span> {p.degreeInSign}° {p.isRetrograde && <span className="text-red-400 font-bold ml-1">Rx</span>}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
 
-              {/* Transit - Natal Açıları */}
-              <div className="bg-black/50 backdrop-blur-md border border-[#D4AF37]/30 p-8 rounded-3xl shadow-2xl">
-                <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Transit - Natal Açıları (Kadersel Tetiklenmeler)</h3>
-                <p className="text-sm text-mystic-text-muted mb-4">Gezegen geçişlerinin kendi doğuştan gelen karakterinize ve kaderinize yaptığı sert veya uyumlu açılar.</p>
-                <div className="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
-                  {transitData.transitAspects.length === 0 ? (
-                    <p className="text-mystic-text-muted text-center py-4">Şu anki transitler natal gezegenlerinize majör bir açı yapmıyor.</p>
-                  ) : (
-                    transitData.transitAspects.sort((a,b) => a.orb - b.orb).map((aspect, i) => (
-                      <div 
-                        key={`ta-${i}`} 
-                        className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-white/20 hover:bg-white/10 transition-colors cursor-pointer"
-                        onClick={() => {
-                          if (isApprenticeOrAbove) {
-                            setSelectedInterp(getTransitAspectInterpretation(aspect.transitPlanet, aspect.natalPlanet, aspect.type));
-                          } else {
-                            setShowLockModal(true);
+                      <MundaneSkyWheel 
+                        planets={skyChartData.planets}
+                        aspects={skyChartData.aspects}
+                        ascendant={skyChartData.ascendant}
+                        onSelectAspect={(asp: any) => {
+                          if (asp.interpretation) {
+                            setSelectedInterp({
+                              title: asp.interpretation.title,
+                              content: `${asp.interpretation.summary}\n\n【Kolektif Etki】\n${asp.interpretation.collectiveTheme}\n\n【Günün Tavsiyesi】\n${asp.interpretation.dailyAdvice}`,
+                              extra: asp.interpretation.chakraResonance
+                            });
                           }
                         }}
-                      >
-                        <div className="flex items-center gap-2">
-                          <span className="text-xl text-[#0EA5E9] font-bold w-6 text-center">{PLANET_SYMBOLS[aspect.transitPlanet] || ''}</span>
-                          <span className="text-white font-medium text-sm">T.{aspect.transitPlanet}</span>
-                        </div>
-                        
-                        <div className="flex flex-col items-center flex-1 px-2">
-                          <span className="text-xs font-bold px-2 py-1 rounded bg-white/10" style={{ color: ASPECT_COLORS[aspect.type] }}>
-                            {aspect.type}
-                          </span>
-                          <span className="text-[10px] text-mystic-text-muted mt-1">
-                            Orb: {aspect.orb.toFixed(1)}° {aspect.isExact && <span className="text-[#D4AF37]">(Tam)</span>}
-                          </span>
-                        </div>
+                      />
+                    </div>
 
-                        <div className="flex items-center gap-2">
-                          <span className="text-white font-medium text-sm">N.{aspect.natalPlanet}</span>
-                          <span className="text-xl text-[#D4AF37] font-bold w-6 text-center">{PLANET_SYMBOLS[aspect.natalPlanet] || ''}</span>
+                    {/* Right: Active Sky Aspects (5 cols) */}
+                    <div className="lg:col-span-5 bg-black/50 backdrop-blur-md border border-white/10 p-4 sm:p-6 rounded-3xl shadow-2xl flex flex-col">
+                      <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+                        <div>
+                          <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                            <Sparkles className="text-[#D4AF37]" size={18} />
+                            Gökyüzündeki Aktif Açı Bağlantıları
+                          </h3>
+                          <p className="text-xs text-mystic-text-muted">
+                            Gezegenlerin şu an birbiriyle kurduğu kozmik açılar
+                          </p>
                         </div>
                       </div>
-                    ))
-                  )}
+
+                      {/* Aspect Type Filters */}
+                      <div className="flex flex-wrap gap-1.5 mb-4">
+                        {[
+                          { id: 'ALL', label: 'Tümü' },
+                          { id: 'CONJUNCTION', label: 'Kavuşum (0°)' },
+                          { id: 'HARMONIOUS', label: 'Destek (△, ⚹)' },
+                          { id: 'CHALLENGING', label: 'Sınav (□, ☍)' },
+                        ].map(f => (
+                          <button
+                            key={f.id}
+                            onClick={() => setSkyAspectFilter(f.id as any)}
+                            className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all ${
+                              skyAspectFilter === f.id
+                                ? 'bg-white/20 text-white font-bold'
+                                : 'bg-white/5 text-mystic-text-muted hover:text-white'
+                            }`}
+                          >
+                            {f.label}
+                          </button>
+                        ))}
+                      </div>
+
+                      {/* Aspects Scrollable List */}
+                      <div className="space-y-3 max-h-[520px] overflow-y-auto custom-scrollbar pr-1">
+                        {filteredSkyAspects.length === 0 ? (
+                          <div className="text-center py-12 text-mystic-text-muted text-xs">
+                            Seçilen filtrede aktif bir gökyüzü açısı bulunmuyor.
+                          </div>
+                        ) : (
+                          filteredSkyAspects.map((asp, idx) => {
+                            const interp = asp.interpretation;
+                            return (
+                              <div
+                                key={`sky-asp-${idx}`}
+                                onClick={() => {
+                                  if (interp) {
+                                    setSelectedInterp({
+                                      title: interp.title,
+                                      content: `${interp.summary}\n\n【Kolektif Etki】\n${interp.collectiveTheme}\n\n【Günün Tavsiyesi】\n${interp.dailyAdvice}`,
+                                      extra: interp.chakraResonance
+                                    });
+                                  }
+                                }}
+                                className="group p-3.5 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5 hover:border-[#0EA5E9]/40 transition-all cursor-pointer flex flex-col gap-2 shadow-sm"
+                              >
+                                <div className="flex items-center justify-between">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-lg text-[#0EA5E9] font-bold">{PLANET_SYMBOLS[asp.planet1] || ''}</span>
+                                    <span className="text-xs sm:text-sm font-semibold text-white">{asp.planet1}</span>
+                                  </div>
+
+                                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10">
+                                    <span className="text-xs font-bold" style={{ color: ASPECT_COLORS[asp.type] }}>
+                                      {asp.type}
+                                    </span>
+                                    <span className="text-[10px] text-gray-400">
+                                      ({asp.orb.toFixed(1)}°)
+                                    </span>
+                                  </div>
+
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xs sm:text-sm font-semibold text-white">{asp.planet2}</span>
+                                    <span className="text-lg text-[#D4AF37] font-bold">{PLANET_SYMBOLS[asp.planet2] || ''}</span>
+                                  </div>
+                                </div>
+
+                                {interp && (
+                                  <p className="text-[11px] text-mystic-text-muted line-clamp-2 leading-relaxed">
+                                    {interp.summary}
+                                  </p>
+                                )}
+
+                                <div className="flex items-center justify-between pt-1 border-t border-white/5 text-[10px] text-gray-400">
+                                  <span className="text-[#0EA5E9]/80 font-medium">
+                                    {interp?.energyType || 'Açı'}
+                                  </span>
+                                  <span className="flex items-center gap-1 text-white/60 group-hover:text-white transition-colors">
+                                    Yorumu Oku <ChevronRight size={12} />
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Anlık Gezegen Burç Yerleşimleri Tablosu */}
+                  <div className="bg-black/50 backdrop-blur-md border border-white/10 p-6 rounded-3xl shadow-2xl">
+                    <h3 className="text-lg font-bold text-white mb-2 flex items-center gap-2">
+                      <Layers className="text-[#38BDF8]" size={18} />
+                      Anlık Gökyüzü Gezegen Yerleşimleri
+                    </h3>
+                    <p className="text-xs text-mystic-text-muted mb-4">
+                      Gezegenlerin şu anda hangi burç ve derecede seyrettiği ve retro (geri hareket) durumları
+                    </p>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                      {skyChartData.planets
+                        .filter(p => ['Güneş', 'Ay', 'Merkür', 'Venüs', 'Mars', 'Jüpiter', 'Satürn', 'Uranüs', 'Neptün', 'Plüton', 'Kiron', 'Kuzey Ay Düğümü'].includes(p.name))
+                        .map((p, idx) => (
+                          <div 
+                            key={`sky-pl-${idx}`}
+                            className="bg-white/5 border border-white/5 rounded-xl p-3 flex flex-col gap-1 hover:border-white/20 transition-colors"
+                          >
+                            <div className="flex items-center justify-between">
+                              <span className="text-base text-[#0EA5E9] font-bold">{PLANET_SYMBOLS[p.name] || ''}</span>
+                              <span className="text-xs font-bold text-white truncate">{p.name}</span>
+                            </div>
+                            <div className="flex items-baseline justify-between mt-1">
+                              <span className="text-xs font-bold" style={{ color: ZODIAC_COLORS[p.sign] }}>
+                                {p.sign}
+                              </span>
+                              <span className="text-[11px] text-gray-300">
+                                {p.degreeInSign}°{String(p.minutes).padStart(2, '0')}'
+                              </span>
+                            </div>
+                            {p.isRetrograde && (
+                              <span className="text-[10px] text-red-400 font-bold bg-red-500/10 px-1.5 py-0.5 rounded w-fit mt-1">
+                                Rx (Retro)
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ) : null
+            )}
 
-            </div>
-          </div>
-        )}
-
-            {/* Tab 2: Kozmik Zaman Çizelgesi (Gantt) */}
-            {activeTab === 'TIMELINE' && (
-              isTimelineLoading && !timelineData ? (
+            {/* Tab B: Kozmik Zaman Çizelgesi (Mundane Gantt) */}
+            {skyTab === 'TIMELINE' && (
+              isSkyTimelineLoading && !skyTimelineData ? (
                 <div className="py-24 text-center bg-black/40 rounded-3xl border border-white/5">
-                  <Loader2 className="mx-auto text-mystic-primary animate-spin mb-4" size={40} />
-                  <h4 className="text-white font-bold text-lg mb-1">Kozmik Zaman Çizelgesi Hesaplanıyor...</h4>
-                  <p className="text-mystic-text-muted text-sm">Gezegenlerin gökyüzü yörüngeleri ve açı başlangıç-bitiş tarihleri taranıyor.</p>
+                  <Loader2 className="mx-auto text-[#0EA5E9] animate-spin mb-4" size={40} />
+                  <h4 className="text-white font-bold text-lg mb-1">Gökyüzü Zaman Çizelgesi Hesaplanıyor...</h4>
+                  <p className="text-mystic-text-muted text-sm">
+                    Gezegenlerin gökyüzünde birbiriyle yapacağı açı başlangıç, 0° zirve ve bitiş döngüleri taranıyor.
+                  </p>
                 </div>
               ) : (
                 <TransitTimelineChart
-                  items={timelineData?.items || []}
-                  startDateStr={timelineData?.startDate || transitDateStr}
-                  endDateStr={timelineData?.endDate || transitDateStr}
-                  range={timelineRange}
+                  items={skyTimelineData?.items || []}
+                  startDateStr={skyTimelineData?.startDate || skyDateStr}
+                  endDateStr={skyTimelineData?.endDate || skyDateStr}
+                  range={skyTimelineRange}
                   onRangeChange={(newRange) => {
-                    setTimelineRange(newRange);
-                    fetchTimeline(newRange);
+                    setSkyTimelineRange(newRange);
+                    fetchSkyTimeline(newRange, skyDateStr);
                   }}
-                  isLoading={isTimelineLoading}
+                  isLoading={isSkyTimelineLoading}
                   isPremium={isApprenticeOrAbove}
                   onRequirePremium={() => setShowLockModal(true)}
                 />
@@ -545,20 +708,288 @@ export default function TransitsPage() {
             )}
           </div>
         )}
+
+        {/* ========================================================================= */}
+        {/* MODE 2: PERSONAL (Doğum Haritası + Gökyüzü Bi-Wheel)                     */}
+        {/* ========================================================================= */}
+        {analysisMode === 'PERSONAL' && (
+          <div className="space-y-8 animate-in fade-in duration-500">
+            {!transitData ? (
+              <div className="bg-black/50 backdrop-blur-md border border-white/10 p-8 rounded-3xl shadow-2xl relative overflow-hidden max-w-4xl mx-auto">
+                {isAnalyzing && (
+                  <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center text-[#0EA5E9]">
+                    <Loader2 size={48} className="animate-spin mb-4" />
+                    <h3 className="text-xl font-bold mb-2 animate-pulse">Transitler Hesaplanıyor...</h3>
+                    <p className="text-sm text-white/60">Gezegen geçişleri ve natal açılarınız analiz ediliyor.</p>
+                  </div>
+                )}
+                
+                <form onSubmit={handlePersonalSubmit} className="space-y-8">
+                  <div className="bg-white/5 p-6 rounded-2xl border border-white/5">
+                    <h3 className="text-xl font-bold text-[#D4AF37] mb-4 flex items-center gap-2">
+                      <Star size={20}/> 1. Doğum Bilgileriniz (Natal)
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-mystic-text-muted mb-2">Doğum Tarihi *</label>
+                        <input required type="date" min="1900-01-01" max="2100-12-31" value={natalDateStr} onChange={e => setNatalDateStr(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-mystic-text-muted mb-2">Doğum Saati</label>
+                        <input required type="time" value={natalTimeStr} onChange={e => setNatalTimeStr(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-mystic-text-muted mb-2">Şehir *</label>
+                        <LocationAutocomplete
+                          onSelect={(c) => setCityKey(c)}
+                          className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-[#0EA5E9]/5 p-6 rounded-2xl border border-[#0EA5E9]/20">
+                    <h3 className="text-xl font-bold text-[#0EA5E9] mb-4 flex items-center gap-2">
+                      <Compass size={20}/> 2. Transit (Geçiş) Tarihi
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div>
+                        <label className="block text-sm font-medium text-mystic-text-muted mb-2">Transit Tarihi *</label>
+                        <input required type="date" min="1900-01-01" max="2100-12-31" value={transitDateStr} onChange={e => setTransitDateStr(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#0EA5E9] transition-colors" />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-mystic-text-muted mb-2">Transit Saati</label>
+                        <input required type="time" value={transitTimeStr} onChange={e => setTransitTimeStr(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#0EA5E9] transition-colors" />
+                      </div>
+                    </div>
+                  </div>
+
+                  <button type="submit" disabled={isAnalyzing} className="w-full bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] hover:opacity-90 disabled:opacity-50 text-black font-bold text-lg py-4 rounded-xl transition-all shadow-lg cursor-pointer">
+                    Transit Haritamı Hesapla
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
+                {/* View Navigation Tabs & Map Info */}
+                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-black/40 p-3 sm:p-4 rounded-3xl border border-white/10 backdrop-blur-md">
+                  <div className="grid grid-cols-2 sm:flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 shadow-lg w-full sm:w-auto">
+                    <button
+                      type="button"
+                      onClick={() => setPersonalTab('BIWHEEL')}
+                      className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all text-center ${
+                        personalTab === 'BIWHEEL'
+                          ? 'bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] text-black shadow-lg shadow-cyan-500/20'
+                          : 'text-mystic-text-muted hover:text-white'
+                      }`}
+                    >
+                      <Compass size={15} className="shrink-0" />
+                      <span className="truncate">Çift Çember</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setPersonalTab('TIMELINE');
+                        if (!timelineData && !isTimelineLoading) {
+                          fetchPersonalTimeline(timelineRange);
+                        }
+                      }}
+                      className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all text-center ${
+                        personalTab === 'TIMELINE'
+                          ? 'bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] text-black shadow-lg shadow-cyan-500/20'
+                          : 'text-mystic-text-muted hover:text-white'
+                      }`}
+                    >
+                      <Sparkles size={15} className="shrink-0" />
+                      <span className="truncate">Zaman Çizelgesi</span>
+                    </button>
+                  </div>
+
+                  <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
+                    <div className="text-left sm:text-right">
+                      <span className="text-[10px] text-mystic-text-muted block">Harita Sahibi</span>
+                      <span className="text-[11px] sm:text-xs font-bold text-white truncate max-w-[180px] block">{cityKey?.name || 'Seçildi'} • {natalDateStr}</span>
+                    </div>
+                    <button 
+                      type="button"
+                      onClick={() => { setTransitData(null); setTimelineData(null); }} 
+                      className="text-xs px-3.5 py-1.5 sm:py-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap shrink-0 cursor-pointer"
+                    >
+                      Yeni Harita Seç
+                    </button>
+                  </div>
+                </div>
+
+                {/* Personal Tab 1: Bi-Wheel */}
+                {personalTab === 'BIWHEEL' && (
+                  <div className="space-y-10">
+                    <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-8 rounded-3xl shadow-2xl flex flex-col items-center w-full max-w-full overflow-hidden">
+                      <div className="flex w-full flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-6 mb-8 gap-4">
+                         <div>
+                           <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-3 mb-2">
+                             <Compass className="text-[#0EA5E9] shrink-0" /> Çift Çemberli Transit Haritası
+                           </h2>
+                           <div className="flex flex-col gap-1 text-xs sm:text-sm">
+                             <p className="text-[#D4AF37] flex items-center gap-2">
+                               <span className="w-2 h-2 rounded-full bg-[#D4AF37] shrink-0"></span>
+                               Natal: {cityKey ? cityKey.name : ''} • {natalDateStr ? natalDateStr.split('-').reverse().join('.') : ''} {natalTimeStr}
+                             </p>
+                             <p className="text-[#0EA5E9] flex items-center gap-2">
+                               <span className="w-2.5 h-2.5 rounded-full bg-[#0EA5E9] inline-block shrink-0"></span>
+                               Transit (Dış Çember): {transitDateStr ? transitDateStr.split('-').reverse().join('.') : ''} {transitTimeStr}
+                             </p>
+                           </div>
+                         </div>
+                      </div>
+
+                      {renderBiWheel()}
+                    </div>
+
+                    {/* Önemli Bilgilendirme */}
+                    <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 p-6 rounded-3xl flex items-start gap-4">
+                      <AlertCircle className="text-[#D4AF37] shrink-0 mt-0.5" size={24} />
+                      <div>
+                        <h4 className="text-sm font-bold text-white mb-2 uppercase tracking-wider">Önemli Bilgilendirme</h4>
+                        <p className="text-xs text-mystic-text-muted leading-relaxed">
+                          Sistemimiz tarafından sunulan yorumlar, astrolojik hesaplama algoritmaları ile üretilmektedir. 
+                          Astrolojide hiçbir gösterge tek başına bir anlam ifade etmez. Haritanızdaki herhangi bir gezegen konumu, ev yerleşimi veya açı; 
+                          her zaman doğum haritanızın tamamı, diğer gezegen yerleşimleri ve gökyüzünün bütünsel bağlamı ile ilişkilendirilerek değerlendirilmelidir.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Analysis Grid */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                      {/* Transitlerin Düştüğü Evler */}
+                      <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-8 rounded-3xl shadow-2xl">
+                        <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Transit Gezegenler & Natal Evleriniz</h3>
+                        <p className="text-sm text-mystic-text-muted mb-4">Gökyüzündeki gezegenler şu an doğum haritanızdaki hangi yaşam alanlarınızı (evlerinizi) tetikliyor?</p>
+                        <div className="space-y-3">
+                          {transitData.transitPlanets.map((p, i) => (
+                            <div 
+                              key={`th-${i}`} 
+                              className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-[#0EA5E9]/30 hover:bg-white/10 transition-colors cursor-pointer"
+                              onClick={() => {
+                                if (isApprenticeOrAbove) {
+                                  setSelectedInterp(getTransitHouseInterpretation(p.name, p.house));
+                                } else {
+                                  setShowLockModal(true);
+                                }
+                              }}
+                            >
+                              <div className="flex items-center gap-3 w-1/3">
+                                <span className="text-2xl text-[#0EA5E9] font-bold w-8 text-center">{PLANET_SYMBOLS[p.name] || ''}</span>
+                                <span className="text-white font-medium">Transit {p.name}</span>
+                              </div>
+                              <div className="w-1/3 text-center">
+                                <span className="font-bold text-white">{p.house}. Evinizde</span>
+                              </div>
+                              <div className="w-1/3 text-right text-mystic-text-muted text-sm">
+                                <span style={{ color: ZODIAC_COLORS[p.sign] }}>{p.sign}</span> {p.degreeInSign}° {p.isRetrograde && <span className="text-red-400 font-bold ml-1">Rx</span>}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Transit - Natal Açıları */}
+                      <div className="bg-black/50 backdrop-blur-md border border-[#D4AF37]/30 p-8 rounded-3xl shadow-2xl">
+                        <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Transit - Natal Açıları (Kadersel Tetiklenmeler)</h3>
+                        <p className="text-sm text-mystic-text-muted mb-4">Gezegen geçişlerinin kendi doğuştan gelen karakterinize ve kaderinize yaptığı sert veya uyumlu açılar.</p>
+                        <div className="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
+                          {transitData.transitAspects.length === 0 ? (
+                            <p className="text-mystic-text-muted text-center py-4">Şu anki transitler natal gezegenlerinize majör bir açı yapmıyor.</p>
+                          ) : (
+                            transitData.transitAspects.sort((a,b) => a.orb - b.orb).map((aspect, i) => (
+                              <div 
+                                key={`ta-${i}`} 
+                                className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-white/20 hover:bg-white/10 transition-colors cursor-pointer"
+                                onClick={() => {
+                                  if (isApprenticeOrAbove) {
+                                    setSelectedInterp(getTransitAspectInterpretation(aspect.transitPlanet, aspect.natalPlanet, aspect.type));
+                                  } else {
+                                    setShowLockModal(true);
+                                  }
+                                }}
+                              >
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xl text-[#0EA5E9] font-bold w-6 text-center">{PLANET_SYMBOLS[aspect.transitPlanet] || ''}</span>
+                                  <span className="text-white font-medium text-sm">T.{aspect.transitPlanet}</span>
+                                </div>
+                                
+                                <div className="flex flex-col items-center flex-1 px-2">
+                                  <span className="text-xs font-bold px-2 py-1 rounded bg-white/10" style={{ color: ASPECT_COLORS[aspect.type] }}>
+                                    {aspect.type}
+                                  </span>
+                                  <span className="text-[10px] text-mystic-text-muted mt-1">
+                                    Orb: {aspect.orb.toFixed(1)}° {aspect.isExact && <span className="text-[#D4AF37]">(Tam)</span>}
+                                  </span>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                  <span className="text-white font-medium text-sm">N.{aspect.natalPlanet}</span>
+                                  <span className="text-xl text-[#D4AF37] font-bold w-6 text-center">{PLANET_SYMBOLS[aspect.natalPlanet] || ''}</span>
+                                </div>
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Personal Tab 2: Timeline */}
+                {personalTab === 'TIMELINE' && (
+                  isTimelineLoading && !timelineData ? (
+                    <div className="py-24 text-center bg-black/40 rounded-3xl border border-white/5">
+                      <Loader2 className="mx-auto text-mystic-primary animate-spin mb-4" size={40} />
+                      <h4 className="text-white font-bold text-lg mb-1">Kozmik Zaman Çizelgesi Hesaplanıyor...</h4>
+                      <p className="text-mystic-text-muted text-sm">Gezegenlerin gökyüzü yörüngeleri ve açı başlangıç-bitiş tarihleri taranıyor.</p>
+                    </div>
+                  ) : (
+                    <TransitTimelineChart
+                      items={timelineData?.items || []}
+                      startDateStr={timelineData?.startDate || transitDateStr}
+                      endDateStr={timelineData?.endDate || transitDateStr}
+                      range={timelineRange}
+                      onRangeChange={(newRange) => {
+                        setTimelineRange(newRange);
+                        fetchPersonalTimeline(newRange);
+                      }}
+                      isLoading={isTimelineLoading}
+                      isPremium={isApprenticeOrAbove}
+                      onRequirePremium={() => setShowLockModal(true)}
+                    />
+                  )
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
+      {/* Shared Interpretation Modal */}
       {selectedInterp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setSelectedInterp(null)}>
-          <div className="bg-mystic-dark border border-white/10 rounded-2xl max-w-lg w-full p-6 shadow-2xl" onClick={e => e.stopPropagation()}>
+          <div className="bg-mystic-dark border border-white/10 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative" onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-start mb-4">
               <h3 className="text-xl font-bold text-[#D4AF37] pr-8">{selectedInterp.title}</h3>
-              <button onClick={() => setSelectedInterp(null)} className="text-white/50 hover:text-white transition-colors">
+              <button onClick={() => setSelectedInterp(null)} className="text-white/50 hover:text-white transition-colors cursor-pointer">
                 <X size={24} />
               </button>
             </div>
-            <div className="text-gray-300 leading-relaxed whitespace-pre-wrap">
+            
+            <div className="text-gray-300 leading-relaxed whitespace-pre-wrap text-sm sm:text-base mb-4">
               {selectedInterp.content}
             </div>
+
+            {selectedInterp.extra && (
+              <div className="mt-4 pt-4 border-t border-white/10 text-xs text-[#0EA5E9] flex items-center gap-2">
+                <Info size={14} className="shrink-0" />
+                <span>{selectedInterp.extra}</span>
+              </div>
+            )}
           </div>
         </div>
       )}

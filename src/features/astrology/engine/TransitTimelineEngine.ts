@@ -1,6 +1,7 @@
 import { Constants } from '@fusionstrings/swisseph-wasi';
 import { getSwe } from './AstrologyEngine';
 import { AstroPoint } from './AstrologyConstants';
+import { getSkyAspectInterpretation } from './SkyAspectInterpretations';
 
 export interface TransitTimelineItem {
   id: string;
@@ -411,3 +412,244 @@ export async function calculateTransitTimeline(
     return new Date(a.peakDate).getTime() - new Date(b.peakDate).getTime();
   });
 }
+
+/**
+ * Calculates mundane transit aspect intervals (Gantt bars) between moving sky planets over a date range.
+ * Independent of any natal birth chart.
+ */
+export async function calculateMundaneTimeline(
+  startDate: Date,
+  endDate: Date,
+  options?: {
+    categoryFilter?: 'ALL' | 'KADERSEL' | 'KISISEL';
+    onlyMajorAspects?: boolean;
+    lookbackDays?: number;
+    lookaheadDays?: number;
+  }
+): Promise<TransitTimelineItem[]> {
+  const swe = await getSwe();
+  const flags = Constants.SEFLG_SWIEPH | Constants.SEFLG_SPEED;
+
+  const lookbackDays = options?.lookbackDays ?? 120;
+  const lookaheadDays = options?.lookaheadDays ?? 90;
+
+  const startDayTime = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate())).getTime();
+  const endDayTime = new Date(Date.UTC(endDate.getUTCFullYear(), endDate.getUTCMonth(), endDate.getUTCDate(), 23, 59, 59)).getTime();
+
+  const scanStartDate = new Date(startDate.getTime() - lookbackDays * 24 * 60 * 60 * 1000);
+  const scanEndDate = new Date(endDate.getTime() + lookaheadDays * 24 * 60 * 60 * 1000);
+
+  // 1. Pre-calculate positions of all 10 transit bodies for each sample day
+  const dailySamples: { date: Date; dateStr: string; positions: Record<string, number> }[] = [];
+  let cur = new Date(Date.UTC(scanStartDate.getUTCFullYear(), scanStartDate.getUTCMonth(), scanStartDate.getUTCDate(), 12, 0, 0));
+  const scanEndUtc = new Date(Date.UTC(scanEndDate.getUTCFullYear(), scanEndDate.getUTCMonth(), scanEndDate.getUTCDate(), 12, 0, 0));
+
+  while (cur <= scanEndUtc) {
+    const year = cur.getUTCFullYear();
+    const month = cur.getUTCMonth() + 1;
+    const day = cur.getUTCDate();
+    const jd = swe.swe_julday(year, month, day, 12.0, Constants.SE_GREG_CAL);
+
+    const positions: Record<string, number> = {};
+    for (const body of TRANSIT_BODIES) {
+      const calc = swe.swe_calc_ut(jd, body.id, flags);
+      positions[body.name] = mod360(calc.xx[0]);
+    }
+
+    dailySamples.push({
+      date: new Date(cur.getTime()),
+      dateStr: formatDate(cur),
+      positions
+    });
+
+    cur = new Date(cur.getTime() + 1 * 24 * 60 * 60 * 1000);
+  }
+
+  if (dailySamples.length === 0) return [];
+
+  const timelineItems: TransitTimelineItem[] = [];
+
+  // Helper for single-point body position
+  const getBodyLonAtDate = (date: Date, bodyId: number): number => {
+    const y = date.getUTCFullYear();
+    const m = date.getUTCMonth() + 1;
+    const d = date.getUTCDate();
+    const jd = swe.swe_julday(y, m, d, 12.0, Constants.SE_GREG_CAL);
+    const calc = swe.swe_calc_ut(jd, bodyId, flags);
+    return mod360(calc.xx[0]);
+  };
+
+  // 2. Scan all unique pairs of transit bodies
+  for (let i = 0; i < TRANSIT_BODIES.length; i++) {
+    for (let j = i + 1; j < TRANSIT_BODIES.length; j++) {
+      const b1 = TRANSIT_BODIES[i];
+      const b2 = TRANSIT_BODIES[j];
+
+      // Determine category
+      const isKadersel = b1.category === 'Kadersel' && b2.category === 'Kadersel';
+      const category: 'Kadersel' | 'Kişisel' = isKadersel ? 'Kadersel' : 'Kişisel';
+
+      if (options?.categoryFilter === 'KADERSEL' && category !== 'Kadersel') continue;
+      if (options?.categoryFilter === 'KISISEL' && category !== 'Kişisel') continue;
+
+      for (const aspect of ASPECTS) {
+        let inInterval = false;
+        let intervalStart: Date | null = null;
+        let intervalEnd: Date | null = null;
+        let peakDate: Date | null = null;
+        let minOrb = 999;
+
+        const finalizeAndPush = (rawStart: Date, rawEnd: Date, rawPeak: Date, rawMinOrb: number) => {
+          let sD = new Date(rawStart.getTime());
+          let eD = new Date(rawEnd.getTime());
+          let pD = new Date(rawPeak.getTime());
+          let bestOrb = rawMinOrb;
+
+          // Backtracking into the past if started at the very first sample
+          if (sD.getTime() === dailySamples[0].date.getTime()) {
+            let backCur = new Date(sD.getTime() - 2 * 24 * 60 * 60 * 1000);
+            let backSteps = 0;
+            while (backSteps < 60) {
+              const lon1 = getBodyLonAtDate(backCur, b1.id);
+              const lon2 = getBodyLonAtDate(backCur, b2.id);
+              const bOrb = getAngularDifference(lon1, lon2, aspect.angle);
+
+              if (bOrb <= aspect.maxOrb) {
+                sD = new Date(backCur.getTime());
+                if (bOrb < bestOrb) {
+                  bestOrb = bOrb;
+                  pD = new Date(backCur.getTime());
+                }
+                backCur = new Date(backCur.getTime() - 2 * 24 * 60 * 60 * 1000);
+                backSteps++;
+              } else {
+                break;
+              }
+            }
+          }
+
+          // Forward tracking into the future if ended at the last sample
+          if (eD.getTime() === dailySamples[dailySamples.length - 1].date.getTime()) {
+            let fwdCur = new Date(eD.getTime() + 2 * 24 * 60 * 60 * 1000);
+            let fwdSteps = 0;
+            while (fwdSteps < 60) {
+              const lon1 = getBodyLonAtDate(fwdCur, b1.id);
+              const lon2 = getBodyLonAtDate(fwdCur, b2.id);
+              const fOrb = getAngularDifference(lon1, lon2, aspect.angle);
+
+              if (fOrb <= aspect.maxOrb) {
+                eD = new Date(fwdCur.getTime());
+                if (fOrb < bestOrb) {
+                  bestOrb = fOrb;
+                  pD = new Date(fwdCur.getTime());
+                }
+                fwdCur = new Date(fwdCur.getTime() + 2 * 24 * 60 * 60 * 1000);
+                fwdSteps++;
+              } else {
+                break;
+              }
+            }
+          }
+
+          // Ensure peak and start are not identical if duration > 1
+          if (pD.getTime() === sD.getTime() && eD.getTime() > sD.getTime()) {
+            const midTime = sD.getTime() + Math.round((eD.getTime() - sD.getTime()) / 2);
+            pD = new Date(midTime);
+          }
+
+          const sTime = sD.getTime();
+          const eTime = eD.getTime();
+
+          // Must overlap requested window
+          if (eTime >= startDayTime && sTime <= endDayTime) {
+            const durationDays = Math.max(1, Math.round((eTime - sTime) / (1000 * 60 * 60 * 24)));
+            const interp = getSkyAspectInterpretation(b1.name, b2.name, aspect.name);
+            const startStr = formatDate(sD);
+            const peakStr = formatDate(pD);
+            const endStr = formatDate(eD);
+
+            const isStartedInPast = sTime < startDayTime;
+            const isPeakInPast = pD.getTime() < startDayTime;
+
+            let status: 'ACTIVE' | 'UPCOMING' | 'COMPLETED' = 'ACTIVE';
+            if (sTime > startDayTime) status = 'UPCOMING';
+            else if (eTime < startDayTime) status = 'COMPLETED';
+
+            let phase: 'YAKLASAN' | 'ZIRVE' | 'UZAKLASAN' = 'YAKLASAN';
+            if (peakStr === formatDate(startDate)) phase = 'ZIRVE';
+            else if (isPeakInPast) phase = 'UZAKLASAN';
+            else phase = 'YAKLASAN';
+
+            timelineItems.push({
+              id: `sky-${b1.name}-${aspect.name}-${b2.name}-${startStr}`,
+              transitPlanet: b1.name,
+              natalPlanet: b2.name,
+              type: aspect.name,
+              isHarmonious: aspect.isHarmonious,
+              startDate: startStr,
+              peakDate: peakStr,
+              endDate: endStr,
+              minOrb: Number(bestOrb.toFixed(2)),
+              category,
+              title: `${b1.name} ${aspect.name} ${b2.name}`,
+              summary: interp.summary,
+              details: interp.collectiveTheme,
+              advice: interp.dailyAdvice,
+              chakraLayer: interp.chakraResonance,
+              durationDays,
+              status,
+              phase,
+              isStartedInPast,
+              isPeakInPast
+            });
+          }
+        };
+
+        for (let s = 0; s < dailySamples.length; s++) {
+          const sample = dailySamples[s];
+          const lon1 = sample.positions[b1.name];
+          const lon2 = sample.positions[b2.name];
+          const orb = getAngularDifference(lon1, lon2, aspect.angle);
+          const isInside = orb <= aspect.maxOrb;
+
+          if (isInside) {
+            if (!inInterval) {
+              inInterval = true;
+              intervalStart = sample.date;
+              peakDate = sample.date;
+              minOrb = orb;
+            } else {
+              if (orb < minOrb) {
+                minOrb = orb;
+                peakDate = sample.date;
+              }
+            }
+            intervalEnd = sample.date;
+          } else {
+            if (inInterval && intervalStart && intervalEnd && peakDate) {
+              finalizeAndPush(intervalStart, intervalEnd, peakDate, minOrb);
+              inInterval = false;
+              intervalStart = null;
+              intervalEnd = null;
+              peakDate = null;
+              minOrb = 999;
+            }
+          }
+        }
+
+        if (inInterval && intervalStart && intervalEnd && peakDate) {
+          finalizeAndPush(intervalStart, intervalEnd, peakDate, minOrb);
+        }
+      }
+    }
+  }
+
+  // Sort: Active first, Kadersel first, then by peakDate
+  return timelineItems.sort((a, b) => {
+    if (a.category !== b.category) {
+      return a.category === 'Kadersel' ? -1 : 1;
+    }
+    return new Date(a.peakDate).getTime() - new Date(b.peakDate).getTime();
+  });
+}
+
