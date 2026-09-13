@@ -76,9 +76,35 @@ export default function BillingProfileForm({ initial, isFirst, onSaved, onCancel
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((f) => ({ ...f, [k]: v }));
   const isCompany = form.type === 'company';
 
-  const submit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submit = async (e?: React.FormEvent | React.MouseEvent) => {
+    if (e) e.preventDefault();
     setError('');
+
+    if (!form.label.trim()) {
+      setError('Lütfen profil adını girin.');
+      return;
+    }
+    if (!form.title.trim()) {
+      setError(isCompany ? 'Lütfen firma ünvanını girin.' : 'Lütfen ad ve soyadınızı girin.');
+      return;
+    }
+    if (!form.taxNumber.trim()) {
+      setError(isCompany ? 'Lütfen vergi numaranızı girin.' : 'Lütfen T.C. kimlik numaranızı girin.');
+      return;
+    }
+    if (isCompany && !form.taxOffice?.trim()) {
+      setError('Lütfen vergi dairesini girin.');
+      return;
+    }
+    if (!form.address.trim()) {
+      setError('Lütfen fatura adresinizi girin.');
+      return;
+    }
+    if (!form.city.trim()) {
+      setError('Lütfen şehir girin.');
+      return;
+    }
+
     setSaving(true);
     try {
       const res = initial
@@ -93,8 +119,17 @@ export default function BillingProfileForm({ initial, isFirst, onSaved, onCancel
   };
 
   return (
-    <form onSubmit={submit} className="space-y-3.5">
+    <div 
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' && (e.target as HTMLElement).tagName !== 'TEXTAREA') {
+          e.preventDefault();
+          submit();
+        }
+      }}
+      className="space-y-3.5"
+    >
       {isFirst && (
+
         <p className="text-xs text-white/60 leading-relaxed">
           Fatura kesebilmemiz için bir fatura profili oluşturmanız gerekir. Daha sonra profil
           sayfanızdan birden fazla profil (şahsi, şirket) ekleyebilirsiniz.
@@ -258,7 +293,8 @@ export default function BillingProfileForm({ initial, isFirst, onSaved, onCancel
           </button>
         )}
         <button
-          type="submit"
+          type="button"
+          onClick={submit}
           disabled={saving}
           className="flex items-center gap-1.5 bg-[#D4AF37] text-black text-xs font-semibold px-4 py-2.5 rounded-xl disabled:opacity-50"
         >
@@ -266,6 +302,7 @@ export default function BillingProfileForm({ initial, isFirst, onSaved, onCancel
           {initial ? 'Güncelle' : 'Kaydet'}
         </button>
       </div>
-    </form>
+    </div>
   );
 }
+
