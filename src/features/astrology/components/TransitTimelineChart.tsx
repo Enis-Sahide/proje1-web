@@ -28,6 +28,7 @@ interface TransitTimelineChartProps {
   isLoading?: boolean;
   isPremium?: boolean;
   onRequirePremium?: () => void;
+  isMundane?: boolean;
 }
 
 const PLANET_SYMBOLS: Record<string, string> = {
@@ -53,7 +54,8 @@ export default function TransitTimelineChart({
   onRangeChange,
   isLoading = false,
   isPremium = false,
-  onRequirePremium
+  onRequirePremium,
+  isMundane = false
 }: TransitTimelineChartProps) {
   const [selectedItem, setSelectedItem] = useState<TransitTimelineItem | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<'ALL' | 'KADERSEL' | 'KISISEL'>('ALL');
@@ -186,7 +188,7 @@ export default function TransitTimelineChart({
                 categoryFilter === 'KADERSEL' ? 'bg-[#9333EA]/30 text-purple-300 font-bold border border-purple-500/30' : 'text-mystic-text-muted hover:text-white'
               }`}
             >
-              Kadersel (Jüpiter/Satürn...)
+              {isMundane ? 'Büyük Döngüler (Jüpiter, Satürn...)' : 'Kadersel (Jüpiter/Satürn...)'}
             </button>
             <button
               onClick={() => setCategoryFilter('KISISEL')}
@@ -194,7 +196,7 @@ export default function TransitTimelineChart({
                 categoryFilter === 'KISISEL' ? 'bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30' : 'text-mystic-text-muted hover:text-white'
               }`}
             >
-              Kişisel (Mars/Güneş...)
+              {isMundane ? 'Hızlı / İç Gezegenler (Mars, Venüs...)' : 'Kişisel (Mars/Güneş...)'}
             </button>
           </div>
 
@@ -372,13 +374,13 @@ export default function TransitTimelineChart({
                           {PLANET_SYMBOLS[item.transitPlanet] || '•'}
                         </span>
                         <span className="text-[11px] sm:text-xs font-semibold text-white truncate">
-                          T.{item.transitPlanet}
+                          {isMundane ? item.transitPlanet : `T.${item.transitPlanet}`}
                         </span>
                         <span className="text-[10px] sm:text-xs font-black text-mystic-accent shrink-0">
                           {ASPECT_SYMBOLS[item.type] || item.type}
                         </span>
                         <span className="text-[11px] sm:text-xs font-semibold text-gray-300 truncate">
-                          N.{item.natalPlanet}
+                          {isMundane ? item.natalPlanet : `N.${item.natalPlanet}`}
                         </span>
                         <span className="text-sm sm:text-base font-bold text-[#D4AF37] w-4 sm:w-5 text-center shrink-0">
                           {PLANET_SYMBOLS[item.natalPlanet] || '•'}
@@ -449,7 +451,9 @@ export default function TransitTimelineChart({
                       ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
                       : 'bg-rose-500/20 text-rose-400 border-rose-500/30'
                   }`}>
-                    {selectedItem.category} Transit • {selectedItem.type}
+                    {isMundane 
+                      ? (selectedItem.category === 'Kadersel' ? 'Büyük Döngü' : 'Hızlı Gezegen') 
+                      : `${selectedItem.category} Transit`} • {selectedItem.type}
                   </span>
                   
                   {/* Phase Badge */}

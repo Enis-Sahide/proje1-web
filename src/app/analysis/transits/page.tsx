@@ -742,6 +742,7 @@ export default function TransitsPage() {
                   isLoading={isSkyTimelineLoading}
                   isPremium={isApprenticeOrAbove}
                   onRequirePremium={() => setShowLockModal(true)}
+                  isMundane={true}
                 />
               )
             )}
