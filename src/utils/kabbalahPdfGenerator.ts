@@ -378,50 +378,106 @@ export const downloadKabbalahPDF = async (
   drawTextWithBold(doc, kabbalahAnalysis.shortcutMessage, 24, currentY + 16, 162, 5.5);
   currentY += 55;
 
-  // --- Active Consciousness Trigger Section ---
+  // --- Active Consciousness & Frequency Mirror Section ---
   if ((kabbalahAnalysis as any).activeConsciousness) {
     const ac = (kabbalahAnalysis as any).activeConsciousness;
-    currentY += 5;
+    checkSpace(125);
+    currentY += 4;
     
     // Header for active consciousness
     doc.setTextColor(gold[0], gold[1], gold[2]);
-    doc.setFontSize(13);
+    doc.setFontSize(12);
     doc.setFont('LiberationSans', 'bold');
-    doc.text("Aktif Bilinç Boyutunuz (Gökyüzü Tetiklenmesi)", 20, currentY);
-    currentY += 6;
+    doc.text("Kozmik Sınav & Frekans Aynanız (Hangi Haritanızı Çalıştırıyorsunuz?)", 20, currentY);
+    currentY += 5;
 
-    // Draw background rectangle (cyan/blue theme)
-    doc.setFillColor(15, 30, 60); // Dark blue background
-    doc.setDrawColor(14, 165, 233); // Cyan border
-    doc.rect(20, currentY, 170, 100, 'FD'); // Fill and border
+    const boxStartY = currentY;
+    const boxHeight = 118;
 
+    // Draw background rectangle (dark blue with cyan border)
+    doc.setFillColor(15, 25, 45);
+    doc.setDrawColor(14, 165, 233);
+    doc.rect(20, boxStartY, 170, boxHeight, 'FD');
+
+    // Title: Güncel Sınav
     doc.setTextColor(14, 165, 233);
-    doc.setFontSize(13); // Increased font size
+    doc.setFontSize(11);
     doc.setFont('LiberationSans', 'bold');
-    doc.text(ac.title, 24, currentY + 8);
+    const challengeTitle = ac.currentTheme || ac.title;
+    doc.text(`Güncel Sınav: ${challengeTitle}`, 24, boxStartY + 7);
 
-    doc.setTextColor(white[0], white[1], white[2]);
-    doc.setFontSize(10.5); // Increased font size
+    // Challenge description
+    doc.setTextColor(240, 240, 240);
+    doc.setFontSize(8.5);
     doc.setFont('LiberationSans', 'normal');
-    
-    let textY = drawTextWithBold(doc, ac.reason, 24, currentY + 18, 162, 6.0); // Increased Y offset and line height
-    
-    doc.setTextColor(gold[0], gold[1], gold[2]);
-    doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(10.5); // Increased font size
-    doc.text("MEVCUT TEKAMÜL TAVSİYESİ", 24, textY + 2);
+    const challengeDesc = ac.cosmicChallenge || ac.explanation;
+    let textY = drawTextWithBold(doc, challengeDesc, 24, boxStartY + 12, 162, 4.2);
+
+    // Trigger
+    doc.setTextColor(56, 189, 248);
+    doc.setFontSize(8);
     doc.setFont('LiberationSans', 'normal');
-    doc.setTextColor(220, 220, 220);
-    textY = drawTextWithBold(doc, ac.explanation, 24, textY + 8, 162, 6.0); // Increased line height
+    const triggerSummary = `⚡ Tetikleyici: ${ac.transitSummary || ac.reason}`;
+    textY = drawTextWithBold(doc, triggerSummary, 24, textY + 1, 162, 3.8);
 
-    // Render static vs transit warning footnote
-    doc.setTextColor(160, 160, 160);
-    doc.setFontSize(8.5); // Increased font size
-    const dateToday = new Date().toLocaleDateString('tr-TR');
-    const warningText = `Önemli Bilgilendirme: Bu harita boyutları ömür boyu değişmeyen kalıcı potansiyellerinizdir. Ancak bu "Aktif Bilinç Boyutu" kartı, yalnızca sorgulama yapılan bugün (${dateToday}) tarihindeki güncel transit gezegen etkilerine göre hesaplanmış geçici bir dönem ödevidir. Canlı gökyüzü değişimlerini ve güncellenen ödevlerinizi takip etmek için dilediğiniz zaman uygulamamıza girerek güncel analizleri kontrol edebilirsiniz.`;
-    drawTextWithBold(doc, warningText, 24, textY + 2, 162, 4.5); // Increased line height
+    // 4 Spectrum levels
+    if (ac.spectrum) {
+      doc.setTextColor(gold[0], gold[1], gold[2]);
+      doc.setFontSize(8.5);
+      doc.setFont('LiberationSans', 'bold');
+      doc.text("4 Alem Frekans Spektrumu (Tutumunuza Göre Teşhis):", 24, textY + 3);
+      textY += 7;
 
-    currentY += 107;
+      const spectrumItems = [
+        { 
+          world: "1. Assiah (Madde)", 
+          tag: "Reaktif", 
+          desc: ac.spectrum.assiah?.diagnosis, 
+          color: [248, 113, 113] as [number, number, number] 
+        },
+        { 
+          world: "2. Yetzirah (Duygu)", 
+          tag: "Duygusal Şifa", 
+          desc: ac.spectrum.yetzirah?.diagnosis, 
+          color: [56, 189, 248] as [number, number, number] 
+        },
+        { 
+          world: "3. Beriyah (Zihin)", 
+          tag: "Bilge İrade", 
+          desc: ac.spectrum.beriyah?.diagnosis, 
+          color: [251, 191, 36] as [number, number, number] 
+        },
+        { 
+          world: "4. Atzilut (Kudret)", 
+          tag: "Kozmik Birlik", 
+          desc: ac.spectrum.atzilut?.diagnosis, 
+          color: [192, 132, 252] as [number, number, number] 
+        }
+      ];
+
+      for (const item of spectrumItems) {
+        if (!item.desc) continue;
+        doc.setTextColor(item.color[0], item.color[1], item.color[2]);
+        doc.setFontSize(8);
+        doc.setFont('LiberationSans', 'bold');
+        doc.text(`• ${item.world} [${item.tag}]:`, 24, textY);
+        
+        doc.setTextColor(215, 215, 215);
+        doc.setFontSize(7.8);
+        doc.setFont('LiberationSans', 'normal');
+        textY = drawTextWithBold(doc, item.desc, 27, textY + 3.5, 159, 3.5);
+        textY += 1;
+      }
+    }
+
+    // Footnote
+    doc.setTextColor(140, 140, 140);
+    doc.setFontSize(7);
+    doc.setFont('LiberationSans', 'normal');
+    const footnote = "⚠️ Ezoterik İlke: Bir kriz anındaki bilinçli tutumunuz o an hangi haritanızı çalıştırdığınızı belirler. Reaksiyonunuzu korkudan (Assiah) bilgelik ve teslimiyete (Beriyah & Atzilut) yükseltebilirsiniz.";
+    drawTextWithBold(doc, footnote, 24, boxStartY + boxHeight - 8, 162, 3.4);
+
+    currentY = boxStartY + boxHeight + 6;
   }
 
   // --- 4 Worlds Analysis ---

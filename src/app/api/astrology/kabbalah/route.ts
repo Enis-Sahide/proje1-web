@@ -53,57 +53,67 @@ export async function POST(req: NextRequest) {
     const transitsToBeriyah = calculateTransitAspects(transitChart.planets, beriyahChart.planets);
     const transitsToAtzilut = calculateTransitAspects(transitChartHelio.planets, atzilutChart.planets);
 
-    // Consciousness Level Calculation based on transit triggers
-    let asiyahCount = 0;
-    let yetzirahCount = 0;
-    let beriyahCount = 0;
-    let atzilutCount = 0;
-
+    // --- FREKANS AYNASI (Kozmik Sınav & 4 Alem Bilinç Spektrumu) ---
     const mod360 = (x: number) => ((x % 360) + 360) % 360;
     const FIXED_STARS_2000 = [
-      { name: 'Sirius', longitude: 104.08 },     // 14°05' Cancer
-      { name: 'Regulus', longitude: 149.83 },    // 29°50' Leo
-      { name: 'Antares', longitude: 249.77 },    // 9°46' Sagittarius
-      { name: 'Aldebaran', longitude: 69.78 },   // 9°47' Gemini
-      { name: 'Spica', longitude: 203.83 }       // 23°50' Libra
+      { name: 'Sirius', longitude: 104.08 },     // 14°05' Yengeç
+      { name: 'Regulus', longitude: 149.83 },    // 29°50' Aslan
+      { name: 'Antares', longitude: 249.77 },    // 9°46' Yay
+      { name: 'Aldebaran', longitude: 69.78 },   // 9°47' İkizler
+      { name: 'Spica', longitude: 203.83 }       // 23°50' Terazi
     ];
 
-    const getPlanetWeight = (name: string) => {
-      if (name === 'Yükselen (ASC)' || name === 'Tepe Noktası (MC)' || name === 'Güneş') return 1.5;
-      if (name === 'Ay' || name === 'Merkür' || name === 'Venüs') return 1.2;
-      if (name === 'Mars' || name === 'Jüpiter' || name === 'Satürn') return 1.0;
-      return 1.2;
+    const categoryWeights = {
+      will_power: 0,
+      emotional_depth: 0,
+      mental_truth: 0,
+      shadow_alchemy: 0
     };
 
-    // 1. Assiah Transits
+    let prominentAspectDesc = '';
+    let minHardOrb = 999;
+
+    const classifyPoint = (pointName: string): 'will_power' | 'emotional_depth' | 'mental_truth' | 'shadow_alchemy' => {
+      if (['Güneş', 'Mars', 'Satürn', 'Yükselen (ASC)', 'Tepe Noktası (MC)'].includes(pointName)) return 'will_power';
+      if (['Ay', 'Venüs', 'Neptün', 'Lilith'].includes(pointName)) return 'emotional_depth';
+      if (['Merkür', 'Jüpiter', 'Uranüs', 'Kuzey Ay Düğümü'].includes(pointName)) return 'mental_truth';
+      if (['Plüton', 'Kiron', 'Güney Ay Düğümü'].includes(pointName)) return 'shadow_alchemy';
+      return 'will_power';
+    };
+
+    // Scan transits to Assiah (Fiziksel / Enkarnasyon Haritası)
     for (const aspect of transitsToAssiah) {
-      if (aspect.orb > 2.5) continue;
-      if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
-      asiyahCount += getPlanetWeight(aspect.natalPlanet);
+      if (aspect.orb > 3.0) continue;
+      const isHard = aspect.type === 'Kavuşum' || aspect.type === 'Karşıt' || aspect.type === 'Kare';
+      const weight = (isHard ? 2.5 : 1.0) * (3.5 - aspect.orb);
+      const cat = classifyPoint(aspect.natalPlanet);
+      categoryWeights[cat] += weight;
+
+      if (isHard && aspect.orb < minHardOrb) {
+        minHardOrb = aspect.orb;
+        prominentAspectDesc = `Transit ${aspect.transitPlanet} ${aspect.type} Natal ${aspect.natalPlanet} (Orb: ${aspect.orb.toFixed(1)}°)`;
+      }
     }
 
-    // 2. Yetzirah Transits
+    // Scan transits to Yetzirah (Duygusal / Ruh Haritası)
     for (const aspect of transitsToYetzirah) {
       if (aspect.orb > 2.5) continue;
-      if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
-      yetzirahCount += getPlanetWeight(aspect.natalPlanet);
+      if (aspect.type === 'Kavuşum' || aspect.type === 'Karşıt' || aspect.type === 'Kare') {
+        const cat = classifyPoint(aspect.natalPlanet);
+        categoryWeights[cat] += (3.0 - aspect.orb) * 0.8;
+      }
     }
 
-    // 3. Beriyah Transits (No age locks!)
+    // Scan transits to Beriyah (Zihinsel / Kadersel Harita)
     for (const aspect of transitsToBeriyah) {
       if (aspect.orb > 2.5) continue;
-      if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
-      beriyahCount += getPlanetWeight(aspect.natalPlanet);
+      if (aspect.type === 'Kavuşum' || aspect.type === 'Karşıt' || aspect.type === 'Kare') {
+        const cat = classifyPoint(aspect.natalPlanet);
+        categoryWeights[cat] += (3.0 - aspect.orb) * 0.7;
+      }
     }
 
-    // 4. Atzilut Transits (No age locks!)
-    for (const aspect of transitsToAtzilut) {
-      if (aspect.orb > 2.5) continue;
-      if (aspect.type !== 'Kavuşum' && aspect.type !== 'Karşıt' && aspect.type !== 'Kare') continue;
-      atzilutCount += getPlanetWeight(aspect.natalPlanet);
-    }
-
-    // Add Fixed Stars transits (No age locks!)
+    // Scan transits to Atzilut & Sabit Yıldızlar
     const transitYear = now.getFullYear();
     for (const tPlanet of transitChart.planets) {
       for (const star of FIXED_STARS_2000) {
@@ -112,76 +122,191 @@ export async function POST(req: NextRequest) {
         if (diff > 180) diff = 360 - diff;
 
         if (diff <= 1.5 || Math.abs(diff - 180) <= 1.5) {
-          atzilutCount += 1.5;
+          categoryWeights.shadow_alchemy += 2.0;
+          if (diff < minHardOrb) {
+            minHardOrb = diff;
+            prominentAspectDesc = `Transit ${tPlanet.name} Kavuşum Sabit Yıldız ${star.name} (Orb: ${diff.toFixed(1)}°)`;
+          }
         }
       }
     }
 
-    let activeLevel = 1;
-    let maxWeight = asiyahCount;
+    // Determine top category
+    let topCategory: 'will_power' | 'emotional_depth' | 'mental_truth' | 'shadow_alchemy' = 'will_power';
+    let maxCatWeight = categoryWeights.will_power;
 
-    if (yetzirahCount > maxWeight) {
-      activeLevel = 2;
-      maxWeight = yetzirahCount;
+    if (categoryWeights.emotional_depth > maxCatWeight) {
+      topCategory = 'emotional_depth';
+      maxCatWeight = categoryWeights.emotional_depth;
     }
-    if (beriyahCount > maxWeight) {
-      activeLevel = 3;
-      maxWeight = beriyahCount;
+    if (categoryWeights.mental_truth > maxCatWeight) {
+      topCategory = 'mental_truth';
+      maxCatWeight = categoryWeights.mental_truth;
     }
-    if (atzilutCount > maxWeight) {
-      activeLevel = 4;
-      maxWeight = atzilutCount;
-    }
-
-    // Fallback if all weights are 0
-    if (maxWeight === 0) {
-      if (age < 28) {
-        activeLevel = 2;
-      } else if (age < 42) {
-        activeLevel = 3;
-      } else {
-        activeLevel = 4;
-      }
+    if (categoryWeights.shadow_alchemy > maxCatWeight) {
+      topCategory = 'shadow_alchemy';
+      maxCatWeight = categoryWeights.shadow_alchemy;
     }
 
-    const levels: Record<number, { name: string; title: string; reason: string; explanation: string }> = {
-      1: {
-        name: 'Assiah',
-        title: 'Güncel Tekamül Odak Noktanız: Fiziksel ve Dünyevi Boyut (Assiah)',
-        reason: asiyahCount > 0 
-          ? 'Güncel transitler sebebiyle; Yükselen (ASC), Tepe Noktası (MC) veya Güneş dereceleriniz tetikleniyor. Bu durum, üst boyutlardaki (Beriyah/Atziluth) ruhsal potansiyelinizi yeryüzüne yansıtabilmeniz için şu an öncelikle kariyer, maddiyat, hedefler veya fiziksel sağlık gibi somut, dünyevi konuları (Assiah Boyutu) yapılandırmanız gerektiğine işaret eder.'
-          : 'Yaş döngünüz ve temel gökyüzü etkileriniz gereği, şu an enerjiniz fiziksel dünyaya köklenme, düzen kurma ve dünyevi sorumluluklar üzerinde çalışmaktadır.',
-        explanation: 'Üst boyutlardaki ruhsal potansiyelinizi yeryüzünde daha güçlü hissedebilmek için, evren şu an sizi somut ve dünyevi konularla sınıyor olabilir. Bedeninize iyi bakmak, bütçenizi yönetmek ve dünyevi sorumluluklarınızı yüksek bir farkındalıkla ele almak, üst boyutların kapısını aralamanıza yardımcı olacak en temel tekamül adımıdır.'
+    // Fallback if weights are 0
+    if (maxCatWeight === 0) {
+      if (age < 28) topCategory = 'emotional_depth';
+      else if (age < 42) topCategory = 'will_power';
+      else topCategory = 'shadow_alchemy';
+    }
+
+    const challengeArchetypes = {
+      will_power: {
+        title: 'İrade, Sınırlar ve Dünyevi Sorumluluk Sınavı',
+        desc: 'Gökyüzü şu an kişisel gücünüzü, sınırlarınızı koruma kapasitenizi ve dünyevi sorumluluklar karşısındaki duruşunuzu sınıyor. Otorite figürleri, kariyer baskıları veya eyleme geçme zorunlulukları karşısında hangi bilinç düzeyinden yanıt veriyorsunuz?',
+        assiah: {
+          title: 'Reaktif Tutum: Öfke, İsyan veya Kontrol Takıntısı',
+          reaction: 'Olayları kişiselleştirip dış koşulları ya da diğer insanları suçlamak; öfkeyle güç savaşına girmek, inatlaşmak veya yetersizlik korkusuyla her şeyi zorla kontrol etmeye çalışmak.',
+          diagnosis: 'Eğer bu dönemde yaşadığınız engellere karşı dişinizi sıkıp hırsla çatışıyor veya "Neden her şey beni buluyor?" diyerek kurban psikolojisine giriyorsanız; 1. Haritanız olan Assiah\'ı alt frekansta çalıştırıyorsunuz.'
+        },
+        yetzirah: {
+          title: 'İçsel Çocuk Tutumu: Duygusal Kökleri ve Güvensizliği Fark Etmek',
+          reaction: 'Öfke veya yetersizlik hissinin altındaki çocukluk yaralarını, onaylanma açlığını ve geçmişte bastırılmış korkuları fark ederek duyguları şefkatle kabul etmek.',
+          diagnosis: 'Tepki vermek yerine bir an durup "Bu öfke bana geçmişimle ilgili hangi yetersizlik yaramı hatırlatıyor?" diyerek duygularınızı anlamlandırmaya çalışıyorsanız; 2. Haritanız Yetzirah\'ı aktive ediyorsunuz.'
+        },
+        beriyah: {
+          title: 'Bilge Zihin Tutumu: Stratejik Sorumluluk ve Yüksek İrade',
+          reaction: 'Egoyu ve kişisel çatışmaları bir kenara bırakıp "Bu sınav beni hangi konuda daha disiplinli ve adil bir birey yapmaya zorluyor?" bilinciyle uzun vadeli, yapıcı adımlar atmak.',
+          diagnosis: 'Dramaya kapılmadan sorumluluğu üstleniyor, sınırlarınızı nezaketle ama tavizsizce çizerek yapıcı bir çözüm planı uyguluyorsanız; 3. Haritanız Beriyah\'ın zihinsel kudretini çalıştırıyorsunuz.'
+        },
+        atzilut: {
+          title: 'Kozmik Birlik Tutumu: İlahi İradeye Hizmet ve Mutlak Teslimiyet',
+          reaction: 'Kişisel haklılık ve kazanma hırsını tamamen bırakarak, gerçekleşen her olayın ilahi adaletin kusursuz bir tezahürü olduğunu bilmek; iradesini bütüne adanmış saf sevgiye teslim etmek.',
+          diagnosis: 'Zorlanma hissini tamamen aşarak, ilahi akışın sizi mükemmel şekilde terbiye ettiğini derinden hissediyor ve egonun sınırlarını aşan dingin bir güven içinde kalıyorsanız; 4. Haritanız Atzilut\'un kozmik frekansındasınız.'
+        }
       },
-      2: {
-        name: 'Yetzirah',
-        title: 'Güncel Tekamül Odak Noktanız: Psikolojik ve Duygusal Boyut (Yetzirah)',
-        reason: yetzirahCount > 0
-          ? 'Güncel transitler sebebiyle; Ay, Merkür veya Venüs dereceleriniz tetikleniyor. Bu durum, bilinçaltı kalıplarınızın, ilişkilerinizi ve hücresel hafızanızdaki eski duygusal yaraları (Yetzirah Boyutu) şifalandırmanız gerektiğine işaret eder.'
-          : 'Güncel transitler sebebiyle; Ay, Merkür veya Venüs dereceleriniz doğrudan tetiklenmiyor olsa da, mevcut döngünüz gereği bilinçaltı kalıplarınızı, ilişkilerinizi ve hücresel hafızanızdaki eski duygusal yaraları (Yetzirah Boyutu) şifalandırmanız gerektiğine işaret eder.',
-        explanation: 'Şu anki tekamül sınavınız duygusal ve psikolojik boyuttan (Yetzirah) geliyor olabilir. Bu dönemde karşınıza çıkan zihinsel karmaşaları veya ikili ilişkilerdeki zorlukları yüksek bir farkındalıkla yönetebilirseniz, üst haritalarınızın ruhsal potansiyelini yaşamınıza başarıyla entegre etmeye başladığınızı göreceksiniz.'
+      emotional_depth: {
+        title: 'Duygusal Bağımlılık, İlişkiler ve Öz-Değer Sınavı',
+        desc: 'Gökyüzü şu an ikili ilişkilerinizi, sevilme ve onaylanma ihtiyacınızı, duygusal sınırlarınızı sınıyor. Bir ilişkideki kriz veya içsel boşluk hissi karşısında hangi bilinç frekansından tepki veriyorsunuz?',
+        assiah: {
+          title: 'Reaktif Tutum: Kaybetme Korkusu, Manipülasyon veya Bağımlılık',
+          reaction: 'Karşı tarafı suçlamak, sessiz cezalandırmalar uygulamak, terk edilme korkusuyla sınırları çiğnetmek veya ilgi görebilmek için kurban rolüne bürünmek.',
+          diagnosis: 'Eğer bir ilişki veya güvensizlik anında karşı tarafı manipüle etmeye çalışıyor, aşırı fedakarlıkla kendinizi yok sayıyor ya da küsüp içine kapanıyorsanız; 1. Haritanız Assiah\'ı alt frekansta çalıştırıyorsunuz.'
+        },
+        yetzirah: {
+          title: 'İçsel Çocuk Tutumu: Kendi Kalbine Şefkatle Ebeveynlik Etmek',
+          reaction: 'Duygusal boşluğun dışarıdaki kişiden değil, kendi içsel bağınızın kopukluğundan kaynaklandığını anlamak; ağlama, yas tutma ve hücresel hafızadaki acıyı serbest bırakma cesareti göstermek.',
+          diagnosis: 'Dışarıya sitem etmek yerine "Ben kendi kendimi nerede terk ettim de bunu dışarıda arıyorum?" sorusunu sorup kalbinize şefkatle sarılıyorsanız; 2. Haritanız Yetzirah\'ı aktive ediyorsunuz.'
+        },
+        beriyah: {
+          title: 'Bilge Zihin Tutumu: Sağlıklı Sınırlar ve Koşulsuz Öz-Sevgi',
+          reaction: 'İlişkilere kadersel bir ayna gözüyle bakmak; sevgiyi bağımlılıkla karıştırmadan, net ve sağlıklı sınırlar çekerek hem kendine hem karşındakine saygı duyan olgun bir duruş sergilemek.',
+          diagnosis: 'Duygusal dramaları mantık ve yüksek şuurla ayrıştırarak, "Herkes kendi tekâmül yolunda; ben kendi değerimin mimarıyım" diyerek net sınırlar çizebiliyorsanız; 3. Haritanız Beriyah\'ı çalıştırıyorsunuz.'
+        },
+        atzilut: {
+          title: 'Kozmik Birlik Tutumu: Koşulsuz Sevgi ve Birlik Şuuru',
+          reaction: 'Karşısındaki kişiyi herhangi bir beklentiye, role veya talebe sokmadan saf ilahi bir ruh olarak görmek; sevginin alınıp verilen bir şey değil, varoluşun özü olduğunu yaşamak.',
+          diagnosis: 'Hiçbir karşılık beklemeden, kimseye tutunmadan veya kırılmadan, saf ve dingin bir sevgi okyanusunda var olabiliyor ve yargılamayı tamamen bıraktıysanız; 4. Haritanız Atzilut\'u aktive ediyorsunuz.'
+        }
       },
-      3: {
-        name: 'Beriyah',
-        title: 'Güncel Tekamül Odak Noktanız: Ruhsal Görevler ve Zihin Boyutu (Beriyah)',
-        reason: beriyahCount > 0
-          ? 'Güncel transitler sebebiyle; Mars, Jüpiter veya Satürn dereceleriniz tetikleniyor. Bu durum, kişisel egonun ve duygusal dramaların ötesine geçerek, ruhunuzun bu dünyadaki ezoterik görevlerini, kadersel yolunu ve yaşam amacını (Beriyah Boyutu) inşa etmeniz gereken ana eşikte olduğunuzu gösterir.'
-          : 'Yaş döngünüz gereği (Satürn Dönüşü sonrası), artık hayatın sadece fiziksel veya duygusal yönüyle yetinemezsiniz; ruhsal görevlerinizi ciddiye alma ve kaderinizi yapılandırma zamanınız gelmiştir.',
-        explanation: 'Şu anki tekamül odağınız doğrudan ruhsal görevleriniz ve zihin boyutunuzdan (Beriyah) geliyor olabilir. Bu dönemde karşınıza çıkan sorumlulukları ve yaşam amacınıza dair sorgulamaları yüksek bir olgunlukla ele alabilirseniz, üst haritalarınızın bilgelik gücünü yaşamınıza başarıyla entegre etmeye başladığınızı göreceksiniz.'
+      mental_truth: {
+        title: 'Zihinsel Kalıplar, Hakikati İfade ve İnanç Sınavı',
+        desc: 'Gökyüzü şu an düşünce sisteminizi, doğru bildiğiniz dogmaları, iletişim dilinizi ve geleceğe dair inançlarınızı sınıyor. Bir fikir ayrılığı, belirsizlik veya zihinsel kriz karşısında nasıl bir tutum sergiliyorsunuz?',
+        assiah: {
+          title: 'Reaktif Tutum: Dogmatizm, Zihinsel Kaygı ve Haklı Çıkma Çabası',
+          reaction: 'Kendi doğrusunu fanatikçe savunmak, sürekli felaket senaryoları kurmak, dinlemeden tartışmak veya aşırı analizle eylemsizliğe saplanmak.',
+          diagnosis: 'Eğer tartışmalarda haklı çıkmak için didiniyor, kafanızda durmaksızın dönen vesveselere teslim oluyor veya geleceğe korkuyla bakıyorsanız; 1. Haritanız Assiah\'ı alt frekansta çalıştırıyorsunuz.'
+        },
+        yetzirah: {
+          title: 'İçsel Çocuk Tutumu: Zihnin Duygusal Köklerini ve İnanç Yaralarını Keşfetmek',
+          reaction: 'Düşüncelerin aslında geçmişte yaşanan incinmelerin kalkanı olduğunu fark etmek; "Hata yaparsam sevilmem" veya "Anlaşılmıyorum" hissiyle yüzleşmek.',
+          diagnosis: 'Savunduğunuz fikirlerin arkasındaki onaylanmama veya küçük düşme korkusunu dürüstçe itiraf edip zihinsel savunma zırhınızı gevşetiyorsanız; 2. Haritanız Yetzirah\'ı aktive ediyorsunuz.'
+        },
+        beriyah: {
+          title: 'Bilge Zihin Tutumu: Objektif Algı, Yüksek Vizyon ve İlham',
+          reaction: 'Zihni yargılayıcı bir araç olmaktan çıkarıp, evrensel ilkeleri idrak eden berrak bir merceğe dönüştürmek; farklı bakış açılarını sentezleyip yapıcı çözümler üretmek.',
+          diagnosis: 'Olaylara kuşbakışı bakarak, kutuplaşmadan sentez yapabiliyor ve zihninizi bütüne hizmet eden ilham dolu projelere yönlendirebiliyorsanız; 3. Haritanız Beriyah\'ı çalıştırıyorsunuz.'
+        },
+        atzilut: {
+          title: 'Kozmik Birlik Tutumu: Zihnin Sessizliği ve Saf Sezgi (Gnosis)',
+          reaction: 'Kavramların, kelimelerin ve düşüncelerin ötesine geçerek "Bilme" halini doğrudan kalpten deneyimlemek; mutlak sessizlikte ilahi ilhamı ve rehberliği duymak.',
+          diagnosis: 'Zihinsel konuşmaların tamamen sustuğu derin bir meditatif dinginlikte, bilginin analizle değil doğrudan ilahi kaynaktan kalbinize aktığını deneyimliyorsanız; 4. Haritanız Atzilut frekansındasınız.'
+        }
       },
-      4: {
-        name: 'Atzilut',
-        title: 'Güncel Tekamül Odak Noktanız: Kozmik ve İlahi Kudret Boyutu (Atzilut)',
-        reason: atzilutCount > 0
-          ? 'Güncel transitler sebebiyle; haritanızdaki Uranüs, Neptün, Plüton veya Kiron dereceleriniz ile Sabit Yıldızlarınız doğrudan tetikleniyor. Bu durum, sizi dünyevi sınırların dışına çıkararak doğrudan ilahi akışa, kozmik uyanışa ve galaktik kökenlerinizle (Atziluth Boyutu) hizalanmaya davet ediyor.'
-          : 'Olgunluk yaş döngünüz (Uranüs Karşıtlığı ve Kiron Dönüşü sonrası), sizi dünyevi sınırların dışına çıkararak doğrudan ilahi akışa (Atzilut) bağlamaktadır.',
-        explanation: 'Şu anki tekamül odağınız doğrudan en yüksek kozmik ve ilahi boyuttan (Atzilut) geliyor olabilir. Bu dönemde karşınıza çıkan mistik sorgulamaları veya ani uyanışları kişisel hırslardan uzak, yüksek bir teslimiyetle yönetebilirseniz, sabit yıldızlarınızın ve kozmik rehberlerinizin gücünü yaşamınıza başarıyla entegre etmeye başladığınızı göreceksiniz.'
+      shadow_alchemy: {
+        title: 'Gölge Simyası, Kriz Yönetimi ve Yeniden Doğuş Sınavı',
+        desc: 'Gökyüzü şu an hayatınızda miadını doldurmuş olanı bırakma cesaretinizi, krizler karşısındaki dayanıklılığınızı ve karanlığı aydınlığa dönüştürme potansiyelinizi sınıyor. Beklenmedik bir kayıp, kriz veya dönüşüm anında nasıl tepki veriyorsunuz?',
+        assiah: {
+          title: 'Reaktif Tutum: Direnç Gösterme, İntikam veya Çöküş Hissi',
+          reaction: 'Biten şeye umutsuzca tutunmak, yıkımı bir felaket olarak algılayıp hayata küsmek, haksızlığa uğradığını düşünüp intikam veya haset duygularına teslim olmak.',
+          diagnosis: 'Eğer kontrolünüz dışındaki bir kayıp veya kriz anında çaresizliğe kapılıyor, öfkeyle yıkıcı tepkiler veriyor veya eskiyi bırakmamak için debeleniyorsanız; 1. Haritanız Assiah\'ı alt frekansta çalıştırıyorsunuz.'
+        },
+        yetzirah: {
+          title: 'İçsel Çocuk Tutumu: Karanlıkla Yüzleşme ve Gölgeyi Kabul',
+          reaction: 'Kendi içindeki kıskançlık, yetersizlik veya ölüm korkusu gibi en karanlık duyguları bastırmadan dürüstçe kabul etmek ve simyasal acıyı hissetmek.',
+          diagnosis: 'Krizin size aynaladığı bastırılmış gölge parçalarınızı suçlamadan kucaklıyor ve acının içinden geçmeye izin veriyorsanız; 2. Haritanız Yetzirah\'ın şifasını aktive ediyorsunuz.'
+        },
+        beriyah: {
+          title: 'Bilge Zihin Tutumu: Simyasal Dönüşüm ve Anka Kuşu Şuuru',
+          reaction: 'Yıkılan formun ruhun özgürleşmesi için zorunlu olduğunu kavramak; krizden büyük bir tekâmül dersi çıkararak küllerinden yepyeni ve çok daha güçlü bir bilinçle doğmak.',
+          diagnosis: '"Biten form gitti çünkü daha yüce bir varoluş doğmak zorunda" diyerek krizin ortasında yeni bir kadersel vizyon inşa edebiliyorsanız; 3. Haritanız Beriyah\'ı çalıştırıyorsunuz.'
+        },
+        atzilut: {
+          title: 'Kozmik Birlik Tutumu: Mutlak Ölüm-Yeniden Doğuş ve Sonsuzluk Şuuru',
+          reaction: 'Ölüm ile yaşamın, varlık ile yokluğun tek bir ilahi nefes olduğunu idrak etmek; hiçbir şeye sahip olunmadığını, dolayısıyla hiçbir şeyin kaybedilemeyeceğini bilerek mutlak huzurda kalmak.',
+          diagnosis: 'En büyük fırtınanın ortasında bile varoluşun ebedi ışığıyla bir olduğunuzu bilip zerre kadar sarsılmadan saf kozmik güvenle durabiliyorsanız; 4. Haritanız Atzilut\'un zirvesindesiniz.'
+        }
       }
     };
 
+    const currentArchetype = challengeArchetypes[topCategory];
+
+    const transitReason = prominentAspectDesc
+      ? `Şu an gökyüzünde ${prominentAspectDesc} açısı doğrudan devrede. Bu güçlü göksel tetiklenme; haritanızın ${topCategory === 'will_power' ? 'fiziksel irade ve eylem' : topCategory === 'emotional_depth' ? 'duygusal bağlar ve bilinçaltı' : topCategory === 'mental_truth' ? 'zihinsel inanç ve vizyon' : 'kriz ve dönüşüm'} alanını aktive ederek sizi önemli bir tekâmül eşiğine davet ediyor.`
+      : `Şu an gökyüzündeki güncel gezegen transitleri haritanızın temel akslarını tetikleyerek; sizi ${currentArchetype.title.toLowerCase()} kapsamında derin bir içsel farkındalığa davet ediyor.`;
+
     const activeConsciousness = {
-      level: activeLevel,
-      ...levels[activeLevel]
+      title: `Günün Kozmik Sınavı: ${currentArchetype.title}`,
+      reason: transitReason,
+      explanation: currentArchetype.desc,
+      currentTheme: currentArchetype.title,
+      themeCategory: topCategory,
+      transitSummary: transitReason,
+      cosmicChallenge: currentArchetype.desc,
+      prominentAspect: prominentAspectDesc || null,
+      spectrum: {
+        assiah: {
+          level: 1,
+          name: '1. Assiah Alemi (Fiziksel Eylem / Madde)',
+          title: currentArchetype.assiah.title,
+          reaction: currentArchetype.assiah.reaction,
+          diagnosis: currentArchetype.assiah.diagnosis,
+          color: '#EF4444',
+          bgClass: 'bg-red-500/10 border-red-500/30 text-red-300'
+        },
+        yetzirah: {
+          level: 2,
+          name: '2. Yetzirah Alemi (Duygu / Bilinçaltı / Kalp)',
+          title: currentArchetype.yetzirah.title,
+          reaction: currentArchetype.yetzirah.reaction,
+          diagnosis: currentArchetype.yetzirah.diagnosis,
+          color: '#0EA5E9',
+          bgClass: 'bg-sky-500/10 border-sky-500/30 text-sky-300'
+        },
+        beriyah: {
+          level: 3,
+          name: '3. Beriyah Alemi (Yüksek Zihin / Kadersel Bilgelik)',
+          title: currentArchetype.beriyah.title,
+          reaction: currentArchetype.beriyah.reaction,
+          diagnosis: currentArchetype.beriyah.diagnosis,
+          color: '#F59E0B',
+          bgClass: 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+        },
+        atzilut: {
+          level: 4,
+          name: '4. Atzilut Alemi (İlahi Kudret / Mutlak Birlik)',
+          title: currentArchetype.atzilut.title,
+          reaction: currentArchetype.atzilut.reaction,
+          diagnosis: currentArchetype.atzilut.diagnosis,
+          color: '#A855F7',
+          bgClass: 'bg-purple-500/10 border-purple-500/30 text-purple-300'
+        }
+      }
     };
 
     (kabbalahAnalysis as any).activeConsciousness = activeConsciousness;

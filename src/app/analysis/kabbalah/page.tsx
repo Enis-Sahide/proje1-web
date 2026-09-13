@@ -412,48 +412,154 @@ export default function KabbalahAnalysisPage() {
                 </div>
               </div>
 
-              {/* Aktif Bilinç Boyutu Kartı */}
+              {/* Aktif Bilinç Boyutu & Frekans Aynası Kartı */}
               {kabbalahAnalysis.activeConsciousness && (
-                <div className="p-8 rounded-2xl border border-[#0EA5E9]/30 bg-[#0EA5E9]/5 backdrop-blur-sm max-w-3xl mx-auto relative overflow-hidden">
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-[#0EA5E9] opacity-20 blur-[50px] pointer-events-none"></div>
+                <div className="p-6 md:p-8 rounded-2xl border border-[#0EA5E9]/30 bg-gradient-to-b from-[#0EA5E9]/10 via-[#0EA5E9]/5 to-transparent backdrop-blur-md max-w-4xl mx-auto relative overflow-hidden shadow-2xl">
+                  <div className="absolute top-0 right-0 w-48 h-48 bg-[#0EA5E9] opacity-15 blur-[60px] pointer-events-none"></div>
                   
                   {/* Güncel Gökyüzü Etkisi Etiketi */}
-                  <div className="absolute top-4 right-4 bg-[#0EA5E9]/20 text-[#0EA5E9] border border-[#0EA5E9]/30 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
-                    Güncel Gökyüzü Etkisi (Geçici)
+                  <div className="flex flex-wrap items-center justify-between gap-2 mb-4">
+                    <div className="flex items-center gap-2">
+                      <div className="p-2 rounded-lg bg-[#0EA5E9] text-black">
+                        <Sparkles size={20} />
+                      </div>
+                      <div>
+                        <span className="text-xs uppercase tracking-widest font-bold text-[#0EA5E9]">Kozmik Sınav & Frekans Aynanız</span>
+                        <h3 className="text-xl md:text-2xl font-bold text-white">
+                          Hangi Haritanızı Çalıştırıyorsunuz?
+                        </h3>
+                      </div>
+                    </div>
+                    <span className="bg-[#0EA5E9]/20 text-[#0EA5E9] border border-[#0EA5E9]/30 text-[11px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                      Canlı Gökyüzü Aynası
+                    </span>
                   </div>
 
-                  <div className="flex items-start gap-4">
-                    <div className="p-3 rounded-xl bg-[#0EA5E9] text-black shrink-0">
-                      <Sparkles size={24} />
-                    </div>
-                    <div>
-                      <h3 className="text-xl font-bold mb-1 text-[#0EA5E9]">
-                        Aktif Bilinç Boyutunuz (Gökyüzü Tetiklenmesi)
-                      </h3>
-                      <h4 className="text-lg font-bold text-white mb-3">
-                        {kabbalahAnalysis.activeConsciousness.title}
+                  {/* Sınav Başlığı & Açıklaması */}
+                  <div className="p-4 rounded-xl bg-black/40 border border-white/10 mb-6">
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">
+                        Güncel Sınav
+                      </span>
+                      <h4 className="text-base md:text-lg font-bold text-[#0EA5E9]">
+                        {kabbalahAnalysis.activeConsciousness.currentTheme || kabbalahAnalysis.activeConsciousness.title}
                       </h4>
-                      <p className="text-white/90 leading-relaxed mb-4 text-sm md:text-base">
-                        {kabbalahAnalysis.activeConsciousness.reason}
-                      </p>
-                      
-                      <div className="p-4 bg-black/40 rounded-xl border border-white/5 mb-4">
-                        <h5 className="text-xs md:text-sm font-bold text-[#0EA5E9] mb-1 uppercase tracking-wider">Mevcut Tekamül Tavsiyesi</h5>
-                        <p className="text-sm md:text-base text-gray-300 leading-relaxed">
-                          {kabbalahAnalysis.activeConsciousness.explanation}
+                    </div>
+                    
+                    <p className="text-white/90 text-sm md:text-base leading-relaxed mb-3">
+                      {kabbalahAnalysis.activeConsciousness.cosmicChallenge || kabbalahAnalysis.activeConsciousness.explanation}
+                    </p>
+
+                    <div className="text-xs text-sky-300/80 bg-sky-950/40 p-2.5 rounded-lg border border-sky-800/30 flex items-start gap-2">
+                      <span className="shrink-0 text-sky-400 font-bold">⚡ Tetikleyici:</span>
+                      <span>{kabbalahAnalysis.activeConsciousness.transitSummary || kabbalahAnalysis.activeConsciousness.reason}</span>
+                    </div>
+                  </div>
+
+                  {/* Frekans Aynası: 4 Alem Spektrumu */}
+                  {kabbalahAnalysis.activeConsciousness.spectrum && (
+                    <div className="mb-6">
+                      <div className="mb-3">
+                        <h5 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+                          <span>🪞 4 Alem Frekans Aynası: Sınav Karşısındaki Tavrınızı Tartın</span>
+                        </h5>
+                        <p className="text-xs text-mystic-text-muted mt-1">
+                          Bu gökyüzü etkisi karşısında sergilediğiniz içsel veya dışsal tepki, şu an hangi haritanızı aktive ettiğinizi teşhis eder:
                         </p>
                       </div>
 
-                      {/* Bilgilendirme ve Mobil Reklam Dipnotları */}
-                      <div className="space-y-2 border-t border-white/10 pt-4 mt-2">
-                        <p className="text-xs md:text-sm text-mystic-text-muted leading-relaxed">
-                          ⚠️ <strong>Önemli Bilgilendirme:</strong> Raporunuzda yer alan genel Kabalistik analizleriniz (1., 2., 3. ve 4. Boyut yerleşimleriniz) doğum haritanızın ömür boyu değişmeyen kalıcı potansiyelleridir. Ancak yukarıdaki "Aktif Bilinç Boyutunuz" kartında sunulan bilgi, yalnızca sorgulama yaptığınız bugün ({new Date().toLocaleDateString('tr-TR')}) tarihindeki güncel gökyüzü hareketlerine göre hesaplanmış geçici ve dönemsel bir tekamül odak noktasıdır.
-                        </p>
-                        <p className="text-xs md:text-sm text-[#0EA5E9]/80 leading-relaxed font-medium">
-                          ✨ <strong>Kozmik İpucu:</strong> Gökyüzü sürekli hareket halindedir. Önümüzdeki aylarda bu tetiklenmenin nasıl değiştiğini görmek, yeni kapılarınızı keşfetmek ve güncel kozmik ödevlerinizi takip etmek için dilediğiniz zaman uygulamamıza girerek güncel durumunuzu kontrol edebilirsiniz.
-                        </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {/* 1. Assiah */}
+                        <div className="p-4 rounded-xl border border-red-500/30 bg-red-950/20 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-red-500/20">
+                              <span className="text-xs font-bold text-red-400">1. Alem (Madde / Assiah)</span>
+                              <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-red-500/20 text-red-300 font-bold">Reaktif Düzey</span>
+                            </div>
+                            <h6 className="text-sm font-bold text-white mb-1.5">
+                              {kabbalahAnalysis.activeConsciousness.spectrum.assiah.title}
+                            </h6>
+                            <p className="text-xs text-gray-300 leading-relaxed mb-3">
+                              {kabbalahAnalysis.activeConsciousness.spectrum.assiah.reaction}
+                            </p>
+                          </div>
+                          <div className="p-2.5 rounded-lg bg-black/40 border border-red-500/20 text-[11px] text-red-200/90 leading-relaxed">
+                            <strong className="text-red-400 block mb-0.5">Teşhis:</strong>
+                            {kabbalahAnalysis.activeConsciousness.spectrum.assiah.diagnosis}
+                          </div>
+                        </div>
+
+                        {/* 2. Yetzirah */}
+                        <div className="p-4 rounded-xl border border-sky-500/30 bg-sky-950/20 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-sky-500/20">
+                              <span className="text-xs font-bold text-sky-400">2. Alem (Duygu / Yetzirah)</span>
+                              <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-bold">Duygusal Şifa</span>
+                            </div>
+                            <h6 className="text-sm font-bold text-white mb-1.5">
+                              {kabbalahAnalysis.activeConsciousness.spectrum.yetzirah.title}
+                            </h6>
+                            <p className="text-xs text-gray-300 leading-relaxed mb-3">
+                              {kabbalahAnalysis.activeConsciousness.spectrum.yetzirah.reaction}
+                            </p>
+                          </div>
+                          <div className="p-2.5 rounded-lg bg-black/40 border border-sky-500/20 text-[11px] text-sky-200/90 leading-relaxed">
+                            <strong className="text-sky-400 block mb-0.5">Teşhis:</strong>
+                            {kabbalahAnalysis.activeConsciousness.spectrum.yetzirah.diagnosis}
+                          </div>
+                        </div>
+
+                        {/* 3. Beriyah */}
+                        <div className="p-4 rounded-xl border border-amber-500/30 bg-amber-950/20 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-amber-500/20">
+                              <span className="text-xs font-bold text-amber-400">3. Alem (Zihin / Beriyah)</span>
+                              <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold">Bilge İrade</span>
+                            </div>
+                            <h6 className="text-sm font-bold text-white mb-1.5">
+                              {kabbalahAnalysis.activeConsciousness.spectrum.beriyah.title}
+                            </h6>
+                            <p className="text-xs text-gray-300 leading-relaxed mb-3">
+                              {kabbalahAnalysis.activeConsciousness.spectrum.beriyah.reaction}
+                            </p>
+                          </div>
+                          <div className="p-2.5 rounded-lg bg-black/40 border border-amber-500/20 text-[11px] text-amber-200/90 leading-relaxed">
+                            <strong className="text-amber-400 block mb-0.5">Teşhis:</strong>
+                            {kabbalahAnalysis.activeConsciousness.spectrum.beriyah.diagnosis}
+                          </div>
+                        </div>
+
+                        {/* 4. Atzilut */}
+                        <div className="p-4 rounded-xl border border-purple-500/30 bg-purple-950/20 flex flex-col justify-between">
+                          <div>
+                            <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-purple-500/20">
+                              <span className="text-xs font-bold text-purple-400">4. Alem (Kudret / Atzilut)</span>
+                              <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 font-bold">Kozmik Birlik</span>
+                            </div>
+                            <h6 className="text-sm font-bold text-white mb-1.5">
+                              {kabbalahAnalysis.activeConsciousness.spectrum.atzilut.title}
+                            </h6>
+                            <p className="text-xs text-gray-300 leading-relaxed mb-3">
+                              {kabbalahAnalysis.activeConsciousness.spectrum.atzilut.reaction}
+                            </p>
+                          </div>
+                          <div className="p-2.5 rounded-lg bg-black/40 border border-purple-500/20 text-[11px] text-purple-200/90 leading-relaxed">
+                            <strong className="text-purple-400 block mb-0.5">Teşhis:</strong>
+                            {kabbalahAnalysis.activeConsciousness.spectrum.atzilut.diagnosis}
+                          </div>
+                        </div>
                       </div>
                     </div>
+                  )}
+
+                  {/* Bilgilendirme ve Mobil Reklam Dipnotları */}
+                  <div className="space-y-2 border-t border-white/10 pt-4 mt-2">
+                    <p className="text-xs md:text-sm text-mystic-text-muted leading-relaxed">
+                      ⚠️ <strong>Ezoterik İlke:</strong> Yaşınız veya haritanız ne olursa olsun, bir kriz ya da sınav anındaki bilinçli tutumunuz o an hangi boyutta titreştiğinizi belirler. Üst haritalarınızın gücünü hayatınıza çekmek için reaksiyonunuzu korku ve kontrolden (Assiah), bilgelik ve teslimiyete (Beriyah & Atzilut) doğru yükseltebilirsiniz.
+                    </p>
+                    <p className="text-xs md:text-sm text-[#0EA5E9]/80 leading-relaxed font-medium">
+                      ✨ <strong>Kozmik Takip:</strong> Gökyüzü sürekli hareket halindedir. Önümüzdeki günlerde tetiklenen yeni sınavlarınızı ve tekâmül eşiklerinizi keşfetmek için dilediğiniz zaman güncel durumunuzu sorgulayabilirsiniz.
+                    </p>
                   </div>
                 </div>
               )}
