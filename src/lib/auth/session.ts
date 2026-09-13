@@ -5,7 +5,7 @@ import { db } from '@/db/client';
 import { sessions } from '@/db/schema';
 import { verifyAccessToken, type AccessPayload } from './jwt';
 
-const REFRESH_TTL_DAYS = Number(process.env.JWT_REFRESH_TTL_DAYS || 30);
+const REFRESH_TTL_DAYS = Number(process.env.JWT_REFRESH_TTL_DAYS || 180);
 const ACCESS_TTL_MIN = Number(process.env.JWT_ACCESS_TTL_MIN || 30);
 
 export function generateRefreshToken(): string {
@@ -30,11 +30,26 @@ export async function createSession(userId: string, userAgent?: string | null) {
 
 export async function rotateSession(oldToken: string, userAgent?: string | null) {
   const [row] = await db.select().from(sessions).where(eq(sessions.refreshTokenHash, hashToken(oldToken)));
-  if (!row || row.revokedAt || row.expiresAt.getTime() < Date.now()) return null;
+  if (!row || row.expiresAt.getTime() < Date.now()) return null;
+
+  // Tolerans Süresi (Grace Period - 60 saniye):
+  // Mobil uygulamadaki paralel istekler veya ağ gecikmelerinde,
+  // aynı refresh token son 60 saniye içinde zaten yenilenmişse
+  // kullanıcıyı oturumdan atmak yerine geçerli bir oturum döndür.
+  if (row.revokedAt) {
+    const revokedSecsAgo = (Date.now() - row.revokedAt.getTime()) / 1000;
+    if (revokedSecsAgo <= 60) {
+      const fresh = await createSession(row.userId, userAgent);
+      return { userId: row.userId, ...fresh };
+    }
+    return null;
+  }
+
   await db.update(sessions).set({ revokedAt: new Date() }).where(eq(sessions.id, row.id));
   const fresh = await createSession(row.userId, userAgent);
   return { userId: row.userId, ...fresh };
 }
+
 
 export async function revokeSession(token: string) {
   await db.update(sessions).set({ revokedAt: new Date() }).where(eq(sessions.refreshTokenHash, hashToken(token)));
