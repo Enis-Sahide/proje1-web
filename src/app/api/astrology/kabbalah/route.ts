@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import { generateAstrologyChart, calculateDraconicChart, calculateHarmonicChart, calculateTransitAspects } from '@/features/astrology/engine/AstrologyEngine';
 import { getKabbalahAnalysis } from '@/features/astrology/engine/KabbalahInterpretations';
-import { getEsotericPlanetInterpretation } from '@/features/astrology/engine/KabbalahPlanetInterpretations';
+import { getEsotericPlanetInterpretation, getEsotericHouseInterpretation } from '@/features/astrology/engine/KabbalahPlanetInterpretations';
 import { json, errorJson, preflight } from '@/lib/http/cors';
 import moment from 'moment-timezone';
 
@@ -219,6 +219,18 @@ export async function POST(req: NextRequest) {
           p.isRetrograde
         );
         interpretations[world][p.name] = interp;
+      }
+
+      for (const h of chart.houses) {
+        const houseInterp = getEsotericHouseInterpretation(
+          h.house,
+          h.sign,
+          isYetzirah,
+          isBeriyah,
+          isAtzilut
+        );
+        interpretations[world][`Ev_${h.house}`] = houseInterp;
+        interpretations[world][`${h.house}`] = houseInterp;
       }
     }
 

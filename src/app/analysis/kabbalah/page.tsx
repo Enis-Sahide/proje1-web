@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { ArrowLeft, Loader2, Search, Triangle, Star, Compass, AlertCircle, ChevronDown, CheckCircle2, Moon, Sun, MoonStar, Sparkles, Download, Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ASTRO_CITIES, AstroPoint, NatalChartData, AstroCity } from '@/features/astrology/engine/AstrologyConstants';
+import { getEsotericHouseInterpretation } from '@/features/astrology/engine/KabbalahPlanetInterpretations';
 // Interpretations are fetched from the backend API.
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { X } from 'lucide-react';
@@ -568,27 +569,40 @@ export default function KabbalahAnalysisPage() {
                       <Triangle size={18} className="rotate-180" /> Ev Yerleşimleri
                     </h4>
                     <div className="space-y-3">
-                      {chartData[selectedWorld].houses.map((h: AstroPoint, idx: number) => (
-                        <div 
-                          key={`house-list-${idx}`} 
-                          className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 transition-colors"
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white text-sm font-bold">
-                              {h.house}
-                            </span>
-                            <span className="font-medium text-white text-sm">. Ev {h.house === 1 ? '(ASC)' : h.house === 10 ? '(MC)' : ''}</span>
+                      {chartData[selectedWorld].houses.map((h: AstroPoint, idx: number) => {
+                        const houseInterp = interpretations?.[selectedWorld]?.[`Ev_${h.house}`] 
+                          || interpretations?.[selectedWorld]?.[`${h.house}`]
+                          || getEsotericHouseInterpretation(
+                              h.house,
+                              h.sign,
+                              selectedWorld === 'yetzirah',
+                              selectedWorld === 'beriyah',
+                              selectedWorld === 'atzilut'
+                            );
+
+                        return (
+                          <div 
+                            key={`house-list-${idx}`} 
+                            className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:border-[#D4AF37]/50 cursor-pointer transition-colors"
+                            onClick={() => handleInterpClick(houseInterp)}
+                          >
+                            <div className="flex items-center gap-3">
+                              <span className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white text-sm font-bold">
+                                {h.house}
+                              </span>
+                              <span className="font-medium text-white text-sm">. Ev {h.house === 1 ? '(ASC)' : h.house === 10 ? '(MC)' : ''}</span>
+                            </div>
+                            <div className="text-right flex flex-col">
+                              <span className="text-mystic-text-muted text-xs">
+                                <span style={{color: ZODIAC_COLORS[h.sign]}}>{ZODIAC_SYMBOLS[h.sign]} {h.sign}</span> 
+                              </span>
+                              <span className="text-white font-mono text-xs">
+                                {h.degreeInSign}°{String(h.minutes).padStart(2, '0')}'
+                              </span>
+                            </div>
                           </div>
-                          <div className="text-right flex flex-col">
-                            <span className="text-mystic-text-muted text-xs">
-                              <span style={{color: ZODIAC_COLORS[h.sign]}}>{ZODIAC_SYMBOLS[h.sign]} {h.sign}</span> 
-                            </span>
-                            <span className="text-white font-mono text-xs">
-                              {h.degreeInSign}°{String(h.minutes).padStart(2, '0')}'
-                            </span>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   </div>
 
