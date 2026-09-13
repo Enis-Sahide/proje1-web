@@ -6,6 +6,7 @@ import { ArrowLeft, CheckCircle2, Download, Loader2, Mail, ShieldAlert } from 'l
 import { downloadKabbalahPDF } from '@/utils/kabbalahPdfGenerator';
 import { downloadChartPDF } from '@/utils/pdfGenerator';
 import { downloadHumanDesignPDF } from '@/utils/humanDesignPdfGenerator';
+import { downloadIncarnationPDF } from '@/utils/incarnationPdfGenerator';
 
 function CheckoutSuccessContent() {
   const router = useRouter();
@@ -69,6 +70,16 @@ function CheckoutSuccessContent() {
           locationStr,
           dateStr,
           result.gatesData
+        );
+      } else if (analysisType === 'incarnation' || analysisType === 'karmic') {
+        await downloadIncarnationPDF(
+          result.incarnation,
+          {
+            localDate,
+            localTime,
+            cityName: cityData.name,
+            country: cityData.country || 'Türkiye'
+          }
         );
       } else {
         // Standard Astrology PDF

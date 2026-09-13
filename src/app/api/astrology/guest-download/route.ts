@@ -106,6 +106,14 @@ export async function GET(request: Request) {
         chartData,
         gatesData: gates
       };
+    } else if (order.analysisType === 'incarnation' || order.analysisType === 'karmic') {
+      const { calculateIncarnationAnalysis } = require('@/features/astrology/engine/IncarnationEngine');
+      const natalChart = await generateAstrologyChart(dateObj, cityData, false);
+      const incarnation = calculateIncarnationAnalysis(natalChart);
+      resultData = {
+        natalChart,
+        incarnation
+      };
     } else {
       // Standard Esoteric Astrology Chart
       const assiahChart = await generateAstrologyChart(dateObj, cityData, false);

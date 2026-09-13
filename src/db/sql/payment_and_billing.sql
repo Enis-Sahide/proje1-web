@@ -171,7 +171,9 @@ VALUES
   ('kabbalah', 'Kabalistik 4 Alem Harita Analizi Raporu',
    'Assiah, Yetzirah, Beriyah ve Atzilut alemlerinin ayrı ayrı yorumlandığı PDF rapor.', '500', '20', 2),
   ('human-design', 'Human Design Kapsamlı Yaşam Rehberi Raporu',
-   'Tip, otorite, profil ve kapı yorumlarını içeren kapsamlı PDF rapor.', '500', '20', 3)
+   'Tip, otorite, profil ve kapı yorumlarını içeren kapsamlı PDF rapor.', '500', '20', 3),
+  ('incarnation', 'Karmik & Enkarnasyon Analizi Raporu',
+   'Geçmiş yaşam, karmik borçlar, Drakonik ruh haritası ve gelecek enkarnasyon potansiyelini içeren kapsamlı PDF rapor.', '500', '20', 4)
 ON CONFLICT ("id") DO NOTHING;
 
 -- Ayar satırlarını boş olarak hazırla; anahtarlar admin panelinden girilir.

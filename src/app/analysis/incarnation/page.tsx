@@ -18,12 +18,16 @@ import {
   AlertCircle, 
   CheckCircle2, 
   Star,
-  Activity
+  Activity,
+  Lock,
+  X
 } from 'lucide-react';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 import { IncarnationAnalysisResult } from '@/features/astrology/engine/IncarnationEngine';
 import { downloadIncarnationPDF } from '@/utils/incarnationPdfGenerator';
+import { useAuth } from '@/context/AuthContext';
+import AuthPromptModal from '@/components/AuthPromptModal';
 
 const ZODIAC_SYMBOLS: Record<string, string> = {
   'Koç': '♈', 'Boğa': '♉', 'İkizler': '♊', 'Yengeç': '♋', 
@@ -40,6 +44,8 @@ const ZODIAC_COLORS: Record<string, string> = {
 
 export default function IncarnationAnalysisPage() {
   const router = useRouter();
+  const { role, user } = useAuth();
+  const isMasterOrAdmin = role === 'master' || role === 'admin';
 
   // Form states
   const [dateStr, setDateStr] = useState('');
@@ -52,6 +58,10 @@ export default function IncarnationAnalysisPage() {
   const [errorStr, setErrorStr] = useState('');
   const [resultData, setResultData] = useState<IncarnationAnalysisResult | null>(null);
   const [birthInfo, setBirthInfo] = useState<{ localDate: string; localTime: string; cityName: string; country: string } | null>(null);
+
+  // Modals
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showLockModal, setShowLockModal] = useState(false);
 
   // Active Tab
   const [activeTab, setActiveTab] = useState<'past_life' | 'karmic_debts' | 'draconic' | 'next_life'>('past_life');
@@ -102,6 +112,48 @@ export default function IncarnationAnalysisPage() {
       setIsPdfLoading(false);
     }
   };
+
+  const handlePurchaseReport = () => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    const query = new URLSearchParams({
+      type: 'incarnation',
+      date: dateStr,
+      time: timeStr,
+      city: cityKey?.name || '',
+      lat: (cityKey?.lat || '').toString(),
+      lon: (cityKey?.lon || '').toString(),
+      tz: cityKey?.tz || '',
+      email: user?.email || ''
+    }).toString();
+    router.push(`/checkout/guest?${query}`);
+  };
+
+  // Reusable locked overlay banner inside tabs
+  const renderLockedSectionNotice = () => (
+    <div className="mt-6 p-6 rounded-2xl bg-gradient-to-r from-amber-500/10 via-[#D4AF37]/10 to-transparent border border-[#D4AF37]/30 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+      <div className="flex items-center gap-4">
+        <div className="p-3 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] shrink-0">
+          <Lock size={24} />
+        </div>
+        <div>
+          <h4 className="text-base font-bold text-white">Detaylı Analizler Usta Seviyesine Özeldir</h4>
+          <p className="text-xs sm:text-sm text-mystic-text-muted mt-1 max-w-xl">
+            Bu bölümdeki derin karmik nedenleri, dharma reçetelerini ve ezoterik ruh haritanızı görmek için Usta Seviyesi üye olabilir veya tüm detayları içeren 5 sayfalık PDF Raporunu indirebilirsiniz.
+          </p>
+        </div>
+      </div>
+      <button
+        onClick={handlePurchaseReport}
+        className="shrink-0 flex items-center gap-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-2.5 px-5 rounded-xl transition-all shadow-md shadow-[#D4AF37]/20 text-xs sm:text-sm cursor-pointer whitespace-nowrap"
+      >
+        <Lock size={15} />
+        <span>Raporu İndir (500 TL)</span>
+      </button>
+    </div>
+  );
 
   return (
     <div className="min-h-screen pt-28 pb-24 px-4 sm:px-6 relative bg-mystic-dark">
@@ -204,6 +256,11 @@ export default function IncarnationAnalysisPage() {
                     <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/5 text-mystic-text-muted border border-white/10">
                       Baskın Element: {resultData.soulMaturity.dominantElement}
                     </span>
+                    {isMasterOrAdmin && (
+                      <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                        Usta Seviyesi Aktif
+                      </span>
+                    )}
                   </div>
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
                     {resultData.soulMaturity.tier} <span className="text-[#D4AF37]">({resultData.soulMaturity.score}/100)</span>
@@ -214,18 +271,28 @@ export default function IncarnationAnalysisPage() {
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-                  <button
-                    onClick={handleDownloadPdf}
-                    disabled={isPdfLoading}
-                    className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] text-sm font-semibold transition-all shadow-md hover:shadow-[#D4AF37]/20 cursor-pointer disabled:opacity-50"
-                  >
-                    {isPdfLoading ? (
-                      <Loader2 className="animate-spin" size={16} />
-                    ) : (
-                      <Download size={16} />
-                    )}
-                    <span>PDF Raporunu İndir</span>
-                  </button>
+                  {isMasterOrAdmin ? (
+                    <button
+                      onClick={handleDownloadPdf}
+                      disabled={isPdfLoading}
+                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-[#D4AF37]/10 hover:bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] text-sm font-semibold transition-all shadow-md hover:shadow-[#D4AF37]/20 cursor-pointer disabled:opacity-50"
+                    >
+                      {isPdfLoading ? (
+                        <Loader2 className="animate-spin" size={16} />
+                      ) : (
+                        <Download size={16} />
+                      )}
+                      <span>PDF Raporunu İndir</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handlePurchaseReport}
+                      className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black text-sm font-bold transition-all shadow-md shadow-[#D4AF37]/20 cursor-pointer"
+                    >
+                      <Lock size={16} />
+                      <span>Karmik Analiz Raporunu İndir (500 TL)</span>
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -308,86 +375,104 @@ export default function IncarnationAnalysisPage() {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="p-5 rounded-2xl bg-black/30 border border-white/5 space-y-2">
-                      <h4 className="text-sm font-bold text-[#D4AF37] flex items-center gap-2">
-                        <span>📜</span> Önceki Yaşam Rolü & Kimliği
+                    <div className="p-5 rounded-2xl bg-black/30 border border-white/5 space-y-2 relative overflow-hidden">
+                      <h4 className="text-sm font-bold text-[#D4AF37] flex items-center justify-between">
+                        <span className="flex items-center gap-2"><span>📜</span> Önceki Yaşam Rolü & Kimliği</span>
+                        {!isMasterOrAdmin && <Lock size={14} className="text-[#D4AF37]" />}
                       </h4>
-                      <p className="text-sm text-mystic-text-muted leading-relaxed">
+                      <p className={`text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                         {resultData.gad.info.pastLifeRole}
                       </p>
                     </div>
 
-                    <div className="p-5 rounded-2xl bg-black/30 border border-white/5 space-y-2">
-                      <h4 className="text-sm font-bold text-amber-400 flex items-center gap-2">
-                        <span>⚠️</span> Konfor Alanı & Karmik Tuzak
+                    <div className="p-5 rounded-2xl bg-black/30 border border-white/5 space-y-2 relative overflow-hidden">
+                      <h4 className="text-sm font-bold text-amber-400 flex items-center justify-between">
+                        <span className="flex items-center gap-2"><span>⚠️</span> Konfor Alanı & Karmik Tuzak</span>
+                        {!isMasterOrAdmin && <Lock size={14} className="text-amber-400" />}
                       </h4>
-                      <p className="text-sm text-mystic-text-muted leading-relaxed">
+                      <p className={`text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                         {resultData.gad.info.comfortZoneTrap}
                       </p>
                     </div>
 
-                    <div className="p-5 rounded-2xl bg-black/30 border border-white/5 space-y-2">
-                      <h4 className="text-sm font-bold text-emerald-400 flex items-center gap-2">
-                        <span>🎁</span> Geçmişten Gelen Ruhsal Yetenek
+                    <div className="p-5 rounded-2xl bg-black/30 border border-white/5 space-y-2 relative overflow-hidden">
+                      <h4 className="text-sm font-bold text-emerald-400 flex items-center justify-between">
+                        <span className="flex items-center gap-2"><span>🎁</span> Geçmişten Gelen Ruhsal Yetenek</span>
+                        {!isMasterOrAdmin && <Lock size={14} className="text-emerald-400" />}
                       </h4>
-                      <p className="text-sm text-mystic-text-muted leading-relaxed">
+                      <p className={`text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                         {resultData.gad.info.karmicGift}
                       </p>
                     </div>
 
-                    <div className="p-5 rounded-2xl bg-black/30 border border-white/5 space-y-2">
-                      <h4 className="text-sm font-bold text-cyan-400 flex items-center gap-2">
-                        <span>🏛️</span> Geçmiş Yaşam Çevresi ({resultData.gad.house}. Ev)
+                    <div className="p-5 rounded-2xl bg-black/30 border border-white/5 space-y-2 relative overflow-hidden">
+                      <h4 className="text-sm font-bold text-cyan-400 flex items-center justify-between">
+                        <span className="flex items-center gap-2"><span>🏛️</span> Geçmiş Yaşam Çevresi ({resultData.gad.house}. Ev)</span>
+                        {!isMasterOrAdmin && <Lock size={14} className="text-cyan-400" />}
                       </h4>
-                      <p className="text-sm text-mystic-text-muted leading-relaxed">
+                      <p className={`text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                         {resultData.gad.houseInfo.pastLifeCircumstances}
                       </p>
                     </div>
                   </div>
 
                   {/* Karmic Ruler Card */}
-                  <div className="mt-6 p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-[#D4AF37]/10 to-transparent border border-[#D4AF37]/30">
-                    <div className="flex items-center gap-2 text-xs font-bold text-[#D4AF37] uppercase tracking-wider mb-2">
-                      <span>👑</span> Karmik Cetvel (GAD Yöneticisi): {resultData.gad.karmicRuler.name} ({resultData.gad.karmicRuler.sign}, {resultData.gad.karmicRuler.house}. Ev)
+                  <div className="mt-6 p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-[#D4AF37]/10 to-transparent border border-[#D4AF37]/30 relative overflow-hidden">
+                    <div className="flex items-center justify-between text-xs font-bold text-[#D4AF37] uppercase tracking-wider mb-2">
+                      <span className="flex items-center gap-2">
+                        <span>👑</span> Karmik Cetvel (GAD Yöneticisi): {resultData.gad.karmicRuler.name} ({resultData.gad.karmicRuler.sign}, {resultData.gad.karmicRuler.house}. Ev)
+                      </span>
+                      {!isMasterOrAdmin && <Lock size={14} className="text-[#D4AF37]" />}
                     </div>
-                    <p className="text-sm text-white/90 leading-relaxed">
+                    <p className={`text-sm text-white/90 leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                       {resultData.gad.karmicRuler.summary}
                     </p>
                   </div>
+
+                  {/* Locked Banner if not master */}
+                  {!isMasterOrAdmin && renderLockedSectionNotice()}
                 </div>
 
                 {/* 12th House & Last Breath Card */}
                 <div className="bg-mystic-surface/50 border border-white/10 rounded-3xl p-6 sm:p-8">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-3 rounded-2xl bg-purple-500/10 border border-purple-500/30 text-purple-400">
-                      <Moon size={24} />
-                    </div>
-                    <div>
-                      <div className="text-xs uppercase tracking-wider text-purple-400 font-bold">
-                        Bilinçaltı & Son Nefes Hafızası
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 rounded-2xl bg-purple-500/10 border border-purple-500/30 text-purple-400">
+                        <Moon size={24} />
                       </div>
-                      <h3 className="text-xl sm:text-2xl font-bold text-white">
-                        12. Ev: {resultData.twelfthHouse.sign} Burcu (Yönetici: {resultData.twelfthHouse.ruler})
-                      </h3>
+                      <div>
+                        <div className="text-xs uppercase tracking-wider text-purple-400 font-bold">
+                          Bilinçaltı & Son Nefes Hafızası
+                        </div>
+                        <h3 className="text-xl sm:text-2xl font-bold text-white">
+                          12. Ev: {resultData.twelfthHouse.sign} Burcu (Yönetici: {resultData.twelfthHouse.ruler})
+                        </h3>
+                      </div>
                     </div>
+                    {!isMasterOrAdmin && (
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-mystic-text-muted text-xs font-semibold">
+                        <Lock size={12} className="text-[#D4AF37]" />
+                        <span>Usta Seviyesi</span>
+                      </div>
+                    )}
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div className="p-4 rounded-2xl bg-black/30 border border-white/5 space-y-2">
                       <span className="text-xs font-bold text-purple-300">Son Nefes & Geçiş Hali</span>
-                      <p className="text-xs sm:text-sm text-mystic-text-muted leading-relaxed">
+                      <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                         {resultData.twelfthHouse.lastBreathAtmosphere}
                       </p>
                     </div>
                     <div className="p-4 rounded-2xl bg-black/30 border border-white/5 space-y-2">
                       <span className="text-xs font-bold text-cyan-300">Bilinçaltı Koruma Armağanı</span>
-                      <p className="text-xs sm:text-sm text-mystic-text-muted leading-relaxed">
+                      <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                         {resultData.twelfthHouse.subconsciousGift}
                       </p>
                     </div>
                     <div className="p-4 rounded-2xl bg-black/30 border border-white/5 space-y-2">
                       <span className="text-xs font-bold text-rose-300">Gizli Karmik Korku</span>
-                      <p className="text-xs sm:text-sm text-mystic-text-muted leading-relaxed">
+                      <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                         {resultData.twelfthHouse.hiddenFear}
                       </p>
                     </div>
@@ -401,7 +486,10 @@ export default function IncarnationAnalysisPage() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         {resultData.twelfthHouse.planetsIn12th.map((p, idx) => (
                           <div key={idx} className="p-3.5 rounded-xl bg-white/5 border border-white/10 text-xs text-white/90">
-                            <strong className="text-[#D4AF37]">{p.name} ({p.sign}):</strong> {p.meaning}
+                            <strong className="text-[#D4AF37]">{p.name} ({p.sign}):</strong>{' '}
+                            <span className={!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}>
+                              {p.meaning}
+                            </span>
                           </div>
                         ))}
                       </div>
@@ -416,20 +504,28 @@ export default function IncarnationAnalysisPage() {
               <div className="space-y-6">
                 {/* Retro Planets Section */}
                 <div className="bg-mystic-surface/50 border border-white/10 rounded-3xl p-6 sm:p-8">
-                  <div className="flex items-center gap-3 mb-6">
-                    <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400">
-                      <ShieldAlert size={24} />
-                    </div>
-                    <div>
-                      <div className="text-xs uppercase tracking-wider text-rose-400 font-bold">
-                        Geçmiş Yaşam Borçları (Retrograd Gezegenler)
+                  <div className="flex items-center justify-between gap-3 mb-6">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-400">
+                        <ShieldAlert size={24} />
                       </div>
-                      <h3 className="text-xl sm:text-2xl font-bold text-white">
-                        {resultData.retroDebts.length > 0 
-                          ? `${resultData.retroDebts.length} Adet Karmik Borç Gezegeni Tespit Edildi`
-                          : 'Doğrudan Retro Karmik Borç Yok'}
-                      </h3>
+                      <div>
+                        <div className="text-xs uppercase tracking-wider text-rose-400 font-bold">
+                          Geçmiş Yaşam Borçları (Retrograd Gezegenler)
+                        </div>
+                        <h3 className="text-xl sm:text-2xl font-bold text-white">
+                          {resultData.retroDebts.length > 0 
+                            ? `${resultData.retroDebts.length} Adet Karmik Borç Gezegeni Tespit Edildi`
+                            : 'Doğrudan Retro Karmik Borç Yok'}
+                        </h3>
+                      </div>
                     </div>
+                    {!isMasterOrAdmin && (
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-mystic-text-muted text-xs font-semibold">
+                        <Lock size={12} className="text-[#D4AF37]" />
+                        <span>Usta Seviyesi</span>
+                      </div>
+                    )}
                   </div>
 
                   {resultData.retroDebts.length === 0 ? (
@@ -442,7 +538,7 @@ export default function IncarnationAnalysisPage() {
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       {resultData.retroDebts.map((debt, idx) => (
-                        <div key={idx} className="p-5 rounded-2xl bg-black/40 border border-rose-500/20 space-y-3">
+                        <div key={idx} className="p-5 rounded-2xl bg-black/40 border border-rose-500/20 space-y-3 relative overflow-hidden">
                           <div className="flex items-center justify-between">
                             <h4 className="text-base font-bold text-white flex items-center gap-2">
                               <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
@@ -455,44 +551,62 @@ export default function IncarnationAnalysisPage() {
 
                           <div className="space-y-2 text-xs sm:text-sm">
                             <p className="text-mystic-text-muted">
-                              <strong className="text-white/90">Geçmiş Yaşam Sebebi:</strong> {debt.pastLifeCause}
+                              <strong className="text-white/90">Geçmiş Yaşam Sebebi:</strong>{' '}
+                              <span className={!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}>
+                                {debt.pastLifeCause}
+                              </span>
                             </p>
                             <p className="text-mystic-text-muted">
-                              <strong className="text-white/90">Bu Yaşamdaki Borç:</strong> {debt.currentLifeKarma}
+                              <strong className="text-white/90">Bu Yaşamdaki Borç:</strong>{' '}
+                              <span className={!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}>
+                                {debt.currentLifeKarma}
+                              </span>
                             </p>
                             <div className="mt-3 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300">
                               <strong className="text-emerald-400 block mb-1">Dharma Reçetesi & Şifa Yolu:</strong>
-                              {debt.dharmaRemedy}
+                              <span className={!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}>
+                                {debt.dharmaRemedy}
+                              </span>
                             </div>
                           </div>
                         </div>
                       ))}
                     </div>
                   )}
+
+                  {!isMasterOrAdmin && renderLockedSectionNotice()}
                 </div>
 
                 {/* Chiron Section */}
                 {resultData.chiron && (
                   <div className="bg-mystic-surface/50 border border-white/10 rounded-3xl p-6 sm:p-8">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="p-3 rounded-2xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37]">
-                        <HeartHandshake size={24} />
-                      </div>
-                      <div>
-                        <div className="text-xs uppercase tracking-wider text-[#D4AF37] font-bold">
-                          Kiron (Karmik Ruh Yarası & Başkalarına Şifa Kapısı)
+                    <div className="flex items-center justify-between gap-3 mb-6">
+                      <div className="flex items-center gap-3">
+                        <div className="p-3 rounded-2xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37]">
+                          <HeartHandshake size={24} />
                         </div>
-                        <h3 className="text-xl sm:text-2xl font-bold text-white">
-                          {resultData.chiron.sign} Burcu, {resultData.chiron.house}. Ev
-                        </h3>
+                        <div>
+                          <div className="text-xs uppercase tracking-wider text-[#D4AF37] font-bold">
+                            Kiron (Karmik Ruh Yarası & Başkalarına Şifa Kapısı)
+                          </div>
+                          <h3 className="text-xl sm:text-2xl font-bold text-white">
+                            {resultData.chiron.sign} Burcu, {resultData.chiron.house}. Ev
+                          </h3>
+                        </div>
                       </div>
+                      {!isMasterOrAdmin && (
+                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-mystic-text-muted text-xs font-semibold">
+                          <Lock size={12} className="text-[#D4AF37]" />
+                          <span>Usta Seviyesi</span>
+                        </div>
+                      )}
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
                       <div className="p-5 rounded-2xl bg-black/40 border border-white/5 space-y-2">
                         <span className="text-xs font-bold text-rose-400">Ruhun Kutsal Yarası</span>
                         <h4 className="text-sm font-semibold text-white">{resultData.chiron.wound.title}</h4>
-                        <p className="text-xs sm:text-sm text-mystic-text-muted leading-relaxed">
+                        <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                           {resultData.chiron.wound.woundDescription}
                         </p>
                       </div>
@@ -500,7 +614,7 @@ export default function IncarnationAnalysisPage() {
                       <div className="p-5 rounded-2xl bg-black/40 border border-white/5 space-y-2">
                         <span className="text-xs font-bold text-emerald-400">Başkalarına Dağıtılan Şifa</span>
                         <h4 className="text-sm font-semibold text-white">Şifacı Arketipiniz</h4>
-                        <p className="text-xs sm:text-sm text-mystic-text-muted leading-relaxed">
+                        <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                           {resultData.chiron.wound.healingGift}
                         </p>
                       </div>
@@ -508,7 +622,7 @@ export default function IncarnationAnalysisPage() {
                       <div className="p-5 rounded-2xl bg-black/40 border border-white/5 space-y-2">
                         <span className="text-xs font-bold text-[#D4AF37]">Dönüşüm & Kendini Sevme Anahtarı</span>
                         <h4 className="text-sm font-semibold text-white">İçsel Çözüm</h4>
-                        <p className="text-xs sm:text-sm text-mystic-text-muted leading-relaxed">
+                        <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                           {resultData.chiron.wound.soulRemedy}
                         </p>
                       </div>
@@ -523,9 +637,17 @@ export default function IncarnationAnalysisPage() {
               <div className="space-y-6">
                 {/* Draconic Introduction Banner */}
                 <div className="bg-gradient-to-r from-indigo-900/30 via-purple-900/20 to-indigo-900/30 border border-indigo-500/30 rounded-3xl p-6 sm:p-8">
-                  <div className="flex items-center gap-3 mb-3">
-                    <Compass size={28} className="text-indigo-400" />
-                    <h3 className="text-2xl font-bold text-white">Drakonik Harita (Ruhun Gerçek Özü)</h3>
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-3">
+                      <Compass size={28} className="text-indigo-400" />
+                      <h3 className="text-2xl font-bold text-white">Drakonik Harita (Ruhun Gerçek Özü)</h3>
+                    </div>
+                    {!isMasterOrAdmin && (
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-mystic-text-muted text-xs font-semibold">
+                        <Lock size={12} className="text-[#D4AF37]" />
+                        <span>Usta Seviyesi</span>
+                      </div>
+                    )}
                   </div>
                   <p className="text-sm text-mystic-text-muted max-w-3xl leading-relaxed">
                     Tropikal natal haritanız bu dünyadaki biyolojik bedeninizin, maskenizin ve egonuzun arketipidir. Kuzey Ay Düğümü 0° Koç noktasına hizalanarak hesaplanan <strong className="text-white">Drakonik Harita</strong> ise enkarnasyonlar ötesindeki ebedi ruhunuzun yüksek titreşimini ve hakiki arzusunu yansıtır.
@@ -535,7 +657,7 @@ export default function IncarnationAnalysisPage() {
                 {/* Comparison Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {resultData.draconicComparison.map((comp, idx) => (
-                    <div key={idx} className="bg-mystic-surface/50 border border-white/10 rounded-3xl p-6 space-y-4">
+                    <div key={idx} className="bg-mystic-surface/50 border border-white/10 rounded-3xl p-6 space-y-4 relative overflow-hidden">
                       <div className="flex items-center justify-between pb-3 border-b border-white/10">
                         <h4 className="text-base font-bold text-white">{comp.pointName}</h4>
                       </div>
@@ -558,12 +680,14 @@ export default function IncarnationAnalysisPage() {
                         </div>
                       </div>
 
-                      <p className="text-xs sm:text-sm text-mystic-text-muted leading-relaxed pt-2">
+                      <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed pt-2 ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                         {comp.spiritualMeaning}
                       </p>
                     </div>
                   ))}
                 </div>
+
+                {!isMasterOrAdmin && renderLockedSectionNotice()}
               </div>
             )}
 
@@ -587,8 +711,16 @@ export default function IncarnationAnalysisPage() {
                       </h3>
                     </div>
 
-                    <div className="px-4 py-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-sm font-semibold">
-                      Tekâmül Pusulası
+                    <div className="flex items-center gap-2">
+                      <div className="px-4 py-2 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-sm font-semibold">
+                        Tekâmül Pusulası
+                      </div>
+                      {!isMasterOrAdmin && (
+                        <div className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-white/5 border border-white/10 text-mystic-text-muted text-xs font-semibold">
+                          <Lock size={12} className="text-[#D4AF37]" />
+                          <span>Usta</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -596,7 +728,7 @@ export default function IncarnationAnalysisPage() {
                     <div className="p-5 rounded-2xl bg-black/40 border border-white/5 space-y-2">
                       <span className="text-xs font-bold text-emerald-400">Bu Yaşamdaki Nihai Amaç</span>
                       <h4 className="text-sm font-semibold text-white">Dharma Hedefi</h4>
-                      <p className="text-xs sm:text-sm text-mystic-text-muted leading-relaxed">
+                      <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                         {resultData.kad.seed.evolutionGoal}
                       </p>
                     </div>
@@ -604,7 +736,7 @@ export default function IncarnationAnalysisPage() {
                     <div className="p-5 rounded-2xl bg-black/40 border border-white/5 space-y-2">
                       <span className="text-xs font-bold text-[#D4AF37]">Gelecek Enkarnasyon Potansiyeli</span>
                       <h4 className="text-sm font-semibold text-white">Ruhun Bir Sonraki Seviyesi</h4>
-                      <p className="text-xs sm:text-sm text-mystic-text-muted leading-relaxed">
+                      <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                         {resultData.kad.seed.nextIncarnationPotential}
                       </p>
                     </div>
@@ -612,7 +744,7 @@ export default function IncarnationAnalysisPage() {
                     <div className="p-5 rounded-2xl bg-black/40 border border-white/5 space-y-2">
                       <span className="text-xs font-bold text-cyan-400">Kutsal Ruhsal Pratik</span>
                       <h4 className="text-sm font-semibold text-white">Günlük Tekâmül Eylemi</h4>
-                      <p className="text-xs sm:text-sm text-mystic-text-muted leading-relaxed">
+                      <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                         {resultData.kad.seed.sacredPractice}
                       </p>
                     </div>
@@ -621,24 +753,34 @@ export default function IncarnationAnalysisPage() {
 
                 {/* 8th House: Boyut Geçişi & Dönüşüm Kapısı */}
                 <div className="bg-mystic-surface/50 border border-white/10 rounded-3xl p-6 sm:p-8">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
-                      <Flame size={24} />
-                    </div>
-                    <div>
-                      <div className="text-xs uppercase tracking-wider text-amber-400 font-bold">
-                        8. Ev: Boyut Geçişi & Ruhun Dönüşüm Kapısı
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
+                        <Flame size={24} />
                       </div>
-                      <h3 className="text-xl sm:text-2xl font-bold text-white">
-                        {resultData.eighthHouse.sign} Burcu (Yönetici: {resultData.eighthHouse.ruler})
-                      </h3>
+                      <div>
+                        <div className="text-xs uppercase tracking-wider text-amber-400 font-bold">
+                          8. Ev: Boyut Geçişi & Ruhun Dönüşüm Kapısı
+                        </div>
+                        <h3 className="text-xl sm:text-2xl font-bold text-white">
+                          {resultData.eighthHouse.sign} Burcu (Yönetici: {resultData.eighthHouse.ruler})
+                        </h3>
+                      </div>
                     </div>
+                    {!isMasterOrAdmin && (
+                      <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-mystic-text-muted text-xs font-semibold">
+                        <Lock size={12} className="text-[#D4AF37]" />
+                        <span>Usta Seviyesi</span>
+                      </div>
+                    )}
                   </div>
 
-                  <p className="text-sm text-mystic-text-muted leading-relaxed p-4 rounded-2xl bg-black/30 border border-white/5">
+                  <p className={`text-sm text-mystic-text-muted leading-relaxed p-4 rounded-2xl bg-black/30 border border-white/5 ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                     {resultData.eighthHouse.transformationGateway}
                   </p>
                 </div>
+
+                {!isMasterOrAdmin && renderLockedSectionNotice()}
               </div>
             )}
 
@@ -652,6 +794,48 @@ export default function IncarnationAnalysisPage() {
           </div>
         )}
       </div>
+
+      {/* Auth Prompt Modal */}
+      <AuthPromptModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        title="Giriş Yapın veya Kayıt Olun"
+        description="Karmik analiz raporunuzu 500 TL karşılığında satın alıp profilinizde ve e-postanızda güvenle saklayabilmeniz için lütfen giriş yapın."
+        redirectUrl={`/checkout/guest?type=incarnation&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}`}
+      />
+
+      {/* Premium Lock Modal */}
+      {showLockModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowLockModal(false)}>
+          <div 
+            className="bg-[#111] border border-[#D4AF37]/30 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl relative animate-in fade-in zoom-in duration-300"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="text-[#D4AF37] mx-auto mb-4 flex justify-center"><Lock size={48} /></div>
+            <h3 className="text-xl font-bold text-white mb-2">Detaylı Karmik Analiz Kilitli</h3>
+            <p className="text-mystic-text-muted text-sm mb-6 leading-relaxed">
+              Geçmiş yaşam nedenleri, karmik borçlar ve dharma reçeteleri Usta Seviyesi (Master) üyelere özeldir. Usta üyeliğe geçebilir veya tüm detayları içeren 5 sayfalık PDF Raporunu indirebilirsiniz.
+            </p>
+            <div className="flex flex-col gap-3">
+              <button 
+                onClick={() => {
+                  setShowLockModal(false);
+                  handlePurchaseReport();
+                }}
+                className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all cursor-pointer shadow-lg shadow-[#D4AF37]/20"
+              >
+                Raporu İndir (500 TL)
+              </button>
+              <button 
+                onClick={() => setShowLockModal(false)}
+                className="w-full bg-white/5 hover:bg-white/10 text-white font-semibold py-3 px-4 rounded-xl transition-all cursor-pointer"
+              >
+                Kapat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
