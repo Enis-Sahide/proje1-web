@@ -708,13 +708,39 @@ export default function KabbalahAnalysisPage() {
               </button>
             </div>
             <div className="p-6">
-              <div className="text-white/90 leading-relaxed space-y-4 text-base whitespace-pre-wrap">
-                {selectedInterp.content.split(/(\*\*.*?\*\*)/g).map((part, index) => {
-                  if (part.startsWith('**') && part.endsWith('**')) {
-                    return <strong key={index} className="text-white font-bold">{part.slice(2, -2)}</strong>;
-                  }
-                  return <span key={index}>{part}</span>;
-                })}
+              <div className="text-white/90 leading-relaxed space-y-3 text-base whitespace-pre-wrap">
+                {(() => {
+                  const normalized = selectedInterp.content
+                    .replace(/\*\((.*?)\)\*/g, '**$1**')
+                    .replace(/\*([^*\n]+)\*/g, '**$1**');
+                    
+                  return normalized.split(/(\*\*.*?\*\*)/g).map((part, index) => {
+                    if (part.startsWith('**') && part.endsWith('**')) {
+                      const inner = part.slice(2, -2);
+                      const isHeader = inner.startsWith('[') && inner.endsWith(']');
+                      const isBadge = inner.includes('✨') || inner.includes('⚠️') || inner.includes('🎯') || inner.includes('🔑') || inner.includes('🔄');
+
+                      if (isHeader) {
+                        return (
+                          <strong key={index} className="text-[#D4AF37] font-bold text-lg block mt-4 mb-1">
+                            {inner}
+                          </strong>
+                        );
+                      }
+
+                      if (isBadge) {
+                        return (
+                          <strong key={index} className="text-[#F59E0B] font-bold">
+                            {inner}
+                          </strong>
+                        );
+                      }
+
+                      return <strong key={index} className="text-white font-bold">{inner}</strong>;
+                    }
+                    return <span key={index}>{part}</span>;
+                  });
+                })()}
               </div>
             </div>
           </div>
