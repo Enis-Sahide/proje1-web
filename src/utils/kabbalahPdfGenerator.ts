@@ -34,7 +34,9 @@ const drawTextWithBold = (
     .replace(/\r\n/g, '\n') // Convert CRLF to LF
     .replace(/!\[.*?\]\(.*?\)/g, '')
     .replace(/<img.*?src=".*?".*?>/g, '')
-    .replace(/^\s*>\s*/gm, '');
+    .replace(/^\s*>\s*/gm, '')
+    .replace(/\*\((.*?)\)\*/g, '$1')
+    .replace(/\*\((.*?)\)\s*\*/g, '$1');
      
   const parts = sanitizedText.split(/(\s+|\*\*)/);
   let isBold = false;

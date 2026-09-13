@@ -710,13 +710,14 @@ export default function KabbalahAnalysisPage() {
             <div className="p-6">
               <div className="text-white/90 leading-relaxed space-y-3 text-base whitespace-pre-wrap">
                 {(() => {
-                  const normalized = selectedInterp.content
-                    .replace(/\*\((.*?)\)\*/g, '**$1**')
-                    .replace(/\*([^*\n]+)\*/g, '**$1**');
-                    
-                  return normalized.split(/(\*\*.*?\*\*)/g).map((part, index) => {
+                  // Clean up any legacy or malformed markdown patterns
+                  let text = selectedInterp.content
+                    .replace(/\*\((.*?)\)\*/g, '$1')
+                    .replace(/\*\((.*?)\)\s*\*/g, '$1');
+
+                  return text.split(/(\*\*.*?\*\*)/g).map((part, index) => {
                     if (part.startsWith('**') && part.endsWith('**')) {
-                      const inner = part.slice(2, -2);
+                      const inner = part.slice(2, -2).replace(/\*/g, '').trim();
                       const isHeader = inner.startsWith('[') && inner.endsWith(']');
                       const isBadge = inner.includes('✨') || inner.includes('⚠️') || inner.includes('🎯') || inner.includes('🔑') || inner.includes('🔄');
 
@@ -738,7 +739,10 @@ export default function KabbalahAnalysisPage() {
 
                       return <strong key={index} className="text-white font-bold">{inner}</strong>;
                     }
-                    return <span key={index}>{part}</span>;
+
+                    // Strip any stray asterisk characters from normal text
+                    const cleanText = part.replace(/\*/g, '');
+                    return <span key={index}>{cleanText}</span>;
                   });
                 })()}
               </div>
