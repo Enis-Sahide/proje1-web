@@ -15,7 +15,8 @@ import {
   Search,
   ChevronRight,
   Info,
-  Lock
+  Lock,
+  MapPin
 } from 'lucide-react';
 import { TransitTimelineItem } from '@/features/astrology/engine/TransitTimelineEngine';
 
@@ -29,6 +30,8 @@ interface TransitTimelineChartProps {
   isPremium?: boolean;
   onRequirePremium?: () => void;
   isMundane?: boolean;
+  userTimezone?: string;
+  tzOffsetHours?: number;
 }
 
 const PLANET_SYMBOLS: Record<string, string> = {
@@ -55,7 +58,9 @@ export default function TransitTimelineChart({
   isLoading = false,
   isPremium = false,
   onRequirePremium,
-  isMundane = false
+  isMundane = false,
+  userTimezone = 'Europe/Istanbul',
+  tzOffsetHours = 3
 }: TransitTimelineChartProps) {
   const [selectedItem, setSelectedItem] = useState<TransitTimelineItem | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<'ALL' | 'KADERSEL' | 'KISISEL'>('ALL');
@@ -256,6 +261,15 @@ export default function TransitTimelineChart({
             <p className="text-xs text-mystic-text-muted mt-0.5">
               Yatay çubuklar açının etki süresini, parlayan işaretler doruk noktasını (0° Partil) temsil eder.
             </p>
+            <div className="flex flex-wrap items-center gap-2 mt-2">
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full">
+                <MapPin size={11} className="text-[#D4AF37]" />
+                Zaman Dilimi: <strong className="text-white">{userTimezone}</strong> (UTC{tzOffsetHours >= 0 ? `+${tzOffsetHours}` : tzOffsetHours})
+              </span>
+              <span className="text-[11px] text-mystic-text-muted">
+                • Tüm başlangıç ve zirve saatleri cihazınızın yerel konumuna göre hesaplanmıştır.
+              </span>
+            </div>
           </div>
 
           <div className="flex flex-wrap items-center gap-3 text-[11px] sm:text-xs">
@@ -538,6 +552,12 @@ export default function TransitTimelineChart({
                 </span>
                 <span className="text-[9px] text-mystic-text-muted block mt-0.5">Toplam {selectedItem.durationDays} gün</span>
               </div>
+            </div>
+
+            {/* Location & Timezone Note */}
+            <div className="text-[10px] text-mystic-text-muted text-center mb-5 flex items-center justify-center gap-1.5 bg-white/[0.03] py-2 px-3 rounded-xl border border-white/5">
+              <MapPin size={11} className="text-[#D4AF37] shrink-0" />
+              <span>Tüm saatler cihazınızın yerel saat dilimine (<strong className="text-gray-200">{userTimezone}</strong> • UTC{tzOffsetHours >= 0 ? `+${tzOffsetHours}` : tzOffsetHours}) göre hesaplanmıştır.</span>
             </div>
 
             {/* Dönemin Temel Özeti (Herkese Açık) */}

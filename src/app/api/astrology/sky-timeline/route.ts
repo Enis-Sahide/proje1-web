@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { calculateMundaneTimeline } from '@/features/astrology/engine/TransitTimelineEngine';
 import { json, errorJson, preflight } from '@/lib/http/cors';
+import moment from 'moment-timezone';
 
 export async function OPTIONS() {
   return preflight();
@@ -18,8 +19,23 @@ export async function POST(req: NextRequest) {
     const { 
       range = '1m', 
       startDateStr,
-      categoryFilter = 'ALL' 
+      categoryFilter = 'ALL',
+      userTz,
+      tzOffsetHours: clientTzOffset
     } = body;
+
+    let tzOffsetHours = 3;
+    let activeTimeZone = userTz || 'Europe/Istanbul';
+
+    if (typeof clientTzOffset === 'number' && !isNaN(clientTzOffset)) {
+      tzOffsetHours = clientTzOffset;
+    } else if (userTz) {
+      try {
+        tzOffsetHours = moment.tz(userTz).utcOffset() / 60;
+      } catch {
+        tzOffsetHours = 3;
+      }
+    }
 
     const today = new Date();
     const startObj = startDateStr 
@@ -33,9 +49,10 @@ export async function POST(req: NextRequest) {
 
     const endObj = new Date(startObj.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
 
-    // Compute Mundane Timeline (independent of natal chart)
+    // Compute Mundane Timeline (independent of natal chart) with user's local timezone
     const timelineItems = await calculateMundaneTimeline(startObj, endObj, {
-      categoryFilter: categoryFilter as any
+      categoryFilter: categoryFilter as any,
+      tzOffsetHours
     });
 
     return json({
@@ -45,6 +62,8 @@ export async function POST(req: NextRequest) {
         endDate: endObj.toISOString().split('T')[0],
         range,
         categoryFilter,
+        timeZone: activeTimeZone,
+        tzOffsetHours,
         totalItems: timelineItems.length,
         items: timelineItems
       }

@@ -72,6 +72,21 @@ export default function TransitsPage() {
   const defaultTDate = today.toISOString().split('T')[0];
   const defaultTTime = today.toTimeString().slice(0, 5);
 
+  // User Local Timezone Detection (Auto-detected from browser / device)
+  const [userTz, setUserTz] = useState<string>('Europe/Istanbul');
+  const [tzOffsetHours, setTzOffsetHours] = useState<number>(3);
+
+  useEffect(() => {
+    try {
+      const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || 'Europe/Istanbul';
+      const offset = -new Date().getTimezoneOffset() / 60;
+      setUserTz(tz);
+      setTzOffsetHours(offset);
+    } catch {
+      // fallback to Europe/Istanbul (UTC+3)
+    }
+  }, []);
+
   // -------------------------------------------------------------
   // 1. MUNDANE (Kolektif Gökyüzü) States
   // -------------------------------------------------------------
@@ -127,7 +142,9 @@ export default function TransitsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           startDateStr: startDate,
-          range: rangeToFetch
+          range: rangeToFetch,
+          userTz,
+          tzOffsetHours
         })
       });
       const data = await res.json();
@@ -177,7 +194,9 @@ export default function TransitsPage() {
           natalTime: natalTimeStr,
           cityData: cityKey,
           range: rangeToFetch,
-          startDateStr: transitDateStr
+          startDateStr: transitDateStr,
+          userTz,
+          tzOffsetHours
         })
       });
       const data = await res.json();
@@ -743,6 +762,8 @@ export default function TransitsPage() {
                   isPremium={isApprenticeOrAbove}
                   onRequirePremium={() => setShowLockModal(true)}
                   isMundane={true}
+                  userTimezone={skyTimelineData?.timeZone || userTz}
+                  tzOffsetHours={skyTimelineData?.tzOffsetHours ?? tzOffsetHours}
                 />
               )
             )}
@@ -1000,6 +1021,8 @@ export default function TransitsPage() {
                       isLoading={isTimelineLoading}
                       isPremium={isApprenticeOrAbove}
                       onRequirePremium={() => setShowLockModal(true)}
+                      userTimezone={timelineData?.timeZone || userTz}
+                      tzOffsetHours={timelineData?.tzOffsetHours ?? tzOffsetHours}
                     />
                   )
                 )}

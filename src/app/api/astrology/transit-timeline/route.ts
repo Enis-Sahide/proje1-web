@@ -17,11 +17,32 @@ export async function POST(req: NextRequest) {
       cityData, 
       range = '1m', 
       startDateStr,
-      categoryFilter = 'ALL' 
+      categoryFilter = 'ALL',
+      userTz,
+      tzOffsetHours: clientTzOffset
     } = body;
 
     if (!natalDate || !natalTime || !cityData) {
       return errorJson('Eksik parametreler. Doğum tarihi, saati ve şehri gereklidir.', 400, { success: false });
+    }
+
+    let tzOffsetHours = 3;
+    let activeTimeZone = userTz || cityData?.tz || 'Europe/Istanbul';
+
+    if (typeof clientTzOffset === 'number' && !isNaN(clientTzOffset)) {
+      tzOffsetHours = clientTzOffset;
+    } else if (userTz) {
+      try {
+        tzOffsetHours = moment.tz(userTz).utcOffset() / 60;
+      } catch {
+        tzOffsetHours = 3;
+      }
+    } else if (cityData?.tz) {
+      try {
+        tzOffsetHours = moment.tz(cityData.tz).utcOffset() / 60;
+      } catch {
+        tzOffsetHours = 3;
+      }
     }
 
     const nMoment = moment.tz(`${natalDate} ${natalTime}:00`, 'YYYY-MM-DD HH:mm:ss', cityData.tz || 'Europe/Istanbul');
@@ -48,9 +69,10 @@ export async function POST(req: NextRequest) {
 
     const endObj = new Date(startObj.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
 
-    // 3. Compute Timeline
+    // 3. Compute Timeline with user's local timezone offset
     const timelineItems = await calculateTransitTimeline(allNatalPoints, startObj, endObj, {
-      categoryFilter: categoryFilter as any
+      categoryFilter: categoryFilter as any,
+      tzOffsetHours
     });
 
     return json({
@@ -60,6 +82,8 @@ export async function POST(req: NextRequest) {
         endDate: endObj.toISOString().split('T')[0],
         range,
         categoryFilter,
+        timeZone: activeTimeZone,
+        tzOffsetHours,
         totalItems: timelineItems.length,
         items: timelineItems
       }
