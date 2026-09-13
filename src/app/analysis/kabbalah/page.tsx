@@ -449,7 +449,7 @@ export default function KabbalahAnalysisPage() {
                           ⚠️ <strong>Önemli Bilgilendirme:</strong> Raporunuzda yer alan genel Kabalistik analizleriniz (1., 2., 3. ve 4. Boyut yerleşimleriniz) doğum haritanızın ömür boyu değişmeyen kalıcı potansiyelleridir. Ancak yukarıdaki "Aktif Bilinç Boyutunuz" kartında sunulan bilgi, yalnızca sorgulama yaptığınız bugün ({new Date().toLocaleDateString('tr-TR')}) tarihindeki güncel gökyüzü hareketlerine göre hesaplanmış geçici ve dönemsel bir tekamül odak noktasıdır.
                         </p>
                         <p className="text-xs md:text-sm text-[#0EA5E9]/80 leading-relaxed font-medium">
-                          ✨ <strong>Kozmik İpucu:</strong> Gökyüzü sürekli hareket halindedir. Önümüzdeki aylarda bu tetiklenmenin nasıl değiştiğini görmek, yeni kapılarınızı keşfetmek ve güncel kozmik ödevlerinizi takip etmek için dilediğiniz zaman uygulamamıza girerek güncel durumunuzu ücretsiz kontrol edebilirsiniz.
+                          ✨ <strong>Kozmik İpucu:</strong> Gökyüzü sürekli hareket halindedir. Önümüzdeki aylarda bu tetiklenmenin nasıl değiştiğini görmek, yeni kapılarınızı keşfetmek ve güncel kozmik ödevlerinizi takip etmek için dilediğiniz zaman uygulamamıza girerek güncel durumunuzu kontrol edebilirsiniz.
                         </p>
                       </div>
                     </div>
