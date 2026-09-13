@@ -119,7 +119,7 @@ export default function KabbalahAnalysisPage() {
     </div>
   );
 
-  const renderSvgWheel = (currentChart: NatalChartData | null) => {
+  const renderSvgWheel = (currentChart: NatalChartData | null, hasHouses: boolean = true) => {
     if (!currentChart) return null;
 
     const ascLon = currentChart.ascendant.longitude;
@@ -195,8 +195,8 @@ export default function KabbalahAnalysisPage() {
             );
           })}
 
-          {/* House Lines */}
-          {currentChart.houses.map((h, i) => {
+          {/* House Lines (Only for worlds with houses: Assiah & Yetzirah) */}
+          {hasHouses && currentChart.houses.map((h, i) => {
             const isAngle = h.house === 1 || h.house === 4 || h.house === 7 || h.house === 10;
             return (
               <g key={`house-${i}`}>
@@ -527,86 +527,99 @@ export default function KabbalahAnalysisPage() {
                   ))}
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                  <div className="lg:col-span-2 flex justify-center items-center bg-black/40 rounded-2xl p-4 border border-white/5">
-                    {renderSvgWheel(chartData[selectedWorld])}
-                  </div>
+                {(() => {
+                  const hasHouses = selectedWorld === 'assiah' || selectedWorld === 'yetzirah';
 
-                  <div className="bg-black/40 rounded-2xl p-6 border border-white/5 max-h-[650px] overflow-y-auto custom-scrollbar">
-                    <h4 className="text-xl font-bold mb-4 text-[#D4AF37] flex items-center gap-2">
-                      <Star size={18} /> Gezegen Yerleşimleri
-                    </h4>
-                    <div className="space-y-3">
-                      {chartData[selectedWorld].planets.map((p: AstroPoint, idx: number) => (
-                        <div 
-                          key={idx} 
-                          className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:border-[#D4AF37]/50 cursor-pointer transition-colors"
-                          onClick={() => handleInterpClick(interpretations?.[selectedWorld]?.[p.name] || null)}
-                        >
-                          <div className="flex items-center gap-3">
-                            <span className="w-8 h-8 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] text-lg font-bold">
-                              {PLANET_SYMBOLS[p.name] || p.name[0]}
+                  return (
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                      <div className="lg:col-span-2 flex justify-center items-center bg-black/40 rounded-2xl p-4 border border-white/5">
+                        {renderSvgWheel(chartData[selectedWorld], hasHouses)}
+                      </div>
+
+                      <div className={`bg-black/40 rounded-2xl p-6 border border-white/5 max-h-[650px] overflow-y-auto custom-scrollbar ${hasHouses ? 'lg:col-span-1' : 'lg:col-span-2'}`}>
+                        <h4 className="text-xl font-bold mb-4 text-[#D4AF37] flex items-center justify-between">
+                          <span className="flex items-center gap-2"><Star size={18} /> Gezegen Yerleşimleri</span>
+                          {!hasHouses && (
+                            <span className="text-xs font-normal text-mystic-text-muted bg-white/5 px-2.5 py-1 rounded-full border border-white/10">
+                              {selectedWorld === 'beriyah' ? 'Zihin Boyutu (Harmonik Frekanslar)' : 'Kozmik İlahi Boyut (Güneş Merkezli)'}
                             </span>
-                            <span className="font-medium text-white text-sm">{p.name}</span>
-                          </div>
-                          <div className="text-right flex flex-col">
-                            <span className="text-mystic-text-muted text-xs">
-                              <span style={{color: ZODIAC_COLORS[p.sign]}}>{ZODIAC_SYMBOLS[p.sign]} {p.sign}</span> 
-                            </span>
-                            <span className="text-white font-mono text-xs">
-                              {p.degreeInSign}°{String(p.minutes).padStart(2, '0')}'
-                              {p.isRetrograde && <span className="text-red-500 ml-1">Rx</span>}
-                            </span>
+                          )}
+                        </h4>
+                        <div className={hasHouses ? "space-y-3" : "grid grid-cols-1 md:grid-cols-2 gap-3"}>
+                          {chartData[selectedWorld].planets.map((p: AstroPoint, idx: number) => (
+                            <div 
+                              key={idx} 
+                              className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:border-[#D4AF37]/50 cursor-pointer transition-colors"
+                              onClick={() => handleInterpClick(interpretations?.[selectedWorld]?.[p.name] || null)}
+                            >
+                              <div className="flex items-center gap-3">
+                                <span className="w-8 h-8 rounded-full bg-[#D4AF37]/10 flex items-center justify-center text-[#D4AF37] text-lg font-bold">
+                                  {PLANET_SYMBOLS[p.name] || p.name[0]}
+                                </span>
+                                <span className="font-medium text-white text-sm">{p.name}</span>
+                              </div>
+                              <div className="text-right flex flex-col">
+                                <span className="text-mystic-text-muted text-xs">
+                                  <span style={{color: ZODIAC_COLORS[p.sign]}}>{ZODIAC_SYMBOLS[p.sign]} {p.sign}</span> 
+                                </span>
+                                <span className="text-white font-mono text-xs">
+                                  {p.degreeInSign}°{String(p.minutes).padStart(2, '0')}'
+                                  {p.isRetrograde && <span className="text-red-500 ml-1">Rx</span>}
+                                </span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Ev Yerleşimleri Listesi (Sadece Assiah ve Yetzirah için) */}
+                      {hasHouses && (
+                        <div className="bg-black/40 rounded-2xl p-6 border border-white/5 max-h-[650px] overflow-y-auto custom-scrollbar lg:col-span-1">
+                          <h4 className="text-xl font-bold mb-4 text-[#D4AF37] flex items-center gap-2">
+                            <Triangle size={18} className="rotate-180" /> Ev Yerleşimleri
+                          </h4>
+                          <div className="space-y-3">
+                            {chartData[selectedWorld].houses.map((h: AstroPoint, idx: number) => {
+                              const houseInterp = interpretations?.[selectedWorld]?.[`Ev_${h.house}`] 
+                                || interpretations?.[selectedWorld]?.[`${h.house}`]
+                                || getEsotericHouseInterpretation(
+                                    h.house,
+                                    h.sign,
+                                    selectedWorld === 'yetzirah',
+                                    false,
+                                    false
+                                  );
+
+                              return (
+                                <div 
+                                  key={`house-list-${idx}`} 
+                                  className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:border-[#D4AF37]/50 cursor-pointer transition-colors"
+                                  onClick={() => handleInterpClick(houseInterp)}
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <span className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white text-sm font-bold">
+                                      {h.house}
+                                    </span>
+                                    <span className="font-medium text-white text-sm">. Ev {h.house === 1 ? '(ASC)' : h.house === 10 ? '(MC)' : ''}</span>
+                                  </div>
+                                  <div className="text-right flex flex-col">
+                                    <span className="text-mystic-text-muted text-xs">
+                                      <span style={{color: ZODIAC_COLORS[h.sign]}}>{ZODIAC_SYMBOLS[h.sign]} {h.sign}</span> 
+                                    </span>
+                                    <span className="text-white font-mono text-xs">
+                                      {h.degreeInSign}°{String(h.minutes).padStart(2, '0')}'
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
-                      ))}
+                      )}
+
                     </div>
-                  </div>
-
-                  {/* Ev Yerleşimleri Listesi */}
-                  <div className="bg-black/40 rounded-2xl p-6 border border-white/5 max-h-[650px] overflow-y-auto custom-scrollbar">
-                    <h4 className="text-xl font-bold mb-4 text-[#D4AF37] flex items-center gap-2">
-                      <Triangle size={18} className="rotate-180" /> Ev Yerleşimleri
-                    </h4>
-                    <div className="space-y-3">
-                      {chartData[selectedWorld].houses.map((h: AstroPoint, idx: number) => {
-                        const houseInterp = interpretations?.[selectedWorld]?.[`Ev_${h.house}`] 
-                          || interpretations?.[selectedWorld]?.[`${h.house}`]
-                          || getEsotericHouseInterpretation(
-                              h.house,
-                              h.sign,
-                              selectedWorld === 'yetzirah',
-                              selectedWorld === 'beriyah',
-                              selectedWorld === 'atzilut'
-                            );
-
-                        return (
-                          <div 
-                            key={`house-list-${idx}`} 
-                            className="flex items-center justify-between p-3 bg-white/5 rounded-xl border border-white/5 hover:border-[#D4AF37]/50 cursor-pointer transition-colors"
-                            onClick={() => handleInterpClick(houseInterp)}
-                          >
-                            <div className="flex items-center gap-3">
-                              <span className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-white text-sm font-bold">
-                                {h.house}
-                              </span>
-                              <span className="font-medium text-white text-sm">. Ev {h.house === 1 ? '(ASC)' : h.house === 10 ? '(MC)' : ''}</span>
-                            </div>
-                            <div className="text-right flex flex-col">
-                              <span className="text-mystic-text-muted text-xs">
-                                <span style={{color: ZODIAC_COLORS[h.sign]}}>{ZODIAC_SYMBOLS[h.sign]} {h.sign}</span> 
-                              </span>
-                              <span className="text-white font-mono text-xs">
-                                {h.degreeInSign}°{String(h.minutes).padStart(2, '0')}'
-                              </span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                </div>
+                  );
+                })()}
               </div>
 
               {/* Detailed Description of The 4 Worlds */}

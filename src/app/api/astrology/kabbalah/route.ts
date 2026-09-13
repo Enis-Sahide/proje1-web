@@ -221,16 +221,18 @@ export async function POST(req: NextRequest) {
         interpretations[world][p.name] = interp;
       }
 
-      for (const h of chart.houses) {
-        const houseInterp = getEsotericHouseInterpretation(
-          h.house,
-          h.sign,
-          isYetzirah,
-          isBeriyah,
-          isAtzilut
-        );
-        interpretations[world][`Ev_${h.house}`] = houseInterp;
-        interpretations[world][`${h.house}`] = houseInterp;
+      if (!isBeriyah && !isAtzilut) {
+        for (const h of chart.houses) {
+          const houseInterp = getEsotericHouseInterpretation(
+            h.house,
+            h.sign,
+            isYetzirah,
+            false,
+            false
+          );
+          interpretations[world][`Ev_${h.house}`] = houseInterp;
+          interpretations[world][`${h.house}`] = houseInterp;
+        }
       }
     }
 
