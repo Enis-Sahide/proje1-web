@@ -330,10 +330,10 @@ const CENTER_COORDS: Record<CenterCode, { x: number, y: number, shape: string, c
   Ajna: { x: 200, y: 115, shape: 'triangle-down', color: '#A8D5BA', s: 28 },
   Throat: { x: 200, y: 190, shape: 'square', color: '#D2B48C', s: 25 },
   G: { x: 200, y: 300, shape: 'diamond', color: '#F4D03F', s: 35 },
-  Heart: { x: 255, y: 340, shape: 'triangle', color: '#FFFFFF', s: 24 },
+  Heart: { x: 255, y: 340, shape: 'triangle', color: '#E1464F', s: 24 },
   Sacral: { x: 200, y: 400, shape: 'square', color: '#E1464F', s: 25 },
-  Root: { x: 200, y: 480, shape: 'square', color: '#FFFFFF', s: 25 },
-  Spleen: { x: 90, y: 390, shape: 'triangle-right', color: '#FFFFFF', s: 30 },
+  Root: { x: 200, y: 480, shape: 'square', color: '#D2B48C', s: 25 },
+  Spleen: { x: 90, y: 390, shape: 'triangle-right', color: '#D2B48C', s: 30 },
   SolarPlexus: { x: 310, y: 390, shape: 'triangle-left', color: '#D2B48C', s: 30 },
 };
 
@@ -403,6 +403,185 @@ const CHANNELS = [
   { id: 4253, gates: [42, 53], centers: ['Sacral', 'Root'] },
   { id: 4764, gates: [47, 64], centers: ['Ajna', 'Head'] }
 ];
+
+const convertSvgToPng = (svgString: string, width: number = 640, height: number = 1080): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    try {
+      const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+      const URL = window.URL || (window as any).webkitURL || window;
+      const blobURL = URL.createObjectURL(svgBlob);
+      
+      const image = new Image();
+      image.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const context = canvas.getContext('2d');
+        if (context) {
+          context.drawImage(image, 0, 0, width, height);
+          const png = canvas.toDataURL('image/png');
+          URL.revokeObjectURL(blobURL);
+          resolve(png);
+        } else {
+          reject(new Error('Canvas context could not be created'));
+        }
+      };
+      image.onerror = (err) => {
+        console.error("[humanDesignPdfGenerator] Image element failed to load SVG blob URL:", err);
+        reject(err);
+      };
+      image.src = blobURL;
+    } catch (err) {
+      console.error("[humanDesignPdfGenerator] Exception in convertSvgToPng:", err);
+      reject(err);
+    }
+  });
+};
+
+const generateHumanDesignSvgString = (chart: HumanDesignChart): string => {
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="1080" viewBox="40 10 320 540">`;
+  
+  // Defs: Gold Gradient background
+  svg += `<defs>
+    <linearGradient id="hdGoldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e6c27a"/>
+      <stop offset="100%" stop-color="#c59b3f"/>
+    </linearGradient>
+  </defs>`;
+
+  // Card Background with smooth rounded corners matching the screen
+  svg += `<rect x="40" y="10" width="320" height="540" rx="28" fill="url(#hdGoldGrad)" stroke="#c59b3f" stroke-width="2"/>`;
+
+  // Channels logic
+  const sortedChannels = [...CHANNELS].sort((a, b) => {
+    if (a.id === 1648) return 1;
+    if (b.id === 1648) return -1;
+    return 0;
+  });
+
+  // 1. Background gray border + white track
+  sortedChannels.forEach(ch => {
+    const g1 = ch.gates[0];
+    const g2 = ch.gates[1];
+    const c1 = GATE_COORDS[g1];
+    const c2 = GATE_COORDS[g2];
+    if (!c1 || !c2) return;
+    const p0x = c1.x, p0y = c1.y;
+    const p2x = c2.x, p2y = c2.y;
+
+    let bgPathD = `M ${p0x} ${p0y} L ${p2x} ${p2y}`;
+    if ([1020, 1034, 2034, 2057, 1648].includes(ch.id)) {
+      let cx = 0, cy = 0;
+      if (ch.id === 1020) { cx = 120; cy = p2y; }
+      else if (ch.id === 1034) { cx = 60; cy = p0y; }
+      else if (ch.id === 2034) { cx = 80; cy = p0y; }
+      else if (ch.id === 2057) { cx = 40; cy = p0y; }
+      else if (ch.id === 1648) { cx = 0; cy = Math.min(p0y, p2y); }
+      bgPathD = `M ${p0x} ${p0y} Q ${cx} ${cy} ${p2x} ${p2y}`;
+    }
+
+    svg += `<path d="${bgPathD}" stroke="#94A3B8" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`;
+    svg += `<path d="${bgPathD}" stroke="#FFFFFF" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>`;
+  });
+
+  // 2. Active channels
+  sortedChannels.forEach(ch => {
+    const g1 = ch.gates[0];
+    const g2 = ch.gates[1];
+    const c1 = GATE_COORDS[g1];
+    const c2 = GATE_COORDS[g2];
+    if (!c1 || !c2) return;
+    const p0x = c1.x, p0y = c1.y;
+    const p2x = c2.x, p2y = c2.y;
+
+    const mx = (p0x + p2x) / 2;
+    const my = (p0y + p2y) / 2;
+    let g1Path = `M ${p0x} ${p0y} L ${mx} ${my}`;
+    let g2Path = `M ${p2x} ${p2y} L ${mx} ${my}`;
+
+    if ([1020, 1034, 2034, 2057, 1648].includes(ch.id)) {
+      let cx = 0, cy = 0;
+      if (ch.id === 1020) { cx = 120; cy = p2y; }
+      else if (ch.id === 1034) { cx = 60; cy = p0y; }
+      else if (ch.id === 2034) { cx = 80; cy = p0y; }
+      else if (ch.id === 2057) { cx = 40; cy = p0y; }
+      else if (ch.id === 1648) { cx = 0; cy = Math.min(p0y, p2y); }
+
+      const pmx = 0.25 * p0x + 0.5 * cx + 0.25 * p2x;
+      const pmy = 0.25 * p0y + 0.5 * cy + 0.25 * p2y;
+
+      const c1x = 0.5 * (p0x + cx), c1y = 0.5 * (p0y + cy);
+      const c2x = 0.5 * (cx + p2x), c2y = 0.5 * (cy + p2y);
+
+      g1Path = `M ${p0x} ${p0y} Q ${c1x} ${c1y} ${pmx} ${pmy}`;
+      g2Path = `M ${p2x} ${p2y} Q ${c2x} ${c2y} ${pmx} ${pmy}`;
+    }
+
+    const g1Cons = chart.conscious.some(p => p.gate === g1);
+    const g1Unc = chart.unconscious.some(p => p.gate === g1);
+    const g2Cons = chart.conscious.some(p => p.gate === g2);
+    const g2Unc = chart.unconscious.some(p => p.gate === g2);
+
+    const drawHalf = (pathD: string, isConscious: boolean, isUnconscious: boolean) => {
+      if (!isConscious && !isUnconscious) return;
+      svg += `<path d="${pathD}" stroke="#000000" stroke-width="8" stroke-linecap="butt" stroke-linejoin="round" fill="none"/>`;
+      if (isConscious && isUnconscious) {
+        svg += `<path d="${pathD}" stroke="#111111" stroke-width="6" stroke-linecap="butt" stroke-linejoin="round" fill="none"/>`;
+        svg += `<path d="${pathD}" stroke="#E63946" stroke-width="6" stroke-linecap="butt" stroke-linejoin="round" stroke-dasharray="3,3" fill="none"/>`;
+      } else if (isConscious) {
+        svg += `<path d="${pathD}" stroke="#111111" stroke-width="6" stroke-linecap="butt" stroke-linejoin="round" fill="none"/>`;
+      } else if (isUnconscious) {
+        svg += `<path d="${pathD}" stroke="#E63946" stroke-width="6" stroke-linecap="butt" stroke-linejoin="round" fill="none"/>`;
+      }
+    };
+
+    drawHalf(g1Path, g1Cons, g1Unc);
+    drawHalf(g2Path, g2Cons, g2Unc);
+  });
+
+  // 3. Centers
+  Object.entries(CENTER_COORDS).forEach(([center, def]) => {
+    const isDefined = chart.definedCenters.includes(center as CenterCode);
+    const fill = isDefined ? def.color : '#FFFFFF';
+    const stroke = isDefined ? 'none' : '#94A3B8';
+    const sw = isDefined ? '0' : '1';
+    const s = def.s;
+
+    if (def.shape === 'square') {
+      svg += `<rect x="${def.x - s}" y="${def.y - s}" width="${s * 2}" height="${s * 2}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
+    } else if (def.shape === 'diamond') {
+      svg += `<polygon points="${def.x},${def.y - s - 2} ${def.x + s + 2},${def.y} ${def.x},${def.y + s + 2} ${def.x - s - 2},${def.y}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+    } else if (def.shape === 'triangle') {
+      svg += `<polygon points="${def.x},${def.y - s} ${def.x + s},${def.y + s} ${def.x - s},${def.y + s}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+    } else if (def.shape === 'triangle-down') {
+      svg += `<polygon points="${def.x - s},${def.y - s} ${def.x + s},${def.y - s} ${def.x},${def.y + s}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+    } else if (def.shape === 'triangle-left') {
+      svg += `<polygon points="${def.x + s},${def.y - s} ${def.x + s},${def.y + s} ${def.x - s},${def.y}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+    } else if (def.shape === 'triangle-right') {
+      svg += `<polygon points="${def.x - s},${def.y - s} ${def.x + s},${def.y} ${def.x - s},${def.y + s}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}" stroke-linejoin="round"/>`;
+    }
+  });
+
+  // 4. Gates
+  Object.entries(GATE_COORDS).forEach(([gateId, coords]) => {
+    const gNum = parseInt(gateId);
+    const isCons = chart.conscious.some(p => p.gate === gNum);
+    const isUnc = chart.unconscious.some(p => p.gate === gNum);
+    const isActive = isCons || isUnc;
+    const textX = coords.x;
+    const textY = coords.y;
+
+    if (isActive) {
+      svg += `<circle cx="${textX}" cy="${textY}" r="5.5" fill="#000000" stroke="none"/>`;
+      svg += `<text x="${textX}" y="${textY + 2.5}" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#FFFFFF" font-weight="900" text-anchor="middle">${gNum}</text>`;
+    } else {
+      svg += `<text x="${textX}" y="${textY + 2.5}" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#64748B" stroke="#FFFFFF" stroke-width="2" paint-order="stroke fill" font-weight="bold" text-anchor="middle">${gNum}</text>`;
+    }
+  });
+
+  svg += `</svg>`;
+  return svg;
+};
 
 const getIncarnationCrossDetails = (cross: string): string => {
   const match = cross.match(/\((\d+)\/(\d+)\s*\|\s*(\d+)\/(\d+)\)/);
@@ -475,6 +654,15 @@ export const downloadHumanDesignPDF = async (
   gatesData?: any[]
 ) => {
   const doc = new jsPDF();
+
+  // Generate high-resolution Bodygraph image (runs in browser context)
+  let chartImageBase64 = '';
+  try {
+    const svgStr = generateHumanDesignSvgString(chart);
+    chartImageBase64 = await convertSvgToPng(svgStr, 640, 1080);
+  } catch (err) {
+    console.error("[humanDesignPdfGenerator] Failed to generate bodygraph visual for PDF:", err);
+  }
 
   // Load custom fonts for Turkish character support
   try {
@@ -575,109 +763,20 @@ export const downloadHumanDesignPDF = async (
     alternateRowStyles: { fillColor: primaryDark },
   });
 
-  // Render Vector Bodygraph on the right (x from 125 to 195, scale = 0.20)
-  const offsetX = 125;
-  const offsetY = currentY - 5;
-  const scale = 0.20;
+  const tableFinalY = (doc as any).lastAutoTable.finalY;
 
-  // Draw Bodygraph channels background lines
-  doc.setLineWidth(1.0);
-  doc.setDrawColor(80, 90, 110);
-  for (const ch of CHANNELS) {
-    const g1 = ch.gates[0];
-    const g2 = ch.gates[1];
-    const c1 = GATE_COORDS[g1];
-    const c2 = GATE_COORDS[g2];
-    if (!c1 || !c2) continue;
-    
-    const p1x = offsetX + (c1.x - 40) * scale;
-    const p1y = offsetY + (c1.y - 10) * scale;
-    const p2x = offsetX + (c2.x - 40) * scale;
-    const p2y = offsetY + (c2.y - 10) * scale;
+  // Render High-Resolution Vector Bodygraph on the right
+  const imageX = 122;
+  const imageY = currentY - 5;
+  const imageW = 68;
+  const imageH = 114.75; // aspect ratio 320:540 -> 68 * (540 / 320)
 
-    doc.line(p1x, p1y, p2x, p2y);
+  if (chartImageBase64) {
+    doc.addImage(chartImageBase64, 'PNG', imageX, imageY, imageW, imageH);
   }
 
-  // Draw active channel halves
-  doc.setLineWidth(1.8);
-  for (const ch of CHANNELS) {
-    const g1 = ch.gates[0];
-    const g2 = ch.gates[1];
-    const c1 = GATE_COORDS[g1];
-    const c2 = GATE_COORDS[g2];
-    if (!c1 || !c2) continue;
-
-    const hasCon1 = chart.conscious.some(p => p.gate === g1);
-    const hasUncon1 = chart.unconscious.some(p => p.gate === g1);
-    const hasCon2 = chart.conscious.some(p => p.gate === g2);
-    const hasUncon2 = chart.unconscious.some(p => p.gate === g2);
-
-    const active1 = hasCon1 || hasUncon1;
-    const active2 = hasCon2 || hasUncon2;
-
-    const p1x = offsetX + (c1.x - 40) * scale;
-    const p1y = offsetY + (c1.y - 10) * scale;
-    const p2x = offsetX + (c2.x - 40) * scale;
-    const p2y = offsetY + (c2.y - 10) * scale;
-
-    const midX = (p1x + p2x) / 2;
-    const midY = (p1y + p2y) / 2;
-
-    if (active1) {
-      const color1 = hasCon1 ? [255, 255, 255] : [230, 70, 70];
-      doc.setDrawColor(color1[0], color1[1], color1[2]);
-      doc.line(p1x, p1y, midX, midY);
-    }
-    if (active2) {
-      const color2 = hasCon2 ? [255, 255, 255] : [230, 70, 70];
-      doc.setDrawColor(color2[0], color2[1], color2[2]);
-      doc.line(p2x, p2y, midX, midY);
-    }
-  }
-
-  // Helper to draw center shapes
-  const drawCenterShape = (center: CenterCode, x: number, y: number, size: number, isDefined: boolean, defaultColorHex: string) => {
-    let fillColor = [30, 41, 59]; // dark gray background for undefined
-    if (isDefined) {
-      const r = parseInt(defaultColorHex.substring(1, 3), 16);
-      const g = parseInt(defaultColorHex.substring(3, 5), 16);
-      const b = parseInt(defaultColorHex.substring(5, 7), 16);
-      fillColor = [r, g, b];
-    }
-    doc.setFillColor(fillColor[0], fillColor[1], fillColor[2]);
-    doc.setDrawColor(gold[0], gold[1], gold[2]);
-    doc.setLineWidth(0.4);
-
-    const coord = CENTER_COORDS[center];
-    const s = size * scale;
-    const px = offsetX + (x - 40) * scale;
-    const py = offsetY + (y - 10) * scale;
-
-    if (coord.shape === 'triangle') {
-      doc.triangle(px, py - s, px - s, py + s/2, px + s, py + s/2, 'FD');
-    } else if (coord.shape === 'triangle-down') {
-      doc.triangle(px, py + s, px - s, py - s/2, px + s, py - s/2, 'FD');
-    } else if (coord.shape === 'triangle-right') {
-      doc.triangle(px + s, py, px - s/2, py - s, px - s/2, py + s, 'FD');
-    } else if (coord.shape === 'triangle-left') {
-      doc.triangle(px - s, py, px + s/2, py - s, px + s/2, py + s, 'FD');
-    } else if (coord.shape === 'square') {
-      doc.rect(px - s, py - s, s * 2, s * 2, 'FD');
-    } else if (coord.shape === 'diamond') {
-      doc.triangle(px, py - s, px + s, py, px - s, py, 'FD');
-      doc.triangle(px, py + s, px + s, py, px - s, py, 'FD');
-    }
-  };
-
-  // Draw all 9 centers
-  const centerKeys: CenterCode[] = ['Head', 'Ajna', 'Throat', 'G', 'Heart', 'Sacral', 'Root', 'Spleen', 'SolarPlexus'];
-  for (const center of centerKeys) {
-    const isDefined = chart.definedCenters.includes(center);
-    const coord = CENTER_COORDS[center];
-    drawCenterShape(center, coord.x, coord.y, coord.s, isDefined, coord.color);
-  }
-
-  currentY = (doc as any).lastAutoTable.finalY + 15;
+  // Update currentY safely below both the table and the bodygraph image so text never collides
+  currentY = Math.max(tableFinalY, imageY + imageH) + 12;
 
   // --- Section 2: Detailed Core Properties ---
   const coreParams = [
@@ -764,6 +863,7 @@ export const downloadHumanDesignPDF = async (
   doc.text("Enerji Merkezleri Çözümlemesi", 20, currentY);
   currentY += 10;
 
+  const centerKeys: CenterCode[] = ['Head', 'Ajna', 'Throat', 'G', 'Heart', 'Sacral', 'Root', 'Spleen', 'SolarPlexus'];
   for (const center of centerKeys) {
     const isDefined = chart.definedCenters.includes(center);
     const centerName = CENTER_NAMES[center] || center;
