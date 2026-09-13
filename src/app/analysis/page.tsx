@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Lock, Activity, AlertCircle, X, Clock } from 'lucide-react';
+import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Lock, Activity, AlertCircle, X, Clock, Scroll } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 interface ToolItem {
@@ -22,6 +22,14 @@ export default function AnalysisPage() {
   const [showLockModal, setShowLockModal] = useState(false);
 
   const tools: ToolItem[] = [
+    {
+      id: 'incarnation',
+      title: 'Karmik & Enkarnasyon',
+      description: 'Önceki yaşam kimliğiniz, karmik borçlarınız, Drakonik ruh haritanız ve gelecek enkarnasyon potansiyeliniz.',
+      icon: <Scroll size={32} />,
+      color: '#FFD700',
+      link: '/analysis/incarnation'
+    },
     {
       id: 'rectification',
       title: 'Doğum Saati Keşfi (Beta)',

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Moon, Wind, BookOpen, Sparkles, Lock, MoonStar, Wrench, AlertCircle, X } from 'lucide-react';
+import { Moon, Wind, BookOpen, Sparkles, Lock, MoonStar, Wrench, AlertCircle, X, Scroll } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
@@ -70,6 +70,15 @@ const exploreItems: ExploreItem[] = [
     icon: MoonStar,
     href: '/analysis/kabbalah',
     color: 'from-yellow-600 to-amber-400',
+    requiresAuth: false,
+    status: 'ACTIVE'
+  },
+  {
+    title: 'Karmik & Enkarnasyon',
+    description: 'Geçmiş yaşam, karmik borçlar ve ruhun tekâmül haritası.',
+    icon: Scroll,
+    href: '/analysis/incarnation',
+    color: 'from-amber-400 to-yellow-600',
     requiresAuth: false,
     status: 'ACTIVE'
   }
