@@ -167,13 +167,13 @@ CREATE TABLE IF NOT EXISTS "invoice_counters" (
 INSERT INTO "report_products" ("id", "name", "description", "price", "tax_rate", "sort")
 VALUES
   ('astrology', 'Doğum Haritası Analizi Raporu',
-   'Ezoterik doğum haritası, gezegen yorumları ve açı analizleri içeren PDF rapor.', '50', '20', 1),
+   'Ezoterik doğum haritası, gezegen yorumları ve açı analizleri içeren PDF rapor.', '444', '20', 1),
   ('kabbalah', 'Kabalistik 4 Alem Harita Analizi Raporu',
-   'Assiah, Yetzirah, Beriyah ve Atzilut alemlerinin ayrı ayrı yorumlandığı PDF rapor.', '500', '20', 2),
+   'Assiah, Yetzirah, Beriyah ve Atzilut alemlerinin ayrı ayrı yorumlandığı PDF rapor.', '999', '20', 2),
   ('human-design', 'Human Design Kapsamlı Yaşam Rehberi Raporu',
-   'Tip, otorite, profil ve kapı yorumlarını içeren kapsamlı PDF rapor.', '500', '20', 3),
+   'Tip, otorite, profil ve kapı yorumlarını içeren kapsamlı PDF rapor.', '555', '20', 3),
   ('incarnation', 'Karmik & Enkarnasyon Analizi Raporu',
-   'Geçmiş yaşam, karmik borçlar, Drakonik ruh haritası ve gelecek enkarnasyon potansiyelini içeren kapsamlı PDF rapor.', '500', '20', 4)
+   'Geçmiş yaşam, karmik borçlar, Drakonik ruh haritası ve gelecek enkarnasyon potansiyelini içeren kapsamlı PDF rapor.', '888', '20', 4)
 ON CONFLICT ("id") DO NOTHING;
 
 -- Ayar satırlarını boş olarak hazırla; anahtarlar admin panelinden girilir.

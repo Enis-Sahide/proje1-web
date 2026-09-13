@@ -17,13 +17,22 @@ function GuestCheckoutForm() {
   const searchParams = useSearchParams();
   const { user } = useAuth();
   
-  // Default type: kabbalah (500 TL), human-design (500 TL), or astrology (50 TL)
+  // Default type: kabbalah (999 TL), human-design (555 TL), incarnation (888 TL), or astrology (444 TL)
   const rawType = searchParams.get('type') || 'kabbalah';
-  const analysisType = (rawType === 'astrology') ? 'astrology' : (rawType === 'human-design' || rawType === 'human_design') ? 'human-design' : 'kabbalah';
+  const analysisType = (rawType === 'astrology') 
+    ? 'astrology' 
+    : (rawType === 'human-design' || rawType === 'human_design') 
+    ? 'human-design' 
+    : (rawType === 'incarnation') 
+    ? 'incarnation' 
+    : 'kabbalah';
+
   const title = analysisType === 'kabbalah'
     ? 'Kabalistik 4 Alem Harita Analizi Raporu' 
     : analysisType === 'human-design'
     ? 'Human Design Kapsamlı Yaşam Rehberi Raporu'
+    : analysisType === 'incarnation'
+    ? 'Karmik & Enkarnasyon Analizi Raporu'
     : 'Doğum Haritası Analizi Raporu';
 
   // Step state: 'info' -> 'payment' (Treps'e yönlendirme anı)

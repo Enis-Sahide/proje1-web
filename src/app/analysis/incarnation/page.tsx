@@ -150,7 +150,7 @@ export default function IncarnationAnalysisPage() {
         className="shrink-0 flex items-center gap-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-2.5 px-5 rounded-xl transition-all shadow-md shadow-[#D4AF37]/20 text-xs sm:text-sm cursor-pointer whitespace-nowrap"
       >
         <Lock size={15} />
-        <span>Raporu İndir (500 TL)</span>
+        <span>Raporu İndir (888 TL)</span>
       </button>
     </div>
   );
@@ -290,7 +290,7 @@ export default function IncarnationAnalysisPage() {
                       className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black text-sm font-bold transition-all shadow-md shadow-[#D4AF37]/20 cursor-pointer"
                     >
                       <Lock size={16} />
-                      <span>Karmik Analiz Raporunu İndir (500 TL)</span>
+                      <span>Karmik Analiz Raporunu İndir (888 TL)</span>
                     </button>
                   )}
                 </div>
@@ -800,7 +800,7 @@ export default function IncarnationAnalysisPage() {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         title="Giriş Yapın veya Kayıt Olun"
-        description="Karmik analiz raporunuzu 500 TL karşılığında satın alıp profilinizde ve e-postanızda güvenle saklayabilmeniz için lütfen giriş yapın."
+        description="Karmik analiz raporunuzu 888 TL karşılığında satın alıp profilinizde ve e-postanızda güvenle saklayabilmeniz için lütfen giriş yapın."
         redirectUrl={`/checkout/guest?type=incarnation&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}`}
       />
 
@@ -824,7 +824,7 @@ export default function IncarnationAnalysisPage() {
                 }}
                 className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all cursor-pointer shadow-lg shadow-[#D4AF37]/20"
               >
-                Raporu İndir (500 TL)
+                Raporu İndir (888 TL)
               </button>
               <button 
                 onClick={() => setShowLockModal(false)}

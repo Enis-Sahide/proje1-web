@@ -386,7 +386,7 @@ export default function KabbalahAnalysisPage() {
                     className="mt-6 flex items-center gap-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-2.5 px-6 rounded-xl transition-all shadow-md shadow-[#D4AF37]/20 cursor-pointer"
                   >
                     <Lock size={16} />
-                    Kabalistik 4 Alem Raporunu Satın Al (500 TL)
+                    Kabalistik 4 Alem Raporunu Satın Al (999 TL)
                   </button>
                 )}
               </div>

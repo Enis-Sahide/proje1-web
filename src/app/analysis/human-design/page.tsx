@@ -755,7 +755,7 @@ export default function HumanDesignPage() {
                         className="text-xs sm:text-sm px-5 py-2.5 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] rounded-full text-black font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2 shadow-lg shadow-[#D4AF37]/20 cursor-pointer"
                       >
                         <Lock size={14} />
-                        PDF Raporu Satın Al (500 TL)
+                        PDF Raporu Satın Al (555 TL)
                       </button>
                     )}
                     <button onClick={() => setChart(null)} className="text-xs sm:text-sm px-5 py-2.5 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap text-center">

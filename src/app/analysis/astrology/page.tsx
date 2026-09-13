@@ -495,7 +495,7 @@ export default function AstrologyPage() {
                          className="flex-1 sm:flex-initial text-xs sm:text-sm px-4 py-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] rounded-full text-black font-bold transition-all whitespace-nowrap flex items-center justify-center gap-2 shadow-lg shadow-[#D4AF37]/20 cursor-pointer"
                        >
                          <Lock size={14} />
-                         PDF Raporu Satın Al (50 TL)
+                         PDF Raporu Satın Al (444 TL)
                        </button>
                      )}
                     <button onClick={() => setChartData(null)} className="flex-1 sm:flex-initial text-xs sm:text-sm px-4 py-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap text-center">
