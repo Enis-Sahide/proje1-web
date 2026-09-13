@@ -408,9 +408,9 @@ export const downloadIncarnationPDF = async (
   data.draconicComparison.forEach(comp => {
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(10.5);
-    const tropLines = doc.splitTextToSize(`• Dünyevi Maske (${comp.tropicalSign}): ${comp.tropicalMeaning || comp.spiritualMeaning}`, 168);
-    const dracLines = doc.splitTextToSize(`• Ruhsal Öz (${comp.draconicSign}): ${comp.draconicMeaning || comp.spiritualMeaning}`, 168);
-    const synthLines = doc.splitTextToSize(`• Kozmik Sentez: ${comp.synthesis || comp.spiritualMeaning}`, 168);
+    const tropLines = doc.splitTextToSize(`• Dünyevi Yüzünüz (${comp.tropicalSign}): ${comp.tropicalMeaning || comp.spiritualMeaning}`, 168);
+    const dracLines = doc.splitTextToSize(`• Ruhsal Özünüz (${comp.draconicSign}): ${comp.draconicMeaning || comp.spiritualMeaning}`, 168);
+    const synthLines = doc.splitTextToSize(`• Tekâmül Anahtarı: ${comp.synthesis || comp.spiritualMeaning}`, 168);
 
     const lineHeight = 5.2;
     const totalLines = tropLines.length + dracLines.length + synthLines.length;
