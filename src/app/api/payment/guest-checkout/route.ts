@@ -4,7 +4,26 @@ import { guestOrders } from '@/db/schema';
 import { json, errorJson, preflight } from '@/lib/http/cors';
 import { getReportProduct, normalizeProductType } from '@/lib/payment/settings';
 
+import { z } from 'zod';
+import { birthDataSchema, formatZodError } from '@/lib/validation';
+
 export const dynamic = 'force-dynamic';
+
+const apiGuestCheckoutSchema = z.object({
+  email: z.string().trim().toLowerCase().email('Geçerli bir e-posta adresi girin'),
+  analysisType: z.string().min(2, 'Analiz türü zorunludur'),
+  birthData: z.object({
+    localDate: birthDataSchema.shape.date,
+    localTime: birthDataSchema.shape.time,
+    cityData: z.object({
+      name: z.string().min(2, 'Şehir adı gereklidir'),
+      lat: z.number().min(-90).max(90),
+      lon: z.number().min(-180).max(180),
+      tz: z.string().optional(),
+      country: z.string().optional(),
+    }),
+  }),
+});
 
 export async function OPTIONS() {
   return preflight();
@@ -20,10 +39,13 @@ export async function OPTIONS() {
  */
 export async function POST(request: Request) {
   try {
-    const { email, analysisType, birthData } = await request.json().catch(() => ({}));
-    if (!email || !analysisType || !birthData) {
-      return errorJson('E-posta, analiz türü veya doğum verileri eksik', 400);
+    const rawBody = await request.json().catch(() => ({}));
+    const parsed = apiGuestCheckoutSchema.safeParse(rawBody);
+    if (!parsed.success) {
+      return errorJson(formatZodError(parsed.error), 400);
     }
+
+    const { email, analysisType, birthData } = parsed.data;
 
     const productType = normalizeProductType(analysisType);
     const product = await getReportProduct(productType);

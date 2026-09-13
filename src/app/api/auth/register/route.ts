@@ -5,27 +5,24 @@ import { hashPassword } from '@/lib/auth/password';
 import { json, errorJson, preflight } from '@/lib/http/cors';
 import { isDisposableEmail, checkDomainHasMx, generateVerificationCode } from '@/lib/auth/validate';
 import { sendVerificationCodeEmail } from '@/lib/mail/smtp';
+import { registerSchema, formatZodError } from '@/lib/validation';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => ({}));
-    const { email, password, fullName, website } = body;
+    const parsed = registerSchema.safeParse(body);
+    if (!parsed.success) {
+      return errorJson(formatZodError(parsed.error), 400);
+    }
+    const { email: normEmail, password, fullName, website } = parsed.data;
 
     // 1. Honeypot (bot tuzağı): website alanı gizlidir; botlar doldurursa engelle
     if (website) {
       return errorJson('Kayıt isteği reddedildi.', 400);
     }
 
-    if (!email || !password) return errorJson('E-posta ve şifre gereklidir.');
-    const normEmail = String(email).trim().toLowerCase();
-
-    // 2. Format kontrolü
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(normEmail)) {
-      return errorJson('Lütfen geçerli bir e-posta adresi girin.');
-    }
 
     // 3. Tek kullanımlık / geçici e-posta engeli
     if (isDisposableEmail(normEmail)) {

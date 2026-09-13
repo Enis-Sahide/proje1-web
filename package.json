@@ -40,7 +40,8 @@
     "server-only": "^0.0.1",
     "sharp": "0.34.5",
     "suncalc": "^1.9.0",
-    "sweph-wasm": "^2.6.9"
+    "sweph-wasm": "^2.6.9",
+    "zod": "^4.6.4"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

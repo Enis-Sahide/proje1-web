@@ -5,6 +5,7 @@ import { users, emailVerifications, siteVisits } from '@/db/schema';
 import { ensureProfileAndProgress } from '@/lib/auth/account';
 import { buildAuthResponse } from '@/lib/auth/respond';
 import { errorJson, preflight } from '@/lib/http/cors';
+import { verifyEmailSchema, formatZodError } from '@/lib/validation';
 
 export const dynamic = 'force-dynamic';
 
@@ -14,14 +15,13 @@ const MAX_OTP_ATTEMPTS = 5;
 export async function POST(request: Request) {
   try {
     const body = await request.json().catch(() => ({}));
-    const { email, code } = body;
-
-    if (!email || !code) {
-      return errorJson('E-posta ve doğrulama kodu gereklidir.', 400);
+    const parsed = verifyEmailSchema.safeParse(body);
+    if (!parsed.success) {
+      return errorJson(formatZodError(parsed.error), 400);
     }
 
-    const normEmail = String(email).trim().toLowerCase();
-    const cleanCode = String(code).trim();
+    const { email: normEmail, code: cleanCode } = parsed.data;
+
 
     // En son oluşturulan ve henüz süresi dolmamış doğrulama kodunu bul
     const [verification] = await db

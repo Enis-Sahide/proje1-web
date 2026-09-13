@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Loader2, Save } from 'lucide-react';
 import { apiFetch } from '@/lib/apiClient';
+import { billingProfileSchema, formatZodError } from '@/lib/validation';
 
 export type BillingProfile = {
   id: string;
@@ -80,28 +81,10 @@ export default function BillingProfileForm({ initial, isFirst, onSaved, onCancel
     if (e) e.preventDefault();
     setError('');
 
-    if (!form.label.trim()) {
-      setError('Lütfen profil adını girin.');
-      return;
-    }
-    if (!form.title.trim()) {
-      setError(isCompany ? 'Lütfen firma ünvanını girin.' : 'Lütfen ad ve soyadınızı girin.');
-      return;
-    }
-    if (!form.taxNumber.trim()) {
-      setError(isCompany ? 'Lütfen vergi numaranızı girin.' : 'Lütfen T.C. kimlik numaranızı girin.');
-      return;
-    }
-    if (isCompany && !form.taxOffice?.trim()) {
-      setError('Lütfen vergi dairesini girin.');
-      return;
-    }
-    if (!form.address.trim()) {
-      setError('Lütfen fatura adresinizi girin.');
-      return;
-    }
-    if (!form.city.trim()) {
-      setError('Lütfen şehir girin.');
+    // Zod ile eksiksiz fatura profili doğrulaması (TCKN, VKN, Vergi dairesi, Adres, İl, İlçe vb.)
+    const parsed = billingProfileSchema.safeParse(form);
+    if (!parsed.success) {
+      setError(formatZodError(parsed.error));
       return;
     }
 

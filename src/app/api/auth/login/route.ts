@@ -5,13 +5,16 @@ import { verifyPassword } from '@/lib/auth/password';
 import { ensureProfileAndProgress } from '@/lib/auth/account';
 import { buildAuthResponse } from '@/lib/auth/respond';
 import { errorJson, preflight } from '@/lib/http/cors';
+import { loginSchema, formatZodError } from '@/lib/validation';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
-  const { email, password } = await request.json().catch(() => ({}));
-  if (!email || !password) return errorJson('E-posta ve şifre gerekli');
-  const normEmail = String(email).trim().toLowerCase();
+  const body = await request.json().catch(() => ({}));
+  const parsed = loginSchema.safeParse(body);
+  if (!parsed.success) return errorJson(formatZodError(parsed.error), 400);
+  const { email: normEmail, password } = parsed.data;
+
 
   const [u] = await db.select().from(users).where(eq(users.email, normEmail));
   if (!u) return errorJson('Geçersiz e-posta veya şifre', 401);

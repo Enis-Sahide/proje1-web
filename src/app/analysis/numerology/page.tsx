@@ -22,6 +22,7 @@ import {
   SuggestedNameItem,
   BodyCenter
 } from '@/features/numerology/engine/PhoneticChakraEngine';
+import { numerologyInputSchema, birthDataSchema, formatZodError } from '@/lib/validation';
 
 const isMaster = (num: number) => num === 11 || num === 22 || num === 33;
 
@@ -85,13 +86,31 @@ export default function NumerologyPage() {
 
   // Brand Analysis Data
   const [brandResult, setBrandResult] = useState<BrandAnalysisResult | null>(null);
+  const [formError, setFormError] = useState('');
 
   // Form Submit
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (activeTab === 'date' && !birthDate) return;
-    if (activeTab === 'name' && (!name || !birthDate)) return;
-    if (activeTab === 'brand' && !brandName.trim()) return;
+    setFormError('');
+
+    if (activeTab === 'date') {
+      const parsed = birthDataSchema.shape.date.safeParse(birthDate);
+      if (!parsed.success) {
+        setFormError(formatZodError(parsed.error));
+        return;
+      }
+    } else if (activeTab === 'name') {
+      const parsed = numerologyInputSchema.safeParse({ fullName: name, birthDate });
+      if (!parsed.success) {
+        setFormError(formatZodError(parsed.error));
+        return;
+      }
+    } else if (activeTab === 'brand') {
+      if (!brandName.trim()) {
+        setFormError('Lütfen marka adını girin.');
+        return;
+      }
+    }
 
     setIsAnalyzing(true);
     
@@ -445,6 +464,12 @@ export default function NumerologyPage() {
                 <Loader2 size={48} className="animate-spin mb-4" />
                 <h3 className="text-xl font-bold mb-2 animate-pulse">Kozmik Ses ve Beden Rezonansları Titreşiyor...</h3>
                 <p className="text-sm text-white/60">Kalp, Karın, Boğaz ve Zihin merkezleri taranıyor</p>
+              </div>
+            )}
+            
+            {formError && (
+              <div className="bg-red-500/10 border border-red-500/20 text-red-400 p-3.5 rounded-xl text-xs leading-relaxed mb-6">
+                {formError}
               </div>
             )}
             

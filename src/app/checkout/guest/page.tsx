@@ -8,6 +8,7 @@ import { AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import BillingProfileForm, { profileSummary, type BillingProfile } from '@/components/billing/BillingProfileForm';
+import { guestCheckoutSchema, formatZodError } from '@/lib/validation';
 
 const inputCls =
   'w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#D4AF37] transition-colors';
@@ -143,16 +144,20 @@ function GuestCheckoutForm() {
   // Siparişi oluştur ve kullanıcıyı Treps'in güvenli ödeme sayfasına yönlendir.
   const handleProceedToPayment = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !dateStr || !timeStr || !cityKey) {
-      setError('Lütfen tüm doğum bilgilerini ve e-posta adresinizi doldurun.');
-      return;
-    }
-    if (!selectedProfileId) {
-      setError('Lütfen bir fatura profili seçin veya oluşturun.');
-      return;
-    }
-    if (!agreedTerms) {
-      setError('Lütfen Mesafeli Satış Sözleşmesi ve İade Koşullarını onaylayınız.');
+
+    // Zod ile kapsamlı girdi doğrulaması (Email, doğum tarihi, saati, şehir koordinatları, fatura profili, sözleşme onayı)
+    const parsed = guestCheckoutSchema.safeParse({
+      email,
+      date: dateStr,
+      time: timeStr,
+      city: cityKey,
+      analysisType,
+      selectedProfileId,
+      agreedTerms,
+    });
+
+    if (!parsed.success) {
+      setError(formatZodError(parsed.error));
       return;
     }
     
