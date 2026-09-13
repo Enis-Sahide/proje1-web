@@ -1120,12 +1120,103 @@ export default function HumanDesignPage() {
                         </div>
                       </div>
 
+                      {/* 🎯 KÖK DAVRANIŞ TEŞHİSİ (Astrolojik Olasılıklardan Kesin Çizgi Teşhisine) */}
+                      {synthesisReport.keyBehavioralDiagnoses && synthesisReport.keyBehavioralDiagnoses.length > 0 && (
+                        <div className="space-y-4">
+                          <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
+                            <div>
+                              <div className="flex items-center gap-2 text-rose-400 font-bold text-xs uppercase tracking-wider mb-1">
+                                <ShieldAlert size={16} />
+                                <span>Kişiselleştirilmiş Kök Neden Teşhisi</span>
+                              </div>
+                              <h3 className="text-xl md:text-2xl font-serif font-bold text-white">
+                                Astrolojik Sınavlar × 6 Çizgi Davranış Mekaniği
+                              </h3>
+                            </div>
+                            <p className="text-xs text-gray-400 max-w-md">
+                              Genel astrolojik olasılıklar yerine, Human Design kapı ve çizginizin (Line 1-6) belirlediği sizde geçerli olan kesin davranış refleksi:
+                            </p>
+                          </div>
+
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {synthesisReport.keyBehavioralDiagnoses.map((diag, dIdx) => (
+                              <div
+                                key={`diag-${diag.planetKey}-${dIdx}`}
+                                className="bg-gradient-to-b from-white/[0.07] to-white/[0.02] border border-white/10 rounded-2xl p-5 space-y-4 hover:border-amber-400/30 transition-all"
+                              >
+                                <div className="flex items-start justify-between gap-3 pb-3 border-b border-white/10">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-amber-500/20 to-rose-500/20 border border-white/10 flex items-center justify-center text-2xl text-white">
+                                      {diag.symbol}
+                                    </div>
+                                    <div>
+                                      <h4 className="font-bold text-white text-base flex items-center gap-2">
+                                        {diag.planetName}
+                                        <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-amber-300 font-medium">
+                                          {diag.house}. Ev ({diag.houseTheme})
+                                        </span>
+                                      </h4>
+                                      <span className="text-xs text-rose-300/80 font-medium">
+                                        {diag.aspectSummary}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className="text-right">
+                                    <span className="inline-block px-2.5 py-1 rounded-lg bg-amber-400/15 border border-amber-400/30 text-amber-300 text-xs font-bold">
+                                      Kapı {diag.gate}.{diag.line}
+                                    </span>
+                                    <span className="block text-[11px] text-gray-400 mt-1 font-medium">
+                                      {diag.lineArchetype}
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div className="bg-black/30 rounded-xl p-3 border border-white/5 space-y-1.5">
+                                  <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 block">
+                                    ❓ Astroloji Haritasındaki Genel Olasılıklar
+                                  </span>
+                                  <p className="text-xs text-gray-300 leading-relaxed italic">
+                                    "{diag.astroChallengeProbabilities}"
+                                  </p>
+                                </div>
+
+                                <div className="bg-rose-950/20 rounded-xl p-3.5 border border-rose-500/30 space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <span className="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
+                                      <span>🎯 Sende Geçerli Olan Kesin Teşhis</span>
+                                    </span>
+                                    <span className="text-[10px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded border border-rose-500/30 font-bold">
+                                      Kök Korku: {diag.rootFear.split(',')[0]}
+                                    </span>
+                                  </div>
+                                  <p className="text-xs text-rose-100 leading-relaxed">
+                                    {diag.preciseBehavioralDiagnosis}
+                                  </p>
+                                </div>
+
+                                <div className="bg-emerald-950/20 rounded-xl p-3 border border-emerald-500/30 flex items-start gap-2.5">
+                                  <span className="text-emerald-400 text-sm mt-0.5">💡</span>
+                                  <div>
+                                    <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 block mb-0.5">
+                                      Çıkış Yolu & Hizalanma Reçetesi
+                                    </span>
+                                    <p className="text-xs text-emerald-100/90 leading-relaxed">
+                                      {diag.actionableRemedy}
+                                    </p>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       {/* Gezegen Çapraz Okuma Matrisi */}
                       <div className="space-y-4">
                         <div className="flex items-center justify-between">
                           <h3 className="text-xl font-serif font-bold text-white flex items-center gap-2">
                             <Layers size={20} className="text-[#32D74B]" />
-                            Gezegen Bazlı Çapraz Okuma Matrisi
+                            Gezegen Bazlı Çapraz Okuma Matrisi (Tüm Kapı & Çizgiler)
                           </h3>
                           <span className="text-xs text-gray-400">Detaylar için kapı kartlarına tıklayın</span>
                         </div>
@@ -1174,12 +1265,22 @@ export default function HumanDesignPage() {
                                 </div>
                               </div>
 
-                              <div className="bg-white/5 rounded-xl p-3 mb-3 border border-white/5">
-                                <div className="text-xs font-semibold text-white mb-1">
+                              <div className="bg-white/5 rounded-xl p-3 mb-3 border border-white/5 space-y-1.5">
+                                <div className="text-xs font-semibold text-white">
                                   {item.synthesisTitle}
                                 </div>
                                 <p className="text-xs text-gray-300 leading-relaxed">
                                   {item.synthesisInterpretation}
+                                </p>
+                              </div>
+
+                              <div className="bg-black/30 rounded-xl p-3 mb-3 border border-white/5 space-y-1">
+                                <div className="flex items-center justify-between text-[11px]">
+                                  <span className="text-amber-300 font-semibold">{item.lineArchetype}</span>
+                                  <span className="text-rose-400/90 text-[10px] font-medium">Kök Korku: {item.rootFear.split(',')[0]}</span>
+                                </div>
+                                <p className="text-xs text-gray-300 leading-relaxed">
+                                  {item.preciseBehavioralDiagnosis}
                                 </p>
                               </div>
 

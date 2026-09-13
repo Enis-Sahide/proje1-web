@@ -1,6 +1,24 @@
 import { AstroPoint, AstroAspect, ZodiacSign } from './AstrologyConstants';
 import { HumanDesignChart, PlanetActivation, CenterCode } from '@/utils/HumanDesignEngine';
 
+export interface LineBehavioralDiagnosis {
+  planetKey: string;
+  planetName: string;
+  symbol: string;
+  sign: string;
+  house: number;
+  houseTheme: string;
+  gate: number;
+  gateName: string;
+  line: number;
+  lineArchetype: string;
+  rootFear: string;
+  aspectSummary: string;
+  astroChallengeProbabilities: string;
+  preciseBehavioralDiagnosis: string;
+  actionableRemedy: string;
+}
+
 export interface AstroHDSynthesisItem {
   planetKey: string;
   planetName: string;
@@ -11,6 +29,8 @@ export interface AstroHDSynthesisItem {
   gate: number;
   gateName: string;
   line: number;
+  lineArchetype: string;
+  rootFear: string;
   center: string;
   isChannelDefined: boolean;
   aspects: {
@@ -23,6 +43,9 @@ export interface AstroHDSynthesisItem {
   synthesisInterpretation: string;
   giftPotential: string;
   shadowWarning: string;
+  astroChallengeProbabilities: string;
+  preciseBehavioralDiagnosis: string;
+  actionableRemedy: string;
 }
 
 export interface AstroHDSynthesisReport {
@@ -46,6 +69,7 @@ export interface AstroHDSynthesisReport {
     house: number;
     description: string;
   };
+  keyBehavioralDiagnoses: LineBehavioralDiagnosis[];
 }
 
 const HOUSE_METADATA: Record<number, { title: string; field: string; theme: string }> = {
@@ -177,6 +201,82 @@ const SYMBOLS: Record<string, string> = {
   SouthNode: '☋'
 };
 
+export interface LineBehaviorProfile {
+  archetype: string;
+  rootFear: string;
+  generalTendency: string;
+  challengingBehavior: string;
+  harmoniousBehavior: string;
+  actionableRemedy: string;
+}
+
+export const LINE_BEHAVIOR_PROFILES: Record<number, LineBehaviorProfile> = {
+  1: {
+    archetype: 'Araştırmacı (The Investigator)',
+    rootFear: 'Zeminsizlik, Bilgi Eksikliği ve Hazırlıksız Yakalanma Korkusu',
+    generalTendency: 'Olayların temeline inme, zihinsel güvence arama ve detaylı veri toplama.',
+    challengingBehavior: 'Yeterince bilmediği hissine kapılarak eylemi sürekli erteler; güvensizlik krizleri yaşar ve her şeye şüpheyle yaklaşarak zihinsel felce (analysis paralysis) uğrar.',
+    harmoniousBehavior: 'Konusunun en derin uzmanı ve sağlam temeller kuran bilge bir otorite olarak parlar.',
+    actionableRemedy: 'Hiçbir zaman her şeyi bilemeyeceğinizi kabul edin; %70 hazırlıkla sahaya çıkıp deneyim içinde öğrenmeye cesaret edin.'
+  },
+  2: {
+    archetype: 'Münzevi (The Hermit)',
+    rootFear: 'Görülme Baskısı, Davetsiz Müdahale ve Beklentileri Karşılayamama Korkusu',
+    generalTendency: 'Kendi doğal alanında yalnız kalarak yeteneklerini eforsuzca geliştirmek.',
+    challengingBehavior: 'Dış dünyayı aşırı tehditkar ve yorucu algılayarak kendi kabuğuna saklanır; yeteneğini değersizleştirir ve dışarıdan birisi onu zorla çekmedikçe görünür olmaktan kaçar.',
+    harmoniousBehavior: 'Zorlanmadan ve doğallıkla sergilediği dehasıyla çevresine ilham verir ve doğru çağrılara yanıt verir.',
+    actionableRemedy: 'Kendi köşenizde kalmak bir kusur değildir; ancak doğru insanlar sizi fark edip çağırdığında saklanmayı bırakıp kapıyı açmalısınız.'
+  },
+  3: {
+    archetype: 'Deneyimci / Şehit (The Martyr)',
+    rootFear: 'Hata Yapma Utancı, Kusurluluk ve Tuzağa Düşme / Bağlanma Korkusu',
+    generalTendency: 'Deneme-yanılma yoluyla hayatı test etmek, neyin çalışıp neyin çalışmadığını bizzat çarparak görmek.',
+    challengingBehavior: 'İlk pürüzde ilişkiyi veya projeyi sabote edip kaçar; "Ben zaten hep kaybediyorum, hiçbir şey düzgün gitmiyor" inancıyla yıkıcı öfke veya vazgeçiş yaşar.',
+    harmoniousBehavior: 'İnsanlığın deneme tüpü olur; en zor krizlerden bile sağ çıkarak bozuk olan sistemleri düzelten eşsiz bir sorun çözücüye dönüşür.',
+    actionableRemedy: 'Hatalarınız birer kusur değil, dünyaya hediye ettiğiniz "Burası çalışmıyor" keşifleridir. Kendinizi suçlamayı bırakıp her çarpmayı bir bilgelik rozeti olarak görün.'
+  },
+  4: {
+    archetype: 'Fırsatçı / Dost (The Opportunist)',
+    rootFear: 'Dışlanma, Reddedilme ve Sosyal Ağını Kaybetme Korkusu',
+    generalTendency: 'Kişisel ilişkiler, dostluk köprüleri ve yakın çevre ağı üzerinden büyüme.',
+    challengingBehavior: 'Yalnız kalma veya dışlanma korkusuyla sınır koyamaz; toksik ilişkilere veya haksızlıklara sırf kabul görmek için boyun eğer; yabancı ortamlara karşı katı bir duvar örer.',
+    harmoniousBehavior: 'Dostlukların en güvenilir limanı olur; kapıların tanıdıklar aracılığıyla açıldığı muazzam bir fırsat mıknatısına dönüşür.',
+    actionableRemedy: 'Herkesin dostu olamazsınız. Sırf yalnız kalmamak için değerlerinizden ödün vermeyin; gerçek dostlar sınırlarınıza saygı duyanlardır.'
+  },
+  5: {
+    archetype: 'Kurtarıcı / Kafir (The Heretic)',
+    rootFear: 'Yanlış Anlaşılma, İtibar Kaybı ve Günah Keçisi İlan Edilme Korkusu',
+    generalTendency: 'Kriz anlarında evrensel ve pratik çözümler üreterek sahneye çıkmak.',
+    challengingBehavior: 'İnsanların ona yüklediği gerçek dışı "kahraman/kurtarıcı" beklentilerini sırtlanmaya kalkar; işler ters gittiğinde ya da beklentiyi karşılayamadığında haksız yere suçlanıp derin bir kurban psikolojisi ve kırgınlığa kapılır.',
+    harmoniousBehavior: 'İmkansız denilen krizleri pratik zekasıyla çözen ve kitleleri arkasından sürükleyen vizyoner bir rehber olur.',
+    actionableRemedy: 'Herkesi kurtarmak sizin göreviniz değil. Sadece pratik olarak çözebileceğiniz ve net olarak sınırları çizilmiş davetleri kabul edin; insanların hayallerini değil sadece gerçeği vaat edin.'
+  },
+  6: {
+    archetype: 'Rol Modeli (The Role Model)',
+    rootFear: 'Hayal Kırıklığı, Dünyanın Sahteliği ve Mükemmeliyetçilik Tuzağı',
+    generalTendency: 'Yüksek idealler, üç aşamalı yaşam döngüsü (30 yaş altı deneme, 30-50 arası çatıya çekilme, 50 üstü bilge liderlik).',
+    challengingBehavior: 'Dünyanın ve insanların hamlığına katlanamayarak "çatıya çekilir"; aşırı soğuk, mesafeli, kibirli veya hayata küskün bir tavır takınır; insanları sürekli kusurlu bulup yargılar.',
+    harmoniousBehavior: 'Yaşadığı tüm acıları bilgeliğe dönüştürmüş, yargısız, ışık saçan ve sözleriyle değil bizzat varlığıyla örnek olan yaşayan bir bilgeye dönüşür.',
+    actionableRemedy: 'İnsanların ve dünyanın kusurlu olması onların değerini azaltmaz. Çatıdan aşağıya sevgiyle bakın; kusurların içindeki ilahi mükemmelliği kabul edin.'
+  }
+};
+
+export const PLANET_ASTRO_CHALLENGES: Record<string, string> = {
+  Sun: "Ego çatışmaları, görünür olma savaşı, onaylanma bağımlılığı veya derin bir değersizlik hissiyle kendini ispatlama baskısı.",
+  Moon: "Duygusal iniş-çıkışlar, aşırı alınganlık, güvenlik kaygısı, geçmişe takılı kalma veya kurban psikolojisine sığınma.",
+  Mercury: "Zihinsel aşırı yüklenme, endişe krizleri, iletişim kazaları, şüphecilik veya yanlış anlaşılma korkusuyla susma.",
+  Venus: "İlişkilerde aşırı fedakarlık, değersizlik hissi, terk edilme korkusu, kıskançlık veya sevgiyi hak etmek için sınırlarından vazgeçme.",
+  Mars: "Ani öfke patlamaları, sabırsızlık, pasif-agresif direnç, kontrol saplantısı veya yetersizlik korkusundan doğan saldırganlık.",
+  Jupiter: "Aşırı risk alma, kibir, sınırları aşma, fanatizm veya gerçekçi olmayan vaatlerle hayal kırıklığına uğrama.",
+  Saturn: "Ağır sorumluluk yükü altında ezilme, başarısızlık korkusu, katı kurallarla kendini cezalandırma veya yetersizlik kompleksi.",
+  Uranus: "Ani kopuşlar, istikrarsızlık, aidiyetsizlik hissi, şok edici krizler veya isyankar bir kopukluk.",
+  Neptune: "Sınırların erimesi, aldanma ve hayal kırıklığı, gerçeklerden kaçma veya aşırı fedakarlıkla kendini feda etme.",
+  Pluto: "Güç savaşları, manipülasyon korkusu, derin kıskançlık, krizleri takıntı haline getirme veya kontrolü kaybetme dehşeti.",
+  NorthNode: "Konfor alanından çıkamama, geçmiş karmik alışkanlıklara sığınma veya geleceğin belirsizliğinden korkma.",
+  SouthNode: "Geçmişin yüklerini bırakamama, eski travmalara takılma veya bildiği kısır döngüleri tekrarlama.",
+  Earth: "Dünyada köklenememe, fiziksel bedenin ihtiyaçlarını ihmal etme veya pratik hayata uyum sağlamakta zorlanma."
+};
+
 /**
  * Astroloji doğum haritası ile Human Design BodyGraph'ını sentezleyip
  * her gezegen için Ev-Kapı-Açı çapraz okuma matrisi üretir.
@@ -228,6 +328,9 @@ export function synthesizeAstroHumanDesign(
     const gateInfo = GATE_TITLES[conAct.gate] || { title: `${conAct.gate}. Kapı`, gift: 'Doğal Yetenek', shadow: 'Zorlayıcı Alışkanlık' };
     const centerName = GATE_TO_CENTER[conAct.gate] || 'Enerji Merkezi';
 
+    const lineProfile = LINE_BEHAVIOR_PROFILES[conAct.line] || LINE_BEHAVIOR_PROFILES[1];
+    const astroChallengeProbabilities = PLANET_ASTRO_CHALLENGES[planetKey] || "Duygusal baskı, yetersizlik hissi veya çatışma olasılıkları.";
+
     // İlgili gezegenin açılarını filtrele
     const pAspects = astroAspects.filter((asp) => asp.planet1 === astroP?.name || asp.planet2 === astroP?.name);
     
@@ -258,7 +361,7 @@ export function synthesizeAstroHumanDesign(
 
     const isChannelDefined = hdChart.activeGates.includes(conAct.gate);
 
-    // Bütünleşik Sentez Yorumu
+    // Bütünleşik Sentez Başlığı
     const synthesisTitle = `${planetName} ${houseInfo.title}'de & ${conAct.gate}.${conAct.line} Kapısında (${gateInfo.title})`;
     
     let synthesisInterpretation = `${planetName} enerjiniz, hayatınızın **${houseInfo.field}** sahnesinde somutlaşırken (${house}. Ev), içsel işletim sisteminizde **${conAct.gate}. Kapı (${gateInfo.title})** ve **${centerName} Merkezi** arketipiyle titreşmektedir. `;
@@ -271,6 +374,16 @@ export function synthesizeAstroHumanDesign(
       synthesisInterpretation += `Bu kapının frekansı, ${houseInfo.theme} alanında doğrudan ve odaklı bir bilinç çalışması sunar.`;
     }
 
+    // Kesin Davranış Teşhisi (Line Mekaniği)
+    let preciseBehavioralDiagnosis = "";
+    if (dominantNature === 'challenging') {
+      preciseBehavioralDiagnosis = `Astroloji haritanızdaki ${houseInfo.title} (${houseInfo.field}) yerleşimi genel olarak birçok olası sınav (öfke, kontrol, yetersizlik vb.) barındırır. Ancak Human Design haritanızda bu enerjinin tam olarak ${conAct.gate}. Kapı'nın ${conAct.line}. Çizgisine (${lineProfile.archetype}) kilitlenmesi, sizdeki sınavın rastgele değil; tam olarak ${lineProfile.rootFear.toLowerCase()} sebebiyle "${lineProfile.challengingBehavior}" şeklinde somutlaşacağını kesinleştirir.`;
+    } else if (dominantNature === 'harmonious') {
+      preciseBehavioralDiagnosis = `Bu gezegenin ${houseInfo.title} alanındaki destekleyici açıları, ${conAct.gate}. Kapı'nın ${conAct.line}. Çizgisi (${lineProfile.archetype}) ile buluştuğunda çatışmaları eritir. Sizde bu yerleşim "${lineProfile.harmoniousBehavior}" şeklinde doğal ve akıcı bir başarıya dönüşür.`;
+    } else {
+      preciseBehavioralDiagnosis = `Bu yerleşim ${houseInfo.title} alanında ${conAct.gate}. Kapı ${conAct.line}. Çizgi arketipi üzerinden çalışır. Temel davranış dinamiğiniz: "${lineProfile.generalTendency}"`;
+    }
+
     items.push({
       planetKey,
       planetName,
@@ -281,6 +394,8 @@ export function synthesizeAstroHumanDesign(
       gate: conAct.gate,
       gateName: gateInfo.title,
       line: conAct.line,
+      lineArchetype: `${conAct.line}. Çizgi: ${lineProfile.archetype}`,
+      rootFear: lineProfile.rootFear,
       center: centerName,
       isChannelDefined,
       aspects: formattedAspects,
@@ -288,7 +403,10 @@ export function synthesizeAstroHumanDesign(
       synthesisTitle,
       synthesisInterpretation,
       giftPotential: gateInfo.gift,
-      shadowWarning: gateInfo.shadow
+      shadowWarning: gateInfo.shadow,
+      astroChallengeProbabilities,
+      preciseBehavioralDiagnosis,
+      actionableRemedy: lineProfile.actionableRemedy
     });
   });
 
@@ -308,6 +426,41 @@ export function synthesizeAstroHumanDesign(
   const bestHarmonious = items.find((i) => i.dominantNature === 'harmonious') || items[0];
   // En büyük büyüme sınavı kapısı (Challenging açılı)
   const biggestChallenge = items.find((i) => i.dominantNature === 'challenging') || items[items.length - 1];
+
+  // En kritik 4 gezegeni davranışsal teşhis (Spotlight) olarak derle
+  const priorityPlanets = ['Mars', 'Saturn', 'Pluto', 'Sun', 'Moon', 'Mercury', 'Venus'];
+  const keyDiagnoses: LineBehavioralDiagnosis[] = items
+    .filter(it => priorityPlanets.includes(it.planetKey))
+    .sort((a, b) => {
+      // Önce zorlayıcı açılı olanları öne al
+      if (a.dominantNature === 'challenging' && b.dominantNature !== 'challenging') return -1;
+      if (b.dominantNature === 'challenging' && a.dominantNature !== 'challenging') return 1;
+      return 0;
+    })
+    .slice(0, 4)
+    .map(it => {
+      const aspSummary = it.aspects.length > 0 
+        ? it.aspects.map(a => `${a.targetPlanet} ile ${a.type}`).join(', ')
+        : 'Doğrudan Odaklı Açı';
+
+      return {
+        planetKey: it.planetKey,
+        planetName: it.planetName,
+        symbol: it.symbol,
+        sign: it.sign,
+        house: it.house,
+        houseTheme: it.houseTheme,
+        gate: it.gate,
+        gateName: it.gateName,
+        line: it.line,
+        lineArchetype: it.lineArchetype,
+        rootFear: it.rootFear,
+        aspectSummary: aspSummary,
+        astroChallengeProbabilities: it.astroChallengeProbabilities,
+        preciseBehavioralDiagnosis: it.preciseBehavioralDiagnosis,
+        actionableRemedy: it.actionableRemedy
+      };
+    });
 
   return {
     items,
@@ -329,6 +482,7 @@ export function synthesizeAstroHumanDesign(
       planet: biggestChallenge?.planetName || 'Mars',
       house: biggestChallenge?.house || 8,
       description: `${biggestChallenge?.planetName} gezegeninizin aktive ettiği ${biggestChallenge?.gate}. Kapı, haritanızdaki dinamik kare/karşıt açılarla tetiklenmektedir. En büyük tekamül sıçramanız **${biggestChallenge?.shadowWarning}** gölgesiyle yüzleşip onu aşmaktan geçer.`
-    }
+    },
+    keyBehavioralDiagnoses: keyDiagnoses
   };
 }
