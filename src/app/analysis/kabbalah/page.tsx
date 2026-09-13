@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { ArrowLeft, Loader2, Search, Triangle, Star, Compass, AlertCircle, ChevronDown, CheckCircle2, Moon, Sun, MoonStar, Sparkles, Download, Lock } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Loader2, Search, Triangle, Star, Compass, AlertCircle, ChevronDown, CheckCircle2, Moon, Sun, MoonStar, Sparkles, Download, Lock } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { ASTRO_CITIES, AstroPoint, NatalChartData, AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 import { getEsotericHouseInterpretation } from '@/features/astrology/engine/KabbalahPlanetInterpretations';
@@ -46,6 +46,29 @@ const ASPECT_COLORS: Record<string, string> = {
 const CHART_SIZE = 640;
 const CENTER = CHART_SIZE / 2;
 const RADIUS = CENTER - 85;
+
+const KABBALAH_HD_BRIDGE: Record<string, { title: string; subtitle: string; desc: string }> = {
+  'Assiah': {
+    title: 'Kişilik (Personality - Siyah Kolon)',
+    subtitle: '1. Alem (Fiziksel / Madde) Beden Yansıması',
+    desc: 'Doğum anınızdaki bilincin kapı aktivasyonlarıdır. 12 Evdeki gezegenlerinizin açtığı I Ching kapıları, dış dünyadaki somut yeteneklerinizi, kariyer ve ilişkilerdeki davranış kalıplarınızı yönetir.'
+  },
+  'Yetzirah': {
+    title: 'Tasarım (Design - Kırmızı Kolon)',
+    subtitle: '2. Alem (Duygu / Şekillendirme) Beden Yansıması',
+    desc: 'Doğumdan 88 gün önce bedene mühürlenen genetik/hücresel bilinçdışı hafızadır. Atalardan gelen DNA mirası, hücresel travmalar ve duygusal savunma refleksleri bu kapılarda kodlanır.'
+  },
+  'Beriyah': {
+    title: 'Enkarnasyon Haçı & Yaşam Misyonu',
+    subtitle: '3. Alem (Zihin / Yaratım) Beden Yansıması',
+    desc: 'Ruhun bu hayata getirdiği ilahi arketipik misyon ve tanımlı enerji kanallarıdır. Yüksek zihinsel planın, kolektife hizmetin ve kadersel yaşam amacınızın rotasını çizer.'
+  },
+  'Atzilut': {
+    title: 'Manyetik Monopol & Benlik (G) Merkezi',
+    subtitle: '4. Alem (Kudret / Saf Ruh) Beden Yansıması',
+    desc: 'Sizi bu fiziksel beden illüzyonunda bir arada tutan ve koşulsuz sevgiyle yönünüzü tayin eden ilahi çekirdektir. Egonun ve ikiliğin ötesindeki saf kozmik birlik bilincidir.'
+  }
+};
 
 export default function KabbalahAnalysisPage() {
   const router = useRouter();
@@ -796,6 +819,32 @@ export default function KabbalahAnalysisPage() {
                         <div><span className="text-mystic-text-muted mr-2">Element:</span><span className="text-white">{world.element}</span></div>
                         <div><span className="text-mystic-text-muted mr-2">Sefirot:</span><span className="text-white">{world.sephirot}</span></div>
                       </div>
+
+                      {(() => {
+                        const hdBridge = KABBALAH_HD_BRIDGE[world.name];
+                        if (!hdBridge) return null;
+                        return (
+                          <div className="mt-4 p-4 rounded-xl bg-gradient-to-r from-emerald-950/30 to-teal-950/20 border border-emerald-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                            <div>
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-[#32D74B] border border-emerald-500/30">
+                                  🧬 Human Design Karşılığı
+                                </span>
+                                <span className="text-xs text-gray-400">{hdBridge.subtitle}</span>
+                              </div>
+                              <h6 className="text-sm font-bold text-white mb-1">{hdBridge.title}</h6>
+                              <p className="text-xs text-gray-300 leading-relaxed max-w-2xl">{hdBridge.desc}</p>
+                            </div>
+                            <button
+                              onClick={() => router.push('/analysis/human-design')}
+                              className="shrink-0 flex items-center gap-1.5 text-xs text-[#32D74B] hover:text-white bg-emerald-500/10 hover:bg-emerald-500/20 px-3.5 py-2 rounded-lg border border-emerald-500/30 font-medium transition-all cursor-pointer"
+                            >
+                              <span>Beden Grafiğini Gör</span>
+                              <ArrowRight size={14} />
+                            </button>
+                          </div>
+                        );
+                      })()}
                     </div>
                   );
                 })}

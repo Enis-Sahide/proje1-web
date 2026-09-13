@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, CheckCircle2, Loader2, Zap, Search, X, Download, AlertCircle, Lock } from 'lucide-react';
+import { ArrowLeft, CheckCircle2, Loader2, Zap, Search, X, Download, AlertCircle, Lock, Sparkles, Compass, ShieldAlert, Award, Layers } from 'lucide-react';
 import moment from 'moment-timezone';
 import { generateChart, HumanDesignChart, CenterCode, PLANET_SYMBOLS, CHANNELS } from '@/utils/HumanDesignEngine';
 import { useContent } from '@/lib/useContent';
@@ -11,6 +11,7 @@ import { AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 import { useAuth } from '@/context/AuthContext';
 import { downloadHumanDesignPDF } from '@/utils/humanDesignPdfGenerator';
 import AuthPromptModal from '@/components/AuthPromptModal';
+import { synthesizeAstroHumanDesign, AstroHDSynthesisReport } from '@/features/astrology/engine/AstroHumanDesignSynthesis';
 
 const COLORS = {
   background: '#0F172A',
@@ -424,33 +425,58 @@ export default function HumanDesignPage() {
     activeGateId && gatesData ? gatesData.find((g: any) => g.id === activeGateId) : null;
   
   const [chart, setChart] = useState<HumanDesignChart | null>(null);
+  const [activeTab, setActiveTab] = useState<'bodygraph' | 'synthesis'>('bodygraph');
+  const [synthesisReport, setSynthesisReport] = useState<AstroHDSynthesisReport | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!dateStr || !timeStr || !city) return;
     setIsAnalyzing(true);
     
-    setTimeout(() => {
-      try {
-        const dateTimeString = `${dateStr} ${timeStr}`;
-        const m = moment.tz(dateTimeString, "YYYY-MM-DD HH:mm", city.tz);
-        
-        if (!m.isValid()) {
-          alert("Girilen tarih/saat geçerli değil.");
-          setIsAnalyzing(false);
-          return;
-        }
-
-        const result = generateChart(m.toDate());
-        setChart(result);
-        setShowResult(true);
-      } catch (err) {
-        console.error(err);
-        alert("Hesaplama sırasında bir hata oluştu.");
-      } finally {
+    try {
+      const dateTimeString = `${dateStr} ${timeStr}`;
+      const m = moment.tz(dateTimeString, "YYYY-MM-DD HH:mm", city.tz);
+      
+      if (!m.isValid()) {
+        alert("Girilen tarih/saat geçerli değil.");
         setIsAnalyzing(false);
+        return;
       }
-    }, 1500);
+
+      const hdResult = generateChart(m.toDate());
+      setChart(hdResult);
+
+      // Astroloji verilerini hesapla ve sentezle
+      try {
+        const astroRes = await fetch('/api/astrology/calculate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            localDate: dateStr,
+            localTime: timeStr,
+            cityData: city
+          })
+        });
+        const astroJson = await astroRes.json();
+        if (astroJson.success && astroJson.data) {
+          const report = synthesizeAstroHumanDesign(
+            astroJson.data.planets,
+            astroJson.data.aspects,
+            hdResult
+          );
+          setSynthesisReport(report);
+        }
+      } catch (astroErr) {
+        console.warn("Astroloji sentezi hesaplanırken hata oluştu:", astroErr);
+      }
+
+      setShowResult(true);
+    } catch (err) {
+      console.error(err);
+      alert("Hesaplama sırasında bir hata oluştu.");
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const drawChannels = () => {
@@ -758,226 +784,454 @@ export default function HumanDesignPage() {
                         PDF Raporu Satın Al (555 TL)
                       </button>
                     )}
-                    <button onClick={() => setChart(null)} className="text-xs sm:text-sm px-5 py-2.5 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap text-center">
+                    <button 
+                      onClick={() => {
+                        setChart(null);
+                        setSynthesisReport(null);
+                        setActiveTab('bodygraph');
+                      }} 
+                      className="text-xs sm:text-sm px-5 py-2.5 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap text-center"
+                    >
                       Yeni Hesaplama
                     </button>
                   </div>
                </div>
 
-              <div className="flex flex-col lg:flex-row justify-center items-start gap-8 mb-10">
-                {/* Left Column - Design */}
-                <div className="w-full lg:w-48 bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col gap-2">
-                  <h3 className="text-center font-bold uppercase tracking-wider text-[#E63946] mb-2 text-sm">Design</h3>
-                  {chart.unconscious.map((p, i) => (
-                    <div 
-                      key={`unc-${i}`} 
-                      className="flex items-center justify-between px-2 py-1 bg-white/5 rounded border border-white/5 cursor-pointer hover:bg-white/10 hover:border-[#E63946]/30 transition-all"
-                      onClick={() => {
-                        if (isApprenticeOrAbove) {
-                          setActiveDetail(null);
-                          setActiveGateId(p.gate);
-                        } else {
-                          setShowLockModal(true);
-                        }
-                      }}
-                    >
-                      <span className="text-xl font-bold text-[#E63946]">{PLANET_SYMBOLS[p.planet]}</span>
-                      <span className="text-sm font-bold text-[#E63946]">{p.gate}.{p.line}</span>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Center SVG BodyGraph */}
-                <div className="w-full max-w-md aspect-[320/540] bg-gradient-to-b from-[#e6c27a] to-[#c59b3f] rounded-3xl border border-white/10 shadow-2xl overflow-hidden relative">
-                  <svg width="100%" height="100%" viewBox="40 10 320 540" className="absolute inset-0">
-                    {drawChannels()}
-                    {drawCenters()}
-                    {drawGates()}
-                  </svg>
-                </div>
-
-                {/* Right Column - Personality */}
-                <div className="w-full lg:w-48 bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col gap-2">
-                  <h3 className="text-center font-bold uppercase tracking-wider text-white mb-2 text-sm">Personality</h3>
-                  {chart.conscious.map((p, i) => (
-                    <div 
-                      key={`con-${i}`} 
-                      className="flex items-center justify-between px-2 py-1 bg-white/5 rounded border border-white/5 cursor-pointer hover:bg-white/10 hover:border-white/20 transition-all"
-                      onClick={() => {
-                        if (isApprenticeOrAbove) {
-                          setActiveDetail(null);
-                          setActiveGateId(p.gate);
-                        } else {
-                          setShowLockModal(true);
-                        }
-                      }}
-                    >
-                      <span className="text-sm font-bold text-white">{p.gate}.{p.line}</span>
-                      <span className="text-xl font-bold text-white">{PLANET_SYMBOLS[p.planet]}</span>
-                    </div>
-                  ))}
-                </div>
+              {/* Tab Switcher */}
+              <div className="flex items-center justify-center gap-3 mb-8 bg-white/5 p-1.5 rounded-2xl border border-white/10 max-w-md mx-auto">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('bodygraph')}
+                  className={`flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${
+                    activeTab === 'bodygraph'
+                      ? 'bg-[#32D74B] text-black font-bold shadow-lg shadow-[#32D74B]/20'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Zap size={16} />
+                  Tasarım Şeması
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab('synthesis')}
+                  className={`flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 relative ${
+                    activeTab === 'synthesis'
+                      ? 'bg-gradient-to-r from-amber-400 via-emerald-400 to-teal-400 text-black font-bold shadow-lg shadow-amber-400/20'
+                      : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  }`}
+                >
+                  <Sparkles size={16} />
+                  Kozmik Sentez (Astro-HD)
+                  <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                  </span>
+                </button>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-                <div 
-                  className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
-                  onClick={() => {
-                    if (isApprenticeOrAbove) {
-                      setActiveGateId(null);
-                      const match = HD_DETAILS_MAP[normalizeHDKey(chart.type)];
-                      setActiveDetail({
-                        title: chart.type,
-                        subtitle: match?.subtitle || "Tür / Tip",
-                        description: match?.description || ""
-                      });
-                    } else {
-                      setShowLockModal(true);
-                    }
-                  }}
-                >
-                  <span className="block text-mystic-text-muted text-sm mb-1">Tür</span>
-                  <span className="text-lg font-bold text-white">{chart.type}</span>
-                </div>
-                <div 
-                  className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
-                  onClick={() => {
-                    if (isApprenticeOrAbove) {
-                      setActiveGateId(null);
-                      const match = HD_DETAILS_MAP[normalizeHDKey(chart.authority)];
-                      setActiveDetail({
-                        title: chart.authority,
-                        subtitle: match?.subtitle || "İç Otorite",
-                        description: match?.description || ""
-                      });
-                    } else {
-                      setShowLockModal(true);
-                    }
-                  }}
-                >
-                  <span className="block text-mystic-text-muted text-sm mb-1">İç Otorite</span>
-                  <span className="text-lg font-bold text-white">{chart.authority}</span>
-                </div>
-                <div 
-                  className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
-                  onClick={() => {
-                    if (isApprenticeOrAbove) {
-                      setActiveGateId(null);
-                      const match = HD_DETAILS_MAP[normalizeHDKey(chart.strategy)];
-                      setActiveDetail({
-                        title: chart.strategy,
-                        subtitle: match?.subtitle || "Strateji",
-                        description: match?.description || ""
-                      });
-                    } else {
-                      setShowLockModal(true);
-                    }
-                  }}
-                >
-                  <span className="block text-mystic-text-muted text-sm mb-1">Strateji</span>
-                  <span className="text-lg font-bold text-white">{chart.strategy}</span>
-                </div>
-                <div 
-                  className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
-                  onClick={() => {
-                    if (isApprenticeOrAbove) {
-                      setActiveGateId(null);
-                      const match = getProfileDetails(chart.profile);
-                      setActiveDetail({
-                        title: `Profil ${chart.profile}`,
-                        subtitle: match.subtitle,
-                        description: match.description
-                      });
-                    } else {
-                      setShowLockModal(true);
-                    }
-                  }}
-                >
-                  <span className="block text-mystic-text-muted text-sm mb-1">Profil</span>
-                  <span className="text-lg font-bold text-white">{chart.profile}</span>
-                </div>
-                <div 
-                  className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
-                  onClick={() => {
-                    if (isApprenticeOrAbove) {
-                      setActiveGateId(null);
-                      const match = HD_DETAILS_MAP[normalizeHDKey(chart.signature)];
-                      setActiveDetail({
-                        title: chart.signature,
-                        subtitle: match?.subtitle || "İmza (Hizalanma Ödülü)",
-                        description: match?.description || ""
-                      });
-                    } else {
-                      setShowLockModal(true);
-                    }
-                  }}
-                >
-                  <span className="block text-mystic-text-muted text-sm mb-1">İmza</span>
-                  <span className="text-lg font-bold text-white">{chart.signature}</span>
-                </div>
-                <div 
-                  className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
-                  onClick={() => {
-                    if (isApprenticeOrAbove) {
-                      setActiveGateId(null);
-                      const match = HD_DETAILS_MAP[normalizeHDKey(chart.notSelfTheme, chart.type)];
-                      setActiveDetail({
-                        title: chart.notSelfTheme,
-                        subtitle: match?.subtitle || "Benlik Olmayan Tema",
-                        description: match?.description || ""
-                      });
-                    } else {
-                      setShowLockModal(true);
-                    }
-                  }}
-                >
-                  <span className="block text-mystic-text-muted text-sm mb-1">Benlik Olmayan Tema</span>
-                  <span className="text-lg font-bold text-white">{chart.notSelfTheme}</span>
-                </div>
-                <div 
-                  className="bg-white/5 p-4 rounded-2xl border border-white/10 lg:col-span-2 cursor-pointer hover:bg-white/10 transition-colors"
-                  onClick={() => {
-                    if (isApprenticeOrAbove) {
-                      setActiveGateId(null);
-                      const match = getIncarnationCrossDetails(chart.incarnationCross);
-                      setActiveDetail({
-                        title: chart.incarnationCross,
-                        subtitle: match.subtitle,
-                        description: match.description
-                      });
-                    } else {
-                      setShowLockModal(true);
-                    }
-                  }}
-                >
-                  <span className="block text-mystic-text-muted text-sm mb-1">Enkarnasyon Haçı</span>
-                  <span className="text-lg font-bold text-white">{chart.incarnationCross}</span>
-                </div>
-              </div>
-
-              {/* Bütünsel Yorum (Holistic Synthesis) */}
-              {(() => {
-                const synthesis = getHolisticSynthesisText(chart.type);
-                return (
-                  <div className="bg-gradient-to-r from-emerald-950/20 to-teal-950/20 rounded-3xl border border-emerald-500/10 p-6 md:p-8 space-y-6 mb-8 text-left">
-                    <div className="flex items-center gap-3">
-                      <div className="w-2 h-8 rounded-full bg-[#32D74B]" />
-                      <h3 className="text-2xl font-serif text-white font-bold">{synthesis.title}</h3>
+              {activeTab === 'bodygraph' && (
+                <div className="space-y-8 animate-in fade-in duration-500">
+                  <div className="flex flex-col lg:flex-row justify-center items-start gap-8 mb-10">
+                    {/* Left Column - Design */}
+                    <div className="w-full lg:w-48 bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col gap-2">
+                      <h3 className="text-center font-bold uppercase tracking-wider text-[#E63946] mb-2 text-sm">Design</h3>
+                      {chart.unconscious.map((p, i) => (
+                        <div 
+                          key={`unc-${i}`} 
+                          className="flex items-center justify-between px-2 py-1 bg-white/5 rounded border border-white/5 cursor-pointer hover:bg-white/10 hover:border-[#E63946]/30 transition-all"
+                          onClick={() => {
+                            if (isApprenticeOrAbove) {
+                              setActiveDetail(null);
+                              setActiveGateId(p.gate);
+                            } else {
+                              setShowLockModal(true);
+                            }
+                          }}
+                        >
+                          <span className="text-xl font-bold text-[#E63946]">{PLANET_SYMBOLS[p.planet]}</span>
+                          <span className="text-sm font-bold text-[#E63946]">{p.gate}.{p.line}</span>
+                        </div>
+                      ))}
                     </div>
-                    <div className="space-y-4 text-gray-300 leading-relaxed text-[15px] md:text-base">
-                      <p>{synthesis.text1}</p>
-                      <p>{synthesis.text2}</p>
+
+                    {/* Center SVG BodyGraph */}
+                    <div className="w-full max-w-md aspect-[320/540] bg-gradient-to-b from-[#e6c27a] to-[#c59b3f] rounded-3xl border border-white/10 shadow-2xl overflow-hidden relative">
+                      <svg width="100%" height="100%" viewBox="40 10 320 540" className="absolute inset-0">
+                        {drawChannels()}
+                        {drawCenters()}
+                        {drawGates()}
+                      </svg>
+                    </div>
+
+                    {/* Right Column - Personality */}
+                    <div className="w-full lg:w-48 bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col gap-2">
+                      <h3 className="text-center font-bold uppercase tracking-wider text-white mb-2 text-sm">Personality</h3>
+                      {chart.conscious.map((p, i) => (
+                        <div 
+                          key={`con-${i}`} 
+                          className="flex items-center justify-between px-2 py-1 bg-white/5 rounded border border-white/5 cursor-pointer hover:bg-white/10 hover:border-white/20 transition-all"
+                          onClick={() => {
+                            if (isApprenticeOrAbove) {
+                              setActiveDetail(null);
+                              setActiveGateId(p.gate);
+                            } else {
+                              setShowLockModal(true);
+                            }
+                          }}
+                        >
+                          <span className="text-sm font-bold text-white">{p.gate}.{p.line}</span>
+                          <span className="text-xl font-bold text-white">{PLANET_SYMBOLS[p.planet]}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                );
-              })()}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                    <div 
+                      className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
+                      onClick={() => {
+                        if (isApprenticeOrAbove) {
+                          setActiveGateId(null);
+                          const match = HD_DETAILS_MAP[normalizeHDKey(chart.type)];
+                          setActiveDetail({
+                            title: chart.type,
+                            subtitle: match?.subtitle || "Tür / Tip",
+                            description: match?.description || ""
+                          });
+                        } else {
+                          setShowLockModal(true);
+                        }
+                      }}
+                    >
+                      <span className="block text-mystic-text-muted text-sm mb-1">Tür</span>
+                      <span className="text-lg font-bold text-white">{chart.type}</span>
+                    </div>
+                    <div 
+                      className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
+                      onClick={() => {
+                        if (isApprenticeOrAbove) {
+                          setActiveGateId(null);
+                          const match = HD_DETAILS_MAP[normalizeHDKey(chart.authority)];
+                          setActiveDetail({
+                            title: chart.authority,
+                            subtitle: match?.subtitle || "İç Otorite",
+                            description: match?.description || ""
+                          });
+                        } else {
+                          setShowLockModal(true);
+                        }
+                      }}
+                    >
+                      <span className="block text-mystic-text-muted text-sm mb-1">İç Otorite</span>
+                      <span className="text-lg font-bold text-white">{chart.authority}</span>
+                    </div>
+                    <div 
+                      className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
+                      onClick={() => {
+                        if (isApprenticeOrAbove) {
+                          setActiveGateId(null);
+                          const match = HD_DETAILS_MAP[normalizeHDKey(chart.strategy)];
+                          setActiveDetail({
+                            title: chart.strategy,
+                            subtitle: match?.subtitle || "Strateji",
+                            description: match?.description || ""
+                          });
+                        } else {
+                          setShowLockModal(true);
+                        }
+                      }}
+                    >
+                      <span className="block text-mystic-text-muted text-sm mb-1">Strateji</span>
+                      <span className="text-lg font-bold text-white">{chart.strategy}</span>
+                    </div>
+                    <div 
+                      className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
+                      onClick={() => {
+                        if (isApprenticeOrAbove) {
+                          setActiveGateId(null);
+                          const match = getProfileDetails(chart.profile);
+                          setActiveDetail({
+                            title: `Profil ${chart.profile}`,
+                            subtitle: match.subtitle,
+                            description: match.description
+                          });
+                        } else {
+                          setShowLockModal(true);
+                        }
+                      }}
+                    >
+                      <span className="block text-mystic-text-muted text-sm mb-1">Profil</span>
+                      <span className="text-lg font-bold text-white">{chart.profile}</span>
+                    </div>
+                    <div 
+                      className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
+                      onClick={() => {
+                        if (isApprenticeOrAbove) {
+                          setActiveGateId(null);
+                          const match = HD_DETAILS_MAP[normalizeHDKey(chart.signature)];
+                          setActiveDetail({
+                            title: chart.signature,
+                            subtitle: match?.subtitle || "İmza (Hizalanma Ödülü)",
+                            description: match?.description || ""
+                          });
+                        } else {
+                          setShowLockModal(true);
+                        }
+                      }}
+                    >
+                      <span className="block text-mystic-text-muted text-sm mb-1">İmza</span>
+                      <span className="text-lg font-bold text-white">{chart.signature}</span>
+                    </div>
+                    <div 
+                      className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
+                      onClick={() => {
+                        if (isApprenticeOrAbove) {
+                          setActiveGateId(null);
+                          const match = HD_DETAILS_MAP[normalizeHDKey(chart.notSelfTheme, chart.type)];
+                          setActiveDetail({
+                            title: chart.notSelfTheme,
+                            subtitle: match?.subtitle || "Benlik Olmayan Tema",
+                            description: match?.description || ""
+                          });
+                        } else {
+                          setShowLockModal(true);
+                        }
+                      }}
+                    >
+                      <span className="block text-mystic-text-muted text-sm mb-1">Benlik Olmayan Tema</span>
+                      <span className="text-lg font-bold text-white">{chart.notSelfTheme}</span>
+                    </div>
+                    <div 
+                      className="bg-white/5 p-4 rounded-2xl border border-white/10 lg:col-span-2 cursor-pointer hover:bg-white/10 transition-colors"
+                      onClick={() => {
+                        if (isApprenticeOrAbove) {
+                          setActiveGateId(null);
+                          const match = getIncarnationCrossDetails(chart.incarnationCross);
+                          setActiveDetail({
+                            title: chart.incarnationCross,
+                            subtitle: match.subtitle,
+                            description: match.description
+                          });
+                        } else {
+                          setShowLockModal(true);
+                        }
+                      }}
+                    >
+                      <span className="block text-mystic-text-muted text-sm mb-1">Enkarnasyon Haçı</span>
+                      <span className="text-lg font-bold text-white">{chart.incarnationCross}</span>
+                    </div>
+                  </div>
+
+                  {/* Bütünsel Yorum (Holistic Synthesis) */}
+                  {(() => {
+                    const synthesis = getHolisticSynthesisText(chart.type);
+                    return (
+                      <div className="bg-gradient-to-r from-emerald-950/20 to-teal-950/20 rounded-3xl border border-emerald-500/10 p-6 md:p-8 space-y-6 mb-8 text-left">
+                        <div className="flex items-center gap-3">
+                          <div className="w-2 h-8 rounded-full bg-[#32D74B]" />
+                          <h3 className="text-2xl font-serif text-white font-bold">{synthesis.title}</h3>
+                        </div>
+                        <div className="space-y-4 text-gray-300 leading-relaxed text-[15px] md:text-base">
+                          <p>{synthesis.text1}</p>
+                          <p>{synthesis.text2}</p>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              )}
+
+              {activeTab === 'synthesis' && (
+                <div className="space-y-8 animate-in fade-in duration-500 text-left">
+                  {/* Hero Introduction */}
+                  <div className="bg-gradient-to-r from-amber-500/10 via-emerald-500/10 to-teal-500/10 rounded-3xl border border-white/10 p-6 md:p-8">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+                      <div>
+                        <div className="flex items-center gap-2 text-amber-400 font-semibold text-sm mb-1">
+                          <Sparkles size={18} />
+                          <span>Kozmik Sentez & Entegrasyon</span>
+                        </div>
+                        <h2 className="text-2xl md:text-3xl font-serif font-bold text-white">
+                          Astroloji Evleri × Human Design Kapıları
+                        </h2>
+                      </div>
+                      <div className="px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-gray-300 self-start md:self-auto">
+                        64 Genetik Kod × 12 Yaşam Arenası
+                      </div>
+                    </div>
+                    <p className="text-gray-300 leading-relaxed text-sm md:text-base">
+                      Human Design’daki 64 Kapı, Tropical Zodyak’ın 360 derecesiyle matematiksel olarak birebir örtüşür. 
+                      Astrolojik <strong className="text-white">Evler</strong> enerjinizin <em>hangi somut hayat sahnesinde</em> oynandığını gösterirken, 
+                      Human Design <strong className="text-white">Kapıları</strong> bu enerjinin <em>hangi genetik işletim sistemiyle</em> aktığını ifade eder. 
+                      Gezegen açıları (kareler, üçgenler) ise bu kapıların armağan mı yoksa gölge frekansından mı tetiklendiğini belirler.
+                    </p>
+                  </div>
+
+                  {synthesisReport ? (
+                    <>
+                      {/* 3 Sentez Özet Kartı */}
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Dominant Ev */}
+                        <div className="bg-white/5 border border-amber-500/20 rounded-2xl p-6 relative overflow-hidden">
+                          <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 mb-4">
+                            <Compass size={20} />
+                          </div>
+                          <span className="text-xs font-bold uppercase tracking-widest text-amber-400 block mb-1">
+                            Ana Yaşam Sahnesi
+                          </span>
+                          <h3 className="text-lg font-bold text-white mb-2">
+                            {synthesisReport.dominantLifeArea.title}
+                          </h3>
+                          <p className="text-gray-300 text-sm leading-relaxed">
+                            {synthesisReport.dominantLifeArea.description}
+                          </p>
+                        </div>
+
+                        {/* En Yüksek Armağan */}
+                        <div className="bg-white/5 border border-emerald-500/20 rounded-2xl p-6 relative overflow-hidden">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-4">
+                            <Award size={20} />
+                          </div>
+                          <span className="text-xs font-bold uppercase tracking-widest text-emerald-400 block mb-1">
+                            En Yüksek Armağan Kapısı
+                          </span>
+                          <h3 className="text-lg font-bold text-white mb-2">
+                            {synthesisReport.highestGiftGate.gate}. Kapı - {synthesisReport.highestGiftGate.gateName}
+                          </h3>
+                          <p className="text-gray-300 text-sm leading-relaxed">
+                            {synthesisReport.highestGiftGate.description}
+                          </p>
+                        </div>
+
+                        {/* Büyük Tekamül Sınavı */}
+                        <div className="bg-white/5 border border-rose-500/20 rounded-2xl p-6 relative overflow-hidden">
+                          <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-center justify-center text-rose-400 mb-4">
+                            <ShieldAlert size={20} />
+                          </div>
+                          <span className="text-xs font-bold uppercase tracking-widest text-rose-400 block mb-1">
+                            Büyük Tekamül Sınavı
+                          </span>
+                          <h3 className="text-lg font-bold text-white mb-2">
+                            {synthesisReport.majorGrowthChallengeGate.gate}. Kapı - {synthesisReport.majorGrowthChallengeGate.gateName}
+                          </h3>
+                          <p className="text-gray-300 text-sm leading-relaxed">
+                            {synthesisReport.majorGrowthChallengeGate.description}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Gezegen Çapraz Okuma Matrisi */}
+                      <div className="space-y-4">
+                        <div className="flex items-center justify-between">
+                          <h3 className="text-xl font-serif font-bold text-white flex items-center gap-2">
+                            <Layers size={20} className="text-[#32D74B]" />
+                            Gezegen Bazlı Çapraz Okuma Matrisi
+                          </h3>
+                          <span className="text-xs text-gray-400">Detaylar için kapı kartlarına tıklayın</span>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {synthesisReport.items.map((item, idx) => (
+                            <div
+                              key={`synth-${item.planetKey}-${idx}`}
+                              onClick={() => {
+                                if (isApprenticeOrAbove) {
+                                  setActiveDetail(null);
+                                  setActiveGateId(item.gate);
+                                } else {
+                                  setShowLockModal(true);
+                                }
+                              }}
+                              className="bg-black/40 border border-white/10 hover:border-white/20 rounded-2xl p-5 cursor-pointer transition-all hover:bg-white/5 group"
+                            >
+                              <div className="flex items-start justify-between gap-3 mb-3">
+                                <div className="flex items-center gap-3">
+                                  <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-xl text-white group-hover:scale-105 transition-transform">
+                                    {item.symbol}
+                                  </div>
+                                  <div>
+                                    <h4 className="font-bold text-white text-base flex items-center gap-2">
+                                      {item.planetName}
+                                      {item.sign && (
+                                        <span className="text-xs px-2 py-0.5 rounded-full bg-white/10 text-gray-300 font-normal">
+                                          {item.sign}
+                                        </span>
+                                      )}
+                                    </h4>
+                                    <span className="text-xs text-amber-300/80 font-medium">
+                                      {item.house}. Ev ({item.houseTheme})
+                                    </span>
+                                  </div>
+                                </div>
+
+                                <div className="text-right">
+                                  <span className="inline-block px-2.5 py-1 rounded-lg bg-[#32D74B]/15 border border-[#32D74B]/30 text-[#32D74B] text-xs font-bold">
+                                    Kapı {item.gate}.{item.line}
+                                  </span>
+                                  <span className="block text-[11px] text-gray-400 mt-1">
+                                    {item.center}
+                                  </span>
+                                </div>
+                              </div>
+
+                              <div className="bg-white/5 rounded-xl p-3 mb-3 border border-white/5">
+                                <div className="text-xs font-semibold text-white mb-1">
+                                  {item.synthesisTitle}
+                                </div>
+                                <p className="text-xs text-gray-300 leading-relaxed">
+                                  {item.synthesisInterpretation}
+                                </p>
+                              </div>
+
+                              <div className="flex items-center justify-between text-[11px] pt-1 border-t border-white/5">
+                                <div className="text-emerald-400/90 truncate max-w-[48%]">
+                                  <span className="text-gray-500">Armağan:</span> {item.giftPotential}
+                                </div>
+                                <div className="text-rose-400/90 truncate max-w-[48%] text-right">
+                                  <span className="text-gray-500">Gölge:</span> {item.shadowWarning}
+                                </div>
+                              </div>
+
+                              {item.aspects.length > 0 && (
+                                <div className="mt-2.5 pt-2 border-t border-white/5 flex flex-wrap gap-1.5">
+                                  {item.aspects.map((asp, aIdx) => (
+                                    <span
+                                      key={`asp-${aIdx}`}
+                                      className={`text-[10px] px-2 py-0.5 rounded-md border ${
+                                        asp.nature === 'harmonious'
+                                          ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-300'
+                                          : asp.nature === 'challenging'
+                                          ? 'bg-rose-500/10 border-rose-500/30 text-rose-300'
+                                          : 'bg-white/5 border-white/10 text-gray-300'
+                                      }`}
+                                    >
+                                      {asp.targetPlanet} ile {asp.type}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center p-12 bg-black/30 rounded-2xl border border-white/10">
+                      <Loader2 size={32} className="animate-spin text-[#32D74B] mb-3" />
+                      <p className="text-sm text-gray-300">Kozmik sentez verileri hesaplanıyor...</p>
+                    </div>
+                  )}
+                </div>
+              )}
               
-              <div className="flex justify-center">
+              <div className="flex justify-center mt-8">
                 <button 
                   onClick={() => {
                     setShowResult(false);
                     setActiveDetail(null);
                     setActiveGateId(null);
+                    setSynthesisReport(null);
+                    setActiveTab('bodygraph');
                   }} 
                   className="text-[#32D74B] hover:text-white transition-colors underline text-sm"
                 >
