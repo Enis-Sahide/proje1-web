@@ -20,7 +20,7 @@ import {
   Info
 } from 'lucide-react';
 import { getTransitHouseInterpretation, getTransitAspectInterpretation } from '@/features/astrology/engine/TransitInterpretations';
-import { getSkyPlanetSignInterpretation, getPlanetSignBriefHeadline } from '@/features/astrology/engine/SkyAspectInterpretations';
+import { getSkyPlanetSignInterpretation, getPlanetSignBriefHeadline, getIngressPhase } from '@/features/astrology/engine/SkyAspectInterpretations';
 import { AstroCity, TransitChartData, AstroPoint, AstroAspect } from '@/features/astrology/engine/AstrologyConstants';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { useAuth } from '@/context/AuthContext';
@@ -106,6 +106,7 @@ export default function TransitsPage() {
   } | null>(null);
   const [skyAspectFilter, setSkyAspectFilter] = useState<'ALL' | 'HARMONIOUS' | 'CHALLENGING' | 'CONJUNCTION'>('ALL');
   const [skyRightTab, setSkyRightTab] = useState<'ASPECTS' | 'SIGN_PLACEMENTS'>('ASPECTS');
+  const [signFilter, setSignFilter] = useState<'ALL' | 'NEW_INGRESS' | 'PERSONAL' | 'OUTER'>('ALL');
 
   // Mundane Timeline states
   const [skyTimelineData, setSkyTimelineData] = useState<any>(null);
@@ -719,93 +720,124 @@ export default function TransitsPage() {
                         </>
                       ) : (
                         /* Sign Placements & Ingress Impacts List */
-                        <div className="space-y-3 max-h-[580px] overflow-y-auto custom-scrollbar pr-1">
-                          <p className="text-xs text-mystic-text-muted mb-2">
-                            Gezegen ve kadersel noktaların zodyaktaki anlık burç yerleşimleri, kolektif etkileri ve dönüşüm temaları:
-                          </p>
-                          {(() => {
-                            const order = ['Lilith', 'Plüton', 'Satürn', 'Neptün', 'Uranüs', 'Jüpiter', 'Mars', 'Güneş', 'Venüs', 'Merkür', 'Ay', 'Kiron', 'Kuzey Ay Düğümü'];
-                            const sortedPlanets = [...skyChartData.planets]
-                              .filter(p => order.includes(p.name))
-                              .sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
+                        <div className="flex flex-col gap-3">
+                          {/* Sign Placements Filter Tabs */}
+                          <div className="flex flex-wrap gap-1.5 pb-1">
+                            {[
+                              { id: 'ALL', label: 'Tümü (13)' },
+                              { id: 'NEW_INGRESS', label: '⚡ Yeni Girişler (İngress)' },
+                              { id: 'PERSONAL', label: 'Kişisel (5)' },
+                              { id: 'OUTER', label: 'Kolektif & Kadersel (8)' }
+                            ].map(f => (
+                              <button
+                                key={f.id}
+                                type="button"
+                                onClick={() => setSignFilter(f.id as any)}
+                                className={`text-xs px-2.5 py-1 rounded-lg font-medium transition-all cursor-pointer ${
+                                  signFilter === f.id
+                                    ? 'bg-[#0EA5E9] text-black font-bold shadow-md'
+                                    : 'bg-white/5 text-mystic-text-muted hover:text-white'
+                                }`}
+                              >
+                                {f.label}
+                              </button>
+                            ))}
+                          </div>
 
-                            return sortedPlanets.map((p, idx) => {
-                              const interp = getSkyPlanetSignInterpretation(
-                                p.name,
-                                p.sign,
-                                p.degreeInSign,
-                                p.minutes,
-                                p.isRetrograde
-                              );
-                              const isHighlighted = p.name === 'Lilith' || p.name === 'Plüton';
+                          <div className="space-y-3 max-h-[530px] overflow-y-auto custom-scrollbar pr-1">
+                            {(() => {
+                              const standardOrder = ['Güneş', 'Ay', 'Merkür', 'Venüs', 'Mars', 'Jüpiter', 'Satürn', 'Uranüs', 'Neptün', 'Plüton', 'Kiron', 'Lilith', 'Kuzey Ay Düğümü'];
+                              const personalPlanets = ['Güneş', 'Ay', 'Merkür', 'Venüs', 'Mars'];
+                              const outerPlanets = ['Jüpiter', 'Satürn', 'Uranüs', 'Neptün', 'Plüton', 'Kiron', 'Lilith', 'Kuzey Ay Düğümü'];
 
-                              return (
-                                <div
-                                  key={`pl-sign-${idx}`}
-                                  onClick={() => setSelectedInterp(interp)}
-                                  className={`group p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col gap-2 shadow-sm ${
-                                    isHighlighted
-                                      ? 'bg-gradient-to-br from-[#0EA5E9]/10 via-white/5 to-transparent border-[#0EA5E9]/30 hover:border-[#0EA5E9]/60 hover:bg-[#0EA5E9]/15'
-                                      : 'bg-white/5 hover:bg-white/10 border-white/5 hover:border-[#0EA5E9]/40'
-                                  }`}
-                                >
-                                  <div className="flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                      <span className="text-xl text-[#0EA5E9] font-bold group-hover:scale-110 transition-transform">
-                                        {PLANET_SYMBOLS[p.name] || ''}
-                                      </span>
-                                      <div>
-                                        <div className="flex items-center gap-2">
-                                          <span className="text-xs sm:text-sm font-bold text-white group-hover:text-[#0EA5E9] transition-colors">
-                                            {p.name}
-                                          </span>
-                                          {isHighlighted && (
-                                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#0EA5E9]/20 text-[#0EA5E9] border border-[#0EA5E9]/30">
-                                              {p.name === 'Lilith' ? 'Gölge & Tabu' : 'Majör Çağ'}
+                              let displayPlanets = [...skyChartData.planets]
+                                .filter(p => standardOrder.includes(p.name))
+                                .sort((a, b) => standardOrder.indexOf(a.name) - standardOrder.indexOf(b.name));
+
+                              if (signFilter === 'NEW_INGRESS') {
+                                displayPlanets = displayPlanets.filter(p => p.degreeInSign === 0 || p.degreeInSign === 1);
+                              } else if (signFilter === 'PERSONAL') {
+                                displayPlanets = displayPlanets.filter(p => personalPlanets.includes(p.name));
+                              } else if (signFilter === 'OUTER') {
+                                displayPlanets = displayPlanets.filter(p => outerPlanets.includes(p.name));
+                              }
+
+                              if (displayPlanets.length === 0) {
+                                return (
+                                  <div className="text-center py-12 text-mystic-text-muted text-xs bg-white/5 rounded-2xl border border-white/5 p-6">
+                                    <p className="font-semibold text-white mb-1">Şu anda 0°-1° derecede taze burç girişi yapan gezegen bulunmuyor.</p>
+                                    <p>Tüm gezegenlerin güncel burç seyirlerini görmek için yukarıdan "Tümü" filtresini seçebilirsiniz.</p>
+                                  </div>
+                                );
+                              }
+
+                              return displayPlanets.map((p, idx) => {
+                                const interp = getSkyPlanetSignInterpretation(
+                                  p.name,
+                                  p.sign,
+                                  p.degreeInSign,
+                                  p.minutes,
+                                  p.isRetrograde
+                                );
+                                const phase = interp.phase;
+
+                                return (
+                                  <div
+                                    key={`pl-sign-${idx}`}
+                                    onClick={() => setSelectedInterp(interp)}
+                                    className="group p-3.5 rounded-2xl border bg-white/5 hover:bg-white/10 border-white/5 hover:border-[#0EA5E9]/40 transition-all cursor-pointer flex flex-col gap-2 shadow-sm"
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-2.5">
+                                        <span className="text-xl text-[#0EA5E9] font-bold group-hover:scale-110 transition-transform">
+                                          {PLANET_SYMBOLS[p.name] || ''}
+                                        </span>
+                                        <div>
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-xs sm:text-sm font-bold text-white group-hover:text-[#0EA5E9] transition-colors">
+                                              {p.name}
                                             </span>
-                                          )}
+                                            <span className={`text-[10px] px-2 py-0.5 rounded-full border ${phase.badgeClass}`}>
+                                              {phase.badge}
+                                            </span>
+                                          </div>
+                                        </div>
+                                      </div>
+
+                                      <div className="flex items-center gap-2">
+                                        <div className="text-right">
+                                          <span className="text-xs font-bold block" style={{ color: ZODIAC_COLORS[p.sign] }}>
+                                            {ZODIAC_SYMBOLS[p.sign] || ''} {p.sign}
+                                          </span>
+                                          <span className="text-[10px] text-gray-400 font-mono">
+                                            {p.degreeInSign}°{String(p.minutes).padStart(2, '0')}'
+                                          </span>
                                         </div>
                                       </div>
                                     </div>
 
-                                    <div className="flex items-center gap-2">
-                                      <div className="text-right">
-                                        <span className="text-xs font-bold block" style={{ color: ZODIAC_COLORS[p.sign] }}>
-                                          {ZODIAC_SYMBOLS[p.sign] || ''} {p.sign}
-                                        </span>
-                                        <span className="text-[10px] text-gray-400 font-mono">
-                                          {p.degreeInSign}°{String(p.minutes).padStart(2, '0')}'
-                                        </span>
-                                      </div>
-                                      {p.isRetrograde && (
-                                        <span className="text-[9px] font-bold text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded border border-red-500/20">
-                                          Rx
-                                        </span>
-                                      )}
+                                    <div className="mt-1">
+                                      <h4 className="text-xs font-semibold text-[#D4AF37] line-clamp-1">
+                                        {interp.headline}
+                                      </h4>
+                                      <p className="text-[11px] text-mystic-text-muted line-clamp-2 mt-0.5 leading-relaxed">
+                                        {interp.summary}
+                                      </p>
+                                    </div>
+
+                                    <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[10px] text-gray-400">
+                                      <span className="text-[#0EA5E9]/80 font-medium truncate max-w-[200px]">
+                                        {interp.extra?.split('•')[0] || p.sign}
+                                      </span>
+                                      <span className="flex items-center gap-1 text-white/70 group-hover:text-white transition-colors">
+                                        Detaylı Analizi Oku <ChevronRight size={12} />
+                                      </span>
                                     </div>
                                   </div>
-
-                                  <div className="mt-1">
-                                    <h4 className="text-xs font-semibold text-[#D4AF37] line-clamp-1">
-                                      {interp.headline}
-                                    </h4>
-                                    <p className="text-[11px] text-mystic-text-muted line-clamp-2 mt-0.5 leading-relaxed">
-                                      {interp.summary}
-                                    </p>
-                                  </div>
-
-                                  <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[10px] text-gray-400">
-                                    <span className="text-[#0EA5E9]/80 font-medium truncate max-w-[200px]">
-                                      {interp.extra?.split('•')[0] || p.sign}
-                                    </span>
-                                    <span className="flex items-center gap-1 text-white/70 group-hover:text-white transition-colors">
-                                      Detaylı Analizi Oku <ChevronRight size={12} />
-                                    </span>
-                                  </div>
-                                </div>
-                              );
-                            });
-                          })()}
+                                );
+                              });
+                            })()}
+                          </div>
                         </div>
                       )}
                     </div>
@@ -817,14 +849,14 @@ export default function TransitsPage() {
                       <div>
                         <h3 className="text-lg font-bold text-white flex items-center gap-2">
                           <Layers className="text-[#38BDF8]" size={18} />
-                          Anlık Gökyüzü Gezegen Yerleşimleri
+                          Anlık Gökyüzü Gezegen Yerleşimleri (13 Gök Cismi)
                         </h3>
                         <p className="text-xs text-mystic-text-muted">
-                          Gezegenlerin şu anda hangi burç ve derecede seyrettiği ve retro (geri hareket) durumları
+                          Gezegenlerin burç dereceleri, geçiş evreleri (İngress / Retro / Aktif) ve kolektif temaları
                         </p>
                       </div>
                       <span className="text-[11px] text-[#0EA5E9] bg-[#0EA5E9]/10 px-3 py-1 rounded-full border border-[#0EA5E9]/20 w-fit">
-                        💡 Detaylı kozmik analiz için gezegen kartına tıklayın
+                        💡 Detaylı burç geçiş analizi için karta tıklayın
                       </span>
                     </div>
 
@@ -832,20 +864,19 @@ export default function TransitsPage() {
                       {skyChartData.planets
                         .filter(p => ['Güneş', 'Ay', 'Merkür', 'Venüs', 'Mars', 'Jüpiter', 'Satürn', 'Uranüs', 'Neptün', 'Plüton', 'Kiron', 'Lilith', 'Kuzey Ay Düğümü'].includes(p.name))
                         .map((p, idx) => {
-                          const headline = getPlanetSignBriefHeadline(p.name, p.sign);
+                          const interp = getSkyPlanetSignInterpretation(
+                            p.name,
+                            p.sign,
+                            p.degreeInSign,
+                            p.minutes,
+                            p.isRetrograde
+                          );
+                          const phase = interp.phase;
+
                           return (
                             <div 
                               key={`sky-pl-${idx}`}
-                              onClick={() => {
-                                const interp = getSkyPlanetSignInterpretation(
-                                  p.name,
-                                  p.sign,
-                                  p.degreeInSign,
-                                  p.minutes,
-                                  p.isRetrograde
-                                );
-                                setSelectedInterp(interp);
-                              }}
+                              onClick={() => setSelectedInterp(interp)}
                               className="bg-white/5 border border-white/5 hover:border-[#0EA5E9]/50 hover:bg-white/10 hover:scale-[1.02] rounded-2xl p-3.5 flex flex-col justify-between transition-all cursor-pointer group shadow-sm relative overflow-hidden"
                             >
                               <div>
@@ -865,13 +896,13 @@ export default function TransitsPage() {
                                     {p.degreeInSign}°{String(p.minutes).padStart(2, '0')}'
                                   </span>
                                 </div>
-                                {p.isRetrograde && (
-                                  <span className="text-[10px] text-red-400 font-bold bg-red-500/10 px-1.5 py-0.5 rounded w-fit mt-1.5 block">
-                                    Rx (Retro)
+                                <div className="mt-1.5 flex flex-wrap gap-1">
+                                  <span className={`text-[9px] px-1.5 py-0.5 rounded border ${phase.badgeClass}`}>
+                                    {phase.badge}
                                   </span>
-                                )}
+                                </div>
                                 <p className="text-[10px] text-mystic-text-muted mt-2 line-clamp-1 group-hover:text-gray-200 transition-colors">
-                                  {headline}
+                                  {interp.headline}
                                 </p>
                               </div>
 

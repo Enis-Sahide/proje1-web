@@ -501,15 +501,68 @@ export function getPlanetSignBriefHeadline(planetName: string, signName: string)
   return `${signName} Burcu Teması`;
 }
 
+export interface IngressPhaseInfo {
+  type: 'NEW_INGRESS' | 'ANARETIC' | 'RETROGRADE' | 'ACTIVE_TRANSIT';
+  badge: string;
+  badgeClass: string;
+  label: string;
+  description: string;
+}
+
+export function getIngressPhase(degreeInSign: number, minutes: number, isRetrograde?: boolean): IngressPhaseInfo {
+  if (degreeInSign === 0) {
+    return {
+      type: 'NEW_INGRESS',
+      badge: '⚡ Yeni Burç Girişi',
+      badgeClass: 'bg-amber-500/20 text-amber-400 border-amber-500/40 font-bold',
+      label: 'Taze İnGRESS Enerjisi (0°)',
+      description: 'Gezegen bu burca yeni adım attı. Burcun tüm arketipsel özellikleri en saf ve çarpıcı haliyle kolektif bilince akıyor.'
+    };
+  }
+  if (degreeInSign === 29) {
+    return {
+      type: 'ANARETIC',
+      badge: '⚠️ Anaretik Derece (29°)',
+      badgeClass: 'bg-red-500/20 text-red-400 border-red-500/40 font-bold',
+      label: 'Kapanış & Ustalık Sınavı (29°)',
+      description: 'Gezegen burcun son derecesinde. Bu burçtaki derslerin nihai muhasebesi ve krizleri çözerek bir sonraki burca geçiş hazırlığı yaşanır.'
+    };
+  }
+  if (isRetrograde) {
+    return {
+      type: 'RETROGRADE',
+      badge: 'Rx Geri Hareket',
+      badgeClass: 'bg-purple-500/20 text-purple-300 border-purple-500/40 font-bold',
+      label: 'Retro (Rx) İçe Dönüş',
+      description: 'Gezegen geri harekette. Bu burcun getirdiği temaları dış dünyada başlatmak yerine içsel olarak yeniden değerlendirme ve onarma zamanıdır.'
+    };
+  }
+  return {
+    type: 'ACTIVE_TRANSIT',
+    badge: 'Aktif Seyir',
+    badgeClass: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/30',
+    label: 'Aktif Burç Seyri',
+    description: 'Gezegen bu burçtaki temalarını istikrarlı ve düzenli bir şekilde çalıştırmaya devam ediyor.'
+  };
+}
+
 export function getSkyPlanetSignInterpretation(
   planetName: string,
   signName: string,
   degree: number,
   minutes: number,
   isRetrograde?: boolean
-): { title: string; headline: string; summary: string; content: string; extra?: string } {
+): { 
+  title: string; 
+  headline: string; 
+  summary: string; 
+  content: string; 
+  extra?: string;
+  phase: IngressPhaseInfo;
+} {
   const customKey = `${planetName}-${signName}`;
   const customInterp = MAJOR_PLANET_SIGN_CUSTOM_INTERPRETATIONS[customKey];
+  const phase = getIngressPhase(degree, minutes, isRetrograde);
 
   const pInfo = PLANET_TRANSIT_THEMES[planetName] || {
     nature: `${planetName} gezegeninin kozmik frekansı`,
@@ -539,21 +592,23 @@ export function getSkyPlanetSignInterpretation(
       `• Acele kararlar vermeyin; gecikmeler birer ceza değil, rotanızı doğru ayarlamanız için evrenin tanıdığı birer nefes alma molasıdır.`;
   }
 
+  const phaseHeader = `【Geçiş Evresi: ${phase.label}】\n${phase.description}\n\n`;
+
   let content = '';
   let extra = '';
 
   if (customInterp) {
-    content = `【Dönemsel Ana Tema & Transit Özeti】\n${customInterp.summary}\n\n` +
+    content = `${phaseHeader}【Dönemsel Ana Tema & Transit Özeti】\n${customInterp.summary}\n\n` +
       `【Kolektif & Toplumsal Yansıma】\n${customInterp.collective}\n\n` +
       `【Bireysel Rehberlik & Dönüşüm Tavsiyesi】\n✓ ${customInterp.advice}${retroSection}`;
     extra = customInterp.chakra || `${sInfo.element} Elementi • ${sInfo.quality} Nitelik • Çakra: ${pInfo.chakra}`;
   } else {
-    content = `【Gezegen Doğası & Anlık Konum】\n${planetName}, astrolojide ${pInfo.nature} temsil eder. Şu anda ${signName} burcunun ${formattedPos} derecesinde seyrediyor.\n\n` +
+    content = `${phaseHeader}【Gezegen Doğası & Anlık Konum】\n${planetName}, astrolojide ${pInfo.nature} temsil eder. Şu anda ${signName} burcunun ${formattedPos} derecesinde seyrediyor.\n\n` +
       `【Kolektif & Küresel Etki】\n${pInfo.focus}\n${signName} burcunun ${sInfo.element} elementi ve ${sInfo.quality} niteliğiyle birleştiğinde; toplumda ve dünyada ${sInfo.theme} temaları çok güçlü bir şekilde ön plana çıkar.\n\n` +
       `【Bireysel Tavsiye & Kozmik Rehberlik】\n✓ ${sInfo.advice}\nBu enerjiyi günlük hayatınızda yapıcı kullanmak için ${signName} burcunun yüksek frekansını benimseyin, gölge yönlerinden uzak durun.${retroSection}`;
     extra = `${sInfo.element} Elementi • ${sInfo.quality} Nitelik • Çakra: ${pInfo.chakra}`;
   }
 
-  return { title, headline, summary, content, extra };
+  return { title, headline, summary, content, extra, phase };
 }
 
