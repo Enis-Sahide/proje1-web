@@ -1156,49 +1156,55 @@ export default function TransitsPage() {
                             key={`ut-${idx}`}
                             className="bg-black/60 backdrop-blur-md border border-white/10 hover:border-cyan-500/30 rounded-3xl p-5 sm:p-7 transition-all shadow-xl space-y-4"
                           >
-                            {/* Header */}
-                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
-                              <div className="flex items-center gap-3.5">
-                                <span className="text-3xl font-black text-[#0EA5E9] w-10 text-center">
-                                  {PLANET_SYMBOLS[ut.planetName] || '★'}
-                                </span>
-                                <div>
-                                  <h4 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
-                                    <span>Transit {ut.planetName}</span>
-                                    <span className="text-xs font-normal text-mystic-text-muted">
-                                      ({ut.sign} {ut.degreeInSign}°)
-                                    </span>
-                                    {ut.isRetrograde && (
-                                      <span className="text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full font-bold">
-                                        Rx Retro
-                                      </span>
-                                    )}
-                                  </h4>
-                                  <span className="text-xs text-[#D4AF37] font-medium flex items-center gap-1 mt-0.5">
-                                    {ZODIAC_SYMBOLS[ut.sign]} {ut.sign} Burcu Transiti
+                            {/* Header: Human-First Title & Technical Meta Badges */}
+                            <div className="flex flex-col gap-3 border-b border-white/10 pb-4">
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex items-center gap-3.5">
+                                  <span className="text-3xl font-black text-[#0EA5E9] w-10 text-center shrink-0">
+                                    {PLANET_SYMBOLS[ut.planetName] || '★'}
                                   </span>
+                                  <div>
+                                    <h4 className="text-base sm:text-lg font-extrabold text-white leading-snug">
+                                      {ut.humanThemeTitle}
+                                    </h4>
+                                    <div className="flex flex-wrap items-center gap-2 mt-2">
+                                      <span className="text-xs text-[#D4AF37] font-semibold flex items-center gap-1 bg-[#D4AF37]/10 px-2.5 py-0.5 rounded-lg border border-[#D4AF37]/25">
+                                        {ut.planetName} ({ZODIAC_SYMBOLS[ut.sign]} {ut.sign} {ut.degreeInSign}°)
+                                      </span>
+                                      <span className="text-xs text-sky-300 font-medium bg-sky-500/10 px-2.5 py-0.5 rounded-lg border border-sky-500/25">
+                                        🏠 {ut.houseTitle.split(':')[1]?.trim() || ut.houseTitle}
+                                      </span>
+                                      {ut.hdGateInfo && (
+                                        <span className="text-xs text-emerald-300 font-medium bg-emerald-500/10 px-2.5 py-0.5 rounded-lg border border-emerald-500/25">
+                                          🧬 Kapı {ut.hdGateInfo.gate}: {ut.hdGateInfo.title}
+                                        </span>
+                                      )}
+                                      {ut.isRetrograde && (
+                                        <span className="text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full font-bold">
+                                          Rx Retro
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
                                 </div>
-                              </div>
-
-                              {/* House Badge */}
-                              <div className="bg-gradient-to-r from-[#D4AF37]/15 to-[#0EA5E9]/15 border border-[#D4AF37]/35 px-4 py-2 rounded-2xl self-start sm:self-center">
-                                <span className="text-[10px] text-mystic-text-muted block uppercase tracking-wider font-bold">
-                                  Kişisel Yaşam Alanınız
-                                </span>
-                                <span className="text-xs sm:text-sm font-extrabold text-[#D4AF37] block">
-                                  {ut.houseTitle}
-                                </span>
                               </div>
                             </div>
 
-                            {/* Synthesis Narrative Box */}
-                            <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-4 sm:p-5">
-                              <span className="text-[10px] text-[#0EA5E9] uppercase tracking-wider font-extrabold flex items-center gap-1.5 mb-2">
-                                <Sparkles size={12} /> Bütünleşik Kadersel Anlam (Gezegen + Ev + Açılar)
+                            {/* Human-Centric Narrative Box */}
+                            <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3">
+                              <span className="text-[10px] text-[#0EA5E9] uppercase tracking-wider font-extrabold flex items-center gap-1.5">
+                                <Sparkles size={12} /> Bütünleşik Yaşam Teşhisi & İdrak
                               </span>
-                              <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
-                                {ut.synthesisSummary}
+                              <p className="text-xs sm:text-sm text-gray-200 leading-relaxed font-normal">
+                                {ut.humanNarrative}
                               </p>
+                              {ut.hdGateInfo && (
+                                <div className="flex flex-wrap items-center gap-2 pt-2 text-[11px] border-t border-white/5">
+                                  <span className="text-red-400/90 font-medium">⚠️ Gölge: {ut.hdGateInfo.shadow}</span>
+                                  <span className="text-gray-500">➔</span>
+                                  <span className="text-emerald-400 font-medium">✨ Hediye: {ut.hdGateInfo.gift}</span>
+                                </div>
+                              )}
                             </div>
 
                             {/* Active Natal Aspects Row */}
@@ -1253,7 +1259,7 @@ export default function TransitsPage() {
                                 onClick={() => {
                                   if (isApprenticeOrAbove) {
                                     setSelectedInterp({
-                                      title: ut.headline,
+                                      title: ut.humanThemeTitle,
                                       content: `${ut.detailedAnalysis}\n\n【Bireysel Eylem & Dönüşüm Rehberliği】\n${ut.actionAdvice}`,
                                       extra: ut.chakraLayer
                                     });

@@ -1,5 +1,7 @@
 import { AstroPoint, TransitAspect, AstroCity } from './AstrologyConstants';
 import { MAJOR_PLANET_SIGN_CUSTOM_INTERPRETATIONS } from './SkyAspectInterpretations';
+import { getGateAndLine } from '@/utils/HumanDesignEngine';
+import { GATE_TITLES } from './AstroHumanDesignSynthesis';
 
 export interface UnifiedAspectInfo {
   natalPlanet: string;
@@ -21,11 +23,50 @@ export interface UnifiedPlanetTransit {
   houseKeywords: string;
   aspects: UnifiedAspectInfo[];
   headline: string;
+  humanThemeTitle: string;
+  humanNarrative: string;
+  hdGateInfo?: {
+    gate: number;
+    line: number;
+    title: string;
+    gift: string;
+    shadow: string;
+  };
   synthesisSummary: string;
   detailedAnalysis: string;
   actionAdvice: string;
   chakraLayer: string;
 }
+
+export const LIFE_AREA_NAMES: Record<number, string> = {
+  1: 'Bireysel Duruş & Benlik',
+  2: 'Maddi Güvenlik & Öz Değer',
+  3: 'Zihinsel İletişim & Fikirler',
+  4: 'İçsel Güvenlik & Aile Kökleri',
+  5: 'Yaratıcı Tutkular & Yaşam Neşesi',
+  6: 'Günlük Düzen & Sağlık',
+  7: 'İlişkiler & Karşılıklı Dengeler',
+  8: 'Krizler & Derin Dönüşüm',
+  9: 'Hayat Vizyonu & İnançlar',
+  10: 'Kariyer & Otorite Hedefleri',
+  11: 'Sosyal Çevre & Gelecek Umutları',
+  12: 'Bilinçaltı & Ruhsal Arınma'
+};
+
+export const LIFE_AREA_DESCRIPTIONS: Record<number, string> = {
+  1: 'kendi kişisel kararların, beden dilin ve dış dünyadaki bağımsız duruşun',
+  2: 'maddi gelirlerin, harcamaların ve kendi öz değerine duyduğun inanç',
+  3: 'iletişim tarzın, zihinsel projelerin ve yakın çevrenle olan diyalogların',
+  4: 'içsel güvenliğin, yuvan ve ailevi köklerindeki bastırılmış duygular',
+  5: 'yaratıcı enerjin, aşk hayatındaki beklentilerin ve yaşamdan aldığın keyif',
+  6: 'günlük çalışma tempon, üstlendiğin sorumluluklar ve beden sağlığın',
+  7: 'ikili ilişkilerin, evliliğin ve karşındaki insanlarla kurduğun sınır dengesi',
+  8: 'derin psikolojik krizler, ortak kaynaklar ve bırakmakta zorlandığın bağlar',
+  9: 'hayata bakış açın, inanç kalıpların ve geleceğe dair vizyonun',
+  10: 'iş hayatındaki sorumlulukların, unvanın ve otoriteyle olan ilişkin',
+  11: 'sosyal çevren, arkadaş grupların ve geleceğe yönelik ideallerin',
+  12: 'bilinçaltındaki endişelerin, içsel yalnızlığın ve ruhsal arınma ihtiyacın'
+};
 
 export const HOUSE_TITLES: Record<number, string> = {
   1: '1. Ev: Benlik, Beden & Dış Dünyadaki Duruş',
@@ -169,7 +210,58 @@ export function generateUnifiedPlanetTransit(
   const customKey = `${pName}-${sign}`;
   const customInterp = MAJOR_PLANET_SIGN_CUSTOM_INTERPRETATIONS[customKey];
 
-  // Synthesize the unified narrative
+  // Human Design Gate & Line calculation for this transit degree
+  const hdCalc = getGateAndLine(transitPlanet.longitude);
+  const gateMeta = GATE_TITLES[hdCalc.gate];
+  const hdGateInfo = gateMeta ? {
+    gate: hdCalc.gate,
+    line: hdCalc.line,
+    title: gateMeta.title,
+    gift: gateMeta.gift,
+    shadow: gateMeta.shadow,
+  } : undefined;
+
+  // Aspect analysis for human language theme
+  const primaryChallenging = aspectInfos.find(a => !a.isHarmonious);
+  const primaryHarmonious = aspectInfos.find(a => a.isHarmonious);
+
+  // 1. İnsan Dili Başlık (Jargondan Arındırılmış Tema)
+  let humanThemeTitle = '';
+  if (primaryChallenging && primaryChallenging.natalHouse) {
+    const mainArea = LIFE_AREA_NAMES[house] || 'Yaşam Yönü';
+    const targetArea = LIFE_AREA_NAMES[primaryChallenging.natalHouse] || 'İçsel Alan';
+    humanThemeTitle = `${mainArea} ile ${targetArea} Arasında Denge Sınavı`;
+  } else if (primaryHarmonious && primaryHarmonious.natalHouse) {
+    const mainArea = LIFE_AREA_NAMES[house] || 'Yaşam Yönü';
+    const targetArea = LIFE_AREA_NAMES[primaryHarmonious.natalHouse] || 'İçsel Alan';
+    humanThemeTitle = `${mainArea} ve ${targetArea} Arasında Akıcı Destek`;
+  } else {
+    humanThemeTitle = `${LIFE_AREA_NAMES[house] || 'Yaşam Alanı'} Konularında Yeniden Yapılanma`;
+  }
+
+  // 2. İnsan Dili Ana Metin (Gezegen/Ev jargonuna boğulmadan doğrudan hayatı anlatan sentez)
+  let humanNarrative = '';
+  if (primaryChallenging && primaryChallenging.natalHouse) {
+    humanNarrative += `Şu sıralar ${LIFE_AREA_DESCRIPTIONS[house]} ile ${LIFE_AREA_DESCRIPTIONS[primaryChallenging.natalHouse]} arasında seni iki yönlü bir baskıya ve yüzleşmeye çeken bir gerilim hissedebilirsin. Dış dünyada bir tarafa aşırı odaklanırken diğer tarafı ihmal ettiğinde içsel ya da ilişkisel sürtüşmeler tetiklenebilir. `;
+  } else if (primaryHarmonious && primaryHarmonious.natalHouse) {
+    humanNarrative += `Bu dönemde ${LIFE_AREA_DESCRIPTIONS[house]} alanında attığın adımlar, ${LIFE_AREA_DESCRIPTIONS[primaryHarmonious.natalHouse]} konularında sana güçlü bir destek ve rahatlama akışı sağlıyor. Çözülmez gibi görünen durumların daha doğal bir akışla hafiflediğini fark edebilirsin. `;
+  } else {
+    humanNarrative += `Bu süreçte temel odak noktan doğrudan ${LIFE_AREA_DESCRIPTIONS[house]} üzerinde toplanıyor. Arka planda biriken belirsizlikleri netleştirmen ve sağlam kararlarla ilerlemen gerekiyor. `;
+  }
+
+  // Human Design Davranışsal Arketip Sentezi
+  if (hdGateInfo) {
+    humanNarrative += `Bu dönemin ruhsal ve zihinsel anahtarı (Human Design ${hdGateInfo.gate}. Kapı: ${hdGateInfo.title}); seni "${hdGateInfo.shadow}" tuzağında tüketmek yerine, "${hdGateInfo.gift}" potansiyelini hayatına taşımandır. `;
+  }
+
+  // Pratik Hayat Reçetesi
+  if (primaryChallenging) {
+    humanNarrative += `Karşılaştığın dirençlerde haklı çıkmak için güç savaşına girmek yerine, kendi sınırlarını sessizce ve netlikle korumak bu süreci en büyük içsel bilgelikle tamamlamanı sağlayacaktır.`;
+  } else {
+    humanNarrative += `Zihnindeki vesvese veya ertelemeleri bir kenara bırakıp eline geçen fırsatları yapıcı adımlarla değerlendirmek sana kalıcı bir huzur ve ferahlık getirecektir.`;
+  }
+
+  // Synthesize the classic technical summary (for advanced/astro users)
   const retroText = transitPlanet.isRetrograde ? ' (Retro Harekette)' : '';
   const headline = `Transit ${pName} ${house}. Evinizde (${sign} ${transitPlanet.degreeInSign}°)${retroText}`;
 
@@ -190,8 +282,16 @@ export function generateUnifiedPlanetTransit(
   }
 
   // Detailed Analysis Synthesis
-  let detailedAnalysis = `【Yaşam Alanı Etkisi: ${houseTitle}】\n` +
-    `${pName}, astrolojide ${PLANET_NATURES[pName] || 'önemli enerjileri'} temsil eder. Bu gezegen sizin ${house}. evinizden geçerken; ${houseTheme} alanınızda köklü bir uyanış ve farkındalık yaratır.\n\n`;
+  let detailedAnalysis = `【Doğrudan İnsan Dili & Yaşam Alanı Özeti】\n${humanNarrative}\n\n` +
+    `【Yaşam Alanı Etkisi: ${houseTitle}】\n` +
+    `${pName}, astrolojide ${PLANET_NATURES[pName] || 'önemli enerjileri'} temsil eder. Bu geçiş sizin ${house}. evinizden geçerken; ${houseTheme} alanınızda köklü bir uyanış ve farkındalık yaratır.\n\n`;
+
+  if (hdGateInfo) {
+    detailedAnalysis += `【Human Design & Davranışsal Arketip】\n` +
+      `• Aktif Kapı: ${hdGateInfo.gate}. Kapı - ${hdGateInfo.title} (Çizgi ${hdGateInfo.line})\n` +
+      `• Gölge Tehdidi: ${hdGateInfo.shadow}\n` +
+      `• Hediye Potansiyeli: ${hdGateInfo.gift}\n\n`;
+  }
 
   if (customInterp) {
     detailedAnalysis += `【Burç & Arketip Dinamiği: ${sign} Burcu】\n${customInterp.summary}\n\n`;
@@ -222,6 +322,9 @@ export function generateUnifiedPlanetTransit(
     houseKeywords: houseTheme,
     aspects: aspectInfos,
     headline,
+    humanThemeTitle,
+    humanNarrative,
+    hdGateInfo,
     synthesisSummary,
     detailedAnalysis,
     actionAdvice,
