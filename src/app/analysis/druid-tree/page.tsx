@@ -19,13 +19,18 @@ import {
   Shield,
   Heart,
   Sun,
-  Leaf
+  Leaf,
+  Compass,
+  Moon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   DRUID_TREES, 
-  getDruidTreeByDate, 
-  DruidTree 
+  OGHAM_TREES,
+  SOLAR_TREES,
+  getDruidTreeAnalysis, 
+  DruidTree,
+  DruidTreeAnalysis 
 } from '@/features/astrology/engine/DruidTreeEngine';
 
 const MONTH_NAMES = [
@@ -35,9 +40,11 @@ const MONTH_NAMES = [
 
 export default function DruidTreePage() {
   const [userName, setUserName] = useState('');
-  const [selectedDay, setSelectedDay] = useState(21);
+  const [selectedDay, setSelectedDay] = useState(17);
   const [selectedMonth, setSelectedMonth] = useState(3);
-  const [analyzedTree, setAnalyzedTree] = useState<DruidTree | null>(null);
+  const [analyzedData, setAnalyzedData] = useState<DruidTreeAnalysis | null>(null);
+  const [activeAnalysisView, setActiveAnalysisView] = useState<'ogham' | 'solar'>('ogham');
+  const [encyclopediaTab, setEncyclopediaTab] = useState<'ogham' | 'solar'>('ogham');
   const [analyzedName, setAnalyzedName] = useState('');
   const [copied, setCopied] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
@@ -54,8 +61,8 @@ export default function DruidTreePage() {
 
   const handleCalculate = (e: React.FormEvent) => {
     e.preventDefault();
-    const tree = getDruidTreeByDate(selectedDay, selectedMonth);
-    setAnalyzedTree(tree);
+    const analysis = getDruidTreeAnalysis(selectedDay, selectedMonth);
+    setAnalyzedData(analysis);
     setAnalyzedName(userName.trim());
 
     setTimeout(() => {
@@ -63,12 +70,16 @@ export default function DruidTreePage() {
     }, 100);
   };
 
+  const currentTree = analyzedData 
+    ? (activeAnalysisView === 'ogham' ? analyzedData.oghamTree : analyzedData.solarTree)
+    : null;
+
   const handleCopyShare = () => {
-    if (!analyzedTree) return;
-    const shareText = `🌲 Kelt Druid Ruh Ağacım: ${analyzedTree.name} (${analyzedTree.oghamSymbol} ${analyzedTree.oghamName})\n` +
-      `✨ Arketip: ${analyzedTree.archetype}\n` +
-      `🪐 Kozmik Güç: ${analyzedTree.rulingPlanets} | Element: ${analyzedTree.element}\n` +
-      `📜 Druid Bilgeliği: "${analyzedTree.druidicProverb}"\n\n` +
+    if (!currentTree) return;
+    const shareText = `🌲 Kelt Druid Ruh Ağacım: ${currentTree.name} (${currentTree.oghamSymbol} ${currentTree.oghamName})\n` +
+      `✨ Ruhsal Karakter: ${currentTree.archetype}\n` +
+      `🪐 Yönetici Güç: ${currentTree.rulingPlanets} | Element: ${currentTree.element}\n` +
+      `📜 Druid Bilgeliği: "${currentTree.druidicProverb}"\n\n` +
       `Sen de kendi kutsal Kelt ağacını keşfet: 7layers.org/analysis/druid-tree`;
 
     navigator.clipboard.writeText(shareText);
@@ -76,17 +87,19 @@ export default function DruidTreePage() {
     setTimeout(() => setCopied(false), 2500);
   };
 
-  // Filtrelenmiş 22 ağaç ansiklopedisi
+  // Ansiklopedi listesi (Ogham 13 veya Güneş 21)
+  const currentTreeList = encyclopediaTab === 'ogham' ? OGHAM_TREES : SOLAR_TREES;
+
   const filteredTrees = useMemo(() => {
-    if (!searchTerm.trim()) return DRUID_TREES;
+    if (!searchTerm.trim()) return currentTreeList;
     const q = searchTerm.toLowerCase();
-    return DRUID_TREES.filter(t => 
+    return currentTreeList.filter(t => 
       t.name.toLowerCase().includes(q) ||
       t.archetype.toLowerCase().includes(q) ||
       t.oghamName.toLowerCase().includes(q) ||
       t.periods.some(p => p.label.toLowerCase().includes(q))
     );
-  }, [searchTerm]);
+  }, [searchTerm, currentTreeList]);
 
   return (
     <div className="min-h-screen bg-[#070A0F] text-gray-100 pt-28 pb-24 px-4 sm:px-6 relative overflow-hidden selection:bg-emerald-500/30 selection:text-emerald-200">
@@ -111,15 +124,14 @@ export default function DruidTreePage() {
         <div className="text-center space-y-4">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs sm:text-sm font-medium tracking-wide">
             <TreePine size={16} className="text-emerald-400" />
-            <span>Kadim Kelt & Ogham Bilgeliği</span>
+            <span>Kadim Kelt & Ağaç Alfabesi (Ogham) Bilgeliği</span>
           </div>
           <h1 className="text-3xl sm:text-5xl font-serif font-bold text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 to-amber-300 tracking-tight">
             Kelt Druid Ağaç Astrolojisi
           </h1>
           <p className="text-sm sm:text-base text-gray-400 max-w-2xl mx-auto leading-relaxed">
             Kadim Druid rahiplerine göre her ruh, doğduğu günün döngüsünde kutsal bir ağacın ve 
-            Ogham harfinin frekansıyla mühürlenir. Doğum gününüzü seçerek kendi ağaç toteminizin ışığını, 
-            gölge sınavını ve orman banyosu ritüelini keşfedin.
+            kadim ağaç harfinin (Ogham) frekansıyla mühürlenir. Doğum gününüzü seçerek hem <strong>13 Kelt Ayı (Ogham)</strong> hem de <strong>21 Güneş Döngüsü</strong> ağaç toteminizin ışığını ve orman topraklanması ritüelini keşfedin.
           </p>
         </div>
 
@@ -169,7 +181,6 @@ export default function DruidTreePage() {
                   onChange={(e) => {
                     const newMonth = Number(e.target.value);
                     setSelectedMonth(newMonth);
-                    // Gün kontrolü
                     const maxForNew = newMonth === 2 ? 29 : [4, 6, 9, 11].includes(newMonth) ? 30 : 31;
                     if (selectedDay > maxForNew) setSelectedDay(maxForNew);
                   }}
@@ -196,7 +207,7 @@ export default function DruidTreePage() {
 
         {/* Sonuç Alanı */}
         <AnimatePresence>
-          {analyzedTree && (
+          {analyzedData && currentTree && (
             <motion.div
               ref={resultRef}
               initial={{ opacity: 0, y: 30 }}
@@ -205,35 +216,69 @@ export default function DruidTreePage() {
               transition={{ duration: 0.5 }}
               className="space-y-8"
             >
+              {/* Çift Takvim Geçiş Butonları (Ogham vs Güneş) */}
+              <div className="bg-white/[0.03] border border-emerald-500/30 rounded-2xl p-2 sm:p-3 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl">
+                <div className="text-xs text-gray-300 px-2 flex items-center gap-2">
+                  <Compass size={16} className="text-emerald-400" />
+                  <span className="font-semibold text-white">Takvim Katmanı:</span>
+                </div>
+                <div className="flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={() => setActiveAnalysisView('ogham')}
+                    className={`flex-1 sm:flex-none py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                      activeAnalysisView === 'ogham'
+                        ? 'bg-emerald-500 text-black shadow-[0_0_20px_rgba(16,185,129,0.4)]'
+                        : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    <Moon size={14} />
+                    <span>Otantik 13 Kelt Ayı: {analyzedData.oghamTree.name}</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveAnalysisView('solar')}
+                    className={`flex-1 sm:flex-none py-2 px-4 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                      activeAnalysisView === 'solar'
+                        ? 'bg-amber-500 text-black shadow-[0_0_20px_rgba(245,158,11,0.4)]'
+                        : 'bg-white/5 text-gray-400 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    <Sun size={14} />
+                    <span>21 Güneş Döngüsü: {analyzedData.solarTree.name}</span>
+                  </button>
+                </div>
+              </div>
+
               {/* Ana Ağaç Totem Rozeti & Başlığı */}
               <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-b from-emerald-950/40 via-[#0B131B]/60 to-[#070A0F] p-6 sm:p-10 shadow-2xl">
                 {/* Arka plan dev Ogham glifi */}
                 <div className="absolute -right-8 -top-10 text-[180px] font-serif text-emerald-500/5 select-none pointer-events-none">
-                  {analyzedTree.oghamSymbol}
+                  {currentTree.oghamSymbol}
                 </div>
 
                 <div className="relative z-10 space-y-6">
                   <div className="flex flex-wrap items-center justify-between gap-4">
                     <div className="flex items-center gap-3">
                       <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-3xl sm:text-4xl text-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-                        {analyzedTree.oghamSymbol}
+                        {currentTree.oghamSymbol}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
                           <span className="text-xs uppercase tracking-widest text-emerald-400 font-bold">
-                            Ogham: {analyzedTree.oghamName}
+                            Kadim Ağaç Alfabesi Harfi (Ogham): {currentTree.oghamName}
                           </span>
-                          {analyzedTree.isCardinalStation && (
+                          {currentTree.isCardinalStation && (
                             <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-semibold">
-                              {analyzedTree.stationLabel}
+                              {currentTree.stationLabel || 'Mevsim Dönüm Noktası (Ekinoks / Gündönümü)'}
                             </span>
                           )}
                         </div>
                         <h2 className="text-2xl sm:text-4xl font-serif font-bold text-white">
-                          {analyzedName ? `${analyzedName} İçin: ` : ''}{analyzedTree.name}
+                          {analyzedName ? `${analyzedName} İçin: ` : ''}{currentTree.name}
                         </h2>
                         <p className="text-xs text-gray-400 italic">
-                          {analyzedTree.botanicalName}
+                          {currentTree.botanicalName}
                         </p>
                       </div>
                     </div>
@@ -251,34 +296,34 @@ export default function DruidTreePage() {
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs sm:text-sm">
                     <div className="bg-black/40 border border-white/10 rounded-2xl p-4">
                       <span className="text-emerald-400 text-[11px] uppercase tracking-wider block font-bold mb-1">
-                        Druid Arketipi
+                        Ruhsal Karakter & Mizaç (Arketip)
                       </span>
                       <span className="text-white font-semibold">
-                        {analyzedTree.archetype}
+                        {currentTree.archetype}
                       </span>
                     </div>
                     <div className="bg-black/40 border border-white/10 rounded-2xl p-4">
                       <span className="text-amber-400 text-[11px] uppercase tracking-wider block font-bold mb-1">
-                        Kozmik Güç & Gezegen
+                        Yönetici Gezegen & Kozmik Güç
                       </span>
                       <span className="text-white font-semibold">
-                        {analyzedTree.rulingPlanets}
+                        {currentTree.rulingPlanets}
                       </span>
                     </div>
                     <div className="bg-black/40 border border-white/10 rounded-2xl p-4">
                       <span className="text-teal-400 text-[11px] uppercase tracking-wider block font-bold mb-1">
-                        Keltik Element
+                        Doğa Elementi
                       </span>
                       <span className="text-white font-semibold">
-                        {analyzedTree.element}
+                        {currentTree.element}
                       </span>
                     </div>
                   </div>
 
                   {/* Tarih Dönemleri */}
                   <div className="flex flex-wrap items-center gap-2 text-xs">
-                    <span className="text-gray-400 font-medium">Hüküm Sürdüğü Tarihler:</span>
-                    {analyzedTree.periods.map((p, idx) => (
+                    <span className="text-gray-400 font-medium">Hüküm Sürdüğü Kutsal Tarihler:</span>
+                    {currentTree.periods.map((p, idx) => (
                       <span 
                         key={idx}
                         className="px-2.5 py-1 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-mono text-[11px]"
@@ -291,7 +336,7 @@ export default function DruidTreePage() {
                   {/* Druid Özdeyişi */}
                   <div className="border-t border-white/10 pt-4">
                     <blockquote className="italic font-serif text-sm sm:text-base text-amber-200/90 leading-relaxed border-l-2 border-amber-400/60 pl-4 py-1">
-                      "{analyzedTree.druidicProverb}"
+                      "{currentTree.druidicProverb}"
                     </blockquote>
                   </div>
                 </div>
@@ -304,7 +349,7 @@ export default function DruidTreePage() {
                   <span>Mitolojik Köken & Ruhsal Öz</span>
                 </div>
                 <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-normal">
-                  {analyzedTree.spiritualEssence}
+                  {currentTree.spiritualEssence}
                 </p>
               </div>
 
@@ -314,10 +359,10 @@ export default function DruidTreePage() {
                 <div className="bg-emerald-950/20 border border-emerald-500/30 rounded-3xl p-6 sm:p-8 space-y-4">
                   <div className="flex items-center gap-2 text-emerald-300 font-bold text-sm tracking-wider uppercase">
                     <Sun size={18} className="text-emerald-400" />
-                    <span>Işık Potansiyeli & Ruhsal Güçler</span>
+                    <span>Işık Potansiyelleri & Ruhsal Erdemler</span>
                   </div>
                   <ul className="space-y-3 text-xs sm:text-sm text-gray-300">
-                    {analyzedTree.lightTraits.map((trait, idx) => (
+                    {currentTree.lightTraits.map((trait, idx) => (
                       <li key={idx} className="flex items-start gap-2.5 leading-relaxed">
                         <span className="text-emerald-400 text-base leading-none shrink-0">✦</span>
                         <span>{trait}</span>
@@ -330,10 +375,10 @@ export default function DruidTreePage() {
                 <div className="bg-amber-950/20 border border-amber-500/30 rounded-3xl p-6 sm:p-8 space-y-4">
                   <div className="flex items-center gap-2 text-amber-300 font-bold text-sm tracking-wider uppercase">
                     <Shield size={18} className="text-amber-400" />
-                    <span>Gölge Taraf & Olgunlaşma Fırtınası</span>
+                    <span>Gölge Sınavı & Olgunlaşma Fırtınası</span>
                   </div>
                   <ul className="space-y-3 text-xs sm:text-sm text-gray-300">
-                    {analyzedTree.shadowTraits.map((trait, idx) => (
+                    {currentTree.shadowTraits.map((trait, idx) => (
                       <li key={idx} className="flex items-start gap-2.5 leading-relaxed">
                         <span className="text-amber-400 text-base leading-none shrink-0">❖</span>
                         <span>{trait}</span>
@@ -355,10 +400,10 @@ export default function DruidTreePage() {
                   <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-2">
                     <div className="flex items-center gap-2 text-emerald-300 font-bold">
                       <TreePine size={16} />
-                      <span>Shinrin-Yoku (Topraklanma)</span>
+                      <span>Orman Banyosu & Topraklanma (Shinrin-Yoku)</span>
                     </div>
                     <p className="text-gray-300 text-xs leading-relaxed">
-                      {analyzedTree.natureRitual.grounding}
+                      {currentTree.natureRitual.grounding}
                     </p>
                   </div>
 
@@ -366,10 +411,10 @@ export default function DruidTreePage() {
                   <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-2">
                     <div className="flex items-center gap-2 text-amber-300 font-bold">
                       <Wind size={16} />
-                      <span>Ortam Buhuru (Difüzör)</span>
+                      <span>Ortam Buhuru & Doğal Koku (Difüzör)</span>
                     </div>
                     <p className="text-gray-300 text-xs leading-relaxed">
-                      {analyzedTree.natureRitual.ambientAroma}
+                      {currentTree.natureRitual.ambientAroma}
                     </p>
                   </div>
 
@@ -377,10 +422,10 @@ export default function DruidTreePage() {
                   <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-2">
                     <div className="flex items-center gap-2 text-teal-300 font-bold">
                       <Sparkles size={16} />
-                      <span>Günlük Frekans Pratiği</span>
+                      <span>Ruhsal Dengeleyici Günlük Alışkanlık</span>
                     </div>
                     <p className="text-gray-300 text-xs leading-relaxed">
-                      {analyzedTree.natureRitual.soulPractice}
+                      {currentTree.natureRitual.soulPractice}
                     </p>
                   </div>
                 </div>
@@ -394,9 +439,9 @@ export default function DruidTreePage() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
                   <div className="bg-black/30 p-4 rounded-2xl border border-white/5 space-y-2">
-                    <span className="text-emerald-400 font-bold block">Rezonanstaki Uyumlu Ağaç Ruhları:</span>
+                    <span className="text-emerald-400 font-bold block">Ruhsal Rezonanstaki Uyumlu Ağaçlar:</span>
                     <div className="flex flex-wrap gap-2">
-                      {analyzedTree.relationships.resonantTrees.map((t, idx) => (
+                      {currentTree.relationships.resonantTrees.map((t, idx) => (
                         <span key={idx} className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs">
                           {t}
                         </span>
@@ -404,9 +449,9 @@ export default function DruidTreePage() {
                     </div>
                   </div>
                   <div className="bg-black/30 p-4 rounded-2xl border border-white/5 space-y-2">
-                    <span className="text-amber-400 font-bold block">Zıtlıkla Büyüten (Katalizör) Ağaçlar:</span>
+                    <span className="text-amber-400 font-bold block">Geliştiren Zıt Ağaçlar (Katalizör):</span>
                     <div className="flex flex-wrap gap-2">
-                      {analyzedTree.relationships.catalystTrees.map((t, idx) => (
+                      {currentTree.relationships.catalystTrees.map((t, idx) => (
                         <span key={idx} className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs">
                           {t}
                         </span>
@@ -427,27 +472,27 @@ export default function DruidTreePage() {
                     <span className="text-[11px] font-mono tracking-widest text-emerald-400 uppercase">
                       7LAYERS KELT ASTROLOJİSİ
                     </span>
-                    <span className="text-2xl text-emerald-300">{analyzedTree.oghamSymbol}</span>
+                    <span className="text-2xl text-emerald-300">{currentTree.oghamSymbol}</span>
                   </div>
                   <div>
-                    <span className="text-xs text-gray-400 block">Benim Kutsal Ağacım:</span>
+                    <span className="text-xs text-gray-400 block">Kutsal Kelt Ruh Ağacım:</span>
                     <h3 className="text-xl font-serif font-bold text-white">
-                      {analyzedTree.name} ({analyzedTree.oghamName})
+                      {currentTree.name} ({currentTree.oghamName})
                     </h3>
                     <p className="text-xs text-amber-300 font-medium mt-0.5">
-                      {analyzedTree.archetype}
+                      {currentTree.archetype}
                     </p>
                   </div>
                   <p className="text-xs text-gray-300 italic border-l-2 border-emerald-400 pl-3 py-1">
-                    "{analyzedTree.druidicProverb}"
+                    "{currentTree.druidicProverb}"
                   </p>
                   <div className="border-t border-white/10 pt-3 flex items-center justify-between text-[10px] text-gray-400">
-                    <span>{analyzedTree.element} • {analyzedTree.rulingPlanets}</span>
+                    <span>{currentTree.element} • {currentTree.rulingPlanets}</span>
                     <span className="text-emerald-400 font-semibold">7layers.org</span>
                   </div>
                 </div>
                 <p className="text-xs text-gray-400 max-w-md mx-auto">
-                  Bu kartın ekran görüntüsünü alarak Instagram Hikayenizde paylaşabilir, takipçilerinize kendi ağaçlarını sorma akımını başlatabilirsiniz.
+                  Bu kartın ekran görüntüsünü alarak Instagram veya WhatsApp durumunuzda paylaşabilir, sevdiklerinizin kendi ağaçlarını keşfetmesini sağlayabilirsiniz.
                 </p>
               </div>
             </motion.div>
@@ -460,10 +505,10 @@ export default function DruidTreePage() {
             <div>
               <h2 className="text-xl sm:text-2xl font-serif font-bold text-white flex items-center gap-2">
                 <BookOpen size={22} className="text-emerald-400" />
-                <span>{DRUID_TREES.length} Kutsal Kelt Ağacı Ansiklopedisi</span>
+                <span>Kutsal Kelt Ağacı Ansiklopedisi ({currentTreeList.length} Ağaç)</span>
               </h2>
               <p className="text-xs text-gray-400 mt-1">
-                Tüm doğum tarihlerine göre hangi ağaca ait olduğunuzu inceleyin; kartlara tıklayarak detaylı rehberi açın.
+                Tüm doğum tarihlerine göre hangi ağaca ait olduğunuzu inceleyin; kartlara tıklayarak detayları açın.
               </p>
             </div>
             {/* Arama Kutusu */}
@@ -479,34 +524,54 @@ export default function DruidTreePage() {
             </div>
           </div>
 
+          {/* Sekme Değiştirici: Ogham 13 vs Güneş 21 */}
+          <div className="flex items-center gap-2 p-1.5 rounded-2xl bg-white/[0.02] border border-white/10">
+            <button
+              type="button"
+              onClick={() => setEncyclopediaTab('ogham')}
+              className={`flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                encyclopediaTab === 'ogham'
+                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Moon size={16} />
+              <span>🌙 Kadim Ogham Ay Takvimi (13 Ağaç)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setEncyclopediaTab('solar')}
+              className={`flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
+                encyclopediaTab === 'solar'
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-lg'
+                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+              }`}
+            >
+              <Sun size={16} />
+              <span>☀️ Kelt Güneş Takvimi (21 Ağaç)</span>
+            </button>
+          </div>
+
           {/* Tarih ve Takvim Rehber Bilgi Kutusu */}
           <div className="bg-white/[0.02] border border-emerald-500/20 rounded-2xl p-5 sm:p-6 space-y-4">
             <div className="flex items-center gap-2 text-emerald-400 font-serif font-bold text-sm sm:text-base">
               <Calendar size={18} className="text-emerald-400" />
-              <span>Kelt Ağaç Takvimi Tarih Dağılımı ve Döngü Sistemi</span>
+              <span>
+                {encyclopediaTab === 'ogham' 
+                  ? 'Kadim Kelt Ogham Ay Takvimi Sistemi (13 Ağaç)' 
+                  : 'Kelt Güneş Döngüsü Takvim Sistemi (21 Ağaç)'}
+              </span>
             </div>
             <div className="text-xs text-gray-300 space-y-2 leading-relaxed">
-              <p>
-                Kadim Kelt geleneğinde Güneş ve doğa döngüsü, 365 gün boyunca belirli ağaçların enerjisiyle rezonanstadır:
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
-                <div className="bg-black/30 p-3.5 rounded-xl border border-white/5 space-y-1.5">
-                  <span className="font-bold text-amber-300 flex items-center gap-1">
-                    ☀️ 4 Kardinal Ağaç (Ekinoks ve Gündönümleri):
-                  </span>
-                  <p className="text-gray-400 text-[11px] leading-relaxed">
-                    <strong>21 Mart:</strong> Meşe (İlkbahar Ekinoksu) • <strong>24 Haziran:</strong> Huş (Yaz Gündönümü) • <strong>23 Eylül:</strong> Zeytin (Sonbahar Ekinoksu) • <strong>22 Aralık:</strong> Kayın (Kış Gündönümü). Bu 4 özel günde doğanlar doğrudan bu eksen ağaçlarının rehberliğindedir.
-                  </p>
-                </div>
-                <div className="bg-black/30 p-3.5 rounded-xl border border-white/5 space-y-1.5">
-                  <span className="font-bold text-emerald-300 flex items-center gap-1">
-                    🌿 17 Döngüsel Ağaç (Mevsimsel Karşılıklar):
-                  </span>
-                  <p className="text-gray-400 text-[11px] leading-relaxed">
-                    Diğer 17 ağaç, Güneş'in yıl içindeki kutupsal yükseliş ve alçalışına göre karşılıklı iki dönemde (Kavak ağacında olduğu gibi üç dönemde) tekrarlanarak 365 günün tamamını eksiksiz ve boşluksuz kapsar.
-                  </p>
-                </div>
-              </div>
+              {encyclopediaTab === 'ogham' ? (
+                <p className="text-[11px] leading-relaxed text-gray-300">
+                  Antik Druidlerin kutsal <strong>Ogham ağaç alfabesi</strong>ne dayanan bu sistemde yıl, 28'er günlük 13 Ay döngüsüne bölünür. Örneğin <strong>18 Şubat – 17 Mart</strong> arasında doğanların kutsal koruyucu ağacı doğrudan <strong>Dişbudak (Nion)</strong> ağacıdır.
+                </p>
+              ) : (
+                <p className="text-[11px] leading-relaxed text-gray-300">
+                  Güneş'in mevsimsel kutup döngüsüne dayanan bu sistemde, 4 Kardinal Ekinoks/Gündönümü günü (Meşe, Huş, Zeytin, Kayın) ile karşılıklı mevsimlerde tekrarlanan 17 döngüsel ağaç bulunur.
+                </p>
+              )}
             </div>
           </div>
 
@@ -536,7 +601,7 @@ export default function DruidTreePage() {
                     </div>
                     {tree.isCardinalStation && (
                       <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-semibold">
-                        Kardinal
+                        Mevsim Dönümü
                       </span>
                     )}
                   </div>
@@ -562,7 +627,7 @@ export default function DruidTreePage() {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px]">
                         <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-2.5 space-y-1">
                           <span className="font-bold text-emerald-400 flex items-center gap-1">
-                            <Sun size={12} /> Işık Nitelikleri:
+                            <Sun size={12} /> Işık Erdemleri:
                           </span>
                           <ul className="space-y-0.5 text-gray-300 list-disc list-inside">
                             {tree.lightTraits.slice(0, 2).map((t, idx) => (
@@ -587,7 +652,11 @@ export default function DruidTreePage() {
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setAnalyzedTree(tree);
+                            // calculate based on tree period
+                            const firstPeriod = tree.periods[0];
+                            const analysis = getDruidTreeAnalysis(firstPeriod.startDay, firstPeriod.startMonth);
+                            setAnalyzedData(analysis);
+                            setActiveAnalysisView(tree.periods[0].label.includes('Ogham') ? 'ogham' : 'solar');
                             setTimeout(() => {
                               resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                             }, 50);
