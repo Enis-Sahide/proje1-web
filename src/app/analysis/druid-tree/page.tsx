@@ -33,8 +33,8 @@ const MONTH_NAMES = [
 
 export default function DruidTreePage() {
   const [userName, setUserName] = useState('');
-  const [selectedDay, setSelectedDay] = useState(17);
-  const [selectedMonth, setSelectedMonth] = useState(3);
+  const [selectedDay, setSelectedDay] = useState(1);
+  const [selectedMonth, setSelectedMonth] = useState(1);
   const [analyzedData, setAnalyzedData] = useState<DruidTreeAnalysis | null>(null);
   const [analyzedName, setAnalyzedName] = useState('');
   const [copied, setCopied] = useState(false);
@@ -135,7 +135,7 @@ export default function DruidTreePage() {
                   type="text"
                   value={userName}
                   onChange={(e) => setUserName(e.target.value)}
-                  placeholder="Örn. Selin"
+                  placeholder="Örn. Ali"
                   className="w-full bg-black/40 border border-white/10 rounded-2xl px-4 py-3.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500 transition-colors"
                 />
               </div>
