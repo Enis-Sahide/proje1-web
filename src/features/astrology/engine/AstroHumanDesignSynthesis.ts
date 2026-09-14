@@ -366,11 +366,11 @@ export function synthesizeAstroHumanDesign(
     
     let synthesisInterpretation = "";
     if (dominantNature === 'challenging') {
-      synthesisInterpretation = `Bu yerleşim, **${gateInfo.shadow}** gölgesiyle yüzleşme ve dönüştürme potansiyeline işaret eder.`;
+      synthesisInterpretation = `Bu yerleşim, ${gateInfo.shadow} gölgesiyle yüzleşme ve dönüştürme potansiyeline işaret eder.`;
     } else if (dominantNature === 'harmonious') {
-      synthesisInterpretation = `Bu yerleşim, **${gateInfo.gift}** armağanını doğal ve akıcı bir yetenek olarak açığa çıkarır.`;
+      synthesisInterpretation = `Bu yerleşim, ${gateInfo.gift} armağanını doğal ve akıcı bir yetenek olarak açığa çıkarır.`;
     } else {
-      synthesisInterpretation = `Bu yerleşim, **${houseInfo.title}** alanında odaklı bir enerji taşır.`;
+      synthesisInterpretation = `Bu yerleşim, ${houseInfo.title} alanında odaklı bir enerji taşır.`;
     }
 
     // Kesin Davranış Teşhisi (Line Mekaniği - Doğrudan Nokta Atışı Cümle)
@@ -466,21 +466,21 @@ export function synthesizeAstroHumanDesign(
     dominantLifeArea: {
       house: dominantHouse,
       title: dominantHouseMeta.title,
-      description: `Gezegenlerinizin ve kilit kapılarınızın en yoğun toplandığı yaşam sahnesi bu alandır. Bütünleşik kader yolculuğunuzun ana laboratuvarı **${dominantHouseMeta.field}** üzerinde çalışmaktadır.`
+      description: `Gezegenlerinizin ve kilit kapılarınızın en yoğun toplandığı yaşam sahnesi bu alandır. Bütünleşik kader yolculuğunuzun ana laboratuvarı ${dominantHouseMeta.field} üzerinde çalışmaktadır.`
     },
     highestGiftGate: {
       gate: bestHarmonious?.gate || 1,
       gateName: bestHarmonious?.gateName || 'Yaratıcılık',
       planet: bestHarmonious?.planetName || 'Güneş',
       house: bestHarmonious?.house || 1,
-      description: `${bestHarmonious?.planetName} gezegeniniz ${bestHarmonious?.house}. Evde ve ${bestHarmonious?.gate}. Kapı'da destekleyici açılar altındadır. En doğal başarı ve çekim alanınız **${bestHarmonious?.giftPotential}** armağanıdır.`
+      description: `${bestHarmonious?.planetName} gezegeniniz ${bestHarmonious?.house}. Evde ve ${bestHarmonious?.gate}. Kapı'da destekleyici açılar altındadır. En doğal başarı ve çekim alanınız ${bestHarmonious?.giftPotential} armağanıdır.`
     },
     majorGrowthChallengeGate: {
       gate: biggestChallenge?.gate || 28,
       gateName: biggestChallenge?.gateName || 'Mücadele',
       planet: biggestChallenge?.planetName || 'Mars',
       house: biggestChallenge?.house || 8,
-      description: `${biggestChallenge?.planetName} gezegeninizin aktive ettiği ${biggestChallenge?.gate}. Kapı, haritanızdaki dinamik kare/karşıt açılarla tetiklenmektedir. En büyük tekamül sıçramanız **${biggestChallenge?.shadowWarning}** gölgesiyle yüzleşip onu aşmaktan geçer.`
+      description: `${biggestChallenge?.planetName} gezegeninizin aktive ettiği ${biggestChallenge?.gate}. Kapı, haritanızdaki dinamik kare/karşıt açılarla tetiklenmektedir. En büyük tekamül sıçramanız ${biggestChallenge?.shadowWarning} gölgesiyle yüzleşip onu aşmaktan geçer.`
     },
     keyBehavioralDiagnoses: keyDiagnoses
   };

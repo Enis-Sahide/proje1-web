@@ -849,7 +849,7 @@ export function synthesizeCosmicMatrix(
     personalTalisman,
     coreLifeMission: {
       title: `${items[0]?.planetName || 'Güneş'} ile ${fourWorldsBalance.dominantWorld} Düzleminde Kozmik Tekâmül`,
-      description: `Ruhunuz bu enkarnasyonda **${fourWorldsBalance.dominantWorld}** katmanının tecrübelerini tamamlayarak **${fourWorldsBalance.growthWorld}** âleminin yüksek idrakine sıçramak üzere kodlanmıştır. Haritanızdaki 13 gezegen enerjisini içe veya dışa taşırırken aşırılıklara kaçmadan, Human Design çizgilerinizin dehasını ve Rune mühürlerinizi denge anahtarı olarak kullanmalısınız.`,
+      description: `Ruhunuz bu enkarnasyonda **${fourWorldsBalance.dominantWorld}** katmanının tecrübelerini tamamlayarak **${fourWorldsBalance.growthWorld}** âleminin yüksek idrakine sıçramak üzere kodlanmıştır. Haritanızdaki 13 gezegen enerjisini içe veya dışa taşırırken aşırılıklara kaçmadan, Human Design çizgilerinizin dehasını ve Rune mühürlerinizi denge anahtarı olarak kullanabilirsiniz.`,
       keyArchetype: `${items[0]?.humanDesign.lineArchetype || '3. Çizgi: Deneyimci'}`
     }
   };

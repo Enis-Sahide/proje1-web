@@ -18,6 +18,21 @@ import {
   PlanetaryDynamicDiagnosis 
 } from '@/features/astrology/engine/CosmicMatrixEngine';
 
+const renderFormattedText = (text: string) => {
+  if (!text) return null;
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return (
+        <strong key={index} className="font-semibold text-amber-300">
+          {part.slice(2, -2)}
+        </strong>
+      );
+    }
+    return part;
+  });
+};
+
 export default function CosmicMatrixPage() {
   const [name, setName] = useState('');
   const [dateStr, setDateStr] = useState('1990-01-01');
@@ -233,7 +248,7 @@ export default function CosmicMatrixPage() {
                 </button>
               </div>
               <p className="text-sm text-gray-300 leading-relaxed max-w-4xl">
-                {report.coreLifeMission.description}
+                {renderFormattedText(report.coreLifeMission.description)}
               </p>
             </div>
 
@@ -334,10 +349,10 @@ export default function CosmicMatrixPage() {
                     Mührün Amacı & Etkisi
                   </span>
                   <p className="text-sm text-gray-300 leading-relaxed">
-                    {report.personalTalisman.purpose}
+                    {renderFormattedText(report.personalTalisman.purpose)}
                   </p>
                   <p className="text-xs text-amber-200/80 italic mt-2">
-                    {report.personalTalisman.kabbalisticBridge}
+                    {renderFormattedText(report.personalTalisman.kabbalisticBridge)}
                   </p>
                 </div>
 
