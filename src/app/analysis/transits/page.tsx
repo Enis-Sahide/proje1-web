@@ -1260,7 +1260,7 @@ export default function TransitsPage() {
                                   if (isApprenticeOrAbove) {
                                     setSelectedInterp({
                                       title: ut.humanThemeTitle,
-                                      content: `${ut.detailedAnalysis}\n\n【Bireysel Eylem & Dönüşüm Rehberliği】\n${ut.actionAdvice}`,
+                                      content: ut.detailedAnalysis,
                                       extra: ut.chakraLayer
                                     });
                                   } else {
@@ -1409,6 +1409,20 @@ export default function TransitsPage() {
               {parseInterpretationSections(selectedInterp.content).map((sec, sIdx) => {
                 if (!sec.title && sec.type === 'general') {
                   return <p key={sIdx} className="text-xs sm:text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">{sec.content}</p>;
+                }
+
+                if (sec.type === 'sources_header') {
+                  return (
+                    <div key={sIdx} className="pt-4 pb-1 border-t border-white/10 space-y-1">
+                      <span className="text-xs font-black uppercase tracking-wider flex items-center gap-2 text-[#D4AF37]">
+                        <Layers size={14} className="text-[#D4AF37]" />
+                        {sec.title}
+                      </span>
+                      {sec.content && (
+                        <p className="text-xs text-gray-400 leading-relaxed">{sec.content}</p>
+                      )}
+                    </div>
+                  );
                 }
                 let borderClass = 'bg-white/[0.03] border-white/10';
                 let icon = <Info size={13} className="text-gray-400" />;

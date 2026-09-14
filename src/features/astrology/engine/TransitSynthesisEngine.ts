@@ -289,8 +289,17 @@ export function generateUnifiedPlanetTransit(
     synthesisSummary += `Şu an doğrudan majör bir natal gezegene açı yapmasa da, bu yaşam alanınızın arka planını sessiz ve derinden dönüştürmeye devam ediyor.`;
   }
 
-  // Detailed Analysis Synthesis
+  const actionAdvice = customInterp?.advice || 
+    `Bu süreçte ${house}. evinizin temsil ettiği konularda aceleci olmadan, bilinçli ve yapıcı sınırlar çizerek hareket edin. Karşınıza çıkan durumları kriz değil, ruhsal olgunlaşma fırsatı olarak görün.`;
+
+  const chakraLayer = customInterp?.chakra || PLANET_CHAKRAS[pName] || 'Kozmik Katman Entegrasyonu';
+
+  // Detailed Analysis Synthesis:
+  // 1. Öncelikli Anlam & Eylem (En Üst Bölüm)
   let detailedAnalysis = `【7Layers Yaşam Alanı Özeti】\n${humanNarrative}\n\n` +
+    `【Bireysel Eylem & Dönüşüm Rehberliği】\n${actionAdvice}\n\n` +
+    `【Metnin Oluşturulduğu Kaynaklar】\n` +
+    `Bu analiz aşağıdaki astrolojik ve enerjetik katmanların sentezlenmesiyle oluşturulmuştur:\n\n` +
     `【Yaşam Alanı Etkisi: ${houseTitle}】\n` +
     `${pName}, astrolojide ${PLANET_NATURES[pName] || 'önemli enerjileri'} temsil eder. Bu geçiş sizin ${house}. evinizden geçerken; ${houseTheme} alanınızda köklü bir uyanış ve farkındalık yaratır.\n\n`;
 
@@ -313,11 +322,6 @@ export function generateUnifiedPlanetTransit(
   if (transitPlanet.isRetrograde) {
     detailedAnalysis += `【Retro (Rx) İçsel Muhasebe】\n${pName} geri harekette olduğu için bu evin konularında dışarıya fevri adımlar atmak yerine, geçmişten gelen eksikleri tamamlamak ve içsel strateji kurmak çok daha hayırlıdır.\n\n`;
   }
-
-  const actionAdvice = customInterp?.advice || 
-    `Bu süreçte ${house}. evinizin temsil ettiği konularda aceleci olmadan, bilinçli ve yapıcı sınırlar çizerek hareket edin. Karşınıza çıkan durumları kriz değil, ruhsal olgunlaşma fırsatı olarak görün.`;
-
-  const chakraLayer = customInterp?.chakra || PLANET_CHAKRAS[pName] || 'Kozmik Katman Entegrasyonu';
 
   return {
     planetName: pName,
@@ -343,7 +347,7 @@ export function generateUnifiedPlanetTransit(
 export interface SectionBlock {
   title: string;
   content: string;
-  type: 'phase' | 'theme' | 'collective' | 'advice' | 'retro' | 'house' | 'aspects' | 'general';
+  type: 'phase' | 'theme' | 'collective' | 'advice' | 'retro' | 'house' | 'aspects' | 'sources_header' | 'general';
 }
 
 export function parseInterpretationSections(text: string): SectionBlock[] {
@@ -363,7 +367,9 @@ export function parseInterpretationSections(text: string): SectionBlock[] {
 
     let type: SectionBlock['type'] = 'general';
     const lowerTitle = title.toLowerCase();
-    if (lowerTitle.includes('yaşam alanı') || lowerTitle.includes('ev ') || lowerTitle.includes('ev:')) {
+    if (lowerTitle.includes('kaynaklar') || lowerTitle.includes('dayandığı')) {
+      type = 'sources_header';
+    } else if (lowerTitle.includes('yaşam alanı') || lowerTitle.includes('ev ') || lowerTitle.includes('ev:')) {
       type = 'house';
     } else if (lowerTitle.includes('bağlantı') || lowerTitle.includes('açı') || lowerTitle.includes('tetiklenen')) {
       type = 'aspects';
