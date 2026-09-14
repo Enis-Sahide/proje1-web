@@ -31,24 +31,56 @@ export async function POST(request: Request) {
 
     // 4. Alan adı (DNS MX) denetimi - var olmayan domainleri durdur
     const domain = normEmail.split('@')[1];
-    const hasMx = await checkDomainHasMx(domain);
-    if (!hasMx) {
-      return errorJson('Girdiğiniz e-posta sağlayıcısına ait aktif bir posta sunucusu bulunamadı. Lütfen geçerli bir e-posta adresi girin.', 400);
+    try {
+      const hasMx = await checkDomainHasMx(domain);
+      if (!hasMx) {
+        return errorJson('Girdiğiniz e-posta sağlayıcısına ait aktif bir posta sunucusu bulunamadı. Lütfen geçerli bir e-posta adresi girin.', 400);
+      }
+    } catch (e: any) {
+      console.warn(`[Register] MX check skipped due to DNS lookup exception for ${domain}:`, e?.message);
     }
 
     if (String(password).length < 6) return errorJson('Şifre en az 6 karakter olmalıdır.');
 
     // 5. Kayıtlı kullanıcı kontrolü
     const [existing] = await db.select().from(users).where(eq(users.email, normEmail));
-    if (existing) {
-      return errorJson('Bu e-posta adresi zaten kayıtlıdır.', 409);
-    }
-
-    // 6. Şifreyi hashle ve bilgileri geçici doğrulama tablosunda tut (users tablosuna HENÜZ yazma!)
     const passwordHash = await hashPassword(String(password));
     const code = generateVerificationCode();
     const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 dakika geçerli
 
+    if (existing) {
+      // Eğer kullanıcı kayıtlı ama henüz e-postasını onaylamamışsa, kilitlenmesini önle: yeni kod gönderip doğrulama ekranına geçir
+      if (existing.emailVerified === false) {
+        await db.delete(emailVerifications).where(eq(emailVerifications.email, normEmail));
+        await db.insert(emailVerifications).values({
+          email: normEmail,
+          code,
+          passwordHash,
+          fullName: fullName || existing.fullName || null,
+          expiresAt,
+        });
+
+        // users tablosundaki şifreyi de yeni belirlenen şifre ile güncelle
+        await db
+          .update(users)
+          .set({
+            passwordHash,
+            fullName: fullName || existing.fullName || null,
+            updatedAt: new Date(),
+          })
+          .where(eq(users.id, existing.id));
+
+        await sendVerificationCodeEmail(normEmail, code);
+        return json({
+          requiresVerification: true,
+          email: normEmail,
+          message: 'Hesabınız için yeni bir 6 haneli doğrulama kodu e-postanıza gönderildi.',
+        });
+      }
+      return errorJson('Bu e-posta adresi zaten kayıtlıdır. Lütfen giriş yapın.', 409, { isAlreadyRegistered: true });
+    }
+
+    // 6. Bilgileri geçici doğrulama tablosunda tut (users tablosuna HENÜZ yazma! - Lazy Registration)
     await db.delete(emailVerifications).where(eq(emailVerifications.email, normEmail));
     await db.insert(emailVerifications).values({
       email: normEmail,

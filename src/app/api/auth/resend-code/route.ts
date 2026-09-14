@@ -34,11 +34,30 @@ export async function POST(request: Request) {
       .orderBy(desc(emailVerifications.createdAt))
       .limit(1);
 
-    if (!pending) {
+    // 1. users tablosunda doğrulanmamış kullanıcı varsa ve pending kaydı yoksa oluştur
+    if (u && !u.emailVerified && !pending) {
+      const code = generateVerificationCode();
+      const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+      await db.insert(emailVerifications).values({
+        email: normEmail,
+        code,
+        passwordHash: u.passwordHash,
+        fullName: u.fullName,
+        expiresAt,
+      });
+      await sendVerificationCodeEmail(normEmail, code);
       return json({
         success: true,
-        message: 'Eğer bu hesap onay bekliyorsa, yeni doğrulama kodu gönderildi.',
+        message: 'Yeni doğrulama kodu e-posta adresinize gönderildi.',
       });
+    }
+
+    if (!pending) {
+      return errorJson(
+        'Doğrulama süreniz dolduğu için lütfen kayıt formunu tekrar doldurarak yeni kod alın.',
+        404,
+        { requireRegister: true }
+      );
     }
 
     // Rate limit: Son 60 saniyede kod istenmiş mi kontrol et
