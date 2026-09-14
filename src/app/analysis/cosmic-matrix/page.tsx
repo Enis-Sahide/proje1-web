@@ -132,7 +132,7 @@ export default function CosmicMatrixPage() {
                 7Layers Kozmik Matris
               </h1>
               <p className="text-base sm:text-lg text-gray-300 max-w-2xl mx-auto leading-relaxed">
-                Ruhsal varlığınızı 4 kadim katmanda (Astroloji, 4 Âlem, Human Design ve Kuzey Runeleri) aynı anda okuyun. Ahlaki etiketler olmadan, enerjinizin içe mi yoksa dışa mı aktığını keşfedin.
+                Ruhsal varlığınızı 4 kadim katmanda (Astroloji, 4 Âlem, Human Design ve Kadim Futhark Runeleri) aynı anda okuyun. Ahlaki etiketler olmadan, enerjinizin içe mi yoksa dışa mı aktığını keşfedin.
               </p>
             </div>
 
@@ -140,7 +140,7 @@ export default function CosmicMatrixPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
                 <div>
                   <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
-                    Adınız & Soyadınız
+                    Adınız & Soyadınız (Opsiyonel)
                   </label>
                   <input
                     type="text"
@@ -341,13 +341,19 @@ export default function CosmicMatrixPage() {
                   </p>
                 </div>
 
-                <div className="bg-white/5 rounded-2xl p-4 border border-white/10 space-y-2">
+                <div className="bg-white/5 rounded-2xl p-4 border border-white/10 space-y-3">
                   <span className="text-xs font-semibold text-amber-400 uppercase tracking-wider block">
                     Nasıl Uygulanır? (Ritüel & Kullanım)
                   </span>
                   <p className="text-xs text-gray-300 leading-relaxed">
                     {report.personalTalisman.usageInstructions}
                   </p>
+                  <div className="flex items-start gap-2 pt-2.5 border-t border-white/10 text-[11px] text-amber-300/90 leading-relaxed">
+                    <span className="text-sm shrink-0">⬆️</span>
+                    <div>
+                      <strong className="text-amber-200">Kadim Çizim Kuralı:</strong> Rune sembollerinin frekansını doğru kanalize etmek ve enerjiyi yeryüzünden ilahi kaynağa yükseltmek için, hatları mutlaka <u>aşağıdan yukarıya doğru</u> kazıyarak veya çizerek aktive edin.
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -521,7 +527,7 @@ export default function CosmicMatrixPage() {
                       <th className="py-4 px-4">1. Astroloji</th>
                       <th className="py-4 px-4">2. Kabala (Sefira)</th>
                       <th className="py-4 px-4">3. Human Design</th>
-                      <th className="py-4 px-4">4. Kuzey Runesi</th>
+                      <th className="py-4 px-4">4. Kadim Futhark Runesi</th>
                       <th className="py-4 px-4">5. Beden & Çakra</th>
                     </tr>
                   </thead>

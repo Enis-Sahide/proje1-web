@@ -25,7 +25,7 @@ export default function AnalysisPage() {
     {
       id: 'cosmic-matrix',
       title: '7Layers Kozmik Matris',
-      description: 'Astroloji, Kabalistik 4 Âlem, Human Design ve Kuzey Runelerini birleştiren bütünleşik kadersel teşhis ve tılsım analizi.',
+      description: 'Astroloji, Kabalistik 4 Âlem, Human Design ve Kadim Futhark Runelerini birleştiren bütünleşik kadersel teşhis ve tılsım analizi.',
       icon: <Compass size={32} />,
       color: '#F59E0B',
       link: '/analysis/cosmic-matrix'
