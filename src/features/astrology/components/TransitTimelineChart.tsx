@@ -18,7 +18,7 @@ import {
   Lock,
   MapPin
 } from 'lucide-react';
-import { TransitTimelineItem } from '@/features/astrology/engine/TransitTimelineEngine';
+import { TransitTimelineItem, getItemPeakMs } from '@/features/astrology/engine/TransitTimelineEngine';
 
 interface TransitTimelineChartProps {
   items: TransitTimelineItem[];
@@ -120,9 +120,22 @@ export default function TransitTimelineChart({
     return cols;
   }, [rangeStart, totalRangeMs, range]);
 
-  // Filter items
+  // Filter & sort items: Prioritize items whose center degree / peak is closest to entered startDate
   const filteredItems = useMemo(() => {
-    return items.filter(item => {
+    const targetMs = (() => {
+      if (!startDateStr) return Date.now();
+      const parts = startDateStr.split('-');
+      if (parts.length === 3) {
+        const y = parseInt(parts[0], 10);
+        const m = parseInt(parts[1], 10) - 1;
+        const d = parseInt(parts[2], 10);
+        return new Date(Date.UTC(y, m, d, 12, 0, 0)).getTime();
+      }
+      const t = new Date(startDateStr).getTime();
+      return isNaN(t) ? Date.now() : t;
+    })();
+
+    const list = items.filter(item => {
       // Event Type filter
       if (eventTypeFilter === 'ASPECTS' && item.type === 'İngress') return false;
       if (eventTypeFilter === 'INGRESS' && item.type !== 'İngress') return false;
@@ -148,7 +161,18 @@ export default function TransitTimelineChart({
 
       return true;
     });
-  }, [items, categoryFilter, aspectFilter, eventTypeFilter, searchQuery]);
+
+    return list.sort((a, b) => {
+      const peakA = getItemPeakMs(a);
+      const peakB = getItemPeakMs(b);
+      const diffA = Math.abs(peakA - targetMs);
+      const diffB = Math.abs(peakB - targetMs);
+      if (diffA !== diffB) {
+        return diffA - diffB;
+      }
+      return peakA - peakB;
+    });
+  }, [items, categoryFilter, aspectFilter, eventTypeFilter, searchQuery, startDateStr]);
 
   return (
     <div className="w-full flex flex-col gap-6">
@@ -308,6 +332,10 @@ export default function TransitTimelineChart({
               Yatay çubuklar açının etki süresini, parlayan işaretler doruk noktasını (0° Partil) temsil eder.
             </p>
             <div className="flex flex-wrap items-center gap-2 mt-2">
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-sky-300 bg-sky-500/10 border border-sky-500/20 px-2.5 py-0.5 rounded-full">
+                <Sparkles size={11} className="text-sky-400" />
+                Sıralama: <strong className="text-white">Merkeze En Yakın</strong>
+              </span>
               <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full">
                 <MapPin size={11} className="text-[#D4AF37]" />
                 Zaman Dilimi: <strong className="text-white">{userTimezone}</strong> (UTC{tzOffsetHours >= 0 ? `+${tzOffsetHours}` : tzOffsetHours})
@@ -342,7 +370,7 @@ export default function TransitTimelineChart({
           
             {/* Calendar Dates Axis Header */}
             <div className="relative h-10 border-b border-white/10 flex items-center mb-3">
-              <div className="w-36 sm:w-44 shrink-0 text-xs font-bold text-mystic-text-muted pl-2 sticky left-0 bg-[#0F172A] z-30 py-2 border-r border-white/5">
+              <div className="w-40 sm:w-48 shrink-0 text-xs font-bold text-mystic-text-muted pl-2 sticky left-0 bg-[#0F172A] z-30 py-2 border-r border-white/5">
                 Transit & Açı
               </div>
               <div className="relative flex-grow h-full">
@@ -374,7 +402,7 @@ export default function TransitTimelineChart({
             <div className="relative flex flex-col gap-2.5 py-2">
               
               {/* Background Grid Lines */}
-              <div className="absolute inset-0 left-36 sm:left-44 pointer-events-none z-0">
+              <div className="absolute inset-0 left-40 sm:left-48 pointer-events-none z-0">
                 {dateColumns.map((col, idx) => (
                   <div 
                     key={`grid-${idx}`} 
@@ -432,7 +460,7 @@ export default function TransitTimelineChart({
                       onClick={() => setSelectedItem(item)}
                     >
                       {/* Left Column Label (Sticky for easy navigation on small screens) */}
-                      <div className="w-36 sm:w-44 shrink-0 flex items-center gap-1 sm:gap-2 pl-1.5 sm:pl-2 pr-2 sm:pr-4 overflow-hidden sticky left-0 bg-[#0A0A0F] z-20 py-1 rounded-l-lg border-r border-white/5">
+                      <div className="w-40 sm:w-48 shrink-0 flex items-center gap-1 sm:gap-1.5 pl-1.5 sm:pl-2 pr-1.5 sm:pr-3 overflow-hidden sticky left-0 bg-[#0A0A0F] z-20 py-1 rounded-l-lg border-r border-white/5">
                         <span className="text-sm sm:text-base font-bold text-mystic-primary w-4 sm:w-5 text-center shrink-0">
                           {PLANET_SYMBOLS[item.transitPlanet] || '•'}
                         </span>
@@ -443,7 +471,7 @@ export default function TransitTimelineChart({
                           {item.type === 'İngress' ? '➔' : (ASPECT_SYMBOLS[item.type] || item.type)}
                         </span>
                         <span className="text-[11px] sm:text-xs font-semibold text-gray-300 truncate">
-                          {item.type === 'İngress' ? item.natalPlanet : (isMundane ? item.natalPlanet : `N.${item.natalPlanet}`)}
+                          {item.type === 'İngress' ? item.natalPlanet.replace(' Burcu', '') : (isMundane ? item.natalPlanet : `N.${item.natalPlanet}`)}
                         </span>
                         <span className="text-sm sm:text-base font-bold text-[#D4AF37] w-4 sm:w-5 text-center shrink-0">
                           {item.type === 'İngress'
