@@ -474,7 +474,7 @@ export const downloadKabbalahPDF = async (
     doc.setTextColor(140, 140, 140);
     doc.setFontSize(7);
     doc.setFont('LiberationSans', 'normal');
-    const footnote = "⚠️ Ezoterik İlke: Bir kriz anındaki bilinçli tutumunuz o an hangi haritanızı çalıştırdığınızı belirler. Reaksiyonunuzu korkudan (Assiah) bilgelik ve teslimiyete (Beriyah & Atzilut) yükseltebilirsiniz.";
+    const footnote = "Ezoterik İlke: Hayat deneyimlerindeki bilinçli farkındalığınız, o an hangi âlemin potansiyelini aktive ettiğinizi belirler. Deneyimlerinizi eylem boyutundan (Assiah) bilgelik, sezgi ve içsel huzura (Beriyah & Atzilut) kolaylıkla dönüştürebilirsiniz.";
     drawTextWithBold(doc, footnote, 24, boxStartY + boxHeight - 8, 162, 3.4);
 
     currentY = boxStartY + boxHeight + 6;

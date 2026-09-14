@@ -174,7 +174,7 @@ export default function FrekansAynasiPage() {
                   <div>
                     <span className="text-[11px] uppercase tracking-widest font-bold text-[#0EA5E9]">Anlık Gökyüzü Aynası</span>
                     <h3 className="text-xl sm:text-2xl font-bold text-white">
-                      Hangi Haritanızı Çalıştırıyorsunuz?
+                      Hangi Bilinç Âlemini Deneyimliyorsunuz?
                     </h3>
                   </div>
                 </div>
@@ -183,10 +183,10 @@ export default function FrekansAynasiPage() {
                   <button
                     type="button"
                     onClick={() => { setActiveConsciousness(null); }}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white text-xs font-semibold border border-white/10 transition-colors"
+                    className="flex items-center gap-1.5 text-xs text-mystic-text-muted hover:text-white px-3 py-1.5 rounded-lg bg-white/5 hover:bg-white/10 transition-colors border border-white/10"
                   >
-                    <RefreshCw size={12} />
-                    <span>Bilgileri Değiştir</span>
+                    <RefreshCw size={14} />
+                    <span>Yeniden Hesapla</span>
                   </button>
                 </div>
               </div>
@@ -195,7 +195,7 @@ export default function FrekansAynasiPage() {
               <div className="p-5 rounded-2xl bg-black/50 border border-white/10 mb-8">
                 <div className="flex flex-wrap items-center gap-2 mb-2">
                   <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">
-                    Günün Sınavı
+                    Gelişim Odak Noktası
                   </span>
                   <h4 className="text-base sm:text-lg font-bold text-[#0EA5E9]">
                     {activeConsciousness.currentTheme || activeConsciousness.title}
@@ -207,7 +207,7 @@ export default function FrekansAynasiPage() {
                 </p>
 
                 <div className="text-xs text-sky-300/90 bg-sky-950/40 p-3 rounded-xl border border-sky-800/30 flex items-start gap-2">
-                  <span className="shrink-0 text-sky-400 font-bold">⚡ Göksel Tetikleyici:</span>
+                  <span className="shrink-0 text-sky-400 font-bold">⚡ Göksel Rehberlik:</span>
                   <span>{activeConsciousness.transitSummary || activeConsciousness.reason}</span>
                 </div>
               </div>
@@ -217,10 +217,10 @@ export default function FrekansAynasiPage() {
                 <div className="mb-8">
                   <div className="mb-4">
                     <h5 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                      <span>🪞 4 Alem Frekans Aynası: Tavrınızı Tartın</span>
+                      <span>🪞 4 Âlem Frekans Aynası: Bilinç Boyutunuzu Keşfedin</span>
                     </h5>
                     <p className="text-xs text-mystic-text-muted mt-1">
-                      Bu gökyüzü sınavı karşısında sergilediğiniz içsel veya dışsal tepki, şu an hangi haritanızı aktive ettiğinizi teşhis eder:
+                      Bu gökyüzü etkisi karşısında geliştirdiğiniz içsel tutum, şu an hangi bilinç boyutunu deneyimlediğinizi yansıtır:
                     </p>
                   </div>
 
@@ -229,8 +229,8 @@ export default function FrekansAynasiPage() {
                     <div className="p-4 sm:p-5 rounded-2xl border border-red-500/30 bg-red-950/20 flex flex-col justify-between">
                       <div>
                         <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-red-500/20">
-                          <span className="text-xs font-bold text-red-400">1. Alem (Madde / Assiah)</span>
-                          <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-red-500/20 text-red-300 font-bold">Reaktif Düzey</span>
+                          <span className="text-xs font-bold text-red-400">1. Âlem (Eylem & Madde / Assiah)</span>
+                          <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-red-500/20 text-red-300 font-bold">Fiziksel / Pratik Boyut</span>
                         </div>
                         <h6 className="text-sm font-bold text-white mb-2">
                           {activeConsciousness.spectrum.assiah.title}
@@ -240,7 +240,7 @@ export default function FrekansAynasiPage() {
                         </p>
                       </div>
                       <div className="p-3 rounded-xl bg-black/50 border border-red-500/20 text-[11px] text-red-200/90 leading-relaxed">
-                        <strong className="text-red-400 block mb-0.5">Teşhis Aynası:</strong>
+                        <strong className="text-red-400 block mb-0.5">Farkındalık Aynası:</strong>
                         {activeConsciousness.spectrum.assiah.diagnosis}
                       </div>
                     </div>
@@ -249,7 +249,7 @@ export default function FrekansAynasiPage() {
                     <div className="p-4 sm:p-5 rounded-2xl border border-sky-500/30 bg-sky-950/20 flex flex-col justify-between">
                       <div>
                         <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-sky-500/20">
-                          <span className="text-xs font-bold text-sky-400">2. Alem (Duygu / Yetzirah)</span>
+                          <span className="text-xs font-bold text-sky-400">2. Âlem (Duygu & Şekillendirme / Yetzirah)</span>
                           <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-bold">Duygusal Şifa</span>
                         </div>
                         <h6 className="text-sm font-bold text-white mb-2">
@@ -260,7 +260,7 @@ export default function FrekansAynasiPage() {
                         </p>
                       </div>
                       <div className="p-3 rounded-xl bg-black/50 border border-sky-500/20 text-[11px] text-sky-200/90 leading-relaxed">
-                        <strong className="text-sky-400 block mb-0.5">Teşhis Aynası:</strong>
+                        <strong className="text-sky-400 block mb-0.5">Farkındalık Aynası:</strong>
                         {activeConsciousness.spectrum.yetzirah.diagnosis}
                       </div>
                     </div>
@@ -269,7 +269,7 @@ export default function FrekansAynasiPage() {
                     <div className="p-4 sm:p-5 rounded-2xl border border-amber-500/30 bg-amber-950/20 flex flex-col justify-between">
                       <div>
                         <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-amber-500/20">
-                          <span className="text-xs font-bold text-amber-400">3. Alem (Zihin / Beriyah)</span>
+                          <span className="text-xs font-bold text-amber-400">3. Âlem (Zihin & Yaratım / Beriyah)</span>
                           <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold">Bilge İrade</span>
                         </div>
                         <h6 className="text-sm font-bold text-white mb-2">
@@ -280,7 +280,7 @@ export default function FrekansAynasiPage() {
                         </p>
                       </div>
                       <div className="p-3 rounded-xl bg-black/50 border border-amber-500/20 text-[11px] text-amber-200/90 leading-relaxed">
-                        <strong className="text-amber-400 block mb-0.5">Teşhis Aynası:</strong>
+                        <strong className="text-amber-400 block mb-0.5">Farkındalık Aynası:</strong>
                         {activeConsciousness.spectrum.beriyah.diagnosis}
                       </div>
                     </div>
@@ -289,7 +289,7 @@ export default function FrekansAynasiPage() {
                     <div className="p-4 sm:p-5 rounded-2xl border border-purple-500/30 bg-purple-950/20 flex flex-col justify-between">
                       <div>
                         <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-purple-500/20">
-                          <span className="text-xs font-bold text-purple-400">4. Alem (Kudret / Atzilut)</span>
+                          <span className="text-xs font-bold text-purple-400">4. Âlem (Ruh & Kudret / Atzilut)</span>
                           <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 font-bold">Kozmik Birlik</span>
                         </div>
                         <h6 className="text-sm font-bold text-white mb-2">
@@ -300,7 +300,7 @@ export default function FrekansAynasiPage() {
                         </p>
                       </div>
                       <div className="p-3 rounded-xl bg-black/50 border border-purple-500/20 text-[11px] text-purple-200/90 leading-relaxed">
-                        <strong className="text-purple-400 block mb-0.5">Teşhis Aynası:</strong>
+                        <strong className="text-purple-400 block mb-0.5">Farkındalık Aynası:</strong>
                         {activeConsciousness.spectrum.atzilut.diagnosis}
                       </div>
                     </div>
@@ -311,7 +311,7 @@ export default function FrekansAynasiPage() {
               {/* Dipnot */}
               <div className="space-y-2 border-t border-white/10 pt-4 mt-2">
                 <p className="text-xs md:text-sm text-mystic-text-muted leading-relaxed">
-                  ⚠️ <strong>Ezoterik İlke:</strong> Yaşınız veya haritanız ne olursa olsun, bir kriz ya da sınav anındaki bilinçli tutumunuz o an hangi boyutta titreştiğinizi belirler. Üst haritalarınızın gücünü hayatınıza çekmek için reaksiyonunuzu korku ve kontrolden (Assiah), bilgelik ve teslimiyete (Beriyah & Atzilut) doğru yükseltebilirsiniz.
+                  🌱 <strong>Ezoterik İlke:</strong> Hayat deneyimlerindeki bilinçli farkındalığınız, o an hangi âlemin potansiyelini aktive ettiğinizi belirler. Üst boyutların rehberliğini hayatınıza dahil etmek için bakış açınızı fiziksel reaksiyondan (Assiah), bilgelik, sezgi ve içsel huzura (Beriyah & Atzilut) kolaylıkla dönüştürebilirsiniz.
                 </p>
               </div>
             </div>

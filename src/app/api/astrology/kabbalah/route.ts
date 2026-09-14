@@ -157,99 +157,99 @@ export async function POST(req: NextRequest) {
 
     const challengeArchetypes = {
       will_power: {
-        title: 'İrade, Sınırlar ve Dünyevi Sorumluluk Sınavı',
-        desc: 'Gökyüzü şu an kişisel gücünüzü, sınırlarınızı koruma kapasitenizi ve dünyevi sorumluluklar karşısındaki duruşunuzu sınıyor. Otorite figürleri, kariyer baskıları veya eyleme geçme zorunlulukları karşısında hangi bilinç düzeyinden yanıt veriyorsunuz?',
+        title: 'İrade, Sınırlar ve Yapıcı Eylem Potansiyeli',
+        desc: 'Gökyüzü şu an kişisel gücünüzü, sağlıklı sınırlarınızı koruma kapasitenizi ve sorumluluklar karşısındaki duruşunuzu aydınlatıyor. Bu dönemde enerjinizi hangi bilinç düzeyinden yönlendirmeyi seçiyorsunuz?',
         assiah: {
-          title: 'Reaktif Tutum: Öfke, İsyan veya Kontrol Takıntısı',
-          reaction: 'Olayları kişiselleştirip dış koşulları ya da diğer insanları suçlamak; öfkeyle güç savaşına girmek, inatlaşmak veya yetersizlik korkusuyla her şeyi zorla kontrol etmeye çalışmak.',
-          diagnosis: 'Eğer bu dönemde yaşadığınız engellere karşı dişinizi sıkıp hırsla çatışıyor veya "Neden her şey beni buluyor?" diyerek kurban psikolojisine giriyorsanız; 1. Haritanız olan Assiah\'ı alt frekansta çalıştırıyorsunuz.'
+          title: 'Farkındalık Alanı: Öfkeyi ve Kontrol Kaygısını Dönüştürmek',
+          reaction: 'Olayları kişiselleştirmek veya zorlayıcı direnç göstermek yerine; sabırla durup enerjiyi yapıcı bir eyleme çevirme fırsatını görmek.',
+          diagnosis: 'Eğer bu dönemde engellere karşı öfkeyle çatışıyor veya dış koşulları suçlama ihtiyacı hissediyorsanız; bu reaksiyonu fark edip enerjinizi Assiah\'ın yapıcı eylem gücüne ve sabrına dönüştürebilirsiniz.'
         },
         yetzirah: {
-          title: 'İçsel Çocuk Tutumu: Duygusal Kökleri ve Güvensizliği Fark Etmek',
-          reaction: 'Öfke veya yetersizlik hissinin altındaki çocukluk yaralarını, onaylanma açlığını ve geçmişte bastırılmış korkuları fark ederek duyguları şefkatle kabul etmek.',
-          diagnosis: 'Tepki vermek yerine bir an durup "Bu öfke bana geçmişimle ilgili hangi yetersizlik yaramı hatırlatıyor?" diyerek duygularınızı anlamlandırmaya çalışıyorsanız; 2. Haritanız Yetzirah\'ı aktive ediyorsunuz.'
+          title: 'İçsel Çocuk Tutumu: Duygusal Kökleri ve Güvensizliği Şefkatle Kucaklamak',
+          reaction: 'Öfke veya yetersizlik hissinin altındaki çocukluk yaralarını ve geçmişte bastırılmış hisleri fark ederek duyguları şefkatle kabul etmek.',
+          diagnosis: 'Tepki vermek yerine bir an durup hislerinizi anlamlandırmaya ve kalbinize şefkat göstermeye niyet ettiğinizde; 2. Haritanız Yetzirah\'ın şifa enerjisini aktive edersiniz.'
         },
         beriyah: {
           title: 'Bilge Zihin Tutumu: Stratejik Sorumluluk ve Yüksek İrade',
-          reaction: 'Egoyu ve kişisel çatışmaları bir kenara bırakıp "Bu sınav beni hangi konuda daha disiplinli ve adil bir birey yapmaya zorluyor?" bilinciyle uzun vadeli, yapıcı adımlar atmak.',
-          diagnosis: 'Dramaya kapılmadan sorumluluğu üstleniyor, sınırlarınızı nezaketle ama tavizsizce çizerek yapıcı bir çözüm planı uyguluyorsanız; 3. Haritanız Beriyah\'ın zihinsel kudretini çalıştırıyorsunuz.'
+          reaction: 'Kişisel çatışmaları bir kenara bırakıp "Bu deneyim beni hangi erdemlerle donatıyor?" bilinciyle uzun vadeli, yapıcı adımlar atmak.',
+          diagnosis: 'Dramaya kapılmadan sorumluluğu üstleniyor, sınırlarınızı nezaketle ama kararlılıkla çizerek yapıcı bir çözüm üretiyorsanız; 3. Haritanız Beriyah\'ın zihinsel kudretini çalıştırırsınız.'
         },
         atzilut: {
-          title: 'Kozmik Birlik Tutumu: İlahi İradeye Hizmet ve Mutlak Teslimiyet',
-          reaction: 'Kişisel haklılık ve kazanma hırsını tamamen bırakarak, gerçekleşen her olayın ilahi adaletin kusursuz bir tezahürü olduğunu bilmek; iradesini bütüne adanmış saf sevgiye teslim etmek.',
-          diagnosis: 'Zorlanma hissini tamamen aşarak, ilahi akışın sizi mükemmel şekilde terbiye ettiğini derinden hissediyor ve egonun sınırlarını aşan dingin bir güven içinde kalıyorsanız; 4. Haritanız Atzilut\'un kozmik frekansındasınız.'
+          title: 'Kozmik Birlik Tutumu: İlahi İradeye Hizmet ve Güvenli Teslimiyet',
+          reaction: 'Kişisel haklılık hırsını bırakarak gerçekleşen her olayın tekâmül için kusursuz bir düzen taşıdığını bilmek; iradesini bütüne adanmış saf sevgiye teslim etmek.',
+          diagnosis: 'İlahi akışın sizi sevgiyle olgunlaştırdığını derinden hissediyor ve egonun sınırlarını aşan dingin bir güven içinde kalıyorsanız; 4. Haritanız Atzilut\'un kozmik frekansındasınız.'
         }
       },
       emotional_depth: {
-        title: 'Duygusal Bağımlılık, İlişkiler ve Öz-Değer Sınavı',
-        desc: 'Gökyüzü şu an ikili ilişkilerinizi, sevilme ve onaylanma ihtiyacınızı, duygusal sınırlarınızı sınıyor. Bir ilişkideki kriz veya içsel boşluk hissi karşısında hangi bilinç frekansından tepki veriyorsunuz?',
+        title: 'Duygusal Denge, Sağlıklı Sınırlar ve Öz-Değer Farkındalığı',
+        desc: 'Gökyüzü şu an ikili ilişkilerinizi, duygusal ihtiyaçlarınızı ve öz-değerinizi aydınlatıyor. İlişkilerinizde ve içsel dünyanızda hangi bilinç frekansından hareket ediyorsunuz?',
         assiah: {
-          title: 'Reaktif Tutum: Kaybetme Korkusu, Manipülasyon veya Bağımlılık',
-          reaction: 'Karşı tarafı suçlamak, sessiz cezalandırmalar uygulamak, terk edilme korkusuyla sınırları çiğnetmek veya ilgi görebilmek için kurban rolüne bürünmek.',
-          diagnosis: 'Eğer bir ilişki veya güvensizlik anında karşı tarafı manipüle etmeye çalışıyor, aşırı fedakarlıkla kendinizi yok sayıyor ya da küsüp içine kapanıyorsanız; 1. Haritanız Assiah\'ı alt frekansta çalıştırıyorsunuz.'
+          title: 'Farkındalık Alanı: Kaybetme Korkusunu ve Bağımlılığı Dönüştürmek',
+          reaction: 'Karşı tarafı suçlamak ya da kurban rolüne bürünmek yerine; kendi duygusal ihtiyaçlarınızın sorumluluğunu üstlenmek.',
+          diagnosis: 'Eğer ilişkilerde güvensizlik anında içe kapanıyor veya aşırı fedakarlıkla sınırlarınızı unutuyorsanız; bu ihtiyacı fark edip Assiah zemininde özdeğerinizi ve sağlıklı sınırlarınızı güçlendirebilirsiniz.'
         },
         yetzirah: {
           title: 'İçsel Çocuk Tutumu: Kendi Kalbine Şefkatle Ebeveynlik Etmek',
-          reaction: 'Duygusal boşluğun dışarıdaki kişiden değil, kendi içsel bağınızın kopukluğundan kaynaklandığını anlamak; ağlama, yas tutma ve hücresel hafızadaki acıyı serbest bırakma cesareti göstermek.',
-          diagnosis: 'Dışarıya sitem etmek yerine "Ben kendi kendimi nerede terk ettim de bunu dışarıda arıyorum?" sorusunu sorup kalbinize şefkatle sarılıyorsanız; 2. Haritanız Yetzirah\'ı aktive ediyorsunuz.'
+          reaction: 'Duygusal doyumun dışarıdaki kişilerden önce kendi içsel bağınızdan kaynaklandığını fark etmek; hislerinizi şefkatle serbest bırakma cesareti göstermek.',
+          diagnosis: 'Dışarıya sitem etmek yerine kendi kalbinize sarılıp içsel çocuğunuza şefkatle yaklaşıyorsanız; 2. Haritanız Yetzirah\'ın iyileştirici gücünü aktive edersiniz.'
         },
         beriyah: {
           title: 'Bilge Zihin Tutumu: Sağlıklı Sınırlar ve Koşulsuz Öz-Sevgi',
           reaction: 'İlişkilere kadersel bir ayna gözüyle bakmak; sevgiyi bağımlılıkla karıştırmadan, net ve sağlıklı sınırlar çekerek hem kendine hem karşındakine saygı duyan olgun bir duruş sergilemek.',
-          diagnosis: 'Duygusal dramaları mantık ve yüksek şuurla ayrıştırarak, "Herkes kendi tekâmül yolunda; ben kendi değerimin mimarıyım" diyerek net sınırlar çizebiliyorsanız; 3. Haritanız Beriyah\'ı çalıştırıyorsunuz.'
+          diagnosis: 'Duygusal süreçleri yüksek şuurla ayrıştırarak "Herkes kendi tekâmül yolunda; ben kendi değerimin mimarıyım" bilinciyle hareket ediyorsanız; 3. Haritanız Beriyah\'ı çalıştırırsınız.'
         },
         atzilut: {
           title: 'Kozmik Birlik Tutumu: Koşulsuz Sevgi ve Birlik Şuuru',
-          reaction: 'Karşısındaki kişiyi herhangi bir beklentiye, role veya talebe sokmadan saf ilahi bir ruh olarak görmek; sevginin alınıp verilen bir şey değil, varoluşun özü olduğunu yaşamak.',
-          diagnosis: 'Hiçbir karşılık beklemeden, kimseye tutunmadan veya kırılmadan, saf ve dingin bir sevgi okyanusunda var olabiliyor ve yargılamayı tamamen bıraktıysanız; 4. Haritanız Atzilut\'u aktive ediyorsunuz.'
+          reaction: 'Karşısındaki insanı herhangi bir role veya beklentiye hapsetmeden saf bir ruh olarak görmek; sevginin varoluşun özü olduğunu yaşamak.',
+          diagnosis: 'Hiçbir karşılık beklemeden saf ve dingin bir sevgi okyanusunda var olabiliyor ve yargılamayı tamamen bıraktıysanız; 4. Haritanız Atzilut\'u aktive edersiniz.'
         }
       },
       mental_truth: {
-        title: 'Zihinsel Kalıplar, Hakikati İfade ve İnanç Sınavı',
-        desc: 'Gökyüzü şu an düşünce sisteminizi, doğru bildiğiniz dogmaları, iletişim dilinizi ve geleceğe dair inançlarınızı sınıyor. Bir fikir ayrılığı, belirsizlik veya zihinsel kriz karşısında nasıl bir tutum sergiliyorsunuz?',
+        title: 'Zihinsel Berraklık, Hakikati İfade ve İlham',
+        desc: 'Gökyüzü şu an düşünce sisteminizi, inanç kalıplarınızı ve iletişim dilinizi aydınlatıyor. Zihinsel süreçlerinizde nasıl bir tutum sergiliyorsunuz?',
         assiah: {
-          title: 'Reaktif Tutum: Dogmatizm, Zihinsel Kaygı ve Haklı Çıkma Çabası',
-          reaction: 'Kendi doğrusunu fanatikçe savunmak, sürekli felaket senaryoları kurmak, dinlemeden tartışmak veya aşırı analizle eylemsizliğe saplanmak.',
-          diagnosis: 'Eğer tartışmalarda haklı çıkmak için didiniyor, kafanızda durmaksızın dönen vesveselere teslim oluyor veya geleceğe korkuyla bakıyorsanız; 1. Haritanız Assiah\'ı alt frekansta çalıştırıyorsunuz.'
+          title: 'Farkındalık Alanı: Haklı Çıkma Çabasını ve Kaygıyı Dönüştürmek',
+          reaction: 'Kendi doğrusunu katıca savunmak yerine; zihni sakinleştirip dinlemeyi ve yapıcı çözümlere odaklanmayı seçmek.',
+          diagnosis: 'Eğer zihinsel tartışmalarda haklı çıkma çabasına veya kaygılara kapıldığınızı hissediyorsanız; zihninizi sakinleştirerek Assiah aleminde düşüncelerinizi pratik ve yapıcı çözümlere odaklayabilirsiniz.'
         },
         yetzirah: {
-          title: 'İçsel Çocuk Tutumu: Zihnin Duygusal Köklerini ve İnanç Yaralarını Keşfetmek',
-          reaction: 'Düşüncelerin aslında geçmişte yaşanan incinmelerin kalkanı olduğunu fark etmek; "Hata yaparsam sevilmem" veya "Anlaşılmıyorum" hissiyle yüzleşmek.',
-          diagnosis: 'Savunduğunuz fikirlerin arkasındaki onaylanmama veya küçük düşme korkusunu dürüstçe itiraf edip zihinsel savunma zırhınızı gevşetiyorsanız; 2. Haritanız Yetzirah\'ı aktive ediyorsunuz.'
+          title: 'İçsel Çocuk Tutumu: Zihnin Duygusal Köklerini Keşfetmek',
+          reaction: 'Düşüncelerin geçmiş incinmelerin savunma kalkanı olduğunu fark etmek; "Anlaşılmıyorum" hissiyle yüzleşip zihinsel zırhı gevşetmek.',
+          diagnosis: 'Savunduğunuz fikirlerin arkasındaki onaylanma ihtiyacını dürüstçe fark edip şefkatle yaklaşıyorsanız; 2. Haritanız Yetzirah\'ı aktive edersiniz.'
         },
         beriyah: {
           title: 'Bilge Zihin Tutumu: Objektif Algı, Yüksek Vizyon ve İlham',
-          reaction: 'Zihni yargılayıcı bir araç olmaktan çıkarıp, evrensel ilkeleri idrak eden berrak bir merceğe dönüştürmek; farklı bakış açılarını sentezleyip yapıcı çözümler üretmek.',
-          diagnosis: 'Olaylara kuşbakışı bakarak, kutuplaşmadan sentez yapabiliyor ve zihninizi bütüne hizmet eden ilham dolu projelere yönlendirebiliyorsanız; 3. Haritanız Beriyah\'ı çalıştırıyorsunuz.'
+          reaction: 'Zihni yargılayıcı bir araç olmaktan çıkarıp, evrensel ilkeleri idrak eden berrak bir merceğe dönüştürmek; yapıcı ve ilham verici projeler üretmek.',
+          diagnosis: 'Olaylara kuşbakışı bakarak kutuplaşmadan sentez yapabiliyor ve zihninizi bütüne hizmet eden projelere yönlendirebiliyorsanız; 3. Haritanız Beriyah\'ı çalıştırırsınız.'
         },
         atzilut: {
           title: 'Kozmik Birlik Tutumu: Zihnin Sessizliği ve Saf Sezgi (Gnosis)',
-          reaction: 'Kavramların, kelimelerin ve düşüncelerin ötesine geçerek "Bilme" halini doğrudan kalpten deneyimlemek; mutlak sessizlikte ilahi ilhamı ve rehberliği duymak.',
-          diagnosis: 'Zihinsel konuşmaların tamamen sustuğu derin bir meditatif dinginlikte, bilginin analizle değil doğrudan ilahi kaynaktan kalbinize aktığını deneyimliyorsanız; 4. Haritanız Atzilut frekansındasınız.'
+          reaction: 'Kavramların ve düşüncelerin ötesine geçerek hakikati doğrudan kalpten deneyimlemek; mutlak sükûnette ilahi ilhamı duymak.',
+          diagnosis: 'Zihinsel karmaşanın tamamen dindiği derin bir meditatif dinginlikte, saf sezginin kalbinize aktığını deneyimliyorsanız; 4. Haritanız Atzilut frekansındasınız.'
         }
       },
       shadow_alchemy: {
-        title: 'Gölge Simyası, Kriz Yönetimi ve Yeniden Doğuş Sınavı',
-        desc: 'Gökyüzü şu an hayatınızda miadını doldurmuş olanı bırakma cesaretinizi, krizler karşısındaki dayanıklılığınızı ve karanlığı aydınlığa dönüştürme potansiyelinizi sınıyor. Beklenmedik bir kayıp, kriz veya dönüşüm anında nasıl tepki veriyorsunuz?',
+        title: 'İçsel Simya, Dönüşüm ve Yeniden Doğuş Bilgeliği',
+        desc: 'Gökyüzü şu an hayatınızda miadını doldurmuş olanı serbest bırakma cesaretinizi ve karanlığı aydınlığa dönüştürme potansiyelinizi aydınlatıyor. Dönüşüm anlarında nasıl tepki veriyorsunuz?',
         assiah: {
-          title: 'Reaktif Tutum: Direnç Gösterme, İntikam veya Çöküş Hissi',
-          reaction: 'Biten şeye umutsuzca tutunmak, yıkımı bir felaket olarak algılayıp hayata küsmek, haksızlığa uğradığını düşünüp intikam veya haset duygularına teslim olmak.',
-          diagnosis: 'Eğer kontrolünüz dışındaki bir kayıp veya kriz anında çaresizliğe kapılıyor, öfkeyle yıkıcı tepkiler veriyor veya eskiyi bırakmamak için debeleniyorsanız; 1. Haritanız Assiah\'ı alt frekansta çalıştırıyorsunuz.'
+          title: 'Farkındalık Alanı: Direnci Bırakıp Akışa Güvenmek',
+          reaction: 'Biten şeye tutunup hayata küsmek yerine; değişimin getirdiği doğal döngüyü kabul ederek yeni bir sayfa açmak.',
+          diagnosis: 'Eğer beklenmedik değişimlerde eski kalıplara tutunma ihtiyacı duyuyorsanız; değişimin getirdiği arınma fırsatını fark ederek Assiah boyutunda sağlam ve esnek adımlarla yeniden köklenebilirsiniz.'
         },
         yetzirah: {
-          title: 'İçsel Çocuk Tutumu: Karanlıkla Yüzleşme ve Gölgeyi Kabul',
-          reaction: 'Kendi içindeki kıskançlık, yetersizlik veya ölüm korkusu gibi en karanlık duyguları bastırmadan dürüstçe kabul etmek ve simyasal acıyı hissetmek.',
-          diagnosis: 'Krizin size aynaladığı bastırılmış gölge parçalarınızı suçlamadan kucaklıyor ve acının içinden geçmeye izin veriyorsanız; 2. Haritanız Yetzirah\'ın şifasını aktive ediyorsunuz.'
+          title: 'İçsel Çocuk Tutumu: Gölge Parçaları Sevgiyle Kabul Etmek',
+          reaction: 'Kendi içindeki korku veya yetersizlik duygularını bastırmadan dürüstçe kabul etmek ve iyileştirici dönüşüme izin vermek.',
+          diagnosis: 'Değişimin size aynaladığı bastırılmış duygularınızı suçlamadan kucaklıyor ve şifalanmasına alan açıyorsanız; 2. Haritanız Yetzirah\'ın bilgeliğini aktive edersiniz.'
         },
         beriyah: {
           title: 'Bilge Zihin Tutumu: Simyasal Dönüşüm ve Anka Kuşu Şuuru',
-          reaction: 'Yıkılan formun ruhun özgürleşmesi için zorunlu olduğunu kavramak; krizden büyük bir tekâmül dersi çıkararak küllerinden yepyeni ve çok daha güçlü bir bilinçle doğmak.',
-          diagnosis: '"Biten form gitti çünkü daha yüce bir varoluş doğmak zorunda" diyerek krizin ortasında yeni bir kadersel vizyon inşa edebiliyorsanız; 3. Haritanız Beriyah\'ı çalıştırıyorsunuz.'
+          reaction: 'Eski formların ruhun özgürleşmesi için dönüştüğünü kavramak; deneyimlerden büyük bir bilgelik damıtarak küllerinden yeniden doğmak.',
+          diagnosis: '"Tamamlanan deneyim bitti çünkü daha yüce bir varoluş filizleniyor" diyerek yeni bir kadersel vizyon inşa edebiliyorsanız; 3. Haritanız Beriyah\'ı çalıştırırsınız.'
         },
         atzilut: {
-          title: 'Kozmik Birlik Tutumu: Mutlak Ölüm-Yeniden Doğuş ve Sonsuzluk Şuuru',
-          reaction: 'Ölüm ile yaşamın, varlık ile yokluğun tek bir ilahi nefes olduğunu idrak etmek; hiçbir şeye sahip olunmadığını, dolayısıyla hiçbir şeyin kaybedilemeyeceğini bilerek mutlak huzurda kalmak.',
-          diagnosis: 'En büyük fırtınanın ortasında bile varoluşun ebedi ışığıyla bir olduğunuzu bilip zerre kadar sarsılmadan saf kozmik güvenle durabiliyorsanız; 4. Haritanız Atzilut\'un zirvesindesiniz.'
+          title: 'Kozmik Birlik Tutumu: Sonsuzluk ve Birlik Şuuru',
+          reaction: 'Ölüm ile yaşamın tek bir ilahi nefes olduğunu idrak etmek; hiçbir şeye bağımlı kalmadan sonsuz huzurda var olmak.',
+          diagnosis: 'En büyük dalgalanmaların ortasında bile varoluşun ebedi ışığıyla bir olduğunuzu bilip saf kozmik güvenle durabiliyorsanız; 4. Haritanız Atzilut\'un zirvesindesiniz.'
         }
       }
     };
@@ -257,11 +257,11 @@ export async function POST(req: NextRequest) {
     const currentArchetype = challengeArchetypes[topCategory];
 
     const transitReason = prominentAspectDesc
-      ? `Şu an gökyüzünde ${prominentAspectDesc} açısı doğrudan devrede. Bu güçlü göksel tetiklenme; haritanızın ${topCategory === 'will_power' ? 'fiziksel irade ve eylem' : topCategory === 'emotional_depth' ? 'duygusal bağlar ve bilinçaltı' : topCategory === 'mental_truth' ? 'zihinsel inanç ve vizyon' : 'kriz ve dönüşüm'} alanını aktive ederek sizi önemli bir tekâmül eşiğine davet ediyor.`
-      : `Şu an gökyüzündeki güncel gezegen transitleri haritanızın temel akslarını tetikleyerek; sizi ${currentArchetype.title.toLowerCase()} kapsamında derin bir içsel farkındalığa davet ediyor.`;
+      ? `Şu an gökyüzünde ${prominentAspectDesc} açısı doğrudan devrede. Bu güçlü göksel etkileşim; haritanızın ${topCategory === 'will_power' ? 'fiziksel irade ve eylem' : topCategory === 'emotional_depth' ? 'duygusal bağlar ve içsel dünya' : topCategory === 'mental_truth' ? 'zihinsel vizyon ve ifade' : 'derin dönüşüm ve bilgelik'} alanını aktive ederek sizi önemli bir tekâmül kapısına davet ediyor.`
+      : `Şu an gökyüzündeki güncel gezegen transitleri haritanızın temel akslarını destekleyerek; sizi ${currentArchetype.title.toLowerCase()} kapsamında derin bir içsel farkındalığa davet ediyor.`;
 
     const activeConsciousness = {
-      title: `Günün Kozmik Sınavı: ${currentArchetype.title}`,
+      title: `Günün Kozmik Farkındalığı: ${currentArchetype.title}`,
       reason: transitReason,
       explanation: currentArchetype.desc,
       currentTheme: currentArchetype.title,
