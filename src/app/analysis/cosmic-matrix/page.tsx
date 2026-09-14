@@ -508,10 +508,50 @@ export default function CosmicMatrixPage() {
 
             {/* 5. Bütünleşik 5 Katman Çapraz Okuma Matrisi (Tablo) */}
             <div className="space-y-4 pt-4">
-              <h2 className="text-xl font-serif font-bold text-white flex items-center gap-2">
-                <Bookmark size={20} className="text-amber-400" />
-                5 Katman Bütünleşik Matris Tablosu
-              </h2>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <h2 className="text-xl font-serif font-bold text-white flex items-center gap-2">
+                  <Bookmark size={20} className="text-amber-400" />
+                  5 Katman Bütünleşik Matris Tablosu
+                </h2>
+                <span className="text-xs text-gray-400">
+                  Astroloji × Kabala × Human Design × Rune × Biyofizik
+                </span>
+              </div>
+
+              {/* Açıklayıcı Rehber Bilgi Kutusu */}
+              <div className="bg-gradient-to-r from-amber-500/10 via-purple-500/10 to-sky-500/10 border border-amber-500/25 rounded-3xl p-5 sm:p-6 space-y-4 shadow-xl">
+                <div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-amber-300">
+                  <Sparkles size={15} className="text-amber-400 shrink-0" />
+                  <span>Bu Tabloyu Nasıl Okumalısınız? (Kozmik Röntgen Rehberi)</span>
+                </div>
+                <p className="text-xs sm:text-sm text-gray-200 leading-relaxed font-normal">
+                  Varlığınız tek bir boyuttan ibaret değildir. Haritanızdaki her bir gezegen gökyüzünde soyut bir göktaşı değil; 
+                  zihninizde bir sahne <strong className="text-amber-300">(Astroloji)</strong>, ruhunuzda ilahi bir kapı <strong className="text-purple-300">(Kabala)</strong>, hücrelerinizde genetik bir devre <strong className="text-emerald-300">(Human Design)</strong>, 
+                  auranızda dengeleyici bir mühür <strong className="text-amber-200">(Kadim Futhark Runesi)</strong> ve etten kemikten bedeninizde somut bir merkezdir <strong className="text-sky-300">(Çakra & Biyofizik)</strong>.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5 pt-2 border-t border-white/10 text-[11px]">
+                  <div className="bg-black/40 p-3 rounded-2xl border border-white/5 space-y-1">
+                    <span className="text-amber-400 font-bold block">1. Astroloji</span>
+                    <span className="text-gray-400 block leading-snug">Bu enerji dünyevi hayatınızda hangi alanda (Ev) ve tarzda (Burç) yaşanıyor?</span>
+                  </div>
+                  <div className="bg-black/40 p-3 rounded-2xl border border-white/5 space-y-1">
+                    <span className="text-purple-400 font-bold block">2. Kabala (Sefira)</span>
+                    <span className="text-gray-400 block leading-snug">Ruhunuz bu enerjiyi Hayat Ağacı’nın hangi kapısında ve hangi âlemde deneyimliyor?</span>
+                  </div>
+                  <div className="bg-black/40 p-3 rounded-2xl border border-white/5 space-y-1">
+                    <span className="text-emerald-400 font-bold block">3. Human Design</span>
+                    <span className="text-gray-400 block leading-snug">Bedeninizdeki genetik devre (Kapı), davranış çizgisi ve psikolojik merkez neresidir?</span>
+                  </div>
+                  <div className="bg-black/40 p-3 rounded-2xl border border-white/5 space-y-1">
+                    <span className="text-amber-300 font-bold block">4. Kadim Rune</span>
+                    <span className="text-gray-400 block leading-snug">Bu frekans dengesini kaybettiğinde onu hizalayacak kadim arketip ve şifa mührü nedir?</span>
+                  </div>
+                  <div className="bg-black/40 p-3 rounded-2xl border border-white/5 space-y-1">
+                    <span className="text-sky-400 font-bold block">5. Beden & Çakra</span>
+                    <span className="text-gray-400 block leading-snug">Bu enerji fiziksel bedeninizde nereye depolanır ve bloke olursa hangi bölge alarm verir?</span>
+                  </div>
+                </div>
+              </div>
               
               <div className="overflow-x-auto bg-white/[0.02] border border-white/10 rounded-3xl shadow-2xl">
                 <table className="w-full text-left text-xs text-gray-300">
