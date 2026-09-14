@@ -227,11 +227,11 @@ export function generateUnifiedPlanetTransit(
 
   // 1. İnsan Dili Başlık (Jargondan Arındırılmış Tema)
   let humanThemeTitle = '';
-  if (primaryChallenging && primaryChallenging.natalHouse) {
+  if (primaryChallenging && primaryChallenging.natalHouse && primaryChallenging.natalHouse !== house) {
     const mainArea = LIFE_AREA_NAMES[house] || 'Yaşam Yönü';
     const targetArea = LIFE_AREA_NAMES[primaryChallenging.natalHouse] || 'İçsel Alan';
     humanThemeTitle = `${mainArea} ile ${targetArea} Arasında Denge Sınavı`;
-  } else if (primaryHarmonious && primaryHarmonious.natalHouse) {
+  } else if (primaryHarmonious && primaryHarmonious.natalHouse && primaryHarmonious.natalHouse !== house) {
     const mainArea = LIFE_AREA_NAMES[house] || 'Yaşam Yönü';
     const targetArea = LIFE_AREA_NAMES[primaryHarmonious.natalHouse] || 'İçsel Alan';
     humanThemeTitle = `${mainArea} ve ${targetArea} Arasında Akıcı Destek`;
@@ -239,19 +239,27 @@ export function generateUnifiedPlanetTransit(
     humanThemeTitle = `${LIFE_AREA_NAMES[house] || 'Yaşam Alanı'} Konularında Yeniden Yapılanma`;
   }
 
-  // 2. İnsan Dili Ana Metin (Gezegen/Ev jargonuna boğulmadan doğrudan hayatı anlatan sentez)
+  // 2. 7Layers Yaşam Alanı Özeti (Tekrar içermeyen, sade ve doğal insan dili)
   let humanNarrative = '';
   if (primaryChallenging && primaryChallenging.natalHouse) {
-    humanNarrative += `Şu sıralar ${LIFE_AREA_DESCRIPTIONS[house]} ile ${LIFE_AREA_DESCRIPTIONS[primaryChallenging.natalHouse]} arasında seni iki yönlü bir baskıya ve yüzleşmeye çeken bir gerilim hissedebilirsin. Dış dünyada bir tarafa aşırı odaklanırken diğer tarafı ihmal ettiğinde içsel ya da ilişkisel sürtüşmeler tetiklenebilir. `;
+    if (primaryChallenging.natalHouse === house) {
+      humanNarrative += `Şu dönemde doğrudan ${LIFE_AREA_DESCRIPTIONS[house]} üzerinde yoğunlaşan etkiler, seni derin bir yüzleşmeye, sınırlarını gözden geçirmeye ve içsel muhasebeye çekebilir. `;
+    } else {
+      humanNarrative += `Şu sıralar ${LIFE_AREA_DESCRIPTIONS[house]} ile ${LIFE_AREA_DESCRIPTIONS[primaryChallenging.natalHouse]} arasında seni iki yönlü bir baskıya ve yüzleşmeye çeken bir gerilim hissedebilirsin. Dış dünyada bir tarafa aşırı odaklanırken diğer tarafı ihmal ettiğinde içsel ya da ilişkisel sürtüşmeler tetiklenebilir. `;
+    }
   } else if (primaryHarmonious && primaryHarmonious.natalHouse) {
-    humanNarrative += `Bu dönemde ${LIFE_AREA_DESCRIPTIONS[house]} alanında attığın adımlar, ${LIFE_AREA_DESCRIPTIONS[primaryHarmonious.natalHouse]} konularında sana güçlü bir destek ve rahatlama akışı sağlıyor. Çözülmez gibi görünen durumların daha doğal bir akışla hafiflediğini fark edebilirsin. `;
+    if (primaryHarmonious.natalHouse === house) {
+      humanNarrative += `Bu dönemde ${LIFE_AREA_DESCRIPTIONS[house]} alanında yoğunlaşan uyumlu etkiler, sana güçlü bir rahatlama, derinleşme ve berraklık sağlıyor. Tıkanmış gibi görünen durumların kendiliğinden çözüme doğru aktığını fark edebilirsin. `;
+    } else {
+      humanNarrative += `Bu dönemde ${LIFE_AREA_DESCRIPTIONS[house]} alanında attığın adımlar, ${LIFE_AREA_DESCRIPTIONS[primaryHarmonious.natalHouse]} konularında sana güçlü bir destek ve rahatlama akışı sağlıyor. Çözülmez gibi görünen durumların daha doğal bir akışla hafiflediğini fark edebilirsin. `;
+    }
   } else {
     humanNarrative += `Bu süreçte temel odak noktan doğrudan ${LIFE_AREA_DESCRIPTIONS[house]} üzerinde toplanıyor. Arka planda biriken belirsizlikleri netleştirmen ve sağlam kararlarla ilerlemen gerekiyor. `;
   }
 
-  // Human Design Davranışsal Arketip Sentezi
+  // Ruhsal ve Zihinsel Arketip Sentezi (Kafa karıştırıcı kapı etiketi olmadan)
   if (hdGateInfo) {
-    humanNarrative += `Bu dönemin ruhsal ve zihinsel anahtarı (Human Design ${hdGateInfo.gate}. Kapı: ${hdGateInfo.title}); seni "${hdGateInfo.shadow}" tuzağında tüketmek yerine, "${hdGateInfo.gift}" potansiyelini hayatına taşımandır. `;
+    humanNarrative += `Bu dönemin ruhsal ve zihinsel anahtarı; seni "${hdGateInfo.shadow}" tuzağında tüketmek yerine, "${hdGateInfo.gift}" potansiyelini hayatına taşımandır. `;
   }
 
   // Pratik Hayat Reçetesi
@@ -282,7 +290,7 @@ export function generateUnifiedPlanetTransit(
   }
 
   // Detailed Analysis Synthesis
-  let detailedAnalysis = `【Doğrudan İnsan Dili & Yaşam Alanı Özeti】\n${humanNarrative}\n\n` +
+  let detailedAnalysis = `【7Layers Yaşam Alanı Özeti】\n${humanNarrative}\n\n` +
     `【Yaşam Alanı Etkisi: ${houseTitle}】\n` +
     `${pName}, astrolojide ${PLANET_NATURES[pName] || 'önemli enerjileri'} temsil eder. Bu geçiş sizin ${house}. evinizden geçerken; ${houseTheme} alanınızda köklü bir uyanış ve farkındalık yaratır.\n\n`;
 

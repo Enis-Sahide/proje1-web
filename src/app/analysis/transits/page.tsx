@@ -1193,7 +1193,7 @@ export default function TransitsPage() {
                             {/* Human-Centric Narrative Box */}
                             <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3">
                               <span className="text-[10px] text-[#0EA5E9] uppercase tracking-wider font-extrabold flex items-center gap-1.5">
-                                <Sparkles size={12} /> Bütünleşik Yaşam Teşhisi & İdrak
+                                <Sparkles size={12} /> 7Layers Yaşam Alanı Özeti
                               </span>
                               <p className="text-xs sm:text-sm text-gray-200 leading-relaxed font-normal">
                                 {ut.humanNarrative}
