@@ -16,7 +16,9 @@ import {
   ChevronRight,
   Info,
   Lock,
-  MapPin
+  MapPin,
+  Globe,
+  RotateCcw
 } from 'lucide-react';
 import type { TransitTimelineItem } from '@/features/astrology/engine/TransitTimelineEngine';
 
@@ -57,6 +59,131 @@ const ZODIAC_SYMBOLS: Record<string, string> = {
   'Aslan Burcu': '♌', 'Başak Burcu': '♍', 'Terazi Burcu': '♎', 'Akrep Burcu': '♏',
   'Yay Burcu': '♐', 'Oğlak Burcu': '♑', 'Kova Burcu': '♒', 'Balık Burcu': '♓',
 };
+
+interface SectionBlock {
+  title: string;
+  content: string;
+  type: 'phase' | 'theme' | 'collective' | 'advice' | 'retro' | 'general';
+}
+
+function parseSections(text: string): SectionBlock[] {
+  if (!text) return [];
+  if (!text.includes('【')) {
+    return [{ title: '', content: text.trim(), type: 'general' }];
+  }
+
+  const rawBlocks = text.split('【').filter(b => b.trim().length > 0);
+  return rawBlocks.map(block => {
+    const closeIdx = block.indexOf('】');
+    if (closeIdx === -1) {
+      return { title: '', content: block.trim(), type: 'general' };
+    }
+    const title = block.slice(0, closeIdx).trim();
+    const content = block.slice(closeIdx + 1).trim();
+
+    let type: SectionBlock['type'] = 'general';
+    const lowerTitle = title.toLowerCase();
+    if (lowerTitle.includes('geçiş evresi') || lowerTitle.includes('evre') || lowerTitle.includes('ingress')) {
+      type = 'phase';
+    } else if (lowerTitle.includes('tema') || lowerTitle.includes('özet') || lowerTitle.includes('doğa')) {
+      type = 'theme';
+    } else if (lowerTitle.includes('kolektif') || lowerTitle.includes('toplumsal') || lowerTitle.includes('küresel')) {
+      type = 'collective';
+    } else if (lowerTitle.includes('tavsiye') || lowerTitle.includes('rehberlik') || lowerTitle.includes('dönüşüm')) {
+      type = 'advice';
+    } else if (lowerTitle.includes('retro') || lowerTitle.includes('rx')) {
+      type = 'retro';
+    }
+
+    return { title, content, type };
+  });
+}
+
+function hasAdviceInDetails(details?: string): boolean {
+  if (!details) return false;
+  const lower = details.toLowerCase();
+  return lower.includes('【bireysel rehberlik') || lower.includes('【bireysel tavsiye') || lower.includes('【rehberlik');
+}
+
+function FormattedDetails({ text }: { text?: string }) {
+  if (!text) return null;
+  const sections = parseSections(text);
+
+  if (sections.length === 1 && sections[0].type === 'general' && !sections[0].title) {
+    return <p className="text-xs text-mystic-text-muted leading-relaxed whitespace-pre-wrap">{sections[0].content}</p>;
+  }
+
+  return (
+    <div className="space-y-3 mt-1.5">
+      {sections.map((sec, idx) => {
+        switch (sec.type) {
+          case 'phase':
+            return (
+              <div key={idx} className="bg-indigo-950/30 border border-indigo-500/25 rounded-2xl p-3.5 shadow-sm">
+                <span className="text-[11px] font-extrabold text-indigo-300 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
+                  <Sparkles size={13} className="text-indigo-400 shrink-0" />
+                  {sec.title}
+                </span>
+                <p className="text-xs text-indigo-100/90 leading-relaxed whitespace-pre-line">{sec.content}</p>
+              </div>
+            );
+          case 'theme':
+            return (
+              <div key={idx} className="bg-amber-950/20 border border-amber-500/25 rounded-2xl p-3.5 shadow-sm">
+                <span className="text-[11px] font-extrabold text-amber-300 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
+                  <Compass size={13} className="text-amber-400 shrink-0" />
+                  {sec.title}
+                </span>
+                <p className="text-xs text-amber-100/90 leading-relaxed whitespace-pre-line">{sec.content}</p>
+              </div>
+            );
+          case 'collective':
+            return (
+              <div key={idx} className="bg-sky-950/20 border border-sky-500/25 rounded-2xl p-3.5 shadow-sm">
+                <span className="text-[11px] font-extrabold text-sky-300 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
+                  <Globe size={13} className="text-sky-400 shrink-0" />
+                  {sec.title}
+                </span>
+                <p className="text-xs text-sky-100/90 leading-relaxed whitespace-pre-line">{sec.content}</p>
+              </div>
+            );
+          case 'advice':
+            return (
+              <div key={idx} className="bg-emerald-950/20 border border-emerald-500/25 rounded-2xl p-3.5 shadow-sm">
+                <span className="text-[11px] font-extrabold text-emerald-300 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
+                  <CheckCircle2 size={13} className="text-emerald-400 shrink-0" />
+                  {sec.title}
+                </span>
+                <p className="text-xs text-emerald-100 leading-relaxed whitespace-pre-line">{sec.content}</p>
+              </div>
+            );
+          case 'retro':
+            return (
+              <div key={idx} className="bg-purple-950/25 border border-purple-500/30 rounded-2xl p-3.5 shadow-sm">
+                <span className="text-[11px] font-extrabold text-purple-300 uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
+                  <RotateCcw size={13} className="text-purple-400 shrink-0" />
+                  {sec.title}
+                </span>
+                <p className="text-xs text-purple-100/90 leading-relaxed whitespace-pre-line">{sec.content}</p>
+              </div>
+            );
+          default:
+            return (
+              <div key={idx} className="bg-white/[0.03] border border-white/10 rounded-2xl p-3.5 shadow-sm">
+                {sec.title && (
+                  <span className="text-[11px] font-extrabold text-white uppercase tracking-wider flex items-center gap-1.5 mb-1.5">
+                    <Info size={13} className="text-[#D4AF37] shrink-0" />
+                    {sec.title}
+                  </span>
+                )}
+                <p className="text-xs text-gray-300 leading-relaxed whitespace-pre-line">{sec.content}</p>
+              </div>
+            );
+        }
+      })}
+    </div>
+  );
+}
 
 export default function TransitTimelineChart({
   items,
@@ -656,12 +783,16 @@ export default function TransitTimelineChart({
                 {/* Content & Interpretation */}
                 <div className="space-y-4 text-sm text-gray-300 leading-relaxed mb-6">
                   <div>
-                    <strong className="text-white block mb-1 text-xs uppercase tracking-wider">Kadersel & Psikolojik Dinamik:</strong>
-                    <p className="text-xs text-mystic-text-muted leading-relaxed whitespace-pre-wrap">{selectedItem.details}</p>
+                    <strong className="text-white block mb-2 text-xs uppercase tracking-wider flex items-center gap-1.5 font-bold">
+                      <Sparkles size={13} className="text-[#D4AF37]" /> Kadersel & Psikolojik Dinamik:
+                    </strong>
+                    <FormattedDetails text={selectedItem.details} />
                   </div>
-                  {selectedItem.advice && (
-                    <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl">
-                      <strong className="text-emerald-400 block mb-1.5 text-xs uppercase tracking-wider">Rehberlik & Tavsiye:</strong>
+                  {selectedItem.advice && !hasAdviceInDetails(selectedItem.details) && (
+                    <div className="p-4 bg-emerald-950/20 border border-emerald-500/25 rounded-2xl">
+                      <strong className="text-emerald-400 block mb-1.5 text-xs uppercase tracking-wider flex items-center gap-1.5 font-bold">
+                        <CheckCircle2 size={13} /> Rehberlik & Tavsiye:
+                      </strong>
                       <p className="text-xs text-emerald-100 leading-relaxed whitespace-pre-line">{selectedItem.advice}</p>
                     </div>
                   )}

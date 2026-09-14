@@ -1064,7 +1064,7 @@ export async function calculateMundaneTimeline(
       if (eTime >= startDayTime && sTime <= endDayTime) {
         const signName = ZODIAC_SIGNS[curSign];
         const durationDays = Math.max(1, Math.round((eTime - sTime) / (1000 * 60 * 60 * 24)));
-        const interp = getSkyPlanetSignInterpretation(b.name, signName, 0, 0);
+        const interp = getSkyPlanetSignInterpretation(b.name, signName, 0, 0, false, true);
 
         const now = Date.now();
         let status: 'ACTIVE' | 'UPCOMING' | 'COMPLETED' = 'ACTIVE';
@@ -1095,7 +1095,7 @@ export async function calculateMundaneTimeline(
           title: `${b.name} → ${signName} Burcu Geçişi`,
           summary: interp.summary || `${b.name} ${signName} burcunda seyrediyor.`,
           details: interp.content || `${signName} burcundaki bu geçiş, kolektif alanda önemli etkiler başlatır.`,
-          advice: interp.extra || 'Bu burç geçişinde farkındalıkla hareket edin.',
+          advice: interp.advice || 'Bu burç geçişinde farkındalıkla hareket edin.',
           chakraLayer: interp.extra || getChakraLayer(b.name, signName),
           durationDays,
           status,

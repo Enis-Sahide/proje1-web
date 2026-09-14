@@ -551,18 +551,28 @@ export function getSkyPlanetSignInterpretation(
   signName: string,
   degree: number,
   minutes: number,
-  isRetrograde?: boolean
+  isRetrograde?: boolean,
+  isWholeSignTransit?: boolean
 ): { 
   title: string; 
   headline: string; 
   summary: string; 
   content: string; 
   extra?: string;
+  advice?: string;
   phase: IngressPhaseInfo;
 } {
   const customKey = `${planetName}-${signName}`;
   const customInterp = MAJOR_PLANET_SIGN_CUSTOM_INTERPRETATIONS[customKey];
-  const phase = getIngressPhase(degree, minutes, isRetrograde);
+  const phase = isWholeSignTransit 
+    ? {
+        type: 'ACTIVE_TRANSIT' as const,
+        badge: 'Burç Geçiş Döngüsü',
+        badgeClass: 'bg-indigo-500/10 text-indigo-300 border-indigo-500/30',
+        label: 'Tüm Burç Seyri',
+        description: `${planetName}, bu döngü boyunca ${signName} burcunun temalarını kolektif ve bireysel alanda derinlemesine çalıştırır.`
+      }
+    : getIngressPhase(degree, minutes, isRetrograde);
 
   const pInfo = PLANET_TRANSIT_THEMES[planetName] || {
     nature: `${planetName} gezegeninin kozmik frekansı`,
@@ -609,6 +619,7 @@ export function getSkyPlanetSignInterpretation(
     extra = `${sInfo.element} Elementi • ${sInfo.quality} Nitelik • Çakra: ${pInfo.chakra}`;
   }
 
-  return { title, headline, summary, content, extra, phase };
-}
+  const advice = customInterp?.advice || sInfo.advice;
 
+  return { title, headline, summary, content, extra, advice, phase };
+}
