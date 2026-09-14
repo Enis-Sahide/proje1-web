@@ -428,6 +428,30 @@ const PLANET_DYNAMIC_PROFILES: Record<string, DynamicProfile> = {
   }
 };
 
+export function normalizePlanetKey(name: string): string {
+  if (!name) return 'Sun';
+  const clean = name.trim().toLowerCase();
+  
+  if (clean.includes('güneş') || clean === 'sun') return 'Sun';
+  if (clean === 'ay' || clean === 'moon') return 'Moon';
+  if (clean.includes('merkür') || clean === 'mercury') return 'Mercury';
+  if (clean.includes('venüs') || clean === 'venus') return 'Venus';
+  if (clean === 'mars') return 'Mars';
+  if (clean.includes('jüpiter') || clean === 'jupiter') return 'Jupiter';
+  if (clean.includes('satürn') || clean === 'saturn') return 'Saturn';
+  if (clean.includes('uranüs') || clean === 'uranus') return 'Uranus';
+  if (clean.includes('neptün') || clean === 'neptune') return 'Neptune';
+  if (clean.includes('plüton') || clean.includes('pluto')) return 'Pluto';
+  if (clean.includes('kuzey') || clean.includes('northnode') || clean.includes('true node') || clean === 'node') return 'NorthNode';
+  if (clean.includes('güney') || clean.includes('southnode')) return 'SouthNode';
+  if (clean.includes('kiron') || clean.includes('chiron')) return 'Chiron';
+  if (clean.includes('yükselen') || clean.includes('asc')) return 'Ascendant';
+  if (clean.includes('tepe') || clean.includes('mc')) return 'Midheaven';
+  if (clean.includes('dünya') || clean === 'earth') return 'Earth';
+  
+  return name;
+}
+
 export function synthesizeCosmicMatrix(
   astroPlanets: PlanetaryInput[],
   astroAspects: AspectInput[],
@@ -443,9 +467,26 @@ export function synthesizeCosmicMatrix(
     Atzilut: 0
   };
 
-  astroPlanets.forEach((p) => {
-    const meta = PLANET_NAMES_TR[p.name] || { tr: p.name, sym: '✧' };
-    const kabbalahMeta = PLANET_KABBALAH_MAP[p.name] || {
+  // Eğer Güney Düğümü eksikse Kuzey Düğümünden otomatik türet
+  let effectivePlanets = [...astroPlanets];
+  const hasSouthNode = effectivePlanets.some(p => normalizePlanetKey(p.name) === 'SouthNode');
+  const northNode = effectivePlanets.find(p => normalizePlanetKey(p.name) === 'NorthNode');
+  if (!hasSouthNode && northNode) {
+    const oppHouse = ((northNode.house + 5) % 12) + 1;
+    effectivePlanets.push({
+      name: 'Güney Düğümü',
+      sign: 'Kök Hafıza',
+      house: oppHouse,
+      degree: northNode.degree,
+      isRetrograde: true,
+      longitude: ((northNode.longitude || 0) + 180) % 360
+    });
+  }
+
+  effectivePlanets.forEach((p) => {
+    const normKey = normalizePlanetKey(p.name);
+    const meta = PLANET_NAMES_TR[normKey] || { tr: p.name, sym: '✧' };
+    const kabbalahMeta = PLANET_KABBALAH_MAP[normKey] || {
       sephira: 'Tiferet',
       sephiraMeaning: 'Kalp ve Bilinç',
       defaultWorld: 'Beriyah'
@@ -459,9 +500,9 @@ export function synthesizeCosmicMatrix(
     else if (p.house === 12) assignedWorld = 'Atzilut';
     worldCounts[assignedWorld] = (worldCounts[assignedWorld] || 0) + 1;
 
-    // Human Design Eşleşmesi
-    const hdCon = hdChart.conscious.find((c) => c.planet === p.name);
-    const hdUnc = hdChart.unconscious.find((u) => u.planet === p.name);
+    // Human Design Eşleşmesi (Doğru İngilizce normKey ile arama)
+    const hdCon = hdChart.conscious.find((c) => c.planet === normKey);
+    const hdUnc = hdChart.unconscious.find((u) => u.planet === normKey);
     const activeGate = hdCon?.gate || hdUnc?.gate || (Math.floor(Math.random() * 64) + 1);
     const activeLine = hdCon?.line || hdUnc?.line || 3;
     const gateInfo = GATE_TITLES[activeGate] || {
@@ -473,38 +514,42 @@ export function synthesizeCosmicMatrix(
     const isCenterDefined = hdChart.definedCenters.includes(centerName);
     const lineProfile = LINE_BEHAVIOR_PROFILES[activeLine] || LINE_BEHAVIOR_PROFILES[1];
 
-    // Rune Eşleşmesi
-    const runeName = PLANET_RUNE_MAP[p.name] || 'Algiz';
+    // Rune Eşleşmesi (Doğru normKey ile)
+    const runeName = PLANET_RUNE_MAP[normKey] || 'Algiz';
     const runeData = ALL_RUNES.find((r) => r.name.toLowerCase() === runeName.toLowerCase()) || ALL_RUNES[0];
 
     // Açı Listesi
     const pAspects = astroAspects
-      .filter((a) => a.planet1 === p.name || a.planet2 === p.name)
+      .filter((a) => a.planet1 === p.name || a.planet2 === p.name || normalizePlanetKey(a.planet1) === normKey || normalizePlanetKey(a.planet2) === normKey)
       .map((a) => {
-        const other = a.planet1 === p.name ? a.planet2 : a.planet1;
+        const other = (a.planet1 === p.name || normalizePlanetKey(a.planet1) === normKey) ? a.planet2 : a.planet1;
         return `${other} ile ${a.type}`;
       });
 
-    // Çakra
-    const chakraMeta = PLANET_CHAKRA_MAP[p.name] || { name: 'Kalp Çakrası', location: 'Göğüs' };
+    // Çakra (Doğru normKey ile)
+    const chakraMeta = PLANET_CHAKRA_MAP[normKey] || { name: 'Kalp Çakrası', location: 'Göğüs' };
 
     // 🎯 ENERJİ ÇALIŞMA YÖNÜ TESPİTİ (İçe Yönelimli vs Dışa Yönelimli)
     // Kriter:
-    // 1. Eğer retro ise -> içe yönelim eğilimi artar.
-    // 2. Eğer HD Merkezi AÇIK (tanımsız) ise -> enerji içselleşir / dış baskıyı emer (inward).
-    // 3. Eğer HD Merkezi TANIMLI ise -> enerji sabit ve dışa dönük çalışır (outward).
-    // 4. Çizgi 1-2-3 (İçsel triagram) vs 4-5-6 (Dışsal triagram).
+    // 1. Eğer retro ise -> içe yönelim eğilimi artar (-2).
+    // 2. Eğer HD Merkezi TANIMLI ise -> dışa yayma gücü artar (+2).
+    // 3. Eğer HD Merkezi AÇIK ise -> dışarıdan emme / içe çekilme artar (-1).
+    // 4. Çizgi 4-5-6 (Dışsal/Sosyal) (+1), Çizgi 1-2-3 (İçsel) (-1).
     let isOutwardScore = 0;
     if (isCenterDefined) isOutwardScore += 2;
+    else isOutwardScore -= 1;
+    
     if ([4, 5, 6].includes(activeLine)) isOutwardScore += 1;
+    else isOutwardScore -= 1;
+
     if (p.isRetrograde) isOutwardScore -= 2;
 
     const energyDirection: EnergyDirection = isOutwardScore >= 1 ? 'outward' : 'inward';
-    const profile = PLANET_DYNAMIC_PROFILES[p.name] || PLANET_DYNAMIC_PROFILES['Sun'];
+    const profile = PLANET_DYNAMIC_PROFILES[normKey] || PLANET_DYNAMIC_PROFILES['Sun'];
     const activeDynamic = energyDirection === 'outward' ? profile.outward : profile.inward;
 
     items.push({
-      planetKey: p.name,
+      planetKey: normKey,
       planetName: meta.tr,
       symbol: meta.sym,
       astrology: {
@@ -547,9 +592,9 @@ export function synthesizeCosmicMatrix(
       }
     });
 
-    // Tüm 13 gezegen için detaylı dinamik teşhisi ekle
+    // Tüm gezegenler için detaylı dinamik teşhisi ekle
     planetaryDynamics.push({
-      planetKey: p.name,
+      planetKey: normKey,
       planetName: meta.tr,
       symbol: meta.sym,
       sign: p.sign,
