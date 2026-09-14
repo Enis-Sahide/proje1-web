@@ -14,6 +14,7 @@ function LoginContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [needsVerification, setNeedsVerification] = useState(false);
 
   useEffect(() => {
     if (searchParams.get('registered') === 'true') {
@@ -25,16 +26,24 @@ function LoginContent() {
     e.preventDefault();
     setLoading(true);
     setError(null);
+    setNeedsVerification(false);
 
     try {
       await apiFetch('/api/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
       });
       const redirectTo = searchParams.get('redirect') || '/';
       window.location.href = redirectTo;
     } catch (err: any) {
-      setError(err?.message || "Giriş başarısız. Bilgilerinizi kontrol edin.");
+      const errMsg = err?.message || "Giriş başarısız. Bilgilerinizi kontrol edin.";
+      setError(errMsg);
+      if (err?.requiresVerification || errMsg.includes('doğrulanmamış') || errMsg.includes('tamamlanmamış')) {
+        setNeedsVerification(true);
+      }
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       setLoading(false);
     }
   };
@@ -66,13 +75,15 @@ function LoginContent() {
               <AlertCircle className="text-red-500 shrink-0" size={20} />
               <p className="text-sm text-red-400 font-medium">{error}</p>
             </div>
-            {error.includes('doğrulanmamış') && email && (
-              <Link 
-                href={`/auth/register?email=${encodeURIComponent(email)}&verify=true`}
-                className="text-xs text-mystic-primary hover:text-mystic-accent underline pl-8 font-semibold transition-colors"
-              >
-                Doğrulama kodunu şimdi girmek için buraya tıklayın →
-              </Link>
+            {needsVerification && email && (
+              <div className="mt-2 pl-8">
+                <Link 
+                  href={`/auth/register?email=${encodeURIComponent(email.trim().toLowerCase())}&verify=true`}
+                  className="inline-block bg-[#D4AF37] text-black font-bold px-3.5 py-1.5 rounded-lg text-xs hover:brightness-110 transition-all shadow-md"
+                >
+                  Doğrulama Kodunu Gir →
+                </Link>
+              </div>
             )}
           </div>
         )}
@@ -115,10 +126,30 @@ function LoginContent() {
             </div>
           </div>
 
+          {/* Mobilde butonun hemen üstünde anlık hata bildirimi */}
+          {error && (
+            <div className="p-3.5 bg-red-500/15 border border-red-500/40 rounded-xl flex items-start gap-2.5 text-xs text-red-200 animate-in fade-in duration-200">
+              <AlertCircle className="text-red-400 shrink-0 mt-0.5" size={16} />
+              <div className="flex-1 leading-relaxed">
+                <span>{error}</span>
+                {needsVerification && email && (
+                  <div className="mt-2.5">
+                    <Link
+                      href={`/auth/register?email=${encodeURIComponent(email.trim().toLowerCase())}&verify=true`}
+                      className="bg-[#D4AF37] text-black font-bold px-3.5 py-1.5 rounded-lg text-xs hover:brightness-110 transition-all inline-block shadow-md"
+                    >
+                      Doğrulama Kodunu Gir →
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-mystic-primary to-purple-600 hover:from-purple-600 hover:to-mystic-primary text-white font-bold py-3.5 rounded-xl mt-6 transition-all flex justify-center items-center shadow-lg"
+            className="w-full bg-gradient-to-r from-mystic-primary to-purple-600 hover:from-purple-600 hover:to-mystic-primary text-white font-bold py-3.5 rounded-xl mt-4 transition-all flex justify-center items-center shadow-lg cursor-pointer disabled:opacity-50"
           >
             {loading ? <Loader2 className="animate-spin mr-2" /> : 'Giriş Yap'}
           </button>

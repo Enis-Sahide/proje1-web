@@ -44,34 +44,43 @@ export async function POST(request: Request) {
 
     // 5. Kayıtlı kullanıcı kontrolü
     const [existing] = await db.select().from(users).where(eq(users.email, normEmail));
+    const passwordHash = await hashPassword(String(password));
+    const code = generateVerificationCode();
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 dakika geçerli
+
     if (existing) {
       // Eğer kullanıcı kayıtlı ama henüz e-postasını onaylamamışsa, kilitlenmesini önle: yeni kod gönderip doğrulama ekranına geçir
       if (existing.emailVerified === false) {
-        const code = generateVerificationCode();
-        const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
         await db.delete(emailVerifications).where(eq(emailVerifications.email, normEmail));
         await db.insert(emailVerifications).values({
           email: normEmail,
           code,
-          passwordHash: existing.passwordHash,
-          fullName: existing.fullName || fullName || null,
+          passwordHash,
+          fullName: fullName || existing.fullName || null,
           expiresAt,
         });
+
+        // users tablosundaki şifreyi de yeni belirlenen şifre ile güncelle
+        await db
+          .update(users)
+          .set({
+            passwordHash,
+            fullName: fullName || existing.fullName || null,
+            updatedAt: new Date(),
+          })
+          .where(eq(users.id, existing.id));
+
         await sendVerificationCodeEmail(normEmail, code);
         return json({
           requiresVerification: true,
           email: normEmail,
-          message: 'Hesabınız daha önce oluşturulmuş fakat onaylanmamıştı. Yeni bir doğrulama kodu gönderildi.',
+          message: 'Hesabınız için yeni bir 6 haneli doğrulama kodu e-postanıza gönderildi.',
         });
       }
       return errorJson('Bu e-posta adresi zaten kayıtlıdır. Lütfen giriş yapın.', 409, { isAlreadyRegistered: true });
     }
 
-    // 6. Şifreyi hashle ve bilgileri geçici doğrulama tablosunda tut (users tablosuna HENÜZ yazma!)
-    const passwordHash = await hashPassword(String(password));
-    const code = generateVerificationCode();
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 dakika geçerli
-
+    // 6. Bilgileri geçici doğrulama tablosunda tut (users tablosuna HENÜZ yazma! - Lazy Registration)
     await db.delete(emailVerifications).where(eq(emailVerifications.email, normEmail));
     await db.insert(emailVerifications).values({
       email: normEmail,

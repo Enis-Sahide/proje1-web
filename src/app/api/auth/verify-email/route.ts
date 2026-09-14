@@ -37,12 +37,30 @@ export async function POST(request: Request) {
       .limit(1);
 
     if (!verification) {
-      return errorJson('Doğrulama kodu hatalı veya süresi dolmuş. Lütfen kontrol edip tekrar deneyin.', 400);
+      const [anyVerification] = await db
+        .select()
+        .from(emailVerifications)
+        .where(eq(emailVerifications.email, normEmail))
+        .orderBy(desc(emailVerifications.createdAt))
+        .limit(1);
+
+      if (anyVerification) {
+        return errorJson(
+          'Doğrulama kodunun 15 dakikalık süresi dolmuş. Lütfen "Tekrar Kod Gönder" butonuna tıklayarak yeni kod isteyin.',
+          400,
+          { isExpired: true }
+        );
+      }
+      return errorJson(
+        'Doğrulama oturumu bulunamadı veya süresi dolmuş. Lütfen kayıt formunu doldurarak tekrar deneyin.',
+        400,
+        { notFound: true, requireRegister: true }
+      );
     }
 
     if (verification.attempts >= MAX_OTP_ATTEMPTS) {
       await db.delete(emailVerifications).where(eq(emailVerifications.id, verification.id));
-      return errorJson('Çok fazla hatalı deneme yapıldı. Lütfen yeni bir doğrulama kodu isteyin.', 429);
+      return errorJson('Çok fazla hatalı deneme yapıldı. Lütfen yeni bir doğrulama kodu isteyin.', 429, { isExpired: true });
     }
 
     // Zamanlama saldırılarına karşı sabit süreli karşılaştırma.
@@ -68,7 +86,7 @@ export async function POST(request: Request) {
     let [u] = await db.select().from(users).where(eq(users.email, normEmail));
     if (!u) {
       if (!verification.passwordHash) {
-        return errorJson('Kayıt oturumunuzun süresi dolmuş. Lütfen formu doldurarak tekrar kayıt olun.', 400);
+        return errorJson('Kayıt oturumunuzun süresi dolmuş. Lütfen formu doldurarak tekrar kayıt olun.', 400, { requireRegister: true });
       }
       const [newUser] = await db
         .insert(users)
@@ -82,10 +100,12 @@ export async function POST(request: Request) {
         .returning();
       u = newUser;
     } else {
-      // Varsa doğrulanmış olarak güncelle
+      // Varsa doğrulanmış olarak güncelle ve şifre/ad güncellendiyse yansıt
       await db
         .update(users)
         .set({
+          ...(verification.passwordHash ? { passwordHash: verification.passwordHash } : {}),
+          ...(verification.fullName ? { fullName: verification.fullName } : {}),
           emailVerified: true,
           emailVerifiedAt: new Date(),
           updatedAt: new Date(),

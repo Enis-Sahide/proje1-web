@@ -95,7 +95,7 @@ function RegisterForm() {
     try {
       await apiFetch('/api/auth/verify-email', {
         method: 'POST',
-        body: JSON.stringify({ email, code: code.trim() }),
+        body: JSON.stringify({ email: email.trim().toLowerCase(), code: code.trim() }),
       });
 
       setSuccessMessage('E-posta başarıyla doğrulandı! Yönlendiriliyorsunuz...');
@@ -103,7 +103,15 @@ function RegisterForm() {
         window.location.href = '/';
       }, 1000);
     } catch (err: any) {
-      setError(err.message || 'Kod doğrulanamadı.');
+      if (err?.requireRegister) {
+        setStep('form');
+        setError(err.message || 'Doğrulama oturumunuzun süresi dolmuş. Lütfen formu doldurarak tekrar kayıt olun.');
+      } else {
+        setError(err.message || 'Kod doğrulanamadı.');
+      }
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
       setLoading(false);
     }
   };
@@ -117,12 +125,20 @@ function RegisterForm() {
     try {
       await apiFetch('/api/auth/resend-code', {
         method: 'POST',
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email: email.trim().toLowerCase() }),
       });
       setCountdown(60);
       setSuccessMessage('Yeni doğrulama kodu e-postanıza gönderildi.');
     } catch (err: any) {
-      setError(err.message || 'Kod yeniden gönderilemedi.');
+      if (err?.requireRegister) {
+        setStep('form');
+        setError(err.message || 'Doğrulama süreniz dolduğu için lütfen formu tekrar doldurarak yeni kod alın.');
+      } else {
+        setError(err.message || 'Kod yeniden gönderilemedi.');
+      }
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     } finally {
       setLoading(false);
     }
@@ -285,6 +301,7 @@ function RegisterForm() {
                 onChange={(e) => setCode(e.target.value.replace(/\D/g, ''))}
                 required
                 autoFocus
+                autoComplete="one-time-code"
                 placeholder="••••••"
                 className="w-64 text-center py-3.5 bg-mystic-dark border-2 border-mystic-primary/50 focus:border-mystic-primary rounded-2xl text-white font-mono text-3xl tracking-[0.4em] outline-none shadow-[0_0_20px_rgba(212,175,55,0.15)] transition-all"
               />
@@ -293,6 +310,29 @@ function RegisterForm() {
               Kod 15 dakika boyunca geçerlidir. Lütfen spam kutunuzu da kontrol edin.
             </p>
           </div>
+
+          {/* Doğrulama adımında mobilde görünür anlık hata kutusu */}
+          {error && (
+            <div className="p-3.5 bg-red-500/15 border border-red-500/40 rounded-xl flex items-start gap-2.5 text-xs text-red-200 animate-in fade-in duration-200">
+              <AlertCircle className="text-red-400 shrink-0 mt-0.5" size={16} />
+              <div className="flex-1 leading-relaxed">
+                <span>{error}</span>
+                {error.includes('süresi dolmuş') && (
+                  <div className="mt-2">
+                    <button
+                      type="button"
+                      onClick={handleResendCode}
+                      disabled={loading || countdown > 0}
+                      className="bg-[#D4AF37] text-black font-bold px-3 py-1.5 rounded-lg text-xs hover:brightness-110 transition-all cursor-pointer inline-flex items-center gap-1 shadow-md"
+                    >
+                      <RefreshCw size={12} className={loading ? 'animate-spin' : ''} />
+                      {countdown > 0 ? `Yeni Kod Gönder (${countdown}s)` : 'Hemen Yeni Kod Gönder'}
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           <button
             type="submit"
