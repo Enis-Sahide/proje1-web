@@ -555,7 +555,8 @@ export default function CosmicMatrixPage() {
                   <span>Bu Tabloyu Nasıl Okumalısınız? (Kozmik Röntgen Rehberi)</span>
                 </div>
                 <p className="text-xs sm:text-sm text-gray-200 leading-relaxed font-normal">
-                  Varlığınız tek bir boyuttan ibaret değildir. Haritanızdaki her bir gezegen gökyüzünde soyut bir göktaşı değil; 
+                  Bu matris tablosu, yukarıda her bir gezegeniniz için adım adım detaylandırdığımız 5 derin katmanın tek bir bakışta görülebilen <strong className="text-amber-300">bütünsel kozmik haritası ve röntgen özetidir</strong>. 
+                  Varlığınız tek bir boyuttan ibaret değildir; yukarıdaki analizlerde incelediğiniz gibi haritanızdaki her bir gezegen gökyüzünde soyut bir göktaşı değil; 
                   zihninizde bir sahne <strong className="text-amber-300">(Astroloji)</strong>, ruhunuzda ilahi bir kapı <strong className="text-purple-300">(Kabala)</strong>, hücrelerinizde genetik bir devre <strong className="text-emerald-300">(Human Design)</strong>, 
                   auranızda dengeleyici bir mühür <strong className="text-amber-200">(Kadim Futhark Runesi)</strong> ve etten kemikten bedeninizde somut bir merkezdir <strong className="text-sky-300">(Çakra & Biyofizik)</strong>.
                 </p>
