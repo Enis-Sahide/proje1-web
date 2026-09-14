@@ -225,6 +225,7 @@ export function calculateIncarnationAnalysis(natalChart: NatalChartData): Incarn
       if (p.name === 'Satürn') meaning = 'Satürn 12. evde: Geçmiş yaşamda ağır bir izolasyon, sürgün veya manastır disiplini yaşanmış. Bu yaşamda derin ruhsal dayanıklılık ve yalnızlıkta huzur bulma kabiliyeti verir.';
       if (p.name === 'Güneş') meaning = 'Güneş 12. evde: Geçmişte kimliği gölgelenmiş veya gizli hizmette bulunmuş bir ruh. Bu yaşamda egosuz ilahi ışığı yansıtma görevi vardır.';
       if (p.name === 'Ay') meaning = 'Ay 12. evde: Geçmiş yaşamlardan taşınan derin psişik sünger algı. Başkalarının acılarını hissetme ve sezgisel şifa gücü.';
+      if (p.name === 'Lilith') meaning = 'Lilith 12. evde: Geçmiş yaşamlarda tabuları yıktığı veya otoriteye boyun eğmediği için dışlanmış bir ruh hafızası. Bu yaşamda derin okült bilgelik ve gölgeyle korkusuzca yüzleşme potansiyeli taşır.';
       return {
         name: p.name,
         sign: p.sign,
@@ -259,6 +260,7 @@ export function calculateIncarnationAnalysis(natalChart: NatalChartData): Incarn
   const pointsToCompare = [
     { name: 'Güneş', label: 'Güneş (Ruhun Asıl Amacı)' },
     { name: 'Ay', label: 'Ay (Bilinçaltı & Duygusal Öz)' },
+    { name: 'Lilith', label: 'Lilith (Ruhun Gölge Gücü & İlksel Özgürlüğü)' },
     { name: 'Yükselen (ASC)', label: 'Yükselen (Ruhun Evrensel Kimliği)' },
     { name: 'Tepe Noktası (MC)', label: 'Tepe Noktası (Ruhun Kozmik Misyonu)' }
   ];

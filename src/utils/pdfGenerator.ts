@@ -357,7 +357,8 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
     "• **Mars:** Eyleme geçme gücünüz, tutkularınız, cesaretiniz ve mücadele tarzınız.\n" +
     "• **Jüpiter:** Şansınız, bolluk-bereket algınız, büyüme, inançlar ve bilgelik alanınız.\n" +
     "• **Satürn:** Sınırlarınız, sorumluluklarınız, hayat dersleriniz, disiplin ve olgunlaşma alanınız.\n" +
-    "• **Kolektif Gezegenler (Uranüs, Neptün, Plüton):** Sırasıyla bireysel özgürleşme, ruhsal çözülme/hayaller ve köklü dönüşüm/küllerinden doğma enerjileridir.";
+    "• **Kolektif Gezegenler (Uranüs, Neptün, Plüton):** Sırasıyla bireysel özgürleşme, ruhsal çözülme/hayaller ve köklü dönüşüm/küllerinden doğma enerjileridir.\n" +
+    "• **Kiron ve Lilith:** Sırasıyla yaralı şifacı bilgeliği ile bastırılmış gölge güç ve tabuları yıkan vahşi doğanızdır.";
   currentY = drawTextWithBold(doc, planetsText, 20, currentY, 170, 5.2);
   currentY += 5;
 

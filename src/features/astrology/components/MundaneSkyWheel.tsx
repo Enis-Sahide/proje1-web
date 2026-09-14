@@ -64,7 +64,7 @@ export default function MundaneSkyWheel({
   // Major visible bodies (Memoized for high performance)
   const visiblePlanets = useMemo(() => {
     return planets.filter(p => 
-      ['Güneş', 'Ay', 'Merkür', 'Venüs', 'Mars', 'Jüpiter', 'Satürn', 'Uranüs', 'Neptün', 'Plüton', 'Kiron'].includes(p.name)
+      ['Güneş', 'Ay', 'Merkür', 'Venüs', 'Mars', 'Jüpiter', 'Satürn', 'Uranüs', 'Neptün', 'Plüton', 'Kiron', 'Lilith', 'Kuzey Ay Düğümü'].includes(p.name)
     );
   }, [planets]);
 

@@ -335,6 +335,11 @@ const PLANET_TRANSIT_THEMES: Record<string, { nature: string; focus: string; cha
     nature: 'Ruhun kadersel tekamül rotası ve kolektifin gitmesi gereken evrimsel yön.',
     focus: 'Ay Düğümü bu burçtayken insanlık bilincinin cesaretle adım atması ve öğrenmesi gereken yeni dersleri simgeler.',
     chakra: '7. Taç Çakrası (Sahasrara) - Kadersel Akış'
+  },
+  'Lilith': {
+    nature: 'Bastırılmış ilksel güç, tabuları yıkan vahşi doğa, boyun eğmeyen dişil bilgelik ve gölge benlik.',
+    focus: 'Lilith bu burçta kaldığı yaklaşık 9 ay boyunca kolektif bilinçaltındaki bastırılmış arzuları, korkuları ve tabuları yüzeye çıkararak otantik özgürleşmeyi talep eder.',
+    chakra: '2. Sakral (Svadhisthana) & Kundalini Kapısı - Özgürleşme & Gölge Şifa'
   }
 };
 

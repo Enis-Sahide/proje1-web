@@ -555,6 +555,8 @@ export function getDraconicPointInterpretation(
       synthesis = `${tropicalSign}'ın dünyevi çekim gücünü ${draconicSign}'ın hakikatini yaşamak ve yaymak için kullanın; egoya değil, amaca odaklanın.`;
     } else if (p.includes('ay') || p.includes('bilinçaltı')) {
       synthesis = `${tropicalSign}'ın savunma reflekslerini bırakıp ${draconicSign}'ın içsel huzuruna ve bilgeliğine güvenin.`;
+    } else if (p.includes('lilith') || p.includes('gölge')) {
+      synthesis = `${tropicalSign}'ın korkularını ve tabularını aşarak ruhunuzun ${draconicSign} burcundaki vahşi, boyun eğmeyen ilksel gücünü sahiplenin.`;
     } else if (p.includes('yükselen') || p.includes('evrensel kimlik')) {
       synthesis = `${tropicalSign} dış maskenizi, ruhunuzun ${draconicSign} misyonunu topluma ulaştıran bir köprü yapın.`;
     } else {

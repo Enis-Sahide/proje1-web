@@ -157,6 +157,7 @@ const PLANET_KABBALAH_MAP: Record<string, { sephira: string; sephiraMeaning: str
   NorthNode: { sephira: 'Keter Yolu', sephiraMeaning: 'Gelecek Tekâmül Amacı ve Ruhsal Zirve', defaultWorld: 'Atzilut' },
   SouthNode: { sephira: 'Malkhut Temeli', sephiraMeaning: 'Geçmiş Enkarnasyon Kökleri ve Atalardan Gelen Miras', defaultWorld: 'Assiah' },
   Chiron: { sephira: 'Tiferet-Yesod Köprüsü', sephiraMeaning: 'Yaralı Şifacı, Kalp ile Bilinçaltını Birleştiren Şifa', defaultWorld: 'Yetzirah' },
+  Lilith: { sephira: 'Yesod-Malkhut Eşiği', sephiraMeaning: 'Bilinçaltı Vahşi Doğa, Gölge Benlik ve İlksel Güç', defaultWorld: 'Yetzirah' },
   Ascendant: { sephira: 'Malkhut', sephiraMeaning: 'Krallık, Fiziksel Beden ve Dünyevi Tezahür', defaultWorld: 'Assiah' }
 };
 
@@ -175,6 +176,7 @@ const PLANET_RUNE_MAP: Record<string, string> = {
   NorthNode: 'Dagaz',
   SouthNode: 'Othala',
   Chiron: 'Kenaz',
+  Lilith: 'Thurisaz',
   Ascendant: 'Uruz'
 };
 
@@ -193,6 +195,7 @@ const PLANET_CHAKRA_MAP: Record<string, { name: string; location: string }> = {
   NorthNode: { name: 'Taç Çakra', location: 'Ruhsal Rehberlik Kapısı' },
   SouthNode: { name: 'Kök Çakra', location: 'Hücresel Atalara Ait Hafıza' },
   Chiron: { name: 'Kalp Çakrası', location: 'Ruhun Yarası ve Şifa Kapısı' },
+  Lilith: { name: 'Sakral & Kundalini (2. Çakra)', location: 'Alt Karın / Gölge Şifa ve Vahşi Bilgelik' },
   Ascendant: { name: 'Bütün Biyofiziksel Beden', location: 'Aura ve Fiziksel Beden' }
 };
 
@@ -210,6 +213,7 @@ const PLANET_NAMES_TR: Record<string, { tr: string; sym: string }> = {
   NorthNode: { tr: 'Kuzey Düğümü', sym: '☊' },
   SouthNode: { tr: 'Güney Düğümü', sym: '☋' },
   Chiron: { tr: 'Kiron', sym: '⚷' },
+  Lilith: { tr: 'Lilith (Kara Ay)', sym: '⚸' },
   Ascendant: { tr: 'Yükselen', sym: 'ASC' }
 };
 
@@ -425,6 +429,21 @@ const PLANET_DYNAMIC_PROFILES: Record<string, DynamicProfile> = {
       actionableRemedy: 'Eski ustalığınızı bir taht gibi kullanmayın; bilmediğiniz alanlarda da çırak kalma cesareti gösterin.',
       kabbalahLesson: 'Geçmişin meyvelerini geleceğin bahçesini yeşertmek için toprağa ekmek.'
     }
+  },
+  Lilith: {
+    theme: 'Bastırılmış Vahşi Doğa, Tabular ve Gölge Güç',
+    inward: {
+      manifestation: 'Gerçek arzu ve öfkesini derine gömme, başkalarını memnun etmek adına otantik özünden ödün verme.',
+      neutralExplanation: 'Lilith enerjiniz içselleşmiş bir gölge gibi çalışır. Kendi tabularınızla sessizce hesaplaşma ve yaralanmamak için derinlere çekilme refleksi taşır.',
+      actionableRemedy: 'Kendi sınırlarınızı net çizin; başkalarını memnun etmek için otantik vahşi doğanızı bastırmayı bırakın.',
+      kabbalahLesson: 'Karanlık aynanın ardındaki ilahi ışığı tanımak ve gölgeyi bilince entegre etmek.'
+    },
+    outward: {
+      manifestation: 'Aşırı isyankarlık, otoriteye ani ve yıkıcı başkaldırı, en ufak kısıtlamada köprüleri yakma.',
+      neutralExplanation: 'Lilith enerjiniz dışa taşarak çalışır. Kendi bağımsızlığını koruma refleksiyle tabuları provokatif ve ödünsüz şekilde yıkma dürtüsü verir.',
+      actionableRemedy: 'İsyanınızı kör bir yıkıma değil yaratıcı bağımsızlığa dönüştürün; her durumu ölüm-kalım savaşına çevirmeyin.',
+      kabbalahLesson: 'Gevurah\'ın sınır gücü ile Lilith\'in ham dişil kudretini kutsal dengede tutmak.'
+    }
   }
 };
 
@@ -441,13 +460,15 @@ export const TURKISH_CENTER_TO_CODE: Record<string, string> = {
 };
 
 const YANG_PLANETS = ['Sun', 'Mars', 'Jupiter', 'Uranus', 'Pluto'];
-const YIN_PLANETS = ['Moon', 'Venus', 'Neptune', 'Saturn'];
+const YIN_PLANETS = ['Moon', 'Venus', 'Neptune', 'Saturn', 'Lilith'];
 const FIRE_AIR_SIGNS = ['Koç', 'İkizler', 'Aslan', 'Terazi', 'Yay', 'Kova', 'Aries', 'Gemini', 'Leo', 'Libra', 'Sagittarius', 'Aquarius'];
 const YANG_HOUSES = [1, 3, 5, 7, 9, 10, 11];
 
 export function normalizePlanetKey(name: string): string {
   if (!name) return 'Sun';
   const clean = name.trim().toLowerCase();
+  
+  if (clean.includes('lilith')) return 'Lilith';
   
   if (clean.includes('kuzey') || clean.includes('northnode') || clean.includes('true node') || clean === 'node') return 'NorthNode';
   if (clean.includes('güney') || clean.includes('southnode')) return 'SouthNode';

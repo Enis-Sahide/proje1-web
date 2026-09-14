@@ -38,7 +38,7 @@ const PLANET_SYMBOLS: Record<string, string> = {
   'Güneş': '☉', 'Ay': '☽', 'Merkür': '☿', 'Venüs': '♀', 'Mars': '♂', 
   'Jüpiter': '♃', 'Satürn': '♄', 'Uranüs': '♅', 'Neptün': '♆', 'Plüton': '♇',
   'Yükselen (ASC)': 'ASC', 'Tepe Noktası (MC)': 'MC', 'Kuzey Ay Düğümü': '☊',
-  'Kiron': '⚷'
+  'Kiron': '⚷', 'Lilith': '⚸'
 };
 
 const ASPECT_SYMBOLS: Record<string, string> = {

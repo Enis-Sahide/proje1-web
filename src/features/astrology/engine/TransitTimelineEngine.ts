@@ -51,6 +51,7 @@ const TRANSIT_BODIES = [
   { name: 'Satürn', id: Constants.SE_SATURN, category: 'Kadersel' as const },
   { name: 'Jüpiter', id: Constants.SE_JUPITER, category: 'Kadersel' as const },
   { name: 'Kiron', id: Constants.SE_CHIRON, category: 'Kadersel' as const },
+  { name: 'Lilith', id: Constants.SE_MEAN_APOG, category: 'Kadersel' as const },
   { name: 'Mars', id: Constants.SE_MARS, category: 'Kişisel' as const },
   { name: 'Venüs', id: Constants.SE_VENUS, category: 'Kişisel' as const },
   { name: 'Güneş', id: Constants.SE_SUN, category: 'Kişisel' as const },
@@ -75,6 +76,9 @@ function getChakraLayer(tPlanet: string, nPlanet: string): string {
   const combined = `${tPlanet} ${nPlanet}`;
   if (combined.includes('Satürn') || combined.includes('Plüton')) {
     return '1. Kök Katmanı (Muladhara - Temel Güven, Sınav & Yapılanma)';
+  }
+  if (combined.includes('Lilith')) {
+    return '2. Sakral Katmanı (Svadhisthana - Gölge Şifa, Tabular & Vahşi Bilgelik)';
   }
   if (combined.includes('Ay') || combined.includes('Venüs')) {
     return '4. Kalp Katmanı (Anahata - Sevgi, Şefkat & İlişkiler)';
@@ -141,6 +145,10 @@ function getInterpretationDetails(tPlanet: string, nPlanet: string, aspect: stri
       details = `Mars'ın uyumlu açısı ertelediğiniz adımları atmak için gereken cesareti ve dayanıklılığı size kazandırır.`;
       advice = `✓ Yapılması Gereken: Hedeflerinize doğrudan odaklanın ve cesurca harekete geçin.`;
     }
+  } else if (tPlanet === 'Lilith') {
+    summary = `Bastırılmış gölgelerle yüzleşme, tabuları yıkma ve otantik bağımsızlık arayışı.`;
+    details = `Transit Lilith, natal ${nPlanet} noktanıza temas ederken taviz verdiğiniz veya boyun eğdiğiniz alanlarda başkaldırı hissi uyandırır. Bu süreç, korkuların arkasındaki ilksel gücü sahiplenme vaktidir.`;
+    advice = `✓ Yapılması Gereken: Gölge yönlerinizi inkar etmek yerine kabul edin; kendi sınırlarınızı ve özgürlüğünüzü korkusuzca savunun.\n✗ Kaçınılması Gereken: Öç alma arzusu, aşırı yıkıcı isyan ve kendini sabote etmek.`;
   } else {
     // Güneş, Venüs, Merkür
     summary = `${tPlanet}, natal ${nPlanet} noktanızla ${aspect} yaparak güncel odağınızı ve ilişkilerinizi canlandırıyor.`;
@@ -158,6 +166,7 @@ const PLANET_LOOKBACK_DAYS: Record<string, number> = {
   'Uranüs': 450,
   'Satürn': 300,
   'Kiron': 365,
+  'Lilith': 180,
   'Jüpiter': 150,
   'Mars': 45,
   'Güneş': 30,
@@ -171,6 +180,7 @@ const PLANET_LOOKAHEAD_DAYS: Record<string, number> = {
   'Uranüs': 300,
   'Satürn': 240,
   'Kiron': 240,
+  'Lilith': 180,
   'Jüpiter': 120,
   'Mars': 45,
   'Güneş': 30,
