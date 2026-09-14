@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { AstroPoint, AstroAspect } from '@/features/astrology/engine/AstrologyConstants';
 
 interface MundaneSkyWheelProps {
@@ -61,22 +61,28 @@ export default function MundaneSkyWheel({
   const R_PLANET_RING = RADIUS - 60;
   const R_ASPECT_CORE = RADIUS - 90;
 
-  // Major visible bodies
-  const visiblePlanets = planets.filter(p => 
-    ['Güneş', 'Ay', 'Merkür', 'Venüs', 'Mars', 'Jüpiter', 'Satürn', 'Uranüs', 'Neptün', 'Plüton', 'Kiron'].includes(p.name)
-  );
+  // Major visible bodies (Memoized for high performance)
+  const visiblePlanets = useMemo(() => {
+    return planets.filter(p => 
+      ['Güneş', 'Ay', 'Merkür', 'Venüs', 'Mars', 'Jüpiter', 'Satürn', 'Uranüs', 'Neptün', 'Plüton', 'Kiron'].includes(p.name)
+    );
+  }, [planets]);
 
-  const planetMap = new Map<string, AstroPoint>();
-  visiblePlanets.forEach(p => planetMap.set(p.name, p));
+  const planetMap = useMemo(() => {
+    const map = new Map<string, AstroPoint>();
+    visiblePlanets.forEach(p => map.set(p.name, p));
+    return map;
+  }, [visiblePlanets]);
 
   return (
     <div className="w-full flex flex-col items-center select-none">
-      <div className="relative w-full max-w-[620px] overflow-visible flex justify-center py-6 bg-black/40 rounded-3xl border border-white/5 shadow-[inset_0_0_50px_rgba(0,0,0,0.6)] backdrop-blur-md">
+      <div className="relative w-full max-w-[620px] flex justify-center py-4 sm:py-6 bg-[#0B0F17]/90 rounded-3xl border border-white/10 shadow-xl overflow-hidden">
         <svg 
           width={CHART_SIZE} 
           height={CHART_SIZE} 
           viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`} 
-          className="max-w-full h-auto drop-shadow-2xl overflow-visible"
+          className="w-full max-w-[560px] h-auto select-none touch-manipulation"
+          style={{ contain: 'paint' }}
         >
           <defs>
             {/* Center glow gradient */}
@@ -115,7 +121,6 @@ export default function MundaneSkyWheel({
                   fill={ZODIAC_COLORS[signName]} 
                   textAnchor="middle" 
                   fontWeight="bold"
-                  className="filter drop-shadow-[0_0_8px_rgba(255,255,255,0.2)]"
                 >
                   {ZODIAC_SYMBOLS[signName]}
                 </text>
@@ -202,7 +207,6 @@ export default function MundaneSkyWheel({
                   fill="#0B0F19" 
                   stroke={isHovered ? '#0EA5E9' : '#D4AF37'} 
                   strokeWidth={isHovered ? 2 : 1.2}
-                  className="filter drop-shadow-[0_0_10px_rgba(212,175,55,0.3)]"
                 />
 
                 {/* Glyph */}

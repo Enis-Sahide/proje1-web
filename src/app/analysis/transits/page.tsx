@@ -272,8 +272,14 @@ export default function TransitsPage() {
     const R_CUSP_NUM = RADIUS - 75;
 
     return (
-      <div className="w-full overflow-x-auto overflow-y-visible flex justify-center py-12 bg-black/40 rounded-3xl border border-white/5 shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
-        <svg width={CHART_SIZE} height={CHART_SIZE} viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`} className="max-w-full h-auto drop-shadow-2xl overflow-visible">
+      <div className="w-full overflow-x-auto flex justify-center py-6 sm:py-10 bg-[#0B0F17]/90 rounded-3xl border border-white/10 shadow-xl overflow-hidden">
+        <svg 
+          width={CHART_SIZE} 
+          height={CHART_SIZE} 
+          viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`} 
+          className="w-full max-w-[580px] h-auto select-none touch-manipulation"
+          style={{ contain: 'paint' }}
+        >
           <circle cx={CENTER} cy={CENTER} r={R_ZODIAC_INNER} stroke="rgba(212,175,55,0.3)" strokeWidth="1.5" fill="none" />
           <circle cx={CENTER} cy={CENTER} r={R_ZODIAC_OUTER} stroke="rgba(212,175,55,0.3)" strokeWidth="1.5" fill="none" />
           <circle cx={CENTER} cy={CENTER} r={R_TRANSIT_PLANETS + 15} stroke="rgba(50,215,75,0.3)" strokeWidth="1" fill="none" strokeDasharray="4 4" />
@@ -448,7 +454,7 @@ export default function TransitsPage() {
         {analysisMode === 'MUNDANE' && (
           <div className="space-y-8 animate-in fade-in duration-500">
             {/* Top Toolbar: Date & Tab Control */}
-            <div className="bg-black/50 border border-white/10 backdrop-blur-md p-4 sm:p-6 rounded-3xl flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4">
+            <div className="bg-[#0A0D14]/90 sm:backdrop-blur-md border border-white/10 p-4 sm:p-6 rounded-3xl flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 shadow-xl">
               
               {/* Left: View Tabs */}
               <div className="flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 shadow-lg">
@@ -549,7 +555,7 @@ export default function TransitsPage() {
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     
                     {/* Left: Mundane Sky Wheel (7 cols) */}
-                    <div className="lg:col-span-7 bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-6 rounded-3xl shadow-2xl flex flex-col items-center">
+                    <div className="lg:col-span-7 bg-[#0A0D14]/90 sm:backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-6 rounded-3xl shadow-xl flex flex-col items-center">
                       <div className="w-full flex items-center justify-between border-b border-white/10 pb-4 mb-4">
                         <div>
                           <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -592,7 +598,7 @@ export default function TransitsPage() {
                     </div>
 
                     {/* Right: Active Sky Aspects (5 cols) */}
-                    <div className="lg:col-span-5 bg-black/50 backdrop-blur-md border border-white/10 p-4 sm:p-6 rounded-3xl shadow-2xl flex flex-col">
+                    <div className="lg:col-span-5 bg-[#0A0D14]/90 sm:backdrop-blur-md border border-white/10 p-4 sm:p-6 rounded-3xl shadow-xl flex flex-col">
                       <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
                         <div>
                           <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -694,7 +700,7 @@ export default function TransitsPage() {
                   </div>
 
                   {/* Anlık Gezegen Burç Yerleşimleri Tablosu */}
-                  <div className="bg-black/50 backdrop-blur-md border border-white/10 p-6 rounded-3xl shadow-2xl">
+                  <div className="bg-[#0A0D14]/90 sm:backdrop-blur-md border border-white/10 p-6 rounded-3xl shadow-xl">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4">
                       <div>
                         <h3 className="text-lg font-bold text-white flex items-center gap-2">
