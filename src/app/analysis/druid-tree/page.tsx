@@ -454,16 +454,16 @@ export default function DruidTreePage() {
           )}
         </AnimatePresence>
 
-        {/* 22 Kutsal Kelt Ağacı Ansiklopedisi & Arama */}
+        {/* Kutsal Kelt Ağacı Ansiklopedisi & Arama */}
         <div className="border-t border-white/10 pt-10 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="text-xl sm:text-2xl font-serif font-bold text-white flex items-center gap-2">
                 <BookOpen size={22} className="text-emerald-400" />
-                <span>22 Kutsal Kelt Ağacı Ansiklopedisi</span>
+                <span>{DRUID_TREES.length} Kutsal Kelt Ağacı Ansiklopedisi</span>
               </h2>
               <p className="text-xs text-gray-400 mt-1">
-                Sevdiklerinizin doğum tarihlerine göre hangi ağaca ait olduklarını inceleyin.
+                Tüm doğum tarihlerine göre hangi ağaca ait olduğunuzu inceleyin; kartlara tıklayarak detaylı rehberi açın.
               </p>
             </div>
             {/* Arama Kutusu */}
@@ -476,6 +476,37 @@ export default function DruidTreePage() {
                 placeholder="Ağaç veya tarih ara..."
                 className="w-full bg-black/40 border border-white/10 rounded-xl pl-9 pr-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-emerald-500"
               />
+            </div>
+          </div>
+
+          {/* Tarih ve Takvim Rehber Bilgi Kutusu */}
+          <div className="bg-white/[0.02] border border-emerald-500/20 rounded-2xl p-5 sm:p-6 space-y-4">
+            <div className="flex items-center gap-2 text-emerald-400 font-serif font-bold text-sm sm:text-base">
+              <Calendar size={18} className="text-emerald-400" />
+              <span>Kelt Ağaç Takvimi Tarih Dağılımı ve Döngü Sistemi</span>
+            </div>
+            <div className="text-xs text-gray-300 space-y-2 leading-relaxed">
+              <p>
+                Kadim Kelt geleneğinde Güneş ve doğa döngüsü, 365 gün boyunca belirli ağaçların enerjisiyle rezonanstadır:
+              </p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                <div className="bg-black/30 p-3.5 rounded-xl border border-white/5 space-y-1.5">
+                  <span className="font-bold text-amber-300 flex items-center gap-1">
+                    ☀️ 4 Kardinal Ağaç (Ekinoks ve Gündönümleri):
+                  </span>
+                  <p className="text-gray-400 text-[11px] leading-relaxed">
+                    <strong>21 Mart:</strong> Meşe (İlkbahar Ekinoksu) • <strong>24 Haziran:</strong> Huş (Yaz Gündönümü) • <strong>23 Eylül:</strong> Zeytin (Sonbahar Ekinoksu) • <strong>22 Aralık:</strong> Kayın (Kış Gündönümü). Bu 4 özel günde doğanlar doğrudan bu eksen ağaçlarının rehberliğindedir.
+                  </p>
+                </div>
+                <div className="bg-black/30 p-3.5 rounded-xl border border-white/5 space-y-1.5">
+                  <span className="font-bold text-emerald-300 flex items-center gap-1">
+                    🌿 17 Döngüsel Ağaç (Mevsimsel Karşılıklar):
+                  </span>
+                  <p className="text-gray-400 text-[11px] leading-relaxed">
+                    Diğer 17 ağaç, Güneş'in yıl içindeki kutupsal yükseliş ve alçalışına göre karşılıklı iki dönemde (Kavak ağacında olduğu gibi üç dönemde) tekrarlanarak 365 günün tamamını eksiksiz ve boşluksuz kapsar.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -522,11 +553,51 @@ export default function DruidTreePage() {
                     ))}
                   </div>
 
-                  {/* Genişletilmiş mini özet */}
+                  {/* Genişletilmiş Tam Açıklama ve Özellikler */}
                   {isExpanded && (
-                    <div className="pt-3 border-t border-white/10 text-xs text-gray-300 space-y-2 animate-in fade-in duration-200">
+                    <div className="pt-3 border-t border-white/10 text-xs text-gray-300 space-y-3 animate-in fade-in duration-200">
                       <p className="italic text-[11px] text-amber-200">"{tree.druidicProverb}"</p>
-                      <p className="text-[11px] leading-relaxed text-gray-400 line-clamp-3">{tree.spiritualEssence}</p>
+                      <p className="text-xs leading-relaxed text-gray-300">{tree.spiritualEssence}</p>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px]">
+                        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-2.5 space-y-1">
+                          <span className="font-bold text-emerald-400 flex items-center gap-1">
+                            <Sun size={12} /> Işık Nitelikleri:
+                          </span>
+                          <ul className="space-y-0.5 text-gray-300 list-disc list-inside">
+                            {tree.lightTraits.slice(0, 2).map((t, idx) => (
+                              <li key={idx}>{t}</li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-2.5 space-y-1">
+                          <span className="font-bold text-rose-400 flex items-center gap-1">
+                            <Shield size={12} /> Gölge Sınavı:
+                          </span>
+                          <ul className="space-y-0.5 text-gray-300 list-disc list-inside">
+                            {tree.shadowTraits.slice(0, 2).map((t, idx) => (
+                              <li key={idx}>{t}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      </div>
+
+                      <div className="pt-1">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setAnalyzedTree(tree);
+                            setTimeout(() => {
+                              resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }, 50);
+                          }}
+                          className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs tracking-wide transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <Sparkles size={14} className="text-amber-200" />
+                          <span>Bu Ağacın Tam Analizini Gör</span>
+                        </button>
+                      </div>
                     </div>
                   )}
                 </div>

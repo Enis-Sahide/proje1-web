@@ -836,7 +836,7 @@ export const DRUID_TREES: DruidTree[] = [
       { startMonth: 11, startDay: 22, endMonth: 12, endDay: 1, label: '22 Kasım - 1 Aralık' }
     ],
     isCardinalStation: false,
-    archetype: 'Kozmik Vizyoner & Yggdrasil Ruhu',
+    archetype: 'Kozmik Vizyoner & Hayat Ağacı Ruhu',
     element: 'Su & Ateş',
     rulingPlanets: 'Neptün & Güneş',
     colorTheme: {
@@ -844,7 +844,7 @@ export const DRUID_TREES: DruidTree[] = [
       secondary: '#38BDF8',
       badgeBg: 'rgba(37, 99, 235, 0.15)'
     },
-    spiritualEssence: 'Kuzey ve Kelt mitolojisinde tüm evreni birbirine bağlayan Dünya Ağacı Yggdrasil bir Dişbudak\'tır (Nion). Kökleri yeraltı sularında, tepesi ise tanrıların katındadır. Dişbudak insanı yüksek ideallerle, geniş vizyonla ve dünyayı değiştirecek projelerle yaşar. Küçük hesaplara takılmaz; daima büyük resmi hedefler.',
+    spiritualEssence: 'Kuzey ve Kelt mitolojisinde tüm evreni birbirine bağlayan kadim Dünya ve Hayat Ağacı (Yggdrasil) bir Dişbudak\'tır (Nion). Kökleri evrenin derinliklerinde, tepesi ise yıldızların katındadır. Dişbudak insanı yüksek ideallerle, geniş vizyonla ve dünyayı değiştirecek ilham verici projelerle yaşar. Küçük hesaplara takılmaz; daima büyük resmi hedefler.',
     lightTraits: [
       'Geniş açılı vizyon, ilham verici hedefler koyma ve insanları sürükleme',
       'Yüksek özgüven, bağımsızlık ve kimseden emir almayan hür irade',
