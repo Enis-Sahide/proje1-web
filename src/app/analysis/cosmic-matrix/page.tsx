@@ -600,7 +600,7 @@ export default function CosmicMatrixPage() {
               </div>
               
               <div className="overflow-x-auto bg-white/[0.02] border border-white/10 rounded-3xl shadow-2xl">
-                <table className="w-full text-left text-xs text-gray-300">
+                <table className="w-full min-w-[640px] text-left text-xs text-gray-300">
                   <thead className="bg-white/5 uppercase tracking-wider text-gray-400 font-bold border-b border-white/10">
                     <tr>
                       <th className="py-4 px-4">Gezegen</th>

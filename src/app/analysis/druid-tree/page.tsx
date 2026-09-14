@@ -541,7 +541,7 @@ export default function DruidTreePage() {
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                 onClick={(e) => e.stopPropagation()}
-                className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-[#0B131B] border border-emerald-500/30 rounded-3xl p-6 sm:p-8 shadow-[0_0_50px_rgba(16,185,129,0.2)] space-y-6 text-gray-100"
+                className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-[#0B131B] border border-emerald-500/30 rounded-3xl p-5 sm:p-8 shadow-[0_0_50px_rgba(16,185,129,0.2)] space-y-6 text-gray-100"
               >
                 {/* Kapat Butonu */}
                 <button
