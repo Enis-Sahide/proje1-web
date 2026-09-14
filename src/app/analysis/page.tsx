@@ -32,8 +32,8 @@ export default function AnalysisPage() {
     },
     {
       id: 'druid-tree',
-      title: 'Kelt Druid Ağaç Astrolojisi',
-      description: 'Doğum gününüzün 22 kutsal Kelt ağacındaki totemini, Ogham harfini, ışık & gölge arketipleri ile orman topraklanması ritüelini keşfedin.',
+      title: 'Kelt Druid Ağacı Analizi',
+      description: 'Doğum gününüzün 13 kutsal Ogham ağacındaki ruhsal arketipini, kadim ağaç harfini, ışık & gölge potansiyelleri ile orman topraklanması (Shinrin-Yoku) ritüelini keşfedin.',
       icon: <TreePine size={32} />,
       color: '#10B981',
       link: '/analysis/druid-tree'
