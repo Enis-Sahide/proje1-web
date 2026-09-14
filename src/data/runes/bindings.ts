@@ -4,7 +4,7 @@ export const runeBindingsData = [
     title: 'Fiziksel ve Psişik Korunma (Aura Kalkanı)',
     description: 'Bilinçli veya bilinçsiz olarak yöneltilen psişik saldırıları, kem gözleri ve ev içindeki negatif enerji girdaplarını dışarıda tutan güçlü bir formüldür.',
     runesUsed: 'Algız - Othala - Algız',
-    usageInstructions: 'Ev veya odanızın dış kapısının merkezine Othala, sağına ve soluna ise Algız sembolleri çizilir (mümkünse kazınarak). Aura yırtığınız varsa kalp çakrası hizasında üzerinizde taşımanız, zarar verecek düşük frekansları anında bloke eder.',
+    usageInstructions: 'Ev veya odanızın dış kapısının merkezine Othala, sağına ve soluna ise Algız sembolleri çizilir (mümkünse kazıyarak ve aşağıdan yukarı yönlü). Aura yırtığınız varsa kalp çakrası hizasında üzerinizde taşımanız, zarar verecek düşük frekansları anında bloke eder.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/bindrune_korunma.png' }
   },
   {
@@ -20,7 +20,7 @@ export const runeBindingsData = [
     title: 'Elma Çalışması ve Bereket Zenginliği',
     description: 'Yaşamınızda durağanlaşan bereket ve bolluk akışını yeniden başlatmak, tıkanan maddi yolları şifalandırmak için uygulanan antik bir bağlamadır.',
     runesUsed: 'Gebo - Wunjo - Gebo',
-    usageInstructions: 'Yeşil bir elmanın üzerine kırmızı saplı (ve tercihen yeni) bir bıçakla bu üçlemeyi kazıyın. Elmayı yerken, bolluğun hücrelerinize karıştığını imgeleyin ve yalnızca sapı kalana kadar tüketin. 21 günlük döngü içinde etki eder.',
+    usageInstructions: 'Yeşil bir elmanın üzerine kırmızı saplı (ve tercihen yeni) bir bıçakla bu üçlemeyi kazıyın (aşağıdan yukarı yönlü). Elmayı yerken, bolluğun hücrelerinize karıştığını imgeleyin ve yalnızca sapı kalana kadar tüketin. 21 günlük döngü içinde etki eder.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/bindrune_bolluk.png' }
   },
   {
@@ -36,7 +36,7 @@ export const runeBindingsData = [
     title: 'İlişkide Denge - Huzur - Uyum',
     description: 'İkili ilişkilerdeki çatışmaları azaltan, kalp kırıklıklarını onaran ve iki taraf arasında kozmik denge kuran bir frekanstır.',
     runesUsed: 'Gebo - Wunjo - Gebo (Türev)',
-    usageInstructions: 'Kağıda çizilecekse yeşil renkli kağıda normal kurşun kalemle çizilmeli. Eğer taşa kazınacaksa yatağın yanına yerleştirilebilir.',
+    usageInstructions: 'Kağıda çizilecekse yeşil renkli kağıda normal kurşun kalemle çizilmeli (aşağıdan yukarı yönlü). Eğer taşa kazınacaksa yatağın yanına yerleştirilebilir.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/bindrune_denge.png' }
   },
   {

@@ -341,19 +341,13 @@ export default function CosmicMatrixPage() {
                   </p>
                 </div>
 
-                <div className="bg-white/5 rounded-2xl p-4 border border-white/10 space-y-3">
+                <div className="bg-white/5 rounded-2xl p-4 border border-white/10 space-y-2">
                   <span className="text-xs font-semibold text-amber-400 uppercase tracking-wider block">
                     Nasıl Uygulanır? (Ritüel & Kullanım)
                   </span>
                   <p className="text-xs text-gray-300 leading-relaxed">
                     {report.personalTalisman.usageInstructions}
                   </p>
-                  <div className="flex items-start gap-2 pt-2.5 border-t border-white/10 text-[11px] text-amber-300/90 leading-relaxed">
-                    <span className="text-sm shrink-0">⬆️</span>
-                    <div>
-                      <strong className="text-amber-200">Kadim Çizim Kuralı:</strong> Rune sembollerinin frekansını doğru kanalize etmek ve enerjiyi yeryüzünden ilahi kaynağa yükseltmek için, hatları mutlaka <u>aşağıdan yukarıya doğru</u> kazıyarak veya çizerek aktive edin.
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
