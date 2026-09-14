@@ -745,7 +745,7 @@ export function synthesizeCosmicMatrix(
       return match ? match.symbol : 'ᚱ';
     }),
     purpose: selectedBinding.description,
-    usageInstructions: `${selectedBinding.usageInstructions} (Kadim Çizim Kuralı: Sembollerin frekansını doğru kanalize etmek ve enerjiyi ilahi kaynağa yükseltmek için tüm hatlar mutlaka aşağıdan yukarıya doğru kazınarak veya çizilerek aktive edilmelidir.)`,
+    usageInstructions: selectedBinding.usageInstructions,
     kabbalisticBridge: `Bu tılsım, ${fourWorldsBalance.dominantWorld} âlemindeki aşırı yoğunluğu ${fourWorldsBalance.growthWorld} âlemine aktararak aura dengesini tesis eder.`
   };
 
