@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Lock, Activity, AlertCircle, X, Clock, Scroll } from 'lucide-react';
+import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Lock, Activity, AlertCircle, X, Clock, Scroll, TreePine } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 interface ToolItem {
@@ -29,6 +29,14 @@ export default function AnalysisPage() {
       icon: <Compass size={32} />,
       color: '#F59E0B',
       link: '/analysis/cosmic-matrix'
+    },
+    {
+      id: 'druid-tree',
+      title: 'Kelt Druid Ağaç Astrolojisi',
+      description: 'Doğum gününüzün 22 kutsal Kelt ağacındaki totemini, Ogham harfini, ışık & gölge arketipleri ile orman topraklanması ritüelini keşfedin.',
+      icon: <TreePine size={32} />,
+      color: '#10B981',
+      link: '/analysis/druid-tree'
     },
     {
       id: 'incarnation',
