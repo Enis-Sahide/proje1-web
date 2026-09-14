@@ -229,42 +229,42 @@ const PLANET_NAMES_TR: Record<string, { tr: string; sym: string }> = {
 // Tarihsel Kaynaklı Kadim Ağaç & Ortam Aromaterapisi Eşleşmeleri (Culpeper & Agrippa)
 export const PLANET_HERB_MAP: Record<string, PlanetBotanical> = {
   Sun: {
-    tree: 'Defne (*Laurus nobilis*) & Meşe Ağacı',
+    tree: 'Defne & Meşe Ağacı',
     essentialOil: 'Biberiye & Bergamot',
     theme: 'Solar Pleksus canlılığı, irade ve kalp neşesini canlandırır.'
   },
   Moon: {
-    tree: 'Söğüt Ağacı (*Salix*) & Nilüfer',
+    tree: 'Söğüt Ağacı & Nilüfer',
     essentialOil: 'Yasemin & Sandal Ağacı',
     theme: 'Duygusal akış, bilinçaltı dinginliği ve sezgisel denge sağlar.'
   },
   Mercury: {
-    tree: 'Huş (*Betula*) & Fındık Ağacı',
+    tree: 'Huş & Fındık Ağacı',
     essentialOil: 'Lavanta & Nane',
     theme: 'Zihinsel odaklanma, berraklık ve hakikat ifadesini açar.'
   },
   Venus: {
-    tree: 'Mersin (*Myrtus*) & Elma Ağacı',
-    essentialOil: 'Şam Gülü & Itır (*Geranium*)',
+    tree: 'Mersin & Elma Ağacı',
+    essentialOil: 'Şam Gülü & Itır',
     theme: 'Kalp çakrası şifası, şefkat ve estetik uyumu yeşertir.'
   },
   Mars: {
-    tree: 'Alıç (*Crataegus*) & Çam Ağacı',
+    tree: 'Alıç & Çam Ağacı',
     essentialOil: 'Sedir & Çam Reçinesi',
     theme: 'Köklenme, yapıcı cesaret, dayanıklılık ve canlılık kazandırır.'
   },
   Jupiter: {
-    tree: 'Ulu Meşe (*Quercus*) & Ihlamur Ağacı',
-    essentialOil: 'Akgünlük (*Frankincense*) & Misk Adaçayı',
+    tree: 'Ulu Meşe & Ihlamur Ağacı',
+    essentialOil: 'Akgünlük (Frankincense) & Misk Adaçayı',
     theme: 'Bilinç genişlemesi, 3. göz sezgisi ve ruhsal bilgeliği uyarır.'
   },
   Saturn: {
-    tree: 'Servi (*Cupressus*) & Porsuk Ağacı',
-    essentialOil: 'Mür (*Myrrh*), Paçuli & Vetiver',
+    tree: 'Servi & Porsuk Ağacı',
+    essentialOil: 'Mür (Myrrh), Paçuli & Vetiver',
     theme: 'Sağlıklı sınırlar, sabır, disiplin ve güçlü topraklanma inşa eder.'
   },
   Uranus: {
-    tree: 'Dişbudak Ağacı (*Fraxinus / Yggdrasil*)',
+    tree: 'Dişbudak Ağacı (Yggdrasil)',
     essentialOil: 'Çay Ağacı & Nane',
     theme: 'Elektriksel sinir sistemi rahatlaması ve yüksek uyanış sağlar.'
   },
@@ -274,13 +274,13 @@ export const PLANET_HERB_MAP: Record<string, PlanetBotanical> = {
     theme: 'Psişik arınma, aurik kalkan ve ilahi teslimiyet frekansı verir.'
   },
   Pluto: {
-    tree: 'Nar Ağacı (*Punica*) & Porsuk',
+    tree: 'Nar Ağacı & Porsuk',
     essentialOil: 'Vetiver & Mürrüsafi',
     theme: 'Hücresel yenilenme, derin detoks ve kökten dönüşüm gücü aşılar.'
   },
   NorthNode: {
     tree: 'Defne Ağacı',
-    essentialOil: 'Akgünlük (*Frankincense*)',
+    essentialOil: 'Akgünlük (Frankincense)',
     theme: 'Kadersel tekâmül rotasında berraklık ve yüksek amaca odaklanma sağlar.'
   },
   SouthNode: {
@@ -294,7 +294,7 @@ export const PLANET_HERB_MAP: Record<string, PlanetBotanical> = {
     theme: 'Ruh ve kalp yaralarını hücresel olarak onarma bilgeliğini uyandırır.'
   },
   Lilith: {
-    tree: 'Ardıç Ağacı (*Juniperus*) & Yabani Gül',
+    tree: 'Ardıç Ağacı & Yabani Gül',
     essentialOil: 'Ardıç & Mür',
     theme: 'Gölge benliği arındırma ve ilksel içsel gücü özgürleştirme frekansı verir.'
   },
