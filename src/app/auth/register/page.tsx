@@ -63,12 +63,18 @@ function RegisterForm() {
       if (res?.requiresVerification) {
         setStep('verify');
         setCountdown(60);
-        setSuccessMessage('Doğrulama kodu e-posta adresinize gönderildi.');
+        setSuccessMessage(res.message || 'Doğrulama kodu e-posta adresinize gönderildi.');
+        if (typeof window !== 'undefined') {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
       } else {
         window.location.href = '/';
       }
     } catch (err: any) {
       setError(err.message || 'Kayıt sırasında bir hata oluştu.');
+      if (typeof window !== 'undefined') {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     } finally {
       setLoading(false);
     }
@@ -163,16 +169,17 @@ function RegisterForm() {
       {/* ADIM 1: KAYIT FORMU */}
       {step === 'form' && (
         <form onSubmit={handleRegister} className="space-y-5">
-          {/* Honeypot gizli bot alanı */}
-          <input
-            type="text"
-            name="website"
-            value={website}
-            onChange={(e) => setWebsite(e.target.value)}
-            style={{ display: 'none' }}
-            tabIndex={-1}
-            autoComplete="off"
-          />
+          {/* Honeypot gizli bot alanı (tarayıcı autofill'inin tetiklememesi için güvenli gizleme) */}
+          <div style={{ position: 'absolute', opacity: 0, zIndex: -1, pointerEvents: 'none', width: 0, height: 0, overflow: 'hidden' }} aria-hidden="true">
+            <input
+              type="text"
+              name="company_security_trap"
+              value={website}
+              onChange={(e) => setWebsite(e.target.value)}
+              tabIndex={-1}
+              autoComplete="new-password"
+            />
+          </div>
 
           <div>
             <label className="block text-sm font-medium text-mystic-text-muted mb-1">Ad Soyad</label>
@@ -225,10 +232,36 @@ function RegisterForm() {
             </div>
           </div>
 
+          {/* Mobilde ekranın altında görünür anlık hata kutusu */}
+          {error && (
+            <div className="p-3.5 bg-red-500/15 border border-red-500/40 rounded-xl flex items-start gap-2.5 text-xs text-red-200 animate-in fade-in duration-200">
+              <AlertCircle className="text-red-400 shrink-0 mt-0.5" size={16} />
+              <div className="flex-1 leading-relaxed">
+                <span>{error}</span>
+                {error.includes('zaten kayıtlı') && (
+                  <div className="mt-2.5 flex flex-wrap items-center gap-2">
+                    <Link
+                      href={`/auth/login?email=${encodeURIComponent(email)}`}
+                      className="bg-[#D4AF37] text-black font-bold px-3 py-1.5 rounded-lg text-xs hover:brightness-110 transition-all inline-block"
+                    >
+                      Giriş Yap →
+                    </Link>
+                    <Link
+                      href={`/auth/forgot-password?email=${encodeURIComponent(email)}`}
+                      className="text-mystic-accent hover:underline text-xs"
+                    >
+                      Şifremi Sıfırla
+                    </Link>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gradient-to-r from-mystic-primary to-purple-600 hover:from-purple-600 hover:to-mystic-primary text-white font-bold py-3.5 rounded-xl mt-6 transition-all flex justify-center items-center shadow-lg cursor-pointer disabled:opacity-50"
+            className="w-full bg-gradient-to-r from-mystic-primary to-purple-600 hover:from-purple-600 hover:to-mystic-primary text-white font-bold py-3.5 rounded-xl mt-4 transition-all flex justify-center items-center shadow-lg cursor-pointer disabled:opacity-50"
           >
             {loading ? <Loader2 className="animate-spin mr-2" /> : 'Doğrulama Kodu Al ve Kayıt Ol'}
           </button>
