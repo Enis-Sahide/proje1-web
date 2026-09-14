@@ -38,6 +38,12 @@ export interface HDChartInput {
 
 export type EnergyDirection = 'inward' | 'outward'; // İçe Yönelimli (Yin) vs Dışa Yönelimli (Yang)
 
+export interface PlanetBotanical {
+  tree: string;
+  essentialOil: string;
+  theme: string;
+}
+
 export interface PlanetaryDynamicDiagnosis {
   planetKey: string;
   planetName: string;
@@ -65,6 +71,7 @@ export interface PlanetaryDynamicDiagnosis {
     meaning: string;
     balancingAction: string;
   };
+  botanical: PlanetBotanical;
   practicalRemedy: string;
 }
 
@@ -106,6 +113,7 @@ export interface CosmicMatrixItem {
     name: string;
     location: string;
   };
+  botanical: PlanetBotanical;
   dynamic: {
     direction: EnergyDirection;
     summary: string;
@@ -128,6 +136,7 @@ export interface PersonalTalismanFormula {
   purpose: string;
   usageInstructions: string;
   kabbalisticBridge: string;
+  incenseAndHerbs?: string;
 }
 
 export interface CosmicMatrixReport {
@@ -215,6 +224,85 @@ const PLANET_NAMES_TR: Record<string, { tr: string; sym: string }> = {
   Chiron: { tr: 'Kiron', sym: '⚷' },
   Lilith: { tr: 'Lilith (Kara Ay)', sym: '⚸' },
   Ascendant: { tr: 'Yükselen', sym: 'ASC' }
+};
+
+// Tarihsel Kaynaklı Kadim Ağaç & Ortam Aromaterapisi Eşleşmeleri (Culpeper & Agrippa)
+export const PLANET_HERB_MAP: Record<string, PlanetBotanical> = {
+  Sun: {
+    tree: 'Defne (*Laurus nobilis*) & Meşe Ağacı',
+    essentialOil: 'Biberiye & Bergamot',
+    theme: 'Solar Pleksus canlılığı, irade ve kalp neşesini canlandırır.'
+  },
+  Moon: {
+    tree: 'Söğüt Ağacı (*Salix*) & Nilüfer',
+    essentialOil: 'Yasemin & Sandal Ağacı',
+    theme: 'Duygusal akış, bilinçaltı dinginliği ve sezgisel denge sağlar.'
+  },
+  Mercury: {
+    tree: 'Huş (*Betula*) & Fındık Ağacı',
+    essentialOil: 'Lavanta & Nane',
+    theme: 'Zihinsel odaklanma, berraklık ve hakikat ifadesini açar.'
+  },
+  Venus: {
+    tree: 'Mersin (*Myrtus*) & Elma Ağacı',
+    essentialOil: 'Şam Gülü & Itır (*Geranium*)',
+    theme: 'Kalp çakrası şifası, şefkat ve estetik uyumu yeşertir.'
+  },
+  Mars: {
+    tree: 'Alıç (*Crataegus*) & Çam Ağacı',
+    essentialOil: 'Sedir & Çam Reçinesi',
+    theme: 'Köklenme, yapıcı cesaret, dayanıklılık ve canlılık kazandırır.'
+  },
+  Jupiter: {
+    tree: 'Ulu Meşe (*Quercus*) & Ihlamur Ağacı',
+    essentialOil: 'Akgünlük (*Frankincense*) & Misk Adaçayı',
+    theme: 'Bilinç genişlemesi, 3. göz sezgisi ve ruhsal bilgeliği uyarır.'
+  },
+  Saturn: {
+    tree: 'Servi (*Cupressus*) & Porsuk Ağacı',
+    essentialOil: 'Mür (*Myrrh*), Paçuli & Vetiver',
+    theme: 'Sağlıklı sınırlar, sabır, disiplin ve güçlü topraklanma inşa eder.'
+  },
+  Uranus: {
+    tree: 'Dişbudak Ağacı (*Fraxinus / Yggdrasil*)',
+    essentialOil: 'Çay Ağacı & Nane',
+    theme: 'Elektriksel sinir sistemi rahatlaması ve yüksek uyanış sağlar.'
+  },
+  Neptune: {
+    tree: 'Lübnan Sediri & Lotus',
+    essentialOil: 'Lotus & Saf Günlük',
+    theme: 'Psişik arınma, aurik kalkan ve ilahi teslimiyet frekansı verir.'
+  },
+  Pluto: {
+    tree: 'Nar Ağacı (*Punica*) & Porsuk',
+    essentialOil: 'Vetiver & Mürrüsafi',
+    theme: 'Hücresel yenilenme, derin detoks ve kökten dönüşüm gücü aşılar.'
+  },
+  NorthNode: {
+    tree: 'Defne Ağacı',
+    essentialOil: 'Akgünlük (*Frankincense*)',
+    theme: 'Kadersel tekâmül rotasında berraklık ve yüksek amaca odaklanma sağlar.'
+  },
+  SouthNode: {
+    tree: 'Selvi Ağacı',
+    essentialOil: 'Paçuli & Mür',
+    theme: 'Karmik tortuları toprağa iade edip hafifleme ve özgürleşme sağlar.'
+  },
+  Chiron: {
+    tree: 'Zeytin & Mürver Ağacı',
+    essentialOil: 'Helichrysum (Ölmez Çiçek) & Lavanta',
+    theme: 'Ruh ve kalp yaralarını hücresel olarak onarma bilgeliğini uyandırır.'
+  },
+  Lilith: {
+    tree: 'Ardıç Ağacı (*Juniperus*) & Yabani Gül',
+    essentialOil: 'Ardıç & Mür',
+    theme: 'Gölge benliği arındırma ve ilksel içsel gücü özgürleştirme frekansı verir.'
+  },
+  Ascendant: {
+    tree: 'Sedir Ağacı',
+    essentialOil: 'Bergamot & Günlük',
+    theme: 'Biyofiziksel beden aurasını güçlendirme ve koruyucu kalkan örer.'
+  }
 };
 
 // 13 Gezegenin Tarafsız İçe Yönelimli (Yin) vs Dışa Yönelimli (Yang) Dinamik Profilleri
@@ -648,6 +736,7 @@ export function synthesizeCosmicMatrix(
         guidance: runeData.usage
       },
       chakra: chakraMeta,
+      botanical: PLANET_HERB_MAP[normKey] || PLANET_HERB_MAP.Sun,
       dynamic: {
         direction: energyDirection,
         summary: activeDynamic.manifestation
@@ -684,6 +773,7 @@ export function synthesizeCosmicMatrix(
         meaning: runeData.meaning,
         balancingAction: runeData.usage
       },
+      botanical: PLANET_HERB_MAP[normKey] || PLANET_HERB_MAP.Sun,
       practicalRemedy: activeDynamic.actionableRemedy
     });
   });
@@ -746,7 +836,10 @@ export function synthesizeCosmicMatrix(
     }),
     purpose: selectedBinding.description,
     usageInstructions: selectedBinding.usageInstructions,
-    kabbalisticBridge: `Bu tılsım, ${fourWorldsBalance.dominantWorld} âlemindeki aşırı yoğunluğu ${fourWorldsBalance.growthWorld} âlemine aktararak aura dengesini tesis eder.`
+    kabbalisticBridge: `Bu tılsım, ${fourWorldsBalance.dominantWorld} âlemindeki aşırı yoğunluğu ${fourWorldsBalance.growthWorld} âlemine aktararak aura dengesini tesis eder.`,
+    incenseAndHerbs: inwardCount > planetaryDynamics.length / 2
+      ? 'Aura arındırıcı ve koruyucu Defne yaprağı & Sedir Ağacı tütsüsü eşliğinde uygulanması frekansı katbekat yükseltir.'
+      : 'Kalp ferahlığı ve denge için Gül yaprakları & Akgünlük (Frankincense) tütsüsü eşliğinde uygulanması tesiri hızlandırır.'
   };
 
   return {

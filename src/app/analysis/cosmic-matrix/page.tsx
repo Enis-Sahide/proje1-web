@@ -6,7 +6,7 @@ import {
   ArrowLeft, Loader2, Sparkles, Layers, Compass, Shield, 
   RotateCcw, Flame, Droplets, Wind, Mountain, Sun, Moon, 
   CheckCircle2, AlertCircle, Bookmark, Compass as CompassIcon, 
-  Eye, Zap, RefreshCw
+  Eye, Zap, RefreshCw, Leaf
 } from 'lucide-react';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import moment from 'moment-timezone';
@@ -341,13 +341,19 @@ export default function CosmicMatrixPage() {
                   </p>
                 </div>
 
-                <div className="bg-white/5 rounded-2xl p-4 border border-white/10 space-y-2">
+                <div className="bg-white/5 rounded-2xl p-4 border border-white/10 space-y-2.5">
                   <span className="text-xs font-semibold text-amber-400 uppercase tracking-wider block">
                     Nasıl Uygulanır? (Ritüel & Kullanım)
                   </span>
                   <p className="text-xs text-gray-300 leading-relaxed">
                     {report.personalTalisman.usageInstructions}
                   </p>
+                  {report.personalTalisman.incenseAndHerbs && (
+                    <div className="pt-2 border-t border-white/10 flex items-start gap-1.5 text-[11px] text-emerald-300/90 leading-relaxed">
+                      <Leaf size={13} className="text-emerald-400 shrink-0 mt-0.5" />
+                      <span><strong>Ortam Tütsüsü & Aromaterapi:</strong> {report.personalTalisman.incenseAndHerbs}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -500,6 +506,30 @@ export default function CosmicMatrixPage() {
                           </p>
                         </div>
                       </div>
+
+                      {/* Kadim Ağaç & Ortam Aromaterapisi (Güvenli Model) */}
+                      <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-3.5 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300/90 flex items-center gap-1.5">
+                            <Leaf size={13} className="text-emerald-400" />
+                            Kadim Ağaç & Ortam Aromaterapisi
+                          </span>
+                          <span className="text-[10px] text-gray-500 italic">Harici / Ortam Kokusu</span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                          <div className="bg-black/30 p-2 rounded-xl border border-white/5">
+                            <span className="text-[10px] text-gray-400 block font-semibold">🌲 Kadim Ağaç (Doğa Teması):</span>
+                            <span className="text-white font-medium">{dyn.botanical.tree}</span>
+                          </div>
+                          <div className="bg-black/30 p-2 rounded-xl border border-white/5">
+                            <span className="text-[10px] text-gray-400 block font-semibold">🌸 Ortam Uçucu Yağı (Buhurdanlık):</span>
+                            <span className="text-white font-medium">{dyn.botanical.essentialOil}</span>
+                          </div>
+                        </div>
+                        <p className="text-[11px] text-gray-400 leading-snug">
+                          {dyn.botanical.theme}
+                        </p>
+                      </div>
                     </div>
                   );
                 })}
@@ -590,12 +620,23 @@ export default function CosmicMatrixPage() {
                           {item.rune.symbol} {item.rune.name}
                         </td>
                         <td className="py-3 px-4 text-gray-400">
-                          {item.chakra.name}
+                          <div>{item.chakra.name}</div>
+                          <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400/90 mt-1 font-medium bg-emerald-500/10 px-2 py-0.5 rounded-md border border-emerald-500/20">
+                            🌲 {item.botanical.tree.split('&')[0].replace(/\(.*?\)/g, '').trim()} · 🌸 {item.botanical.essentialOil.split('&')[0].replace(/\(.*?\)/g, '').trim()}
+                          </span>
                         </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Güvenlik & Tıbbi Sorumluluk Uyarısı */}
+              <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 flex items-start gap-3 text-xs text-gray-400">
+                <Shield size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                <p className="leading-relaxed text-[11px]">
+                  <strong className="text-amber-300 font-semibold">Güvenlik & Enerjetik Bilgilendirme:</strong> Bu sayfada yer alan kadim ağaç ve aromaterapi eşleşmeleri sembolik doğa teması, açık hava topraklanması ve ortam buhurdanlığı/difüzör frekansına dayanır. Kesinlikle dahili tüketim (yeme, içme, kaynatma), tıbbi tedavi veya ilaç niteliği taşımaz. Sağlık konularında daima uzman hekiminize danışınız.
+                </p>
               </div>
             </div>
           </div>
