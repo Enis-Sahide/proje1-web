@@ -95,7 +95,7 @@ export default function CosmicMatrixPage() {
   }) || [];
 
   return (
-    <div className="min-h-screen bg-[#0A0D14] text-gray-100 font-sans selection:bg-amber-500/20 selection:text-amber-300">
+    <div className="min-h-screen bg-[#0A0D14] text-gray-100 font-sans selection:bg-amber-500/20 selection:text-amber-300 pt-28 pb-20">
       {/* Arka Plan Mistik Işıklandırma */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-amber-500/10 blur-[120px]" />
@@ -103,7 +103,7 @@ export default function CosmicMatrixPage() {
         <div className="absolute bottom-[-10%] left-[20%] w-[500px] h-[500px] rounded-full bg-emerald-500/10 blur-[130px]" />
       </div>
 
-      <div className="relative max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Üst Navigasyon */}
         <div className="flex items-center justify-between pb-6 border-b border-white/10 mb-8">
           <Link 

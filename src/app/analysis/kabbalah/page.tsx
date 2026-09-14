@@ -269,12 +269,12 @@ export default function KabbalahAnalysisPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#05050A] text-white overflow-hidden relative font-sans">
+    <div className="min-h-screen bg-[#05050A] text-white overflow-hidden relative font-sans pt-24 pb-20">
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay pointer-events-none z-0"></div>
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#D4AF37] opacity-5 blur-[150px] rounded-full pointer-events-none"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#6A0DAD] opacity-10 blur-[150px] rounded-full pointer-events-none"></div>
 
-      <div className="max-w-5xl mx-auto px-6 py-12 relative z-10">
+      <div className="max-w-5xl mx-auto px-6 py-6 relative z-10">
         
         <button 
           onClick={() => router.back()}
