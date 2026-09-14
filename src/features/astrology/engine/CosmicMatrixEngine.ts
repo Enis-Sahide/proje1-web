@@ -428,10 +428,29 @@ const PLANET_DYNAMIC_PROFILES: Record<string, DynamicProfile> = {
   }
 };
 
+export const TURKISH_CENTER_TO_CODE: Record<string, string> = {
+  'Tepe (Taç)': 'Head',
+  'Ajna (Zihin)': 'Ajna',
+  'Boğaz': 'Throat',
+  'Benlik (G)': 'G',
+  'Kalp (Ego)': 'Heart',
+  'Sakral': 'Sacral',
+  'Kök': 'Root',
+  'Dalak': 'Spleen',
+  'Solar Pleksus': 'SolarPlexus'
+};
+
+const YANG_PLANETS = ['Sun', 'Mars', 'Jupiter', 'Uranus', 'Pluto'];
+const YIN_PLANETS = ['Moon', 'Venus', 'Neptune', 'Saturn'];
+const FIRE_AIR_SIGNS = ['Koç', 'İkizler', 'Aslan', 'Terazi', 'Yay', 'Kova', 'Aries', 'Gemini', 'Leo', 'Libra', 'Sagittarius', 'Aquarius'];
+const YANG_HOUSES = [1, 3, 5, 7, 9, 10, 11];
+
 export function normalizePlanetKey(name: string): string {
   if (!name) return 'Sun';
   const clean = name.trim().toLowerCase();
   
+  if (clean.includes('kuzey') || clean.includes('northnode') || clean.includes('true node') || clean === 'node') return 'NorthNode';
+  if (clean.includes('güney') || clean.includes('southnode')) return 'SouthNode';
   if (clean.includes('güneş') || clean === 'sun') return 'Sun';
   if (clean === 'ay' || clean === 'moon') return 'Moon';
   if (clean.includes('merkür') || clean === 'mercury') return 'Mercury';
@@ -442,8 +461,6 @@ export function normalizePlanetKey(name: string): string {
   if (clean.includes('uranüs') || clean === 'uranus') return 'Uranus';
   if (clean.includes('neptün') || clean === 'neptune') return 'Neptune';
   if (clean.includes('plüton') || clean.includes('pluto')) return 'Pluto';
-  if (clean.includes('kuzey') || clean.includes('northnode') || clean.includes('true node') || clean === 'node') return 'NorthNode';
-  if (clean.includes('güney') || clean.includes('southnode')) return 'SouthNode';
   if (clean.includes('kiron') || clean.includes('chiron')) return 'Chiron';
   if (clean.includes('yükselen') || clean.includes('asc')) return 'Ascendant';
   if (clean.includes('tepe') || clean.includes('mc')) return 'Midheaven';
@@ -510,8 +527,13 @@ export function synthesizeCosmicMatrix(
       gift: 'Denge ve Farkındalık',
       shadow: 'Korku ve Direnç'
     };
+
     const centerName = GATE_TO_CENTER[activeGate] || 'Solar Pleksus';
-    const isCenterDefined = hdChart.definedCenters.includes(centerName);
+    const centerCode = TURKISH_CENTER_TO_CODE[centerName] || centerName;
+    const isCenterDefined = hdChart.definedCenters.some(dc => 
+      dc.toLowerCase() === centerCode.toLowerCase() || 
+      dc.toLowerCase() === centerName.toLowerCase()
+    );
     const lineProfile = LINE_BEHAVIOR_PROFILES[activeLine] || LINE_BEHAVIOR_PROFILES[1];
 
     // Rune Eşleşmesi (Doğru normKey ile)
@@ -529,22 +551,41 @@ export function synthesizeCosmicMatrix(
     // Çakra (Doğru normKey ile)
     const chakraMeta = PLANET_CHAKRA_MAP[normKey] || { name: 'Kalp Çakrası', location: 'Göğüs' };
 
-    // 🎯 ENERJİ ÇALIŞMA YÖNÜ TESPİTİ (İçe Yönelimli vs Dışa Yönelimli)
-    // Kriter:
-    // 1. Eğer retro ise -> içe yönelim eğilimi artar (-2).
-    // 2. Eğer HD Merkezi TANIMLI ise -> dışa yayma gücü artar (+2).
-    // 3. Eğer HD Merkezi AÇIK ise -> dışarıdan emme / içe çekilme artar (-1).
-    // 4. Çizgi 4-5-6 (Dışsal/Sosyal) (+1), Çizgi 1-2-3 (İçsel) (-1).
-    let isOutwardScore = 0;
-    if (isCenterDefined) isOutwardScore += 2;
-    else isOutwardScore -= 1;
-    
-    if ([4, 5, 6].includes(activeLine)) isOutwardScore += 1;
-    else isOutwardScore -= 1;
+    // 🎯 ÇOK KATMANLI ENERJİ ÇALIŞMA YÖNÜ TESPİTİ (İçe Yönelimli vs Dışa Yönelimli)
+    let score = 0;
 
-    if (p.isRetrograde) isOutwardScore -= 2;
+    // 1. Gezegen temel doğası
+    if (YANG_PLANETS.includes(normKey)) score += 2;
+    else if (YIN_PLANETS.includes(normKey)) score -= 2;
+    else if (normKey === 'NorthNode') score += 1;
+    else if (normKey === 'SouthNode') score -= 1;
 
-    const energyDirection: EnergyDirection = isOutwardScore >= 1 ? 'outward' : 'inward';
+    // 2. Burç Elementi (Ateş/Hava = Yang, Toprak/Su = Yin)
+    const isFireOrAir = p.sign ? FIRE_AIR_SIGNS.some(s => p.sign.toLowerCase().includes(s.toLowerCase())) : false;
+    if (isFireOrAir) score += 1;
+    else score -= 1;
+
+    // 3. Ev Pozisyonu (1, 3, 5, 7, 9, 10, 11 = Yang; 2, 4, 6, 8, 12 = Yin)
+    if (YANG_HOUSES.includes(p.house)) score += 1;
+    else score -= 1;
+
+    // 4. Human Design Tanımlı Merkez & Çizgi
+    if (isCenterDefined) score += 1;
+    else score -= 1;
+
+    if ([4, 5, 6].includes(activeLine)) score += 1;
+    else score -= 1;
+
+    // 5. Retro Durumu (Retrograde içe dönük çalışmayı kesinleştirir/derinleştirir)
+    if (p.isRetrograde) score -= 3;
+
+    // Karar: Pozitif ise Yang (Dışa Yönelimli), Negatif ise Yin (İçe Yönelimli)
+    const energyDirection: EnergyDirection = score > 0 
+      ? 'outward' 
+      : score < 0 
+        ? 'inward' 
+        : (YANG_PLANETS.includes(normKey) ? 'outward' : 'inward');
+
     const profile = PLANET_DYNAMIC_PROFILES[normKey] || PLANET_DYNAMIC_PROFILES['Sun'];
     const activeDynamic = energyDirection === 'outward' ? profile.outward : profile.inward;
 
