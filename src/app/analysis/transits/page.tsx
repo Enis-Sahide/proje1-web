@@ -20,7 +20,7 @@ import {
   Info
 } from 'lucide-react';
 import { getTransitHouseInterpretation, getTransitAspectInterpretation } from '@/features/astrology/engine/TransitInterpretations';
-import { getSkyPlanetSignInterpretation } from '@/features/astrology/engine/SkyAspectInterpretations';
+import { getSkyPlanetSignInterpretation, getPlanetSignBriefHeadline } from '@/features/astrology/engine/SkyAspectInterpretations';
 import { AstroCity, TransitChartData, AstroPoint, AstroAspect } from '@/features/astrology/engine/AstrologyConstants';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { useAuth } from '@/context/AuthContext';
@@ -105,6 +105,7 @@ export default function TransitsPage() {
     aspects: any[];
   } | null>(null);
   const [skyAspectFilter, setSkyAspectFilter] = useState<'ALL' | 'HARMONIOUS' | 'CHALLENGING' | 'CONJUNCTION'>('ALL');
+  const [skyRightTab, setSkyRightTab] = useState<'ASPECTS' | 'SIGN_PLACEMENTS'>('ASPECTS');
 
   // Mundane Timeline states
   const [skyTimelineData, setSkyTimelineData] = useState<any>(null);
@@ -597,105 +598,216 @@ export default function TransitsPage() {
                       />
                     </div>
 
-                    {/* Right: Active Sky Aspects (5 cols) */}
+                    {/* Right: Active Sky Aspects or Planetary Sign Transits (5 cols) */}
                     <div className="lg:col-span-5 bg-[#0A0D14]/90 sm:backdrop-blur-md border border-white/10 p-4 sm:p-6 rounded-3xl shadow-xl flex flex-col">
-                      <div className="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
-                        <div>
-                          <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                            <Sparkles className="text-[#D4AF37]" size={18} />
-                            Gökyüzündeki Aktif Açı Bağlantıları
-                          </h3>
-                          <p className="text-xs text-mystic-text-muted">
-                            Gezegenlerin şu an birbiriyle kurduğu kozmik açılar
-                          </p>
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-white/10 pb-4 mb-4 gap-3">
+                        <div className="inline-flex p-1 rounded-xl bg-white/5 border border-white/10 w-full sm:w-auto">
+                          <button
+                            type="button"
+                            onClick={() => setSkyRightTab('ASPECTS')}
+                            className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                              skyRightTab === 'ASPECTS'
+                                ? 'bg-gradient-to-r from-[#D4AF37] to-[#F59E0B] text-black shadow-md'
+                                : 'text-mystic-text-muted hover:text-white'
+                            }`}
+                          >
+                            <Sparkles size={14} />
+                            <span>Aktif Açılar ({skyChartData.aspects.length})</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSkyRightTab('SIGN_PLACEMENTS')}
+                            className={`flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                              skyRightTab === 'SIGN_PLACEMENTS'
+                                ? 'bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8] text-black shadow-md'
+                                : 'text-mystic-text-muted hover:text-white'
+                            }`}
+                          >
+                            <Layers size={14} />
+                            <span>Burç Geçişleri & Etkileri</span>
+                          </button>
                         </div>
                       </div>
 
-                      {/* Aspect Type Filters */}
-                      <div className="flex flex-wrap gap-1.5 mb-4">
-                        {[
-                          { id: 'ALL', label: 'Tümü' },
-                          { id: 'CONJUNCTION', label: 'Kavuşum (0°)' },
-                          { id: 'HARMONIOUS', label: 'Destek (△, ⚹)' },
-                          { id: 'CHALLENGING', label: 'Sınav (□, ☍)' },
-                        ].map(f => (
-                          <button
-                            key={f.id}
-                            onClick={() => setSkyAspectFilter(f.id as any)}
-                            className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all ${
-                              skyAspectFilter === f.id
-                                ? 'bg-white/20 text-white font-bold'
-                                : 'bg-white/5 text-mystic-text-muted hover:text-white'
-                            }`}
-                          >
-                            {f.label}
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* Aspects Scrollable List */}
-                      <div className="space-y-3 max-h-[520px] overflow-y-auto custom-scrollbar pr-1">
-                        {filteredSkyAspects.length === 0 ? (
-                          <div className="text-center py-12 text-mystic-text-muted text-xs">
-                            Seçilen filtrede aktif bir gökyüzü açısı bulunmuyor.
-                          </div>
-                        ) : (
-                          filteredSkyAspects.map((asp, idx) => {
-                            const interp = asp.interpretation;
-                            return (
-                              <div
-                                key={`sky-asp-${idx}`}
-                                onClick={() => {
-                                  if (interp) {
-                                    setSelectedInterp({
-                                      title: interp.title,
-                                      content: `${interp.summary}\n\n【Kolektif Etki】\n${interp.collectiveTheme}\n\n【Günün Tavsiyesi】\n${interp.dailyAdvice}`,
-                                      extra: interp.chakraResonance
-                                    });
-                                  }
-                                }}
-                                className="group p-3.5 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5 hover:border-[#0EA5E9]/40 transition-all cursor-pointer flex flex-col gap-2 shadow-sm"
+                      {skyRightTab === 'ASPECTS' ? (
+                        <>
+                          {/* Aspect Type Filters */}
+                          <div className="flex flex-wrap gap-1.5 mb-4">
+                            {[
+                              { id: 'ALL', label: 'Tümü' },
+                              { id: 'CONJUNCTION', label: 'Kavuşum (0°)' },
+                              { id: 'HARMONIOUS', label: 'Destek (△, ⚹)' },
+                              { id: 'CHALLENGING', label: 'Sınav (□, ☍)' },
+                            ].map(f => (
+                              <button
+                                key={f.id}
+                                onClick={() => setSkyAspectFilter(f.id as any)}
+                                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all ${
+                                  skyAspectFilter === f.id
+                                    ? 'bg-white/20 text-white font-bold'
+                                    : 'bg-white/5 text-mystic-text-muted hover:text-white'
+                                }`}
                               >
-                                <div className="flex items-center justify-between">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-lg text-[#0EA5E9] font-bold">{PLANET_SYMBOLS[asp.planet1] || ''}</span>
-                                    <span className="text-xs sm:text-sm font-semibold text-white">{asp.planet1}</span>
-                                  </div>
+                                {f.label}
+                              </button>
+                            ))}
+                          </div>
 
-                                  <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10">
-                                    <span className="text-xs font-bold" style={{ color: ASPECT_COLORS[asp.type] }}>
-                                      {asp.type}
-                                    </span>
-                                    <span className="text-[10px] text-gray-400">
-                                      ({asp.orb.toFixed(1)}°)
-                                    </span>
-                                  </div>
-
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-xs sm:text-sm font-semibold text-white">{asp.planet2}</span>
-                                    <span className="text-lg text-[#D4AF37] font-bold">{PLANET_SYMBOLS[asp.planet2] || ''}</span>
-                                  </div>
-                                </div>
-
-                                {interp && (
-                                  <p className="text-[11px] text-mystic-text-muted line-clamp-2 leading-relaxed">
-                                    {interp.summary}
-                                  </p>
-                                )}
-
-                                <div className="flex items-center justify-between pt-1 border-t border-white/5 text-[10px] text-gray-400">
-                                  <span className="text-[#0EA5E9]/80 font-medium">
-                                    {interp?.energyType || 'Açı'}
-                                  </span>
-                                  <span className="flex items-center gap-1 text-white/60 group-hover:text-white transition-colors">
-                                    Yorumu Oku <ChevronRight size={12} />
-                                  </span>
-                                </div>
+                          {/* Aspects Scrollable List */}
+                          <div className="space-y-3 max-h-[520px] overflow-y-auto custom-scrollbar pr-1">
+                            {filteredSkyAspects.length === 0 ? (
+                              <div className="text-center py-12 text-mystic-text-muted text-xs">
+                                Seçilen filtrede aktif bir gökyüzü açısı bulunmuyor.
                               </div>
-                            );
-                          })
-                        )}
-                      </div>
+                            ) : (
+                              filteredSkyAspects.map((asp, idx) => {
+                                const interp = asp.interpretation;
+                                return (
+                                  <div
+                                    key={`sky-asp-${idx}`}
+                                    onClick={() => {
+                                      if (interp) {
+                                        setSelectedInterp({
+                                          title: interp.title,
+                                          content: `${interp.summary}\n\n【Kolektif Etki】\n${interp.collectiveTheme}\n\n【Günün Tavsiyesi】\n${interp.dailyAdvice}`,
+                                          extra: interp.chakraResonance
+                                        });
+                                      }
+                                    }}
+                                    className="group p-3.5 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5 hover:border-[#0EA5E9]/40 transition-all cursor-pointer flex flex-col gap-2 shadow-sm"
+                                  >
+                                    <div className="flex items-center justify-between">
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-lg text-[#0EA5E9] font-bold">{PLANET_SYMBOLS[asp.planet1] || ''}</span>
+                                        <span className="text-xs sm:text-sm font-semibold text-white">{asp.planet1}</span>
+                                      </div>
+
+                                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10">
+                                        <span className="text-xs font-bold" style={{ color: ASPECT_COLORS[asp.type] }}>
+                                          {asp.type}
+                                        </span>
+                                        <span className="text-[10px] text-gray-400">
+                                          ({asp.orb.toFixed(1)}°)
+                                        </span>
+                                      </div>
+
+                                      <div className="flex items-center gap-2">
+                                        <span className="text-xs sm:text-sm font-semibold text-white">{asp.planet2}</span>
+                                        <span className="text-lg text-[#D4AF37] font-bold">{PLANET_SYMBOLS[asp.planet2] || ''}</span>
+                                      </div>
+                                    </div>
+
+                                    {interp && (
+                                      <p className="text-[11px] text-mystic-text-muted line-clamp-2 leading-relaxed">
+                                        {interp.summary}
+                                      </p>
+                                    )}
+
+                                    <div className="flex items-center justify-between pt-1 border-t border-white/5 text-[10px] text-gray-400">
+                                      <span className="text-[#0EA5E9]/80 font-medium">
+                                        {interp?.energyType || 'Açı'}
+                                      </span>
+                                      <span className="flex items-center gap-1 text-white/60 group-hover:text-white transition-colors">
+                                        Yorumu Oku <ChevronRight size={12} />
+                                      </span>
+                                    </div>
+                                  </div>
+                                );
+                              })
+                            )}
+                          </div>
+                        </>
+                      ) : (
+                        /* Sign Placements & Ingress Impacts List */
+                        <div className="space-y-3 max-h-[580px] overflow-y-auto custom-scrollbar pr-1">
+                          <p className="text-xs text-mystic-text-muted mb-2">
+                            Gezegen ve kadersel noktaların zodyaktaki anlık burç yerleşimleri, kolektif etkileri ve dönüşüm temaları:
+                          </p>
+                          {(() => {
+                            const order = ['Lilith', 'Plüton', 'Satürn', 'Neptün', 'Uranüs', 'Jüpiter', 'Mars', 'Güneş', 'Venüs', 'Merkür', 'Ay', 'Kiron', 'Kuzey Ay Düğümü'];
+                            const sortedPlanets = [...skyChartData.planets]
+                              .filter(p => order.includes(p.name))
+                              .sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
+
+                            return sortedPlanets.map((p, idx) => {
+                              const interp = getSkyPlanetSignInterpretation(
+                                p.name,
+                                p.sign,
+                                p.degreeInSign,
+                                p.minutes,
+                                p.isRetrograde
+                              );
+                              const isHighlighted = p.name === 'Lilith' || p.name === 'Plüton';
+
+                              return (
+                                <div
+                                  key={`pl-sign-${idx}`}
+                                  onClick={() => setSelectedInterp(interp)}
+                                  className={`group p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col gap-2 shadow-sm ${
+                                    isHighlighted
+                                      ? 'bg-gradient-to-br from-[#0EA5E9]/10 via-white/5 to-transparent border-[#0EA5E9]/30 hover:border-[#0EA5E9]/60 hover:bg-[#0EA5E9]/15'
+                                      : 'bg-white/5 hover:bg-white/10 border-white/5 hover:border-[#0EA5E9]/40'
+                                  }`}
+                                >
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-xl text-[#0EA5E9] font-bold group-hover:scale-110 transition-transform">
+                                        {PLANET_SYMBOLS[p.name] || ''}
+                                      </span>
+                                      <div>
+                                        <div className="flex items-center gap-2">
+                                          <span className="text-xs sm:text-sm font-bold text-white group-hover:text-[#0EA5E9] transition-colors">
+                                            {p.name}
+                                          </span>
+                                          {isHighlighted && (
+                                            <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-[#0EA5E9]/20 text-[#0EA5E9] border border-[#0EA5E9]/30">
+                                              {p.name === 'Lilith' ? 'Gölge & Tabu' : 'Majör Çağ'}
+                                            </span>
+                                          )}
+                                        </div>
+                                      </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-2">
+                                      <div className="text-right">
+                                        <span className="text-xs font-bold block" style={{ color: ZODIAC_COLORS[p.sign] }}>
+                                          {ZODIAC_SYMBOLS[p.sign] || ''} {p.sign}
+                                        </span>
+                                        <span className="text-[10px] text-gray-400 font-mono">
+                                          {p.degreeInSign}°{String(p.minutes).padStart(2, '0')}'
+                                        </span>
+                                      </div>
+                                      {p.isRetrograde && (
+                                        <span className="text-[9px] font-bold text-red-400 bg-red-500/10 px-1.5 py-0.5 rounded border border-red-500/20">
+                                          Rx
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+
+                                  <div className="mt-1">
+                                    <h4 className="text-xs font-semibold text-[#D4AF37] line-clamp-1">
+                                      {interp.headline}
+                                    </h4>
+                                    <p className="text-[11px] text-mystic-text-muted line-clamp-2 mt-0.5 leading-relaxed">
+                                      {interp.summary}
+                                    </p>
+                                  </div>
+
+                                  <div className="flex items-center justify-between pt-2 border-t border-white/5 text-[10px] text-gray-400">
+                                    <span className="text-[#0EA5E9]/80 font-medium truncate max-w-[200px]">
+                                      {interp.extra?.split('•')[0] || p.sign}
+                                    </span>
+                                    <span className="flex items-center gap-1 text-white/70 group-hover:text-white transition-colors">
+                                      Detaylı Analizi Oku <ChevronRight size={12} />
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            });
+                          })()}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -719,51 +831,57 @@ export default function TransitsPage() {
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3.5">
                       {skyChartData.planets
                         .filter(p => ['Güneş', 'Ay', 'Merkür', 'Venüs', 'Mars', 'Jüpiter', 'Satürn', 'Uranüs', 'Neptün', 'Plüton', 'Kiron', 'Lilith', 'Kuzey Ay Düğümü'].includes(p.name))
-                        .map((p, idx) => (
-                          <div 
-                            key={`sky-pl-${idx}`}
-                            onClick={() => {
-                              const interp = getSkyPlanetSignInterpretation(
-                                p.name,
-                                p.sign,
-                                p.degreeInSign,
-                                p.minutes,
-                                p.isRetrograde
-                              );
-                              setSelectedInterp(interp);
-                            }}
-                            className="bg-white/5 border border-white/5 hover:border-[#0EA5E9]/50 hover:bg-white/10 hover:scale-[1.02] rounded-2xl p-3.5 flex flex-col justify-between transition-all cursor-pointer group shadow-sm relative overflow-hidden"
-                          >
-                            <div>
-                              <div className="flex items-center justify-between">
-                                <span className="text-lg text-[#0EA5E9] font-bold group-hover:scale-110 transition-transform">
-                                  {PLANET_SYMBOLS[p.name] || ''}
-                                </span>
-                                <span className="text-xs font-bold text-white truncate group-hover:text-[#0EA5E9] transition-colors">
-                                  {p.name}
-                                </span>
+                        .map((p, idx) => {
+                          const headline = getPlanetSignBriefHeadline(p.name, p.sign);
+                          return (
+                            <div 
+                              key={`sky-pl-${idx}`}
+                              onClick={() => {
+                                const interp = getSkyPlanetSignInterpretation(
+                                  p.name,
+                                  p.sign,
+                                  p.degreeInSign,
+                                  p.minutes,
+                                  p.isRetrograde
+                                );
+                                setSelectedInterp(interp);
+                              }}
+                              className="bg-white/5 border border-white/5 hover:border-[#0EA5E9]/50 hover:bg-white/10 hover:scale-[1.02] rounded-2xl p-3.5 flex flex-col justify-between transition-all cursor-pointer group shadow-sm relative overflow-hidden"
+                            >
+                              <div>
+                                <div className="flex items-center justify-between">
+                                  <span className="text-lg text-[#0EA5E9] font-bold group-hover:scale-110 transition-transform">
+                                    {PLANET_SYMBOLS[p.name] || ''}
+                                  </span>
+                                  <span className="text-xs font-bold text-white truncate group-hover:text-[#0EA5E9] transition-colors">
+                                    {p.name}
+                                  </span>
+                                </div>
+                                <div className="flex items-baseline justify-between mt-2">
+                                  <span className="text-xs font-bold" style={{ color: ZODIAC_COLORS[p.sign] }}>
+                                    {p.sign}
+                                  </span>
+                                  <span className="text-[11px] text-gray-300 font-mono">
+                                    {p.degreeInSign}°{String(p.minutes).padStart(2, '0')}'
+                                  </span>
+                                </div>
+                                {p.isRetrograde && (
+                                  <span className="text-[10px] text-red-400 font-bold bg-red-500/10 px-1.5 py-0.5 rounded w-fit mt-1.5 block">
+                                    Rx (Retro)
+                                  </span>
+                                )}
+                                <p className="text-[10px] text-mystic-text-muted mt-2 line-clamp-1 group-hover:text-gray-200 transition-colors">
+                                  {headline}
+                                </p>
                               </div>
-                              <div className="flex items-baseline justify-between mt-2">
-                                <span className="text-xs font-bold" style={{ color: ZODIAC_COLORS[p.sign] }}>
-                                  {p.sign}
-                                </span>
-                                <span className="text-[11px] text-gray-300 font-mono">
-                                  {p.degreeInSign}°{String(p.minutes).padStart(2, '0')}'
-                                </span>
-                              </div>
-                              {p.isRetrograde && (
-                                <span className="text-[10px] text-red-400 font-bold bg-red-500/10 px-1.5 py-0.5 rounded w-fit mt-1.5 block">
-                                  Rx (Retro)
-                                </span>
-                              )}
-                            </div>
 
-                            <div className="flex items-center justify-between mt-2.5 pt-1.5 border-t border-white/5 text-[10px] text-gray-400 group-hover:text-[#38BDF8] transition-colors">
-                              <span>Analizi Oku</span>
-                              <ChevronRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                              <div className="flex items-center justify-between mt-2.5 pt-1.5 border-t border-white/5 text-[10px] text-gray-400 group-hover:text-[#38BDF8] transition-colors">
+                                <span>Analizi Oku</span>
+                                <ChevronRight size={12} className="group-hover:translate-x-0.5 transition-transform" />
+                              </div>
                             </div>
-                          </div>
-                        ))}
+                          );
+                        })}
                     </div>
                   </div>
                 </div>
