@@ -16,7 +16,8 @@ import {
   Heart,
   Sun,
   Leaf,
-  Wind
+  Wind,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -39,7 +40,7 @@ export default function DruidTreePage() {
   const [analyzedName, setAnalyzedName] = useState('');
   const [copied, setCopied] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [expandedTreeId, setExpandedTreeId] = useState<string | null>(null);
+  const [selectedModalTree, setSelectedModalTree] = useState<DruidTree | null>(null);
 
   const resultRef = useRef<HTMLDivElement>(null);
 
@@ -483,100 +484,197 @@ export default function DruidTreePage() {
             </p>
           </div>
 
-          {/* Ağaç Kartları Grid */}
+          {/* Ağaç Kartları Grid (Eşit Yükseklikte ve Kompakt) */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {filteredTrees.map((tree) => {
-              const isExpanded = expandedTreeId === tree.id;
-              return (
-                <div 
-                  key={tree.id}
-                  onClick={() => setExpandedTreeId(isExpanded ? null : tree.id)}
-                  className="bg-white/[0.02] hover:bg-white/[0.04] border border-white/10 hover:border-emerald-500/40 rounded-2xl p-5 transition-all cursor-pointer flex flex-col justify-between space-y-3"
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-xl text-emerald-300">
-                        {tree.oghamSymbol}
-                      </div>
-                      <div>
-                        <h4 className="font-bold text-white text-sm">
-                          {tree.name}
-                        </h4>
-                        <span className="text-[11px] text-gray-400 block">
-                          {tree.oghamName} • {tree.rulingPlanets}
-                        </span>
-                      </div>
+            {filteredTrees.map((tree) => (
+              <div 
+                key={tree.id}
+                onClick={() => setSelectedModalTree(tree)}
+                className="bg-white/[0.02] hover:bg-white/[0.05] border border-white/10 hover:border-emerald-500/40 rounded-2xl p-5 transition-all duration-200 cursor-pointer flex flex-col justify-between space-y-3 hover:scale-[1.01] group shadow-lg"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-xl text-emerald-300 group-hover:border-emerald-400/60 transition-colors shrink-0">
+                      {tree.oghamSymbol}
                     </div>
-                  </div>
-
-                  <p className="text-xs text-emerald-300/90 font-medium">
-                    {tree.archetype}
-                  </p>
-
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {tree.periods.map((p, idx) => (
-                      <span key={idx} className="text-[10px] px-2 py-0.5 rounded bg-white/5 text-gray-300">
-                        {p.label}
+                    <div>
+                      <h4 className="font-bold text-white text-sm group-hover:text-emerald-300 transition-colors">
+                        {tree.name}
+                      </h4>
+                      <span className="text-[11px] text-gray-400 block">
+                        {tree.oghamName} • {tree.rulingPlanets}
                       </span>
-                    ))}
-                  </div>
-
-                  {/* Genişletilmiş Tam Açıklama ve Özellikler */}
-                  {isExpanded && (
-                    <div className="pt-3 border-t border-white/10 text-xs text-gray-300 space-y-3 animate-in fade-in duration-200">
-                      <p className="italic text-[11px] text-amber-200">"{tree.druidicProverb}"</p>
-                      <p className="text-xs leading-relaxed text-gray-300">{tree.spiritualEssence}</p>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1 text-[11px]">
-                        <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-2.5 space-y-1">
-                          <span className="font-bold text-emerald-400 flex items-center gap-1">
-                            <Sun size={12} /> Işık Erdemleri:
-                          </span>
-                          <ul className="space-y-0.5 text-gray-300 list-disc list-inside">
-                            {tree.lightTraits.slice(0, 2).map((t, idx) => (
-                              <li key={idx}>{t}</li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div className="bg-rose-500/10 border border-rose-500/20 rounded-xl p-2.5 space-y-1">
-                          <span className="font-bold text-rose-400 flex items-center gap-1">
-                            <Shield size={12} /> Gölge Sınavı:
-                          </span>
-                          <ul className="space-y-0.5 text-gray-300 list-disc list-inside">
-                            {tree.shadowTraits.slice(0, 2).map((t, idx) => (
-                              <li key={idx}>{t}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      </div>
-
-                      <div className="pt-1">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            const firstPeriod = tree.periods[0];
-                            const analysis = getDruidTreeAnalysis(firstPeriod.startDay, firstPeriod.startMonth);
-                            setSelectedDay(firstPeriod.startDay);
-                            setSelectedMonth(firstPeriod.startMonth);
-                            setAnalyzedData(analysis);
-                            setTimeout(() => {
-                              resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                            }, 50);
-                          }}
-                          className="w-full py-2.5 px-3 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs tracking-wide transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer"
-                        >
-                          <Sparkles size={14} className="text-amber-200" />
-                          <span>Bu Ağacın Tam Analizini Gör</span>
-                        </button>
-                      </div>
                     </div>
-                  )}
+                  </div>
                 </div>
-              );
-            })}
+
+                <p className="text-xs text-emerald-300/90 font-medium line-clamp-2">
+                  {tree.archetype}
+                </p>
+
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {tree.periods.map((p, idx) => (
+                    <span key={idx} className="text-[10px] px-2.5 py-0.5 rounded-md bg-white/5 text-gray-300 border border-white/5">
+                      {p.label}
+                    </span>
+                  ))}
+                </div>
+
+                <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-gray-400 group-hover:text-emerald-400 transition-colors">
+                  <span>Detayları ve Ritüeli İncele</span>
+                  <span className="text-xs">→</span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
+
+        {/* Ağaç Detay Modalı (Açılır Pencere) */}
+        <AnimatePresence>
+          {selectedModalTree && (
+            <div 
+              className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md"
+              onClick={() => setSelectedModalTree(null)}
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                onClick={(e) => e.stopPropagation()}
+                className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto bg-[#0B131B] border border-emerald-500/30 rounded-3xl p-6 sm:p-8 shadow-[0_0_50px_rgba(16,185,129,0.2)] space-y-6 text-gray-100"
+              >
+                {/* Kapat Butonu */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedModalTree(null)}
+                  className="absolute top-5 right-5 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center text-gray-300 hover:text-white transition-colors cursor-pointer z-10"
+                >
+                  <X size={18} />
+                </button>
+
+                {/* Modal Başlık */}
+                <div className="flex items-center gap-4 border-b border-white/10 pb-5 pr-10">
+                  <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-3xl text-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.3)] shrink-0">
+                    {selectedModalTree.oghamSymbol}
+                  </div>
+                  <div>
+                    <span className="text-xs uppercase tracking-widest text-emerald-400 font-bold block">
+                      Kadim Ağaç Alfabesi (Ogham): {selectedModalTree.oghamName}
+                    </span>
+                    <h3 className="text-2xl font-serif font-bold text-white">
+                      {selectedModalTree.name}
+                    </h3>
+                    <p className="text-xs text-gray-400 italic">
+                      {selectedModalTree.botanicalName} • {selectedModalTree.periods.map(p => p.label).join(', ')}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Arketip ve Bilgiler */}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                  <div className="bg-black/40 border border-white/10 rounded-xl p-3">
+                    <span className="text-emerald-400 font-bold block text-[10px] uppercase">Ruhsal Karakter</span>
+                    <span className="text-white font-semibold">{selectedModalTree.archetype}</span>
+                  </div>
+                  <div className="bg-black/40 border border-white/10 rounded-xl p-3">
+                    <span className="text-amber-400 font-bold block text-[10px] uppercase">Yönetici Güç</span>
+                    <span className="text-white font-semibold">{selectedModalTree.rulingPlanets}</span>
+                  </div>
+                  <div className="bg-black/40 border border-white/10 rounded-xl p-3">
+                    <span className="text-teal-400 font-bold block text-[10px] uppercase">Doğa Elementi</span>
+                    <span className="text-white font-semibold">{selectedModalTree.element}</span>
+                  </div>
+                </div>
+
+                {/* Atasözü */}
+                <blockquote className="italic font-serif text-xs sm:text-sm text-amber-200/90 border-l-2 border-amber-400/60 pl-3 py-1">
+                  "{selectedModalTree.druidicProverb}"
+                </blockquote>
+
+                {/* Mitolojik Ruhsal Öz */}
+                <div className="space-y-2">
+                  <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 block">
+                    Mitolojik Köken & Ruhsal Öz
+                  </span>
+                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed font-normal">
+                    {selectedModalTree.spiritualEssence}
+                  </p>
+                </div>
+
+                {/* Işık ve Gölge */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div className="bg-emerald-950/20 border border-emerald-500/30 rounded-2xl p-4 space-y-2">
+                    <span className="font-bold text-emerald-300 flex items-center gap-1">
+                      <Sun size={14} className="text-emerald-400" /> Işık Erdemleri:
+                    </span>
+                    <ul className="space-y-1.5 text-gray-300">
+                      {selectedModalTree.lightTraits.map((t, idx) => (
+                        <li key={idx} className="flex items-start gap-1.5">
+                          <span className="text-emerald-400 text-xs shrink-0">✦</span>
+                          <span>{t}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="bg-rose-950/20 border border-rose-500/30 rounded-2xl p-4 space-y-2">
+                    <span className="font-bold text-rose-300 flex items-center gap-1">
+                      <Shield size={14} className="text-rose-400" /> Gölge Sınavı:
+                    </span>
+                    <ul className="space-y-1.5 text-gray-300">
+                      {selectedModalTree.shadowTraits.map((t, idx) => (
+                        <li key={idx} className="flex items-start gap-1.5">
+                          <span className="text-rose-400 text-xs shrink-0">❖</span>
+                          <span>{t}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+
+                {/* Ritüel ve Koku */}
+                <div className="bg-black/30 border border-white/10 rounded-2xl p-4 space-y-2 text-xs">
+                  <span className="font-bold text-teal-300 block">Orman Banyosu & Ortam Buhuru</span>
+                  <p className="text-gray-300 leading-relaxed">
+                    🌲 <strong className="text-emerald-300">Topraklanma:</strong> {selectedModalTree.natureRitual.grounding}
+                  </p>
+                  <p className="text-gray-300 leading-relaxed">
+                    💨 <strong className="text-amber-300">Ortam Kokusu:</strong> {selectedModalTree.natureRitual.ambientAroma}
+                  </p>
+                </div>
+
+                {/* Alt Aksiyon Butonları */}
+                <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const firstPeriod = selectedModalTree.periods[0];
+                      const analysis = getDruidTreeAnalysis(firstPeriod.startDay, firstPeriod.startMonth);
+                      setSelectedDay(firstPeriod.startDay);
+                      setSelectedMonth(firstPeriod.startMonth);
+                      setAnalyzedData(analysis);
+                      setSelectedModalTree(null);
+                      setTimeout(() => {
+                        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }, 100);
+                    }}
+                    className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-semibold text-xs sm:text-sm tracking-wide transition-all shadow-lg flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Sparkles size={16} className="text-amber-200" />
+                    <span>Bu Ağacın Tam Analizini Gör & Sayfada Aç</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSelectedModalTree(null)}
+                    className="w-full sm:w-auto py-3 px-5 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white font-medium text-xs sm:text-sm transition-colors cursor-pointer"
+                  >
+                    Kapat
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
 
         {/* Medikal / Güvenlik Sorumluluk Reddi Kutusu */}
         <div className="bg-white/[0.02] border border-white/10 rounded-2xl p-5 sm:p-6 text-xs text-gray-400 leading-relaxed space-y-2">
