@@ -87,7 +87,7 @@ const HOUSE_METADATA: Record<number, { title: string; field: string; theme: stri
   12: { title: '12. Ev (Bilinçaltı & Mistik Çözülme)', field: 'Karmik Hafıza, İnziva ve Evrensel Birlik', theme: 'Görünmeyen boyutlar, egonun teslimiyeti ve sezgisel bilgelik' }
 };
 
-const GATE_TITLES: Record<number, { title: string; gift: string; shadow: string }> = {
+export const GATE_TITLES: Record<number, { title: string; gift: string; shadow: string }> = {
   1: { title: "Yaratıcılık & Kendini İfade", gift: "Özgün Deha", shadow: "Amaçsızlık ve Yetersizlik" },
   2: { title: "Alıcılık & Yön Tayini", gift: "Doğru Zamanlama ve Rehberlik", shadow: "Kayıp Hissetme" },
   3: { title: "Düzen & Yeni Başlangıçlar", gift: "Kaosu Düzene Çevirme", shadow: "Kaos ve Erteleme" },

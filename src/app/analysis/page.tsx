@@ -23,6 +23,14 @@ export default function AnalysisPage() {
 
   const tools: ToolItem[] = [
     {
+      id: 'cosmic-matrix',
+      title: '7Layers Kozmik Matris',
+      description: 'Astroloji, Kabalistik 4 Âlem, Human Design ve Kuzey Runelerini birleştiren bütünleşik kadersel teşhis ve tılsım analizi.',
+      icon: <Compass size={32} />,
+      color: '#F59E0B',
+      link: '/analysis/cosmic-matrix'
+    },
+    {
       id: 'incarnation',
       title: 'Karmik & Enkarnasyon',
       description: 'Önceki yaşam kimliğiniz, karmik borçlarınız, Drakonik ruh haritanız ve gelecek enkarnasyon potansiyeliniz.',
