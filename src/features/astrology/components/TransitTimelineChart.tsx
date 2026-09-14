@@ -18,7 +18,7 @@ import {
   Lock,
   MapPin
 } from 'lucide-react';
-import { TransitTimelineItem, getItemPeakMs } from '@/features/astrology/engine/TransitTimelineEngine';
+import type { TransitTimelineItem } from '@/features/astrology/engine/TransitTimelineEngine';
 
 interface TransitTimelineChartProps {
   items: TransitTimelineItem[];
@@ -57,6 +57,27 @@ const ZODIAC_SYMBOLS: Record<string, string> = {
   'Aslan Burcu': '♌', 'Başak Burcu': '♍', 'Terazi Burcu': '♎', 'Akrep Burcu': '♏',
   'Yay Burcu': '♐', 'Oğlak Burcu': '♑', 'Kova Burcu': '♒', 'Balık Burcu': '♓',
 };
+
+function getItemPeakMs(item: { peakDate: string; peakTime?: string }): number {
+  if (!item.peakDate) return 0;
+  const parts = item.peakDate.split('-');
+  if (parts.length === 3) {
+    const y = parseInt(parts[0], 10);
+    const m = parseInt(parts[1], 10) - 1;
+    const d = parseInt(parts[2], 10);
+    let hour = 12;
+    let min = 0;
+    if (item.peakTime) {
+      const tParts = item.peakTime.split(':');
+      if (tParts.length >= 2) {
+        hour = parseInt(tParts[0], 10) || 0;
+        min = parseInt(tParts[1], 10) || 0;
+      }
+    }
+    return new Date(Date.UTC(y, m, d, hour, min, 0)).getTime();
+  }
+  return new Date(item.peakDate).getTime();
+}
 
 export default function TransitTimelineChart({
   items,
