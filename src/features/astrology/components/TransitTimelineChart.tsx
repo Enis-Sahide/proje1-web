@@ -58,27 +58,6 @@ const ZODIAC_SYMBOLS: Record<string, string> = {
   'Yay Burcu': '♐', 'Oğlak Burcu': '♑', 'Kova Burcu': '♒', 'Balık Burcu': '♓',
 };
 
-function getItemPeakMs(item: { peakDate: string; peakTime?: string }): number {
-  if (!item.peakDate) return 0;
-  const parts = item.peakDate.split('-');
-  if (parts.length === 3) {
-    const y = parseInt(parts[0], 10);
-    const m = parseInt(parts[1], 10) - 1;
-    const d = parseInt(parts[2], 10);
-    let hour = 12;
-    let min = 0;
-    if (item.peakTime) {
-      const tParts = item.peakTime.split(':');
-      if (tParts.length >= 2) {
-        hour = parseInt(tParts[0], 10) || 0;
-        min = parseInt(tParts[1], 10) || 0;
-      }
-    }
-    return new Date(Date.UTC(y, m, d, hour, min, 0)).getTime();
-  }
-  return new Date(item.peakDate).getTime();
-}
-
 export default function TransitTimelineChart({
   items,
   startDateStr,
@@ -141,22 +120,9 @@ export default function TransitTimelineChart({
     return cols;
   }, [rangeStart, totalRangeMs, range]);
 
-  // Filter & sort items: Prioritize items whose center degree / peak is closest to entered startDate
+  // Filter items
   const filteredItems = useMemo(() => {
-    const targetMs = (() => {
-      if (!startDateStr) return Date.now();
-      const parts = startDateStr.split('-');
-      if (parts.length === 3) {
-        const y = parseInt(parts[0], 10);
-        const m = parseInt(parts[1], 10) - 1;
-        const d = parseInt(parts[2], 10);
-        return new Date(Date.UTC(y, m, d, 12, 0, 0)).getTime();
-      }
-      const t = new Date(startDateStr).getTime();
-      return isNaN(t) ? Date.now() : t;
-    })();
-
-    const list = items.filter(item => {
+    return items.filter(item => {
       // Event Type filter
       if (eventTypeFilter === 'ASPECTS' && item.type === 'İngress') return false;
       if (eventTypeFilter === 'INGRESS' && item.type !== 'İngress') return false;
@@ -182,18 +148,7 @@ export default function TransitTimelineChart({
 
       return true;
     });
-
-    return list.sort((a, b) => {
-      const peakA = getItemPeakMs(a);
-      const peakB = getItemPeakMs(b);
-      const diffA = Math.abs(peakA - targetMs);
-      const diffB = Math.abs(peakB - targetMs);
-      if (diffA !== diffB) {
-        return diffA - diffB;
-      }
-      return peakA - peakB;
-    });
-  }, [items, categoryFilter, aspectFilter, eventTypeFilter, searchQuery, startDateStr]);
+  }, [items, categoryFilter, aspectFilter, eventTypeFilter, searchQuery]);
 
   return (
     <div className="w-full flex flex-col gap-6">
@@ -353,10 +308,6 @@ export default function TransitTimelineChart({
               Yatay çubuklar açının etki süresini, parlayan işaretler doruk noktasını (0° Partil) temsil eder.
             </p>
             <div className="flex flex-wrap items-center gap-2 mt-2">
-              <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-sky-300 bg-sky-500/10 border border-sky-500/20 px-2.5 py-0.5 rounded-full">
-                <Sparkles size={11} className="text-sky-400" />
-                Sıralama: <strong className="text-white">Merkeze En Yakın</strong>
-              </span>
               <span className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-amber-300 bg-amber-500/10 border border-amber-500/20 px-2.5 py-0.5 rounded-full">
                 <MapPin size={11} className="text-[#D4AF37]" />
                 Zaman Dilimi: <strong className="text-white">{userTimezone}</strong> (UTC{tzOffsetHours >= 0 ? `+${tzOffsetHours}` : tzOffsetHours})

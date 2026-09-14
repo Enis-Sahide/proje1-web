@@ -72,27 +72,6 @@ function formatDate(date: Date): string {
   return date.toISOString().split('T')[0];
 }
 
-export function getItemPeakMs(item: { peakDate: string; peakTime?: string }): number {
-  if (!item.peakDate) return 0;
-  const parts = item.peakDate.split('-');
-  if (parts.length === 3) {
-    const y = parseInt(parts[0], 10);
-    const m = parseInt(parts[1], 10) - 1;
-    const d = parseInt(parts[2], 10);
-    let hour = 12;
-    let min = 0;
-    if (item.peakTime) {
-      const tParts = item.peakTime.split(':');
-      if (tParts.length >= 2) {
-        hour = parseInt(tParts[0], 10) || 0;
-        min = parseInt(tParts[1], 10) || 0;
-      }
-    }
-    return new Date(Date.UTC(y, m, d, hour, min, 0)).getTime();
-  }
-  return new Date(item.peakDate).getTime();
-}
-
 function getChakraLayer(tPlanet: string, nPlanet: string): string {
   const combined = `${tPlanet} ${nPlanet}`;
   if (combined.includes('Satürn') || combined.includes('Plüton')) {
@@ -669,17 +648,13 @@ export async function calculateTransitTimeline(
   }
 
   // Sort timeline items:
-  // Prioritize items whose peak/center date is closest to the reference startDate
-  const targetMs = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate(), 12, 0, 0)).getTime();
+  // 1. Kadersel (outer) planets first, then Kişisel
+  // 2. Chronologically by peakDate
   return timelineItems.sort((a, b) => {
-    const peakA = getItemPeakMs(a);
-    const peakB = getItemPeakMs(b);
-    const diffA = Math.abs(peakA - targetMs);
-    const diffB = Math.abs(peakB - targetMs);
-    if (diffA !== diffB) {
-      return diffA - diffB;
+    if (a.category !== b.category) {
+      return a.category === 'Kadersel' ? -1 : 1;
     }
-    return peakA - peakB;
+    return new Date(a.peakDate).getTime() - new Date(b.peakDate).getTime();
   });
 }
 
@@ -1136,18 +1111,12 @@ export async function calculateMundaneTimeline(
 
   timelineItems.push(...ingressItems);
 
-  // Sort timeline items:
-  // Prioritize items whose peak/center date is closest to the reference startDate
-  const targetMs = new Date(Date.UTC(startDate.getUTCFullYear(), startDate.getUTCMonth(), startDate.getUTCDate(), 12, 0, 0)).getTime();
+  // Sort: Active first, Kadersel first, then by peakDate
   return timelineItems.sort((a, b) => {
-    const peakA = getItemPeakMs(a);
-    const peakB = getItemPeakMs(b);
-    const diffA = Math.abs(peakA - targetMs);
-    const diffB = Math.abs(peakB - targetMs);
-    if (diffA !== diffB) {
-      return diffA - diffB;
+    if (a.category !== b.category) {
+      return a.category === 'Kadersel' ? -1 : 1;
     }
-    return peakA - peakB;
+    return new Date(a.peakDate).getTime() - new Date(b.peakDate).getTime();
   });
 }
 
