@@ -409,7 +409,10 @@ export default function TransitTimelineChart({
 
                   const leftPercent = Math.max(0, ((startClamped - rangeStart) / totalRangeMs) * 100);
                   const widthPercent = Math.max(1.5, ((endClamped - startClamped) / totalRangeMs) * 100);
-                  const peakPercent = Math.max(0, Math.min(100, isNaN(itemPeak) ? 0 : ((itemPeak - rangeStart) / totalRangeMs) * 100));
+                  const isStartedInPast = !isNaN(itemStart) && itemStart < rangeStart;
+                  const isEndedInFuture = !isNaN(itemEnd) && itemEnd > rangeEnd;
+                  const isPeakInRange = !isNaN(itemPeak) && itemPeak >= rangeStart && itemPeak <= rangeEnd;
+                  const peakPercent = isPeakInRange ? ((itemPeak - rangeStart) / totalRangeMs) * 100 : -1;
 
                   // Color styles
                   let barColor = 'from-emerald-500/80 to-teal-500/80 border-emerald-400/40 text-emerald-100';
@@ -465,14 +468,15 @@ export default function TransitTimelineChart({
                           }}
                         >
                           <span className="text-[10px] font-extrabold truncate drop-shadow-sm flex items-center gap-1">
-                            {item.isStartedInPast && <span className="text-[10px] opacity-75 mr-0.5 font-black">◀</span>}
+                            {isStartedInPast && <span className="text-[10px] opacity-75 mr-0.5 font-black" title="Bu pencereden önce başladı">◀</span>}
                             {item.type === 'İngress' 
-                              ? `⚡ ${item.natalPlanet} (${item.durationDays}g)` 
+                              ? `⚡ ${item.natalPlanet.replace(' Burcu', '')} (${item.durationDays}g)` 
                               : `${item.type} (${item.durationDays}g)`}
+                            {isEndedInFuture && <span className="text-[10px] opacity-75 ml-0.5 font-black" title="Bu pencerenin sonrasına uzanıyor">▶</span>}
                           </span>
 
-                          {/* Peak Point Glowing Marker (only if peak falls within range) */}
-                          {!item.isPeakInPast && peakPercent >= leftPercent && peakPercent <= (leftPercent + widthPercent) && (
+                          {/* Peak Point Glowing Marker (only if peak falls strictly within active range) */}
+                          {isPeakInRange && (
                             <div 
                               className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-white shadow-[0_0_10px_#fff] border-2 border-black flex items-center justify-center z-20 group-hover:scale-125 transition-transform"
                               style={{
