@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   ArrowLeft, 
@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { getTransitHouseInterpretation, getTransitAspectInterpretation } from '@/features/astrology/engine/TransitInterpretations';
 import { getSkyPlanetSignInterpretation, getPlanetSignBriefHeadline, getIngressPhase } from '@/features/astrology/engine/SkyAspectInterpretations';
+import { generateUnifiedPlanetTransit, UnifiedPlanetTransit, UnifiedAspectInfo, parseInterpretationSections } from '@/features/astrology/engine/TransitSynthesisEngine';
 import { AstroCity, TransitChartData, AstroPoint, AstroAspect } from '@/features/astrology/engine/AstrologyConstants';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { useAuth } from '@/context/AuthContext';
@@ -178,11 +179,23 @@ export default function TransitsPage() {
   const [transitDateStr, setTransitDateStr] = useState(defaultTDate);
   const [transitTimeStr, setTransitTimeStr] = useState(defaultTTime);
 
-  // Personal Timeline states
   const [personalTab, setPersonalTab] = useState<'BIWHEEL' | 'TIMELINE'>('BIWHEEL');
+  const [personalViewMode, setPersonalViewMode] = useState<'SYNTHESIS' | 'TABLES'>('SYNTHESIS');
   const [timelineData, setTimelineData] = useState<any>(null);
   const [timelineRange, setTimelineRange] = useState<'1m' | '3m' | '6m' | '1y'>('1m');
   const [isTimelineLoading, setIsTimelineLoading] = useState(false);
+
+  const unifiedTransits = useMemo(() => {
+    if (!transitData) return [];
+    return transitData.transitPlanets.map(p =>
+      generateUnifiedPlanetTransit(
+        p,
+        transitData.transitAspects,
+        transitData.natalChart.planets,
+        transitData.natalChart.houses
+      )
+    );
+  }, [transitData]);
 
   const fetchPersonalTimeline = async (rangeToFetch: '1m' | '3m' | '6m' | '1y' = timelineRange) => {
     if (!cityKey) return;
@@ -1100,84 +1113,243 @@ export default function TransitsPage() {
                       </div>
                     </div>
 
-                    {/* Analysis Grid */}
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                      {/* Transitlerin Düştüğü Evler */}
-                      <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-8 rounded-3xl shadow-2xl">
-                        <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Transit Gezegenler & Natal Evleriniz</h3>
-                        <p className="text-sm text-mystic-text-muted mb-4">Gökyüzündeki gezegenler şu an doğum haritanızdaki hangi yaşam alanlarınızı (evlerinizi) tetikliyor?</p>
-                        <div className="space-y-3">
-                          {transitData.transitPlanets.map((p, i) => (
-                            <div 
-                              key={`th-${i}`} 
-                              className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-[#0EA5E9]/30 hover:bg-white/10 transition-colors cursor-pointer"
-                              onClick={() => {
-                                if (isApprenticeOrAbove) {
-                                  setSelectedInterp(getTransitHouseInterpretation(p.name, p.house));
-                                } else {
-                                  setShowLockModal(true);
-                                }
-                              }}
-                            >
-                              <div className="flex items-center gap-3 w-1/3">
-                                <span className="text-2xl text-[#0EA5E9] font-bold w-8 text-center">{PLANET_SYMBOLS[p.name] || ''}</span>
-                                <span className="text-white font-medium">Transit {p.name}</span>
+                    {/* Personal View Switcher (Synthesis vs Separate Tables) */}
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-black/50 p-3 rounded-2xl border border-white/10 mb-6">
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setPersonalViewMode('SYNTHESIS')}
+                          className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
+                            personalViewMode === 'SYNTHESIS'
+                              ? 'bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] text-black shadow-lg shadow-cyan-500/20'
+                              : 'text-mystic-text-muted hover:text-white'
+                          }`}
+                        >
+                          <Sparkles size={15} />
+                          <span>Bütünleşik Gezegen Kartları (Sentez)</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setPersonalViewMode('TABLES')}
+                          className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
+                            personalViewMode === 'TABLES'
+                              ? 'bg-white/20 text-white border border-white/30'
+                              : 'text-mystic-text-muted hover:text-white'
+                          }`}
+                        >
+                          <Layers size={15} />
+                          <span>Ayrık Tablolar</span>
+                        </button>
+                      </div>
+                      <span className="text-[11px] text-mystic-text-muted hidden md:inline">
+                        {personalViewMode === 'SYNTHESIS' 
+                          ? 'Gezegen + Burç + Ev + Açı tek bir derlenmiş kartta sunulur' 
+                          : 'Ayrı ev ve açı tabloları'}
+                      </span>
+                    </div>
+
+                    {/* Mode A: Bütünleşik Kişisel Transit Sentezi */}
+                    {personalViewMode === 'SYNTHESIS' ? (
+                      <div className="space-y-6">
+                        {unifiedTransits.map((ut: UnifiedPlanetTransit, idx: number) => (
+                          <div 
+                            key={`ut-${idx}`}
+                            className="bg-black/60 backdrop-blur-md border border-white/10 hover:border-cyan-500/30 rounded-3xl p-5 sm:p-7 transition-all shadow-xl space-y-4"
+                          >
+                            {/* Header */}
+                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+                              <div className="flex items-center gap-3.5">
+                                <span className="text-3xl font-black text-[#0EA5E9] w-10 text-center">
+                                  {PLANET_SYMBOLS[ut.planetName] || '★'}
+                                </span>
+                                <div>
+                                  <h4 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+                                    <span>Transit {ut.planetName}</span>
+                                    <span className="text-xs font-normal text-mystic-text-muted">
+                                      ({ut.sign} {ut.degreeInSign}°)
+                                    </span>
+                                    {ut.isRetrograde && (
+                                      <span className="text-[10px] bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded-full font-bold">
+                                        Rx Retro
+                                      </span>
+                                    )}
+                                  </h4>
+                                  <span className="text-xs text-[#D4AF37] font-medium flex items-center gap-1 mt-0.5">
+                                    {ZODIAC_SYMBOLS[ut.sign]} {ut.sign} Burcu Transiti
+                                  </span>
+                                </div>
                               </div>
-                              <div className="w-1/3 text-center">
-                                <span className="font-bold text-white">{p.house}. Evinizde</span>
-                              </div>
-                              <div className="w-1/3 text-right text-mystic-text-muted text-sm">
-                                <span style={{ color: ZODIAC_COLORS[p.sign] }}>{p.sign}</span> {p.degreeInSign}° {p.isRetrograde && <span className="text-red-400 font-bold ml-1">Rx</span>}
+
+                              {/* House Badge */}
+                              <div className="bg-gradient-to-r from-[#D4AF37]/15 to-[#0EA5E9]/15 border border-[#D4AF37]/35 px-4 py-2 rounded-2xl self-start sm:self-center">
+                                <span className="text-[10px] text-mystic-text-muted block uppercase tracking-wider font-bold">
+                                  Kişisel Yaşam Alanınız
+                                </span>
+                                <span className="text-xs sm:text-sm font-extrabold text-[#D4AF37] block">
+                                  {ut.houseTitle}
+                                </span>
                               </div>
                             </div>
-                          ))}
-                        </div>
-                      </div>
 
-                      {/* Transit - Natal Açıları */}
-                      <div className="bg-black/50 backdrop-blur-md border border-[#D4AF37]/30 p-8 rounded-3xl shadow-2xl">
-                        <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Transit - Natal Açıları (Kadersel Tetiklenmeler)</h3>
-                        <p className="text-sm text-mystic-text-muted mb-4">Gezegen geçişlerinin kendi doğuştan gelen karakterinize ve kaderinize yaptığı sert veya uyumlu açılar.</p>
-                        <div className="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
-                          {transitData.transitAspects.length === 0 ? (
-                            <p className="text-mystic-text-muted text-center py-4">Şu anki transitler natal gezegenlerinize majör bir açı yapmıyor.</p>
-                          ) : (
-                            transitData.transitAspects.sort((a,b) => a.orb - b.orb).map((aspect, i) => (
-                              <div 
-                                key={`ta-${i}`} 
-                                className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-white/20 hover:bg-white/10 transition-colors cursor-pointer"
+                            {/* Synthesis Narrative Box */}
+                            <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-4 sm:p-5">
+                              <span className="text-[10px] text-[#0EA5E9] uppercase tracking-wider font-extrabold flex items-center gap-1.5 mb-2">
+                                <Sparkles size={12} /> Bütünleşik Kadersel Anlam (Gezegen + Ev + Açılar)
+                              </span>
+                              <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
+                                {ut.synthesisSummary}
+                              </p>
+                            </div>
+
+                            {/* Active Natal Aspects Row */}
+                            <div>
+                              <span className="text-[11px] text-mystic-text-muted block uppercase tracking-wider font-bold mb-2">
+                                Eşzamanlı Tetiklenen Natal Gezegenler & Açılar:
+                              </span>
+                              {ut.aspects.length === 0 ? (
+                                <div className="text-xs text-gray-400 italic bg-white/[0.02] p-3 rounded-xl border border-white/5">
+                                  Şu anda doğrudan majör bir natal gezegene açı yapmıyor; {ut.house}. evinizin genel atmosferini sessizce dönüştürüyor.
+                                </div>
+                              ) : (
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                                  {ut.aspects.map((asp: UnifiedAspectInfo, aIdx: number) => (
+                                    <div 
+                                      key={`asp-${aIdx}`}
+                                      className="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-white/5 hover:border-white/20 transition-all text-xs"
+                                    >
+                                      <div className="flex items-center gap-2">
+                                        <span 
+                                          className="font-bold px-2 py-0.5 rounded text-[11px]"
+                                          style={{ color: ASPECT_COLORS[asp.aspectType] || '#D4AF37', backgroundColor: 'rgba(255,255,255,0.05)' }}
+                                        >
+                                          {asp.aspectType}
+                                        </span>
+                                        <span className="text-white font-medium">
+                                          Natal {asp.natalPlanet}
+                                        </span>
+                                        {asp.natalHouse && (
+                                          <span className="text-[11px] text-gray-400">
+                                            [{asp.natalHouse}. Ev]
+                                          </span>
+                                        )}
+                                      </div>
+                                      <span className="text-[10px] text-mystic-text-muted">
+                                        Orb: {asp.orb.toFixed(1)}°
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+
+                            {/* Footer Action */}
+                            <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                              <span className="text-[11px] text-purple-300/80 flex items-center gap-1.5">
+                                <Layers size={13} className="text-purple-400 shrink-0" />
+                                <span>{ut.chakraLayer}</span>
+                              </span>
+                              <button
+                                type="button"
                                 onClick={() => {
                                   if (isApprenticeOrAbove) {
-                                    setSelectedInterp(getTransitAspectInterpretation(aspect.transitPlanet, aspect.natalPlanet, aspect.type));
+                                    setSelectedInterp({
+                                      title: ut.headline,
+                                      content: `${ut.detailedAnalysis}\n\n【Bireysel Eylem & Dönüşüm Rehberliği】\n${ut.actionAdvice}`,
+                                      extra: ut.chakraLayer
+                                    });
+                                  } else {
+                                    setShowLockModal(true);
+                                  }
+                                }}
+                                className="px-4 py-2 bg-gradient-to-r from-[#D4AF37]/20 to-[#0EA5E9]/20 hover:from-[#D4AF37]/30 hover:to-[#0EA5E9]/30 text-white border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                              >
+                                <span>Derin Bütünleşik Analizi Gör</span>
+                                <ChevronRight size={14} />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      /* Mode B: Klasik Ayrık Tablolar */
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Transitlerin Düştüğü Evler */}
+                        <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-8 rounded-3xl shadow-2xl">
+                          <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Transit Gezegenler & Natal Evleriniz</h3>
+                          <p className="text-sm text-mystic-text-muted mb-4">Gökyüzündeki gezegenler şu an doğum haritanızdaki hangi yaşam alanlarınızı (evlerinizi) tetikliyor?</p>
+                          <div className="space-y-3">
+                            {transitData.transitPlanets.map((p, i) => (
+                              <div 
+                                key={`th-${i}`} 
+                                className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-[#0EA5E9]/30 hover:bg-white/10 transition-colors cursor-pointer"
+                                onClick={() => {
+                                  if (isApprenticeOrAbove) {
+                                    setSelectedInterp(getTransitHouseInterpretation(p.name, p.house));
                                   } else {
                                     setShowLockModal(true);
                                   }
                                 }}
                               >
-                                <div className="flex items-center gap-2">
-                                  <span className="text-xl text-[#0EA5E9] font-bold w-6 text-center">{PLANET_SYMBOLS[aspect.transitPlanet] || ''}</span>
-                                  <span className="text-white font-medium text-sm">T.{aspect.transitPlanet}</span>
+                                <div className="flex items-center gap-3 w-1/3">
+                                  <span className="text-2xl text-[#0EA5E9] font-bold w-8 text-center">{PLANET_SYMBOLS[p.name] || ''}</span>
+                                  <span className="text-white font-medium">Transit {p.name}</span>
                                 </div>
-                                
-                                <div className="flex flex-col items-center flex-1 px-2">
-                                  <span className="text-xs font-bold px-2 py-1 rounded bg-white/10" style={{ color: ASPECT_COLORS[aspect.type] }}>
-                                    {aspect.type}
-                                  </span>
-                                  <span className="text-[10px] text-mystic-text-muted mt-1">
-                                    Orb: {aspect.orb.toFixed(1)}° {aspect.isExact && <span className="text-[#D4AF37]">(Tam)</span>}
-                                  </span>
+                                <div className="w-1/3 text-center">
+                                  <span className="font-bold text-white">{p.house}. Evinizde</span>
                                 </div>
-
-                                <div className="flex items-center gap-2">
-                                  <span className="text-white font-medium text-sm">N.{aspect.natalPlanet}</span>
-                                  <span className="text-xl text-[#D4AF37] font-bold w-6 text-center">{PLANET_SYMBOLS[aspect.natalPlanet] || ''}</span>
+                                <div className="w-1/3 text-right text-mystic-text-muted text-sm">
+                                  <span style={{ color: ZODIAC_COLORS[p.sign] }}>{p.sign}</span> {p.degreeInSign}° {p.isRetrograde && <span className="text-red-400 font-bold ml-1">Rx</span>}
                                 </div>
                               </div>
-                            ))
-                          )}
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Transit - Natal Açıları */}
+                        <div className="bg-black/50 backdrop-blur-md border border-[#D4AF37]/30 p-8 rounded-3xl shadow-2xl">
+                          <h3 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Transit - Natal Açıları (Kadersel Tetiklenmeler)</h3>
+                          <p className="text-sm text-mystic-text-muted mb-4">Gezegen geçişlerinin kendi doğuştan gelen karakterinize ve kaderinize yaptığı sert veya uyumlu açılar.</p>
+                          <div className="space-y-3 max-h-[600px] overflow-y-auto custom-scrollbar pr-2">
+                            {transitData.transitAspects.length === 0 ? (
+                              <p className="text-mystic-text-muted text-center py-4">Şu anki transitler natal gezegenlerinize majör bir açı yapmıyor.</p>
+                            ) : (
+                              transitData.transitAspects.sort((a,b) => a.orb - b.orb).map((aspect, i) => (
+                                <div 
+                                  key={`ta-${i}`} 
+                                  className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-white/20 hover:bg-white/10 transition-colors cursor-pointer"
+                                  onClick={() => {
+                                    if (isApprenticeOrAbove) {
+                                      setSelectedInterp(getTransitAspectInterpretation(aspect.transitPlanet, aspect.natalPlanet, aspect.type));
+                                    } else {
+                                      setShowLockModal(true);
+                                    }
+                                  }}
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-xl text-[#0EA5E9] font-bold w-6 text-center">{PLANET_SYMBOLS[aspect.transitPlanet] || ''}</span>
+                                    <span className="text-white font-medium text-sm">T.{aspect.transitPlanet}</span>
+                                  </div>
+                                  
+                                  <div className="flex flex-col items-center flex-1 px-2">
+                                    <span className="text-xs font-bold px-2 py-1 rounded bg-white/10" style={{ color: ASPECT_COLORS[aspect.type] }}>
+                                      {aspect.type}
+                                    </span>
+                                    <span className="text-[10px] text-mystic-text-muted mt-1">
+                                      Orb: {aspect.orb.toFixed(1)}° {aspect.isExact && <span className="text-[#D4AF37]">(Tam)</span>}
+                                    </span>
+                                  </div>
+
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-white font-medium text-sm">N.{aspect.natalPlanet}</span>
+                                    <span className="text-xl text-[#D4AF37] font-bold w-6 text-center">{PLANET_SYMBOLS[aspect.natalPlanet] || ''}</span>
+                                  </div>
+                                </div>
+                              ))
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 )}
 
@@ -1216,21 +1388,65 @@ export default function TransitsPage() {
       {/* Shared Interpretation Modal */}
       {selectedInterp && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200" onClick={() => setSelectedInterp(null)}>
-          <div className="bg-mystic-dark border border-white/10 rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl relative" onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-xl font-bold text-[#D4AF37] pr-8">{selectedInterp.title}</h3>
-              <button onClick={() => setSelectedInterp(null)} className="text-white/50 hover:text-white transition-colors cursor-pointer">
-                <X size={24} />
+          <div className="bg-mystic-dark border border-white/10 rounded-3xl max-w-xl w-full p-6 sm:p-8 shadow-2xl relative max-h-[85vh] overflow-y-auto custom-scrollbar" onClick={e => e.stopPropagation()}>
+            <div className="flex justify-between items-start mb-4 border-b border-white/10 pb-4">
+              <h3 className="text-xl font-bold text-[#D4AF37] pr-8 flex items-center gap-2">
+                <Sparkles size={18} className="text-[#0EA5E9] shrink-0" />
+                <span>{selectedInterp.title}</span>
+              </h3>
+              <button onClick={() => setSelectedInterp(null)} className="text-white/50 hover:text-white transition-colors cursor-pointer p-1">
+                <X size={22} />
               </button>
             </div>
             
-            <div className="text-gray-300 leading-relaxed whitespace-pre-wrap text-sm sm:text-base mb-4">
-              {selectedInterp.content}
+            <div className="space-y-3.5 mb-5">
+              {parseInterpretationSections(selectedInterp.content).map((sec, sIdx) => {
+                if (!sec.title && sec.type === 'general') {
+                  return <p key={sIdx} className="text-xs sm:text-sm text-gray-300 leading-relaxed whitespace-pre-wrap">{sec.content}</p>;
+                }
+                let borderClass = 'bg-white/[0.03] border-white/10';
+                let icon = <Info size={13} className="text-gray-400" />;
+                let titleColor = 'text-white';
+                
+                if (sec.type === 'house') {
+                  borderClass = 'bg-amber-950/20 border-amber-500/25';
+                  icon = <Compass size={13} className="text-amber-400" />;
+                  titleColor = 'text-amber-300';
+                } else if (sec.type === 'aspects') {
+                  borderClass = 'bg-sky-950/20 border-sky-500/25';
+                  icon = <Orbit size={13} className="text-sky-400" />;
+                  titleColor = 'text-sky-300';
+                } else if (sec.type === 'advice') {
+                  borderClass = 'bg-emerald-950/20 border-emerald-500/25';
+                  icon = <Sparkles size={13} className="text-emerald-400" />;
+                  titleColor = 'text-emerald-300';
+                } else if (sec.type === 'phase') {
+                  borderClass = 'bg-indigo-950/30 border-indigo-500/25';
+                  icon = <Sparkles size={13} className="text-indigo-400" />;
+                  titleColor = 'text-indigo-300';
+                } else if (sec.type === 'retro') {
+                  borderClass = 'bg-purple-950/25 border-purple-500/30';
+                  icon = <Clock size={13} className="text-purple-400" />;
+                  titleColor = 'text-purple-300';
+                }
+
+                return (
+                  <div key={sIdx} className={`border rounded-2xl p-4 ${borderClass}`}>
+                    {sec.title && (
+                      <span className={`text-[11px] font-extrabold uppercase tracking-wider flex items-center gap-1.5 mb-1.5 ${titleColor}`}>
+                        {icon}
+                        {sec.title}
+                      </span>
+                    )}
+                    <p className="text-xs sm:text-sm text-gray-200 leading-relaxed whitespace-pre-line">{sec.content}</p>
+                  </div>
+                );
+              })}
             </div>
 
             {selectedInterp.extra && (
-              <div className="mt-4 pt-4 border-t border-white/10 text-xs text-[#0EA5E9] flex items-center gap-2">
-                <Info size={14} className="shrink-0" />
+              <div className="pt-3 border-t border-white/10 text-xs text-purple-300 flex items-center gap-2">
+                <Layers size={14} className="text-purple-400 shrink-0" />
                 <span>{selectedInterp.extra}</span>
               </div>
             )}

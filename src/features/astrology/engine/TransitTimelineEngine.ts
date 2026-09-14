@@ -2,6 +2,7 @@ import { Constants } from '@fusionstrings/swisseph-wasi';
 import { getSwe } from './AstrologyEngine';
 import { AstroPoint } from './AstrologyConstants';
 import { getSkyAspectInterpretation, getSkyPlanetSignInterpretation } from './SkyAspectInterpretations';
+import { getHouseFromLongitude, HOUSE_TITLES, HOUSE_SHORT_THEMES } from './TransitSynthesisEngine';
 
 export interface TransitTimelineItem {
   id: string;
@@ -27,6 +28,8 @@ export interface TransitTimelineItem {
   phase: 'YAKLASAN' | 'ZIRVE' | 'UZAKLASAN';
   isStartedInPast: boolean;
   isPeakInPast: boolean;
+  transitHouse?: number;
+  natalHouse?: number;
 }
 
 interface AspectConfig {
@@ -419,6 +422,7 @@ export async function calculateTransitTimeline(
     lookbackDays?: number;
     lookaheadDays?: number;
     tzOffsetHours?: number;
+    natalHouses?: AstroPoint[];
   }
 ): Promise<TransitTimelineItem[]> {
   const swe = await getSwe();
@@ -582,6 +586,29 @@ export async function calculateTransitTimeline(
             else if (isPeakInPast) phase = 'UZAKLASAN';
             else phase = 'YAKLASAN';
 
+            const peakSample = samples.find(s => s.dateStr === timing.peakDateStr) || samples.find(s => s.date.getTime() === pD.getTime());
+            const tLonAtPeak = peakSample ? peakSample.lon : samples[0]?.lon || 0;
+            const tHouse = options?.natalHouses ? getHouseFromLongitude(tLonAtPeak, options.natalHouses) : undefined;
+            const nHouse = nPlanet.house || (options?.natalHouses ? getHouseFromLongitude(nPlanet.longitude, options.natalHouses) : undefined);
+
+            let itemTitle = `Transit ${tBody.name} ${aspect.name} Natal ${nPlanet.name}`;
+            if (tHouse && nHouse) {
+              itemTitle = `Transit ${tBody.name} [${tHouse}. Ev] ${aspect.name} Natal ${nPlanet.name} [${nHouse}. Ev]`;
+            } else if (tHouse) {
+              itemTitle = `Transit ${tBody.name} [${tHouse}. Ev] ${aspect.name} Natal ${nPlanet.name}`;
+            }
+
+            let houseSection = '';
+            if (tHouse && nHouse) {
+              houseSection = `【Yaşam Alanı (Ev) Etkileşimi: ${tHouse}. Ev ➔ ${nHouse}. Ev】\n` +
+                `Transit ${tBody.name} haritanızın ${tHouse}. evinde (${HOUSE_SHORT_THEMES[tHouse] || 'bu alan'}) hareket ederken, ` +
+                `${nHouse}. evinizdeki (${HOUSE_SHORT_THEMES[nHouse] || 'bu alan'}) Natal ${nPlanet.name} noktanıza ${aspect.name} açı yapıyor. ` +
+                `Bu durum, bu iki yaşam alanı arasında doğrudan bir köprü kurar ve kadersel farkındalık yaratır.\n\n`;
+            } else if (tHouse) {
+              houseSection = `【Yaşam Alanı (Ev) Etkisi: ${tHouse}. Ev】\n` +
+                `Transit ${tBody.name}, haritanızın ${tHouse}. evinden (${HOUSE_SHORT_THEMES[tHouse] || 'bu alan'}) geçerken bu açıyı gerçekleştiriyor.\n\n`;
+            }
+
             timelineItems.push({
               id: `${tBody.name}-${aspect.name}-${nPlanet.name}-${timing.startDateStr}`,
               transitPlanet: tBody.name,
@@ -596,16 +623,18 @@ export async function calculateTransitTimeline(
               endTime: timing.endTimeStr,
               minOrb: timing.exactMinOrb,
               category: tBody.category,
-              title: `Transit ${tBody.name} ${aspect.name} Natal ${nPlanet.name}`,
+              title: itemTitle,
               summary: interp.summary,
-              details: interp.details,
+              details: houseSection + interp.details,
               advice: interp.advice,
               chakraLayer: getChakraLayer(tBody.name, nPlanet.name),
               durationDays,
               status,
               phase,
               isStartedInPast,
-              isPeakInPast
+              isPeakInPast,
+              transitHouse: tHouse,
+              natalHouse: nHouse
             });
           }
         };
@@ -642,6 +671,73 @@ export async function calculateTransitTimeline(
 
         if (inInterval && intervalStart && intervalEnd && peakDate) {
           finalizeAndPush(intervalStart, intervalEnd, peakDate, minOrb);
+        }
+      }
+    }
+
+    // House Ingresses for personal timeline
+    if (options?.natalHouses && options.natalHouses.length >= 12 && samples.length > 0) {
+      let curHouse = getHouseFromLongitude(samples[0].lon, options.natalHouses);
+      let segStart = samples[0];
+
+      for (let i = 1; i < samples.length; i++) {
+        const s = samples[i];
+        const h = getHouseFromLongitude(s.lon, options.natalHouses);
+        const isLast = i === samples.length - 1;
+
+        if (h !== curHouse || isLast) {
+          const segEnd = isLast && h === curHouse ? s : samples[i - 1];
+          const sTime = segStart.date.getTime();
+          const eTime = segEnd.date.getTime();
+
+          if (eTime >= startDayTime && sTime <= endDayTime) {
+            const durationDays = Math.max(1, Math.round((eTime - sTime) / (1000 * 60 * 60 * 24)));
+            const midMs = (sTime + eTime) / 2;
+            const midDate = new Date(midMs);
+            const peakDateStr = formatDate(midDate);
+
+            const isStartedInPast = sTime < startDayTime;
+            const isPeakInPast = midMs < startDayTime;
+
+            let status: 'ACTIVE' | 'UPCOMING' | 'COMPLETED' = 'ACTIVE';
+            if (sTime > startDayTime) status = 'UPCOMING';
+            else if (eTime < startDayTime) status = 'COMPLETED';
+
+            const hTitle = HOUSE_TITLES[curHouse] || `${curHouse}. Ev`;
+            const hTheme = HOUSE_SHORT_THEMES[curHouse] || 'bu yaşam alanınız';
+
+            timelineItems.push({
+              id: `house-ingress-${tBody.name}-${curHouse}-${segStart.dateStr}`,
+              transitPlanet: tBody.name,
+              natalPlanet: `${curHouse}. Ev`,
+              type: 'İngress',
+              isHarmonious: true,
+              startDate: segStart.dateStr,
+              startTime: '00:00',
+              peakDate: peakDateStr,
+              peakTime: '12:00',
+              endDate: segEnd.dateStr,
+              endTime: '23:59',
+              minOrb: 0,
+              category: tBody.category,
+              title: `Transit ${tBody.name} → ${curHouse}. Evinizde (${hTitle.split(':')[1]?.trim() || ''})`,
+              summary: `Transit ${tBody.name}, haritanızın ${curHouse}. evinde (${hTheme}) seyrediyor.`,
+              details: `【Kişisel Yaşam Alanı (Ev) Geçişi: ${hTitle}】\n` +
+                `Transit ${tBody.name}, bu döngü boyunca haritanızın ${curHouse}. evinden geçer. Bu dönemde ${hTheme} konuları gündeminizin merkezine yerleşir ve köklü bir farkındalık süreci başlar.\n\n` +
+                `【Dönüşüm Rehberliği】\nBu evin getirdiği sorumlulukları ve fırsatları ertelemeden, yapıcı bir bilinçle sahiplenin.`,
+              advice: `${curHouse}. evinizin temsil ettiği konularda farkındalıkla ve dengeli hareket edin.`,
+              chakraLayer: `Kişisel Yaşam Alanı: ${hTitle}`,
+              durationDays,
+              status,
+              phase: status === 'ACTIVE' ? 'ZIRVE' : (status === 'COMPLETED' ? 'UZAKLASAN' : 'YAKLASAN'),
+              isStartedInPast,
+              isPeakInPast,
+              transitHouse: curHouse
+            });
+          }
+
+          curHouse = h;
+          segStart = s;
         }
       }
     }

@@ -69,10 +69,11 @@ export async function POST(req: NextRequest) {
 
     const endObj = new Date(startObj.getTime() + daysToAdd * 24 * 60 * 60 * 1000);
 
-    // 3. Compute Timeline with user's local timezone offset
+    // 3. Compute Timeline with user's local timezone offset and natal houses
     const timelineItems = await calculateTransitTimeline(allNatalPoints, startObj, endObj, {
       categoryFilter: categoryFilter as any,
-      tzOffsetHours
+      tzOffsetHours,
+      natalHouses: natalChart.houses
     });
 
     return json({
