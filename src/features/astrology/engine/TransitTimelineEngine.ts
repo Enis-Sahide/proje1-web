@@ -1,13 +1,13 @@
 import { Constants } from '@fusionstrings/swisseph-wasi';
 import { getSwe } from './AstrologyEngine';
 import { AstroPoint } from './AstrologyConstants';
-import { getSkyAspectInterpretation } from './SkyAspectInterpretations';
+import { getSkyAspectInterpretation, getSkyPlanetSignInterpretation } from './SkyAspectInterpretations';
 
 export interface TransitTimelineItem {
   id: string;
   transitPlanet: string;
   natalPlanet: string;
-  type: 'Kavuşum' | 'Karşıt' | 'Kare' | 'Üçgen' | 'Sekstil';
+  type: 'Kavuşum' | 'Karşıt' | 'Kare' | 'Üçgen' | 'Sekstil' | 'İngress';
   isHarmonious: boolean;
   startDate: string; // YYYY-MM-DD
   startTime?: string; // HH:mm (e.g. "08:15")
@@ -906,6 +906,211 @@ export async function calculateMundaneTimeline(
       }
     }
   }
+
+  // 3. Scan Sign Ingresses (Burç Geçişleri) for all transit bodies with minute precision
+  const ZODIAC_SIGNS = ['Koç', 'Boğa', 'İkizler', 'Yengeç', 'Aslan', 'Başak', 'Terazi', 'Akrep', 'Yay', 'Oğlak', 'Kova', 'Balık'];
+
+  const findSignCrossingMoment = (
+    bodyId: number,
+    t1: Date,
+    t2: Date,
+    targetDegree: number,
+    tzOffset: number
+  ): { dateStr: string; timeStr: string; dateObj: Date } => {
+    let low = t1.getTime();
+    let high = t2.getTime();
+
+    for (let iter = 0; iter < 12; iter++) {
+      const mid = low + (high - low) / 2;
+      const testDate = new Date(mid);
+      const y = testDate.getUTCFullYear();
+      const m = testDate.getUTCMonth() + 1;
+      const d = testDate.getUTCDate();
+      const hourFloat = testDate.getUTCHours() + testDate.getUTCMinutes() / 60.0 + testDate.getUTCSeconds() / 3600.0;
+      const jd = swe.swe_julday(y, m, d, hourFloat, Constants.SE_GREG_CAL);
+      const calc = swe.swe_calc_ut(jd, bodyId, flags);
+      const lon = mod360(calc.xx[0]);
+
+      let diff = lon - targetDegree;
+      if (diff > 180) diff -= 360;
+      if (diff < -180) diff += 360;
+
+      if (diff < 0) {
+        low = mid;
+      } else {
+        high = mid;
+      }
+    }
+
+    const finalUtc = new Date(low);
+    const localMs = finalUtc.getTime() + tzOffset * 3600 * 1000;
+    const localDate = new Date(localMs);
+
+    const y = localDate.getUTCFullYear();
+    const m = String(localDate.getUTCMonth() + 1).padStart(2, '0');
+    const d = String(localDate.getUTCDate()).padStart(2, '0');
+    const hh = String(localDate.getUTCHours()).padStart(2, '0');
+    const mm = String(localDate.getUTCMinutes()).padStart(2, '0');
+
+    return {
+      dateStr: `${y}-${m}-${d}`,
+      timeStr: `${hh}:${mm}`,
+      dateObj: finalUtc
+    };
+  };
+
+  const ingressItems: TransitTimelineItem[] = [];
+  const tzOffset = options?.tzOffsetHours ?? 3;
+
+  for (const b of TRANSIT_BODIES) {
+    if (options?.categoryFilter === 'KADERSEL' && b.category !== 'Kadersel') continue;
+    if (options?.categoryFilter === 'KISISEL' && b.category !== 'Kişisel') continue;
+
+    const sampleSigns = dailySamples.map(s => Math.floor(s.positions[b.name] / 30) % 12);
+    let segStartIdx = 0;
+
+    while (segStartIdx < dailySamples.length) {
+      const curSign = sampleSigns[segStartIdx];
+      let segEndIdx = segStartIdx;
+      while (segEndIdx + 1 < dailySamples.length && sampleSigns[segEndIdx + 1] === curSign) {
+        segEndIdx++;
+      }
+
+      // Determine exact entry date/time for curSign
+      let startMoment: { dateStr: string; timeStr: string; dateObj: Date } = {
+        dateStr: dailySamples[segStartIdx].dateStr,
+        timeStr: '00:00',
+        dateObj: dailySamples[segStartIdx].date
+      };
+      if (segStartIdx === 0) {
+        let backCur = new Date(dailySamples[0].date.getTime() - 3 * 24 * 3600 * 1000);
+        let foundEntry = false;
+        let steps = 0;
+        while (steps < 120) {
+          const lon = getBodyLonAtDate(backCur, b.id);
+          const sign = Math.floor(lon / 30) % 12;
+          if (sign !== curSign) {
+            const nextDate = new Date(backCur.getTime() + 3 * 24 * 3600 * 1000);
+            startMoment = findSignCrossingMoment(b.id, backCur, nextDate, curSign * 30.0, tzOffset);
+            foundEntry = true;
+            break;
+          }
+          backCur = new Date(backCur.getTime() - 3 * 24 * 3600 * 1000);
+          steps++;
+        }
+        if (!foundEntry) {
+          startMoment = {
+            dateStr: dailySamples[0].dateStr,
+            timeStr: '00:00',
+            dateObj: dailySamples[0].date
+          };
+        }
+      } else {
+        const prevDate = dailySamples[segStartIdx - 1].date;
+        const curDate = dailySamples[segStartIdx].date;
+        startMoment = findSignCrossingMoment(b.id, prevDate, curDate, curSign * 30.0, tzOffset);
+      }
+
+      // Determine exact exit date/time for curSign
+      let endMoment: { dateStr: string; timeStr: string; dateObj: Date } = {
+        dateStr: dailySamples[segEndIdx].dateStr,
+        timeStr: '23:59',
+        dateObj: dailySamples[segEndIdx].date
+      };
+      if (segEndIdx === dailySamples.length - 1) {
+        let fwdCur = new Date(dailySamples[dailySamples.length - 1].date.getTime() + 3 * 24 * 3600 * 1000);
+        let foundExit = false;
+        let steps = 0;
+        while (steps < 120) {
+          const lon = getBodyLonAtDate(fwdCur, b.id);
+          const sign = Math.floor(lon / 30) % 12;
+          if (sign !== curSign) {
+            const prevDate = new Date(fwdCur.getTime() - 3 * 24 * 3600 * 1000);
+            const exitTargetDegree = sign * 30.0;
+            endMoment = findSignCrossingMoment(b.id, prevDate, fwdCur, exitTargetDegree, tzOffset);
+            foundExit = true;
+            break;
+          }
+          fwdCur = new Date(fwdCur.getTime() + 3 * 24 * 3600 * 1000);
+          steps++;
+        }
+        if (!foundExit) {
+          endMoment = {
+            dateStr: dailySamples[dailySamples.length - 1].dateStr,
+            timeStr: '23:59',
+            dateObj: dailySamples[dailySamples.length - 1].date
+          };
+        }
+      } else {
+        const curDate = dailySamples[segEndIdx].date;
+        const nextDate = dailySamples[segEndIdx + 1].date;
+        const nextSign = sampleSigns[segEndIdx + 1];
+        const exitTargetDegree = nextSign * 30.0;
+        endMoment = findSignCrossingMoment(b.id, curDate, nextDate, exitTargetDegree, tzOffset);
+      }
+
+      // Midpoint / peak of sign
+      const midMs = startMoment.dateObj.getTime() + Math.round((endMoment.dateObj.getTime() - startMoment.dateObj.getTime()) / 2);
+      const midDateUtc = new Date(midMs);
+      const localMidMs = midDateUtc.getTime() + tzOffset * 3600 * 1000;
+      const localMid = new Date(localMidMs);
+      const peakMoment = {
+        dateStr: `${localMid.getUTCFullYear()}-${String(localMid.getUTCMonth() + 1).padStart(2, '0')}-${String(localMid.getUTCDate()).padStart(2, '0')}`,
+        timeStr: `${String(localMid.getUTCHours()).padStart(2, '0')}:${String(localMid.getUTCMinutes()).padStart(2, '0')}`
+      };
+
+      const sTime = startMoment.dateObj.getTime();
+      const eTime = endMoment.dateObj.getTime();
+
+      if (eTime >= startDayTime && sTime <= endDayTime) {
+        const signName = ZODIAC_SIGNS[curSign];
+        const durationDays = Math.max(1, Math.round((eTime - sTime) / (1000 * 60 * 60 * 24)));
+        const interp = getSkyPlanetSignInterpretation(b.name, signName, 0, 0);
+
+        const now = Date.now();
+        let status: 'ACTIVE' | 'UPCOMING' | 'COMPLETED' = 'ACTIVE';
+        if (sTime > now) status = 'UPCOMING';
+        else if (eTime < now) status = 'COMPLETED';
+
+        const isStartedInPast = sTime < startDayTime;
+        const isPeakInPast = midMs < startDayTime;
+
+        let phase: 'YAKLASAN' | 'ZIRVE' | 'UZAKLASAN' = 'YAKLASAN';
+        if (status === 'ACTIVE') phase = 'ZIRVE';
+        else if (status === 'COMPLETED') phase = 'UZAKLASAN';
+
+        ingressItems.push({
+          id: `ingress-${b.name}-${signName}-${startMoment.dateStr}`,
+          transitPlanet: b.name,
+          natalPlanet: `${signName} Burcu`,
+          type: 'İngress',
+          isHarmonious: true,
+          startDate: startMoment.dateStr,
+          startTime: startMoment.timeStr,
+          peakDate: peakMoment.dateStr,
+          peakTime: peakMoment.timeStr,
+          endDate: endMoment.dateStr,
+          endTime: endMoment.timeStr,
+          minOrb: 0,
+          category: b.category,
+          title: `${b.name} → ${signName} Burcu Geçişi`,
+          summary: interp.summary || `${b.name} ${signName} burcunda seyrediyor.`,
+          details: interp.content || `${signName} burcundaki bu geçiş, kolektif alanda önemli etkiler başlatır.`,
+          advice: interp.extra || 'Bu burç geçişinde farkındalıkla hareket edin.',
+          chakraLayer: interp.extra || getChakraLayer(b.name, signName),
+          durationDays,
+          status,
+          phase,
+          isStartedInPast,
+          isPeakInPast
+        });
+      }
+
+      segStartIdx = segEndIdx + 1;
+    }
+  }
+
+  timelineItems.push(...ingressItems);
 
   // Sort: Active first, Kadersel first, then by peakDate
   return timelineItems.sort((a, b) => {

@@ -49,6 +49,15 @@ const ASPECT_SYMBOLS: Record<string, string> = {
   'Karşıt': '☍'
 };
 
+const ZODIAC_SYMBOLS: Record<string, string> = {
+  'Koç': '♈', 'Boğa': '♉', 'İkizler': '♊', 'Yengeç': '♋',
+  'Aslan': '♌', 'Başak': '♍', 'Terazi': '♎', 'Akrep': '♏',
+  'Yay': '♐', 'Oğlak': '♑', 'Kova': '♒', 'Balık': '♓',
+  'Koç Burcu': '♈', 'Boğa Burcu': '♉', 'İkizler Burcu': '♊', 'Yengeç Burcu': '♋',
+  'Aslan Burcu': '♌', 'Başak Burcu': '♍', 'Terazi Burcu': '♎', 'Akrep Burcu': '♏',
+  'Yay Burcu': '♐', 'Oğlak Burcu': '♑', 'Kova Burcu': '♒', 'Balık Burcu': '♓',
+};
+
 export default function TransitTimelineChart({
   items,
   startDateStr,
@@ -65,6 +74,7 @@ export default function TransitTimelineChart({
   const [selectedItem, setSelectedItem] = useState<TransitTimelineItem | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<'ALL' | 'KADERSEL' | 'KISISEL'>('ALL');
   const [aspectFilter, setAspectFilter] = useState<'ALL' | 'HARMONIOUS' | 'CHALLENGING'>('ALL');
+  const [eventTypeFilter, setEventTypeFilter] = useState<'ALL' | 'ASPECTS' | 'INGRESS'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
 
   const rangeStart = useMemo(() => {
@@ -113,13 +123,19 @@ export default function TransitTimelineChart({
   // Filter items
   const filteredItems = useMemo(() => {
     return items.filter(item => {
+      // Event Type filter
+      if (eventTypeFilter === 'ASPECTS' && item.type === 'İngress') return false;
+      if (eventTypeFilter === 'INGRESS' && item.type !== 'İngress') return false;
+
       // Category filter
       if (categoryFilter === 'KADERSEL' && item.category !== 'Kadersel') return false;
       if (categoryFilter === 'KISISEL' && item.category !== 'Kişisel') return false;
 
       // Aspect filter
-      if (aspectFilter === 'HARMONIOUS' && !item.isHarmonious) return false;
-      if (aspectFilter === 'CHALLENGING' && (item.isHarmonious || item.type === 'Kavuşum')) return false;
+      if (item.type !== 'İngress') {
+        if (aspectFilter === 'HARMONIOUS' && !item.isHarmonious) return false;
+        if (aspectFilter === 'CHALLENGING' && (item.isHarmonious || item.type === 'Kavuşum')) return false;
+      }
 
       // Search query
       if (searchQuery.trim()) {
@@ -132,7 +148,7 @@ export default function TransitTimelineChart({
 
       return true;
     });
-  }, [items, categoryFilter, aspectFilter, searchQuery]);
+  }, [items, categoryFilter, aspectFilter, eventTypeFilter, searchQuery]);
 
   return (
     <div className="w-full flex flex-col gap-6">
@@ -175,8 +191,36 @@ export default function TransitTimelineChart({
           </div>
         </div>
 
-        {/* Center: Category & Aspect Filters */}
+        {/* Center: Event Type, Category & Aspect Filters */}
         <div className="flex flex-wrap items-center gap-2">
+          {/* Event Type (Tümü / Açılar / Burç Geçişleri) */}
+          <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 text-xs overflow-x-auto max-w-full">
+            <button
+              onClick={() => setEventTypeFilter('ALL')}
+              className={`px-2.5 py-1 rounded-lg font-medium transition-all whitespace-nowrap ${
+                eventTypeFilter === 'ALL' ? 'bg-white/20 text-white font-bold' : 'text-mystic-text-muted hover:text-white'
+              }`}
+            >
+              Tümü
+            </button>
+            <button
+              onClick={() => setEventTypeFilter('ASPECTS')}
+              className={`px-2.5 py-1 rounded-lg font-medium transition-all whitespace-nowrap ${
+                eventTypeFilter === 'ASPECTS' ? 'bg-sky-500/20 text-sky-300 font-bold border border-sky-500/30' : 'text-mystic-text-muted hover:text-white'
+              }`}
+            >
+              Açılar (☌, □, △)
+            </button>
+            <button
+              onClick={() => setEventTypeFilter('INGRESS')}
+              className={`px-2.5 py-1 rounded-lg font-medium transition-all whitespace-nowrap ${
+                eventTypeFilter === 'INGRESS' ? 'bg-amber-500/20 text-amber-300 font-bold border border-amber-500/30' : 'text-mystic-text-muted hover:text-white'
+              }`}
+            >
+              ⚡ Burç Geçişleri (İngress)
+            </button>
+          </div>
+
           {/* Category */}
           <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 text-xs overflow-x-auto max-w-full">
             <button
@@ -205,33 +249,35 @@ export default function TransitTimelineChart({
             </button>
           </div>
 
-          {/* Aspect Harmony */}
-          <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 text-xs overflow-x-auto max-w-full">
-            <button
-              onClick={() => setAspectFilter('ALL')}
-              className={`px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
-                aspectFilter === 'ALL' ? 'bg-white/10 text-white font-bold' : 'text-mystic-text-muted'
-              }`}
-            >
-              Tümü
-            </button>
-            <button
-              onClick={() => setAspectFilter('HARMONIOUS')}
-              className={`px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
-                aspectFilter === 'HARMONIOUS' ? 'bg-emerald-500/20 text-emerald-400 font-bold' : 'text-mystic-text-muted'
-              }`}
-            >
-              Destek (🟢)
-            </button>
-            <button
-              onClick={() => setAspectFilter('CHALLENGING')}
-              className={`px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
-                aspectFilter === 'CHALLENGING' ? 'bg-rose-500/20 text-rose-400 font-bold' : 'text-mystic-text-muted'
-              }`}
-            >
-              Sınav (🔴)
-            </button>
-          </div>
+          {/* Aspect Harmony (Only relevant for aspects) */}
+          {eventTypeFilter !== 'INGRESS' && (
+            <div className="flex bg-black/40 p-1 rounded-xl border border-white/5 text-xs overflow-x-auto max-w-full">
+              <button
+                onClick={() => setAspectFilter('ALL')}
+                className={`px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
+                  aspectFilter === 'ALL' ? 'bg-white/10 text-white font-bold' : 'text-mystic-text-muted'
+                }`}
+              >
+                Tümü
+              </button>
+              <button
+                onClick={() => setAspectFilter('HARMONIOUS')}
+                className={`px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
+                  aspectFilter === 'HARMONIOUS' ? 'bg-emerald-500/20 text-emerald-400 font-bold' : 'text-mystic-text-muted'
+                }`}
+              >
+                Destek (🟢)
+              </button>
+              <button
+                onClick={() => setAspectFilter('CHALLENGING')}
+                className={`px-2.5 py-1 rounded-lg transition-all whitespace-nowrap ${
+                  aspectFilter === 'CHALLENGING' ? 'bg-rose-500/20 text-rose-400 font-bold' : 'text-mystic-text-muted'
+                }`}
+              >
+                Sınav (🔴)
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Right: Search Box */}
@@ -368,7 +414,10 @@ export default function TransitTimelineChart({
                   // Color styles
                   let barColor = 'from-emerald-500/80 to-teal-500/80 border-emerald-400/40 text-emerald-100';
                   let iconColor = 'text-emerald-300';
-                  if (item.type === 'Kavuşum') {
+                  if (item.type === 'İngress') {
+                    barColor = 'from-cyan-600/80 via-indigo-600/80 to-purple-600/80 border-cyan-400/40 text-cyan-100';
+                    iconColor = 'text-cyan-300';
+                  } else if (item.type === 'Kavuşum') {
                     barColor = 'from-amber-500/80 to-yellow-500/80 border-amber-300/40 text-amber-100';
                     iconColor = 'text-amber-300';
                   } else if (!item.isHarmonious) {
@@ -388,16 +437,18 @@ export default function TransitTimelineChart({
                           {PLANET_SYMBOLS[item.transitPlanet] || '•'}
                         </span>
                         <span className="text-[11px] sm:text-xs font-semibold text-white truncate">
-                          {isMundane ? item.transitPlanet : `T.${item.transitPlanet}`}
+                          {isMundane || item.type === 'İngress' ? item.transitPlanet : `T.${item.transitPlanet}`}
                         </span>
                         <span className="text-[10px] sm:text-xs font-black text-mystic-accent shrink-0">
-                          {ASPECT_SYMBOLS[item.type] || item.type}
+                          {item.type === 'İngress' ? '➔' : (ASPECT_SYMBOLS[item.type] || item.type)}
                         </span>
                         <span className="text-[11px] sm:text-xs font-semibold text-gray-300 truncate">
-                          {isMundane ? item.natalPlanet : `N.${item.natalPlanet}`}
+                          {item.type === 'İngress' ? item.natalPlanet : (isMundane ? item.natalPlanet : `N.${item.natalPlanet}`)}
                         </span>
                         <span className="text-sm sm:text-base font-bold text-[#D4AF37] w-4 sm:w-5 text-center shrink-0">
-                          {PLANET_SYMBOLS[item.natalPlanet] || '•'}
+                          {item.type === 'İngress'
+                            ? (ZODIAC_SYMBOLS[item.natalPlanet] || '♒')
+                            : (PLANET_SYMBOLS[item.natalPlanet] || '•')}
                         </span>
                       </div>
 
@@ -415,7 +466,9 @@ export default function TransitTimelineChart({
                         >
                           <span className="text-[10px] font-extrabold truncate drop-shadow-sm flex items-center gap-1">
                             {item.isStartedInPast && <span className="text-[10px] opacity-75 mr-0.5 font-black">◀</span>}
-                            {item.type} ({item.durationDays}g)
+                            {item.type === 'İngress' 
+                              ? `⚡ ${item.natalPlanet} (${item.durationDays}g)` 
+                              : `${item.type} (${item.durationDays}g)`}
                           </span>
 
                           {/* Peak Point Glowing Marker (only if peak falls within range) */}
@@ -425,7 +478,7 @@ export default function TransitTimelineChart({
                               style={{
                                 left: `${Math.max(8, Math.min(widthPercent - 8, ((peakPercent - leftPercent) / widthPercent) * 100))}%`
                               }}
-                              title={`Zirve (0° Partil): ${item.peakDate}${item.peakTime ? ` • Saat: ${item.peakTime}` : ''}`}
+                              title={item.type === 'İngress' ? `Merkez Derecesi (15°): ${item.peakDate}${item.peakTime ? ` • Saat: ${item.peakTime}` : ''}` : `Zirve (0° Partil): ${item.peakDate}${item.peakTime ? ` • Saat: ${item.peakTime}` : ''}`}
                             >
                               <span className="w-1.5 h-1.5 rounded-full bg-black"></span>
                             </div>
@@ -478,20 +531,28 @@ export default function TransitTimelineChart({
                       ? 'bg-purple-500/20 text-purple-300 border-purple-500/30 animate-pulse'
                       : 'bg-sky-500/15 text-sky-300 border-sky-500/30'
                   }`}>
-                    {selectedItem.phase === 'YAKLASAN' && '📈 Zirveye Yaklaşıyor'}
-                    {selectedItem.phase === 'ZIRVE' && '⚡ Tam Zirvede (0°)'}
-                    {selectedItem.phase === 'UZAKLASAN' && '📉 Zirvesi Geçti (Çözülüyor)'}
+                    {selectedItem.phase === 'YAKLASAN' && (selectedItem.type === 'İngress' ? '📈 Merkeze Yaklaşıyor' : '📈 Zirveye Yaklaşıyor')}
+                    {selectedItem.phase === 'ZIRVE' && (selectedItem.type === 'İngress' ? '⚡ Burç Seyrinde (Aktif)' : '⚡ Tam Zirvede (0°)')}
+                    {selectedItem.phase === 'UZAKLASAN' && (selectedItem.type === 'İngress' ? '📉 Burç Çıkışına Yakın' : '📉 Zirvesi Geçti (Çözülüyor)')}
                   </span>
 
                   <span className="text-xs text-mystic-text-muted">
-                    Min Orb: <strong className="text-white">{selectedItem.minOrb}°</strong>
+                    {selectedItem.type === 'İngress' ? (
+                      <>Etki: <strong className="text-white">Burç Seyri</strong></>
+                    ) : (
+                      <>Min Orb: <strong className="text-white">{selectedItem.minOrb}°</strong></>
+                    )}
                   </span>
                 </div>
 
                 <h3 className="text-xl font-bold text-white flex items-center gap-2">
                   <span className="text-mystic-primary">{PLANET_SYMBOLS[selectedItem.transitPlanet]}</span>
                   {selectedItem.title}
-                  <span className="text-[#D4AF37]">{PLANET_SYMBOLS[selectedItem.natalPlanet]}</span>
+                  <span className="text-[#D4AF37]">
+                    {selectedItem.type === 'İngress'
+                      ? (ZODIAC_SYMBOLS[selectedItem.natalPlanet] || '')
+                      : PLANET_SYMBOLS[selectedItem.natalPlanet]}
+                  </span>
                 </h3>
               </div>
               <button 
@@ -518,7 +579,9 @@ export default function TransitTimelineChart({
                   <span className="text-[9px] text-amber-400 font-semibold block mt-0.5">Geçmişte başladı</span>
                 ) : selectedItem.startDate === new Date().toISOString().split('T')[0] ? (
                   <span className="text-[9px] text-emerald-400 font-semibold block mt-0.5">
-                    Bugün {selectedItem.startTime ? `${selectedItem.startTime}'te ` : ''}başladı
+                    {selectedItem.startTime && selectedItem.startTime > `${String(new Date().getHours()).padStart(2, '0')}:${String(new Date().getMinutes()).padStart(2, '0')}`
+                      ? `Bugün ${selectedItem.startTime}'te başlayacak`
+                      : `Bugün ${selectedItem.startTime ? `${selectedItem.startTime}'te ` : ''}başladı`}
                   </span>
                 ) : (
                   <span className="text-[9px] text-sky-400 font-semibold block mt-0.5">Başlaması bekleniyor</span>
@@ -526,7 +589,7 @@ export default function TransitTimelineChart({
               </div>
               <div className="border-x border-white/10">
                 <span className="text-[10px] text-mystic-primary font-extrabold block uppercase tracking-wider flex items-center justify-center gap-1 mb-0.5">
-                  <Sparkles size={10} /> Zirve (0°)
+                  <Sparkles size={10} /> {selectedItem.type === 'İngress' ? 'Merkez (15°)' : 'Zirve (0°)'}
                 </span>
                 <span className="text-xs font-black text-[#D4AF37] block">
                   {selectedItem.peakDate}
@@ -537,7 +600,9 @@ export default function TransitTimelineChart({
                   )}
                 </span>
                 <span className={`text-[9px] font-semibold block mt-0.5 ${selectedItem.isPeakInPast ? 'text-sky-400' : 'text-emerald-400'}`}>
-                  {selectedItem.isPeakInPast ? 'Zirvesi tamamlandı' : 'Zirve bekleniyor'}
+                  {selectedItem.isPeakInPast 
+                    ? (selectedItem.type === 'İngress' ? 'Merkez geride kaldı' : 'Zirvesi tamamlandı') 
+                    : (selectedItem.type === 'İngress' ? 'Merkez bekleniyor' : 'Zirve bekleniyor')}
                 </span>
               </div>
               <div>
