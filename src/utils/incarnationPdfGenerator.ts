@@ -237,6 +237,15 @@ export const downloadIncarnationPDF = async (
   curY += 4;
   curY = drawTextWithBold(doc, `**Karmik Cetvel (GAD Yöneticisi):** ${data.gad.karmicRuler.name} (${data.gad.karmicRuler.sign}, ${data.gad.karmicRuler.house}. Ev) - ${data.gad.karmicRuler.summary}`, 15, curY, 180, 7.5);
 
+  if (data.gad.hdGate) {
+    curY += 4;
+    curY = drawTextWithBold(doc, `**Human Design Kapısı:** Kapı ${data.gad.hdGate.gate}.${data.gad.hdGate.line} (${data.gad.hdGate.title} - ${data.gad.hdGate.center} Merkezi) | ${data.gad.hdGate.lineArchetype}`, 15, curY, 180, 7.5);
+    curY += 3;
+    curY = drawTextWithBold(doc, `**HD Konfor Tuzağı:** ${data.gad.hdGate.shadowTrap}`, 15, curY, 180, 7.5);
+    curY += 3;
+    curY = drawTextWithBold(doc, `**HD Ruhsal Deha:** ${data.gad.hdGate.karmicGift}`, 15, curY, 180, 7.5);
+  }
+
   // ================= PAGE 2 =================
   doc.addPage();
   drawHeader();
@@ -270,6 +279,15 @@ export const downloadIncarnationPDF = async (
 
   curY += 4;
   curY = drawTextWithBold(doc, `**Gizli Karmik Korku:** ${data.twelfthHouse.hiddenFear}`, 15, curY, 180, 7.5);
+
+  if (data.twelfthHouse.hdFearSynthesis) {
+    curY += 4;
+    curY = drawTextWithBold(doc, `**HD Karmik Korku Merkezi:** ${data.twelfthHouse.hdFearSynthesis.centerTitle}`, 15, curY, 180, 7.5);
+    curY += 3;
+    curY = drawTextWithBold(doc, `**Hücresel Son Nefes Travması:** ${data.twelfthHouse.hdFearSynthesis.traumaMechanism}`, 15, curY, 180, 7.5);
+    curY += 3;
+    curY = drawTextWithBold(doc, `**Özgürleşme Anahtarı:** ${data.twelfthHouse.hdFearSynthesis.liberationKey}`, 15, curY, 180, 7.5);
+  }
 
   if (data.twelfthHouse.planetsIn12th.length > 0) {
     curY += 4;
@@ -393,6 +411,17 @@ export const downloadIncarnationPDF = async (
 
     curY += 4;
     curY = drawTextWithBold(doc, `**Dönüşüm Anahtarı:** ${data.chiron.wound.soulRemedy}`, 15, curY, 180, 7.5);
+
+    if (data.chiron.hdGate) {
+      curY += 4;
+      curY = drawTextWithBold(doc, `**HD Kiron Kapısı:** Kapı ${data.chiron.hdGate.gate}.${data.chiron.hdGate.line} (${data.chiron.hdGate.title} - ${data.chiron.hdGate.center} Merkezi) | ${data.chiron.hdGate.lineArchetype}`, 15, curY, 180, 7.5);
+      curY += 3;
+      curY = drawTextWithBold(doc, `**Yaranın HD Kökeni:** ${data.chiron.hdGate.woundKey}`, 15, curY, 180, 7.5);
+      curY += 3;
+      curY = drawTextWithBold(doc, `**HD Şifa Dehası:** ${data.chiron.hdGate.healingGift}`, 15, curY, 180, 7.5);
+      curY += 3;
+      curY = drawTextWithBold(doc, `**Dönüşüm Pratiği:** ${data.chiron.hdGate.transformationPractice}`, 15, curY, 180, 7.5);
+    }
   }
 
   // ================= PAGE 4: DRACONIC CARDS =================
@@ -416,6 +445,32 @@ export const downloadIncarnationPDF = async (
   doc.setTextColor(...white);
   const dracDesc = 'Drakonik harita, Kuzey Ay Düğümü 0° Koç noktasına hizalanarak hesaplanan yüksek ruhsal boyut haritanızdır. Tropikal burcunuz dünyadaki maskeniz ve egonuz iken, Drakonik burcunuz ruhunuzun enkarnasyonlar ötesi öz titreşimidir.';
   curY = drawTextWithBold(doc, dracDesc, 15, curY, 180, 7.5);
+
+  if (data.incarnationCross) {
+    curY += 4;
+    ensureSpace(38);
+    doc.setFillColor(...cardDark);
+    doc.roundedRect(15, curY, 180, 32, 3, 3, 'F');
+    doc.setDrawColor(...gold);
+    doc.setLineWidth(0.6);
+    doc.roundedRect(15, curY, 180, 32, 3, 3, 'D');
+
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(...gold);
+    doc.text(`⚡ ENKARNASYON ÇAPRAZI: ${data.incarnationCross.title} ${data.incarnationCross.code}`, 20, curY + 8);
+
+    doc.setFont('LiberationSans', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(255, 255, 255);
+    doc.text(`Açı Tipi: ${data.incarnationCross.angleType}`, 20, curY + 15);
+
+    const crossMissionLines = doc.splitTextToSize(`Ruhun Büyük Misyonu: ${data.incarnationCross.soulMission}`, 168);
+    doc.setTextColor(215, 225, 255);
+    doc.text(crossMissionLines.slice(0, 2), 20, curY + 22);
+
+    curY += 36;
+  }
 
   curY += 6;
 
@@ -505,6 +560,15 @@ export const downloadIncarnationPDF = async (
 
   curY += 5;
   curY = drawTextWithBold(doc, `**Kutsal Ruhsal Pratik:** ${data.kad.seed.sacredPractice}`, 15, curY, 180, 7.5);
+
+  if (data.kad.hdGate) {
+    curY += 4;
+    curY = drawTextWithBold(doc, `**Human Design KAD Kapısı:** Kapı ${data.kad.hdGate.gate}.${data.kad.hdGate.line} (${data.kad.hdGate.title} - ${data.kad.hdGate.center} Merkezi) | ${data.kad.hdGate.lineArchetype}`, 15, curY, 180, 7.5);
+    curY += 3;
+    curY = drawTextWithBold(doc, `**Evrimsel Rota:** ${data.kad.hdGate.evolutionPath}`, 15, curY, 180, 7.5);
+    curY += 3;
+    curY = drawTextWithBold(doc, `**Dharma Reçetesi:** ${data.kad.hdGate.actionableDharma}`, 15, curY, 180, 7.5);
+  }
 
   curY += 10;
   doc.setFont('LiberationSans', 'bold');

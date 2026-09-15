@@ -1,4 +1,5 @@
 import { ZodiacSign } from './AstrologyConstants';
+import { GATE_TITLES, GATE_TO_CENTER, LINE_BEHAVIOR_PROFILES } from './AstroHumanDesignSynthesis';
 
 export interface IncarnationPastLifeInfo {
   sign: ZodiacSign;
@@ -698,5 +699,296 @@ export function getDraconicPointInterpretation(
     draconicMeaning,
     synthesis,
     spiritualMeaning
+  };
+}
+
+// ==========================================
+// HUMAN DESIGN FULL-SPECTRUM SENTEZİ
+// ==========================================
+
+export interface GADHDGateSynthesis {
+  gate: number;
+  line: number;
+  title: string;
+  center: string;
+  lineArchetype: string;
+  shadowTrap: string;
+  karmicGift: string;
+  synthesis: string;
+}
+
+export interface TwelfthHouseHDFearSynthesis {
+  dominantCenter: string;
+  centerTitle: string;
+  traumaMechanism: string;
+  liberationKey: string;
+}
+
+export interface ChironHDGateSynthesis {
+  gate: number;
+  line: number;
+  title: string;
+  center: string;
+  lineArchetype: string;
+  woundKey: string;
+  healingGift: string;
+  transformationPractice: string;
+}
+
+export interface KADHDGateSynthesis {
+  gate: number;
+  line: number;
+  title: string;
+  center: string;
+  lineArchetype: string;
+  evolutionGoal: string;
+  evolutionPath: string;
+  actionableDharma: string;
+}
+
+export interface IncarnationCrossDetails {
+  code: string;
+  title: string;
+  angleType: 'Right Angle (Kişisel Kader)' | 'Juxtaposition (Sabit Kader)' | 'Left Angle (Kişilerarası Kader)';
+  sunGateTitle: string;
+  description: string;
+  gatesSummary: string;
+  soulMission: string;
+}
+
+const CROSS_FAMILIES: Record<number, { name: string; trName: string; theme: string }> = {
+  1: { name: 'The Sphinx', trName: 'Sfenks Çaprazı (Kozmik Yön & Vizyon)', theme: 'Kolektife yön gösterme, yeni yollar açma ve evrensel kılavuzluk.' },
+  2: { name: 'The Sphinx', trName: 'Sfenks Çaprazı (Kozmik Yön & Vizyon)', theme: 'Doğru zamanlama, yüksek alıcılık ve ilahi rotayı belirleme.' },
+  7: { name: 'The Sphinx', trName: 'Sfenks Çaprazı (Kozmik Yön & Vizyon)', theme: 'Görünmeyen rehberlik, demokratik liderlik ve geleceğe yön verme.' },
+  13: { name: 'The Sphinx', trName: 'Sfenks Çaprazı (Kozmik Yön & Vizyon)', theme: 'Geçmişin bilgeliğini dinleme, sırları tutma ve yön tayin etme.' },
+  10: { name: 'The Vessel of Love', trName: 'Aşk Gemisi Çaprazı (Koşulsuz Sevgi & Birlik)', theme: 'Kendini sevme, özgün varoluş ve doğal duruşla örnek olma.' },
+  15: { name: 'The Vessel of Love', trName: 'Aşk Gemisi Çaprazı (Koşulsuz Sevgi & Birlik)', theme: 'Tüm insanlığı ve uç kutupları kucaklayan evrensel sevgi.' },
+  25: { name: 'The Vessel of Love', trName: 'Aşk Gemisi Çaprazı (Koşulsuz Sevgi & Birlik)', theme: 'Koşulsuz masumiyet, yargısız kalp ve evrensel şefkat.' },
+  46: { name: 'The Vessel of Love', trName: 'Aşk Gemisi Çaprazı (Koşulsuz Sevgi & Birlik)', theme: 'Bedensel varoluşu sevme, dünya hayatının kutsallığı ve talih.' },
+  19: { name: 'The Four Ways', trName: 'Dört Yol Çaprazı (Duyarlılık & Uyanış)', theme: 'Toplumsal ihtiyaçları hissetme, ruhsal yakınlık ve uyanış.' },
+  24: { name: 'The Four Ways', trName: 'Dört Yol Çaprazı (Duyarlılık & Uyanış)', theme: 'Zihinsel aydınlanma, yenilenme ve hakikate geri dönüş.' },
+  33: { name: 'The Four Ways', trName: 'Dört Yol Çaprazı (Duyarlılık & Uyanış)', theme: 'Mahremiyet, deneyimleri hafızada süzme ve bilgece hatırlama.' },
+  44: { name: 'The Four Ways', trName: 'Dört Yol Çaprazı (Duyarlılık & Uyanış)', theme: 'Geçmişin kalıplarını tanıma, doğru ekipleri ve insanları birleştirme.' },
+  4: { name: 'The Cross of Explanation', trName: 'Açıklama & Hakikat Çaprazı', theme: 'Formüller üretme, karmaşık soruları mantıkla aydınlatma.' },
+  23: { name: 'The Cross of Explanation', trName: 'Açıklama & Hakikat Çaprazı', theme: 'Karmaşıklığı en saf ve basit hale indirgeyerek aktarma dehası.' },
+  43: { name: 'The Cross of Explanation', trName: 'Açıklama & Hakikat Çaprazı', theme: 'Eşsiz içgörüler, tabuları yıkan orijinal deha ve yeni paradigmalar.' },
+  49: { name: 'The Cross of Explanation', trName: 'Açıklama & Hakikat Çaprazı', theme: 'Devrimci ilkeler, yüksek adalet ve toplumun dönüşümü.' },
+  21: { name: 'The Cross of Tension', trName: 'Gerilim & İrade Çaprazı', theme: 'Kaynakları adil yönetme, kontrol ve irade ustalığı.' },
+  38: { name: 'The Cross of Tension', trName: 'Gerilim & İrade Çaprazı', theme: 'Değerli amaçlar için cesurca savaşma ve anlam arayışı.' },
+  39: { name: 'The Cross of Tension', trName: 'Gerilim & İrade Çaprazı', theme: 'Ruhları harekete geçiren kışkırtma ve derin tutku uyandırma.' },
+  48: { name: 'The Cross of Tension', trName: 'Gerilim & İrade Çaprazı', theme: 'Kusursuz derinlik, dipsiz bilgi kuyusu ve somut çözümler.' },
+  32: { name: 'The Cross of Maya', trName: 'Maya Çaprazı (İllüzyonları Çözme & Gerçeklik)', theme: 'Kalıcı olanı geçici olandan ayırma ve sezgisel süreklilik.' },
+  42: { name: 'The Cross of Maya', trName: 'Maya Çaprazı (İllüzyonları Çözme & Gerçeklik)', theme: 'Döngüleri tamamlama, olgunlaşma ve evrimsel büyüme.' },
+  61: { name: 'The Cross of Maya', trName: 'Maya Çaprazı (İllüzyonları Çözme & Gerçeklik)', theme: 'Evrenin gizemlerini çözme, içsel hakikate ve ilhama ulaşma.' },
+  62: { name: 'The Cross of Maya', trName: 'Maya Çaprazı (İllüzyonları Çözme & Gerçeklik)', theme: 'Kelimelerin ve detayların gücüyle gerçeği kusursuz adlandırma.' },
+  17: { name: 'The Cross of Service', trName: 'Kutsal Hizmet & İyileştirme Çaprazı', theme: 'Geleceği öngören mantıksal vizyon ve toplumsal rehberlik.' },
+  18: { name: 'The Cross of Service', trName: 'Kutsal Hizmet & İyileştirme Çaprazı', theme: 'Bozuk olanı onarma, kusursuzlaştırma ve şifa hizmeti.' },
+  52: { name: 'The Cross of Service', trName: 'Kutsal Hizmet & İyileştirme Çaprazı', theme: 'Hareketsizliğin kutsal gücü, dağ gibi sarsılmaz odaklanma.' },
+  58: { name: 'The Cross of Service', trName: 'Kutsal Hizmet & İyileştirme Çaprazı', theme: 'Yaşam sevinci, bütünü daha iyiye taşıma coşkusu ve canlılık.' },
+  9: { name: 'The Cross of Planning', trName: 'Planlama & Topluluk Sözleşmesi Çaprazı', theme: 'Mikro detaylara odaklanma ve büyük planları adım adım örme.' },
+  16: { name: 'The Cross of Planning', trName: 'Planlama & Topluluk Sözleşmesi Çaprazı', theme: 'Ustalık, çok yönlü beceriler ve geleceği coşkuyla kurma.' },
+  37: { name: 'The Cross of Planning', trName: 'Planlama & Topluluk Sözleşmesi Çaprazı', theme: 'Aile, sıcak topluluk bağı ve kutsal sadakat sözleşmeleri.' },
+  40: { name: 'The Cross of Planning', trName: 'Planlama & Topluluk Sözleşmesi Çaprazı', theme: 'Topluluk için adanmış çalışma ve bağımsız dinlenme dengesi.' },
+  5: { name: 'The Cross of Consciousness', trName: 'Kozmik Bilinç & Evrensel Ritim Çaprazı', theme: 'Evrensel ritimlere güvenme ve doğru zamanlamayı bekleme.' },
+  11: { name: 'The Cross of Consciousness', trName: 'Kozmik Bilinç & Evrensel Ritim Çaprazı', theme: 'İlham veren fikirler, hayal gücü ve görsel bilgelik.' },
+  35: { name: 'The Cross of Consciousness', trName: 'Kozmik Bilinç & Evrensel Ritim Çaprazı', theme: 'İnsani deneyimlerin zenginliği ve tekâmül basamakları.' },
+  63: { name: 'The Cross of Consciousness', trName: 'Kozmik Bilinç & Evrensel Ritim Çaprazı', theme: 'Mantıksal sorgulama, şüpheyi aydınlığa çıkarma ve bilim.' },
+  20: { name: 'The Sleeping Phoenix', trName: 'Uyuyan Anka Çaprazı (Yeniden Doğuş & An Bilinci)', theme: 'Saf şimdiki anın gücü, anlık eylem ve yüksek farkındalık.' },
+  34: { name: 'The Sleeping Phoenix', trName: 'Uyuyan Anka Çaprazı (Yeniden Doğuş & An Bilinci)', theme: 'Muazzam bireysel yaşam gücü ve saf üretken kudret.' },
+  55: { name: 'The Sleeping Phoenix', trName: 'Uyuyan Anka Çaprazı (Yeniden Doğuş & An Bilinci)', theme: 'Ruhun bolluğu, duygusal özgürlük ve melankoliyi aşma.' },
+  59: { name: 'The Sleeping Phoenix', trName: 'Uyuyan Anka Çaprazı (Yeniden Doğuş & An Bilinci)', theme: 'Bariyerleri eritme, derin yakınlık ve yeni nesiller doğurma.' },
+  6: { name: 'The Cross of Eden', trName: 'Cennet & Duygusal Olgunluk Çaprazı', theme: 'Çatışmaları aşarak barışçıl yakınlığa ve birliğe ulaşma.' },
+  12: { name: 'The Cross of Eden', trName: 'Cennet & Duygusal Olgunluk Çaprazı', theme: 'Duyguların zarafetle ifadesi ve derin şiirsel duruş.' },
+  36: { name: 'The Cross of Eden', trName: 'Cennet & Duygusal Olgunluk Çaprazı', theme: 'Duygusal krizleri bilgeliğe dönüştürme ve merhamet.' },
+  22: { name: 'The Cross of Eden', trName: 'Cennet & Duygusal Olgunluk Çaprazı', theme: 'Ruhsal zarafet, müzikal duyarlılık ve nezaketin gücü.' },
+  3: { name: 'The Cross of Laws', trName: 'Evrensel Yasalar & Mutasyon Çaprazı', theme: 'Kaosu kozmik düzene çevirme ve yeni yapıları başlatma.' },
+  50: { name: 'The Cross of Laws', trName: 'Evrensel Yasalar & Mutasyon Çaprazı', theme: 'Toplumsal ahlak, değerler ve yeni nesilleri koruma yasaları.' },
+  60: { name: 'The Cross of Laws', trName: 'Evrensel Yasalar & Mutasyon Çaprazı', theme: 'Sınırları kabul ederek sınırsız mutasyonlar ve yenilik yaratma.' },
+  27: { name: 'The Cross of Laws', trName: 'Evrensel Yasalar & Mutasyon Çaprazı', theme: 'Koşulsuz besleme, koruma ve kolektif sorumluluk alma.' },
+  26: { name: 'The Cross of Alignment', trName: 'Hizalanma & Kaynak Liderliği Çaprazı', theme: 'Doğru mesajı aktarma, ikna gücü ve güven inşa etme.' },
+  45: { name: 'The Cross of Alignment', trName: 'Hizalanma & Kaynak Liderliği Çaprazı', theme: 'Topluluğu zenginleştirme, bolluk dağıtma ve egemen liderlik.' },
+  8: { name: 'The Cross of Alignment', trName: 'Hizalanma & Kaynak Liderliği Çaprazı', theme: 'Örnek olarak liderlik etme, özgün tarz ve bireysel katkı.' },
+  14: { name: 'The Cross of Alignment', trName: 'Hizalanma & Kaynak Liderliği Çaprazı', theme: 'Yüksek enerji, kaynak üretimi ve vizyoner projeleri fonlama.' },
+  28: { name: 'The Cross of Dedication', trName: 'Kozmik Adanmışlık & Kader Çaprazı', theme: 'Hayata derin anlam katma ve korkusuzca mücadele etme.' },
+  29: { name: 'The Cross of Dedication', trName: 'Kozmik Adanmışlık & Kader Çaprazı', theme: 'Kendini deneyime tam adama, sadakat ve güvenle yola çıkma.' },
+  30: { name: 'The Cross of Dedication', trName: 'Kozmik Adanmışlık & Kader Çaprazı', theme: 'Duygusal arınma, ateşli tutkular ve kaderin çağrısını kabul.' },
+  41: { name: 'The Cross of Dedication', trName: 'Kozmik Adanmışlık & Kader Çaprazı', theme: 'Yeni döngüleri başlatan vizyoner hayal gücü ve umut.' },
+  53: { name: 'The Cross of Ambition', trName: 'Yükseliş & Ruhsal Başarı Çaprazı', theme: 'Yeni başlangıçların tohumunu ekme ve tekâmülü ilerletme.' },
+  54: { name: 'The Cross of Ambition', trName: 'Yükseliş & Ruhsal Başarı Çaprazı', theme: 'Maddi dünyadan ruhsal zirvelere tırmanan saf azim.' },
+  56: { name: 'The Cross of Ambition', trName: 'Yükseliş & Ruhsal Başarı Çaprazı', theme: 'Hikayeler anlatma, insanları uyandırma ve vizyon genişletme.' },
+  57: { name: 'The Cross of Ambition', trName: 'Yükseliş & Ruhsal Başarı Çaprazı', theme: 'Anlık sezgisel netlik, tehlikeleri önceden sezen kutsal kulak.' },
+  31: { name: 'The Cross of Awakening', trName: 'Büyük Uyanış & Dönüşüm Çaprazı', theme: 'Halkın sesi olma, ilhamla yönlendirme ve modern liderlik.' },
+  47: { name: 'The Cross of Awakening', trName: 'Büyük Uyanış & Dönüşüm Çaprazı', theme: 'Zor deneyimleri aydınlatma, kafeslerden kurtulma ve içsel simya.' },
+  51: { name: 'The Cross of Awakening', trName: 'Büyük Uyanış & Dönüşüm Çaprazı', theme: 'Şoklarla inisiye etme, sahte konforları yıkıp ruhu uyandırma.' },
+  64: { name: 'The Cross of Awakening', trName: 'Büyük Uyanış & Dönüşüm Çaprazı', theme: 'Geçmişin imgelerini geleceğin sanatına ve bilincine dönüştürme.' }
+};
+
+export function getGADHDGateSynthesis(gate: number, line: number): GADHDGateSynthesis {
+  const gateData = GATE_TITLES[gate] || { title: 'Bilinmeyen Kapı', gift: 'Ruhsal Ustalık', shadow: 'Atalet' };
+  const center = GATE_TO_CENTER[gate] || 'Bilinmeyen Merkez';
+  const lineData = LINE_BEHAVIOR_PROFILES[line] || LINE_BEHAVIOR_PROFILES[1];
+
+  const shadowTrap = `Geçmiş enkarnasyonlarda "${gateData.shadow}" gölgesinde saplanıp kaldınız. Bilinçaltınız zorlandığında ${lineData.rootFear.toLowerCase()} sebebiyle ${lineData.challengingBehavior.toLowerCase()} Bu kalıp sizin çok iyi bildiğiniz ama bu hayatta aşmanız gereken en büyük konfor alanı tuzağınızdır.`;
+  const karmicGift = `Ruhunuz geçmiş yaşamlardan "${gateData.gift}" ustalığını ve ${lineData.harmoniousBehavior.toLowerCase()} gücünü bu hayata hazır bir armağan olarak getirmiştir. Bu yeteneği sığınağınız değil, KAD hedeflerinize sıçrama tahtası yapmalısınız.`;
+  const synthesis = `Kapı ${gate}.${line} (${center} Merkezi) geçmiş yaşamınızın kök kodudur. Tanıdık gelen gölge eğiliminiz: "${gateData.shadow}". Ruhsal dehanız: "${gateData.gift}".`;
+
+  return {
+    gate,
+    line,
+    title: gateData.title,
+    center,
+    lineArchetype: lineData.archetype,
+    shadowTrap,
+    karmicGift,
+    synthesis
+  };
+}
+
+export function getTwelfthHouseHDFearSynthesis(dominantCenter: string): TwelfthHouseHDFearSynthesis {
+  switch (dominantCenter) {
+    case 'Dalak':
+      return {
+        dominantCenter: 'Dalak',
+        centerTitle: 'Dalak (Spleen) Merkezi - Hayatta Kalma & Beden Travması',
+        traumaMechanism: 'Son nefeste ani bir tehlike, terk edilme veya fiziksel bedeni koruyamama korkusu bilinçaltınıza kazınmış. Geçmişten gelen bu hücresel korku, şimdiki hayatınızda açıklanamayan anksiyete, hastalık evhamı veya tehlike beklentisi olarak yüzeye çıkabilir.',
+        liberationKey: 'Anlık sezgilerinize güvenin. Bedeninizin verdiği ilk ses daima doğrudur. Geleceğin belirsizliğini zihinle kontrol etmeye çalışmak yerine bedeninizin doğal bilgeliğine teslim olun.'
+      };
+    case 'Solar Pleksus':
+      return {
+        dominantCenter: 'Solar Pleksus',
+        centerTitle: 'Solar Pleksus Merkezi - Duygusal Suçluluk & Utanç Travması',
+        traumaMechanism: 'Son nefeste derin bir duygusal hayal kırıklığı, dışlanma, sevdiklerinin acısına sebep olma veya sevilmediğini hissederek ölme travması taşınıyor. Bilinçaltınız insanları memnun etmeye çalışırken kendi duygularını bastırma veya aniden öfkeyle patlama döngüsüne girebilir.',
+        liberationKey: 'Duygusal dalgalanmaların en dibindeyken karar almayın. Başkalarının onayını kazanmak için kendi sınırlarınızı feda etmekten vazgeçin; duygusal özgürlük, suçluluk duymadan "Hayır" diyebilmektir.'
+      };
+    case 'Tepe (Taç)':
+    case 'Ajna (Zihin)':
+      return {
+        dominantCenter: 'Ajna / Tepe',
+        centerTitle: 'Taç & Ajna Merkezi - Zihinsel Sis & İnanç İhaneti Travması',
+        traumaMechanism: 'Son nefeste fikirleri, inançları veya bildiği sırlar yüzünden cezalandırılma, zihinsel dengesini kaybetme veya inandığı tüm sistemin çöküşünü izleme korkusu bilinçaltına yerleşmiş. Bu hayatta aşırı düşünme, her şeyi analiz etme takıntısı ve yanılma korkusu yaratır.',
+        liberationKey: 'Her sorunun zihinsel bir cevabı olmak zorunda değildir. Zihninizi bir rehber olarak kullanın, bir gardiyan değil. Bilinmeyenin içindeki ilahi düzene teslim olun.'
+      };
+    case 'Kalp (Ego)':
+      return {
+        dominantCenter: 'Kalp (Ego)',
+        centerTitle: 'Kalp (Ego) Merkezi - İrade Kırılması & Değersizlik Travması',
+        traumaMechanism: 'Son nefeste iradenin zorbalıkla kırılması, verilen sözlerin tutulamaması, köleleştirilme veya itibarını kaybederek ölme travması taşınıyor. Bu durum şimdiki hayatta kendini sürekli ispatlama, aşırı güç gösterme veya değersizlik korkusu doğurabilir.',
+        liberationKey: 'Değerinizi hiçbir dış başarıya, unvana veya başkalarının onayına bağlamayın. Siz hiçbir şey kanıtlamak zorunda değilsiniz; varoluşunuz tek başına kutsaldır.'
+      };
+    case 'Kök':
+      return {
+        dominantCenter: 'Kök',
+        centerTitle: 'Kök Merkezi - Ağır Yük & Sürekli Baskı Travması',
+        traumaMechanism: 'Son nefeste bitmeyen bir savaş, ağır sorumluluklar altında ezilme veya yetiştirilemeyen zaman baskısı ile ölme hafızası kayıtlıdır. Şimdiki hayatınızda her şeyi hemen bitirme telaşı ve kronik stres üretebilir.',
+        liberationKey: 'Hayat bir yarış değildir. Sahte aciliyetlerin sizi esir almasına izin vermeyin; derin nefes alın ve dinlenmenin en kutsal hak olduğunu kabul edin.'
+      };
+    case 'Benlik (G)':
+      return {
+        dominantCenter: 'Benlik (G)',
+        centerTitle: 'Benlik (G) Merkezi - Yön Yitimi & Aidiyetsizlik Travması',
+        traumaMechanism: 'Son nefeste sürgün edilme, kimsesiz kalma, nereye gideceğini bilememe ve ruhsal köklerinden koparılma travması taşınıyor. Bu durum şimdiki hayatta sürekli kim olduğunu ve nereye ait olduğunu arama huzursuzluğu yaratır.',
+        liberationKey: 'Doğru yer ve doğru insanları aramak yerine kendi kalbinizin merkezinde evinizi bulun. Siz kendinizle barıştığınızda evren sizi doğru yöne zahmetsizce çekecektir.'
+      };
+    case 'Sakral':
+      return {
+        dominantCenter: 'Sakral',
+        centerTitle: 'Sakral Merkezi - Yaşam Gücünün Sömürülmesi & Tükenmişlik',
+        traumaMechanism: 'Son nefeste tüm yaşam enerjisinin başkalarının hizmetinde son damlasına kadar tüketilmesi, köle gibi çalıştırılma ve kendi arzularını yaşayamadan ölme travması mevcuttur.',
+        liberationKey: 'Sadece karnınızdan, derinlerinizden coşkulu bir "Evet" gelen işlere ve insanlara enerjinizi verin. Tükendiğiniz yerde durmayı kutsal bir sınır olarak görün.'
+      };
+    case 'Boğaz':
+    default:
+      return {
+        dominantCenter: 'Boğaz',
+        centerTitle: 'Boğaz Merkezi - Susturulma & Hakikati Haykıramama',
+        traumaMechanism: 'Son nefeste söylemek istediklerini söyleyememe, sesi kesilerek veya sırları mezara götürerek ölme travması taşınıyor. Şimdiki hayatta kendini ifade ederken boğazda düğümlenme veya konuşmaktan çekinme yaratabilir.',
+        liberationKey: 'Sözünüzün kudretini fark edin. Doğru zaman geldiğinde kimseden onay beklemeden kendi hakikatinizi nezaketle ama tavizsizce dile getirin.'
+      };
+  }
+}
+
+export function getChironHDGateSynthesis(gate: number, line: number): ChironHDGateSynthesis {
+  const gateData = GATE_TITLES[gate] || { title: 'Bilinmeyen Kapı', gift: 'Ruhsal Şifa', shadow: 'Yara' };
+  const center = GATE_TO_CENTER[gate] || 'Bilinmeyen Merkez';
+  const lineData = LINE_BEHAVIOR_PROFILES[line] || LINE_BEHAVIOR_PROFILES[1];
+
+  const woundKey = `Kiron ${gate}. Kapı (${gateData.title}) ve ${line}. Çizgide (${center} Merkezi) yerleşmiştir. Ruhsal yaranızın kökeni: "${gateData.shadow}" frekansıdır. Bilinçaltınız ${lineData.rootFear.toLowerCase()} sebebiyle kendini doğuştan yaralı veya eksik hissetmiştir.`;
+  const healingGift = `Bu yara sizin kapanmayacak kusurunuz değil; dünyaya sunacağınız en yüce şifa armağanıdır: "${gateData.gift}". Bu alanda derin bir sızı çektiğiniz için, aynı yarayı taşıyan insanları hemen fark eder ve ${lineData.harmoniousBehavior.toLowerCase()} dehasıyla onlara yol gösterirsiniz.`;
+  const transformationPractice = `${lineData.actionableRemedy} Başkalarına şifa verirken kendi yaranızın da dönüştüğünü ve kutsal bir ışık kaynağına evrildiğini göreceksiniz.`;
+
+  return {
+    gate,
+    line,
+    title: gateData.title,
+    center,
+    lineArchetype: lineData.archetype,
+    woundKey,
+    healingGift,
+    transformationPractice
+  };
+}
+
+export function getKADHDGateSynthesis(gate: number, line: number): KADHDGateSynthesis {
+  const gateData = GATE_TITLES[gate] || { title: 'Bilinmeyen Kapı', gift: 'Gelecek Işığı', shadow: 'Atalet' };
+  const center = GATE_TO_CENTER[gate] || 'Bilinmeyen Merkez';
+  const lineData = LINE_BEHAVIOR_PROFILES[line] || LINE_BEHAVIOR_PROFILES[1];
+
+  const evolutionGoal = `Kuzey Düğümünüz ${gate}. Kapı (${gateData.title}) ve ${line}. Çizgidedir (${center} Merkezi). Ruhunuzun bu hayatta açığa çıkarması gereken ana potansiyel: "${gateData.gift}".`;
+  const evolutionPath = `Bu yaşamda ${lineData.archetype} duruşunu sahiplenmeli ve ${lineData.generalTendency.toLowerCase()} doğrultusunda cesur adımlar atmalısınız. "${gateData.shadow}" gölgesine düşmekten çekinmeyin; gölgeyle yüzleştiğinizde "${gateData.gift}" dehası serbest kalacaktır.`;
+  const actionableDharma = lineData.actionableRemedy;
+
+  return {
+    gate,
+    line,
+    title: gateData.title,
+    center,
+    lineArchetype: lineData.archetype,
+    evolutionGoal,
+    evolutionPath,
+    actionableDharma
+  };
+}
+
+export function getIncarnationCrossDetails(
+  consciousSunGate: number,
+  consciousEarthGate: number,
+  unconsciousSunGate: number,
+  unconsciousEarthGate: number,
+  profile: string
+): IncarnationCrossDetails {
+  const code = `(${consciousSunGate}/${consciousEarthGate} | ${unconsciousSunGate}/${unconsciousEarthGate})`;
+  const sunGateData = GATE_TITLES[consciousSunGate] || { title: 'Kozmik Kapı', gift: 'Ruhsal Uyanış', shadow: 'Amaçsızlık' };
+  const family = CROSS_FAMILIES[consciousSunGate] || {
+    name: 'The Cross of Purpose',
+    trName: 'Evrensel Yaşam Amacı Çaprazı',
+    theme: 'Kozmik bilincin uyanışı ve bireysel ruhsal amacın dünyaya taşınması.'
+  };
+
+  let angleType: 'Right Angle (Kişisel Kader)' | 'Juxtaposition (Sabit Kader)' | 'Left Angle (Kişilerarası Kader)';
+  let angleDescription = '';
+
+  if (profile === '4/1') {
+    angleType = 'Juxtaposition (Sabit Kader)';
+    angleDescription = 'Kişisel kader ile kolektif kader arasında sarsılmaz bir köprü görevi görürsünüz. Yaşam rotanız son derece nettir ve dış etkilerle kolay kolay rotasından sapmaz. Belirli ve odaklanmış bir ruhsal misyona kilitlenmişsinizdir.';
+  } else if (profile.startsWith('5/') || profile.startsWith('6/')) {
+    angleType = 'Left Angle (Kişilerarası Kader)';
+    angleDescription = 'Kişilerarası ve kolektif bir misyonla bu dünyadasınız. Hayatınız, başkalarıyla kesişerek onlara rehberlik etmek, geçmiş karmik düğümleri çözmek ve toplumsal bir dönüşüm başlatmak için tasarlanmıştır. Başkalarına bıraktığınız etki sizin asıl tekâmülünüzdür.';
+  } else {
+    angleType = 'Right Angle (Kişisel Kader)';
+    angleDescription = 'Bağımsız ve kişisel bir tekâmül sürecine odaklısınız. Dünyadaki varoluşunuz, kendi kararlarınız ve bireysel deneyimleriniz üzerinden yeni yollar keşfetmeye ayarlıdır. Başkalarının beklentilerinden bağımsız, kendi özgün patikanızı inşa etmek için buradasınız.';
+  }
+
+  const title = `${angleType.split(' ')[0]} Cross of ${family.name} (${family.trName})`;
+  const gatesSummary = `Bilinçli Güneş: Kapı ${consciousSunGate} (Yaşam Işığı: ${sunGateData.gift}) | Bilinçli Dünya: Kapı ${consciousEarthGate} (Topraklanma) | Bilinçdışı Güneş: Kapı ${unconsciousSunGate} (Ruhsal İtici Güç) | Bilinçdışı Dünya: Kapı ${unconsciousEarthGate} (Karmik Temel)`;
+  const soulMission = `${angleDescription} ${family.trName} altında doğarak ruhunuz şu büyük temayı gerçekleştirmeyi seçti: "${family.theme}". Bilinçli Güneşinizin ${consciousSunGate}. Kapıdaki (${sunGateData.title}) dehasını açığa çıkardığınızda, bu çapraz tüm ihtişamıyla hayatınızda parlar.`;
+
+  return {
+    code,
+    title,
+    angleType,
+    sunGateTitle: sunGateData.title,
+    description: angleDescription,
+    gatesSummary,
+    soulMission
   };
 }

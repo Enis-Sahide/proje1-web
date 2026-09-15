@@ -25,8 +25,19 @@ import {
   RetroKarmicDebt,
   ChironWound,
   NextLifeSeed,
-  getDraconicPointInterpretation
+  getDraconicPointInterpretation,
+  GADHDGateSynthesis,
+  getGADHDGateSynthesis,
+  TwelfthHouseHDFearSynthesis,
+  getTwelfthHouseHDFearSynthesis,
+  ChironHDGateSynthesis,
+  getChironHDGateSynthesis,
+  KADHDGateSynthesis,
+  getKADHDGateSynthesis,
+  IncarnationCrossDetails,
+  getIncarnationCrossDetails
 } from './IncarnationInterpretations';
+import { GATE_TO_CENTER } from './AstroHumanDesignSynthesis';
 
 export interface GADAspect {
   planet: string;
@@ -65,6 +76,7 @@ export interface IncarnationAnalysisResult {
       summary: string;
     };
     aspects: GADAspect[];
+    hdGate?: GADHDGateSynthesis;
   };
 
   // 12. Ev Hafızası & Son Nefes
@@ -79,6 +91,7 @@ export interface IncarnationAnalysisResult {
       sign: ZodiacSign;
       meaning: string;
     }[];
+    hdFearSynthesis?: TwelfthHouseHDFearSynthesis;
   };
 
   // Karmik Borçlar (Retrolar)
@@ -89,6 +102,7 @@ export interface IncarnationAnalysisResult {
     sign: ZodiacSign;
     house: number;
     wound: ChironWound;
+    hdGate?: ChironHDGateSynthesis;
   } | null;
 
   // Drakonik Karşılaştırma
@@ -100,12 +114,16 @@ export interface IncarnationAnalysisResult {
     degreeInSign: number;
     house: number;
     seed: NextLifeSeed;
+    hdGate?: KADHDGateSynthesis;
   };
   eighthHouse: {
     sign: ZodiacSign;
     ruler: string;
     transformationGateway: string;
   };
+
+  // Human Design Enkarnasyon Çaprazı (Kozmik Yaşam Misyonu)
+  incarnationCross?: IncarnationCrossDetails;
 
   // Ruhsal Olgunluk Skoru & Seviye
   soulMaturity: {
@@ -322,6 +340,10 @@ export function calculateIncarnationAnalysis(
   const gadSignInfo = GAD_SIGN_INTERPRETATIONS[gadData.sign] || GAD_SIGN_INTERPRETATIONS['Koç'];
   const gadHouseInfo = GAD_HOUSE_INTERPRETATIONS[gadHouse] || GAD_HOUSE_INTERPRETATIONS[1];
 
+  // Human Design Güney Ay Düğümü (GAD) Kapı & Çizgi Sentezi
+  const gadHD = getGateAndLine(gadLon);
+  const gadHDSynthesis = getGADHDGateSynthesis(gadHD.gate, gadHD.line);
+
   // GAD Yöneticisi (Karmik Cetvel)
   const rulerPair = SIGN_RULERS[gadData.sign] || { traditional: 'Mars', modern: 'Mars' };
   const rulerPlanet = natalChart.planets.find(p => p.name === rulerPair.modern) || 
@@ -388,6 +410,28 @@ export function calculateIncarnationAnalysis(
       };
     });
 
+  // 12. evdeki gezegenlerin ve yöneticinin bağlandığı Human Design merkezini tespit et
+  let dominant12thCenter = 'Dalak';
+  const h12RulerPlanet = natalChart.planets.find(p => p.name === h12Ruler);
+  if (h12RulerPlanet) {
+    const rulerGate = getGateAndLine(h12RulerPlanet.longitude).gate;
+    const c = GATE_TO_CENTER[rulerGate];
+    if (c) dominant12thCenter = c;
+  } else if (planetsIn12th.length > 0) {
+    const p1 = natalChart.planets.find(p => p.name === planetsIn12th[0].name);
+    if (p1) {
+      const pGate = getGateAndLine(p1.longitude).gate;
+      const c = GATE_TO_CENTER[pGate];
+      if (c) dominant12thCenter = c;
+    }
+  } else {
+    if (['Balık', 'Yengeç', 'Akrep'].includes(h12.sign)) dominant12thCenter = 'Solar Pleksus';
+    else if (['İkizler', 'Kova', 'Terazi'].includes(h12.sign)) dominant12thCenter = 'Ajna (Zihin)';
+    else if (['Koç', 'Aslan', 'Yay'].includes(h12.sign)) dominant12thCenter = 'Kalp (Ego)';
+    else dominant12thCenter = 'Dalak';
+  }
+  const hdFearSynthesis = getTwelfthHouseHDFearSynthesis(dominant12thCenter);
+
   // 3. Karmik Borçlar (Retrolar - Human Design Sentezi ile Nokta Atışı Kutuplanma)
   const retroDebts: RetroKarmicDebt[] = [];
   natalChart.planets.forEach(p => {
@@ -408,15 +452,18 @@ export function calculateIncarnationAnalysis(
     }
   });
 
-  // 4. Kiron Ruh Yarası
+  // 4. Kiron Ruh Yarası (Human Design Kapı & Çizgi Sentezi)
   const chironPoint = natalChart.planets.find(p => p.name === 'Kiron');
   let chironResult = null;
   if (chironPoint) {
     const wound = CHIRON_SIGN_WOUNDS[chironPoint.sign] || CHIRON_SIGN_WOUNDS['Koç'];
+    const chironHD = getGateAndLine(chironPoint.longitude);
+    const chironHDSynthesis = getChironHDGateSynthesis(chironHD.gate, chironHD.line);
     chironResult = {
       sign: chironPoint.sign,
       house: chironPoint.house,
-      wound
+      wound,
+      hdGate: chironHDSynthesis
     };
   }
 
@@ -463,8 +510,10 @@ export function calculateIncarnationAnalysis(
     }
   });
 
-  // 6. Gelecek Yaşam Tohumu (KAD & 8./9. Ev)
+  // 6. Gelecek Yaşam Tohumu (KAD & 8./9. Ev & HD Kuzey Düğümü Kapısı)
   const kadSeed = KAD_NEXT_LIFE_SEEDS[kadPoint.sign] || KAD_NEXT_LIFE_SEEDS['Koç'];
+  const kadHD = getGateAndLine(kadPoint.longitude);
+  const kadHDSynthesis = getKADHDGateSynthesis(kadHD.gate, kadHD.line);
 
   const h8 = natalChart.houses && natalChart.houses.length >= 8 ? natalChart.houses[7] : {
     name: '8. Ev',
@@ -477,7 +526,26 @@ export function calculateIncarnationAnalysis(
   const h8Ruler = SIGN_RULERS[h8.sign]?.modern || 'Plüton';
   const transformationGateway = `8. Eviniz ${h8.sign} burcunda ve yöneticisi ${h8Ruler}. Ruhunuzun bu bedenden ayrılışındaki ve boyut geçişlerindeki ana kapısı ${h8.sign} enerjisidir. Bu kapıdan geçerken bırakmanız gereken en büyük ağırlık; ${h8.sign} burcunun negatif gölgeleri (bağımlılıklar, korkular veya kontrol takıntısı) olacaktır.`;
 
-  // 7. Ruhsal Olgunluk Skoru (Soul Maturity Score)
+  // 7. Human Design Enkarnasyon Çaprazı (Kozmik Yaşam Misyonu)
+  let incarnationCrossResult: IncarnationCrossDetails | undefined = undefined;
+  if (hdChart && hdChart.conscious && hdChart.unconscious) {
+    const cSun = hdChart.conscious.find(p => p.planet === 'Sun');
+    const cEarth = hdChart.conscious.find(p => p.planet === 'Earth');
+    const uSun = hdChart.unconscious.find(p => p.planet === 'Sun');
+    const uEarth = hdChart.unconscious.find(p => p.planet === 'Earth');
+
+    if (cSun && cEarth && uSun && uEarth) {
+      incarnationCrossResult = getIncarnationCrossDetails(
+        cSun.gate,
+        cEarth.gate,
+        uSun.gate,
+        uEarth.gate,
+        hdChart.profile || '1/3'
+      );
+    }
+  }
+
+  // 8. Ruhsal Olgunluk Skoru (Soul Maturity Score)
   let score = 55; // Baz puan
 
   // Retro gezegenler derin karmik geçmişi gösterir
@@ -545,7 +613,8 @@ export function calculateIncarnationAnalysis(
         isRetrograde: !!rulerPlanet.isRetrograde,
         summary: karmicRulerSummary
       },
-      aspects: gadAspects
+      aspects: gadAspects,
+      hdGate: gadHDSynthesis
     },
     twelfthHouse: {
       sign: h12.sign,
@@ -553,7 +622,8 @@ export function calculateIncarnationAnalysis(
       lastBreathAtmosphere: h12Info.lastBreathAtmosphere,
       subconsciousGift: h12Info.subconsciousGift,
       hiddenFear: h12Info.hiddenFear,
-      planetsIn12th
+      planetsIn12th,
+      hdFearSynthesis
     },
     retroDebts,
     chiron: chironResult,
@@ -562,13 +632,15 @@ export function calculateIncarnationAnalysis(
       sign: kadPoint.sign,
       degreeInSign: kadPoint.degreeInSign,
       house: kadPoint.house,
-      seed: kadSeed
+      seed: kadSeed,
+      hdGate: kadHDSynthesis
     },
     eighthHouse: {
       sign: h8.sign,
       ruler: h8Ruler,
       transformationGateway
     },
+    incarnationCross: incarnationCrossResult,
     soulMaturity: {
       score,
       tier,

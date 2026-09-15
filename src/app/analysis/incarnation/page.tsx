@@ -374,6 +374,35 @@ export default function IncarnationAnalysisPage() {
                     </div>
                   </div>
 
+                  {/* Human Design GAD Sentezi */}
+                  {resultData.gad.hdGate && (
+                    <div className="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs sm:text-sm space-y-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-[#FFD700] font-bold text-xs">
+                            ⚡ HD Kapısı: {resultData.gad.hdGate.gate}.{resultData.gad.hdGate.line}
+                          </span>
+                          <span className="text-white font-semibold">{resultData.gad.hdGate.title}</span>
+                          <span className="text-white/50">({resultData.gad.hdGate.center} Merkezi)</span>
+                        </div>
+                        <span className="text-xs text-amber-300 font-medium">{resultData.gad.hdGate.lineArchetype}</span>
+                      </div>
+                      <p className="text-white/80 text-xs leading-relaxed">
+                        <strong className="text-amber-400">Ruhun Kök Kodu:</strong> {resultData.gad.hdGate.synthesis}
+                      </p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                        <div className="p-3 rounded-xl bg-black/40 border border-amber-500/20">
+                          <strong className="text-rose-400 block mb-1">Gölge Konfor Tuzağı:</strong>
+                          <span className="text-mystic-text-muted">{resultData.gad.hdGate.shadowTrap}</span>
+                        </div>
+                        <div className="p-3 rounded-xl bg-black/40 border border-emerald-500/20">
+                          <strong className="text-emerald-400 block mb-1">Geçmişten Taşınan Deha:</strong>
+                          <span className="text-mystic-text-muted">{resultData.gad.hdGate.karmicGift}</span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="p-5 rounded-2xl bg-black/30 border border-white/5 space-y-2 relative overflow-hidden">
                       <h4 className="text-sm font-bold text-[#D4AF37] flex items-center justify-between">
@@ -477,6 +506,28 @@ export default function IncarnationAnalysisPage() {
                       </p>
                     </div>
                   </div>
+
+                  {/* Human Design 12. Ev Karmik Korku & Özgürleşme Sentezi */}
+                  {resultData.twelfthHouse.hdFearSynthesis && (
+                    <div className="mt-6 p-4 rounded-2xl bg-purple-950/30 border border-purple-500/30 text-xs sm:text-sm space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2.5 py-1 rounded-lg bg-purple-500/20 text-purple-300 font-bold text-xs">
+                          ⚡ Human Design Karmik Korku Merkezi
+                        </span>
+                        <span className="text-white font-semibold">{resultData.twelfthHouse.hdFearSynthesis.centerTitle}</span>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                        <div className="p-3 rounded-xl bg-black/40 border border-purple-500/20">
+                          <strong className="text-rose-400 block mb-1">Hücresel Son Nefes Travması:</strong>
+                          <p className="text-mystic-text-muted leading-relaxed">{resultData.twelfthHouse.hdFearSynthesis.traumaMechanism}</p>
+                        </div>
+                        <div className="p-3 rounded-xl bg-black/40 border border-cyan-500/20">
+                          <strong className="text-cyan-400 block mb-1">Özgürleşme & Ruhsal Teslimiyet:</strong>
+                          <p className="text-mystic-text-muted leading-relaxed">{resultData.twelfthHouse.hdFearSynthesis.liberationKey}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   {resultData.twelfthHouse.planetsIn12th.length > 0 && (
                     <div className="mt-6 space-y-3">
@@ -645,6 +696,36 @@ export default function IncarnationAnalysisPage() {
                         </p>
                       </div>
                     </div>
+
+                    {/* Human Design Kiron Kapı Sentezi */}
+                    {resultData.chiron.hdGate && (
+                      <div className="mt-6 p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-rose-500/10 to-transparent border border-amber-500/30 text-xs sm:text-sm space-y-2">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-[#FFD700] font-bold text-xs">
+                              ⚡ Kiron HD Kapısı: {resultData.chiron.hdGate.gate}.{resultData.chiron.hdGate.line}
+                            </span>
+                            <span className="text-white font-semibold">{resultData.chiron.hdGate.title}</span>
+                            <span className="text-white/50">({resultData.chiron.hdGate.center} Merkezi)</span>
+                          </div>
+                          <span className="text-xs text-amber-300 font-medium">{resultData.chiron.hdGate.lineArchetype}</span>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+                          <div className="p-3 rounded-xl bg-black/40 border border-rose-500/20">
+                            <strong className="text-rose-400 block mb-1">Kiron Yarasının Kökeni:</strong>
+                            <p className="text-mystic-text-muted leading-relaxed">{resultData.chiron.hdGate.woundKey}</p>
+                          </div>
+                          <div className="p-3 rounded-xl bg-black/40 border border-emerald-500/20">
+                            <strong className="text-emerald-400 block mb-1">Kozmik Şifa Dehası:</strong>
+                            <p className="text-mystic-text-muted leading-relaxed">{resultData.chiron.hdGate.healingGift}</p>
+                          </div>
+                          <div className="p-3 rounded-xl bg-black/40 border border-amber-500/20">
+                            <strong className="text-amber-400 block mb-1">Dönüşüm Pratiği:</strong>
+                            <p className="text-mystic-text-muted leading-relaxed">{resultData.chiron.hdGate.transformationPractice}</p>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -671,6 +752,38 @@ export default function IncarnationAnalysisPage() {
                     Tropikal natal haritanız bu dünyadaki biyolojik bedeninizin, maskenizin ve egonuzun arketipidir. Kuzey Ay Düğümü 0° Koç noktasına hizalanarak hesaplanan <strong className="text-white">Drakonik Harita</strong> ise enkarnasyonlar ötesindeki ebedi ruhunuzun yüksek titreşimini ve hakiki arzusunu yansıtır.
                   </p>
                 </div>
+
+                {/* Human Design Enkarnasyon Çaprazı (Ruhun Kozmik Misyonu) */}
+                {resultData.incarnationCross && (
+                  <div className="bg-gradient-to-r from-amber-950/40 via-purple-950/40 to-indigo-950/40 border border-[#D4AF37]/40 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xl">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pb-4 border-b border-white/10">
+                      <div>
+                        <div className="text-xs uppercase tracking-wider text-[#D4AF37] font-bold mb-1 flex items-center gap-2">
+                          <Sparkles size={16} /> Human Design Enkarnasyon Çaprazı (Incarnation Cross)
+                        </div>
+                        <h3 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                          <span>{resultData.incarnationCross.title}</span>
+                          <span className="text-sm font-normal text-mystic-text-muted font-mono">{resultData.incarnationCross.code}</span>
+                        </h3>
+                      </div>
+                      <span className="px-3 py-1.5 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#FFD700] text-xs font-bold">
+                        {resultData.incarnationCross.angleType}
+                      </span>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
+                      <span className="text-xs font-bold text-indigo-300 block">Kozmik Sütunlar (Güneş & Dünya Kapıları):</span>
+                      <p className="text-xs sm:text-sm text-white/90 font-mono leading-relaxed">{resultData.incarnationCross.gatesSummary}</p>
+                    </div>
+
+                    <div className="p-5 rounded-2xl bg-gradient-to-r from-[#D4AF37]/10 to-transparent border border-[#D4AF37]/20 space-y-2">
+                      <span className="text-xs font-bold text-[#D4AF37] uppercase tracking-wider block">Ruhun Dünyadaki Büyük Misyonu & Tekâmülü:</span>
+                      <p className={`text-sm text-white/95 leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
+                        {resultData.incarnationCross.soulMission}
+                      </p>
+                    </div>
+                  </div>
+                )}
 
                 {/* Comparison Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -792,6 +905,32 @@ export default function IncarnationAnalysisPage() {
                       </p>
                     </div>
                   </div>
+
+                  {/* Human Design KAD Evrim Yolu Sentezi */}
+                  {resultData.kad.hdGate && (
+                    <div className="mt-6 p-4 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 text-xs sm:text-sm space-y-2">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 font-bold text-xs">
+                            ⚡ KAD HD Kapısı: {resultData.kad.hdGate.gate}.{resultData.kad.hdGate.line}
+                          </span>
+                          <span className="text-white font-semibold">{resultData.kad.hdGate.title}</span>
+                          <span className="text-white/50">({resultData.kad.hdGate.center} Merkezi)</span>
+                        </div>
+                        <span className="text-xs text-emerald-400 font-medium">{resultData.kad.hdGate.lineArchetype}</span>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-2">
+                        <div className="p-3 rounded-xl bg-black/40 border border-emerald-500/20">
+                          <strong className="text-emerald-400 block mb-1">Ruhun Evrimsel Yolu:</strong>
+                          <p className="text-mystic-text-muted leading-relaxed">{resultData.kad.hdGate.evolutionPath}</p>
+                        </div>
+                        <div className="p-3 rounded-xl bg-black/40 border border-amber-500/20">
+                          <strong className="text-amber-400 block mb-1">Ruhsal Eylem Reçetesi (Dharma):</strong>
+                          <p className="text-mystic-text-muted leading-relaxed">{resultData.kad.hdGate.actionableDharma}</p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* 8th House: Boyut Geçişi & Dönüşüm Kapısı */}
