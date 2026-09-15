@@ -992,3 +992,177 @@ export function getIncarnationCrossDetails(
     soulMission
   };
 }
+
+export interface InterceptedSignKarmicInfo {
+  sign: ZodiacSign;
+  oppositeSign: ZodiacSign;
+  archetype: string;
+  karmicRootCause: string;
+  lockedPsychology: string;
+  unlockKey: string;
+  shadowTrap: string;
+}
+
+export const INTERCEPTED_SIGN_KARMIC_DATA: Record<ZodiacSign, InterceptedSignKarmicInfo> = {
+  'Koç': {
+    sign: 'Koç',
+    oppositeSign: 'Terazi',
+    archetype: 'Kilitli Cesaret & Bastırılmış İrade',
+    karmicRootCause: 'Geçmiş yaşamlarda kendi isteklerinizi, öfkenizi veya liderliğinizi doğrudan ortaya koyduğunuzda şiddetle cezalandırıldınız, dışlandınız ya da başkalarına zarar verdiğiniz için vicdani felç yaşayarak iradenizi sandığa kilitlediniz.',
+    lockedPsychology: 'Kişi erken yaşlarda kendi haklarını savunmakta zorlanır, çatışmadan çekinir veya ani öfke patlamalarıyla içsel baskıyı dışa vurur. "Ben kimim ve ne istiyorum?" sorusu kilitli kalır.',
+    unlockKey: 'İkincil ilerletimde Mars veya Koç açıldığında ruh, başkalarından onay beklemeden kendi adına eyleme geçme hakkını geri kazanır. Sağlıklı bencillik ve cesaret kutsal bir uyanıştır.',
+    shadowTrap: 'Pasif-agresif birikimler veya kendi hakkını savunmak yerine başkalarının gölgesine sığınmak.'
+  },
+  'Boğa': {
+    sign: 'Boğa',
+    oppositeSign: 'Akrep',
+    archetype: 'Kilitli Özdeğer & Maddi Güven',
+    karmicRootCause: 'Geçmiş hayatta mülkiyetiniz, toprağınız veya bedeniniz elinizden zorla alındı; ya da aşırı maddeye saplanıp her şeyi bir gecede kaybederek derin bir kıtlık ve değersizlik travmasıyla ruhunuzu kilitlediniz.',
+    lockedPsychology: 'Kendi emeğinin ve bedeninin kıymetini bilmekte zorlanma, parayla veya sahip olduklarıyla sürekli bir güvensizlik yaşama veya tam tersine aşırı bağımlılık geliştirme hali.',
+    unlockKey: 'Kendi özdeğerinin dışsal varlıklara değil, ruhun doğuştan gelen hakkına dayandığını anlamak. Toprakla, bedenle ve huzurla barışıp kendi üretken bahçesini kurmak.',
+    shadowTrap: 'Değersizlik hissiyle azına razı olmak ya da kaybetme korkusuyla biriktirme takıntısı.'
+  },
+  'İkizler': {
+    sign: 'İkizler',
+    oppositeSign: 'Yay',
+    archetype: 'Kilitli Ses & Susturulmuş Merak',
+    karmicRootCause: 'Geçmiş yaşamlarda düşündüklerinizi söylediğiniz, gerçeği sorguladığınız veya bir bilgiyi yaydığınız için susturuldunuz, alaya alındınız ya da fikirleriniz yüzünden bedel ödediniz.',
+    lockedPsychology: 'Kişi düşündüklerini söylerken anlaşılmayacağı korkusu yaşar; zihni sürekli konuşur ama en hakiki düşüncelerini dışarıya akıtamaz, zihinsel kararsızlık yaşar.',
+    unlockKey: 'Kendi zihninin kıvraklığına ve sesine güvenmek. Düşüncelerini korkusuzca yazmak, konuşmak ve merakını yargılamadan takip etmek bu kilidi açar.',
+    shadowTrap: 'Suskunluk ile yüzeysel gevezelik arasında gidip gelerek derin hakikatini saklamak.'
+  },
+  'Yengeç': {
+    sign: 'Yengeç',
+    oppositeSign: 'Oğlak',
+    archetype: 'Kilitli Şefkat & Bastırılmış Yuva',
+    karmicRootCause: 'Geçmiş hayatta ailenizden, köklerinizden veya sevdiklerinizden zorla koparıldınız; duygusal kırılganlık gösterdiğiniz için ezildiniz ve duyguları göstermenin bir zayıflık olduğuna inanarak kalbinizi mühürlediniz.',
+    lockedPsychology: 'Duygularını ifade etmekte büyük bir çekingenlik, ait hissedememe, şefkat beklerken katı bir kabuk arkasına saklanma ve içsel çocukla temas kuramama.',
+    unlockKey: 'Kendi kendine şefkatli bir anne olabilmek; kırılganlığın en büyük ruhsal güç olduğunu kabul ederek güvenli duygusal alanlar inşa etmek.',
+    shadowTrap: 'Kırılmaktan korktuğu için mesafeli durup içten içe derin yalnızlık çekmek.'
+  },
+  'Aslan': {
+    sign: 'Aslan',
+    oppositeSign: 'Kova',
+    archetype: 'Kilitli Işık & Bastırılmış Görkem',
+    karmicRootCause: 'Geçmişte kibirle güç kullanıp sonrasında büyük bir utanç yaşadınız; ya da tam tersine yetenekleriniz ve yaratıcı parlaklığınız hasetle söndürüldü, öne çıkmanız yasaklandı.',
+    lockedPsychology: 'Kendi yaratıcılığını göstermekten utanma, sahnede olmaktan veya takdir edilmekten korkma; "Ben özel değilim" inancıyla kendi ışığını saklama.',
+    unlockKey: 'Kalp merkezini (Anahata) açarak, başkalarının alkışı için değil sadece varoluşun bir kutlaması olarak içindeki çocuğu ve yaratıcı dehasını parlatmak.',
+    shadowTrap: 'Görünmez olmaya çalışırken içten içe fark edilmemenin derin kırgınlığını yaşamak.'
+  },
+  'Başak': {
+    sign: 'Başak',
+    oppositeSign: 'Balık',
+    archetype: 'Kilitli Düzen & Bastırılmış Ustalık',
+    karmicRootCause: 'Geçmiş hayatta yaptığınız işlerde haksız yere kusurlu bulundunuz, köle gibi çalıştırılıp emeğiniz hiçe sayıldı ya da aşırı mükemmeliyetçilik yüzünden hayatı kendinize zehir ettiniz.',
+    lockedPsychology: 'Sürekli bir yetersizlik hissi, detaylarda boğulup büyük resmi kaçırma korkusu veya kendi bedeninin ve zanaatının bilgeliğine güvenememe.',
+    unlockKey: 'Mükemmelliğin bir hedef değil, ilahi bir süreç olduğunu kabul etmek. Bedenine ve sunduğu hizmete saygı duyarak sadeleşmeyi ve arınmayı öğrenmek.',
+    shadowTrap: 'Kendini ve çevresini acımasızca eleştirerek harekete geçmeyi ertelemek.'
+  },
+  'Terazi': {
+    sign: 'Terazi',
+    oppositeSign: 'Koç',
+    archetype: 'Kilitli Denge & Bastırılmış Eşitlik',
+    karmicRootCause: 'Geçmiş yaşamlarda ilişkilerde tamamen yok sayıldınız, evlilikler veya ortaklıklarda sömürüldünüz ya da çatışmayı engellemek uğruna tüm haklarınızı teslim ettiniz.',
+    lockedPsychology: 'Hakiki bir ortaklık kurmakta tereddüt, karar vermekte aşırı zorlanma, yalnız kalma korkusu ile sınır koyamama arasındaki içsel sıkışma.',
+    unlockKey: 'Kendi içinde eril ve dişil dengeyi kurup, taviz vermeden de sevilebileceğini anlamak. Adaleti ve uyumu dışarıdan dilenmek yerine kendi merkezinden yaymak.',
+    shadowTrap: 'Huzur bozulmasın diye boyun eğip içten içe adaletsizlik duygusuyla dolmak.'
+  },
+  'Akrep': {
+    sign: 'Akrep',
+    oppositeSign: 'Boğa',
+    archetype: 'Kilitli Dönüşüm & Mühürlü Simya',
+    karmicRootCause: 'Geçmişte derin bir ihanet, büyü/okültizm cezalandırılması veya ölümcül bir kriz deneyimlediniz. Gücünüzü gösterdiğinizde felaket geldiği için sezgilerinizi ve tutkunuzu yerin altına kilitlediniz.',
+    lockedPsychology: 'Aşırı kontrolcülük, kimseye güvenememe, derin duygulardan ve cinsellik/tutku gibi dönüştürücü güçlerden korkma, savunma kalkanı arkasında yaşama.',
+    unlockKey: 'Karanlıktan korkmak yerine onun içindeki ışığı görmeyi öğrenmek. Sezgisel ve simyasal gücünü teslimiyetle ve şifa amacıyla açığa çıkarmak.',
+    shadowTrap: 'İhanete uğrama korkusuyla herkesi şüpheli görüp kendi cehennemini yaratmak.'
+  },
+  'Yay': {
+    sign: 'Yay',
+    oppositeSign: 'İkizler',
+    archetype: 'Kilitli İnanç & Mühürlü Vizyon',
+    karmicRootCause: 'Geçmiş hayatta dini dogmalar veya fanatizm yüzünden zulüm gördünüz ya da kendi inancınız yüzünden sürüldünüz; ruhunuz yüksek anlam arayışını kilitledi.',
+    lockedPsychology: 'Hayatın anlamına ve evrenin adaletine güvenmekte zorlanma, kendi vizyonunu küçümseme, dar kalıplar içine sıkışıp kalma hissi.',
+    unlockKey: 'Evrensel bilgeliğe ve kendi içsel felsefesine yeniden inanmak. Seyahat, felsefe ve yüksek bilinç kapılarını cesaretle aralamak.',
+    shadowTrap: 'Ya hiçbir şeye inanmayıp sinikleşmek ya da dogmatik bir fanatizme sığınmak.'
+  },
+  'Oğlak': {
+    sign: 'Oğlak',
+    oppositeSign: 'Yengeç',
+    archetype: 'Kilitli Otorite & Bastırılmış Saygınlık',
+    karmicRootCause: 'Geçmişte üzerinize kaldıramayacağınız kadar erken yaşta devasa sorumluluklar yüklendi veya otorite figürleri tarafından ezilerek başarı hakkınız gaspedildi.',
+    lockedPsychology: 'Başarı ve sorumluluk almaktan bilinçdışı korkma, kendi hayatının yöneticisi olduğunu kabul etmekte zorlanma veya tam tersi katı bir soğukluk sergileme.',
+    unlockKey: 'Kendi içsel bilge otoritesini (Satürn) sahiplenmek. Zamanın bilgeliğine güvenerek sabırla kendi kalıcı ruhsal krallığını inşa etmek.',
+    shadowTrap: 'Başarısızlık korkusuyla sorumluluktan kaçmak veya duygusuz bir işkolikliğe sığınmak.'
+  },
+  'Kova': {
+    sign: 'Kova',
+    oppositeSign: 'Aslan',
+    archetype: 'Kilitli Özgünlük & Mühürlü Deha',
+    karmicRootCause: 'Geçmişte farklı düşündüğünüz, toplumsal normların ötesine geçtiğiniz veya devrimci fikirleriniz yüzünden aforoz edildiniz, kabileden/topluluktan kovuldunuz.',
+    lockedPsychology: 'Kendi marjinal ve dahi tarafını saklama, topluma uyum sağlamak için sıradanlaşma çabası, kolektife güvenmekte ve ait hissetmekte zorlanma.',
+    unlockKey: 'Kendi tuhaflığını ve benzersiz dehasını kutsal bir hediye olarak kabul etmek. Kolektif bilinci uyandırmak için sürüden ayrılma cesaretini göstermek.',
+    shadowTrap: 'Dışlanma korkusuyla silikleşmek ya da isyankar olup bağları tamamen koparmak.'
+  },
+  'Balık': {
+    sign: 'Balık',
+    oppositeSign: 'Başak',
+    archetype: 'Kilitli Teslimiyet & Mühürlü Sezgi',
+    karmicRootCause: 'Geçmiş yaşamlarda aşırı fedakarlık yapıp kurban edildiniz; manastırlarda/inzivalarda dünyadan koparıldınız ya da sezgileriniz yüzünden büyücülükle suçlanıp yok edildiniz.',
+    lockedPsychology: 'Ruhsal alem ile madde alemi arasında köprü kuramama, sezgilerine güvenmekten korkma, kurban psikolojisine düşme veya aşırı mantıkçılıkla sezgileri bastırma.',
+    unlockKey: 'Evrenle bir olduğunu hatırlamak. Şartsız teslimiyet ve ilahi sevgi kanalını açarak sanatsal ve şifacı ilhamı dünyaya aktarmak.',
+    shadowTrap: 'Gerçeklerden kaçmak için bağımlılıklara sığınmak veya aşırı katı rasyonalizmle ruhunu hapsetmek.'
+  }
+};
+
+export interface AnareticDegreeInfo {
+  degreeType: '29° Anaretik Derece' | '28° Kritik Eşik' | '0°-1° Taze Tohum' | 'Dengeli Seyir';
+  badgeTitle: string;
+  badgeColor: string;
+  karmicStage: string;
+  evolutionSummary: string;
+}
+
+export function getAnareticDegreeInfo(
+  degreeInSign: number,
+  minutes: number,
+  natalSign: ZodiacSign,
+  progressedSign: ZodiacSign,
+  progressedAge: number,
+  currentAge: number | null
+): AnareticDegreeInfo {
+  if (degreeInSign === 29) {
+    return {
+      degreeType: '29° Anaretik Derece',
+      badgeTitle: '29° Anaretik Derece (Karmik Kapanış & Usta Eşik)',
+      badgeColor: '#EF4444',
+      karmicStage: 'Tamamlanmış Ruhsal Döngü',
+      evolutionSummary: `Doğum anınızda Güneş ${natalSign} burcunun 29. son derecesindedir. Ezoterik astrolojide 29° bir kriz değil, "Karmik Mühür" derecesidir. Ruhunuz ${natalSign} burcunun tüm derslerini geçmiş yaşamlarda tamamlamış ve bu hayata o kapıyı kapatmaya gelmiştir. İkincil İlerletilmiş Haritanızda henüz ${progressedAge} yaşındayken Güneşiniz ${progressedSign} burcuna geçmiş ve ruhsal bilinciniz çocukluğunuzun hemen başında bir sonraki basamağa sıçramıştır.${currentAge !== null ? ` Şu an ${currentAge} yaşındasınız ve yaşam kararlarınızı ${progressedSign} frekansının olgunluğuyla almaktasınız.` : ''}`
+    };
+  }
+  if (degreeInSign === 28) {
+    return {
+      degreeType: '28° Kritik Eşik',
+      badgeTitle: '28° Kritik Geçiş Eşiği',
+      badgeColor: '#F59E0B',
+      karmicStage: 'Kabuk Değişimi Hazırlığı',
+      evolutionSummary: `Güneşiniz ${natalSign} burcunun 28. derecesinde olup son eşiktedir. Ruhunuz bu burcun son sınavlarını verirken bir yandan da ${progressedSign} burcunun enerjisine çekilir. İkincil İlerletilmiş Haritanızda yaklaşık ${progressedAge} yaşında Güneşiniz ${progressedSign} burcuna adım atmış ve yaşamınızda köklü bir mizaç ve rota değişimi tetiklenmiştir.${currentAge !== null && currentAge >= progressedAge ? ` Şu an ${currentAge} yaşındasınız ve ruhunuz ${progressedSign} burcunun derin bilinciyle hareket etmektedir.` : ''}`
+    };
+  }
+  if (degreeInSign === 0 || (degreeInSign === 1 && minutes <= 30)) {
+    return {
+      degreeType: '0°-1° Taze Tohum',
+      badgeTitle: '0°-1° Taze Tohum (Yeni Evrimsel Başlangıç)',
+      badgeColor: '#10B981',
+      karmicStage: 'Saf Keşif Alanı',
+      evolutionSummary: `Güneşiniz ${natalSign} burcunun en başında (0°-1°) yer almaktadır. Bu, ruhunuzun ${natalSign} arketipiyle yepyeni bir sayfaya başladığını gösterir. Geçmiş yaşam yükü en az olan, saf bir öğrenme ve inşa etme dönemindesiniz. Önünüzde yaklaşık 30 yıllık kesintisiz bir ${natalSign} ustalığı yolculuğu bulunmaktadır.`
+    };
+  }
+  return {
+    degreeType: 'Dengeli Seyir',
+    badgeTitle: 'Dengeli Tekâmül Seyri',
+    badgeColor: '#6366F1',
+    karmicStage: 'Kademeli Ruhsal İnşa',
+    evolutionSummary: `Güneşiniz ${natalSign} burcunun ${degreeInSign}. derecesindedir. Ruhunuz bu arketipte dengeli bir ustalık sürecindedir. İkincil İlerletilmiş Haritanıza göre yaklaşık ${progressedAge} yaşına geldiğinizde Güneşiniz sınırları aşarak ${progressedSign} burcuna geçecek ve ruhunuz yeni bir tekâmül evresine adım atacaktır.${currentAge !== null && currentAge >= progressedAge ? ` Şu an ${currentAge} yaşındasınız ve bu geçiş gerçekleşmiş durumdadır; ${progressedSign} frekansını hayatınıza entegre etmişsinizdir.` : ''}`
+  };
+}
+

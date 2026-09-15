@@ -35,9 +35,44 @@ import {
   KADHDGateSynthesis,
   getKADHDGateSynthesis,
   IncarnationCrossDetails,
-  getIncarnationCrossDetails
+  getIncarnationCrossDetails,
+  INTERCEPTED_SIGN_KARMIC_DATA,
+  InterceptedSignKarmicInfo,
+  getAnareticDegreeInfo,
+  AnareticDegreeInfo
 } from './IncarnationInterpretations';
 import { GATE_TO_CENTER } from './AstroHumanDesignSynthesis';
+
+export interface InterceptedSignItem {
+  sign: ZodiacSign;
+  oppositeSign: ZodiacSign;
+  house: number;
+  archetype: string;
+  ruler: string;
+  karmicRootCause: string;
+  lockedPsychology: string;
+  unlockKey: string;
+  shadowTrap: string;
+  planetsInside: string[];
+}
+
+export interface ProgressedEvolution {
+  isCriticalDegree: boolean;
+  degreeType: '29° Anaretik Derece' | '28° Kritik Eşik' | '0°-1° Taze Tohum' | 'Dengeli Seyir';
+  badgeTitle: string;
+  badgeColor: string;
+  karmicStage: string;
+  natalSunSign: ZodiacSign;
+  natalSunDegree: number;
+  natalSunMinutes: number;
+  progressedSunSign: ZodiacSign;
+  progressedAge: number;
+  currentAge: number | null;
+  hasShifted: boolean;
+  evolutionSummary: string;
+  interceptedSigns: InterceptedSignItem[];
+  hasInterceptedSigns: boolean;
+}
 
 export interface GADAspect {
   planet: string;
@@ -124,6 +159,9 @@ export interface IncarnationAnalysisResult {
 
   // Human Design Enkarnasyon Çaprazı (Kozmik Yaşam Misyonu)
   incarnationCross?: IncarnationCrossDetails;
+
+  // İkincil İlerletilmiş Harita & Karmik Kilitler (Sıkıştırılmış Burçlar & Anaretik Eşikler)
+  progressedEvolution?: ProgressedEvolution;
 
   // Ruhsal Olgunluk Skoru & Seviye
   soulMaturity: {
@@ -595,7 +633,103 @@ export function calculateIncarnationAnalysis(
   } else {
     tier = 'Arayıcı Ruh';
     tierDesc = 'Dünyevi deneyimlerin tazeliği ve dinamizmi içindesiniz. Karmik yükleriniz nispeten hafiftir; bu enkarnasyondaki ana amacınız yeni ruhsal tohumlar ekmek ve özgür iradeyle yolu açmaktır.';
+  // 9. İkincil İlerletilmiş Harita & Karmik Kilitler (Sıkıştırılmış Burçlar & Anaretik Eşikler)
+  const sun = natalChart.planets.find(p => p.name === 'Güneş') || {
+    name: 'Güneş',
+    longitude: 0,
+    sign: 'Koç' as ZodiacSign,
+    degreeInSign: 0,
+    minutes: 0,
+    house: 1
+  };
+
+  const sunData = getSignAndDegree(sun.longitude);
+  const remainingDegrees = 30 - sunData.degreeInSign - (sunData.minutes / 60);
+  const progressedAge = Math.round((remainingDegrees / 0.9856) * 10) / 10;
+
+  // Sıradaki İlerletilmiş Güneş Burcu
+  const currentSunIndex = ZODIAC_SIGNS.indexOf(sunData.sign);
+  const nextSunIndex = (currentSunIndex + 1) % 12;
+  const directNextSign = ZODIAC_SIGNS[nextSunIndex];
+
+  // Yaş hesabı
+  let currentAge: number | null = null;
+  let currentProgressedSign: ZodiacSign = directNextSign;
+  let hasShifted = false;
+
+  if (birthDate && !isNaN(birthDate.getTime())) {
+    currentAge = Math.floor((new Date().getTime() - birthDate.getTime()) / (365.25 * 24 * 3600 * 1000));
+    hasShifted = currentAge >= progressedAge;
+    // Toplam ilerletilmiş boylam
+    const totalProgLon = mod360(sun.longitude + (currentAge * 0.9856));
+    const progData = getSignAndDegree(totalProgLon);
+    currentProgressedSign = progData.sign;
   }
+
+  // Anaretik ve kritik derece bilgisi
+  const anareticInfo = getAnareticDegreeInfo(
+    sunData.degreeInSign,
+    sunData.minutes,
+    sunData.sign,
+    directNextSign,
+    progressedAge,
+    currentAge
+  );
+
+  // Sıkıştırılmış Burçlar (Intercepted Signs)
+  const cuspSigns = new Set<ZodiacSign>();
+  if (natalChart.houses && natalChart.houses.length >= 12) {
+    natalChart.houses.forEach(h => cuspSigns.add(h.sign));
+  }
+
+  const interceptedSigns: InterceptedSignItem[] = [];
+  ZODIAC_SIGNS.forEach((sign, sIdx) => {
+    if (!cuspSigns.has(sign)) {
+      // Bu burç hiçbir evin başlangıç çizgisinde değil -> SIKIŞTIRILMIŞ!
+      const midLon = sIdx * 30 + 15;
+      const containingHouse = findHouseForLongitude(midLon, natalChart.houses);
+      const karmicData = INTERCEPTED_SIGN_KARMIC_DATA[sign];
+      const ruler = SIGN_RULERS[sign]?.modern || SIGN_RULERS[sign]?.traditional || 'Bilinmiyor';
+
+      // Bu kilitli burcun içinde bulunan gezegenler
+      const planetsInside = natalChart.planets
+        .filter(p => p.sign === sign && p.name !== 'Kuzey Ay Düğümü')
+        .map(p => p.name);
+
+      if (karmicData) {
+        interceptedSigns.push({
+          sign,
+          oppositeSign: karmicData.oppositeSign,
+          house: containingHouse,
+          archetype: karmicData.archetype,
+          ruler,
+          karmicRootCause: karmicData.karmicRootCause,
+          lockedPsychology: karmicData.lockedPsychology,
+          unlockKey: karmicData.unlockKey,
+          shadowTrap: karmicData.shadowTrap,
+          planetsInside
+        });
+      }
+    }
+  });
+
+  const progressedEvolution: ProgressedEvolution = {
+    isCriticalDegree: [28, 29, 0].includes(sunData.degreeInSign) || (sunData.degreeInSign === 1 && sunData.minutes <= 30),
+    degreeType: anareticInfo.degreeType,
+    badgeTitle: anareticInfo.badgeTitle,
+    badgeColor: anareticInfo.badgeColor,
+    karmicStage: anareticInfo.karmicStage,
+    natalSunSign: sunData.sign,
+    natalSunDegree: sunData.degreeInSign,
+    natalSunMinutes: sunData.minutes,
+    progressedSunSign: currentProgressedSign,
+    progressedAge,
+    currentAge,
+    hasShifted,
+    evolutionSummary: anareticInfo.evolutionSummary,
+    interceptedSigns,
+    hasInterceptedSigns: interceptedSigns.length > 0
+  };
 
   return {
     gad: {
@@ -641,6 +775,7 @@ export function calculateIncarnationAnalysis(
       transformationGateway
     },
     incarnationCross: incarnationCrossResult,
+    progressedEvolution,
     soulMaturity: {
       score,
       tier,
