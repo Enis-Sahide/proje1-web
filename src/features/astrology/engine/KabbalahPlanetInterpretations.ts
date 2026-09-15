@@ -448,36 +448,26 @@ export function getEsotericPlanetInterpretation(planetName: string, signName: Zo
   const planetContent = planet[layerKey] || planet.assiah;
   const signContent = sign[layerKey] || sign.assiah;
 
-  let houseSection = '';
-  let synthesisSection = '';
+  let houseIntegration = '';
+  let synthesisNarrative = '';
 
   if (isNoHouseWorld) {
-    houseSection = isHeliocentric 
-      ? `**[İLÂHÎ BOYUT: ATZILUT (KUDRET)]**\nBu boyutta dünyevi ev ve ufuk kısıtlamaları bulunmaz. Gezegeniniz Güneş'in saf bilinciyle doğrudan rezonansa girer ve ego illüzyonlarından arınmış saf bir ilahi irade frekansı yayar.`
-      : `**[YÜKSEK ZİHİN BOYUTU: BERİYAH]**\nBu harmonik boyutta dünyevi ev sınırları aşılmıştır. Gezegeniniz doğrudan evrensel ilkeler, yüksek zihinsel kavrayış ve ruhsal vizyonunuzla rezonansa girer.`;
+    houseIntegration = isHeliocentric 
+      ? `Bu boyutta dünyevi ev ve ufuk kısıtlamaları aşılmıştır; ${planetName} enerjisi Güneş'in saf bilinciyle doğrudan rezonansa girerek ego illüzyonlarından arınmış ilahi irade frekansı yayar.`
+      : `Bu harmonik boyutta dünyevi ev sınırları aşılmıştır; ${planetName} enerjisi doğrudan evrensel ilkeler, yüksek zihinsel kavrayış ve ruhsal vizyonla rezonansa girer.`;
 
-    synthesisSection = `Bu yerleşim; ruhsal tekamülünüzde **${pDomain}**, ${signName} burcunun yüksek kozmik frekansıyla birleştirerek evrensel plana hizmet ettirir. ${worldSynthesisDesc}`;
+    synthesisNarrative = `Ruhsal tekâmülünüzde **${pDomain}**, ${signName} burcunun yüksek kozmik frekansıyla birleşerek evrensel plana hizmet eder. ${worldSynthesisDesc}`;
   } else {
-    houseSection = `**[YAŞAM ALANI (EV): ${houseNum}. Ev]**\n${house.esoteric}\n\n**🎯 Yaşamsal Sahne:** ${hPractical} merkezidir.`;
-    synthesisSection = `Bu yerleşim; haritanızda **${pDomain}**, ${signName} burcunun nitelikleriyle buluşturarak ${hPractical.toLowerCase()} doğrudan merkezine taşır. ${worldSynthesisDesc}`;
+    houseIntegration = `Bu enerji, ${houseNum}. ev sahasında (${house.esoteric}) somutlaşarak ${hPractical.toLowerCase()} doğrudan merkezinde tezahür eder.`;
+    synthesisNarrative = `Haritanızda **${pDomain}**, ${signName} burcunun nitelikleriyle buluşarak bu yaşam sahnesinde dönüştürücü, yapıcı ve somut bir bilinç gücü olarak açığa çıkar. ${worldSynthesisDesc}`;
   }
 
-  const content = `**[KOZMİK SEMBOLİZM: ${planetName}]**
-${planetContent}
-
-**✨ Ruhsal Güç & Potansiyel:** ${pPractical.power}
-
-**[BURÇ REZONANSI: ${signName}]**
-${signContent}
-
-**⚠️ Gölge Yan & Sınav:** ${sPractical.shadow}
-
-${houseSection}
-
-**[${worldNameTitle.toUpperCase()} SENTEZİ & TEKÂMÜL REHBERİ]**
-${synthesisSection}
-
-**🔑 Tekâmül Anahtarı:** ${pPractical.key} ${sPractical.advice}${retroSynthesis}`;
+  const content = `**[${worldNameTitle.toUpperCase()} BÜTÜNLEŞİK KOZMİK VE YAŞAMSAL ANALİZİ]**\n` +
+    `**Kozmik Sembolizm:** ${planetContent}\n\n` +
+    `**Burç ve Yaşam Sahnesi Entegrasyonu:** ${signName} burcunun nitelikleriyle bütünleşen bu enerji (${signContent}), ${houseIntegration} ${synthesisNarrative}\n\n` +
+    `**✨ Ruhsal Güç & Potansiyel:** ${pPractical.power}\n\n` +
+    `**⚠️ Gölge Yan & Sınav:** ${sPractical.shadow}\n\n` +
+    `**🔑 Tekâmül Anahtarı:** ${pPractical.key} ${sPractical.advice}${retroSynthesis}`;
 
   return { title, content };
 }
