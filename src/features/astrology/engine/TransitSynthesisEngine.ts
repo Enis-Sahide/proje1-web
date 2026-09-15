@@ -1,7 +1,50 @@
 import { AstroPoint, TransitAspect, AstroCity } from './AstrologyConstants';
-import { MAJOR_PLANET_SIGN_CUSTOM_INTERPRETATIONS } from './SkyAspectInterpretations';
+import { 
+  MAJOR_PLANET_SIGN_CUSTOM_INTERPRETATIONS,
+  getIngressPhase,
+  getSkyPlanetSignInterpretation,
+  getPlanetSignBriefHeadline,
+  getSkyAspectInterpretation,
+  IngressPhaseInfo
+} from './SkyAspectInterpretations';
 import { getGateAndLine } from '@/utils/HumanDesignEngine';
 import { GATE_TITLES } from './AstroHumanDesignSynthesis';
+
+export interface UnifiedSkyAspectInfo {
+  targetPlanet: string;
+  targetSign?: string;
+  targetDegree?: number;
+  aspectType: 'Kavuşum' | 'Sekstil' | 'Kare' | 'Üçgen' | 'Karşıt' | 'Görmeyen' | string;
+  orb: number;
+  isHarmonious: boolean;
+  summary: string;
+  energyType: string;
+}
+
+export interface UnifiedSkyPlanet {
+  planetName: string;
+  sign: string;
+  degreeInSign: number;
+  minutes: number;
+  isRetrograde?: boolean;
+  longitude: number;
+  ingressPhase: IngressPhaseInfo;
+  aspects: UnifiedSkyAspectInfo[];
+  headline: string;
+  humanThemeTitle: string;
+  humanNarrative: string;
+  hdGateInfo?: {
+    gate: number;
+    line: number;
+    title: string;
+    gift: string;
+    shadow: string;
+  };
+  collectiveTheme: string;
+  dailyAdvice: string;
+  chakraLayer: string;
+  detailedAnalysis: string;
+}
 
 export interface UnifiedAspectInfo {
   natalPlanet: string;
@@ -387,4 +430,172 @@ export function parseInterpretationSections(text: string): SectionBlock[] {
 
     return { title, content, type };
   });
+}
+
+/**
+ * Generates a unified, synthesized collective sky transit report for a specific sky planet.
+ * Connects the Planet + Zodiac Sign + Ingress Phase + Human Design Gate + Aspecting Sky Planets into one narrative.
+ */
+export function generateUnifiedSkyPlanet(
+  skyPlanet: AstroPoint,
+  allSkyAspects: any[],
+  allSkyPlanets: AstroPoint[]
+): UnifiedSkyPlanet {
+  const pName = skyPlanet.name;
+  const sign = skyPlanet.sign;
+  const ingressPhase = getIngressPhase(skyPlanet.degreeInSign, skyPlanet.minutes, skyPlanet.isRetrograde);
+
+  // Human Design Gate
+  const hdCalc = getGateAndLine(skyPlanet.longitude);
+  const gateMeta = GATE_TITLES[hdCalc.gate];
+  const hdGateInfo = gateMeta ? {
+    gate: hdCalc.gate,
+    line: hdCalc.line,
+    title: gateMeta.title,
+    gift: gateMeta.gift,
+    shadow: gateMeta.shadow,
+  } : undefined;
+
+  // Custom/Sign Interpretation
+  const customKey = `${pName}-${sign}`;
+  const customInterp = MAJOR_PLANET_SIGN_CUSTOM_INTERPRETATIONS[customKey];
+  const signInterp = getSkyPlanetSignInterpretation(pName, sign, skyPlanet.degreeInSign, skyPlanet.minutes, skyPlanet.isRetrograde);
+  const briefHeadline = getPlanetSignBriefHeadline(pName, sign);
+
+  // Matching Aspects for this planet in the sky
+  const matchingAspects = (allSkyAspects || []).filter(a => a.planet1 === pName || a.planet2 === pName);
+
+  const aspectInfos: UnifiedSkyAspectInfo[] = matchingAspects.map(asp => {
+    const targetName = asp.planet1 === pName ? asp.planet2 : asp.planet1;
+    const targetPlanet = allSkyPlanets.find(item => item.name === targetName);
+    const isHarmonious = asp.type === 'Üçgen' || asp.type === 'Sekstil' || (asp.type === 'Kavuşum' && !['Satürn', 'Mars', 'Plüton'].includes(targetName));
+    const interp = asp.interpretation || getSkyAspectInterpretation(asp.planet1, asp.planet2, asp.type);
+
+    return {
+      targetPlanet: targetName,
+      targetSign: targetPlanet?.sign,
+      targetDegree: targetPlanet?.degreeInSign,
+      aspectType: asp.type,
+      orb: asp.orb,
+      isHarmonious,
+      summary: interp?.summary || `${targetName} ile ${asp.type} açısı.`,
+      energyType: interp?.energyType || (isHarmonious ? 'Destekleyici' : 'Zorlayıcı / Sınav')
+    };
+  });
+
+  const primaryChallenging = aspectInfos.find(a => !a.isHarmonious);
+  const primaryHarmonious = aspectInfos.find(a => a.isHarmonious && a.aspectType !== 'Kavuşum');
+  const conjunctionAspect = aspectInfos.find(a => a.aspectType === 'Kavuşum');
+
+  // 1. İnsan Odaklı Kolektif Başlık
+  let humanThemeTitle = '';
+  if (primaryChallenging) {
+    humanThemeTitle = `Kolektif ${pName} ile ${primaryChallenging.targetPlanet} Arasında Denge & Sınav`;
+  } else if (primaryHarmonious) {
+    humanThemeTitle = `Kolektif ${pName} ve ${primaryHarmonious.targetPlanet} Arasında Akıcı Destek & Fırsat`;
+  } else if (conjunctionAspect) {
+    humanThemeTitle = `Kolektif ${pName} ve ${conjunctionAspect.targetPlanet} Kavuşumu: Yoğun Odak & Yenilenme`;
+  } else {
+    humanThemeTitle = `${pName} ${sign} Seyrinde: ${briefHeadline}`;
+  }
+
+  // 2. 7Layers Kolektif Gökyüzü Özeti
+  let humanNarrative = `${pName}, ${sign} burcundaki seyrinde; kolektif bilince ${signInterp.summary.replace(/^.*?;\s*/, '')} `;
+
+  const challengingList = aspectInfos.filter(a => !a.isHarmonious);
+  const harmoniousList = aspectInfos.filter(a => a.isHarmonious && a.aspectType !== 'Kavuşum');
+
+  if (challengingList.length > 0) {
+    humanNarrative += `Şu sıralar gökyüzünde ${challengingList.map(a => `${a.targetPlanet} (${a.aspectType})`).join(', ')} ile kurduğu etkileşim; toplumsal ve bireysel düzeyde sabır, net sınırlar ve yüzleşmeler gerektiren bir gerilim yaratabilir. Bir tarafa aşırı kilitlenirken diğer sorumlulukları ihmal etmemek hayati önem taşır. `;
+  }
+
+  if (harmoniousList.length > 0) {
+    humanNarrative += `Aynı zamanda ${harmoniousList.map(a => `${a.targetPlanet} (${a.aspectType})`).join(', ')} ile kurduğu ahenkli temas, tıkanıklıkları aşmanız için yapıcı çözümler, ilham verici çıkış yolları ve bereketli fırsatlar sunuyor. `;
+  }
+
+  if (conjunctionAspect) {
+    humanNarrative += `${conjunctionAspect.targetPlanet} ile olan kavuşumu ise, bu alanda yepyeni ve tavizsiz bir odaklanma enerjisi başlatıyor. `;
+  }
+
+  if (aspectInfos.length === 0) {
+    humanNarrative += `Şu anda diğer gökyüzü gezegenleriyle sert bir açı bağı kurmadan, ${sign} burcundaki arketipsel gücünü sakin ve istikrarlı bir şekilde dünyaya yaymaya devam ediyor. `;
+  }
+
+  if (hdGateInfo) {
+    humanNarrative += `Bu gökyüzü döngüsünün kolektif anahtarı; "${hdGateInfo.shadow}" tuzağına kapılarak yıpranmak yerine, "${hdGateInfo.gift}" potansiyelini kararlarınıza ve ilişkilerinize yansıtabilmektir. `;
+  }
+
+  if (signInterp.advice) {
+    humanNarrative += ` ${signInterp.advice}`;
+  }
+
+  const retroText = skyPlanet.isRetrograde ? ' (Retro Harekette - Rx)' : '';
+  const headline = `Kolektif ${pName} (${sign} ${skyPlanet.degreeInSign}°)${retroText}`;
+  const chakraLayer = customInterp?.chakra || PLANET_CHAKRAS[pName] || 'Kozmik Katman Entegrasyonu';
+  const collectiveTheme = customInterp?.collective || signInterp.summary;
+  const dailyAdvice = signInterp.advice || customInterp?.advice || 'Bu dönemde kendi içsel dengenizi koruyarak adımlar atın.';
+
+  // Detailed Analysis Synthesis for modal
+  let detailedAnalysis = `【7Layers Kolektif Gökyüzü Özeti】\n${humanNarrative}\n\n` +
+    `【Kolektif Bilinç ve Toplumsal Etki】\n${collectiveTheme}\n\n` +
+    `【Günün Kolektif Rehberliği & Tavsiyesi】\n${dailyAdvice}\n\n` +
+    `【Metnin Dayandığı Kozmik Katmanlar】\n` +
+    `Bu analiz anlık gökyüzü gezegen konumları, burç dinamikleri ve açı kalıplarının sentezlenmesiyle oluşturulmuştur:\n\n` +
+    `【Burç Seyri & Geçiş Evresi: ${sign} Burcu】\n` +
+    `• Evre: ${ingressPhase.badge} (${ingressPhase.label})\n` +
+    `• Açıklama: ${ingressPhase.description}\n` +
+    `• Burç Dinamiği: ${signInterp.summary}\n\n`;
+
+  if (hdGateInfo) {
+    detailedAnalysis += `【Human Design Kozmik Kapısı】\n` +
+      `• Aktif Kapı: ${hdGateInfo.gate}. Kapı - ${hdGateInfo.title} (Çizgi ${hdGateInfo.line})\n` +
+      `• Gölge Tuzağı: ${hdGateInfo.shadow}\n` +
+      `• Hediye Frekansı: ${hdGateInfo.gift}\n\n`;
+  }
+
+  if (aspectInfos.length > 0) {
+    detailedAnalysis += `【Eşzamanlı Aktif Gökyüzü Açıları】\n` +
+      aspectInfos.map(a => `• ${a.aspectType} ${a.targetPlanet}${a.targetSign ? ` (${a.targetSign} ${a.targetDegree || 0}°)` : ''} [Orb: ${a.orb.toFixed(1)}°]: ${a.summary}`).join('\n') + '\n\n';
+  }
+
+  if (skyPlanet.isRetrograde) {
+    detailedAnalysis += `【Retro (Rx) İçe Dönüş】\n${pName} gökyüzünde geri harekette seyrediyor. Bu dönemde dışsal fevri atılımlar yerine, içsel değerlendirmeler yapmak, eksikleri onarmak ve stratejileri sağlamlaştırmak kolektif olarak çok daha verimlidir.\n\n`;
+  }
+
+  return {
+    planetName: pName,
+    sign,
+    degreeInSign: skyPlanet.degreeInSign,
+    minutes: skyPlanet.minutes,
+    isRetrograde: skyPlanet.isRetrograde,
+    longitude: skyPlanet.longitude,
+    ingressPhase,
+    aspects: aspectInfos,
+    headline,
+    humanThemeTitle,
+    humanNarrative,
+    hdGateInfo,
+    collectiveTheme,
+    dailyAdvice,
+    chakraLayer,
+    detailedAnalysis
+  };
+}
+
+export function generateUnifiedSkyPlanets(
+  allSkyPlanets: AstroPoint[],
+  allSkyAspects: any[]
+): UnifiedSkyPlanet[] {
+  if (!allSkyPlanets || allSkyPlanets.length === 0) return [];
+
+  const PRIORITY_ORDER = [
+    'Güneş', 'Ay', 'Merkür', 'Venüs', 'Mars',
+    'Jüpiter', 'Satürn', 'Uranüs', 'Neptün', 'Plüton',
+    'Kiron', 'Kuzey Ay Düğümü', 'Lilith'
+  ];
+
+  const sortedPlanets = [...allSkyPlanets].filter(p => PRIORITY_ORDER.includes(p.name))
+    .sort((a, b) => PRIORITY_ORDER.indexOf(a.name) - PRIORITY_ORDER.indexOf(b.name));
+
+  return sortedPlanets.map(p => generateUnifiedSkyPlanet(p, allSkyAspects, allSkyPlanets));
 }

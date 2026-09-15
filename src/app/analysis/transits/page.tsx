@@ -21,7 +21,14 @@ import {
 } from 'lucide-react';
 import { getTransitHouseInterpretation, getTransitAspectInterpretation } from '@/features/astrology/engine/TransitInterpretations';
 import { getSkyPlanetSignInterpretation, getPlanetSignBriefHeadline, getIngressPhase } from '@/features/astrology/engine/SkyAspectInterpretations';
-import { generateUnifiedPlanetTransit, UnifiedPlanetTransit, UnifiedAspectInfo, parseInterpretationSections } from '@/features/astrology/engine/TransitSynthesisEngine';
+import { 
+  generateUnifiedPlanetTransit, 
+  UnifiedPlanetTransit, 
+  UnifiedAspectInfo, 
+  parseInterpretationSections,
+  generateUnifiedSkyPlanets,
+  UnifiedSkyPlanet
+} from '@/features/astrology/engine/TransitSynthesisEngine';
 import { AstroCity, TransitChartData, AstroPoint, AstroAspect } from '@/features/astrology/engine/AstrologyConstants';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { useAuth } from '@/context/AuthContext';
@@ -107,6 +114,7 @@ export default function TransitsPage() {
   } | null>(null);
   const [skyAspectFilter, setSkyAspectFilter] = useState<'ALL' | 'HARMONIOUS' | 'CHALLENGING' | 'CONJUNCTION'>('ALL');
   const [skyRightTab, setSkyRightTab] = useState<'ASPECTS' | 'SIGN_PLACEMENTS'>('ASPECTS');
+  const [skyViewMode, setSkyViewMode] = useState<'SYNTHESIS' | 'LIST'>('SYNTHESIS');
   const [signFilter, setSignFilter] = useState<'ALL' | 'NEW_INGRESS' | 'PERSONAL' | 'OUTER'>('ALL');
 
   // Mundane Timeline states
@@ -167,6 +175,11 @@ export default function TransitsPage() {
       fetchSkyChart(skyDateStr, skyTimeStr);
     }
   }, []);
+
+  const unifiedSkyPlanets = useMemo(() => {
+    if (!skyChartData?.planets || !skyChartData?.aspects) return [];
+    return generateUnifiedSkyPlanets(skyChartData.planets, skyChartData.aspects);
+  }, [skyChartData]);
 
   // -------------------------------------------------------------
   // 2. PERSONAL (Natal Bi-Wheel) States
@@ -645,91 +658,261 @@ export default function TransitsPage() {
 
                       {skyRightTab === 'ASPECTS' ? (
                         <>
-                          {/* Aspect Type Filters */}
-                          <div className="flex flex-wrap gap-1.5 mb-4">
-                            {[
-                              { id: 'ALL', label: 'Tümü' },
-                              { id: 'CONJUNCTION', label: 'Kavuşum (0°)' },
-                              { id: 'HARMONIOUS', label: 'Destek (△, ⚹)' },
-                              { id: 'CHALLENGING', label: 'Sınav (□, ☍)' },
-                            ].map(f => (
+                          {/* Sub-View Switcher: Synthesis vs List */}
+                          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 mb-4 bg-black/50 p-2 rounded-2xl border border-white/10">
+                            <div className="flex items-center gap-1.5 bg-black/60 p-1 rounded-xl border border-white/10">
                               <button
-                                key={f.id}
-                                onClick={() => setSkyAspectFilter(f.id as any)}
-                                className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all ${
-                                  skyAspectFilter === f.id
-                                    ? 'bg-white/20 text-white font-bold'
-                                    : 'bg-white/5 text-mystic-text-muted hover:text-white'
+                                type="button"
+                                onClick={() => setSkyViewMode('SYNTHESIS')}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                                  skyViewMode === 'SYNTHESIS'
+                                    ? 'bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] text-black shadow-md'
+                                    : 'text-mystic-text-muted hover:text-white'
                                 }`}
                               >
-                                {f.label}
+                                <Sparkles size={13} />
+                                <span>Bütünleşik Gezegen Kartları (Sentez)</span>
                               </button>
-                            ))}
+                              <button
+                                type="button"
+                                onClick={() => setSkyViewMode('LIST')}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                                  skyViewMode === 'LIST'
+                                    ? 'bg-white/20 text-white border border-white/30'
+                                    : 'text-mystic-text-muted hover:text-white'
+                                }`}
+                              >
+                                <Layers size={13} />
+                                <span>Ayrık Tablolar</span>
+                              </button>
+                            </div>
+                            <span className="text-[10px] text-mystic-text-muted px-2">
+                              {skyViewMode === 'SYNTHESIS' 
+                                ? 'Gezegen + Burç + HD Kapı + Açılar' 
+                                : `${filteredSkyAspects.length} aktif açı`}
+                            </span>
                           </div>
 
-                          {/* Aspects Scrollable List */}
-                          <div className="space-y-3 max-h-[520px] overflow-y-auto custom-scrollbar pr-1">
-                            {filteredSkyAspects.length === 0 ? (
-                              <div className="text-center py-12 text-mystic-text-muted text-xs">
-                                Seçilen filtrede aktif bir gökyüzü açısı bulunmuyor.
-                              </div>
-                            ) : (
-                              filteredSkyAspects.map((asp, idx) => {
-                                const interp = asp.interpretation;
-                                return (
+                          {skyViewMode === 'SYNTHESIS' ? (
+                            /* Mode 1: Bütünleşik Gezegen Kartları (Sentez) */
+                            <div className="space-y-4 max-h-[560px] overflow-y-auto custom-scrollbar pr-1">
+                              {unifiedSkyPlanets.length === 0 ? (
+                                <div className="text-center py-12 text-mystic-text-muted text-xs">
+                                  Aktif gökyüzü gezegen sentezi hesaplanamadı.
+                                </div>
+                              ) : (
+                                unifiedSkyPlanets.map((sp: UnifiedSkyPlanet, idx: number) => (
                                   <div
-                                    key={`sky-asp-${idx}`}
-                                    onClick={() => {
-                                      if (interp) {
-                                        setSelectedInterp({
-                                          title: interp.title,
-                                          content: `${interp.summary}\n\n【Kolektif Etki】\n${interp.collectiveTheme}\n\n【Günün Tavsiyesi】\n${interp.dailyAdvice}`,
-                                          extra: interp.chakraResonance
-                                        });
-                                      }
-                                    }}
-                                    className="group p-3.5 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5 hover:border-[#0EA5E9]/40 transition-all cursor-pointer flex flex-col gap-2 shadow-sm"
+                                    key={`sky-sp-${idx}`}
+                                    className="bg-black/60 backdrop-blur-md border border-white/10 hover:border-cyan-500/30 rounded-3xl p-4 sm:p-5 transition-all shadow-xl space-y-3.5"
                                   >
-                                    <div className="flex items-center justify-between">
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-lg text-[#0EA5E9] font-bold">{PLANET_SYMBOLS[asp.planet1] || ''}</span>
-                                        <span className="text-xs sm:text-sm font-semibold text-white">{asp.planet1}</span>
-                                      </div>
-
-                                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10">
-                                        <span className="text-xs font-bold" style={{ color: ASPECT_COLORS[asp.type] }}>
-                                          {asp.type}
-                                        </span>
-                                        <span className="text-[10px] text-gray-400">
-                                          ({asp.orb.toFixed(1)}°)
-                                        </span>
-                                      </div>
-
-                                      <div className="flex items-center gap-2">
-                                        <span className="text-xs sm:text-sm font-semibold text-white">{asp.planet2}</span>
-                                        <span className="text-lg text-[#D4AF37] font-bold">{PLANET_SYMBOLS[asp.planet2] || ''}</span>
+                                    {/* Header: Human-First Title & Technical Meta Badges */}
+                                    <div className="flex flex-col gap-2 border-b border-white/10 pb-3">
+                                      <div className="flex items-start justify-between gap-3">
+                                        <div className="flex items-center gap-3">
+                                          <span className="text-2xl sm:text-3xl font-black text-[#0EA5E9] w-9 text-center shrink-0">
+                                            {PLANET_SYMBOLS[sp.planetName] || '★'}
+                                          </span>
+                                          <div>
+                                            <h4 className="text-sm sm:text-base font-extrabold text-white leading-snug">
+                                              {sp.humanThemeTitle}
+                                            </h4>
+                                            <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                                              <span className="text-xs text-[#D4AF37] font-semibold flex items-center gap-1 bg-[#D4AF37]/10 px-2.5 py-0.5 rounded-lg border border-[#D4AF37]/25">
+                                                {sp.planetName} ({ZODIAC_SYMBOLS[sp.sign]} {sp.sign} {sp.degreeInSign}°)
+                                              </span>
+                                              <span className={`text-[10px] px-2 py-0.5 rounded-lg border font-medium ${sp.ingressPhase.badgeClass}`}>
+                                                {sp.ingressPhase.badge}
+                                              </span>
+                                              {sp.hdGateInfo && (
+                                                <span className="text-xs text-emerald-300 font-medium bg-emerald-500/10 px-2.5 py-0.5 rounded-lg border border-emerald-500/25">
+                                                  🧬 Kapı {sp.hdGateInfo.gate}: {sp.hdGateInfo.title}
+                                                </span>
+                                              )}
+                                              {sp.isRetrograde && (
+                                                <span className="text-[10px] bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-full font-bold">
+                                                  Rx Retro
+                                                </span>
+                                              )}
+                                            </div>
+                                          </div>
+                                        </div>
                                       </div>
                                     </div>
 
-                                    {interp && (
-                                      <p className="text-[11px] text-mystic-text-muted line-clamp-2 leading-relaxed">
-                                        {interp.summary}
+                                    {/* Human-Centric Narrative Box */}
+                                    <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-3.5 sm:p-4 space-y-2.5">
+                                      <span className="text-[10px] text-[#0EA5E9] uppercase tracking-wider font-extrabold flex items-center gap-1.5">
+                                        <Sparkles size={11} /> 7Layers Yaşam Alanı Özeti
+                                      </span>
+                                      <p className="text-xs sm:text-sm text-gray-200 leading-relaxed font-normal">
+                                        {sp.humanNarrative}
                                       </p>
-                                    )}
+                                      {sp.hdGateInfo && (
+                                        <div className="flex flex-wrap items-center gap-2 pt-2 text-[11px] border-t border-white/5">
+                                          <span className="text-red-400/90 font-medium">▲ Gölge: {sp.hdGateInfo.shadow}</span>
+                                          <span className="text-gray-500">➔</span>
+                                          <span className="text-emerald-400 font-medium">✨ Hediye: {sp.hdGateInfo.gift}</span>
+                                        </div>
+                                      )}
+                                    </div>
 
-                                    <div className="flex items-center justify-between pt-1 border-t border-white/5 text-[10px] text-gray-400">
-                                      <span className="text-[#0EA5E9]/80 font-medium">
-                                        {interp?.energyType || 'Açı'}
+                                    {/* Active Sky Aspects Row */}
+                                    <div>
+                                      <span className="text-[11px] text-mystic-text-muted block uppercase tracking-wider font-bold mb-2">
+                                        Eşzamanlı Tetiklenen Gökyüzü Gezegenleri & Açılar:
                                       </span>
-                                      <span className="flex items-center gap-1 text-white/60 group-hover:text-white transition-colors">
-                                        Yorumu Oku <ChevronRight size={12} />
+                                      {sp.aspects.length === 0 ? (
+                                        <div className="text-xs text-gray-400 italic bg-white/[0.02] p-2.5 rounded-xl border border-white/5">
+                                          Şu anda doğrudan majör bir gökyüzü açısı yapmıyor; {sp.sign} burcundaki arketipsel seyrini bağımsız sürdürüyor.
+                                        </div>
+                                      ) : (
+                                        <div className="grid grid-cols-1 gap-2">
+                                          {sp.aspects.map((asp, aIdx) => (
+                                            <div
+                                              key={`asp-${aIdx}`}
+                                              className="flex items-center justify-between p-2.5 rounded-xl bg-black/40 border border-white/5 hover:border-white/20 transition-all text-xs"
+                                            >
+                                              <div className="flex items-center gap-2">
+                                                <span
+                                                  className="font-bold px-2 py-0.5 rounded text-[11px]"
+                                                  style={{ color: ASPECT_COLORS[asp.aspectType] || '#D4AF37', backgroundColor: 'rgba(255,255,255,0.05)' }}
+                                                >
+                                                  {asp.aspectType}
+                                                </span>
+                                                <span className="text-white font-medium">
+                                                  {asp.targetPlanet}
+                                                </span>
+                                                {asp.targetSign && (
+                                                  <span className="text-[11px] text-gray-400">
+                                                    [{asp.targetSign} {asp.targetDegree}°]
+                                                  </span>
+                                                )}
+                                              </div>
+                                              <span className="text-[10px] text-mystic-text-muted">
+                                                Orb: {asp.orb.toFixed(1)}°
+                                              </span>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    {/* Footer Action */}
+                                    <div className="pt-2 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 border-t border-white/5">
+                                      <span className="text-[11px] text-purple-300/80 flex items-center gap-1.5">
+                                        <Layers size={13} className="text-purple-400 shrink-0" />
+                                        <span>{sp.chakraLayer}</span>
                                       </span>
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setSelectedInterp({
+                                            title: sp.headline,
+                                            content: sp.detailedAnalysis,
+                                            extra: sp.chakraLayer
+                                          });
+                                        }}
+                                        className="flex items-center justify-center gap-1 px-3 py-1.5 rounded-xl bg-[#0EA5E9]/10 hover:bg-[#0EA5E9]/20 text-[#0EA5E9] hover:text-white border border-[#0EA5E9]/20 transition-all text-xs font-semibold cursor-pointer"
+                                      >
+                                        <span>Kolektif Analizi Oku</span>
+                                        <ChevronRight size={13} />
+                                      </button>
                                     </div>
                                   </div>
-                                );
-                              })
-                            )}
-                          </div>
+                                ))
+                              )}
+                            </div>
+                          ) : (
+                            /* Mode 2: Ayrık Açı Listesi (Existing Filter & List) */
+                            <>
+                              {/* Aspect Type Filters */}
+                              <div className="flex flex-wrap gap-1.5 mb-4">
+                                {[
+                                  { id: 'ALL', label: 'Tümü' },
+                                  { id: 'CONJUNCTION', label: 'Kavuşum (0°)' },
+                                  { id: 'HARMONIOUS', label: 'Destek (△, ⚹)' },
+                                  { id: 'CHALLENGING', label: 'Sınav (□, ☍)' },
+                                ].map(f => (
+                                  <button
+                                    key={f.id}
+                                    onClick={() => setSkyAspectFilter(f.id as any)}
+                                    className={`text-xs px-3 py-1.5 rounded-lg font-medium transition-all ${
+                                      skyAspectFilter === f.id
+                                        ? 'bg-white/20 text-white font-bold'
+                                        : 'bg-white/5 text-mystic-text-muted hover:text-white'
+                                    }`}
+                                  >
+                                    {f.label}
+                                  </button>
+                                ))}
+                              </div>
+
+                              {/* Aspects Scrollable List */}
+                              <div className="space-y-3 max-h-[520px] overflow-y-auto custom-scrollbar pr-1">
+                                {filteredSkyAspects.length === 0 ? (
+                                  <div className="text-center py-12 text-mystic-text-muted text-xs">
+                                    Seçilen filtrede aktif bir gökyüzü açısı bulunmuyor.
+                                  </div>
+                                ) : (
+                                  filteredSkyAspects.map((asp, idx) => {
+                                    const interp = asp.interpretation;
+                                    return (
+                                      <div
+                                        key={`sky-asp-${idx}`}
+                                        onClick={() => {
+                                          if (interp) {
+                                            setSelectedInterp({
+                                              title: interp.title,
+                                              content: `${interp.summary}\n\n【Kolektif Etki】\n${interp.collectiveTheme}\n\n【Günün Tavsiyesi】\n${interp.dailyAdvice}`,
+                                              extra: interp.chakraResonance
+                                            });
+                                          }
+                                        }}
+                                        className="group p-3.5 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5 hover:border-[#0EA5E9]/40 transition-all cursor-pointer flex flex-col gap-2 shadow-sm"
+                                      >
+                                        <div className="flex items-center justify-between">
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-lg text-[#0EA5E9] font-bold">{PLANET_SYMBOLS[asp.planet1] || ''}</span>
+                                            <span className="text-xs sm:text-sm font-semibold text-white">{asp.planet1}</span>
+                                          </div>
+
+                                          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/10">
+                                            <span className="text-xs font-bold" style={{ color: ASPECT_COLORS[asp.type] }}>
+                                              {asp.type}
+                                            </span>
+                                            <span className="text-[10px] text-gray-400">
+                                              ({asp.orb.toFixed(1)}°)
+                                            </span>
+                                          </div>
+
+                                          <div className="flex items-center gap-2">
+                                            <span className="text-xs sm:text-sm font-semibold text-white">{asp.planet2}</span>
+                                            <span className="text-lg text-[#D4AF37] font-bold">{PLANET_SYMBOLS[asp.planet2] || ''}</span>
+                                          </div>
+                                        </div>
+
+                                        {interp && (
+                                          <p className="text-[11px] text-mystic-text-muted line-clamp-2 leading-relaxed">
+                                            {interp.summary}
+                                          </p>
+                                        )}
+
+                                        <div className="flex items-center justify-between pt-1 border-t border-white/5 text-[10px] text-gray-400">
+                                          <span className="text-[#0EA5E9]/80 font-medium">
+                                            {interp?.energyType || 'Açı'}
+                                          </span>
+                                          <span className="flex items-center gap-1 text-white/60 group-hover:text-white transition-colors">
+                                            Yorumu Oku <ChevronRight size={12} />
+                                          </span>
+                                        </div>
+                                      </div>
+                                    );
+                                  })
+                                )}
+                              </div>
+                            </>
+                          )}
                         </>
                       ) : (
                         /* Sign Placements & Ingress Impacts List */
