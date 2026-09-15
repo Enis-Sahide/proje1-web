@@ -316,10 +316,10 @@ export const RETRO_KARMIC_DEBTS_DATA: Record<string, RetroKarmicDebtData> = {
     },
     passive: {
       polarity: 'passive',
-      polarityLabel: 'Susturulmuş Zihin & Bastırılmış Ses',
-      pastLifeCause: 'Geçmiş yaşamınızda düşüncelerinizi ifade etmeniz yasaklandı, susturuldunuz veya hakikati konuştuğunuz için cezalandırılarak zihinsel tecritte bırakıldınız.',
-      currentLifeKarma: 'Düşüncelerini ifade etmekte gecikme, topluluk önünde konuşmaktan çekinme, fikirlerinin değersiz olduğuna inanma ve suskunluk nöbetleri.',
-      dharmaRemedy: 'Kendi sesinizi ve fikrinizi çekinmeden duyurmak, içsel bilgeliğinize güvenmek ve hakikati cesaretle paylaşmak.'
+      polarityLabel: 'Susturulmuş Zihin & Sessiz Kalma Karması',
+      pastLifeCause: 'Geçmiş yaşamınızda haksız iftiralara, yalanlara ve masumların karalanmasına şahit olduğunuz halde korkudan veya menfaatinizi korumak adına sustunuz; hakikati savunmayarak zulmün ve cehaletin yayılmasına sessizce zemin hazırladınız ya da baskı altında sahte tanıklık yapmaya alet edildiniz.',
+      currentLifeKarma: 'Düşüncelerini ifade ederken derin bir suçluluk duyma, haksızlık karşısında boğaz düğümlenmesi, sözlerinin değer görmeyeceği inancıyla suskunluğa kilitlenme.',
+      dharmaRemedy: 'Baskı ve korku ne olursa olsun hakikatin saf sesi olmak, iftiraya uğrayanların ve suskunların hakkını korkusuzca dile getirmek, içsel bilgeliğe güvenmek.'
     }
   },
   'Venüs': {
@@ -334,10 +334,10 @@ export const RETRO_KARMIC_DEBTS_DATA: Record<string, RetroKarmicDebtData> = {
     },
     passive: {
       polarity: 'passive',
-      polarityLabel: 'Değersizlik Hissi & Kendini Feda Etme',
-      pastLifeCause: 'Geçmiş yaşamınızda sevgiye layık görülmediniz, sevgi uğruna sömürüldünüz veya kendinizi bütünüyle hiçe sayarak başkalarına feda ettiniz.',
-      currentLifeKarma: 'Kendini sevilmeye layık görememe, ilişkilerde sürekli ödün verip tükenme ve kendi ihtiyaçlarını talep etmekten utanma.',
-      dharmaRemedy: 'Önce kendi öz-değerini ve öz-sevgisini koşulsuzca inşa etmek, sağlıklı sınır koyabilmek ve sevgiyi hak ettiğine inanmak.'
+      polarityLabel: 'Konfor Uğruna Sessizlik & Çıkar Ortaklığı',
+      pastLifeCause: 'Geçmiş yaşamınızda kendi konforunuzu, canınızı veya maddi güvenliğinizi korumak uğruna sevdiklerinizin ve masum insanların sömürülmesine göz yumdunuz; adaletsiz ilişki ve çıkar ağlarına boyun eğerek zulmün sessiz bir parçası haline geldiniz.',
+      currentLifeKarma: 'Kendini gerçek sevgiye layık görememe, ilişkilerde sürekli ödün verip sömürülme ve kendi değerini başkalarının onayına teslim etme.',
+      dharmaRemedy: 'Menfaat için adaletsizliğe asla ortak olmamak; önce kendi öz-değerini inşa edip koşulsuz sevgi ve adalet ilkelerinden ödün vermemek.'
     }
   },
   'Mars': {
@@ -352,10 +352,10 @@ export const RETRO_KARMIC_DEBTS_DATA: Record<string, RetroKarmicDebtData> = {
     },
     passive: {
       polarity: 'passive',
-      polarityLabel: 'Bastırılmış İrade & Korku Felci',
-      pastLifeCause: 'Geçmiş yaşamınızda çatışma korkusu ve dışsal baskılar karşısında kendi gücünüzden vazgeçtiniz; haklı öfkenizi dahi bastırıp felç oldunuz ve boyun eğerek ezildiniz.',
-      currentLifeKarma: 'Öfkeyi içeriye yöneltme eğilimi, pasif-agresif patlamalar, hakkını savunurken suçluluk duyma ve harekete geçmekte derin bir tereddüt.',
-      dharmaRemedy: 'Kendi haklı sınırlarınızı korkusuzca savunmak, öfkeyi bastırmadan sağlıklı ve kararlı bir dille ifade etmek, içsel savaşçınızı cesaretle uyandırmak.'
+      polarityLabel: 'Bastırılmış İrade & Zulme Alet Olma Karması',
+      pastLifeCause: 'Geçmiş yaşamınızda çatışma korkusu ve zalim otoritelerin baskısı karşısında kendi gücünüzden vazgeçtiniz; haklı öfkenizi bastırıp felç oldunuz. Başkalarına yapılan haksızlıklara ve şiddete korkudan sessiz kaldınız ya da baskı altında istemeyerek de olsa zalimlerin elinde bir maşaya/araca dönüştürüldünüz.',
+      currentLifeKarma: 'Öfkeyi içeriye yöneltme eğilimi, haksızlık karşısında donup kalma, hakkını savunurken suçluluk duyma ve kendi içsel gücünden korkma.',
+      dharmaRemedy: 'Güç odaklarından ve çatışmadan korkmadan zayıfların yanında durmak; haklı öfkeyi bastırmadan sağlıklı bir adalet ve cesaret eylemine dönüştürmek.'
     }
   },
   'Jüpiter': {
@@ -370,10 +370,10 @@ export const RETRO_KARMIC_DEBTS_DATA: Record<string, RetroKarmicDebtData> = {
     },
     passive: {
       polarity: 'passive',
-      polarityLabel: 'Dogmalara Kurban Olma & İnanç Yitimi',
-      pastLifeCause: 'Geçmiş yaşamınızda katı dini dogmalar veya sahte ruhsal otoriteler tarafından inancınız sömürüldü; kandırıldınız ve manevi boşluğa itildiniz.',
-      currentLifeKarma: 'Dışsal hiçbir inanç sistemine veya rehbere güvenememe, hayatta yönünü ve anlamını kaybetme kaygısı, derin bir şüphecilik.',
-      dharmaRemedy: 'Dış dogmalara değil, kendi vicdanınızın ve kalbinizin rehberliğine güvenmek; hakikati bizzat kendi içsel deneyiminizle keşfetmek.'
+      polarityLabel: 'Dogmalara Boyun Eğme & Yozlaşmaya Göz Yumma',
+      pastLifeCause: 'Geçmiş yaşamınızda dini, ahlaki veya kurumsal yozlaşmayı, insanların manevi olarak sömürüldüğünü gördüğünüz halde dışlanma veya cezalandırılma korkusuyla sustunuz; sahte tiranların ve dogmatik otoritelerin sessiz bir onaylayıcısı oldunuz.',
+      currentLifeKarma: 'Dışsal hiçbir inanç sistemine veya rehbere güvenememe, derin bir ruhsal şüphecilik ve anlam arayışında yönünü kaybetme kaygısı.',
+      dharmaRemedy: 'Hiçbir dogmaya veya sahte otoriteye körü körüne boyun eğmemek; kalbinin ve vicdanının evrensel ahlakına güvenerek hakikati savunmak.'
     }
   },
   'Satürn': {
@@ -388,10 +388,10 @@ export const RETRO_KARMIC_DEBTS_DATA: Record<string, RetroKarmicDebtData> = {
     },
     passive: {
       polarity: 'passive',
-      polarityLabel: 'Ezilmişlik & Sorumluluk Yükü Altında Çöküş',
-      pastLifeCause: 'Geçmiş yaşamınızda zalim otoritelerin altında ezildiniz; taşınamaz sorumluluklar sırtınıza yüklendi ve kendi haklarınızı savunamayarak köleleştirildiniz.',
-      currentLifeKarma: 'Omuzlarda açıklanamaz bir suçluluk yükü, sürekli yetersizlik hissi, hayatta her şeyin ancak aşırı zahmetlerle geleceği inancı.',
-      dharmaRemedy: 'Size ait olmayan yükleri taşımayı bırakmak, zamanın efendisi olarak sabırla çalışmak ve kendinize dinlenme hakkı tanımak.'
+      polarityLabel: 'Sisteme Boyun Eğme & "Emir Kulu" Karması',
+      pastLifeCause: 'Geçmiş yaşamınızda zalim bir sistemin veya tiranın idari çarkı haline geldiniz; "ben sadece emir kuluyum, kurallar böyle" diyerek başkalarına yapılan zulmü uyguladınız ya da haksızlıklara sessizce boyun eğerek vicdani sorumluluğu reddettiniz.',
+      currentLifeKarma: 'Omuzlarda açıklanamaz bir suçluluk yükü, otorite figürleri karşısında donup kalma, hayatta her şeyin ancak ağır cezalar ve zahmetlerle geleceği inancı.',
+      dharmaRemedy: 'Kör itaati bırakıp vicdani sorumluluğu her kuralın üzerinde tutmak; adil, şefkatli ve dik bir ruhsal omurga inşa etmek.'
     }
   },
   'Uranüs': {
@@ -406,10 +406,10 @@ export const RETRO_KARMIC_DEBTS_DATA: Record<string, RetroKarmicDebtData> = {
     },
     passive: {
       polarity: 'passive',
-      polarityLabel: 'Bastırılmış Özgünlük & Sürüye Boyun Eğme',
-      pastLifeCause: 'Geçmiş yaşamınızda özgün fikirleriniz ve bireyselliğiniz toplum tarafından dışlandı; sürüye uymaya zorlandınız ve ruhsal özgürlüğünüz elinizden alındı.',
-      currentLifeKarma: 'Farklı olmaktan korkma, dışlanma endişesiyle kendi dehasını gizleme ve otoriter sistemler karşısında içsel huzursuzluk yaşama.',
-      dharmaRemedy: 'Kendi özgünlüğünüzü ve sıradışı yönlerinizi gururla sahiplenmek, sürüye uymak yerine geleceğe ışık tutan vizyoner kimliğinizi yaşamak.'
+      polarityLabel: 'Sürüye Uyma & Kolektif Lince Sessiz Kalma',
+      pastLifeCause: 'Geçmiş yaşamınızda dışlanma ve yalnız kalma korkusuyla sürü psikolojisine boyun eğdiniz; masum bireylerin toplum tarafından dışlanmasına, haksız yere linç edilmesine veya ayrımcılığa uğramasına sessiz kalarak bu kolektif adaletsizliğe ortak oldunuz.',
+      currentLifeKarma: 'Topluluklar içinde sürekli kendini yabancı hissetme, dışlanma paranoyası ve kendi özgün dehasını toplumdan gizleme eğilimi.',
+      dharmaRemedy: 'Sürüden ayrılma pahasına hakikatin ve evrensel özgürlüğün yanında durmak; bireysel vicdanını kolektif cinnete asla kurban etmemek.'
     }
   },
   'Neptün': {
@@ -424,10 +424,10 @@ export const RETRO_KARMIC_DEBTS_DATA: Record<string, RetroKarmicDebtData> = {
     },
     passive: {
       polarity: 'passive',
-      polarityLabel: 'Kurban Rolü & Manevi Sömürü',
-      pastLifeCause: 'Geçmiş yaşamınızda sahte guruların, tarikatların veya manevi sömürücülerin kurbanı oldunuz; sınır koyamayarak gerçeklerden kaçmak için kendinizi feda ettiniz.',
-      currentLifeKarma: 'İlişkilerde kurtarıcı-kurban üçgenine çekilme, sınır çizememe, kime güveneceğini bilememe ve bağımlılık eğilimleri.',
-      dharmaRemedy: 'Ruhsal sınırları netleştirmek, kurban psikolojisinden çıkıp kendi hayatının sorumluluğunu almak, sanat ve meditasyonla arınmak.'
+      polarityLabel: 'Sahte İnziva & Sömürüye Alan Açma',
+      pastLifeCause: 'Geçmiş yaşamınızda sahte tarikatların, manevi sömürücülerin ve illüzyonların insanları zehirlediğini gördüğünüz halde "bana dokunmayan yılan bin yaşasın" diyerek sahte bir inzivaya sığındınız; ruhsal kaçışla sorumluluktan kaçarak kötülüğün yayılmasına alan açtınız.',
+      currentLifeKarma: 'İlişkilerde kurtarıcı-kurban üçgenine çekilme, sınır çizememe, kime güveneceğini bilememe ve gerçeklikten kaçma arzusu.',
+      dharmaRemedy: 'Ruhsal uyanışı dünyadan kaçış olarak değil, aktif bir şefkat ve ayırt etme gücüyle (discernment) dünyadaki karanlığı aydınlatmak için kullanmak.'
     }
   },
   'Plüton': {
@@ -442,10 +442,10 @@ export const RETRO_KARMIC_DEBTS_DATA: Record<string, RetroKarmicDebtData> = {
     },
     passive: {
       polarity: 'passive',
-      polarityLabel: 'Derin İhanet & Güçsüzlük Travması',
-      pastLifeCause: 'Geçmiş yaşamınızda karanlık güç odaklarının ve zalim tiranların kurbanı oldunuz; yıkıcı bir ihanete uğrayarak tüm gücünüzü ve varlığınızı kaybettiniz.',
-      currentLifeKarma: 'İnsanlara güvenmekte aşırı zorlanma, sırtından bıçaklanma paranoyası ve kendi içsel gücünü ortaya çıkarmaktan korkma.',
-      dharmaRemedy: 'İhanet travmasını affediş ve içsel simya ile şifalandırmak; Anka kuşu gibi küllerinden doğarak kendi gücünü korkusuzca sahiplenmek.'
+      polarityLabel: 'Korkudan Sığınma & Karanlığa Alet Olma',
+      pastLifeCause: 'Geçmiş yaşamınızda karanlık güç odaklarının ve zalim tiranların başkalarını yok etmesine korkudan göz yumdunuz; kendi canınızı kurtarmak adına zalimlerin gölgesine sığındınız ve istemeyerek de olsa onların entrikalarına, ihanetlerine alet edildiniz.',
+      currentLifeKarma: 'Güçsüz düşmekten dehşet duyma, insanlara güvenememe, derin bir sırtından bıçaklanma paranoyası ve kendi içsel gücünü ortaya çıkarmaktan korkma.',
+      dharmaRemedy: 'Karanlık güç odaklarından korkmadan, ışığın ve dönüştürücü hakikatin tarafında durmak; kendi içsel korkularını yenerek Anka kuşu gibi küllerinden doğmak.'
     }
   }
 };
