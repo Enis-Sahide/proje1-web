@@ -63,7 +63,16 @@ const GALACTIC_FIXED_STARS: FixedStarDef[] = [
     challenge: 'Dünyanın hantal bürokrasisi, ilkel kuralları ve yavaşlığı karşısında zihinsel sabırsızlık ve yalnızlık.'
   },
   {
-    name: 'Andromeda / Mirach & Alpheratz',
+    name: 'Spica (Alfa Virginis)',
+    longitude: 203.83, // 23°50' Terazi
+    constellation: 'Başak (Virgo)',
+    frequencyBadge: 'Spica (Kozmik Zarafet & İlahi Işık)',
+    mission: 'Yeryüzüne ilahi uyum, yüksek estetik, bilgelik ve saf kristal ışık frekansını demirleme görevi.',
+    gift: 'Kusursuz estetik zarafet, barışçıl diplomasi, ruhsal koruma ve yüksek sanatsal deha.',
+    challenge: 'Kaba dünyevi çekişmelerden hızla tükenme, mükemmeliyetçilik sancısı.'
+  },
+  {
+    name: 'Andromeda / Mirach (Beta Andromedae)',
     longitude: 44.40, // 14°24' Boğa
     constellation: 'Andromeda Galaksisi',
     frequencyBadge: 'Andromeda (Kozmik Özgürlük Gezgini)',
@@ -72,13 +81,31 @@ const GALACTIC_FIXED_STARS: FixedStarDef[] = [
     challenge: 'Kapalı mekanlar, katı rutinler ve dar görüşlü kurallar karşısında klostrofobi ve isyan refleksi.'
   },
   {
-    name: 'Orion / Rigel & Betelgeuse',
-    longitude: 76.83, // 16°50' İkizler (Rigel)
+    name: 'Andromeda / Alpheratz (Alfa Andromedae)',
+    longitude: 14.30, // 14°18' Koç
+    constellation: 'Andromeda / Pegasus',
+    frequencyBadge: 'Andromeda (Işık Savaşçısı & Gezgin)',
+    mission: 'Kozmik zincirleri kırma, kitleleri özgürleştirme ve yeni bilinç kapılarını açma misyonu.',
+    gift: 'Hızlı idrak, sınır tanımaz cesaret ve kadersel engelleri bir sıçrayışta aşabilme gücü.',
+    challenge: 'Geleneksel dünyevi sınırlara ve yavaş insanlara tahammülsüzlük.'
+  },
+  {
+    name: 'Orion / Rigel (Beta Orionis)',
+    longitude: 76.83, // 16°50' İkizler
     constellation: 'Orion (Avcı)',
     frequencyBadge: 'Orion (Kadim Bilgelik Savaşçısı)',
     mission: 'Galaktik Işık ve Karanlık savaşlarından geçmiş, bilgeliğe ve kalp-akıl dengesine evrilen kıdemli ruh.',
     gift: 'Muazzam içsel direnç, hakikati her ne pahasına olursa olsun savunma, stratejik cesaret.',
     challenge: 'Her an bir savaş veya ihanet çıkacakmış gibi gardını düşürememe, insanlara tam güvenememe.'
+  },
+  {
+    name: 'Orion / Betelgeuse (Alfa Orionis)',
+    longitude: 88.75, // 28°45' İkizler
+    constellation: 'Orion (Avcı)',
+    frequencyBadge: 'Betelgeuse (Süpernova Kalp Savaşçısı)',
+    mission: 'Kozmik dönüşüm; eskiyen galaktik kalıpları yıkıp yerine yüksek bilinç ışığını getirme.',
+    gift: 'Devasa enerjetik çekim gücü, krizleri aşma kuvveti ve ilahi adanmışlık.',
+    challenge: 'Ruhsal tükenmişlik hissi ve devasa sorumlulukların ağırlığı altında ezilme.'
   },
   {
     name: 'Vega (Alfa Lyrae)',
@@ -88,6 +115,15 @@ const GALACTIC_FIXED_STARS: FixedStarDef[] = [
     mission: 'Evrenin ilk saf humanoid tohumlarından; ilahi ses, müzik ve frekans simyacılığı.',
     gift: 'Sözcüklerle ve ses tonuyla aura arındırma, sanatsal deha ve büyüleyici zarafet.',
     challenge: 'Dünyanın kakofonisi ve estetik yoksunluğu karşısında aşırı duyusal yorgunluk.'
+  },
+  {
+    name: 'Canopus (Alfa Carinae)',
+    longitude: 104.97, // 14°58' Yengeç
+    constellation: 'Carina (Gemi Omurgası)',
+    frequencyBadge: 'Canopus (Büyük Kozmik Seyyah)',
+    mission: 'Ruhlann galaksiler arası yolculuklarında yön bulmalarını sağlayan yüksek kozmik rehberlik.',
+    gift: 'Doğal yön bulma yeteneği, derin içsel pusula, karmaşık yollardan selametle çıkma.',
+    challenge: 'Dünyada tek bir yere veya kişiye kök salmakta zorlanma, ebedi göçmenlik hissi.'
   },
   {
     name: 'Galaktik Merkez (Galactic Center)',
@@ -144,49 +180,68 @@ function angleDifference(a: number, b: number): number {
 
 /**
  * 1. Galaktik Ruh Kökeni & Sabit Yıldız Taraması
- * Güneş, Ay, ASC, GAD, KAD, Kiron ve Tepe Noktası (MC) incelenir.
+ * TÜM gezegenler, GAD/KAD, ASC ve MC eksiksiz taranır ve ağırlıklandırılır.
  */
 export function calculateCosmicOrigin(natalChart: NatalChartData): CosmicOriginResult {
-  const pointsToTest: { name: string; longitude: number }[] = [];
+  const pointsToTest: { name: string; longitude: number; weight: number; maxOrb: number }[] = [];
 
-  // Gezegenler
+  // 1. Işıklar ve Köşe Noktalar (En Yüksek Öncelik & Geniş Orb 2.2°)
+  const kad = natalChart.planets.find(p => p.name === 'Kuzey Ay Düğümü');
+  if (kad) {
+    pointsToTest.push({ name: 'Kuzey Ay Düğümü (KAD)', longitude: kad.longitude, weight: 3, maxOrb: 2.2 });
+    const gadLon = (kad.longitude + 180) % 360;
+    pointsToTest.push({ name: 'Güney Ay Düğümü (GAD)', longitude: gadLon, weight: 3, maxOrb: 2.2 });
+  }
+
+  const sun = natalChart.planets.find(p => p.name === 'Güneş');
+  if (sun) pointsToTest.push({ name: 'Güneş', longitude: sun.longitude, weight: 3, maxOrb: 2.2 });
+
+  const moon = natalChart.planets.find(p => p.name === 'Ay');
+  if (moon) pointsToTest.push({ name: 'Ay', longitude: moon.longitude, weight: 3, maxOrb: 2.2 });
+
+  if (natalChart.houses && natalChart.houses.length > 0) {
+    const ascHouse = natalChart.houses.find(h => h.house === 1);
+    if (ascHouse) pointsToTest.push({ name: 'Yükselen (ASC)', longitude: ascHouse.longitude, weight: 3, maxOrb: 2.2 });
+
+    const mcHouse = natalChart.houses.find(h => h.house === 10);
+    if (mcHouse) pointsToTest.push({ name: 'Tepe Noktası (MC)', longitude: mcHouse.longitude, weight: 2.5, maxOrb: 2.0 });
+  }
+
+  // 2. Kişisel Gezegenler (Ağırlık: 2, Orb: 1.85°)
+  const personalPlanets = ['Merkür', 'Venüs', 'Mars', 'Kiron'];
   natalChart.planets.forEach(p => {
-    if (['Güneş', 'Ay', 'Kuzey Ay Düğümü', 'Kiron', 'Mars', 'Venüs'].includes(p.name)) {
-      pointsToTest.push({ name: p.name, longitude: p.longitude });
+    if (personalPlanets.includes(p.name)) {
+      pointsToTest.push({ name: p.name, longitude: p.longitude, weight: 2, maxOrb: 1.85 });
     }
   });
 
-  // GAD (KAD + 180)
-  const kad = natalChart.planets.find(p => p.name === 'Kuzey Ay Düğümü');
-  if (kad) {
-    const gadLon = (kad.longitude + 180) % 360;
-    pointsToTest.push({ name: 'Güney Ay Düğümü (GAD)', longitude: gadLon });
-  }
-
-  // Yükselen (1. Ev başlangıcı)
-  if (natalChart.houses && natalChart.houses.length > 0) {
-    const ascHouse = natalChart.houses.find(h => h.house === 1);
-    if (ascHouse) {
-      pointsToTest.push({ name: 'Yükselen (ASC)', longitude: ascHouse.longitude });
+  // 3. Kolektif & Sosyal Gezegenler (Ağırlık: 1.5, Orb: 1.75°)
+  const outerPlanets = ['Jüpiter', 'Satürn', 'Uranüs', 'Neptün', 'Plüton'];
+  natalChart.planets.forEach(p => {
+    if (outerPlanets.includes(p.name)) {
+      pointsToTest.push({ name: p.name, longitude: p.longitude, weight: 1.5, maxOrb: 1.75 });
     }
-  }
+  });
 
-  const MAX_ORB = 1.65; // Maksimum kavuşum payı
   let bestMatch: {
     star: FixedStarDef;
     pointName: string;
     orb: number;
+    score: number;
   } | null = null;
 
   for (const star of GALACTIC_FIXED_STARS) {
     for (const pt of pointsToTest) {
       const diff = angleDifference(star.longitude, pt.longitude);
-      if (diff <= MAX_ORB) {
-        if (!bestMatch || diff < bestMatch.orb) {
+      if (diff <= pt.maxOrb) {
+        // Puan: Ağırlık yüksek ve orb dar oldukça skor yükselir
+        const score = pt.weight * 10 - diff * 3;
+        if (!bestMatch || score > bestMatch.score) {
           bestMatch = {
             star,
             pointName: pt.name,
-            orb: Math.round(diff * 100) / 100
+            orb: Math.round(diff * 100) / 100,
+            score
           };
         }
       }

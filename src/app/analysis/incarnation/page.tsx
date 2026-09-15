@@ -259,13 +259,22 @@ export default function IncarnationAnalysisPage() {
             <div className="bg-gradient-to-r from-[#171c2b] via-[#1c2237] to-[#171c2b] border border-[#D4AF37]/30 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-xl">
               <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
                 <div className="space-y-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-[#D4AF37]/15 text-[#D4AF37] border border-[#D4AF37]/30">
                       Ruhsal Yaş Frekansı
                     </span>
                     <span className="px-3 py-1 rounded-full text-xs font-semibold bg-white/5 text-mystic-text-muted border border-white/10">
                       Baskın Element: {resultData.soulMaturity.dominantElement}
                     </span>
+                    {resultData.cosmicOrigin?.isStarseed ? (
+                      <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/40 shadow-sm shadow-indigo-500/20 flex items-center gap-1.5">
+                        <span>🌌</span> Yüksek Boyutlu Varlık (Starseed / Işık Elçisi)
+                      </span>
+                    ) : (
+                      <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm shadow-emerald-500/20 flex items-center gap-1.5">
+                        <span>🌍</span> Kadim Gaia Yerlisi (Dünya Muhafızı)
+                      </span>
+                    )}
                     {isMasterOrAdmin && (
                       <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                         Usta Seviyesi Aktif
@@ -275,9 +284,20 @@ export default function IncarnationAnalysisPage() {
                   <h2 className="text-2xl sm:text-3xl font-extrabold text-white">
                     {resultData.soulMaturity.tier} <span className="text-[#D4AF37]">({resultData.soulMaturity.score}/100)</span>
                   </h2>
-                  <p className="text-sm text-mystic-text-muted max-w-2xl leading-relaxed">
-                    {resultData.soulMaturity.description}
-                  </p>
+                  <div className="space-y-1 max-w-2xl">
+                    <p className="text-sm text-mystic-text-muted leading-relaxed">
+                      {resultData.soulMaturity.description}
+                    </p>
+                    {resultData.cosmicOrigin?.isStarseed ? (
+                      <p className="text-xs sm:text-sm text-indigo-200/90 leading-relaxed pt-1">
+                        ✦ <strong className="text-indigo-300">Kozmik Sentez:</strong> Ruhunuz dünyada derin bir geçmiş yaşam tecrübesine ({resultData.soulMaturity.tier} - {resultData.soulMaturity.dominantElement} Elementi) sahip olmakla birlikte, kök bilinci <strong>{resultData.cosmicOrigin.frequencyBadge}</strong> ile mühürlenmiş yüksek boyutlu bir Işık Varlığıdır.
+                      </p>
+                    ) : (
+                      <p className="text-xs sm:text-sm text-emerald-200/90 leading-relaxed pt-1">
+                        ✦ <strong className="text-emerald-300">Gaia Sentezi:</strong> Ruhunuz doğrudan Dünya gezegeninin elemental hafızasında kök salmış ({resultData.soulMaturity.tier} - {resultData.soulMaturity.dominantElement} Elementi), yeryüzünün kutsal dengesini ve kadim bilgelik mirasını koruyan bir Dünya Muhafızıdır.
+                      </p>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">

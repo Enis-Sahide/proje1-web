@@ -176,11 +176,14 @@ export const downloadIncarnationPDF = async (
   doc.setTextColor(...white);
   doc.text(`Tarih: ${birthInfo.localDate}   |   Saat: ${birthInfo.localTime}   |   Konum: ${birthInfo.cityName}, ${birthInfo.country}`, 22, 66);
 
-  // Soul Maturity Summary Banner (Dynamic Height)
+  // Soul Maturity & Cosmic Frequency Summary Banner (Dynamic Height)
   doc.setFont('LiberationSans', 'normal');
-  doc.setFontSize(11.5);
-  const mLines = doc.splitTextToSize(data.soulMaturity.description, 166);
-  const bannerHeight = 18 + (mLines.length * 6) + 4;
+  doc.setFontSize(10.5);
+  const synthText = data.cosmicOrigin?.isStarseed
+    ? `${data.soulMaturity.description} Kozmik Hiza: Ruhunuz dünyada derin bir geçmiş yaşam birikimine (${data.soulMaturity.tier} - ${data.soulMaturity.dominantElement} Elementi) sahip olmakla birlikte, kök bilinci ${data.cosmicOrigin.frequencyBadge} ile mühürlenmiş yüksek boyutlu bir elçidir.`
+    : `${data.soulMaturity.description} Kozmik Hiza: Ruhunuz doğrudan Dünya gezegeninin kökleriyle rezonansta olan bilge bir Kadim Gaia Muhafızıdır.`;
+  const mLines = doc.splitTextToSize(synthText, 166);
+  const bannerHeight = 26 + (mLines.length * 5.2);
 
   doc.setFillColor(28, 36, 60);
   doc.roundedRect(15, 80, 180, bannerHeight, 3, 3, 'F');
@@ -189,14 +192,24 @@ export const downloadIncarnationPDF = async (
   doc.roundedRect(15, 80, 180, bannerHeight, 3, 3, 'D');
 
   doc.setFont('LiberationSans', 'bold');
-  doc.setFontSize(13.5);
+  doc.setFontSize(12.5);
   doc.setTextColor(...gold);
-  doc.text(`RUHSAL OLGUNLUK SEVİYESİ: ${data.soulMaturity.tier.toUpperCase()} (${data.soulMaturity.score}/100)`, 22, 90);
+  doc.text(`RUHSAL OLGUNLUK: ${data.soulMaturity.tier.toUpperCase()} (${data.soulMaturity.score}/100) - ${data.soulMaturity.dominantElement} ELEMENTİ`, 22, 89);
+
+  doc.setFont('LiberationSans', 'bold');
+  doc.setFontSize(10.5);
+  if (data.cosmicOrigin?.isStarseed) {
+    doc.setTextColor(190, 220, 255);
+    doc.text(`KOZMİK KÖKEN: YÜKSEK BOYUTLU VARLIK (STARSEED / IŞIK ELÇİSİ)`, 22, 96);
+  } else {
+    doc.setTextColor(160, 240, 180);
+    doc.text(`KOZMİK KÖKEN: KADİM GAİA YERLİSİ (DÜNYA MUHAFIZI)`, 22, 96);
+  }
 
   doc.setFont('LiberationSans', 'normal');
-  doc.setFontSize(11.5);
+  doc.setFontSize(10);
   doc.setTextColor(...white);
-  doc.text(mLines, 22, 98);
+  doc.text(mLines, 22, 103);
 
   // SECTION 1: ÖNCEKİ ENKARNASYON & GAD
   curY = 80 + bannerHeight + 14;
