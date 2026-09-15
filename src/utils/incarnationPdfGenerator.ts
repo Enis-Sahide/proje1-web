@@ -306,6 +306,60 @@ export const downloadIncarnationPDF = async (
     });
   }
 
+  // KARMİK ZAMAN TÜNELİ & DÜNYADAKİ ÇAĞ
+  if (data.historicalEra) {
+    ensureSpace(45);
+    curY += 6;
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(14.5);
+    doc.setTextColor(...gold);
+    doc.text(`Karmik Zaman Tüneli: ${data.historicalEra.eraName}`, 15, curY);
+
+    curY += 5.5;
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(255, 215, 0);
+    doc.text(`Dönem & Çağ: ${data.historicalEra.century} (${data.historicalEra.timeSpan}) | Coğrafya: ${data.historicalEra.geographyCulture}`, 15, curY);
+
+    curY += 6.5;
+    doc.setFont('LiberationSans', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(...white);
+    curY = drawTextWithBold(doc, `**Sosyal / Mesleki Rol:** ${data.historicalEra.archetypeRole}`, 15, curY, 180, 5.5);
+    curY += 2.5;
+    curY = drawTextWithBold(doc, `**Dönemin Atmosferi:** ${data.historicalEra.atmosphere}`, 15, curY, 180, 5.5);
+    curY += 2.5;
+    curY = drawTextWithBold(doc, `**Bilinçaltı İzi:** ${data.historicalEra.karmicImprint}`, 15, curY, 180, 5.5);
+    curY += 2.5;
+    curY = drawTextWithBold(doc, `**Ruhun Kök Hatırlayışı:** ${data.historicalEra.soulMemoryKey}`, 15, curY, 180, 5.5);
+  }
+
+  // KOZMİK RUH KÖKENİ & GALAKTİK İZİ (STARSEED)
+  if (data.cosmicOrigin) {
+    ensureSpace(42);
+    curY += 6;
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(14.5);
+    doc.setTextColor(180, 200, 255);
+    doc.text(`Kozmik Ruh Kökeni: ${data.cosmicOrigin.starName}`, 15, curY);
+
+    curY += 5.5;
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(190, 220, 255);
+    doc.text(`Frekans: ${data.cosmicOrigin.frequencyBadge} | Hiza: ${data.cosmicOrigin.connectedPoint}`, 15, curY);
+
+    curY += 6.5;
+    doc.setFont('LiberationSans', 'normal');
+    doc.setFontSize(10);
+    doc.setTextColor(...white);
+    curY = drawTextWithBold(doc, `**Kozmik Yaşam Misyonu:** ${data.cosmicOrigin.soulMission}`, 15, curY, 180, 5.5);
+    curY += 2.5;
+    curY = drawTextWithBold(doc, `**Kozmik Deha & Hediye:** ${data.cosmicOrigin.cosmicGift}`, 15, curY, 180, 5.5);
+    curY += 2.5;
+    curY = drawTextWithBold(doc, `**Hücresel Yabancılık & Sınav:** ${data.cosmicOrigin.earthlyChallenge}`, 15, curY, 180, 5.5);
+  }
+
   // ================= PAGE 3: KARMIC DEBTS =================
   doc.addPage();
   drawHeader();

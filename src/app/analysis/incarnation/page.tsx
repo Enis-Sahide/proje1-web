@@ -23,7 +23,8 @@ import {
   X,
   Key,
   Clock,
-  Unlock
+  Unlock,
+  History
 } from 'lucide-react';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import type { AstroCity } from '@/features/astrology/engine/AstrologyConstants';
@@ -484,6 +485,136 @@ export default function IncarnationAnalysisPage() {
                   {/* Locked Banner if not master */}
                   {!isMasterOrAdmin && renderLockedSectionNotice()}
                 </div>
+
+                {/* 1.1 KARMİK ZAMAN TÜNELİ (DÜNYADAKİ TARİHSEL ÇAĞ) */}
+                {resultData.historicalEra && (
+                  <div className="bg-mystic-surface/50 border border-amber-500/25 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-xl">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-white/10">
+                      <div className="flex items-center gap-3">
+                        <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-[#D4AF37]">
+                          <History size={24} />
+                        </div>
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <span className="text-xs uppercase tracking-wider text-[#D4AF37] font-bold">
+                              Karmik Zaman Tüneli
+                            </span>
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500/20 text-[#FFD700] border border-amber-500/30">
+                              {resultData.historicalEra.century} ({resultData.historicalEra.timeSpan})
+                            </span>
+                          </div>
+                          <h3 className="text-xl sm:text-2xl font-bold text-white">
+                            {resultData.historicalEra.eraName}
+                          </h3>
+                        </div>
+                      </div>
+
+                      <div className="px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-left sm:text-right">
+                        <div className="text-[11px] text-mystic-text-muted">Muhtemel Coğrafya / Kültür</div>
+                        <div className="text-xs font-semibold text-white/90">{resultData.historicalEra.geographyCulture}</div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                      <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
+                        <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                          <span>📜</span> O Dönemdeki Sosyal / Mesleki Rol
+                        </span>
+                        <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
+                          {resultData.historicalEra.archetypeRole}
+                        </p>
+                      </div>
+
+                      <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
+                        <span className="text-xs font-bold text-cyan-300 flex items-center gap-1.5">
+                          <span>🌍</span> Dönemin Kültürel & Kolektif Koşulları
+                        </span>
+                        <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
+                          {resultData.historicalEra.atmosphere}
+                        </p>
+                      </div>
+
+                      <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
+                        <span className="text-xs font-bold text-rose-300 flex items-center gap-1.5">
+                          <span>🧬</span> O Çağdan Şimdiki Yaşama Taşınan Bilinçaltı İzi
+                        </span>
+                        <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
+                          {resultData.historicalEra.karmicImprint}
+                        </p>
+                      </div>
+
+                      <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500/10 via-[#D4AF37]/10 to-transparent border border-amber-500/20 space-y-2">
+                        <span className="text-xs font-bold text-[#FFD700] flex items-center gap-1.5">
+                          <span>🗝️</span> Ruhun Kök Hatırlayışı
+                        </span>
+                        <p className={`text-xs sm:text-sm text-white/90 leading-relaxed font-medium ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
+                          {resultData.historicalEra.soulMemoryKey}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 1.2 KOZMİK RUH KÖKENİ & GALAKTİK İZİ (STARSEED) */}
+                {resultData.cosmicOrigin && (
+                  <div className="bg-gradient-to-r from-indigo-950/40 via-mystic-surface/60 to-purple-950/40 border border-indigo-500/30 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-xl">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-white/10">
+                      <div className="flex items-center gap-3">
+                        <div className="p-3 rounded-2xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-300">
+                          <Star size={24} />
+                        </div>
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            <span className="text-xs uppercase tracking-wider text-indigo-400 font-bold">
+                              Kozmik Ruh Kökeni (Starseed İzi)
+                            </span>
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-500/20 text-indigo-200 border border-indigo-500/30">
+                              {resultData.cosmicOrigin.frequencyBadge}
+                            </span>
+                          </div>
+                          <h3 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
+                            <span>{resultData.cosmicOrigin.starName}</span>
+                          </h3>
+                        </div>
+                      </div>
+
+                      <div className="px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-left sm:text-right">
+                        <div className="text-[11px] text-mystic-text-muted">Kozmik Hiza & Takımyıldız</div>
+                        <div className="text-xs font-semibold text-indigo-200">{resultData.cosmicOrigin.constellation}</div>
+                        <div className="text-[10px] text-white/50">{resultData.cosmicOrigin.connectedPoint}</div>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                      <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
+                        <span className="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
+                          <span>🌌</span> Kozmik Yaşam Misyonu
+                        </span>
+                        <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
+                          {resultData.cosmicOrigin.soulMission}
+                        </p>
+                      </div>
+
+                      <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
+                        <span className="text-xs font-bold text-emerald-300 flex items-center gap-1.5">
+                          <span>🎁</span> Dünyaya Getirdiği Kozmik Deha
+                        </span>
+                        <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
+                          {resultData.cosmicOrigin.cosmicGift}
+                        </p>
+                      </div>
+
+                      <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
+                        <span className="text-xs font-bold text-rose-300 flex items-center gap-1.5">
+                          <span>⚡</span> Dünyadaki Yabancılık & Hücresel Sınav
+                        </span>
+                        <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
+                          {resultData.cosmicOrigin.earthlyChallenge}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* 12th House & Last Breath Card */}
                 <div className="bg-mystic-surface/50 border border-white/10 rounded-3xl p-6 sm:p-8">

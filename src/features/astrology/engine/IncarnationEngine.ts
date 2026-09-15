@@ -42,6 +42,14 @@ import {
   AnareticDegreeInfo
 } from './IncarnationInterpretations';
 import { GATE_TO_CENTER } from './AstroHumanDesignSynthesis';
+import {
+  HistoricalEraResult,
+  CosmicOriginResult,
+  calculateHistoricalEra,
+  calculateCosmicOrigin
+} from './IncarnationHistoricalCosmic';
+
+export type { HistoricalEraResult, CosmicOriginResult };
 
 export interface InterceptedSignItem {
   sign: ZodiacSign;
@@ -166,6 +174,10 @@ export interface IncarnationAnalysisResult {
 
   // İkincil İlerletilmiş Harita & Karmik Kilitler (Sıkıştırılmış Burçlar & Anaretik Eşikler)
   progressedEvolution?: ProgressedEvolution;
+
+  // Tarihsel Zaman Tüneli & Galaktik Ruh Kökeni (Aşama 1)
+  historicalEra?: HistoricalEraResult;
+  cosmicOrigin?: CosmicOriginResult;
 
   // Ruhsal Olgunluk Skoru & Seviye
   soulMaturity: {
@@ -868,6 +880,10 @@ export function calculateIncarnationAnalysis(
     hasInterceptedSigns
   };
 
+  // 10. Tarihsel Zaman Tüneli & Galaktik Ruh Kökeni (Aşama 1)
+  const historicalEra = calculateHistoricalEra(natalChart, gadData.sign, gadHouse);
+  const cosmicOrigin = calculateCosmicOrigin(natalChart);
+
   return {
     gad: {
       longitude: gadLon,
@@ -887,6 +903,8 @@ export function calculateIncarnationAnalysis(
       aspects: gadAspects,
       hdGate: gadHDSynthesis
     },
+    historicalEra,
+    cosmicOrigin,
     twelfthHouse: {
       sign: h12.sign,
       ruler: h12Ruler,
