@@ -123,7 +123,7 @@ export default function AnalysisPage() {
   ];
 
   return (
-    <div className="min-h-screen pt-32 pb-24 px-6 relative">
+    <div className="min-h-screen pt-32 pb-24 px-4 sm:px-6 relative overflow-x-hidden">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center p-3 rounded-full bg-mystic-primary/10 border border-mystic-primary/30 text-mystic-primary mb-6">

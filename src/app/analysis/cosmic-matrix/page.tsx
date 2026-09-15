@@ -116,7 +116,7 @@ export default function CosmicMatrixPage() {
   }) || [];
 
   return (
-    <div className="min-h-screen bg-[#0A0D14] text-gray-100 font-sans selection:bg-amber-500/20 selection:text-amber-300 pt-28 pb-20">
+    <div className="min-h-screen bg-[#0A0D14] text-gray-100 font-sans selection:bg-amber-500/20 selection:text-amber-300 pt-28 pb-20 overflow-x-hidden">
       {/* Arka Plan Mistik Işıklandırma */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-amber-500/10 blur-[120px]" />
@@ -229,6 +229,7 @@ export default function CosmicMatrixPage() {
                   <LocationAutocomplete
                     defaultDisplay={city?.name || ''}
                     onSelect={(c) => setCity(c)}
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-400/50"
                   />
                 </div>
               </div>
@@ -284,7 +285,7 @@ export default function CosmicMatrixPage() {
 
             {/* 2. Dört Âlem Katman Dengesi */}
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <h2 className="text-xl font-serif font-bold text-white flex items-center gap-2">
                   <Layers size={20} className="text-amber-400" />
                   Kabalistik Dört Âlem Enerji Dağılımı
@@ -416,7 +417,7 @@ export default function CosmicMatrixPage() {
                   </p>
                 </div>
 
-                <div className="flex items-center gap-1.5 bg-black/40 p-1 rounded-xl border border-white/10 self-start sm:self-auto">
+                <div className="flex flex-wrap items-center gap-1.5 bg-black/40 p-1.5 rounded-xl border border-white/10 self-start sm:self-auto max-w-full">
                   <button
                     onClick={() => setActiveFilter('all')}
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${

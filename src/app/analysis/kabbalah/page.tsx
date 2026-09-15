@@ -157,8 +157,9 @@ export default function KabbalahAnalysisPage() {
     const R_ASPECTS = RADIUS - 40;
 
     return (
-      <div className="w-full overflow-x-auto overflow-y-visible flex justify-center py-12 bg-black/40 rounded-3xl border border-white/5 shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
-        <svg width={CHART_SIZE} height={CHART_SIZE} viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`} overflow="visible" className="max-w-full h-auto">
+      <div className="w-full overflow-hidden flex justify-center py-6 sm:py-12 px-2 bg-black/40 rounded-3xl border border-white/5 shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
+        <div className="w-full max-w-[340px] sm:max-w-[480px] md:max-w-[640px] aspect-square flex items-center justify-center">
+          <svg viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`} className="w-full h-full max-w-full" style={{ overflow: 'visible' }}>
           {/* Aspect Lines */}
           <circle cx={CENTER} cy={CENTER} r={R_ASPECTS} stroke="rgba(212,175,55,0.3)" strokeWidth="1" fill="rgba(0,0,0,0.4)" />
           {currentChart.aspects.filter(a => a.type !== 'Kavuşum').map((a, i) => {
@@ -263,7 +264,8 @@ export default function KabbalahAnalysisPage() {
               </g>
             );
           })}
-        </svg>
+          </svg>
+        </div>
       </div>
     );
   };

@@ -168,7 +168,7 @@ export default function IncarnationAnalysisPage() {
   // Master seviyesi kapısı — erken döndür
   if (!isMasterOrAdmin) {
     return (
-      <div className="min-h-screen pt-28 pb-24 px-4 sm:px-6 relative bg-mystic-dark">
+      <div className="min-h-screen pt-28 pb-24 px-4 sm:px-6 relative bg-mystic-dark overflow-x-hidden">
         <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-gradient-to-b from-[#D4AF37]/15 to-purple-600/10 blur-[130px] pointer-events-none -z-10 rounded-full" />
         <div className="max-w-5xl mx-auto">
           <button
@@ -216,7 +216,7 @@ export default function IncarnationAnalysisPage() {
   }
 
   return (
-    <div className="min-h-screen pt-28 pb-24 px-4 sm:px-6 relative bg-mystic-dark">
+    <div className="min-h-screen pt-28 pb-24 px-4 sm:px-6 relative bg-mystic-dark overflow-x-hidden">
       {/* Background glow ornaments */}
       <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-gradient-to-b from-[#D4AF37]/15 to-purple-600/10 blur-[130px] pointer-events-none -z-10 rounded-full" />
 
@@ -1416,7 +1416,7 @@ export default function IncarnationAnalysisPage() {
       {showLockModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm" onClick={() => setShowLockModal(false)}>
           <div 
-            className="bg-[#111] border border-[#D4AF37]/30 rounded-2xl max-w-md w-full p-6 text-center shadow-2xl relative animate-in fade-in zoom-in duration-300"
+            className="bg-[#111] border border-[#D4AF37]/30 rounded-2xl max-w-md w-full max-h-[90vh] overflow-y-auto p-6 text-center shadow-2xl relative animate-in fade-in zoom-in duration-300"
             onClick={e => e.stopPropagation()}
           >
             <div className="text-[#D4AF37] mx-auto mb-4 flex justify-center"><Lock size={48} /></div>

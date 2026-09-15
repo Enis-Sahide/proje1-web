@@ -36,7 +36,7 @@ export default function AuthPromptModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-200">
       <div 
-        className="bg-[#0f0f18] border border-[#D4AF37]/30 rounded-3xl max-w-md w-full p-6 md:p-8 shadow-2xl relative text-white animate-in zoom-in-95 duration-200"
+        className="bg-[#0f0f18] border border-[#D4AF37]/30 rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto p-5 sm:p-8 shadow-2xl relative text-white animate-in zoom-in-95 duration-200"
         onClick={e => e.stopPropagation()}
       >
         {/* Close Button */}
