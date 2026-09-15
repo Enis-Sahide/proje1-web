@@ -594,7 +594,7 @@ export const downloadIncarnationPDF = async (
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(10.5);
   doc.setTextColor(...muted);
-  const disclaimer = 'Bu rapor, kadim Batı Karmik Astrolojisi ve Drakonik Ruh Haritası hesaplama ilkelerine dayanır. Bilinçaltınızın kök kalıplarını aydınlatmak ve tekâmül yolculuğunuzda size rehberlik etmek için hazırlanmıştır. Gelecek, özgür iradenizle şekillenen ilahi bir danstır.';
+  const disclaimer = 'Bu rapor; kadim Karmik Astroloji, Drakonik Ruh Haritası ve Human Design (Kapı, Merkez ve Enkarnasyon Çaprazı) kozmik hesaplamalarının hakiki bir sentezine dayanır. Bilinçaltınızın kök kalıplarını aydınlatmak ve tekâmül yolculuğunuzda size rehberlik etmek için hazırlanmıştır. Gelecek, özgür iradeniz ve yüksek bilincinizle şekillenen dinamik bir akıştır.';
   doc.text(doc.splitTextToSize(disclaimer, 172), 20, curY + 9);
 
   // Add Page Numbers on all pages

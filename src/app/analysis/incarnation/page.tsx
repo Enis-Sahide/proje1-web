@@ -970,7 +970,7 @@ export default function IncarnationAnalysisPage() {
             <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-2xl p-4 flex gap-3 items-start mt-8">
               <AlertCircle size={18} className="text-[#D4AF37] shrink-0 mt-0.5" />
               <p className="text-xs text-mystic-text-muted leading-relaxed">
-                Bu analiz, kadim Batı Karmik Astrolojisi ve Drakonik Ruh Haritası matematiksel hesaplamalarına dayanır. Amacı, bilinçaltı kök eğilimlerinizi aydınlatmak ve tekâmül sürecinizde size farkındalık kazandırmaktır. Kader kesin bir çizgi değil, özgür iradenizle şekillendirdiğiniz dinamik bir bilinç akışıdır.
+                Bu analiz; kadim Karmik Astroloji, Drakonik Ruh Haritası ve Human Design (Kapı, Merkez ve Enkarnasyon Çaprazı) kozmik hesaplamalarının hakiki bir sentezine dayanır. Amacı, bilinçaltı kök eğilimlerinizi aydınlatmak ve tekâmül sürecinizde size farkındalık kazandırmaktır. Kader kesin bir çizgi değil, özgür iradeniz ve yüksek bilincinizle şekillendirdiğiniz dinamik bir akıştır.
               </p>
             </div>
           </div>
