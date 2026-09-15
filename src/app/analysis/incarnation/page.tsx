@@ -26,8 +26,8 @@ import {
   Unlock
 } from 'lucide-react';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
-import { AstroCity } from '@/features/astrology/engine/AstrologyConstants';
-import { IncarnationAnalysisResult } from '@/features/astrology/engine/IncarnationEngine';
+import type { AstroCity } from '@/features/astrology/engine/AstrologyConstants';
+import type { IncarnationAnalysisResult } from '@/features/astrology/engine/IncarnationEngine';
 import { downloadIncarnationPDF } from '@/utils/incarnationPdfGenerator';
 import { useAuth } from '@/context/AuthContext';
 import AuthPromptModal from '@/components/AuthPromptModal';

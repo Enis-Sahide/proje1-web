@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import { IncarnationAnalysisResult } from '@/features/astrology/engine/IncarnationEngine';
+import type { IncarnationAnalysisResult } from '@/features/astrology/engine/IncarnationEngine';
 
 // Helper to convert ArrayBuffer to Base64
 const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {

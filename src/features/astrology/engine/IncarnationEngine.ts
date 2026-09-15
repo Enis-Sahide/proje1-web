@@ -633,6 +633,8 @@ export function calculateIncarnationAnalysis(
   } else {
     tier = 'Arayıcı Ruh';
     tierDesc = 'Dünyevi deneyimlerin tazeliği ve dinamizmi içindesiniz. Karmik yükleriniz nispeten hafiftir; bu enkarnasyondaki ana amacınız yeni ruhsal tohumlar ekmek ve özgür iradeyle yolu açmaktır.';
+  }
+
   // 9. İkincil İlerletilmiş Harita & Karmik Kilitler (Sıkıştırılmış Burçlar & Anaretik Eşikler)
   const sun = natalChart.planets.find(p => p.name === 'Güneş') || {
     name: 'Güneş',
