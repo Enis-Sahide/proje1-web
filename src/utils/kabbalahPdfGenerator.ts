@@ -25,10 +25,19 @@ const drawTextWithBold = (
   x: number,
   y: number,
   maxWidth: number,
-  lineHeight: number = 6
+  lineHeight: number = 6,
+  maxY: number = 275,
+  startY: number = 25
 ): number => {
   let curX = x;
   let curY = y;
+  const activeColor = (doc as any).getTextColor ? (doc as any).getTextColor() : '#e6e6e6';
+
+  if (curY > maxY) {
+    doc.addPage();
+    curY = startY;
+    doc.setTextColor(activeColor);
+  }
   
   const sanitizedText = text
     .replace(/\r\n/g, '\n') // Convert CRLF to LF
@@ -50,7 +59,15 @@ const drawTextWithBold = (
     if (part.includes('\n')) {
       const newlineCount = (part.match(/\n/g) || []).length;
       curX = x;
-      curY += lineHeight * newlineCount;
+      for (let i = 0; i < newlineCount; i++) {
+        curY += lineHeight;
+        if (curY > maxY) {
+          doc.addPage();
+          curY = startY;
+          doc.setTextColor(activeColor);
+          doc.setFont('LiberationSans', isBold ? 'bold' : 'normal');
+        }
+      }
       continue;
     }
     if (part === '') continue;
@@ -59,6 +76,12 @@ const drawTextWithBold = (
     if (curX + wordWidth > x + maxWidth && part.trim() !== '') {
       curX = x;
       curY += lineHeight;
+      if (curY > maxY) {
+        doc.addPage();
+        curY = startY;
+        doc.setTextColor(activeColor);
+        doc.setFont('LiberationSans', isBold ? 'bold' : 'normal');
+      }
     }
     
     doc.text(part, curX, curY);
