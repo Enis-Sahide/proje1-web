@@ -993,14 +993,20 @@ export function getIncarnationCrossDetails(
   };
 }
 
-export interface InterceptedSignKarmicInfo {
-  sign: ZodiacSign;
-  oppositeSign: ZodiacSign;
-  archetype: string;
+export interface InterceptedSignPolarityData {
+  polarityLabel: string;
   karmicRootCause: string;
   lockedPsychology: string;
   unlockKey: string;
   shadowTrap: string;
+}
+
+export interface InterceptedSignKarmicInfo {
+  sign: ZodiacSign;
+  oppositeSign: ZodiacSign;
+  archetype: string;
+  active: InterceptedSignPolarityData;
+  passive: InterceptedSignPolarityData;
 }
 
 export const INTERCEPTED_SIGN_KARMIC_DATA: Record<ZodiacSign, InterceptedSignKarmicInfo> = {
@@ -1008,109 +1014,229 @@ export const INTERCEPTED_SIGN_KARMIC_DATA: Record<ZodiacSign, InterceptedSignKar
     sign: 'Koç',
     oppositeSign: 'Terazi',
     archetype: 'Kilitli Cesaret & Bastırılmış İrade',
-    karmicRootCause: 'Geçmiş yaşamlarda kendi isteklerinizi, öfkenizi veya liderliğinizi doğrudan ortaya koyduğunuzda şiddetle cezalandırıldınız, dışlandınız ya da başkalarına zarar verdiğiniz için vicdani felç yaşayarak iradenizi sandığa kilitlediniz.',
-    lockedPsychology: 'Kişi erken yaşlarda kendi haklarını savunmakta zorlanır, çatışmadan çekinir veya ani öfke patlamalarıyla içsel baskıyı dışa vurur. "Ben kimim ve ne istiyorum?" sorusu kilitli kalır.',
-    unlockKey: 'İkincil ilerletimde Mars veya Koç açıldığında ruh, başkalarından onay beklemeden kendi adına eyleme geçme hakkını geri kazanır. Sağlıklı bencillik ve cesaret kutsal bir uyanıştır.',
-    shadowTrap: 'Pasif-agresif birikimler veya kendi hakkını savunmak yerine başkalarının gölgesine sığınmak.'
+    active: {
+      polarityLabel: 'Aktif İrade Aşırılığı & Zorbalık Borcu',
+      karmicRootCause: 'Geçmiş yaşamlarda kontrolsüz bir öfkeyle hareket ettiniz; savaşlarda veya liderlik pozisyonlarında kaba kuvvet uygulayarak başkalarının iradesini ezdiniz. Bu eylemlerin yarattığı derin vicdani ağırlık yüzünden bu hayatta iradenizi ve cesaretinizi sandığa kilitlediniz.',
+      lockedPsychology: 'Kendi gücünden veya öfkelenmekten bilinçdışı bir dehşet duyma; "Harekete geçersem yine zarar veririm" inancıyla önemli kararlarda felç olma.',
+      unlockKey: 'Cesareti yok etmek yerine onu adil ve koruyucu bir ruhsal savaşçı dehasına dönüştürmek; yıkıcı değil yapıcı liderliği hayata geçirmek.',
+      shadowTrap: 'Öfkeyi ve hakkını bastırıp patlama noktasına kadar içinde zehir gibi biriktirmek.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Boyun Eğme & Bastırılmış İrade',
+      karmicRootCause: 'Geçmiş yaşamlarda kendi isteklerinizi ve haklarınızı savunduğunuzda ağır şiddetle cezalandırıldınız; iradeniz zorbalarca kırıldı ve başkalarına mutlak boyun eğmek zorunda bırakıldınız.',
+      lockedPsychology: 'Kendi hakkını savunurken donup kalma, çatışmadan panikle kaçınma, "Benim isteklerimin hiçbir önemi yok" diyerek hemen geri çekilme.',
+      unlockKey: 'Kendi adına eyleme geçme ve "Hayır" diyebilme kutsal hakkını geri kazanmak; kurban rolünden çıkıp kendi hayatının mutlak egemeni olmak.',
+      shadowTrap: 'Haksızlığa boyun eğip içten içe pasif-agresif bir kin ve çaresizlik beslemek.'
+    }
   },
   'Boğa': {
     sign: 'Boğa',
     oppositeSign: 'Akrep',
     archetype: 'Kilitli Özdeğer & Maddi Güven',
-    karmicRootCause: 'Geçmiş hayatta mülkiyetiniz, toprağınız veya bedeniniz elinizden zorla alındı; ya da aşırı maddeye saplanıp her şeyi bir gecede kaybederek derin bir kıtlık ve değersizlik travmasıyla ruhunuzu kilitlediniz.',
-    lockedPsychology: 'Kendi emeğinin ve bedeninin kıymetini bilmekte zorlanma, parayla veya sahip olduklarıyla sürekli bir güvensizlik yaşama veya tam tersine aşırı bağımlılık geliştirme hali.',
-    unlockKey: 'Kendi özdeğerinin dışsal varlıklara değil, ruhun doğuştan gelen hakkına dayandığını anlamak. Toprakla, bedenle ve huzurla barışıp kendi üretken bahçesini kurmak.',
-    shadowTrap: 'Değersizlik hissiyle azına razı olmak ya da kaybetme korkusuyla biriktirme takıntısı.'
+    active: {
+      polarityLabel: 'Aktif Mülkiyet Tahakkümü & Açgözlülük',
+      karmicRootCause: 'Geçmiş yaşamlarda doyumsuz bir açgözlülükle kaynakları ve toprakları gaspederek insanları yokluğa mahkum ettiniz; her şeyi aniden kaybedince dünyevi zenginliği bir lanet gibi algılayıp arzularınızı kilitlediniz.',
+      lockedPsychology: 'Maddi güvence hissettiğinde aniden her şeyi kaybetme korkusu, refahı ve bolluğu hak etmediği bilinçaltı inancı.',
+      unlockKey: 'Maddiyatın bir hükmetme aracı değil, ilahi bir emanet olduğunu fark ederek paylaşarak çoğalmayı öğrenmek.',
+      shadowTrap: 'Kaybetme korkusuyla cimrileşmek ve her şeyi kontrol etmeye çalışmak.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Mülkiyetsizlik & Kıtlık Travması',
+      karmicRootCause: 'Geçmiş yaşamlarda emeğiniz, toprağınız, eviniz ve bedeniniz zorbalar tarafından elinizden alındı; sefalet ve kıtlık içinde yaşamaya mahkum edilerek özdeğeriniz ayaklar altına alındı.',
+      lockedPsychology: 'Kendi değerini belirlemekte zorlanma, parayla veya sahip olduklarıyla sürekli bir eksiklik ve yetersizlik hissi, azına razı olma refleksi.',
+      unlockKey: 'Kendi emeğinin ve bedeninin kutsallığına inanmak; evrenin sınırsız rızkına güvenerek kendi bereket alanını korkusuzca inşa etmek.',
+      shadowTrap: 'Değersizlik hissiyle hak ettiği karşılığı talep etmekten utanmak.'
+    }
   },
   'İkizler': {
     sign: 'İkizler',
     oppositeSign: 'Yay',
     archetype: 'Kilitli Ses & Susturulmuş Merak',
-    karmicRootCause: 'Geçmiş yaşamlarda düşündüklerinizi söylediğiniz, gerçeği sorguladığınız veya bir bilgiyi yaydığınız için susturuldunuz, alaya alındınız ya da fikirleriniz yüzünden bedel ödediniz.',
-    lockedPsychology: 'Kişi düşündüklerini söylerken anlaşılmayacağı korkusu yaşar; zihni sürekli konuşur ama en hakiki düşüncelerini dışarıya akıtamaz, zihinsel kararsızlık yaşar.',
-    unlockKey: 'Kendi zihninin kıvraklığına ve sesine güvenmek. Düşüncelerini korkusuzca yazmak, konuşmak ve merakını yargılamadan takip etmek bu kilidi açar.',
-    shadowTrap: 'Suskunluk ile yüzeysel gevezelik arasında gidip gelerek derin hakikatini saklamak.'
+    active: {
+      polarityLabel: 'Aktif Bilgi Manipülasyonu & İftira Borcu',
+      karmicRootCause: 'Geçmiş yaşamlarda zekanızı ve söz gücünüzü dedikodu, iftira, yalan ve zihinsel manipülasyon için kullandınız; sözlerinizle masum insanların hayatını kararttığınız için bu hayatta sesinizi sandığa kilitlediniz.',
+      lockedPsychology: 'Düşüncelerini söylerken yanlış anlaşılacağı veya zarar vereceği korkusu, zihninin konuşması ama gerçeği söylerken tutulup kalması.',
+      unlockKey: 'Sözcükleri bir silah değil, gerçeği aydınlatan kutsal bir köprü olarak kullanmak; sözün şifa gücüne sadık kalmak.',
+      shadowTrap: 'Yüzeysel konuşmalar ve gevezelikle derin hakikatten kaçmak.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Sansür & Susturulmuş Ses',
+      karmicRootCause: 'Geçmiş yaşamlarda gerçeği söylediğiniz, düşündüklerinizi ifade ettiğiniz veya bilgiyi yaymaya çalıştığınız için susturuldunuz, alaya alındınız veya zindanlara kapatıldınız.',
+      lockedPsychology: 'Fikirlerini açıklamaktan çekinme, "Beni kimse dinlemez ya da ciddiye almaz" inancı, kendini ifade ederken boğazda düğümlenme.',
+      unlockKey: 'Kendi düşüncelerinin özgünlüğüne güvenmek; merakını, bilgisini ve kelimelerini korkusuzca dünyaya aktarmak.',
+      shadowTrap: 'Anlaşılmayacağını düşünerek tamamen suskunluğa çekilmek.'
+    }
   },
   'Yengeç': {
     sign: 'Yengeç',
     oppositeSign: 'Oğlak',
     archetype: 'Kilitli Şefkat & Bastırılmış Yuva',
-    karmicRootCause: 'Geçmiş hayatta ailenizden, köklerinizden veya sevdiklerinizden zorla koparıldınız; duygusal kırılganlık gösterdiğiniz için ezildiniz ve duyguları göstermenin bir zayıflık olduğuna inanarak kalbinizi mühürlediniz.',
-    lockedPsychology: 'Duygularını ifade etmekte büyük bir çekingenlik, ait hissedememe, şefkat beklerken katı bir kabuk arkasına saklanma ve içsel çocukla temas kuramama.',
-    unlockKey: 'Kendi kendine şefkatli bir anne olabilmek; kırılganlığın en büyük ruhsal güç olduğunu kabul ederek güvenli duygusal alanlar inşa etmek.',
-    shadowTrap: 'Kırılmaktan korktuğu için mesafeli durup içten içe derin yalnızlık çekmek.'
+    active: {
+      polarityLabel: 'Aktif Duygusal Şantaj & Boğucu Kontrol',
+      karmicRootCause: 'Geçmişte sevgiyi ve şefkati bir kontrol mekanizması olarak kullandınız; suçluluk hissettirerek sevdiklerinizi kendinize bağımlı kıldınız ve bu bağların kopmasıyla kalbinizi derin bir suçlulukla kilitlediniz.',
+      lockedPsychology: 'Duygusal bağlanmaktan ve tekrar kontrolcü olmaktan korkma, duygusal mesafeyle kendini korumaya alma.',
+      unlockKey: 'Koşulsuz şefkati öğrenmek; sevdiklerini özgür bırakarak da güvenli ve saf bir bağ kurulabileceğini idrak etmek.',
+      shadowTrap: 'Duygularını gizleyip soğuk bir kabuk arkasına saklanmak.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Aidiyetsizlik & Kök Travması',
+      karmicRootCause: 'Geçmiş yaşamlarda ailenizden, köklerinizden veya sevdiklerinizden zorla koparıldınız; duygusal kırılganlık gösterdiğiniz için acımasızca ezildiniz ve duyguların bir zayıflık olduğuna inandırıldınız.',
+      lockedPsychology: 'Hiçbir yere ait hissedememe, şefkat beklerken katı durma, içindeki yaralı çocuğu duymaktan kaçınma.',
+      unlockKey: 'Kendi içindeki güvenli yuvayı inşa etmek; kırılganlığın bir zafiyet değil, ruhun en derin şifa gücü olduğunu kabul etmek.',
+      shadowTrap: 'Kırılmaktan korktuğu için kimseyi kalbine yaklaştırmamak.'
+    }
   },
   'Aslan': {
     sign: 'Aslan',
     oppositeSign: 'Kova',
     archetype: 'Kilitli Işık & Bastırılmış Görkem',
-    karmicRootCause: 'Geçmişte kibirle güç kullanıp sonrasında büyük bir utanç yaşadınız; ya da tam tersine yetenekleriniz ve yaratıcı parlaklığınız hasetle söndürüldü, öne çıkmanız yasaklandı.',
-    lockedPsychology: 'Kendi yaratıcılığını göstermekten utanma, sahnede olmaktan veya takdir edilmekten korkma; "Ben özel değilim" inancıyla kendi ışığını saklama.',
-    unlockKey: 'Kalp merkezini (Anahata) açarak, başkalarının alkışı için değil sadece varoluşun bir kutlaması olarak içindeki çocuğu ve yaratıcı dehasını parlatmak.',
-    shadowTrap: 'Görünmez olmaya çalışırken içten içe fark edilmemenin derin kırgınlığını yaşamak.'
+    active: {
+      polarityLabel: 'Aktif Kibir & Egosal Tahakküm Borcu',
+      karmicRootCause: 'Geçmiş yaşamınızda egonuzu, gücünüzü ve yaratıcılığınızı bir tahakküm aracı olarak kullandınız; kibriniz yüzünden başkalarını gölgede bıraktınız ve bunun sonucunda büyük bir utanç yaşayarak ışığınızı sandığa kilitlediniz.',
+      lockedPsychology: 'Öne çıkmaktan, sahnede olmaktan veya liderlik yapmaktan bilinçdışı bir suçluluk duyma, "Parlarsam yine başkalarını ezerim" korkusu.',
+      unlockKey: 'Kalp merkezini (Anahata) açarak, egonun alkışı için değil varoluşun sevinci için içindeki çocuğu ve yaratıcı dehasını cömertçe parlatmak.',
+      shadowTrap: 'Kendini arka plana atıp içten içe takdir edilmemenin gizli kibrini ve kırgınlığını yaşamak.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Bastırılma & Görünmezlik Travması',
+      karmicRootCause: 'Geçmiş yaşamınızda eşsiz yetenekleriniz ve yaratıcı parlaklığınız otorite figürlerinin hasediyle acımasızca söndürüldü; öne çıkmanız, kendinizi ifade etmeniz ve sevilmeniz cezalandırıldığı için görünmez olmayı seçip ışığınızı sandığa kilitlediniz.',
+      lockedPsychology: '"Ben özel değilim", "Parlarsam beni yok ederler" inancıyla yeteneklerini gizleme, takdir edildiğinde aşırı rahatsız olma.',
+      unlockKey: 'Kendi ışığının kimseden izin alması gerekmediğini anlamak; korkusuzca sahneye çıkıp ruhsal dehasını dünyaya sunmak.',
+      shadowTrap: 'Başkalarını parlatırken kendi hayatında daima seyirci koltuğunda kalmak.'
+    }
   },
   'Başak': {
     sign: 'Başak',
     oppositeSign: 'Balık',
     archetype: 'Kilitli Düzen & Bastırılmış Ustalık',
-    karmicRootCause: 'Geçmiş hayatta yaptığınız işlerde haksız yere kusurlu bulundunuz, köle gibi çalıştırılıp emeğiniz hiçe sayıldı ya da aşırı mükemmeliyetçilik yüzünden hayatı kendinize zehir ettiniz.',
-    lockedPsychology: 'Sürekli bir yetersizlik hissi, detaylarda boğulup büyük resmi kaçırma korkusu veya kendi bedeninin ve zanaatının bilgeliğine güvenememe.',
-    unlockKey: 'Mükemmelliğin bir hedef değil, ilahi bir süreç olduğunu kabul etmek. Bedenine ve sunduğu hizmete saygı duyarak sadeleşmeyi ve arınmayı öğrenmek.',
-    shadowTrap: 'Kendini ve çevresini acımasızca eleştirerek harekete geçmeyi ertelemek.'
+    active: {
+      polarityLabel: 'Aktif Kusur Arayıcılığı & Katı Eleştiri',
+      karmicRootCause: 'Geçmişte aşırı mükemmeliyetçilikle başkalarının en ufak hatalarını cezalandırdınız; insanları kusurlu bularak köle gibi çalıştırdınız ve bu katılık yüzünden hayatın sevgisini yok ettiniz.',
+      lockedPsychology: 'Hata yapmaktan dehşete düşme, sürekli bir kontrol ve kusursuzluk takıntısıyla zihnini ve bedenini tüketme.',
+      unlockKey: 'Kusurluluğun içindeki ilahi güzelliği görmek; mükemmellik baskısını bırakıp şefkatli bir hizmet anlayışına geçmek.',
+      shadowTrap: 'Detaylarda boğulup büyük resmi tamamen kaçırmak.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Yetersizlik & Emeği Sömürülme',
+      karmicRootCause: 'Geçmiş yaşamlarda gece gündüz çalıştığınız halde emeğiniz hiçe sayıldı; sürekli kusurlu ve eksik bulunarak aşağılandınız, ne yaparsanız yapın yetersiz olduğunuza inandırıldınız.',
+      lockedPsychology: 'Sürekli bir "Ben yetersizim" hissi, sunduğu hizmetin ve zanaatın değerini görememe, kendini feda edercesine çalışma.',
+      unlockKey: 'Kendi bedeninin, emeğinin ve zanaatının bilgeliğini kutsamak; hak ettiği dinlenme ve takdiri kendine cömertçe sunmak.',
+      shadowTrap: 'Kendini acımasızca eleştirerek harekete geçmeyi ertelemek.'
+    }
   },
   'Terazi': {
     sign: 'Terazi',
     oppositeSign: 'Koç',
     archetype: 'Kilitli Denge & Bastırılmış Eşitlik',
-    karmicRootCause: 'Geçmiş yaşamlarda ilişkilerde tamamen yok sayıldınız, evlilikler veya ortaklıklarda sömürüldünüz ya da çatışmayı engellemek uğruna tüm haklarınızı teslim ettiniz.',
-    lockedPsychology: 'Hakiki bir ortaklık kurmakta tereddüt, karar vermekte aşırı zorlanma, yalnız kalma korkusu ile sınır koyamama arasındaki içsel sıkışma.',
-    unlockKey: 'Kendi içinde eril ve dişil dengeyi kurup, taviz vermeden de sevilebileceğini anlamak. Adaleti ve uyumu dışarıdan dilenmek yerine kendi merkezinden yaymak.',
-    shadowTrap: 'Huzur bozulmasın diye boyun eğip içten içe adaletsizlik duygusuyla dolmak.'
+    active: {
+      polarityLabel: 'Aktif Çıkarcı Diplomasi & Adaleti İhlal',
+      karmicRootCause: 'Geçmişte ilişkileri ve ortaklıkları sahte bir diplomasiyle manipüle ettiniz; kendi konforunuz için adaleti çarpıttınız ve bu ilahi yasayı ihlal etmenin ağırlığıyla dengeyi kilitlediniz.',
+      lockedPsychology: 'İlişkilerde güven kuramama, adil davranırken aşırı tereddüt yaşama, karar vermekten felç olma derecesinde korkma.',
+      unlockKey: 'Hakiki dürüstlüğü ve adaleti kendi merkezinde inşa etmek; menfaat için değil ruhsal uyum için ilişki kurmak.',
+      shadowTrap: 'Sahte bir nezaket arkasında samimiyetsiz kalmak.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Bağımlılık & Kurban Edilmiş Denge',
+      karmicRootCause: 'Geçmiş yaşamlarda ortaklıklarda veya evliliklerde tüm haklarınızı teslim etmek zorunda bırakıldınız; çatışma çıkmasın diye yok sayıldınız ve sesinizi çıkaramadığınız için sömürüldünüz.',
+      lockedPsychology: 'Yalnız kalmaktan korktuğu için sınır çizememe, başkalarının isteklerine boyun eğme, "Benim dengem yok" hissi.',
+      unlockKey: 'Taviz vermeden de sevilebileceğini kabul etmek; kendi sınırlarını onurlandırarak eşit ve adil ortaklıklar kurmak.',
+      shadowTrap: 'Huzur bozulmasın diye boyun eğip içten içe adaletsizlik duygusuyla dolmak.'
+    }
   },
   'Akrep': {
     sign: 'Akrep',
     oppositeSign: 'Boğa',
     archetype: 'Kilitli Dönüşüm & Mühürlü Simya',
-    karmicRootCause: 'Geçmişte derin bir ihanet, büyü/okültizm cezalandırılması veya ölümcül bir kriz deneyimlediniz. Gücünüzü gösterdiğinizde felaket geldiği için sezgilerinizi ve tutkunuzu yerin altına kilitlediniz.',
-    lockedPsychology: 'Aşırı kontrolcülük, kimseye güvenememe, derin duygulardan ve cinsellik/tutku gibi dönüştürücü güçlerden korkma, savunma kalkanı arkasında yaşama.',
-    unlockKey: 'Karanlıktan korkmak yerine onun içindeki ışığı görmeyi öğrenmek. Sezgisel ve simyasal gücünü teslimiyetle ve şifa amacıyla açığa çıkarmak.',
-    shadowTrap: 'İhanete uğrama korkusuyla herkesi şüpheli görüp kendi cehennemini yaratmak.'
+    active: {
+      polarityLabel: 'Aktif Güç İstismarı & Okült Manipülasyon',
+      karmicRootCause: 'Geçmişte okült güçlerinizi, cinselliği veya psikolojik kontrolü başkalarını köleleştirmek ve intikam almak için kullandınız; bu güçlerin yarattığı felaketin ardından derin bir vicdani korkuyla simyasal gücünüzü kilitlediniz.',
+      lockedPsychology: 'Kendi tutkusundan ve sezgisel gücünden korkma, derin bağlar kurmaktan kaçınma, gücü eline almaktan ürkme.',
+      unlockKey: 'Gücün başkalarını kontrol etmek için değil, ruhsal dönüşüm ve şifa için var olduğunu kabul etmek; teslimiyetin en büyük güç olduğunu görmek.',
+      shadowTrap: 'Aşırı kontrolcülükle herkesi manipüle etmeye çalışmak.'
+    },
+    passive: {
+      polarityLabel: 'Pasif İhanet Travması & Bastırılmış Sezgi',
+      karmicRootCause: 'Geçmişte en güvendiğiniz kişiler tarafından sırtınızdan vuruldunuz; derin sezgileriniz veya dönüştürücü yetenekleriniz yüzünden büyücülükle suçlanıp yok edildiniz.',
+      lockedPsychology: 'Kimseye güvenememe, sürekli tetikte ve savunmada yaşama, derin duygulardan korkma.',
+      unlockKey: 'Karanlığı ışığa dönüştürme yeteneğine güvenmek; korkularıyla yüzleşip ilahi korumaya teslim olarak sezgilerini açığa çıkarmak.',
+      shadowTrap: 'İhanete uğrama korkusuyla herkesi düşman bilip kendini yalnızlığa mahkum etmek.'
+    }
   },
   'Yay': {
     sign: 'Yay',
     oppositeSign: 'İkizler',
     archetype: 'Kilitli İnanç & Mühürlü Vizyon',
-    karmicRootCause: 'Geçmiş hayatta dini dogmalar veya fanatizm yüzünden zulüm gördünüz ya da kendi inancınız yüzünden sürüldünüz; ruhunuz yüksek anlam arayışını kilitledi.',
-    lockedPsychology: 'Hayatın anlamına ve evrenin adaletine güvenmekte zorlanma, kendi vizyonunu küçümseme, dar kalıplar içine sıkışıp kalma hissi.',
-    unlockKey: 'Evrensel bilgeliğe ve kendi içsel felsefesine yeniden inanmak. Seyahat, felsefe ve yüksek bilinç kapılarını cesaretle aralamak.',
-    shadowTrap: 'Ya hiçbir şeye inanmayıp sinikleşmek ya da dogmatik bir fanatizme sığınmak.'
+    active: {
+      polarityLabel: 'Aktif Dogmatizm & İnanç Baskısı',
+      karmicRootCause: 'Geçmişte dini veya felsefi bir otorite olarak kendi dogmalarınızı başkalarına zorla dayattınız; farklı inananları yargıladınız ve bu fanatizmin yıkımıyla inanç merkezinizi kilitlediniz.',
+      lockedPsychology: 'Kendi inançlarına ve sezgisel rehberliğine güvenmekte zorlanma, anlam arayışında kaybolma hissi.',
+      unlockKey: 'Gerçeğin tek bir kalıba sığmayacağını anlamak; yargılamadan evrensel hakikatin öğrencisi olmak.',
+      shadowTrap: 'Ya dogmatik olmak ya da hiçbir şeye inanmayıp anlamsızlığa düşmek.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Sürgün & Bastırılmış İnanç',
+      karmicRootCause: 'Geçmiş yaşamlarda inancınız, vizyonunuz veya hakikat arayışınız yüzünden aforoz edildiniz, topraklarınızdan sürüldünüz ve kendi hakikatinizi yaşamanız yasaklandı.',
+      lockedPsychology: 'Kendi vizyonunu küçümseme, dar bir çerçevenin dışına çıkmaktan korkma, evrenin adaletine güvenememe.',
+      unlockKey: 'İçsel bilge pusulasına yeniden güvenmek; dünyayı ve yüksek bilinci cesaretle keşfe çıkmak.',
+      shadowTrap: 'Kendi büyük hayallerini "imkansız" diyerek erkenden terk etmek.'
+    }
   },
   'Oğlak': {
     sign: 'Oğlak',
     oppositeSign: 'Yengeç',
     archetype: 'Kilitli Otorite & Bastırılmış Saygınlık',
-    karmicRootCause: 'Geçmişte üzerinize kaldıramayacağınız kadar erken yaşta devasa sorumluluklar yüklendi veya otorite figürleri tarafından ezilerek başarı hakkınız gaspedildi.',
-    lockedPsychology: 'Başarı ve sorumluluk almaktan bilinçdışı korkma, kendi hayatının yöneticisi olduğunu kabul etmekte zorlanma veya tam tersi katı bir soğukluk sergileme.',
-    unlockKey: 'Kendi içsel bilge otoritesini (Satürn) sahiplenmek. Zamanın bilgeliğine güvenerek sabırla kendi kalıcı ruhsal krallığını inşa etmek.',
-    shadowTrap: 'Başarısızlık korkusuyla sorumluluktan kaçmak veya duygusuz bir işkolikliğe sığınmak.'
+    active: {
+      polarityLabel: 'Aktif Tiranlık & Otorite İstismarı',
+      karmicRootCause: 'Geçmişte bir yönetici veya otorite olarak insanlara karşı kalpsiz ve acımasız kurallar koydunuz; başarı uğruna insanların duygularını ezdiniz ve bu soğukluğun vicdan azabıyla otoritenizi kilitlediniz.',
+      lockedPsychology: 'Sorumluluk almaktan veya lider olmaktan bilinçdışı kaçınma, soğuk görünmekten korkma.',
+      unlockKey: 'Kalpli bir otorite olmayı öğrenmek; saygınlığın baskıyla değil adalet ve sevgiyle kazanıldığını idrak etmek.',
+      shadowTrap: 'Duygusuz bir işkolikliğe sığınarak insanlarla bağını koparmak.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Ezilme & Yük Taşıma Travması',
+      karmicRootCause: 'Geçmişte çocuk yaşta üzerinize taşınamayacak kadar ağır sorumluluklar yüklendi; otorite figürleri tarafından ezildiniz ve başarı hakkınız tamamen engellendi.',
+      lockedPsychology: 'Kendi hayatının efendisi olduğuna inanamama, başarısızlıktan dehşete düşme, sürekli bir yük altında ezilme hissi.',
+      unlockKey: 'Başkalarının yüklerini bırakıp yalnızca kendi ruhsal tekâmülünün mimarı olmak; sabırla kendi zirvesine yürümek.',
+      shadowTrap: 'Başarısızlık korkusuyla sorumluluk almaktan kaçıp çocuk kalmak.'
+    }
   },
   'Kova': {
     sign: 'Kova',
     oppositeSign: 'Aslan',
     archetype: 'Kilitli Özgünlük & Mühürlü Deha',
-    karmicRootCause: 'Geçmişte farklı düşündüğünüz, toplumsal normların ötesine geçtiğiniz veya devrimci fikirleriniz yüzünden aforoz edildiniz, kabileden/topluluktan kovuldunuz.',
-    lockedPsychology: 'Kendi marjinal ve dahi tarafını saklama, topluma uyum sağlamak için sıradanlaşma çabası, kolektife güvenmekte ve ait hissetmekte zorlanma.',
-    unlockKey: 'Kendi tuhaflığını ve benzersiz dehasını kutsal bir hediye olarak kabul etmek. Kolektif bilinci uyandırmak için sürüden ayrılma cesaretini göstermek.',
-    shadowTrap: 'Dışlanma korkusuyla silikleşmek ya da isyankar olup bağları tamamen koparmak.'
+    active: {
+      polarityLabel: 'Aktif Elitizm & Soğuk Kibir',
+      karmicRootCause: 'Geçmişte zekanız ve dehanız yüzünden insanları küçümsediniz; kibirli bir elitizmle topluluktan koptunuz ve insanlara tepeden baktığınız için kolektif bağlarınızı kilitlediniz.',
+      lockedPsychology: 'Kendi zekasını veya vizyonunu sunarken soğuk ve mesafeli olma, insanlarla kalpten bağ kurmakta zorlanma.',
+      unlockKey: 'Dehayı insanlığa hizmet eden bir şefkate dönüştürmek; herkesin eşit bir ilahi kıvılcım taşıdığını hatırlamak.',
+      shadowTrap: 'İnsanları aşağılayıp entelektüel bir fildişi kuleye çekilmek.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Dışlanma & Bastırılmış Deha',
+      karmicRootCause: 'Geçmiş yaşamlarda farklı düşündüğünüz, devrimci fikirleriniz veya marjinal kimliğiniz yüzünden kabileden kovuldunuz, taşlandınız ve toplumdan dışlandınız.',
+      lockedPsychology: 'Farklı olmaktan korkma, dışlanmamak için sıradanlaşmaya çalışma, topluluk içinde güvensiz hissetme.',
+      unlockKey: 'Kendi özgünlüğünü ve farklılığını kutsal bir armağan olarak kutlamak; kolektifi uyandırmak için sürüden ayrılma cesaretini göstermek.',
+      shadowTrap: 'Uyum sağlamak uğruna kendi eşsiz dehasını tamamen çöpe atmak.'
+    }
   },
   'Balık': {
     sign: 'Balık',
     oppositeSign: 'Başak',
     archetype: 'Kilitli Teslimiyet & Mühürlü Sezgi',
-    karmicRootCause: 'Geçmiş yaşamlarda aşırı fedakarlık yapıp kurban edildiniz; manastırlarda/inzivalarda dünyadan koparıldınız ya da sezgileriniz yüzünden büyücülükle suçlanıp yok edildiniz.',
-    lockedPsychology: 'Ruhsal alem ile madde alemi arasında köprü kuramama, sezgilerine güvenmekten korkma, kurban psikolojisine düşme veya aşırı mantıkçılıkla sezgileri bastırma.',
-    unlockKey: 'Evrenle bir olduğunu hatırlamak. Şartsız teslimiyet ve ilahi sevgi kanalını açarak sanatsal ve şifacı ilhamı dünyaya aktarmak.',
-    shadowTrap: 'Gerçeklerden kaçmak için bağımlılıklara sığınmak veya aşırı katı rasyonalizmle ruhunu hapsetmek.'
+    active: {
+      polarityLabel: 'Aktif İllüzyon & Kurban Rolü İstismarı',
+      karmicRootCause: 'Geçmişte spiritüel veya mistik yeteneklerinizi insanları kandırmak, hayal dünyalarına hapsetmek veya sahte kurban rolüyle başkalarını sömürmek için kullandınız; bu illüzyonun ağırlığıyla sezgilerinizi kilitlediniz.',
+      lockedPsychology: 'Sezgisel ve ruhsal deneyimlerden ürkme, gerçeklikten kopmaktan korkma, spiritüel konulara şüpheyle yaklaşma.',
+      unlockKey: 'Sezgiyi dünyevi sorumlulukla dengelemek; illüzyonlara değil hakiki birlik bilincine ve saf sevgiye hizmet etmek.',
+      shadowTrap: 'Gerçeklerden kaçmak için bağımlılıklara veya sahte hayallere sığınmak.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Kurban Travması & Mühürlü Sezgi',
+      karmicRootCause: 'Geçmiş yaşamlarda aşırı fedakarlık yapıp herkesin günahını üstlendiniz; kurban edildiniz, dünyadan koparılıp manastırlara kapatıldınız ya da şifacılığınız yüzünden cezalandırıldınız.',
+      lockedPsychology: 'Kendi sınırlarını koruyamama, herkesin acısını sünger gibi çekip hastalanma, sezgilerini kapatmak için aşırı mantıkçılığa sığınma.',
+      unlockKey: 'Kurban olmadan da şifacı olunabileceğini bilmek; sağlıklı ruhsal sınırlar çizerek ilahi ilhamı ve sanatı dünyaya akıtmak.',
+      shadowTrap: 'Acı çekmeyi bir erdem sanıp kurban rolünde takılı kalmak.'
+    }
   }
 };
 

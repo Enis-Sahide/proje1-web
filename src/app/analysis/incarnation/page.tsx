@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   ArrowLeft, 
@@ -68,6 +68,12 @@ export default function IncarnationAnalysisPage() {
 
   // Active Tab
   const [activeTab, setActiveTab] = useState<'past_life' | 'karmic_debts' | 'draconic' | 'progressed' | 'next_life'>('past_life');
+
+  useEffect(() => {
+    if (resultData && activeTab === 'progressed' && !resultData.progressedEvolution?.hasSpecialLocks) {
+      setActiveTab('past_life');
+    }
+  }, [resultData, activeTab]);
 
   const handleCalculate = async () => {
     try {
@@ -301,7 +307,7 @@ export default function IncarnationAnalysisPage() {
             </div>
 
             {/* TAB NAVIGATION */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 bg-black/40 p-1.5 rounded-2xl border border-white/10">
+            <div className={`grid ${resultData.progressedEvolution?.hasSpecialLocks ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5' : 'grid-cols-2 md:grid-cols-4'} gap-2 bg-black/40 p-1.5 rounded-2xl border border-white/10`}>
               <button
                 onClick={() => setActiveTab('past_life')}
                 className={`flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
@@ -338,17 +344,19 @@ export default function IncarnationAnalysisPage() {
                 <span>3. Drakonik Ruh</span>
               </button>
 
-              <button
-                onClick={() => setActiveTab('progressed')}
-                className={`flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
-                  activeTab === 'progressed'
-                    ? 'bg-[#D4AF37] text-black shadow-lg shadow-[#D4AF37]/30 font-bold'
-                    : 'text-mystic-text-muted hover:text-white hover:bg-white/5'
-                }`}
-              >
-                <Key size={16} />
-                <span>4. İlerletim & Kilitler</span>
-              </button>
+              {resultData.progressedEvolution?.hasSpecialLocks && (
+                <button
+                  onClick={() => setActiveTab('progressed')}
+                  className={`flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                    activeTab === 'progressed'
+                      ? 'bg-amber-400 text-black shadow-lg shadow-amber-400/30 font-bold'
+                      : 'text-amber-300/90 hover:text-amber-200 hover:bg-amber-500/10'
+                  }`}
+                >
+                  <Key size={16} className="text-amber-400" />
+                  <span>4. Karmik Kilitler</span>
+                </button>
+              )}
 
               <button
                 onClick={() => setActiveTab('next_life')}
@@ -359,7 +367,7 @@ export default function IncarnationAnalysisPage() {
                 }`}
               >
                 <Flame size={16} />
-                <span>5. Dharma & Gelecek</span>
+                <span>{resultData.progressedEvolution?.hasSpecialLocks ? '5. Dharma & Gelecek' : '4. Dharma & Gelecek'}</span>
               </button>
             </div>
 
@@ -863,98 +871,115 @@ export default function IncarnationAnalysisPage() {
             )}
 
             {/* TAB CONTENT: 4. PROGRESSED & INTERCEPTED */}
-            {activeTab === 'progressed' && resultData.progressedEvolution && (
+            {activeTab === 'progressed' && resultData.progressedEvolution && resultData.progressedEvolution.hasSpecialLocks && (
               <div className="space-y-6">
-                {/* Header Banner */}
-                <div className="bg-gradient-to-r from-purple-950/40 via-mystic-surface/60 to-black/40 border border-purple-500/30 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-xl">
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
-                    <div className="space-y-1">
-                      <div className="flex flex-wrap items-center gap-2">
-                        <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/30">
-                          2. İlerletilmiş Harita (Secondary Progressions)
-                        </span>
-                        <span
-                          className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border"
-                          style={{
-                            backgroundColor: `${resultData.progressedEvolution.badgeColor}20`,
-                            color: resultData.progressedEvolution.badgeColor,
-                            borderColor: `${resultData.progressedEvolution.badgeColor}40`
-                          }}
-                        >
-                          {resultData.progressedEvolution.badgeTitle}
-                        </span>
-                      </div>
-                      <h3 className="text-xl sm:text-2xl font-bold text-white mt-2">
-                        İlerletilmiş Ruh Evrimi & Karmik Kilitler
-                      </h3>
-                    </div>
+                {/* Special Illumination Alert / Initiation Key Banner */}
+                <div className="p-6 rounded-3xl bg-gradient-to-r from-amber-500/15 via-purple-900/20 to-black/40 border border-amber-500/30 flex items-start gap-4 shadow-xl">
+                  <div className="p-3 rounded-2xl bg-amber-500/20 text-[#FFD700] shrink-0">
+                    <Sparkles size={24} />
                   </div>
-
-                  <p className="text-sm text-mystic-text-muted leading-relaxed max-w-3xl">
-                    {resultData.progressedEvolution.evolutionSummary}
-                  </p>
-
-                  {/* Progressed Sun Shift Card */}
-                  <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-white/10">
-                    <div className="p-4 rounded-2xl bg-black/40 border border-white/5">
-                      <span className="text-xs text-white/50 block mb-1">Natal (Doğum Anı) Güneş</span>
-                      <div className="text-lg font-bold text-white flex items-center gap-2">
-                        <span>{ZODIAC_SYMBOLS[resultData.progressedEvolution.natalSunSign]}</span>
-                        <span>{resultData.progressedEvolution.natalSunSign}</span>
-                        <span className="text-xs text-white/60 font-mono">
-                          {resultData.progressedEvolution.natalSunDegree}°{resultData.progressedEvolution.natalSunMinutes}'
-                        </span>
-                      </div>
-                      <span className="text-[11px] text-white/40 mt-1 block">Ruhun bu hayata geldiği kök kimlik</span>
-                    </div>
-
-                    <div className="p-4 rounded-2xl bg-purple-950/30 border border-purple-500/30">
-                      <span className="text-xs text-purple-300 block mb-1">İkincil İlerletilmiş Güneş</span>
-                      <div className="text-lg font-bold text-[#FFD700] flex items-center gap-2">
-                        <span>{ZODIAC_SYMBOLS[resultData.progressedEvolution.progressedSunSign]}</span>
-                        <span>{resultData.progressedEvolution.progressedSunSign}</span>
-                      </div>
-                      <span className="text-[11px] text-purple-200/60 mt-1 block">
-                        {resultData.progressedEvolution.hasShifted 
-                          ? `Ruhunuz ${resultData.progressedEvolution.progressedAge} yaşında bu burcun frekansına sıçradı.`
-                          : `${resultData.progressedEvolution.progressedAge} yaşında bu yeni bilince sıçrayacak.`}
-                      </span>
-                    </div>
-
-                    <div className="p-4 rounded-2xl bg-amber-950/20 border border-amber-500/20">
-                      <span className="text-xs text-amber-300 block mb-1">Tekâmül Eşiği Yaşı</span>
-                      <div className="text-lg font-bold text-white flex items-center gap-2">
-                        <Clock size={18} className="text-[#D4AF37]" />
-                        <span>{resultData.progressedEvolution.progressedAge} Yaş</span>
-                      </div>
-                      <span className="text-[11px] text-white/50 mt-1 block">
-                        {resultData.progressedEvolution.degreeType === '29° Anaretik Derece'
-                          ? '29° Anaretik: Geçmiş yaşam karmanızı ilk yıllarda kapatıp yeni frekansa geçtiniz.'
-                          : 'Karmik kabuk değişimi ve içsel bilinç genişleme yaşı.'}
-                      </span>
-                    </div>
+                  <div className="space-y-1">
+                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                      <span>⚠️ Özel Karmik Aydınlanma & İnisiyasyon Kilidi</span>
+                    </h3>
+                    <p className="text-xs sm:text-sm text-mystic-text-muted leading-relaxed">
+                      Doğum haritanızda ruhsal tekâmülünüzü doğrudan mühürleyen özel bir karmik eşik tespit edilmiştir. Bu gösterge sıradan bir enerji yerleşimi değil; geçmiş yaşamlardan bu enkarnasyona taşınan gizli bir inisiyasyon sınavı ve açılması gereken kilitli bir ruh kodudur.
+                    </p>
                   </div>
                 </div>
 
-                {/* SIKIŞTIRILMIŞ BURÇLAR (INTERCEPTED SIGNS) BÖLÜMÜ */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 rounded-xl bg-amber-500/10 text-[#D4AF37] border border-amber-500/30">
-                        <Key size={20} />
+                {/* 28°-29° ANARETİK SINIR DERECESİ & İKİNCİL İLERLETİLMİŞ GÜNEŞ (SADECE VARSA GÖSTERİLİR) */}
+                {resultData.progressedEvolution.isCriticalDegree && (
+                  <div className="bg-gradient-to-r from-purple-950/40 via-mystic-surface/60 to-black/40 border border-purple-500/30 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-xl">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+                      <div className="space-y-1">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <span className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                            2. İlerletilmiş Harita (Secondary Progressions)
+                          </span>
+                          <span
+                            className="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border"
+                            style={{
+                              backgroundColor: `${resultData.progressedEvolution.badgeColor}20`,
+                              color: resultData.progressedEvolution.badgeColor,
+                              borderColor: `${resultData.progressedEvolution.badgeColor}40`
+                            }}
+                          >
+                            {resultData.progressedEvolution.badgeTitle}
+                          </span>
+                        </div>
+                        <h3 className="text-xl sm:text-2xl font-bold text-white mt-2">
+                          İlerletilmiş Ruh Evrimi & Anaretik Sınır Derecesi
+                        </h3>
                       </div>
-                      <div>
-                        <h4 className="text-lg sm:text-xl font-bold text-white">
-                          Sıkıştırılmış Burçlar (Kilitli Sandıklar & Gizli Potansiyeller)
-                        </h4>
-                        <p className="text-xs text-mystic-text-muted">
-                          Ev çizgilerinin arasına hapsolmuş, geçmiş yaşamda bastırılmış veya yasaklanmış kök güçler
-                        </p>
+                    </div>
+
+                    <p className="text-sm text-mystic-text-muted leading-relaxed max-w-3xl">
+                      {resultData.progressedEvolution.evolutionSummary}
+                    </p>
+
+                    {/* Progressed Sun Shift Card */}
+                    <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-4 pt-6 border-t border-white/10">
+                      <div className="p-4 rounded-2xl bg-black/40 border border-white/5">
+                        <span className="text-xs text-white/50 block mb-1">Natal (Doğum Anı) Güneş</span>
+                        <div className="text-lg font-bold text-white flex items-center gap-2">
+                          <span>{ZODIAC_SYMBOLS[resultData.progressedEvolution.natalSunSign]}</span>
+                          <span>{resultData.progressedEvolution.natalSunSign}</span>
+                          <span className="text-xs text-white/60 font-mono">
+                            {resultData.progressedEvolution.natalSunDegree}°{resultData.progressedEvolution.natalSunMinutes}'
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-white/40 mt-1 block">Ruhun bu hayata geldiği kök kimlik</span>
+                      </div>
+
+                      <div className="p-4 rounded-2xl bg-purple-950/30 border border-purple-500/30">
+                        <span className="text-xs text-purple-300 block mb-1">İkincil İlerletilmiş Güneş</span>
+                        <div className="text-lg font-bold text-[#FFD700] flex items-center gap-2">
+                          <span>{ZODIAC_SYMBOLS[resultData.progressedEvolution.progressedSunSign]}</span>
+                          <span>{resultData.progressedEvolution.progressedSunSign}</span>
+                        </div>
+                        <span className="text-[11px] text-purple-200/60 mt-1 block">
+                          {resultData.progressedEvolution.hasShifted 
+                            ? `Ruhunuz ${resultData.progressedEvolution.progressedAge} yaşında bu burcun frekansına sıçradı.`
+                            : `${resultData.progressedEvolution.progressedAge} yaşında bu yeni bilince sıçrayacak.`}
+                        </span>
+                      </div>
+
+                      <div className="p-4 rounded-2xl bg-amber-950/20 border border-amber-500/20">
+                        <span className="text-xs text-amber-300 block mb-1">Tekâmül Eşiği Yaşı</span>
+                        <div className="text-lg font-bold text-white flex items-center gap-2">
+                          <Clock size={18} className="text-[#D4AF37]" />
+                          <span>{resultData.progressedEvolution.progressedAge} Yaş</span>
+                        </div>
+                        <span className="text-[11px] text-white/50 mt-1 block">
+                          {resultData.progressedEvolution.degreeType === '29° Anaretik Derece'
+                            ? '29° Anaretik: Geçmiş yaşam karmanızı ilk yıllarda kapatıp yeni frekansa geçtiniz.'
+                            : 'Karmik kabuk değişimi ve içsel bilinç genişleme yaşı.'}
+                        </span>
                       </div>
                     </div>
                   </div>
+                )}
 
-                  {resultData.progressedEvolution.hasInterceptedSigns ? (
+                {/* SIKIŞTIRILMIŞ BURÇLAR (KİLİTLİ SANDIKLAR) (SADECE VARSA GÖSTERİLİR) */}
+                {resultData.progressedEvolution.hasInterceptedSigns && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-xl bg-amber-500/10 text-[#D4AF37] border border-amber-500/30">
+                          <Key size={20} />
+                        </div>
+                        <div>
+                          <h4 className="text-lg sm:text-xl font-bold text-white">
+                            Sıkıştırılmış Burçlar (Kilitli Sandıklar & Gizli Potansiyeller)
+                          </h4>
+                          <p className="text-xs text-mystic-text-muted">
+                            Ev çizgilerinin arasına hapsolmuş, geçmiş yaşamda bastırılmış veya yasaklanmış kök güçler
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {resultData.progressedEvolution.interceptedSigns.map((inter, idx) => (
                         <div
@@ -962,14 +987,23 @@ export default function IncarnationAnalysisPage() {
                           className="bg-mystic-surface/50 border border-amber-500/30 rounded-3xl p-6 relative overflow-hidden shadow-lg space-y-4"
                         >
                           <div className="flex items-start justify-between gap-4 pb-4 border-b border-white/10">
-                            <div>
-                              <div className="flex items-center gap-2">
+                            <div className="space-y-1">
+                              <div className="flex flex-wrap items-center gap-2">
                                 <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase bg-amber-500/20 text-[#D4AF37] border border-amber-500/40">
                                   {inter.house}. Evde Hapsolmuş
                                 </span>
                                 <span className="text-xs text-white/50 font-medium">
                                   Yönetici: {inter.ruler}
                                 </span>
+                                {inter.polarityLabel && (
+                                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                                    inter.polarity === 'active' 
+                                      ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40' 
+                                      : 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/40'
+                                  }`}>
+                                    ⚡ {inter.polarityLabel}
+                                  </span>
+                                )}
                               </div>
                               <h5 className="text-lg font-bold text-white mt-1 flex items-center gap-2">
                                 <span>{ZODIAC_SYMBOLS[inter.sign]} {inter.sign} Burcu</span>
@@ -982,6 +1016,13 @@ export default function IncarnationAnalysisPage() {
                               <Lock size={18} />
                             </div>
                           </div>
+
+                          {inter.hdDiagnosis && (
+                            <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200/90 leading-relaxed">
+                              <strong className="text-[#FFD700] block mb-1">🧬 Human Design Sentezi:</strong>
+                              {inter.hdDiagnosis}
+                            </div>
+                          )}
 
                           {inter.planetsInside && inter.planetsInside.length > 0 && (
                             <div className="p-3 rounded-2xl bg-amber-950/30 border border-amber-500/30 flex items-center gap-2 text-xs text-amber-200">
@@ -1024,20 +1065,8 @@ export default function IncarnationAnalysisPage() {
                         </div>
                       ))}
                     </div>
-                  ) : (
-                    <div className="p-6 rounded-3xl bg-emerald-950/20 border border-emerald-500/30 text-center space-y-2">
-                      <div className="inline-flex p-3 rounded-full bg-emerald-500/20 text-emerald-300 mb-1">
-                        <CheckCircle2 size={24} />
-                      </div>
-                      <h5 className="text-base font-bold text-white">
-                        Tüm Burç Kapılarınız Doğrudan Akışta
-                      </h5>
-                      <p className="text-xs sm:text-sm text-mystic-text-muted max-w-xl mx-auto leading-relaxed">
-                        Doğum haritanızda ev çizgileri arasına sıkışmış (kilitli) bir burç bulunmamaktadır. Ruhunuzun 12 burç arketipinin enerjisine doğrudan erişim kapısı mevcuttur; geçmiş yaşamlardan hapsedilmiş bir potansiyeliniz bulunmamaktadır.
-                      </p>
-                    </div>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 {!isMasterOrAdmin && renderLockedSectionNotice()}
               </div>

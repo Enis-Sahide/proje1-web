@@ -49,6 +49,9 @@ export interface InterceptedSignItem {
   house: number;
   archetype: string;
   ruler: string;
+  polarity: 'active' | 'passive';
+  polarityLabel: string;
+  hdDiagnosis: string;
   karmicRootCause: string;
   lockedPsychology: string;
   unlockKey: string;
@@ -57,6 +60,7 @@ export interface InterceptedSignItem {
 }
 
 export interface ProgressedEvolution {
+  hasSpecialLocks: boolean;
   isCriticalDegree: boolean;
   degreeType: '29° Anaretik Derece' | '28° Kritik Eşik' | '0°-1° Taze Tohum' | 'Dengeli Seyir';
   badgeTitle: string;
@@ -344,6 +348,122 @@ export function determineKarmicPolarity(
     polarity,
     polarityLabel: option.polarityLabel,
     hdDiagnosis
+  };
+}
+
+export function determineInterceptedSignPolarity(
+  sign: ZodiacSign,
+  hdChart: HumanDesignChart | null,
+  natalChart: NatalChartData,
+  planetsInside: string[]
+): {
+  polarity: 'active' | 'passive';
+  polarityLabel: string;
+  hdDiagnosis: string;
+  karmicRootCause: string;
+  lockedPsychology: string;
+  unlockKey: string;
+  shadowTrap: string;
+} {
+  const data = INTERCEPTED_SIGN_KARMIC_DATA[sign];
+  if (!data) {
+    return {
+      polarity: 'active',
+      polarityLabel: 'Genel Karmik Kilit',
+      hdDiagnosis: 'Standart Astrolojik Boyut',
+      karmicRootCause: '',
+      lockedPsychology: '',
+      unlockKey: '',
+      shadowTrap: ''
+    };
+  }
+
+  let activeScore = 0;
+  let passiveScore = 0;
+  const diagnosisPoints: string[] = [];
+
+  if (hdChart) {
+    const isDefined = (center: CenterCode) => hdChart.definedCenters.includes(center);
+
+    // 1. Burcun Yönetici Merkez Analizleri
+    if (['Koç', 'Aslan', 'Oğlak'].includes(sign)) {
+      if (isDefined('Heart')) {
+        activeScore += 3;
+        diagnosisPoints.push('Tanımlı Kalp/Ego (Güç & İrade Otoritesi)');
+      } else {
+        passiveScore += 3;
+        diagnosisPoints.push('Açık Kalp Merkezi (Özdeğer & İrade Kırılması)');
+      }
+    }
+
+    if (['Aslan', 'Terazi', 'Yay'].includes(sign)) {
+      if (isDefined('G')) {
+        activeScore += 2;
+        diagnosisPoints.push('Tanımlı G-Merkezi (Baskın Kimlik & Yön)');
+      } else {
+        passiveScore += 2;
+        diagnosisPoints.push('Açık G-Merkezi (Görünmezlik & Kimlik Arayışı)');
+      }
+    }
+
+    if (['Yengeç', 'Akrep', 'Balık'].includes(sign)) {
+      if (isDefined('SolarPlexus')) {
+        activeScore += 3;
+        diagnosisPoints.push('Tanımlı Solar Pleksus (Duygusal Tahakküm Dalgası)');
+      } else {
+        passiveScore += 4;
+        diagnosisPoints.push('Açık Solar Pleksus (Duygusal Çatışmadan Kaçınma & Kurban)');
+      }
+    }
+
+    if (['İkizler', 'Kova', 'Başak'].includes(sign)) {
+      if (isDefined('Throat')) {
+        activeScore += 2;
+        diagnosisPoints.push('Tanımlı Boğaz (Sözsel Baskı & İfade Üstünlüğü)');
+      } else {
+        passiveScore += 3;
+        diagnosisPoints.push('Açık Boğaz (Susturulmuş Ses & İfade Çekingenliği)');
+      }
+    }
+
+    // 2. Human Design Tipi
+    if (hdChart.type === 'Manifestor') {
+      activeScore += 3;
+      diagnosisPoints.push('Manifestor Tipi (Başlatıcı Güç)');
+    } else if (hdChart.type === 'Projector' || hdChart.type === 'Reflector') {
+      passiveScore += 3;
+      diagnosisPoints.push(`${hdChart.type} Tipi (Dış Baskıya Maruz Kalma)`);
+    } else if (hdChart.type === 'Manifesting Generator') {
+      activeScore += 1;
+    }
+  }
+
+  // 3. Kilitli Gezegenler varsa onların kapı ve çizgisine bak
+  if (planetsInside.length > 0) {
+    const mainPlanet = natalChart.planets.find(p => planetsInside.includes(p.name));
+    if (mainPlanet) {
+      const { gate, line } = getGateAndLine(mainPlanet.longitude);
+      diagnosisPoints.push(`${mainPlanet.name} Kapı ${gate}.${line}`);
+      if (line === 1 || line === 2) {
+        passiveScore += 2;
+      } else if (line === 3 || line === 5) {
+        activeScore += 2;
+      }
+    }
+  }
+
+  const polarity: 'active' | 'passive' = activeScore >= passiveScore ? 'active' : 'passive';
+  const selected = data[polarity];
+  const hdDiagnosis = diagnosisPoints.length > 0 ? diagnosisPoints.slice(0, 2).join(' & ') : 'Human Design Rezonansı';
+
+  return {
+    polarity,
+    polarityLabel: selected.polarityLabel,
+    hdDiagnosis,
+    karmicRootCause: selected.karmicRootCause,
+    lockedPsychology: selected.lockedPsychology,
+    unlockKey: selected.unlockKey,
+    shadowTrap: selected.shadowTrap
   };
 }
 
@@ -699,24 +819,39 @@ export function calculateIncarnationAnalysis(
         .map(p => p.name);
 
       if (karmicData) {
+        const polarityResult = determineInterceptedSignPolarity(
+          sign,
+          hdChart,
+          natalChart,
+          planetsInside
+        );
+
         interceptedSigns.push({
           sign,
           oppositeSign: karmicData.oppositeSign,
           house: containingHouse,
           archetype: karmicData.archetype,
           ruler,
-          karmicRootCause: karmicData.karmicRootCause,
-          lockedPsychology: karmicData.lockedPsychology,
-          unlockKey: karmicData.unlockKey,
-          shadowTrap: karmicData.shadowTrap,
+          polarity: polarityResult.polarity,
+          polarityLabel: polarityResult.polarityLabel,
+          hdDiagnosis: polarityResult.hdDiagnosis,
+          karmicRootCause: polarityResult.karmicRootCause,
+          lockedPsychology: polarityResult.lockedPsychology,
+          unlockKey: polarityResult.unlockKey,
+          shadowTrap: polarityResult.shadowTrap,
           planetsInside
         });
       }
     }
   });
 
+  const isCriticalDegree = [28, 29].includes(sunData.degreeInSign);
+  const hasInterceptedSigns = interceptedSigns.length > 0;
+  const hasSpecialLocks = hasInterceptedSigns || isCriticalDegree;
+
   const progressedEvolution: ProgressedEvolution = {
-    isCriticalDegree: [28, 29, 0].includes(sunData.degreeInSign) || (sunData.degreeInSign === 1 && sunData.minutes <= 30),
+    hasSpecialLocks,
+    isCriticalDegree,
     degreeType: anareticInfo.degreeType,
     badgeTitle: anareticInfo.badgeTitle,
     badgeColor: anareticInfo.badgeColor,
@@ -730,7 +865,7 @@ export function calculateIncarnationAnalysis(
     hasShifted,
     evolutionSummary: anareticInfo.evolutionSummary,
     interceptedSigns,
-    hasInterceptedSigns: interceptedSigns.length > 0
+    hasInterceptedSigns
   };
 
   return {

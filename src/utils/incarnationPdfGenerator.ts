@@ -529,7 +529,7 @@ export const downloadIncarnationPDF = async (
   });
 
   // ================= PAGE 5: PROGRESSED EVOLUTION & INTERCEPTED SIGNS =================
-  if (data.progressedEvolution) {
+  if (data.progressedEvolution?.hasSpecialLocks) {
     doc.addPage();
     drawHeader();
 
@@ -537,119 +537,144 @@ export const downloadIncarnationPDF = async (
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(19);
     doc.setTextColor(...gold);
-    doc.text('5. 2. İlerletilmiş Harita & Karmik Kilitler', 15, curY);
+    doc.text('5. Karmik Kilitler & Ruhsal İnisiyasyon', 15, curY);
 
     curY += 6;
     doc.setDrawColor(...gold);
     doc.setLineWidth(0.6);
     doc.line(15, curY, 195, curY);
 
-    curY += 10;
-    doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(13);
-    doc.setTextColor(...white);
-    doc.text(`Eşik Durumu: ${data.progressedEvolution.badgeTitle}`, 15, curY);
-
-    curY += 7;
-    doc.setFont('LiberationSans', 'normal');
-    doc.setFontSize(11);
-    doc.setTextColor(...white);
-    curY = drawTextWithBold(doc, data.progressedEvolution.evolutionSummary, 15, curY, 180, 6.5);
-
-    curY += 6;
-    // Box for Natal vs Progressed Sun
-    doc.setFillColor(...cardDark);
-    doc.roundedRect(15, curY, 180, 26, 3, 3, 'F');
-    doc.setDrawColor(80, 70, 140);
-    doc.roundedRect(15, curY, 180, 26, 3, 3, 'D');
-
-    doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(200, 180, 255);
-    doc.text('Natal Güneş (Doğum Anı):', 20, curY + 8);
-    doc.setFont('LiberationSans', 'normal');
-    doc.setTextColor(...white);
-    doc.text(`${data.progressedEvolution.natalSunSign} (${data.progressedEvolution.natalSunDegree}°${data.progressedEvolution.natalSunMinutes}')`, 75, curY + 8);
-
-    doc.setFont('LiberationSans', 'bold');
-    doc.setTextColor(...gold);
-    doc.text('İlerletilmiş Güneş (Progressed):', 20, curY + 16);
-    doc.setFont('LiberationSans', 'normal');
-    doc.setTextColor(...white);
-    doc.text(`${data.progressedEvolution.progressedSunSign} (Geçiş Yaşı: ${data.progressedEvolution.progressedAge} Yaş)`, 85, curY + 16);
-
-    doc.setFont('LiberationSans', 'italic');
-    doc.setFontSize(10);
-    doc.setTextColor(...muted);
-    const shiftNote = data.progressedEvolution.hasShifted
-      ? `Ruhunuz ${data.progressedEvolution.progressedAge} yaşında kabuk değiştirerek ${data.progressedEvolution.progressedSunSign} bilincine evrilmiştir.`
-      : `${data.progressedEvolution.progressedAge} yaşında Güneş sınırları aşarak ${data.progressedEvolution.progressedSunSign} burcuna sıçrayacaktır.`;
-    doc.text(shiftNote, 20, curY + 23);
-
-    curY += 34;
-
-    // Sıkıştırılmış Burçlar
-    doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(15);
-    doc.setTextColor(...gold);
-    doc.text('Sıkıştırılmış Burçlar (Kilitli Sandıklar & Gizli Potansiyeller)', 15, curY);
-
     curY += 8;
+
+    // Aydınlanma Uyarısı
+    doc.setFillColor(...cardDark);
+    doc.roundedRect(15, curY, 180, 18, 3, 3, 'F');
+    doc.setDrawColor(...gold);
+    doc.setLineWidth(0.4);
+    doc.roundedRect(15, curY, 180, 18, 3, 3, 'D');
+
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(10.5);
+    doc.setTextColor(...gold);
+    doc.text('Özel Karmik Aydınlanma Uyarısı:', 20, curY + 6);
+    doc.setFont('LiberationSans', 'normal');
+    doc.setFontSize(9.5);
+    doc.setTextColor(...white);
+    const alertLines = doc.splitTextToSize('Doğum haritanızda ruhsal tekâmülünüzü doğrudan mühürleyen özel bir karmik eşik/kilit tespit edilmiştir. Bu gösterge sıradan bir yerleşim değil, geçmiş yaşamlardan bu enkarnasyona taşınan gizli bir inisiyasyon sınavıdır.', 170);
+    doc.text(alertLines, 20, curY + 12);
+
+    curY += 24;
+
+    // SADECE 28°-29° ANARATİK SINIR DERECESİ VARSA
+    if (data.progressedEvolution.isCriticalDegree) {
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(13);
+      doc.setTextColor(...white);
+      doc.text(`Anaretik Eşik Durumu: ${data.progressedEvolution.badgeTitle}`, 15, curY);
+
+      curY += 7;
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(10.5);
+      doc.setTextColor(...white);
+      curY = drawTextWithBold(doc, data.progressedEvolution.evolutionSummary, 15, curY, 180, 6);
+
+      curY += 4;
+      // Box for Natal vs Progressed Sun
+      doc.setFillColor(...cardDark);
+      doc.roundedRect(15, curY, 180, 24, 3, 3, 'F');
+      doc.setDrawColor(80, 70, 140);
+      doc.roundedRect(15, curY, 180, 24, 3, 3, 'D');
+
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(10.5);
+      doc.setTextColor(200, 180, 255);
+      doc.text('Natal Güneş (Doğum Anı):', 20, curY + 7);
+      doc.setFont('LiberationSans', 'normal');
+      doc.setTextColor(...white);
+      doc.text(`${data.progressedEvolution.natalSunSign} (${data.progressedEvolution.natalSunDegree}°${data.progressedEvolution.natalSunMinutes}')`, 75, curY + 7);
+
+      doc.setFont('LiberationSans', 'bold');
+      doc.setTextColor(...gold);
+      doc.text('İlerletilmiş Güneş (Progressed):', 20, curY + 14);
+      doc.setFont('LiberationSans', 'normal');
+      doc.setTextColor(...white);
+      doc.text(`${data.progressedEvolution.progressedSunSign} (Geçiş Yaşı: ${data.progressedEvolution.progressedAge} Yaş)`, 85, curY + 14);
+
+      doc.setFont('LiberationSans', 'italic');
+      doc.setFontSize(9.5);
+      doc.setTextColor(...muted);
+      const shiftNote = data.progressedEvolution.hasShifted
+        ? `Ruhunuz ${data.progressedEvolution.progressedAge} yaşında kabuk değiştirerek ${data.progressedEvolution.progressedSunSign} bilincine evrilmiştir.`
+        : `${data.progressedEvolution.progressedAge} yaşında Güneş sınırları aşarak ${data.progressedEvolution.progressedSunSign} burcuna sıçrayacaktır.`;
+      doc.text(shiftNote, 20, curY + 20);
+
+      curY += 29;
+    }
+
+    // SADECE SIKIŞTIRILMIŞ BURÇLAR VARSA
     if (data.progressedEvolution.hasInterceptedSigns) {
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(14);
+      doc.setTextColor(...gold);
+      doc.text('Sıkıştırılmış Burçlar (Kilitli Sandıklar & Gizli Potansiyeller)', 15, curY);
+
+      curY += 8;
       data.progressedEvolution.interceptedSigns.forEach(inter => {
-        ensureSpace(42);
+        ensureSpace(48);
         doc.setFillColor(...cardDark);
-        doc.roundedRect(15, curY, 180, 38, 3, 3, 'F');
+        doc.roundedRect(15, curY, 180, 44, 3, 3, 'F');
         doc.setDrawColor(...gold);
         doc.setLineWidth(0.3);
-        doc.roundedRect(15, curY, 180, 38, 3, 3, 'D');
+        doc.roundedRect(15, curY, 180, 44, 3, 3, 'D');
 
         doc.setFont('LiberationSans', 'bold');
         doc.setFontSize(11);
         doc.setTextColor(...gold);
-        doc.text(`${inter.sign} Burcu (${inter.archetype}) - ${inter.house}. Evde Hapsolmuş`, 20, curY + 7);
+        const polText = inter.polarityLabel ? ` [${inter.polarityLabel}]` : '';
+        doc.text(`${inter.sign} Burcu (${inter.archetype}) - ${inter.house}. Evde Hapsolmuş${polText}`, 20, curY + 7);
+
+        let boxY = curY + 13;
+        if (inter.hdDiagnosis) {
+          doc.setFont('LiberationSans', 'italic');
+          doc.setFontSize(9);
+          doc.setTextColor(255, 215, 0);
+          const hdLines = doc.splitTextToSize(`HD Teşhisi: ${inter.hdDiagnosis}`, 170);
+          doc.text(hdLines.slice(0, 1), 20, boxY);
+          boxY += 6;
+        }
 
         doc.setFont('LiberationSans', 'normal');
         doc.setFontSize(9.5);
         doc.setTextColor(255, 180, 180);
         const causeLines = doc.splitTextToSize(`Geçmiş Kök Neden: ${inter.karmicRootCause}`, 170);
-        doc.text(causeLines.slice(0, 2), 20, curY + 14);
+        doc.text(causeLines.slice(0, 2), 20, boxY);
+        boxY += causeLines.slice(0, 2).length * 4.5 + 1;
 
         doc.setTextColor(255, 230, 180);
         const lockLines = doc.splitTextToSize(`Bilinçaltı Kilit: ${inter.lockedPsychology}`, 170);
-        doc.text(lockLines.slice(0, 2), 20, curY + 23);
+        doc.text(lockLines.slice(0, 2), 20, boxY);
+        boxY += lockLines.slice(0, 2).length * 4.5 + 1;
 
         doc.setFont('LiberationSans', 'bold');
         doc.setTextColor(...white);
         const keyLines = doc.splitTextToSize(`Açılış Anahtarı: ${inter.unlockKey}`, 170);
-        doc.text(keyLines.slice(0, 2), 20, curY + 32);
+        doc.text(keyLines.slice(0, 2), 20, boxY);
 
-        curY += 43;
+        curY += 48;
       });
-    } else {
-      doc.setFont('LiberationSans', 'normal');
-      doc.setFontSize(11);
-      doc.setTextColor(...white);
-      curY = drawTextWithBold(
-        doc,
-        'Doğum haritanızda ev çizgileri arasına hapsolmuş (sıkıştırılmış) bir burç bulunmamaktadır. Ruhunuzun 12 burç kapısı da doğrudan akışta ve aktiftir.',
-        15,
-        curY,
-        180,
-        6.5
-      );
     }
   }
 
-  // ================= PAGE 6: DHARMA & NEXT LIFE =================
+  // ================= PAGE 6 (veya 5): DHARMA & NEXT LIFE =================
   doc.addPage();
   drawHeader();
 
+  const dharmaPageTitleNum = data.progressedEvolution?.hasSpecialLocks ? '6' : '5';
   curY = 30;
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(19);
   doc.setTextColor(...gold);
-  doc.text('6. Dharma & Gelecek Yaşam Tohumu (KAD)', 15, curY);
+  doc.text(`${dharmaPageTitleNum}. Dharma & Gelecek Yaşam Tohumu (KAD)`, 15, curY);
 
   curY += 6;
   doc.setDrawColor(...gold);
