@@ -70,7 +70,7 @@ export default function DruidTreePage() {
       `✨ Ruhsal Karakter: ${currentTree.archetype}\n` +
       `🪐 Yönetici Güç: ${currentTree.rulingPlanets} | Element: ${currentTree.element}\n` +
       `📜 Druid Bilgeliği: "${currentTree.druidicProverb}"\n\n` +
-      `Sen de kendi kutsal Kelt ağacını analiz et: 7layers.org/analysis/druid-tree`;
+      `Sen de kendi kutsal Kelt ağacını analiz et: 7layers.tr/analysis/druid-tree`;
 
     navigator.clipboard.writeText(shareText);
     setCopied(true);
@@ -437,7 +437,7 @@ export default function DruidTreePage() {
                   </p>
                   <div className="border-t border-white/10 pt-3 flex items-center justify-between text-[10px] text-gray-400">
                     <span>{currentTree.element} • {currentTree.rulingPlanets}</span>
-                    <span className="text-emerald-400 font-semibold">7layers.org</span>
+                    <span className="text-emerald-400 font-semibold">7layers.tr</span>
                   </div>
                 </div>
                 <p className="text-xs text-gray-400 max-w-md mx-auto">
