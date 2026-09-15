@@ -16,9 +16,29 @@ export interface IncarnationHouseInfo {
   unresolvedTheme: string;
 }
 
+export type RetroPolarity = 'active' | 'passive';
+
+export interface RetroKarmicDebtOption {
+  polarity: RetroPolarity;
+  polarityLabel: string;
+  pastLifeCause: string;
+  currentLifeKarma: string;
+  dharmaRemedy: string;
+}
+
+export interface RetroKarmicDebtData {
+  planet: string;
+  title: string;
+  active: RetroKarmicDebtOption;
+  passive: RetroKarmicDebtOption;
+}
+
 export interface RetroKarmicDebt {
   planet: string;
   title: string;
+  polarity: RetroPolarity;
+  polarityLabel: string;
+  hdDiagnosis: string;
   pastLifeCause: string;
   currentLifeKarma: string;
   dharmaRemedy: string;
@@ -282,65 +302,169 @@ export const TWELFTH_HOUSE_SIGN_INTERPRETATIONS: Record<ZodiacSign, {
   }
 };
 
-// Retro Gezegenler - Karmik Borçlar
-export const RETRO_KARMIC_DEBTS: Record<string, RetroKarmicDebt> = {
+// Polarize Edilmiş Retro Gezegenler - Karmik Borçlar (Aktif vs Pasif)
+export const RETRO_KARMIC_DEBTS_DATA: Record<string, RetroKarmicDebtData> = {
   'Merkür': {
     planet: 'Merkür',
     title: 'Hakikat ve İletişim Karması',
-    pastLifeCause: 'Geçmiş yaşamlarda bilgiyi çıkarlarınız için sakladınız, yalan haber yaydınız veya keskin sözlerinizle başkalarının onurunu zedelediniz.',
-    currentLifeKarma: 'Zihin sürekli geriye dönük çalışır; kendinizi ifade etmekte gecikir, yanlış anlaşılma endişesiyle susar ya da iç diyaloğa kilitlenirsiniz.',
-    dharmaRemedy: 'Sadece hakikati konuşmak, dedikodudan uzak durmak, yazarak ruhu arındırmak ve içsel bilgeliği dinlemek.'
+    active: {
+      polarity: 'active',
+      polarityLabel: 'Aktif Zihinsel Manipülasyon',
+      pastLifeCause: 'Geçmiş yaşamınızda bilgiyi çıkarlarınız için sakladınız, kasıtlı olarak asılsız haberler yaydınız veya keskin, alaycı sözlerinizle başkalarının onurunu zedelediniz.',
+      currentLifeKarma: 'Zihnin sürekli aşırı analiz döngüsüne kilitlenmesi; sözlerinizin başkaları tarafından yanlış anlaşılacağı endişesiyle iletişimde tıkanma yaşama.',
+      dharmaRemedy: 'Sadece saf hakikati konuşmak, dedikodudan bütünüyle uzak durmak, yazarak ve içsel bilgeliği dinleyerek zihni arındırmak.'
+    },
+    passive: {
+      polarity: 'passive',
+      polarityLabel: 'Susturulmuş Zihin & Bastırılmış Ses',
+      pastLifeCause: 'Geçmiş yaşamınızda düşüncelerinizi ifade etmeniz yasaklandı, susturuldunuz veya hakikati konuştuğunuz için cezalandırılarak zihinsel tecritte bırakıldınız.',
+      currentLifeKarma: 'Düşüncelerini ifade etmekte gecikme, topluluk önünde konuşmaktan çekinme, fikirlerinin değersiz olduğuna inanma ve suskunluk nöbetleri.',
+      dharmaRemedy: 'Kendi sesinizi ve fikrinizi çekinmeden duyurmak, içsel bilgeliğinize güvenmek ve hakikati cesaretle paylaşmak.'
+    }
   },
   'Venüs': {
     planet: 'Venüs',
     title: 'Aşk, Değer ve Sadakat Karması',
-    pastLifeCause: 'Geçmişte aşka, ilişkilere veya sanata gereken değeri vermediniz; sevgiyi bir pazarlık unsuru yaptınız ya da kalpleri kırdınız.',
-    currentLifeKarma: 'Kendini sevilmeye layık görememe, ilişkilerde sürekli geçmiş partnerlerin gölgelerini arama veya aşırı fedakarlıkla tükenme.',
-    dharmaRemedy: 'Önce kendi öz değerini inşa etmek, koşulsuz sevgiyi bir pazarlık olmadan deneyimlemek ve estetik şifa yaratmak.'
+    active: {
+      polarity: 'active',
+      polarityLabel: 'Bencil Sevgi & Kalp Kırma',
+      pastLifeCause: 'Geçmiş yaşamınızda sevgiyi ve ilişkileri bencilce bir pazarlık unsuru yaptınız; başkalarının duygularıyla oynayarak kalpleri kırdınız ve sevgiyi istismar ettiniz.',
+      currentLifeKarma: 'İlişkilerde samimiyete güvenememe, sevgiyi kaybetme korkusuyla aşırı sahiplenme veya geçmiş partnerlerin gölgelerini bugüne taşıma.',
+      dharmaRemedy: 'Koşulsuz sevgiyi bir karşılık beklemeden deneyimlemek, sevgide güven inşa etmek ve estetik şifa yaratmak.'
+    },
+    passive: {
+      polarity: 'passive',
+      polarityLabel: 'Değersizlik Hissi & Kendini Feda Etme',
+      pastLifeCause: 'Geçmiş yaşamınızda sevgiye layık görülmediniz, sevgi uğruna sömürüldünüz veya kendinizi bütünüyle hiçe sayarak başkalarına feda ettiniz.',
+      currentLifeKarma: 'Kendini sevilmeye layık görememe, ilişkilerde sürekli ödün verip tükenme ve kendi ihtiyaçlarını talep etmekten utanma.',
+      dharmaRemedy: 'Önce kendi öz-değerini ve öz-sevgisini koşulsuzca inşa etmek, sağlıklı sınır koyabilmek ve sevgiyi hak ettiğine inanmak.'
+    }
   },
   'Mars': {
     planet: 'Mars',
     title: 'Güç, Öfke ve Şiddet Karması',
-    pastLifeCause: 'Geçmişte kontrolsüz şiddet uyguladınız, haksız savaşlara katıldınız ya da tam tersine haklı öfkenizi bastırıp felç oldunuz.',
-    currentLifeKarma: 'Öfkeyi içeriye yöneltme eğilimi, pasif-agresif patlamalar, harekete geçmekte tereddüt ve kendi gücünden korkma.',
-    dharmaRemedy: 'Öfkeyi yapıcı bir yaratıcı disipline ve spora kanalize etmek, zayıfların koruyucusu olarak cesaret göstermek.'
+    active: {
+      polarity: 'active',
+      polarityLabel: 'Aktif Güç İstismarı & Aşırı Saldırganlık',
+      pastLifeCause: 'Geçmiş yaşamınızda kontrolsüz öfke, aşırı güç gösterisi ve şiddet uyguladınız; haksız çatışmalara katılarak başkalarının sınırlarını zorla çiğnediniz.',
+      currentLifeKarma: 'Kendi gücünüzün yıkıcılığından bilinçaltı düzeyde korkma, öfke patlamalarından sonra gelen derin suçluluk ve iradeyi yönetmekte zorlanma.',
+      dharmaRemedy: 'Gücü ezmek ve dayatmak için değil; zayıfları korumak, adaleti sağlamak ve yapıcı bir disiplin/spor ile içsel ateşi arındırmak için kullanmak.'
+    },
+    passive: {
+      polarity: 'passive',
+      polarityLabel: 'Bastırılmış İrade & Korku Felci',
+      pastLifeCause: 'Geçmiş yaşamınızda çatışma korkusu ve dışsal baskılar karşısında kendi gücünüzden vazgeçtiniz; haklı öfkenizi dahi bastırıp felç oldunuz ve boyun eğerek ezildiniz.',
+      currentLifeKarma: 'Öfkeyi içeriye yöneltme eğilimi, pasif-agresif patlamalar, hakkını savunurken suçluluk duyma ve harekete geçmekte derin bir tereddüt.',
+      dharmaRemedy: 'Kendi haklı sınırlarınızı korkusuzca savunmak, öfkeyi bastırmadan sağlıklı ve kararlı bir dille ifade etmek, içsel savaşçınızı cesaretle uyandırmak.'
+    }
   },
   'Jüpiter': {
     planet: 'Jüpiter',
     title: 'İnanç, Etik ve Kibir Karması',
-    pastLifeCause: 'Geçmişte dini ya da ahlaki bir otoriteyi kötüye kullandınız, sahte vaiz oldunuz ya da ruhsal kibirle başkalarını yargıladınız.',
-    currentLifeKarma: 'Dışsal inanç sistemlerine şüpheyle bakma, içsel boşluk hissi ve kendi ahlaki ilkelerini sıfırdan keşfetme zorunluluğu.',
-    dharmaRemedy: 'Dogmalara değil kendi vicdanının sesine güvenmek, tevazu ile öğrenci kalmak ve karşılıksız bilgelik paylaşmak.'
+    active: {
+      polarity: 'active',
+      polarityLabel: 'Ruhsal Kibir & İnanç İstismarı',
+      pastLifeCause: 'Geçmiş yaşamınızda dini, ahlaki veya felsefi bir otoriteyi kötüye kullandınız; sahte vaazlar verdiniz ya da manevi kibirle başkalarını yargıladınız.',
+      currentLifeKarma: 'Kendi ahlaki üstünlüğünü kanıtlama dürtüsü ile içsel boşluk arasında gidip gelme, dogmatik yargılama eğilimi.',
+      dharmaRemedy: 'Tevazu ile daimi bir öğrenci kalmak, insanları yargılamadan kucaklamak ve bilgeliği karşılıksız bir cömertlikle sunmak.'
+    },
+    passive: {
+      polarity: 'passive',
+      polarityLabel: 'Dogmalara Kurban Olma & İnanç Yitimi',
+      pastLifeCause: 'Geçmiş yaşamınızda katı dini dogmalar veya sahte ruhsal otoriteler tarafından inancınız sömürüldü; kandırıldınız ve manevi boşluğa itildiniz.',
+      currentLifeKarma: 'Dışsal hiçbir inanç sistemine veya rehbere güvenememe, hayatta yönünü ve anlamını kaybetme kaygısı, derin bir şüphecilik.',
+      dharmaRemedy: 'Dış dogmalara değil, kendi vicdanınızın ve kalbinizin rehberliğine güvenmek; hakikati bizzat kendi içsel deneyiminizle keşfetmek.'
+    }
   },
   'Satürn': {
     planet: 'Satürn',
     title: 'Büyük Karmik Sorumluluk & Zaman Borcu',
-    pastLifeCause: 'Geçmiş yaşamlarda aldığınız sorumlulukları terk ettiniz, başkalarına karşı zalimce bir otorite kurdunuz veya taahhütlerinizi hiçe saydınız.',
-    currentLifeKarma: 'Hayatta her şeyin geç ve büyük zahmetlerle gelmesi, derin yetersizlik hissi ve omuzlarda hissedilen açıklanamaz suçluluk yükü.',
-    dharmaRemedy: 'Zamanın efendisi olmak, sabırla çalışmak, dürüstlükten asla sapmamak ve kendi sınırlarını sevgiyle inşa etmek.'
+    active: {
+      polarity: 'active',
+      polarityLabel: 'Zalim Otorite & Katı Kurallar',
+      pastLifeCause: 'Geçmiş yaşamınızda elinizdeki gücü ve makamı acımasızca kullandınız; başkalarına karşı zalimce bir otorite kurarak taahhütlerinizi ve adalet ilkelerini çiğnediniz.',
+      currentLifeKarma: 'Otorite figürleriyle derin çatışmalar, cezalandırılma korkusu ve her hatada aşırı katı içsel yargıç sesine maruz kalma.',
+      dharmaRemedy: 'Otoriteyi baskı kurmak için değil, adil ve şefkatli bir koruyucu olarak yapılandırmak; kendi sınırlarını sevgiyle inşa etmek.'
+    },
+    passive: {
+      polarity: 'passive',
+      polarityLabel: 'Ezilmişlik & Sorumluluk Yükü Altında Çöküş',
+      pastLifeCause: 'Geçmiş yaşamınızda zalim otoritelerin altında ezildiniz; taşınamaz sorumluluklar sırtınıza yüklendi ve kendi haklarınızı savunamayarak köleleştirildiniz.',
+      currentLifeKarma: 'Omuzlarda açıklanamaz bir suçluluk yükü, sürekli yetersizlik hissi, hayatta her şeyin ancak aşırı zahmetlerle geleceği inancı.',
+      dharmaRemedy: 'Size ait olmayan yükleri taşımayı bırakmak, zamanın efendisi olarak sabırla çalışmak ve kendinize dinlenme hakkı tanımak.'
+    }
   },
   'Uranüs': {
     planet: 'Uranüs',
     title: 'Özgürlük ve İsyan Karması',
-    pastLifeCause: 'Geçmişte anarşistçe bir yıkım yarattınız ya da toplumun kurallarını hiçe sayarak başkalarının hayatını altüst ettiniz.',
-    currentLifeKarma: 'Sürekli bir yere ait olamama hissi, ani içsel huzursuzluklar ve sistemle uzlaşmakta derin bir direnç.',
-    dharmaRemedy: 'Özgürlüğü sadece kendini soyutlamak olarak değil, insanlığın tekâmülüne hizmet eden özgün bir uyanış olarak yaşamak.'
+    active: {
+      polarity: 'active',
+      polarityLabel: 'Yıkıcı İsyan & Sorumsuz Başkaldırı',
+      pastLifeCause: 'Geçmiş yaşamınızda anarşistçe bir yıkım yarattınız; toplumun kurallarını sorumsuzca hiçe sayarak kaos çıkardınız ve başkalarının düzenini altüst ettiniz.',
+      currentLifeKarma: 'Sürekli bir yere veya düzene ait olamama, ani yıkıcı tepkiler ve kurallara karşı sebepsiz bir öfke hissetme.',
+      dharmaRemedy: 'Özgürlüğü salt yıkım olarak değil; insanlığın hayrına çalışan yenilikçi, vizyoner ve yapıcı bir uyanış olarak yaşamak.'
+    },
+    passive: {
+      polarity: 'passive',
+      polarityLabel: 'Bastırılmış Özgünlük & Sürüye Boyun Eğme',
+      pastLifeCause: 'Geçmiş yaşamınızda özgün fikirleriniz ve bireyselliğiniz toplum tarafından dışlandı; sürüye uymaya zorlandınız ve ruhsal özgürlüğünüz elinizden alındı.',
+      currentLifeKarma: 'Farklı olmaktan korkma, dışlanma endişesiyle kendi dehasını gizleme ve otoriter sistemler karşısında içsel huzursuzluk yaşama.',
+      dharmaRemedy: 'Kendi özgünlüğünüzü ve sıradışı yönlerinizi gururla sahiplenmek, sürüye uymak yerine geleceğe ışık tutan vizyoner kimliğinizi yaşamak.'
+    }
   },
   'Neptün': {
     planet: 'Neptün',
     title: 'İllüzyon, Kaçış ve Aldanış Karması',
-    pastLifeCause: 'Geçmişte gerçeklerden kaçmak için bağımlılıklara, sahte tarikatlara sığındınız veya insanları manevi illüzyonlarla yanılttınız.',
-    currentLifeKarma: 'Sınır koyamama, sürekli kurban rolüne çekilme, kime güveneceğini bilememe ve gerçeklikten kopma arzusu.',
-    dharmaRemedy: 'Ruhsal uyanışı ayırt etme yeteneğiyle (discernment) birleştirmek, sanat ve dua ile ilahi sevginin saf kanalı olmak.'
+    active: {
+      polarity: 'active',
+      polarityLabel: 'Manevi Manipülasyon & İllüzyon Yayma',
+      pastLifeCause: 'Geçmiş yaşamınızda insanları manevi illüzyonlarla yanılttınız; sahte tarikatlar, batıl inançlar veya manevi güç gösterileriyle kitleleri aldattınız.',
+      currentLifeKarma: 'Kendi sezgilerine güvenememe, ruhsal konularda kandırılmaktan dehşet duyma ve gerçeklikten kopma korkusu.',
+      dharmaRemedy: 'Ruhsal uyanışı keskin bir ayırt etme yeteneği (discernment) ile birleştirmek, tevazuyla sadece ilahi sevginin temiz bir kanalı olmak.'
+    },
+    passive: {
+      polarity: 'passive',
+      polarityLabel: 'Kurban Rolü & Manevi Sömürü',
+      pastLifeCause: 'Geçmiş yaşamınızda sahte guruların, tarikatların veya manevi sömürücülerin kurbanı oldunuz; sınır koyamayarak gerçeklerden kaçmak için kendinizi feda ettiniz.',
+      currentLifeKarma: 'İlişkilerde kurtarıcı-kurban üçgenine çekilme, sınır çizememe, kime güveneceğini bilememe ve bağımlılık eğilimleri.',
+      dharmaRemedy: 'Ruhsal sınırları netleştirmek, kurban psikolojisinden çıkıp kendi hayatının sorumluluğunu almak, sanat ve meditasyonla arınmak.'
+    }
   },
   'Plüton': {
     planet: 'Plüton',
     title: 'Karanlık Güç ve Dönüşüm Karması',
-    pastLifeCause: 'Geçmişte muazzam bir güç, büyü veya siyasi manipülasyonla kitleleri yönettiniz ya da yıkıcı bir ihanetin kurbanı oldunuz.',
-    currentLifeKarma: 'Güçsüz düşmekten dehşet duyma, derin kontrol ihtiyacı ve hayatın belirli dönemlerinde yaşanan köklü yıkım-yeniden doğuş krizleri.',
-    dharmaRemedy: 'Egoyu öldürüp Anka kuşu gibi küllerinden doğmak, gücü başkalarını manipüle etmek için değil, onları karanlıktan çıkarmak için kullanmak.'
+    active: {
+      polarity: 'active',
+      polarityLabel: 'Tiranlık & Kitle Manipülasyonu',
+      pastLifeCause: 'Geçmiş yaşamınızda muazzam bir okült güç, siyasi tiranlık veya manipülasyonla kitleleri kontrol ettiniz; gücü başkalarını ezmek ve sindirmek için kullandınız.',
+      currentLifeKarma: 'Kontrolü kaybetmekten veya güçsüz duruma düşmekten dehşet duyma, derin şüphecilik ve herkesi kontrol etme arzusu.',
+      dharmaRemedy: 'Kontrol saplantısını bırakıp ilahi teslimiyeti öğrenmek; gücü başkalarına hükmetmek için değil, insanları karanlıktan aydınlığa çıkarmak için dönüştürmek.'
+    },
+    passive: {
+      polarity: 'passive',
+      polarityLabel: 'Derin İhanet & Güçsüzlük Travması',
+      pastLifeCause: 'Geçmiş yaşamınızda karanlık güç odaklarının ve zalim tiranların kurbanı oldunuz; yıkıcı bir ihanete uğrayarak tüm gücünüzü ve varlığınızı kaybettiniz.',
+      currentLifeKarma: 'İnsanlara güvenmekte aşırı zorlanma, sırtından bıçaklanma paranoyası ve kendi içsel gücünü ortaya çıkarmaktan korkma.',
+      dharmaRemedy: 'İhanet travmasını affediş ve içsel simya ile şifalandırmak; Anka kuşu gibi küllerinden doğarak kendi gücünü korkusuzca sahiplenmek.'
+    }
   }
 };
+
+// Geriye dönük uyumluluk için varsayılan fallback RETRO_KARMIC_DEBTS
+export const RETRO_KARMIC_DEBTS: Record<string, RetroKarmicDebt> = Object.keys(RETRO_KARMIC_DEBTS_DATA).reduce((acc, p) => {
+  const data = RETRO_KARMIC_DEBTS_DATA[p];
+  acc[p] = {
+    planet: data.planet,
+    title: data.title,
+    polarity: 'active',
+    polarityLabel: data.active.polarityLabel,
+    hdDiagnosis: 'Standart Astrolojik Rezonans',
+    pastLifeCause: data.active.pastLifeCause,
+    currentLifeKarma: data.active.currentLifeKarma,
+    dharmaRemedy: data.active.dharmaRemedy
+  };
+  return acc;
+}, {} as Record<string, RetroKarmicDebt>);
 
 // Kiron - Ruh Yarası ve Şifa Kapısı
 export const CHIRON_SIGN_WOUNDS: Record<ZodiacSign, ChironWound> = {

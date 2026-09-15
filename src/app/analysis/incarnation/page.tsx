@@ -539,19 +539,37 @@ export default function IncarnationAnalysisPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       {resultData.retroDebts.map((debt, idx) => (
                         <div key={idx} className="p-5 rounded-2xl bg-black/40 border border-rose-500/20 space-y-3 relative overflow-hidden">
-                          <div className="flex items-center justify-between">
+                          <div className="flex flex-wrap items-center justify-between gap-2">
                             <h4 className="text-base font-bold text-white flex items-center gap-2">
                               <span className="w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse"></span>
                               {debt.planet} Rx: <span className="text-rose-400">{debt.title}</span>
                             </h4>
-                            <span className="text-xs font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">
-                              Retrograd
-                            </span>
+                            <div className="flex flex-wrap items-center gap-1.5">
+                              {debt.polarityLabel && (
+                                <span className={`text-[11px] font-medium px-2.5 py-0.5 rounded-full border ${
+                                  debt.polarity === 'active' 
+                                    ? 'bg-amber-500/15 text-amber-300 border-amber-500/30' 
+                                    : 'bg-indigo-500/15 text-indigo-300 border-indigo-500/30'
+                                }`}>
+                                  {debt.polarityLabel}
+                                </span>
+                              )}
+                              <span className="text-xs font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                                Retrograd
+                              </span>
+                            </div>
                           </div>
+
+                          {debt.hdDiagnosis && (
+                            <div className="text-[11px] text-sky-300/90 bg-sky-950/40 border border-sky-800/30 px-3 py-1.5 rounded-xl flex items-center gap-2">
+                              <span className="text-sky-400 font-bold shrink-0">⚡ Human Design Teşhisi:</span>
+                              <span className="truncate">{debt.hdDiagnosis}</span>
+                            </div>
+                          )}
 
                           <div className="space-y-2 text-xs sm:text-sm">
                             <p className="text-mystic-text-muted">
-                              <strong className="text-white/90">Geçmiş Yaşam Sebebi:</strong>{' '}
+                              <strong className="text-white/90">Geçmiş Yaşam Nedeni:</strong>{' '}
                               <span className={!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}>
                                 {debt.pastLifeCause}
                               </span>

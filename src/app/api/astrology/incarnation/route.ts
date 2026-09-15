@@ -28,8 +28,8 @@ export async function POST(req: NextRequest) {
     // 1. Natal haritayı hesapla
     const natalChart = await generateAstrologyChart(dateObj, cityData, false);
 
-    // 2. Karmik & Enkarnasyon analizini üret
-    const incarnationData = calculateIncarnationAnalysis(natalChart);
+    // 2. Karmik & Enkarnasyon analizini üret (Human Design sentezi için dateObj ile)
+    const incarnationData = calculateIncarnationAnalysis(natalChart, dateObj);
 
     return json({
       success: true,

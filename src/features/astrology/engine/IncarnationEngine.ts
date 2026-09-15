@@ -6,10 +6,18 @@ import {
 } from './AstrologyConstants';
 import { getSignAndDegree, calculateDraconicChart } from './AstrologyEngine';
 import {
+  generateChart,
+  HumanDesignChart,
+  getGateAndLine,
+  CenterCode
+} from '@/utils/HumanDesignEngine';
+import {
   GAD_SIGN_INTERPRETATIONS,
   GAD_HOUSE_INTERPRETATIONS,
   TWELFTH_HOUSE_SIGN_INTERPRETATIONS,
   RETRO_KARMIC_DEBTS,
+  RETRO_KARMIC_DEBTS_DATA,
+  RetroPolarity,
   CHIRON_SIGN_WOUNDS,
   KAD_NEXT_LIFE_SEEDS,
   IncarnationPastLifeInfo,
@@ -149,7 +157,154 @@ function findHouseForLongitude(lon: number, houses: AstroPoint[]): number {
   return 1;
 }
 
-export function calculateIncarnationAnalysis(natalChart: NatalChartData): IncarnationAnalysisResult {
+interface KarmicPolarityResult {
+  polarity: RetroPolarity;
+  polarityLabel: string;
+  hdDiagnosis: string;
+}
+
+export function determineKarmicPolarity(
+  planetName: string,
+  natalPoint: AstroPoint,
+  hdChart: HumanDesignChart | null,
+  natalChart: NatalChartData
+): KarmicPolarityResult {
+  const debtData = RETRO_KARMIC_DEBTS_DATA[planetName];
+  if (!debtData) {
+    return {
+      polarity: 'active',
+      polarityLabel: 'Genel Karmik Rezonans',
+      hdDiagnosis: 'Standart Astrolojik Gösterge'
+    };
+  }
+
+  // Human Design Kapı ve Çizgisi
+  const { gate, line } = getGateAndLine(natalPoint.longitude);
+  const gateDiagnosis = `Kapı ${gate}.${line}`;
+
+  let activeScore = 0;
+  let passiveScore = 0;
+  const diagnosisPoints: string[] = [];
+
+  // 1. Human Design Merkezleri
+  if (hdChart) {
+    const isDefined = (center: CenterCode) => hdChart.definedCenters.includes(center);
+
+    // Kalp / Ego (İrade & Güç Dayatma)
+    if (isDefined('Heart')) {
+      activeScore += 3;
+      if (['Mars', 'Satürn', 'Plüton'].includes(planetName)) {
+        diagnosisPoints.push('Tanımlı Kalp/Ego (İrade Gücü & Baskı)');
+      }
+    } else {
+      passiveScore += 3;
+      if (['Mars', 'Venüs', 'Satürn'].includes(planetName)) {
+        diagnosisPoints.push('Açık Kalp Merkezi (İrade Yetersizliği & Ezilme)');
+      }
+    }
+
+    // Solar Pleksus (Duygusal Fırtına vs Çatışmadan Kaçınma / Felç)
+    if (isDefined('SolarPlexus')) {
+      activeScore += 2;
+      if (['Mars', 'Venüs', 'Neptün'].includes(planetName)) {
+        diagnosisPoints.push('Tanımlı Solar Pleksus (Duygusal Patlama Dalgası)');
+      }
+    } else {
+      // Açık Solar Pleksus en belirgin 'öfkeyi bastırıp felç olma' sebebidir!
+      passiveScore += 4;
+      if (['Mars', 'Merkür', 'Neptün'].includes(planetName)) {
+        diagnosisPoints.push('Açık Solar Pleksus (Çatışmadan Kaçınma & Felç)');
+      }
+    }
+
+    // Kök Merkezi (Stres / Baskıyı Dışa Vurma vs Donup Kalma)
+    if (isDefined('Root')) {
+      activeScore += 2;
+    } else {
+      passiveScore += 2;
+    }
+
+    // 2. Human Design Tipi
+    if (hdChart.type === 'Manifestor') {
+      activeScore += 4;
+      diagnosisPoints.push('Manifestor Tipi (Doğrudan Başlatıcı Güç)');
+    } else if (hdChart.type === 'Projector' || hdChart.type === 'Reflector') {
+      passiveScore += 3;
+      diagnosisPoints.push(`${hdChart.type} Tipi (Dış Baskıya Boyun Eğme)`);
+    } else if (hdChart.type === 'Manifesting Generator') {
+      activeScore += 1;
+    }
+  }
+
+  // 3. Çizgi Arketipi (Line 1-6)
+  if (line === 1 || line === 2) {
+    passiveScore += 2;
+    diagnosisPoints.push(`${line}. Çizgi (İçe Çekilme & Bastırma)`);
+  } else if (line === 4 || line === 5) {
+    activeScore += 2;
+    diagnosisPoints.push(`${line}. Çizgi (Dışa Vuran Liderlik & Otorite)`);
+  } else if (line === 3) {
+    if (planetName === 'Mars' || planetName === 'Uranüs') activeScore += 1;
+  } else if (line === 6) {
+    if (planetName === 'Jüpiter' || planetName === 'Satürn') activeScore += 1;
+  }
+
+  // 4. Astroloji Haritası (Burç, Ev & Sert Açılar)
+  const sign = natalPoint.sign;
+  const house = natalPoint.house;
+
+  if (['Koç', 'Akrep', 'Aslan', 'Oğlak'].includes(sign)) {
+    activeScore += 2;
+  } else if (['Balık', 'Yengeç', 'Boğa', 'Başak'].includes(sign)) {
+    passiveScore += 2;
+  }
+
+  if ([1, 8, 10].includes(house)) {
+    activeScore += 2;
+  } else if ([4, 6, 12].includes(house)) {
+    passiveScore += 3;
+    diagnosisPoints.push(`${house}. Ev (İnziva & Bilinçaltına İtme)`);
+  }
+
+  const challengingAspects = natalChart.aspects.filter(
+    a => (a.planet1 === planetName || a.planet2 === planetName) && (a.type === 'Kare' || a.type === 'Karşıt')
+  );
+  challengingAspects.forEach(a => {
+    const otherPlanet = a.planet1 === planetName ? a.planet2 : a.planet1;
+    if (otherPlanet === 'Satürn' || otherPlanet === 'Kiron') {
+      passiveScore += 2;
+    } else if (otherPlanet === 'Plüton' || otherPlanet === 'Mars' || otherPlanet === 'Uranüs') {
+      activeScore += 2;
+    }
+  });
+
+  const polarity: RetroPolarity = activeScore > passiveScore ? 'active' : 'passive';
+  const option = debtData[polarity];
+
+  const topDiagnosis = diagnosisPoints.slice(0, 2).join(' & ');
+  const hdDiagnosis = topDiagnosis ? `${topDiagnosis} (${gateDiagnosis})` : gateDiagnosis;
+
+  return {
+    polarity,
+    polarityLabel: option.polarityLabel,
+    hdDiagnosis
+  };
+}
+
+export function calculateIncarnationAnalysis(
+  natalChart: NatalChartData,
+  birthDate?: Date | null
+): IncarnationAnalysisResult {
+  // Eğer birthDate verilmişse Human Design haritasını hesapla
+  let hdChart: HumanDesignChart | null = null;
+  if (birthDate && !isNaN(birthDate.getTime())) {
+    try {
+      hdChart = generateChart(birthDate);
+    } catch (e) {
+      console.warn('Human Design chart could not be generated for incarnation analysis:', e);
+    }
+  }
+
   // 1. KAD ve GAD Hesabı
   const kadPoint = natalChart.planets.find(p => p.name === 'Kuzey Ay Düğümü') || {
     name: 'Kuzey Ay Düğümü',
@@ -233,11 +388,23 @@ export function calculateIncarnationAnalysis(natalChart: NatalChartData): Incarn
       };
     });
 
-  // 3. Karmik Borçlar (Retrolar)
+  // 3. Karmik Borçlar (Retrolar - Human Design Sentezi ile Nokta Atışı Kutuplanma)
   const retroDebts: RetroKarmicDebt[] = [];
   natalChart.planets.forEach(p => {
-    if (p.isRetrograde && RETRO_KARMIC_DEBTS[p.name]) {
-      retroDebts.push(RETRO_KARMIC_DEBTS[p.name]);
+    if (p.isRetrograde && RETRO_KARMIC_DEBTS_DATA[p.name]) {
+      const data = RETRO_KARMIC_DEBTS_DATA[p.name];
+      const { polarity, polarityLabel, hdDiagnosis } = determineKarmicPolarity(p.name, p, hdChart, natalChart);
+      const chosenOption = data[polarity];
+      retroDebts.push({
+        planet: data.planet,
+        title: data.title,
+        polarity,
+        polarityLabel,
+        hdDiagnosis,
+        pastLifeCause: chosenOption.pastLifeCause,
+        currentLifeKarma: chosenOption.currentLifeKarma,
+        dharmaRemedy: chosenOption.dharmaRemedy
+      });
     }
   });
 

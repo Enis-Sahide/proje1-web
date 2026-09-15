@@ -313,7 +313,14 @@ export const downloadIncarnationPDF = async (
   } else {
     data.retroDebts.forEach(debt => {
       // Split each text line to fit within card width (168mm)
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(12.5);
+      const titleStr = `${debt.planet} Rx: ${debt.title}${debt.polarityLabel ? ` [${debt.polarityLabel}]` : ''}`;
+
       doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(10.5);
+      const hdDiagLines = debt.hdDiagnosis ? doc.splitTextToSize(`⚡ Human Design Teşhisi: ${debt.hdDiagnosis}`, 168) : [];
+
       doc.setFontSize(11.5);
       const pastLifeLines = doc.splitTextToSize(`Geçmiş Yaşam Nedeni: ${debt.pastLifeCause}`, 168);
       const currentKarmaLines = doc.splitTextToSize(`Bu Yaşamdaki Borç: ${debt.currentLifeKarma}`, 168);
@@ -321,9 +328,9 @@ export const downloadIncarnationPDF = async (
       const dharmaLines = doc.splitTextToSize(`Dharma Reçetesi: ${debt.dharmaRemedy}`, 168);
 
       const lineHeight = 5.6;
-      const totalTextLinesCount = pastLifeLines.length + currentKarmaLines.length + dharmaLines.length;
+      const totalTextLinesCount = hdDiagLines.length + pastLifeLines.length + currentKarmaLines.length + dharmaLines.length;
       // title(8mm) + lines + padding
-      const cardHeight = 16 + (totalTextLinesCount * lineHeight) + 6;
+      const cardHeight = 18 + (totalTextLinesCount * lineHeight) + (hdDiagLines.length ? 4 : 0) + 6;
 
       ensureSpace(cardHeight + 6);
 
@@ -336,10 +343,18 @@ export const downloadIncarnationPDF = async (
 
       let textY = curY + 8;
       doc.setFont('LiberationSans', 'bold');
-      doc.setFontSize(13.5);
+      doc.setFontSize(12.5);
       doc.setTextColor(...gold);
-      doc.text(`${debt.planet} Rx: ${debt.title}`, 20, textY);
+      doc.text(titleStr, 20, textY);
       textY += 7;
+
+      if (hdDiagLines.length > 0) {
+        doc.setFont('LiberationSans', 'normal');
+        doc.setFontSize(10.5);
+        doc.setTextColor(130, 210, 255);
+        doc.text(hdDiagLines, 20, textY);
+        textY += hdDiagLines.length * 4.8 + 2;
+      }
 
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(11.5);
