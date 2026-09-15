@@ -407,6 +407,7 @@ export default function HumanDesignPage() {
   const router = useRouter();
   const { role, user } = useAuth();
   const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
+  const isMasterOrAdmin = role === 'master' || role === 'admin';
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [showLockModal, setShowLockModal] = useState(false);
@@ -797,39 +798,41 @@ export default function HumanDesignPage() {
                   </div>
                </div>
 
-              {/* Tab Switcher */}
-              <div className="flex items-center justify-center gap-3 mb-8 bg-white/5 p-1.5 rounded-2xl border border-white/10 max-w-md mx-auto">
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('bodygraph')}
-                  className={`flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${
-                    activeTab === 'bodygraph'
-                      ? 'bg-[#32D74B] text-black font-bold shadow-lg shadow-[#32D74B]/20'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <Zap size={16} />
-                  Tasarım Şeması
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('synthesis')}
-                  className={`flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 relative ${
-                    activeTab === 'synthesis'
-                      ? 'bg-gradient-to-r from-amber-400 via-emerald-400 to-teal-400 text-black font-bold shadow-lg shadow-amber-400/20'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <Sparkles size={16} />
-                  Kozmik Sentez (Astro-HD)
-                  <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-                  </span>
-                </button>
-              </div>
+              {/* Tab Switcher - Yalnızca Usta / Admin seviyesinde görünür */}
+              {isMasterOrAdmin && (
+                <div className="flex items-center justify-center gap-3 mb-8 bg-white/5 p-1.5 rounded-2xl border border-white/10 max-w-md mx-auto">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('bodygraph')}
+                    className={`flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${
+                      activeTab === 'bodygraph'
+                        ? 'bg-[#32D74B] text-black font-bold shadow-lg shadow-[#32D74B]/20'
+                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <Zap size={16} />
+                    Tasarım Şeması
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('synthesis')}
+                    className={`flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 relative ${
+                      activeTab === 'synthesis'
+                        ? 'bg-gradient-to-r from-amber-400 via-emerald-400 to-teal-400 text-black font-bold shadow-lg shadow-amber-400/20'
+                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <Sparkles size={16} />
+                    Kozmik Sentez (Astro-HD)
+                    <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                    </span>
+                  </button>
+                </div>
+              )}
 
-              {activeTab === 'bodygraph' && (
+              {(!isMasterOrAdmin || activeTab === 'bodygraph') && (
                 <div className="space-y-8 animate-in fade-in duration-500">
                   <div className="flex flex-col lg:flex-row justify-center items-start gap-8 mb-10">
                     {/* Left Column - Design */}
@@ -1041,7 +1044,7 @@ export default function HumanDesignPage() {
                 </div>
               )}
 
-              {activeTab === 'synthesis' && (
+              {isMasterOrAdmin && activeTab === 'synthesis' && (
                 <div className="space-y-8 animate-in fade-in duration-500 text-left">
                   {/* Hero Introduction */}
                   <div className="bg-gradient-to-r from-amber-500/10 via-emerald-500/10 to-teal-500/10 rounded-3xl border border-white/10 p-6 md:p-8">
