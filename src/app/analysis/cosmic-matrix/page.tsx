@@ -2,12 +2,14 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { 
   ArrowLeft, Loader2, Sparkles, Layers, Compass, Shield, 
   RotateCcw, Flame, Droplets, Wind, Mountain, Sun, Moon, 
   CheckCircle2, AlertCircle, Bookmark, Compass as CompassIcon, 
-  Eye, Zap, RefreshCw, Leaf
+  Eye, Zap, RefreshCw, Leaf, Lock
 } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import moment from 'moment-timezone';
 import { AstroCity } from '@/features/astrology/engine/AstrologyConstants';
@@ -34,6 +36,10 @@ const renderFormattedText = (text: string) => {
 };
 
 export default function CosmicMatrixPage() {
+  const router = useRouter();
+  const { role } = useAuth();
+  const isMasterOrAdmin = role === 'master' || role === 'admin';
+
   const [name, setName] = useState('');
   const [dateStr, setDateStr] = useState('1990-01-01');
   const [timeStr, setTimeStr] = useState('12:00');
@@ -135,6 +141,30 @@ export default function CosmicMatrixPage() {
           </div>
         </div>
 
+        {/* Usta Seviyesi Kapısı */}
+        {!isMasterOrAdmin ? (
+          <div className="max-w-2xl mx-auto text-center py-20">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-amber-500/10 border border-amber-500/30 mb-6">
+              <Lock size={36} className="text-amber-400" />
+            </div>
+            <h2 className="text-3xl font-bold text-white mb-3">Usta Seviyesi Gerektiriyor</h2>
+            <p className="text-mystic-text-muted text-base leading-relaxed mb-8 max-w-lg mx-auto">
+              7Layers Kozmik Matris Analizi; Astroloji, Kabalistik 4 Âlem, Human Design ve Kadim Futhark Runelerini
+              tek bir sentezde birleştiren ileri düzey bir araçtır. Bu analiz yalnızca <strong className="text-amber-300">Usta (Master)</strong> ve üstü seviyelere açıktır.
+            </p>
+            <button
+              onClick={() => router.push('/profile')}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-600 hover:brightness-110 text-black font-bold py-3.5 px-8 rounded-2xl transition-all shadow-lg shadow-amber-500/25 text-sm cursor-pointer"
+            >
+              <Sparkles size={18} />
+              Seviyeni Yükselt
+            </button>
+            <p className="text-xs text-mystic-text-muted mt-5">
+              Mevcut seviyeniz: <span className="text-amber-400 font-semibold capitalize">{role || 'Üye'}</span>
+            </p>
+          </div>
+        ) : (
+          <>
         {/* Giriş & Form Alanı */}
         {!report ? (
           <div className="max-w-3xl mx-auto text-center space-y-8 py-10">
@@ -656,6 +686,8 @@ export default function CosmicMatrixPage() {
               </div>
             </div>
           </div>
+        )}
+          </>
         )}
       </div>
     </div>

@@ -28,7 +28,8 @@ export default function AnalysisPage() {
       description: 'Astroloji, Kabalistik 4 Âlem, Human Design ve Kadim Futhark Runelerini birleştiren bütünleşik kadersel teşhis ve tılsım analizi.',
       icon: <Compass size={32} />,
       color: '#F59E0B',
-      link: '/analysis/cosmic-matrix'
+      link: '/analysis/cosmic-matrix',
+      isLocked: true
     },
     {
       id: 'druid-tree',
@@ -44,7 +45,8 @@ export default function AnalysisPage() {
       description: 'Önceki yaşam kimliğiniz, karmik borçlarınız, Drakonik ruh haritanız ve gelecek enkarnasyon potansiyeliniz.',
       icon: <Scroll size={32} />,
       color: '#FFD700',
-      link: '/analysis/incarnation'
+      link: '/analysis/incarnation',
+      isLocked: true
     },
     {
       id: 'rectification',

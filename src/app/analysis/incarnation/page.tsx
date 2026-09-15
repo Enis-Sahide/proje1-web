@@ -165,6 +165,56 @@ export default function IncarnationAnalysisPage() {
     </div>
   );
 
+  // Master seviyesi kapısı — erken döndür
+  if (!isMasterOrAdmin) {
+    return (
+      <div className="min-h-screen pt-28 pb-24 px-4 sm:px-6 relative bg-mystic-dark">
+        <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[600px] h-[350px] bg-gradient-to-b from-[#D4AF37]/15 to-purple-600/10 blur-[130px] pointer-events-none -z-10 rounded-full" />
+        <div className="max-w-5xl mx-auto">
+          <button
+            onClick={() => router.push('/analysis')}
+            className="inline-flex items-center gap-2 text-mystic-text-muted hover:text-white transition-colors mb-6 text-sm group"
+          >
+            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+            <span>Ruhsal Analiz Merkezi'ne Dön</span>
+          </button>
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center justify-center p-3 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] mb-4">
+              <Sparkles size={28} />
+            </div>
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-[#FFD700] to-amber-200 mb-3">
+              Karmik & Enkarnasyon Analizi
+            </h1>
+            <p className="text-sm sm:text-base text-mystic-text-muted max-w-2xl mx-auto">
+              Önceki enkarnasyon kimliğiniz, bu hayata taşıdığınız karmik borçlar, Drakonik ruh haritanız ve gelecek enkarnasyon potansiyeliniz.
+            </p>
+          </div>
+          <div className="max-w-2xl mx-auto text-center py-16">
+            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 mb-6">
+              <Lock size={36} className="text-[#D4AF37]" />
+            </div>
+            <h2 className="text-3xl font-bold text-white mb-3">Usta Seviyesi Gerektiriyor</h2>
+            <p className="text-mystic-text-muted text-base leading-relaxed mb-8 max-w-lg mx-auto">
+              Karmik & Enkarnasyon Analizi; önceki yaşam kimliğiniz, karmik borçlarınız, Drakonik ruh haritanız ve
+              gelecek enkarnasyon potansiyelinizi derinlemesine inceleyen ileri düzey bir araçtır.
+              Bu analiz yalnızca <strong className="text-[#D4AF37]">Usta (Master)</strong> ve üstü seviyelere açıktır.
+            </p>
+            <button
+              onClick={() => router.push('/profile')}
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:brightness-110 text-black font-bold py-3.5 px-8 rounded-2xl transition-all shadow-lg shadow-[#D4AF37]/25 text-sm cursor-pointer"
+            >
+              <Sparkles size={18} />
+              Seviyeni Yükselt
+            </button>
+            <p className="text-xs text-mystic-text-muted mt-5">
+              Mevcut seviyeniz: <span className="text-[#D4AF37] font-semibold capitalize">{role || 'Üye'}</span>
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen pt-28 pb-24 px-4 sm:px-6 relative bg-mystic-dark">
       {/* Background glow ornaments */}
