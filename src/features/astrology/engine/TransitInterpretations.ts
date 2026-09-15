@@ -12,7 +12,8 @@ export function getTransitHouseInterpretation(transitPlanet: string, house: numb
     'Uranüs': 'hayatınızdaki ani sürprizler, uyanışlar ve özgürleşme alanınız',
     'Neptün': 'hayal gücünüz, sezgileriniz, ruhsal derinliğiniz ve bazen kafa karışıklıklarınız',
     'Plüton': 'derin dönüşümleriniz, küllerinden yeniden doğma gücünüz ve krizleri aşma enerjiniz',
-    'Kiron': 'ruhun en derin hassasiyetleri, şifalanma kapılarınız ve hassas yönleriniz'
+    'Kiron': 'ruhun en derin hassasiyetleri, şifalanma kapılarınız ve hassas yönleriniz',
+    'Lilith': 'bastırılmış gölge gücünüz, tabuları yıkan vahşi doğanız ve otantik özgürlük arayışınız'
   };
 
   const houseThemes: Record<number, string> = {

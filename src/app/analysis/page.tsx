@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Lock, Activity, AlertCircle, X, Clock, Scroll } from 'lucide-react';
+import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Lock, Activity, AlertCircle, X, Clock, Scroll, TreePine } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 interface ToolItem {
@@ -23,12 +23,30 @@ export default function AnalysisPage() {
 
   const tools: ToolItem[] = [
     {
+      id: 'cosmic-matrix',
+      title: '7Layers Kozmik Matris',
+      description: 'Astroloji, Kabalistik 4 Âlem, Human Design ve Kadim Futhark Runelerini birleştiren bütünleşik kadersel teşhis ve tılsım analizi.',
+      icon: <Compass size={32} />,
+      color: '#F59E0B',
+      link: '/analysis/cosmic-matrix',
+      isLocked: true
+    },
+    {
+      id: 'druid-tree',
+      title: 'Kelt Druid Ağacı Analizi',
+      description: 'Doğum gününüzün 13 kutsal Ogham ağacındaki ruhsal arketipini, kadim ağaç harfini, ışık & gölge potansiyelleri ile orman topraklanması (Shinrin-Yoku) ritüelini keşfedin.',
+      icon: <TreePine size={32} />,
+      color: '#10B981',
+      link: '/analysis/druid-tree'
+    },
+    {
       id: 'incarnation',
       title: 'Karmik & Enkarnasyon',
       description: 'Önceki yaşam kimliğiniz, karmik borçlarınız, Drakonik ruh haritanız ve gelecek enkarnasyon potansiyeliniz.',
       icon: <Scroll size={32} />,
       color: '#FFD700',
-      link: '/analysis/incarnation'
+      link: '/analysis/incarnation',
+      isLocked: true
     },
     {
       id: 'rectification',
@@ -105,7 +123,7 @@ export default function AnalysisPage() {
   ];
 
   return (
-    <div className="min-h-screen pt-32 pb-24 px-6 relative">
+    <div className="min-h-screen pt-32 pb-24 px-4 sm:px-6 relative overflow-x-hidden">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-16">
           <div className="inline-flex items-center justify-center p-3 rounded-full bg-mystic-primary/10 border border-mystic-primary/30 text-mystic-primary mb-6">

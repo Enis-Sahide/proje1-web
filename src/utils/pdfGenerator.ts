@@ -23,10 +23,20 @@ const drawTextWithBold = (
   x: number,
   y: number,
   maxWidth: number,
-  lineHeight: number = 6
+  lineHeight: number = 6,
+  maxY: number = 275,
+  startY: number = 25
 ): number => {
   let curX = x;
   let curY = y;
+  const activeColor = (doc as any).getTextColor ? (doc as any).getTextColor() : '#e6e6e6';
+
+  if (curY > maxY) {
+    doc.addPage();
+    curY = startY;
+    doc.setTextColor(activeColor);
+  }
+
   const sanitizedText = text
     .replace(/\r\n/g, '\n') // Convert CRLF to LF
     .replace(/^\s*>\s*/gm, '');
@@ -42,7 +52,15 @@ const drawTextWithBold = (
     if (part.includes('\n')) {
       const newlineCount = (part.match(/\n/g) || []).length;
       curX = x;
-      curY += lineHeight * newlineCount;
+      for (let i = 0; i < newlineCount; i++) {
+        curY += lineHeight;
+        if (curY > maxY) {
+          doc.addPage();
+          curY = startY;
+          doc.setTextColor(activeColor);
+          doc.setFont('LiberationSans', isBold ? 'bold' : 'normal');
+        }
+      }
       continue;
     }
     if (part === '') continue;
@@ -51,6 +69,12 @@ const drawTextWithBold = (
     if (curX + wordWidth > x + maxWidth && part.trim() !== '') {
       curX = x;
       curY += lineHeight;
+      if (curY > maxY) {
+        doc.addPage();
+        curY = startY;
+        doc.setTextColor(activeColor);
+        doc.setFont('LiberationSans', isBold ? 'bold' : 'normal');
+      }
     }
     
     doc.text(part, curX, curY);
@@ -357,7 +381,8 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
     "• **Mars:** Eyleme geçme gücünüz, tutkularınız, cesaretiniz ve mücadele tarzınız.\n" +
     "• **Jüpiter:** Şansınız, bolluk-bereket algınız, büyüme, inançlar ve bilgelik alanınız.\n" +
     "• **Satürn:** Sınırlarınız, sorumluluklarınız, hayat dersleriniz, disiplin ve olgunlaşma alanınız.\n" +
-    "• **Kolektif Gezegenler (Uranüs, Neptün, Plüton):** Sırasıyla bireysel özgürleşme, ruhsal çözülme/hayaller ve köklü dönüşüm/küllerinden doğma enerjileridir.";
+    "• **Kolektif Gezegenler (Uranüs, Neptün, Plüton):** Sırasıyla bireysel özgürleşme, ruhsal çözülme/hayaller ve köklü dönüşüm/küllerinden doğma enerjileridir.\n" +
+    "• **Kiron ve Lilith:** Sırasıyla yaralı şifacı bilgeliği ile bastırılmış gölge güç ve tabuları yıkan vahşi doğanızdır.";
   currentY = drawTextWithBold(doc, planetsText, 20, currentY, 170, 5.2);
   currentY += 5;
 
@@ -395,6 +420,7 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
     if (currentY + required > 275) {
       doc.addPage();
       currentY = 25;
+      doc.setTextColor(230, 230, 230);
     }
   };
 
@@ -426,8 +452,11 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
 
   currentY = (doc as any).lastAutoTable.finalY + 15;
 
+  // Start Section 2 (Interpretations) on a new page so the first planet (Güneş) begins cleanly at the top
+  doc.addPage();
+  currentY = 25;
+
   // 2. Gezegen Yorumları
-  checkSpace(30);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(15);
   doc.setTextColor(gold[0], gold[1], gold[2]);
@@ -510,78 +539,78 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
     }
   }
 
-  // --- Mobile App Advertisement Page ---
+  // --- 7LAYERS Exploration & Ecosystem Page ---
   doc.addPage();
-  currentY = 25;
+  currentY = 22;
 
   doc.setFont('LiberationSans', 'bold');
-  doc.setFontSize(18);
+  doc.setFontSize(16);
   doc.setTextColor(gold[0], gold[1], gold[2]);
-  doc.text("7LAYERS MOBİL UYGULAMASI İLE KEŞFE DEVAM EDİN", 20, currentY);
-  currentY += 15;
+  doc.text("7LAYERS İLE KOZMİK YOLCULUĞUNUZA DEVAM EDİN", 20, currentY);
+  currentY += 9;
 
   // Decorative Line
   doc.setDrawColor(gold[0], gold[1], gold[2]);
   doc.setLineWidth(0.5);
   doc.line(20, currentY, 190, currentY);
-  currentY += 12;
-
-  doc.setFont('LiberationSans', 'normal');
-  doc.setFontSize(10.5);
-  doc.setTextColor(240, 240, 240);
-
-  const adIntro = "Doğum haritanızdaki derin ezoterik anlamları günlük hayatınıza entegre etmek ve gök kubbenin anlık enerjilerini her an takip etmek için **7LAYERS** mobil uygulamamızı kullanabilirsiniz.";
-  currentY = drawTextWithBold(doc, adIntro, 20, currentY, 170, 6);
-  currentY += 10;
-
-  // Feature 1
-  doc.setFont('LiberationSans', 'bold');
-  doc.setFontSize(13);
-  doc.setTextColor(gold[0], gold[1], gold[2]);
-  doc.text("• Anlık Gökyüzü Sorgulama (Transit Analizi)", 20, currentY);
-  currentY += 7;
+  currentY += 8;
 
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(10);
-  doc.setTextColor(210, 210, 210);
-  const feat1 = "Şu andaki gökyüzü enerjilerinin sizin doğum haritanız üzerindeki etkilerini anlık olarak analiz edin. Günlük, haftalık transit etkilerini ve gezegen geçişlerini takip ederek hayatınızı gökyüzüyle uyumlayın.";
-  currentY = drawTextWithBold(doc, feat1, 20, currentY, 170, 5.5);
-  currentY += 10;
+  doc.setTextColor(230, 230, 230);
 
-  // Feature 2
-  doc.setFont('LiberationSans', 'bold');
-  doc.setFontSize(13);
-  doc.setTextColor(gold[0], gold[1], gold[2]);
-  doc.text("• Detaylı Doğum Haritası Sorgulama", 20, currentY);
-  currentY += 7;
+  const adIntro = "Doğum haritanız ruhunuzun yeryüzü planındaki pusulasıdır. Varlığınızın diğer boyutlarını ve kaderinizin gizli katmanlarını **7LAYERS** analizleriyle keşfetmeye devam edin:";
+  currentY = drawTextWithBold(doc, adIntro, 20, currentY, 170, 5);
+  currentY += 6;
 
-  doc.setFont('LiberationSans', 'normal');
-  doc.setFontSize(10);
-  doc.setTextColor(210, 210, 210);
-  const feat2 = "Mobil uygulamamız üzerinden doğum bilgilerinizi girerek haritanızı interaktif olarak inceleyin, gezegen açılarını ve karmik göstergelerinizi detaylı grafiklerle görüntüleyin.";
-  currentY = drawTextWithBold(doc, feat2, 20, currentY, 170, 5.5);
-  currentY += 10;
+  const features = [
+    {
+      title: "• Anlık Gökyüzü & Canlı Kozmik Rehber",
+      desc: "Şu anki gezegen geçişlerinin doğum haritanızla kurduğu canlı açıları, günlük ve haftalık kişisel kozmik hava durumunuzu anbean takip edin."
+    },
+    {
+      title: "• Kabalistik 4 Alem Analizi",
+      desc: "Ruhunuzun Madde, Duygu, Zihin ve Kudret boyutlarındaki 4 farklı haritasını ve kadersel Tikkun (ruhsal düzeltim) şifrelerinizi çözün."
+    },
+    {
+      title: "• Enkarnasyon & Geçmiş Yaşam Analizi",
+      desc: "Önceki yaşam rolleriniz, hücresel bilinçaltı izleriniz, Kozmik Kökeniniz (Starseed) ve ruhunuzun bu enkarnasyondaki büyük misyonu."
+    },
+    {
+      title: "• Human Design (İnsan Tasarımı)",
+      desc: "Aura tipiniz, karar alma merkeziniz (otorite) ve bilinçaltı enerji kapılarınızın eşsiz yaşam kullanma kılavuzu."
+    },
+    {
+      title: "• Kelt Druid Ağacı Analizi",
+      desc: "Kadim Kelt Druid takvimine göre koruyucu ruh ağacınız, kadim doğa arketipleriniz ve içsel güç kaynaklarınız."
+    },
+    {
+      title: "• Ezoterik Numeroloji & Kader Döngüleri",
+      desc: "Yaşam yolu sayınız, ruh güdünüz ve hayatınızın dönüm noktalarını belirleyen evrensel sayı frekansları."
+    }
+  ];
 
-  // Feature 3
-  doc.setFont('LiberationSans', 'bold');
-  doc.setFontSize(13);
-  doc.setTextColor(gold[0], gold[1], gold[2]);
-  doc.text("• Ay Döngüleri ve Faz Analizleri", 20, currentY);
-  currentY += 7;
+  for (const feat of features) {
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(gold[0], gold[1], gold[2]);
+    doc.text(feat.title, 20, currentY);
+    currentY += 5.5;
 
-  doc.setFont('LiberationSans', 'normal');
-  doc.setFontSize(10);
-  doc.setTextColor(210, 210, 210);
-  const feat3 = "Ay'ın evrelerini (Yeniay, Dolunay, Hilal vb.) ve bunların ruh haliniz, enerjiniz ve çakralarınız üzerindeki yansımalarını takip edin. Ay ritimlerine uygun meditasyon ve niyet pratiklerine erişin.";
-  currentY = drawTextWithBold(doc, feat3, 20, currentY, 170, 5.5);
-  currentY += 15;
+    doc.setFont('LiberationSans', 'normal');
+    doc.setFontSize(9.5);
+    doc.setTextColor(215, 215, 215);
+    currentY = drawTextWithBold(doc, feat.desc, 23, currentY, 167, 4.6);
+    currentY += 4.5;
+  }
 
+  currentY += 4;
   // Closing Call to Action
   doc.setFont('LiberationSans', 'bold');
-  doc.setFontSize(11);
+  doc.setFontSize(10);
   doc.setTextColor(gold[0], gold[1], gold[2]);
-  const adClosing = "**7LAYERS** Mobil Uygulamasını **Google Play Store** üzerinden indirerek kadim astroloji ve ezoterizm yolculuğunuzu her an yanınızda taşıyabilirsiniz.";
-  currentY = drawTextWithBold(doc, adClosing, 20, currentY, 170, 6);
+  const adClosing = "**7LAYERS** web platformumuz (**7layers.tr**) ve mobil uygulamamız üzerinden tüm bu derin analizlere dilediğiniz an ulaşabilir, kadim ezoterizm yolculuğunuzu derinleştirebilirsiniz.";
+  currentY = drawTextWithBold(doc, adClosing, 20, currentY, 170, 5.2);
 
   // Save the PDF
   doc.save(`Ezoterik_Dogum_Haritasi_${locationStr.replace(/\s+/g, '_')}.pdf`);

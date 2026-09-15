@@ -87,7 +87,7 @@ const HOUSE_METADATA: Record<number, { title: string; field: string; theme: stri
   12: { title: '12. Ev (Bilinçaltı & Mistik Çözülme)', field: 'Karmik Hafıza, İnziva ve Evrensel Birlik', theme: 'Görünmeyen boyutlar, egonun teslimiyeti ve sezgisel bilgelik' }
 };
 
-const GATE_TITLES: Record<number, { title: string; gift: string; shadow: string }> = {
+export const GATE_TITLES: Record<number, { title: string; gift: string; shadow: string }> = {
   1: { title: "Yaratıcılık & Kendini İfade", gift: "Özgün Deha", shadow: "Amaçsızlık ve Yetersizlik" },
   2: { title: "Alıcılık & Yön Tayini", gift: "Doğru Zamanlama ve Rehberlik", shadow: "Kayıp Hissetme" },
   3: { title: "Düzen & Yeni Başlangıçlar", gift: "Kaosu Düzene Çevirme", shadow: "Kaos ve Erteleme" },
@@ -212,52 +212,52 @@ export interface LineBehaviorProfile {
 
 export const LINE_BEHAVIOR_PROFILES: Record<number, LineBehaviorProfile> = {
   1: {
-    archetype: 'Araştırmacı (The Investigator)',
+    archetype: '1. Çizgi: Araştırmacı',
     rootFear: 'Zeminsizlik, Bilgi Eksikliği ve Hazırlıksız Yakalanma Korkusu',
-    generalTendency: 'Olayların temeline inme, zihinsel güvence arama ve detaylı veri toplama.',
-    challengingBehavior: 'Yeterince bilmediği hissine kapılarak eylemi sürekli erteler; güvensizlik krizleri yaşar ve her şeye şüpheyle yaklaşarak zihinsel felce (analysis paralysis) uğrar.',
-    harmoniousBehavior: 'Konusunun en derin uzmanı ve sağlam temeller kuran bilge bir otorite olarak parlar.',
-    actionableRemedy: 'Hiçbir zaman her şeyi bilemeyeceğinizi kabul edin; %70 hazırlıkla sahaya çıkıp deneyim içinde öğrenmeye cesaret edin.'
+    generalTendency: 'Olayların temeline inme, zihinsel güvence arama ve detaylı veri toplama refleksi.',
+    challengingBehavior: 'Yeterince bilmediğiniz hissine kapılarak eylemi sürekli ertelersiniz; güvensizlik krizleri yaşar ve her şeye şüpheyle yaklaşarak zihinsel felce (aşırı analiz) uğrarsınız.',
+    harmoniousBehavior: 'Konunuzun en derin uzmanı olarak sağlam temeller kurar, şüpheyi bilge bir otoriteye dönüştürürsünüz.',
+    actionableRemedy: 'Hiçbir zaman her şeyi tam olarak bilemeyeceğinizi kabul edin; %70 hazırlıkla sahaya çıkıp deneyim içinde öğrenmeye cesaret edin.'
   },
   2: {
-    archetype: 'Münzevi (The Hermit)',
+    archetype: '2. Çizgi: Münzevi',
     rootFear: 'Görülme Baskısı, Davetsiz Müdahale ve Beklentileri Karşılayamama Korkusu',
-    generalTendency: 'Kendi doğal alanında yalnız kalarak yeteneklerini eforsuzca geliştirmek.',
-    challengingBehavior: 'Dış dünyayı aşırı tehditkar ve yorucu algılayarak kendi kabuğuna saklanır; yeteneğini değersizleştirir ve dışarıdan birisi onu zorla çekmedikçe görünür olmaktan kaçar.',
-    harmoniousBehavior: 'Zorlanmadan ve doğallıkla sergilediği dehasıyla çevresine ilham verir ve doğru çağrılara yanıt verir.',
+    generalTendency: 'Kendi alanınızda kalarak yeteneklerinizi zahmetsizce sergileme refleksi.',
+    challengingBehavior: 'Dış dünyayı aşırı yorucu algılayarak kendi kabuğunuza saklanırsınız; doğal yeteneğinizi değersizleştirir ve dışarıdan biri zorlamadıkça görünür olmaktan kaçarsınız.',
+    harmoniousBehavior: 'Zorlanmadan ve doğallıkla sergilediğiniz dehanızla çevrenize ilham verir, doğru çağrılara yanıt verirsiniz.',
     actionableRemedy: 'Kendi köşenizde kalmak bir kusur değildir; ancak doğru insanlar sizi fark edip çağırdığında saklanmayı bırakıp kapıyı açmalısınız.'
   },
   3: {
-    archetype: 'Deneyimci / Şehit (The Martyr)',
+    archetype: '3. Çizgi: Deneyimci / Şehit',
     rootFear: 'Hata Yapma Utancı, Kusurluluk ve Tuzağa Düşme / Bağlanma Korkusu',
-    generalTendency: 'Deneme-yanılma yoluyla hayatı test etmek, neyin çalışıp neyin çalışmadığını bizzat çarparak görmek.',
-    challengingBehavior: 'İlk pürüzde ilişkiyi veya projeyi sabote edip kaçar; "Ben zaten hep kaybediyorum, hiçbir şey düzgün gitmiyor" inancıyla yıkıcı öfke veya vazgeçiş yaşar.',
-    harmoniousBehavior: 'İnsanlığın deneme tüpü olur; en zor krizlerden bile sağ çıkarak bozuk olan sistemleri düzelten eşsiz bir sorun çözücüye dönüşür.',
-    actionableRemedy: 'Hatalarınız birer kusur değil, dünyaya hediye ettiğiniz "Burası çalışmıyor" keşifleridir. Kendinizi suçlamayı bırakıp her çarpmayı bir bilgelik rozeti olarak görün.'
+    generalTendency: 'Deneme-yanılma yoluyla neyin çalışıp neyin çalışmadığını bizzat deneyimleyerek bulma refleksi.',
+    challengingBehavior: 'İlk pürüzde ilişkiyi veya projeyi sabote edip kaçarsınız; "Ben zaten hep kaybediyorum" inancıyla yıkıcı öfke veya vazgeçiş yaşarsınız.',
+    harmoniousBehavior: 'En zor krizlerden bile sağ çıkarak bozuk sistemleri onaran eşsiz bir pratik sorun çözücüye dönüşürsünüz.',
+    actionableRemedy: 'Hatalarınız kusur değil, dünyaya sunduğunuz "burası çalışmıyor" keşifleridir. Kendinizi suçlamayı bırakıp her deneyimi bir bilgelik rozeti olarak görün.'
   },
   4: {
-    archetype: 'Fırsatçı / Dost (The Opportunist)',
+    archetype: '4. Çizgi: Fırsatçı / Dost',
     rootFear: 'Dışlanma, Reddedilme ve Sosyal Ağını Kaybetme Korkusu',
-    generalTendency: 'Kişisel ilişkiler, dostluk köprüleri ve yakın çevre ağı üzerinden büyüme.',
-    challengingBehavior: 'Yalnız kalma veya dışlanma korkusuyla sınır koyamaz; toksik ilişkilere veya haksızlıklara sırf kabul görmek için boyun eğer; yabancı ortamlara karşı katı bir duvar örer.',
-    harmoniousBehavior: 'Dostlukların en güvenilir limanı olur; kapıların tanıdıklar aracılığıyla açıldığı muazzam bir fırsat mıknatısına dönüşür.',
+    generalTendency: 'Kişisel ilişkiler, dostluk köprüleri ve yakın çevre ağı üzerinden büyüme refleksi.',
+    challengingBehavior: 'Yalnız kalma veya dışlanma korkusuyla sınır koyamazsınız; toksik ilişkilere sırf kabul görmek için boyun eğer, yabancı ortamlara karşı katı duvarlar örersiniz.',
+    harmoniousBehavior: 'Dostlukların en güvenilir limanı olur, samimi bağlarınız sayesinde kapıların kendiliğinden açıldığı bir fırsat mıknatısına dönüşürsünüz.',
     actionableRemedy: 'Herkesin dostu olamazsınız. Sırf yalnız kalmamak için değerlerinizden ödün vermeyin; gerçek dostlar sınırlarınıza saygı duyanlardır.'
   },
   5: {
-    archetype: 'Kurtarıcı / Kafir (The Heretic)',
+    archetype: '5. Çizgi: Kurtarıcı / Kafir',
     rootFear: 'Yanlış Anlaşılma, İtibar Kaybı ve Günah Keçisi İlan Edilme Korkusu',
-    generalTendency: 'Kriz anlarında evrensel ve pratik çözümler üreterek sahneye çıkmak.',
-    challengingBehavior: 'İnsanların ona yüklediği gerçek dışı "kahraman/kurtarıcı" beklentilerini sırtlanmaya kalkar; işler ters gittiğinde ya da beklentiyi karşılayamadığında haksız yere suçlanıp derin bir kurban psikolojisi ve kırgınlığa kapılır.',
-    harmoniousBehavior: 'İmkansız denilen krizleri pratik zekasıyla çözen ve kitleleri arkasından sürükleyen vizyoner bir rehber olur.',
-    actionableRemedy: 'Herkesi kurtarmak sizin göreviniz değil. Sadece pratik olarak çözebileceğiniz ve net olarak sınırları çizilmiş davetleri kabul edin; insanların hayallerini değil sadece gerçeği vaat edin.'
+    generalTendency: 'Kriz anlarında pratik ve evrensel çözümlerle sahneye çıkma refleksi.',
+    challengingBehavior: 'İnsanların size yüklediği kurtarıcı beklentilerini sırtlanmaya kalkarsınız; işler ters gittiğinde günah keçisi ilan edilip derin bir kurban psikolojisi ve kırgınlığa kapılırsınız.',
+    harmoniousBehavior: 'İmkansız denilen krizleri pratik zekanızla çözen ve kitleleri arkasından sürükleyen vizyoner bir rehber olursunuz.',
+    actionableRemedy: 'Herkesi kurtarmak sizin göreviniz değil. Sadece pratik olarak çözebileceğiniz ve net sınırları çizilmiş davetleri kabul edin; insanların hayallerini değil sadece gerçeği vaat edin.'
   },
   6: {
-    archetype: 'Rol Modeli (The Role Model)',
+    archetype: '6. Çizgi: Rol Modeli',
     rootFear: 'Hayal Kırıklığı, Dünyanın Sahteliği ve Mükemmeliyetçilik Tuzağı',
-    generalTendency: 'Yüksek idealler, üç aşamalı yaşam döngüsü (30 yaş altı deneme, 30-50 arası çatıya çekilme, 50 üstü bilge liderlik).',
-    challengingBehavior: 'Dünyanın ve insanların hamlığına katlanamayarak "çatıya çekilir"; aşırı soğuk, mesafeli, kibirli veya hayata küskün bir tavır takınır; insanları sürekli kusurlu bulup yargılar.',
-    harmoniousBehavior: 'Yaşadığı tüm acıları bilgeliğe dönüştürmüş, yargısız, ışık saçan ve sözleriyle değil bizzat varlığıyla örnek olan yaşayan bir bilgeye dönüşür.',
-    actionableRemedy: 'İnsanların ve dünyanın kusurlu olması onların değerini azaltmaz. Çatıdan aşağıya sevgiyle bakın; kusurların içindeki ilahi mükemmelliği kabul edin.'
+    generalTendency: 'Yüksek idealler ve hayatı kuşbakışı gözlemleyip rehberlik etme refleksi.',
+    challengingBehavior: 'Dünyanın ve insanların hamlığına katlanamayarak "çatıya çekilirsiniz"; aşırı mesafeli, soğuk ve kusur arayan yargılayıcı bir tavır takınırsınız.',
+    harmoniousBehavior: 'Yaşadığınız tüm acıları bilgeliğe dönüştürmüş, yargısız ve bizzat duruşuyla örnek olan yaşayan bir rehbere dönüşürsünüz.',
+    actionableRemedy: 'İnsanların kusurlu olması onların değerini azaltmaz. Çatıdan aşağıya şefkatle bakın; kusurların içindeki tekamülü kabul edin.'
   }
 };
 
@@ -362,26 +362,25 @@ export function synthesizeAstroHumanDesign(
     const isChannelDefined = hdChart.activeGates.includes(conAct.gate);
 
     // Bütünleşik Sentez Başlığı
-    const synthesisTitle = `${planetName} ${houseInfo.title}'de & ${conAct.gate}.${conAct.line} Kapısında (${gateInfo.title})`;
+    const synthesisTitle = `${planetName} (${gateInfo.title}) · Kapı ${conAct.gate}.${conAct.line}`;
     
-    let synthesisInterpretation = `${planetName} enerjiniz, hayatınızın **${houseInfo.field}** sahnesinde somutlaşırken (${house}. Ev), içsel işletim sisteminizde **${conAct.gate}. Kapı (${gateInfo.title})** ve **${centerName} Merkezi** arketipiyle titreşmektedir. `;
-    
+    let synthesisInterpretation = "";
     if (dominantNature === 'challenging') {
-      synthesisInterpretation += `Haritanızdaki dinamik zorlayıcı açılar (Kare/Karşıt), bu kapının **Gölge Frekansı (${gateInfo.shadow})** üzerinden sınandığınızı ve dönüştürücü dersler sunduğunu gösterir.`;
+      synthesisInterpretation = `Bu yerleşim, ${gateInfo.shadow} gölgesiyle yüzleşme ve dönüştürme potansiyeline işaret eder.`;
     } else if (dominantNature === 'harmonious') {
-      synthesisInterpretation += `Uyumlu açılar (Üçgen/Sekstil) sayesinde bu kapının **Armağan Frekansı (${gateInfo.gift})** yaşamınıza doğal, zahmetsiz ve akıcı bir deha olarak yansır.`;
+      synthesisInterpretation = `Bu yerleşim, ${gateInfo.gift} armağanını doğal ve akıcı bir yetenek olarak açığa çıkarır.`;
     } else {
-      synthesisInterpretation += `Bu kapının frekansı, ${houseInfo.theme} alanında doğrudan ve odaklı bir bilinç çalışması sunar.`;
+      synthesisInterpretation = `Bu yerleşim, ${houseInfo.title} alanında odaklı bir enerji taşır.`;
     }
 
-    // Kesin Davranış Teşhisi (Line Mekaniği)
+    // Kesin Davranış Teşhisi (Line Mekaniği - Doğrudan Nokta Atışı Cümle)
     let preciseBehavioralDiagnosis = "";
     if (dominantNature === 'challenging') {
-      preciseBehavioralDiagnosis = `Astroloji haritanızdaki ${houseInfo.title} (${houseInfo.field}) yerleşimi genel olarak birçok olası sınav (öfke, kontrol, yetersizlik vb.) barındırır. Ancak Human Design haritanızda bu enerjinin tam olarak ${conAct.gate}. Kapı'nın ${conAct.line}. Çizgisine (${lineProfile.archetype}) kilitlenmesi, sizdeki sınavın rastgele değil; tam olarak ${lineProfile.rootFear.toLowerCase()} sebebiyle "${lineProfile.challengingBehavior}" şeklinde somutlaşacağını kesinleştirir.`;
+      preciseBehavioralDiagnosis = lineProfile.challengingBehavior;
     } else if (dominantNature === 'harmonious') {
-      preciseBehavioralDiagnosis = `Bu gezegenin ${houseInfo.title} alanındaki destekleyici açıları, ${conAct.gate}. Kapı'nın ${conAct.line}. Çizgisi (${lineProfile.archetype}) ile buluştuğunda çatışmaları eritir. Sizde bu yerleşim "${lineProfile.harmoniousBehavior}" şeklinde doğal ve akıcı bir başarıya dönüşür.`;
+      preciseBehavioralDiagnosis = lineProfile.harmoniousBehavior;
     } else {
-      preciseBehavioralDiagnosis = `Bu yerleşim ${houseInfo.title} alanında ${conAct.gate}. Kapı ${conAct.line}. Çizgi arketipi üzerinden çalışır. Temel davranış dinamiğiniz: "${lineProfile.generalTendency}"`;
+      preciseBehavioralDiagnosis = lineProfile.generalTendency;
     }
 
     items.push({
@@ -394,7 +393,7 @@ export function synthesizeAstroHumanDesign(
       gate: conAct.gate,
       gateName: gateInfo.title,
       line: conAct.line,
-      lineArchetype: `${conAct.line}. Çizgi: ${lineProfile.archetype}`,
+      lineArchetype: lineProfile.archetype,
       rootFear: lineProfile.rootFear,
       center: centerName,
       isChannelDefined,
@@ -467,21 +466,21 @@ export function synthesizeAstroHumanDesign(
     dominantLifeArea: {
       house: dominantHouse,
       title: dominantHouseMeta.title,
-      description: `Gezegenlerinizin ve kilit kapılarınızın en yoğun toplandığı yaşam sahnesi bu alandır. Bütünleşik kader yolculuğunuzun ana laboratuvarı **${dominantHouseMeta.field}** üzerinde çalışmaktadır.`
+      description: `Gezegenlerinizin ve kilit kapılarınızın en yoğun toplandığı yaşam sahnesi bu alandır. Bütünleşik kader yolculuğunuzun ana laboratuvarı ${dominantHouseMeta.field} üzerinde çalışmaktadır.`
     },
     highestGiftGate: {
       gate: bestHarmonious?.gate || 1,
       gateName: bestHarmonious?.gateName || 'Yaratıcılık',
       planet: bestHarmonious?.planetName || 'Güneş',
       house: bestHarmonious?.house || 1,
-      description: `${bestHarmonious?.planetName} gezegeniniz ${bestHarmonious?.house}. Evde ve ${bestHarmonious?.gate}. Kapı'da destekleyici açılar altındadır. En doğal başarı ve çekim alanınız **${bestHarmonious?.giftPotential}** armağanıdır.`
+      description: `${bestHarmonious?.planetName} gezegeniniz ${bestHarmonious?.house}. Evde ve ${bestHarmonious?.gate}. Kapı'da destekleyici açılar altındadır. En doğal başarı ve çekim alanınız ${bestHarmonious?.giftPotential} armağanıdır.`
     },
     majorGrowthChallengeGate: {
       gate: biggestChallenge?.gate || 28,
       gateName: biggestChallenge?.gateName || 'Mücadele',
       planet: biggestChallenge?.planetName || 'Mars',
       house: biggestChallenge?.house || 8,
-      description: `${biggestChallenge?.planetName} gezegeninizin aktive ettiği ${biggestChallenge?.gate}. Kapı, haritanızdaki dinamik kare/karşıt açılarla tetiklenmektedir. En büyük tekamül sıçramanız **${biggestChallenge?.shadowWarning}** gölgesiyle yüzleşip onu aşmaktan geçer.`
+      description: `${biggestChallenge?.planetName} gezegeninizin aktive ettiği ${biggestChallenge?.gate}. Kapı, haritanızdaki dinamik kare/karşıt açılarla tetiklenmektedir. En büyük tekamül sıçramanız ${biggestChallenge?.shadowWarning} gölgesiyle yüzleşip onu aşmaktan geçer.`
     },
     keyBehavioralDiagnoses: keyDiagnoses
   };

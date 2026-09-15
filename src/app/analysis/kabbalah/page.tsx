@@ -157,8 +157,9 @@ export default function KabbalahAnalysisPage() {
     const R_ASPECTS = RADIUS - 40;
 
     return (
-      <div className="w-full overflow-x-auto overflow-y-visible flex justify-center py-12 bg-black/40 rounded-3xl border border-white/5 shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
-        <svg width={CHART_SIZE} height={CHART_SIZE} viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`} overflow="visible" className="max-w-full h-auto">
+      <div className="w-full overflow-hidden flex justify-center py-6 sm:py-12 px-2 bg-black/40 rounded-3xl border border-white/5 shadow-[inset_0_0_50px_rgba(0,0,0,0.5)]">
+        <div className="w-full max-w-[340px] sm:max-w-[480px] md:max-w-[640px] aspect-square flex items-center justify-center">
+          <svg viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`} className="w-full h-full max-w-full" style={{ overflow: 'visible' }}>
           {/* Aspect Lines */}
           <circle cx={CENTER} cy={CENTER} r={R_ASPECTS} stroke="rgba(212,175,55,0.3)" strokeWidth="1" fill="rgba(0,0,0,0.4)" />
           {currentChart.aspects.filter(a => a.type !== 'Kavuşum').map((a, i) => {
@@ -263,18 +264,19 @@ export default function KabbalahAnalysisPage() {
               </g>
             );
           })}
-        </svg>
+          </svg>
+        </div>
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen bg-[#05050A] text-white overflow-hidden relative font-sans">
+    <div className="min-h-screen bg-[#05050A] text-white overflow-hidden relative font-sans pt-24 pb-20">
       <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay pointer-events-none z-0"></div>
       <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-[#D4AF37] opacity-5 blur-[150px] rounded-full pointer-events-none"></div>
       <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-[#6A0DAD] opacity-10 blur-[150px] rounded-full pointer-events-none"></div>
 
-      <div className="max-w-5xl mx-auto px-6 py-12 relative z-10">
+      <div className="max-w-5xl mx-auto px-6 py-6 relative z-10">
         
         <button 
           onClick={() => router.back()}
@@ -447,9 +449,9 @@ export default function KabbalahAnalysisPage() {
                         <Sparkles size={20} />
                       </div>
                       <div>
-                        <span className="text-xs uppercase tracking-widest font-bold text-[#0EA5E9]">Kozmik Sınav & Frekans Aynanız</span>
+                        <span className="text-xs uppercase tracking-widest font-bold text-[#0EA5E9]">Kozmik Farkındalık & Frekans Aynanız</span>
                         <h3 className="text-xl md:text-2xl font-bold text-white">
-                          Hangi Haritanızı Çalıştırıyorsunuz?
+                          Hangi Bilinç Âlemini Deneyimliyorsunuz?
                         </h3>
                       </div>
                     </div>
@@ -462,7 +464,7 @@ export default function KabbalahAnalysisPage() {
                   <div className="p-4 rounded-xl bg-black/40 border border-white/10 mb-6">
                     <div className="flex items-center gap-2 mb-2">
                       <span className="text-xs font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">
-                        Güncel Sınav
+                        Gelişim Odak Noktası
                       </span>
                       <h4 className="text-base md:text-lg font-bold text-[#0EA5E9]">
                         {kabbalahAnalysis.activeConsciousness.currentTheme || kabbalahAnalysis.activeConsciousness.title}
@@ -474,7 +476,7 @@ export default function KabbalahAnalysisPage() {
                     </p>
 
                     <div className="text-xs text-sky-300/80 bg-sky-950/40 p-2.5 rounded-lg border border-sky-800/30 flex items-start gap-2">
-                      <span className="shrink-0 text-sky-400 font-bold">⚡ Tetikleyici:</span>
+                      <span className="shrink-0 text-sky-400 font-bold">⚡ Göksel Rehberlik:</span>
                       <span>{kabbalahAnalysis.activeConsciousness.transitSummary || kabbalahAnalysis.activeConsciousness.reason}</span>
                     </div>
                   </div>
@@ -484,10 +486,10 @@ export default function KabbalahAnalysisPage() {
                     <div className="mb-6">
                       <div className="mb-3">
                         <h5 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
-                          <span>🪞 4 Alem Frekans Aynası: Sınav Karşısındaki Tavrınızı Tartın</span>
+                          <span>🪞 4 Âlem Frekans Aynası: Bilinç Boyutunuzu Keşfedin</span>
                         </h5>
                         <p className="text-xs text-mystic-text-muted mt-1">
-                          Bu gökyüzü etkisi karşısında sergilediğiniz içsel veya dışsal tepki, şu an hangi haritanızı aktive ettiğinizi teşhis eder:
+                          Bu gökyüzü etkisi karşısında geliştirdiğiniz içsel tutum, şu an hangi bilinç boyutunu deneyimlediğinizi yansıtır:
                         </p>
                       </div>
 
@@ -496,8 +498,8 @@ export default function KabbalahAnalysisPage() {
                         <div className="p-4 rounded-xl border border-red-500/30 bg-red-950/20 flex flex-col justify-between">
                           <div>
                             <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-red-500/20">
-                              <span className="text-xs font-bold text-red-400">1. Alem (Madde / Assiah)</span>
-                              <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-red-500/20 text-red-300 font-bold">Reaktif Düzey</span>
+                              <span className="text-xs font-bold text-red-400">1. Âlem (Eylem & Madde / Assiah)</span>
+                              <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-red-500/20 text-red-300 font-bold">Fiziksel / Pratik Boyut</span>
                             </div>
                             <h6 className="text-sm font-bold text-white mb-1.5">
                               {kabbalahAnalysis.activeConsciousness.spectrum.assiah.title}
@@ -507,7 +509,7 @@ export default function KabbalahAnalysisPage() {
                             </p>
                           </div>
                           <div className="p-2.5 rounded-lg bg-black/40 border border-red-500/20 text-[11px] text-red-200/90 leading-relaxed">
-                            <strong className="text-red-400 block mb-0.5">Teşhis:</strong>
+                            <strong className="text-red-400 block mb-0.5">Farkındalık Aynası:</strong>
                             {kabbalahAnalysis.activeConsciousness.spectrum.assiah.diagnosis}
                           </div>
                         </div>
@@ -516,7 +518,7 @@ export default function KabbalahAnalysisPage() {
                         <div className="p-4 rounded-xl border border-sky-500/30 bg-sky-950/20 flex flex-col justify-between">
                           <div>
                             <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-sky-500/20">
-                              <span className="text-xs font-bold text-sky-400">2. Alem (Duygu / Yetzirah)</span>
+                              <span className="text-xs font-bold text-sky-400">2. Âlem (Duygu & Şekillendirme / Yetzirah)</span>
                               <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 font-bold">Duygusal Şifa</span>
                             </div>
                             <h6 className="text-sm font-bold text-white mb-1.5">
@@ -527,7 +529,7 @@ export default function KabbalahAnalysisPage() {
                             </p>
                           </div>
                           <div className="p-2.5 rounded-lg bg-black/40 border border-sky-500/20 text-[11px] text-sky-200/90 leading-relaxed">
-                            <strong className="text-sky-400 block mb-0.5">Teşhis:</strong>
+                            <strong className="text-sky-400 block mb-0.5">Farkındalık Aynası:</strong>
                             {kabbalahAnalysis.activeConsciousness.spectrum.yetzirah.diagnosis}
                           </div>
                         </div>
@@ -536,7 +538,7 @@ export default function KabbalahAnalysisPage() {
                         <div className="p-4 rounded-xl border border-amber-500/30 bg-amber-950/20 flex flex-col justify-between">
                           <div>
                             <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-amber-500/20">
-                              <span className="text-xs font-bold text-amber-400">3. Alem (Zihin / Beriyah)</span>
+                              <span className="text-xs font-bold text-amber-400">3. Âlem (Zihin & Yaratım / Beriyah)</span>
                               <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold">Bilge İrade</span>
                             </div>
                             <h6 className="text-sm font-bold text-white mb-1.5">
@@ -547,7 +549,7 @@ export default function KabbalahAnalysisPage() {
                             </p>
                           </div>
                           <div className="p-2.5 rounded-lg bg-black/40 border border-amber-500/20 text-[11px] text-amber-200/90 leading-relaxed">
-                            <strong className="text-amber-400 block mb-0.5">Teşhis:</strong>
+                            <strong className="text-amber-400 block mb-0.5">Farkındalık Aynası:</strong>
                             {kabbalahAnalysis.activeConsciousness.spectrum.beriyah.diagnosis}
                           </div>
                         </div>
@@ -556,7 +558,7 @@ export default function KabbalahAnalysisPage() {
                         <div className="p-4 rounded-xl border border-purple-500/30 bg-purple-950/20 flex flex-col justify-between">
                           <div>
                             <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-purple-500/20">
-                              <span className="text-xs font-bold text-purple-400">4. Alem (Kudret / Atzilut)</span>
+                              <span className="text-xs font-bold text-purple-400">4. Âlem (Ruh & Kudret / Atzilut)</span>
                               <span className="text-[10px] uppercase px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 font-bold">Kozmik Birlik</span>
                             </div>
                             <h6 className="text-sm font-bold text-white mb-1.5">
@@ -567,7 +569,7 @@ export default function KabbalahAnalysisPage() {
                             </p>
                           </div>
                           <div className="p-2.5 rounded-lg bg-black/40 border border-purple-500/20 text-[11px] text-purple-200/90 leading-relaxed">
-                            <strong className="text-purple-400 block mb-0.5">Teşhis:</strong>
+                            <strong className="text-purple-400 block mb-0.5">Farkındalık Aynası:</strong>
                             {kabbalahAnalysis.activeConsciousness.spectrum.atzilut.diagnosis}
                           </div>
                         </div>
@@ -578,10 +580,10 @@ export default function KabbalahAnalysisPage() {
                   {/* Bilgilendirme ve Mobil Reklam Dipnotları */}
                   <div className="space-y-2 border-t border-white/10 pt-4 mt-2">
                     <p className="text-xs md:text-sm text-mystic-text-muted leading-relaxed">
-                      ⚠️ <strong>Ezoterik İlke:</strong> Yaşınız veya haritanız ne olursa olsun, bir kriz ya da sınav anındaki bilinçli tutumunuz o an hangi boyutta titreştiğinizi belirler. Üst haritalarınızın gücünü hayatınıza çekmek için reaksiyonunuzu korku ve kontrolden (Assiah), bilgelik ve teslimiyete (Beriyah & Atzilut) doğru yükseltebilirsiniz.
+                      🌱 <strong>Ezoterik İlke:</strong> Hayat deneyimlerindeki bilinçli farkındalığınız, o an hangi âlemin potansiyelini aktive ettiğinizi belirler. Üst boyutların rehberliğini hayatınıza dahil etmek için bakış açınızı fiziksel reaksiyondan (Assiah), bilgelik, sezgi ve içsel huzura (Beriyah & Atzilut) kolaylıkla dönüştürebilirsiniz.
                     </p>
                     <p className="text-xs md:text-sm text-[#0EA5E9]/80 leading-relaxed font-medium">
-                      ✨ <strong>Kozmik Takip:</strong> Gökyüzü sürekli hareket halindedir. Önümüzdeki günlerde tetiklenen yeni sınavlarınızı ve tekâmül eşiklerinizi keşfetmek için dilediğiniz zaman güncel durumunuzu sorgulayabilirsiniz.
+                      ✨ <strong>Kozmik Farkındalık:</strong> Gökyüzü sürekli hareket halindedir. Hayatınızdaki yeni gelişim pencerelerini ve tekâmül fırsatlarını keşfetmek için dilediğiniz zaman güncel durumunuzu sorgulayabilirsiniz.
                     </p>
                   </div>
                 </div>

@@ -109,7 +109,7 @@ export async function GET(request: Request) {
     } else if (order.analysisType === 'incarnation' || order.analysisType === 'karmic') {
       const { calculateIncarnationAnalysis } = require('@/features/astrology/engine/IncarnationEngine');
       const natalChart = await generateAstrologyChart(dateObj, cityData, false);
-      const incarnation = calculateIncarnationAnalysis(natalChart);
+      const incarnation = calculateIncarnationAnalysis(natalChart, dateObj);
       resultData = {
         natalChart,
         incarnation

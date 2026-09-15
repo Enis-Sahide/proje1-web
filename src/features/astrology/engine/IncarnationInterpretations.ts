@@ -1,4 +1,5 @@
 import { ZodiacSign } from './AstrologyConstants';
+import { GATE_TITLES, GATE_TO_CENTER, LINE_BEHAVIOR_PROFILES } from './AstroHumanDesignSynthesis';
 
 export interface IncarnationPastLifeInfo {
   sign: ZodiacSign;
@@ -16,9 +17,29 @@ export interface IncarnationHouseInfo {
   unresolvedTheme: string;
 }
 
+export type RetroPolarity = 'active' | 'passive';
+
+export interface RetroKarmicDebtOption {
+  polarity: RetroPolarity;
+  polarityLabel: string;
+  pastLifeCause: string;
+  currentLifeKarma: string;
+  dharmaRemedy: string;
+}
+
+export interface RetroKarmicDebtData {
+  planet: string;
+  title: string;
+  active: RetroKarmicDebtOption;
+  passive: RetroKarmicDebtOption;
+}
+
 export interface RetroKarmicDebt {
   planet: string;
   title: string;
+  polarity: RetroPolarity;
+  polarityLabel: string;
+  hdDiagnosis: string;
   pastLifeCause: string;
   currentLifeKarma: string;
   dharmaRemedy: string;
@@ -282,65 +303,169 @@ export const TWELFTH_HOUSE_SIGN_INTERPRETATIONS: Record<ZodiacSign, {
   }
 };
 
-// Retro Gezegenler - Karmik Borçlar
-export const RETRO_KARMIC_DEBTS: Record<string, RetroKarmicDebt> = {
+// Polarize Edilmiş Retro Gezegenler - Karmik Borçlar (Aktif vs Pasif)
+export const RETRO_KARMIC_DEBTS_DATA: Record<string, RetroKarmicDebtData> = {
   'Merkür': {
     planet: 'Merkür',
     title: 'Hakikat ve İletişim Karması',
-    pastLifeCause: 'Geçmiş yaşamlarda bilgiyi çıkarlarınız için sakladınız, yalan haber yaydınız veya keskin sözlerinizle başkalarının onurunu zedelediniz.',
-    currentLifeKarma: 'Zihin sürekli geriye dönük çalışır; kendinizi ifade etmekte gecikir, yanlış anlaşılma endişesiyle susar ya da iç diyaloğa kilitlenirsiniz.',
-    dharmaRemedy: 'Sadece hakikati konuşmak, dedikodudan uzak durmak, yazarak ruhu arındırmak ve içsel bilgeliği dinlemek.'
+    active: {
+      polarity: 'active',
+      polarityLabel: 'Aktif Zihinsel Manipülasyon',
+      pastLifeCause: 'Geçmiş yaşamınızda bilgiyi çıkarlarınız için sakladınız, kasıtlı olarak asılsız haberler yaydınız veya keskin, alaycı sözlerinizle başkalarının onurunu zedelediniz.',
+      currentLifeKarma: 'Zihnin sürekli aşırı analiz döngüsüne kilitlenmesi; sözlerinizin başkaları tarafından yanlış anlaşılacağı endişesiyle iletişimde tıkanma yaşama.',
+      dharmaRemedy: 'Sadece saf hakikati konuşmak, dedikodudan bütünüyle uzak durmak, yazarak ve içsel bilgeliği dinleyerek zihni arındırmak.'
+    },
+    passive: {
+      polarity: 'passive',
+      polarityLabel: 'Susturulmuş Zihin & Sessiz Kalma Karması',
+      pastLifeCause: 'Geçmiş yaşamınızda haksız iftiralara, yalanlara ve masumların karalanmasına şahit olduğunuz halde korkudan veya menfaatinizi korumak adına sustunuz; hakikati savunmayarak zulmün ve cehaletin yayılmasına sessizce zemin hazırladınız ya da baskı altında sahte tanıklık yapmaya alet edildiniz.',
+      currentLifeKarma: 'Düşüncelerini ifade ederken derin bir suçluluk duyma, haksızlık karşısında boğaz düğümlenmesi, sözlerinin değer görmeyeceği inancıyla suskunluğa kilitlenme.',
+      dharmaRemedy: 'Baskı ve korku ne olursa olsun hakikatin saf sesi olmak, iftiraya uğrayanların ve suskunların hakkını korkusuzca dile getirmek, içsel bilgeliğe güvenmek.'
+    }
   },
   'Venüs': {
     planet: 'Venüs',
     title: 'Aşk, Değer ve Sadakat Karması',
-    pastLifeCause: 'Geçmişte aşka, ilişkilere veya sanata gereken değeri vermediniz; sevgiyi bir pazarlık unsuru yaptınız ya da kalpleri kırdınız.',
-    currentLifeKarma: 'Kendini sevilmeye layık görememe, ilişkilerde sürekli geçmiş partnerlerin gölgelerini arama veya aşırı fedakarlıkla tükenme.',
-    dharmaRemedy: 'Önce kendi öz değerini inşa etmek, koşulsuz sevgiyi bir pazarlık olmadan deneyimlemek ve estetik şifa yaratmak.'
+    active: {
+      polarity: 'active',
+      polarityLabel: 'Bencil Sevgi & Kalp Kırma',
+      pastLifeCause: 'Geçmiş yaşamınızda sevgiyi ve ilişkileri bencilce bir pazarlık unsuru yaptınız; başkalarının duygularıyla oynayarak kalpleri kırdınız ve sevgiyi istismar ettiniz.',
+      currentLifeKarma: 'İlişkilerde samimiyete güvenememe, sevgiyi kaybetme korkusuyla aşırı sahiplenme veya geçmiş partnerlerin gölgelerini bugüne taşıma.',
+      dharmaRemedy: 'Koşulsuz sevgiyi bir karşılık beklemeden deneyimlemek, sevgide güven inşa etmek ve estetik şifa yaratmak.'
+    },
+    passive: {
+      polarity: 'passive',
+      polarityLabel: 'Konfor Uğruna Sessizlik & Çıkar Ortaklığı',
+      pastLifeCause: 'Geçmiş yaşamınızda kendi konforunuzu, canınızı veya maddi güvenliğinizi korumak uğruna sevdiklerinizin ve masum insanların sömürülmesine göz yumdunuz; adaletsiz ilişki ve çıkar ağlarına boyun eğerek zulmün sessiz bir parçası haline geldiniz.',
+      currentLifeKarma: 'Kendini gerçek sevgiye layık görememe, ilişkilerde sürekli ödün verip sömürülme ve kendi değerini başkalarının onayına teslim etme.',
+      dharmaRemedy: 'Menfaat için adaletsizliğe asla ortak olmamak; önce kendi öz-değerini inşa edip koşulsuz sevgi ve adalet ilkelerinden ödün vermemek.'
+    }
   },
   'Mars': {
     planet: 'Mars',
     title: 'Güç, Öfke ve Şiddet Karması',
-    pastLifeCause: 'Geçmişte kontrolsüz şiddet uyguladınız, haksız savaşlara katıldınız ya da tam tersine haklı öfkenizi bastırıp felç oldunuz.',
-    currentLifeKarma: 'Öfkeyi içeriye yöneltme eğilimi, pasif-agresif patlamalar, harekete geçmekte tereddüt ve kendi gücünden korkma.',
-    dharmaRemedy: 'Öfkeyi yapıcı bir yaratıcı disipline ve spora kanalize etmek, zayıfların koruyucusu olarak cesaret göstermek.'
+    active: {
+      polarity: 'active',
+      polarityLabel: 'Aktif Güç İstismarı & Aşırı Saldırganlık',
+      pastLifeCause: 'Geçmiş yaşamınızda kontrolsüz öfke, aşırı güç gösterisi ve şiddet uyguladınız; haksız çatışmalara katılarak başkalarının sınırlarını zorla çiğnediniz.',
+      currentLifeKarma: 'Kendi gücünüzün yıkıcılığından bilinçaltı düzeyde korkma, öfke patlamalarından sonra gelen derin suçluluk ve iradeyi yönetmekte zorlanma.',
+      dharmaRemedy: 'Gücü ezmek ve dayatmak için değil; zayıfları korumak, adaleti sağlamak ve yapıcı bir disiplin/spor ile içsel ateşi arındırmak için kullanmak.'
+    },
+    passive: {
+      polarity: 'passive',
+      polarityLabel: 'Bastırılmış İrade & Zulme Alet Olma Karması',
+      pastLifeCause: 'Geçmiş yaşamınızda çatışma korkusu ve zalim otoritelerin baskısı karşısında kendi gücünüzden vazgeçtiniz; haklı öfkenizi bastırıp felç oldunuz. Başkalarına yapılan haksızlıklara ve şiddete korkudan sessiz kaldınız ya da baskı altında istemeyerek de olsa zalimlerin elinde bir maşaya/araca dönüştürüldünüz.',
+      currentLifeKarma: 'Öfkeyi içeriye yöneltme eğilimi, haksızlık karşısında donup kalma, hakkını savunurken suçluluk duyma ve kendi içsel gücünden korkma.',
+      dharmaRemedy: 'Güç odaklarından ve çatışmadan korkmadan zayıfların yanında durmak; haklı öfkeyi bastırmadan sağlıklı bir adalet ve cesaret eylemine dönüştürmek.'
+    }
   },
   'Jüpiter': {
     planet: 'Jüpiter',
     title: 'İnanç, Etik ve Kibir Karması',
-    pastLifeCause: 'Geçmişte dini ya da ahlaki bir otoriteyi kötüye kullandınız, sahte vaiz oldunuz ya da ruhsal kibirle başkalarını yargıladınız.',
-    currentLifeKarma: 'Dışsal inanç sistemlerine şüpheyle bakma, içsel boşluk hissi ve kendi ahlaki ilkelerini sıfırdan keşfetme zorunluluğu.',
-    dharmaRemedy: 'Dogmalara değil kendi vicdanının sesine güvenmek, tevazu ile öğrenci kalmak ve karşılıksız bilgelik paylaşmak.'
+    active: {
+      polarity: 'active',
+      polarityLabel: 'Ruhsal Kibir & İnanç İstismarı',
+      pastLifeCause: 'Geçmiş yaşamınızda dini, ahlaki veya felsefi bir otoriteyi kötüye kullandınız; sahte vaazlar verdiniz ya da manevi kibirle başkalarını yargıladınız.',
+      currentLifeKarma: 'Kendi ahlaki üstünlüğünü kanıtlama dürtüsü ile içsel boşluk arasında gidip gelme, dogmatik yargılama eğilimi.',
+      dharmaRemedy: 'Tevazu ile daimi bir öğrenci kalmak, insanları yargılamadan kucaklamak ve bilgeliği karşılıksız bir cömertlikle sunmak.'
+    },
+    passive: {
+      polarity: 'passive',
+      polarityLabel: 'Dogmalara Boyun Eğme & Yozlaşmaya Göz Yumma',
+      pastLifeCause: 'Geçmiş yaşamınızda dini, ahlaki veya kurumsal yozlaşmayı, insanların manevi olarak sömürüldüğünü gördüğünüz halde dışlanma veya cezalandırılma korkusuyla sustunuz; sahte tiranların ve dogmatik otoritelerin sessiz bir onaylayıcısı oldunuz.',
+      currentLifeKarma: 'Dışsal hiçbir inanç sistemine veya rehbere güvenememe, derin bir ruhsal şüphecilik ve anlam arayışında yönünü kaybetme kaygısı.',
+      dharmaRemedy: 'Hiçbir dogmaya veya sahte otoriteye körü körüne boyun eğmemek; kalbinin ve vicdanının evrensel ahlakına güvenerek hakikati savunmak.'
+    }
   },
   'Satürn': {
     planet: 'Satürn',
     title: 'Büyük Karmik Sorumluluk & Zaman Borcu',
-    pastLifeCause: 'Geçmiş yaşamlarda aldığınız sorumlulukları terk ettiniz, başkalarına karşı zalimce bir otorite kurdunuz veya taahhütlerinizi hiçe saydınız.',
-    currentLifeKarma: 'Hayatta her şeyin geç ve büyük zahmetlerle gelmesi, derin yetersizlik hissi ve omuzlarda hissedilen açıklanamaz suçluluk yükü.',
-    dharmaRemedy: 'Zamanın efendisi olmak, sabırla çalışmak, dürüstlükten asla sapmamak ve kendi sınırlarını sevgiyle inşa etmek.'
+    active: {
+      polarity: 'active',
+      polarityLabel: 'Zalim Otorite & Katı Kurallar',
+      pastLifeCause: 'Geçmiş yaşamınızda elinizdeki gücü ve makamı acımasızca kullandınız; başkalarına karşı zalimce bir otorite kurarak taahhütlerinizi ve adalet ilkelerini çiğnediniz.',
+      currentLifeKarma: 'Otorite figürleriyle derin çatışmalar, cezalandırılma korkusu ve her hatada aşırı katı içsel yargıç sesine maruz kalma.',
+      dharmaRemedy: 'Otoriteyi baskı kurmak için değil, adil ve şefkatli bir koruyucu olarak yapılandırmak; kendi sınırlarını sevgiyle inşa etmek.'
+    },
+    passive: {
+      polarity: 'passive',
+      polarityLabel: 'Sisteme Boyun Eğme & "Emir Kulu" Karması',
+      pastLifeCause: 'Geçmiş yaşamınızda zalim bir sistemin veya tiranın idari çarkı haline geldiniz; "ben sadece emir kuluyum, kurallar böyle" diyerek başkalarına yapılan zulmü uyguladınız ya da haksızlıklara sessizce boyun eğerek vicdani sorumluluğu reddettiniz.',
+      currentLifeKarma: 'Omuzlarda açıklanamaz bir suçluluk yükü, otorite figürleri karşısında donup kalma, hayatta her şeyin ancak ağır cezalar ve zahmetlerle geleceği inancı.',
+      dharmaRemedy: 'Kör itaati bırakıp vicdani sorumluluğu her kuralın üzerinde tutmak; adil, şefkatli ve dik bir ruhsal omurga inşa etmek.'
+    }
   },
   'Uranüs': {
     planet: 'Uranüs',
     title: 'Özgürlük ve İsyan Karması',
-    pastLifeCause: 'Geçmişte anarşistçe bir yıkım yarattınız ya da toplumun kurallarını hiçe sayarak başkalarının hayatını altüst ettiniz.',
-    currentLifeKarma: 'Sürekli bir yere ait olamama hissi, ani içsel huzursuzluklar ve sistemle uzlaşmakta derin bir direnç.',
-    dharmaRemedy: 'Özgürlüğü sadece kendini soyutlamak olarak değil, insanlığın tekâmülüne hizmet eden özgün bir uyanış olarak yaşamak.'
+    active: {
+      polarity: 'active',
+      polarityLabel: 'Yıkıcı İsyan & Sorumsuz Başkaldırı',
+      pastLifeCause: 'Geçmiş yaşamınızda anarşistçe bir yıkım yarattınız; toplumun kurallarını sorumsuzca hiçe sayarak kaos çıkardınız ve başkalarının düzenini altüst ettiniz.',
+      currentLifeKarma: 'Sürekli bir yere veya düzene ait olamama, ani yıkıcı tepkiler ve kurallara karşı sebepsiz bir öfke hissetme.',
+      dharmaRemedy: 'Özgürlüğü salt yıkım olarak değil; insanlığın hayrına çalışan yenilikçi, vizyoner ve yapıcı bir uyanış olarak yaşamak.'
+    },
+    passive: {
+      polarity: 'passive',
+      polarityLabel: 'Sürüye Uyma & Kolektif Lince Sessiz Kalma',
+      pastLifeCause: 'Geçmiş yaşamınızda dışlanma ve yalnız kalma korkusuyla sürü psikolojisine boyun eğdiniz; masum bireylerin toplum tarafından dışlanmasına, haksız yere linç edilmesine veya ayrımcılığa uğramasına sessiz kalarak bu kolektif adaletsizliğe ortak oldunuz.',
+      currentLifeKarma: 'Topluluklar içinde sürekli kendini yabancı hissetme, dışlanma paranoyası ve kendi özgün dehasını toplumdan gizleme eğilimi.',
+      dharmaRemedy: 'Sürüden ayrılma pahasına hakikatin ve evrensel özgürlüğün yanında durmak; bireysel vicdanını kolektif cinnete asla kurban etmemek.'
+    }
   },
   'Neptün': {
     planet: 'Neptün',
     title: 'İllüzyon, Kaçış ve Aldanış Karması',
-    pastLifeCause: 'Geçmişte gerçeklerden kaçmak için bağımlılıklara, sahte tarikatlara sığındınız veya insanları manevi illüzyonlarla yanılttınız.',
-    currentLifeKarma: 'Sınır koyamama, sürekli kurban rolüne çekilme, kime güveneceğini bilememe ve gerçeklikten kopma arzusu.',
-    dharmaRemedy: 'Ruhsal uyanışı ayırt etme yeteneğiyle (discernment) birleştirmek, sanat ve dua ile ilahi sevginin saf kanalı olmak.'
+    active: {
+      polarity: 'active',
+      polarityLabel: 'Manevi Manipülasyon & İllüzyon Yayma',
+      pastLifeCause: 'Geçmiş yaşamınızda insanları manevi illüzyonlarla yanılttınız; sahte tarikatlar, batıl inançlar veya manevi güç gösterileriyle kitleleri aldattınız.',
+      currentLifeKarma: 'Kendi sezgilerine güvenememe, ruhsal konularda kandırılmaktan dehşet duyma ve gerçeklikten kopma korkusu.',
+      dharmaRemedy: 'Ruhsal uyanışı keskin bir ayırt etme yeteneği (discernment) ile birleştirmek, tevazuyla sadece ilahi sevginin temiz bir kanalı olmak.'
+    },
+    passive: {
+      polarity: 'passive',
+      polarityLabel: 'Sahte İnziva & Sömürüye Alan Açma',
+      pastLifeCause: 'Geçmiş yaşamınızda sahte tarikatların, manevi sömürücülerin ve illüzyonların insanları zehirlediğini gördüğünüz halde "bana dokunmayan yılan bin yaşasın" diyerek sahte bir inzivaya sığındınız; ruhsal kaçışla sorumluluktan kaçarak kötülüğün yayılmasına alan açtınız.',
+      currentLifeKarma: 'İlişkilerde kurtarıcı-kurban üçgenine çekilme, sınır çizememe, kime güveneceğini bilememe ve gerçeklikten kaçma arzusu.',
+      dharmaRemedy: 'Ruhsal uyanışı dünyadan kaçış olarak değil, aktif bir şefkat ve ayırt etme gücüyle (discernment) dünyadaki karanlığı aydınlatmak için kullanmak.'
+    }
   },
   'Plüton': {
     planet: 'Plüton',
     title: 'Karanlık Güç ve Dönüşüm Karması',
-    pastLifeCause: 'Geçmişte muazzam bir güç, büyü veya siyasi manipülasyonla kitleleri yönettiniz ya da yıkıcı bir ihanetin kurbanı oldunuz.',
-    currentLifeKarma: 'Güçsüz düşmekten dehşet duyma, derin kontrol ihtiyacı ve hayatın belirli dönemlerinde yaşanan köklü yıkım-yeniden doğuş krizleri.',
-    dharmaRemedy: 'Egoyu öldürüp Anka kuşu gibi küllerinden doğmak, gücü başkalarını manipüle etmek için değil, onları karanlıktan çıkarmak için kullanmak.'
+    active: {
+      polarity: 'active',
+      polarityLabel: 'Tiranlık & Kitle Manipülasyonu',
+      pastLifeCause: 'Geçmiş yaşamınızda muazzam bir okült güç, siyasi tiranlık veya manipülasyonla kitleleri kontrol ettiniz; gücü başkalarını ezmek ve sindirmek için kullandınız.',
+      currentLifeKarma: 'Kontrolü kaybetmekten veya güçsüz duruma düşmekten dehşet duyma, derin şüphecilik ve herkesi kontrol etme arzusu.',
+      dharmaRemedy: 'Kontrol saplantısını bırakıp ilahi teslimiyeti öğrenmek; gücü başkalarına hükmetmek için değil, insanları karanlıktan aydınlığa çıkarmak için dönüştürmek.'
+    },
+    passive: {
+      polarity: 'passive',
+      polarityLabel: 'Korkudan Sığınma & Karanlığa Alet Olma',
+      pastLifeCause: 'Geçmiş yaşamınızda karanlık güç odaklarının ve zalim tiranların başkalarını yok etmesine korkudan göz yumdunuz; kendi canınızı kurtarmak adına zalimlerin gölgesine sığındınız ve istemeyerek de olsa onların entrikalarına, ihanetlerine alet edildiniz.',
+      currentLifeKarma: 'Güçsüz düşmekten dehşet duyma, insanlara güvenememe, derin bir sırtından bıçaklanma paranoyası ve kendi içsel gücünü ortaya çıkarmaktan korkma.',
+      dharmaRemedy: 'Karanlık güç odaklarından korkmadan, ışığın ve dönüştürücü hakikatin tarafında durmak; kendi içsel korkularını yenerek Anka kuşu gibi küllerinden doğmak.'
+    }
   }
 };
+
+// Geriye dönük uyumluluk için varsayılan fallback RETRO_KARMIC_DEBTS
+export const RETRO_KARMIC_DEBTS: Record<string, RetroKarmicDebt> = Object.keys(RETRO_KARMIC_DEBTS_DATA).reduce((acc, p) => {
+  const data = RETRO_KARMIC_DEBTS_DATA[p];
+  acc[p] = {
+    planet: data.planet,
+    title: data.title,
+    polarity: 'active',
+    polarityLabel: data.active.polarityLabel,
+    hdDiagnosis: 'Standart Astrolojik Rezonans',
+    pastLifeCause: data.active.pastLifeCause,
+    currentLifeKarma: data.active.currentLifeKarma,
+    dharmaRemedy: data.active.dharmaRemedy
+  };
+  return acc;
+}, {} as Record<string, RetroKarmicDebt>);
 
 // Kiron - Ruh Yarası ve Şifa Kapısı
 export const CHIRON_SIGN_WOUNDS: Record<ZodiacSign, ChironWound> = {
@@ -555,6 +680,8 @@ export function getDraconicPointInterpretation(
       synthesis = `${tropicalSign}'ın dünyevi çekim gücünü ${draconicSign}'ın hakikatini yaşamak ve yaymak için kullanın; egoya değil, amaca odaklanın.`;
     } else if (p.includes('ay') || p.includes('bilinçaltı')) {
       synthesis = `${tropicalSign}'ın savunma reflekslerini bırakıp ${draconicSign}'ın içsel huzuruna ve bilgeliğine güvenin.`;
+    } else if (p.includes('lilith') || p.includes('gölge')) {
+      synthesis = `${tropicalSign}'ın korkularını ve tabularını aşarak ruhunuzun ${draconicSign} burcundaki vahşi, boyun eğmeyen ilksel gücünü sahiplenin.`;
     } else if (p.includes('yükselen') || p.includes('evrensel kimlik')) {
       synthesis = `${tropicalSign} dış maskenizi, ruhunuzun ${draconicSign} misyonunu topluma ulaştıran bir köprü yapın.`;
     } else {
@@ -574,3 +701,594 @@ export function getDraconicPointInterpretation(
     spiritualMeaning
   };
 }
+
+// ==========================================
+// HUMAN DESIGN FULL-SPECTRUM SENTEZİ
+// ==========================================
+
+export interface GADHDGateSynthesis {
+  gate: number;
+  line: number;
+  title: string;
+  center: string;
+  lineArchetype: string;
+  shadowTrap: string;
+  karmicGift: string;
+  synthesis: string;
+}
+
+export interface TwelfthHouseHDFearSynthesis {
+  dominantCenter: string;
+  centerTitle: string;
+  traumaMechanism: string;
+  liberationKey: string;
+}
+
+export interface ChironHDGateSynthesis {
+  gate: number;
+  line: number;
+  title: string;
+  center: string;
+  lineArchetype: string;
+  woundKey: string;
+  healingGift: string;
+  transformationPractice: string;
+}
+
+export interface KADHDGateSynthesis {
+  gate: number;
+  line: number;
+  title: string;
+  center: string;
+  lineArchetype: string;
+  evolutionGoal: string;
+  evolutionPath: string;
+  actionableDharma: string;
+}
+
+export interface IncarnationCrossDetails {
+  code: string;
+  title: string;
+  angleType: 'Right Angle (Kişisel Kader)' | 'Juxtaposition (Sabit Kader)' | 'Left Angle (Kişilerarası Kader)';
+  sunGateTitle: string;
+  description: string;
+  gatesSummary: string;
+  soulMission: string;
+}
+
+const CROSS_FAMILIES: Record<number, { name: string; trName: string; theme: string }> = {
+  1: { name: 'The Sphinx', trName: 'Sfenks Çaprazı (Kozmik Yön & Vizyon)', theme: 'Kolektife yön gösterme, yeni yollar açma ve evrensel kılavuzluk.' },
+  2: { name: 'The Sphinx', trName: 'Sfenks Çaprazı (Kozmik Yön & Vizyon)', theme: 'Doğru zamanlama, yüksek alıcılık ve ilahi rotayı belirleme.' },
+  7: { name: 'The Sphinx', trName: 'Sfenks Çaprazı (Kozmik Yön & Vizyon)', theme: 'Görünmeyen rehberlik, demokratik liderlik ve geleceğe yön verme.' },
+  13: { name: 'The Sphinx', trName: 'Sfenks Çaprazı (Kozmik Yön & Vizyon)', theme: 'Geçmişin bilgeliğini dinleme, sırları tutma ve yön tayin etme.' },
+  10: { name: 'The Vessel of Love', trName: 'Aşk Gemisi Çaprazı (Koşulsuz Sevgi & Birlik)', theme: 'Kendini sevme, özgün varoluş ve doğal duruşla örnek olma.' },
+  15: { name: 'The Vessel of Love', trName: 'Aşk Gemisi Çaprazı (Koşulsuz Sevgi & Birlik)', theme: 'Tüm insanlığı ve uç kutupları kucaklayan evrensel sevgi.' },
+  25: { name: 'The Vessel of Love', trName: 'Aşk Gemisi Çaprazı (Koşulsuz Sevgi & Birlik)', theme: 'Koşulsuz masumiyet, yargısız kalp ve evrensel şefkat.' },
+  46: { name: 'The Vessel of Love', trName: 'Aşk Gemisi Çaprazı (Koşulsuz Sevgi & Birlik)', theme: 'Bedensel varoluşu sevme, dünya hayatının kutsallığı ve talih.' },
+  19: { name: 'The Four Ways', trName: 'Dört Yol Çaprazı (Duyarlılık & Uyanış)', theme: 'Toplumsal ihtiyaçları hissetme, ruhsal yakınlık ve uyanış.' },
+  24: { name: 'The Four Ways', trName: 'Dört Yol Çaprazı (Duyarlılık & Uyanış)', theme: 'Zihinsel aydınlanma, yenilenme ve hakikate geri dönüş.' },
+  33: { name: 'The Four Ways', trName: 'Dört Yol Çaprazı (Duyarlılık & Uyanış)', theme: 'Mahremiyet, deneyimleri hafızada süzme ve bilgece hatırlama.' },
+  44: { name: 'The Four Ways', trName: 'Dört Yol Çaprazı (Duyarlılık & Uyanış)', theme: 'Geçmişin kalıplarını tanıma, doğru ekipleri ve insanları birleştirme.' },
+  4: { name: 'The Cross of Explanation', trName: 'Açıklama & Hakikat Çaprazı', theme: 'Formüller üretme, karmaşık soruları mantıkla aydınlatma.' },
+  23: { name: 'The Cross of Explanation', trName: 'Açıklama & Hakikat Çaprazı', theme: 'Karmaşıklığı en saf ve basit hale indirgeyerek aktarma dehası.' },
+  43: { name: 'The Cross of Explanation', trName: 'Açıklama & Hakikat Çaprazı', theme: 'Eşsiz içgörüler, tabuları yıkan orijinal deha ve yeni paradigmalar.' },
+  49: { name: 'The Cross of Explanation', trName: 'Açıklama & Hakikat Çaprazı', theme: 'Devrimci ilkeler, yüksek adalet ve toplumun dönüşümü.' },
+  21: { name: 'The Cross of Tension', trName: 'Gerilim & İrade Çaprazı', theme: 'Kaynakları adil yönetme, kontrol ve irade ustalığı.' },
+  38: { name: 'The Cross of Tension', trName: 'Gerilim & İrade Çaprazı', theme: 'Değerli amaçlar için cesurca savaşma ve anlam arayışı.' },
+  39: { name: 'The Cross of Tension', trName: 'Gerilim & İrade Çaprazı', theme: 'Ruhları harekete geçiren kışkırtma ve derin tutku uyandırma.' },
+  48: { name: 'The Cross of Tension', trName: 'Gerilim & İrade Çaprazı', theme: 'Kusursuz derinlik, dipsiz bilgi kuyusu ve somut çözümler.' },
+  32: { name: 'The Cross of Maya', trName: 'Maya Çaprazı (İllüzyonları Çözme & Gerçeklik)', theme: 'Kalıcı olanı geçici olandan ayırma ve sezgisel süreklilik.' },
+  42: { name: 'The Cross of Maya', trName: 'Maya Çaprazı (İllüzyonları Çözme & Gerçeklik)', theme: 'Döngüleri tamamlama, olgunlaşma ve evrimsel büyüme.' },
+  61: { name: 'The Cross of Maya', trName: 'Maya Çaprazı (İllüzyonları Çözme & Gerçeklik)', theme: 'Evrenin gizemlerini çözme, içsel hakikate ve ilhama ulaşma.' },
+  62: { name: 'The Cross of Maya', trName: 'Maya Çaprazı (İllüzyonları Çözme & Gerçeklik)', theme: 'Kelimelerin ve detayların gücüyle gerçeği kusursuz adlandırma.' },
+  17: { name: 'The Cross of Service', trName: 'Kutsal Hizmet & İyileştirme Çaprazı', theme: 'Geleceği öngören mantıksal vizyon ve toplumsal rehberlik.' },
+  18: { name: 'The Cross of Service', trName: 'Kutsal Hizmet & İyileştirme Çaprazı', theme: 'Bozuk olanı onarma, kusursuzlaştırma ve şifa hizmeti.' },
+  52: { name: 'The Cross of Service', trName: 'Kutsal Hizmet & İyileştirme Çaprazı', theme: 'Hareketsizliğin kutsal gücü, dağ gibi sarsılmaz odaklanma.' },
+  58: { name: 'The Cross of Service', trName: 'Kutsal Hizmet & İyileştirme Çaprazı', theme: 'Yaşam sevinci, bütünü daha iyiye taşıma coşkusu ve canlılık.' },
+  9: { name: 'The Cross of Planning', trName: 'Planlama & Topluluk Sözleşmesi Çaprazı', theme: 'Mikro detaylara odaklanma ve büyük planları adım adım örme.' },
+  16: { name: 'The Cross of Planning', trName: 'Planlama & Topluluk Sözleşmesi Çaprazı', theme: 'Ustalık, çok yönlü beceriler ve geleceği coşkuyla kurma.' },
+  37: { name: 'The Cross of Planning', trName: 'Planlama & Topluluk Sözleşmesi Çaprazı', theme: 'Aile, sıcak topluluk bağı ve kutsal sadakat sözleşmeleri.' },
+  40: { name: 'The Cross of Planning', trName: 'Planlama & Topluluk Sözleşmesi Çaprazı', theme: 'Topluluk için adanmış çalışma ve bağımsız dinlenme dengesi.' },
+  5: { name: 'The Cross of Consciousness', trName: 'Kozmik Bilinç & Evrensel Ritim Çaprazı', theme: 'Evrensel ritimlere güvenme ve doğru zamanlamayı bekleme.' },
+  11: { name: 'The Cross of Consciousness', trName: 'Kozmik Bilinç & Evrensel Ritim Çaprazı', theme: 'İlham veren fikirler, hayal gücü ve görsel bilgelik.' },
+  35: { name: 'The Cross of Consciousness', trName: 'Kozmik Bilinç & Evrensel Ritim Çaprazı', theme: 'İnsani deneyimlerin zenginliği ve tekâmül basamakları.' },
+  63: { name: 'The Cross of Consciousness', trName: 'Kozmik Bilinç & Evrensel Ritim Çaprazı', theme: 'Mantıksal sorgulama, şüpheyi aydınlığa çıkarma ve bilim.' },
+  20: { name: 'The Sleeping Phoenix', trName: 'Uyuyan Anka Çaprazı (Yeniden Doğuş & An Bilinci)', theme: 'Saf şimdiki anın gücü, anlık eylem ve yüksek farkındalık.' },
+  34: { name: 'The Sleeping Phoenix', trName: 'Uyuyan Anka Çaprazı (Yeniden Doğuş & An Bilinci)', theme: 'Muazzam bireysel yaşam gücü ve saf üretken kudret.' },
+  55: { name: 'The Sleeping Phoenix', trName: 'Uyuyan Anka Çaprazı (Yeniden Doğuş & An Bilinci)', theme: 'Ruhun bolluğu, duygusal özgürlük ve melankoliyi aşma.' },
+  59: { name: 'The Sleeping Phoenix', trName: 'Uyuyan Anka Çaprazı (Yeniden Doğuş & An Bilinci)', theme: 'Bariyerleri eritme, derin yakınlık ve yeni nesiller doğurma.' },
+  6: { name: 'The Cross of Eden', trName: 'Cennet & Duygusal Olgunluk Çaprazı', theme: 'Çatışmaları aşarak barışçıl yakınlığa ve birliğe ulaşma.' },
+  12: { name: 'The Cross of Eden', trName: 'Cennet & Duygusal Olgunluk Çaprazı', theme: 'Duyguların zarafetle ifadesi ve derin şiirsel duruş.' },
+  36: { name: 'The Cross of Eden', trName: 'Cennet & Duygusal Olgunluk Çaprazı', theme: 'Duygusal krizleri bilgeliğe dönüştürme ve merhamet.' },
+  22: { name: 'The Cross of Eden', trName: 'Cennet & Duygusal Olgunluk Çaprazı', theme: 'Ruhsal zarafet, müzikal duyarlılık ve nezaketin gücü.' },
+  3: { name: 'The Cross of Laws', trName: 'Evrensel Yasalar & Mutasyon Çaprazı', theme: 'Kaosu kozmik düzene çevirme ve yeni yapıları başlatma.' },
+  50: { name: 'The Cross of Laws', trName: 'Evrensel Yasalar & Mutasyon Çaprazı', theme: 'Toplumsal ahlak, değerler ve yeni nesilleri koruma yasaları.' },
+  60: { name: 'The Cross of Laws', trName: 'Evrensel Yasalar & Mutasyon Çaprazı', theme: 'Sınırları kabul ederek sınırsız mutasyonlar ve yenilik yaratma.' },
+  27: { name: 'The Cross of Laws', trName: 'Evrensel Yasalar & Mutasyon Çaprazı', theme: 'Koşulsuz besleme, koruma ve kolektif sorumluluk alma.' },
+  26: { name: 'The Cross of Alignment', trName: 'Hizalanma & Kaynak Liderliği Çaprazı', theme: 'Doğru mesajı aktarma, ikna gücü ve güven inşa etme.' },
+  45: { name: 'The Cross of Alignment', trName: 'Hizalanma & Kaynak Liderliği Çaprazı', theme: 'Topluluğu zenginleştirme, bolluk dağıtma ve egemen liderlik.' },
+  8: { name: 'The Cross of Alignment', trName: 'Hizalanma & Kaynak Liderliği Çaprazı', theme: 'Örnek olarak liderlik etme, özgün tarz ve bireysel katkı.' },
+  14: { name: 'The Cross of Alignment', trName: 'Hizalanma & Kaynak Liderliği Çaprazı', theme: 'Yüksek enerji, kaynak üretimi ve vizyoner projeleri fonlama.' },
+  28: { name: 'The Cross of Dedication', trName: 'Kozmik Adanmışlık & Kader Çaprazı', theme: 'Hayata derin anlam katma ve korkusuzca mücadele etme.' },
+  29: { name: 'The Cross of Dedication', trName: 'Kozmik Adanmışlık & Kader Çaprazı', theme: 'Kendini deneyime tam adama, sadakat ve güvenle yola çıkma.' },
+  30: { name: 'The Cross of Dedication', trName: 'Kozmik Adanmışlık & Kader Çaprazı', theme: 'Duygusal arınma, ateşli tutkular ve kaderin çağrısını kabul.' },
+  41: { name: 'The Cross of Dedication', trName: 'Kozmik Adanmışlık & Kader Çaprazı', theme: 'Yeni döngüleri başlatan vizyoner hayal gücü ve umut.' },
+  53: { name: 'The Cross of Ambition', trName: 'Yükseliş & Ruhsal Başarı Çaprazı', theme: 'Yeni başlangıçların tohumunu ekme ve tekâmülü ilerletme.' },
+  54: { name: 'The Cross of Ambition', trName: 'Yükseliş & Ruhsal Başarı Çaprazı', theme: 'Maddi dünyadan ruhsal zirvelere tırmanan saf azim.' },
+  56: { name: 'The Cross of Ambition', trName: 'Yükseliş & Ruhsal Başarı Çaprazı', theme: 'Hikayeler anlatma, insanları uyandırma ve vizyon genişletme.' },
+  57: { name: 'The Cross of Ambition', trName: 'Yükseliş & Ruhsal Başarı Çaprazı', theme: 'Anlık sezgisel netlik, tehlikeleri önceden sezen kutsal kulak.' },
+  31: { name: 'The Cross of Awakening', trName: 'Büyük Uyanış & Dönüşüm Çaprazı', theme: 'Halkın sesi olma, ilhamla yönlendirme ve modern liderlik.' },
+  47: { name: 'The Cross of Awakening', trName: 'Büyük Uyanış & Dönüşüm Çaprazı', theme: 'Zor deneyimleri aydınlatma, kafeslerden kurtulma ve içsel simya.' },
+  51: { name: 'The Cross of Awakening', trName: 'Büyük Uyanış & Dönüşüm Çaprazı', theme: 'Şoklarla inisiye etme, sahte konforları yıkıp ruhu uyandırma.' },
+  64: { name: 'The Cross of Awakening', trName: 'Büyük Uyanış & Dönüşüm Çaprazı', theme: 'Geçmişin imgelerini geleceğin sanatına ve bilincine dönüştürme.' }
+};
+
+export function getGADHDGateSynthesis(gate: number, line: number): GADHDGateSynthesis {
+  const gateData = GATE_TITLES[gate] || { title: 'Bilinmeyen Kapı', gift: 'Ruhsal Ustalık', shadow: 'Atalet' };
+  const center = GATE_TO_CENTER[gate] || 'Bilinmeyen Merkez';
+  const lineData = LINE_BEHAVIOR_PROFILES[line] || LINE_BEHAVIOR_PROFILES[1];
+
+  const shadowTrap = `Geçmiş enkarnasyonlarda "${gateData.shadow}" gölgesinde saplanıp kaldınız. Bilinçaltınız zorlandığında ${lineData.rootFear.toLowerCase()} sebebiyle ${lineData.challengingBehavior.toLowerCase()} Bu kalıp sizin çok iyi bildiğiniz ama bu hayatta aşmanız gereken en büyük konfor alanı tuzağınızdır.`;
+  const karmicGift = `Ruhunuz geçmiş yaşamlardan "${gateData.gift}" ustalığını ve ${lineData.harmoniousBehavior.toLowerCase()} gücünü bu hayata hazır bir armağan olarak getirmiştir. Bu yeteneği sığınağınız değil, KAD hedeflerinize sıçrama tahtası yapmalısınız.`;
+  const synthesis = `Kapı ${gate}.${line} (${center} Merkezi) geçmiş yaşamınızın kök kodudur. Tanıdık gelen gölge eğiliminiz: "${gateData.shadow}". Ruhsal dehanız: "${gateData.gift}".`;
+
+  return {
+    gate,
+    line,
+    title: gateData.title,
+    center,
+    lineArchetype: lineData.archetype,
+    shadowTrap,
+    karmicGift,
+    synthesis
+  };
+}
+
+export function getTwelfthHouseHDFearSynthesis(dominantCenter: string): TwelfthHouseHDFearSynthesis {
+  switch (dominantCenter) {
+    case 'Dalak':
+      return {
+        dominantCenter: 'Dalak',
+        centerTitle: 'Dalak (Spleen) Merkezi - Hayatta Kalma & Beden Travması',
+        traumaMechanism: 'Son nefeste ani bir tehlike, terk edilme veya fiziksel bedeni koruyamama korkusu bilinçaltınıza kazınmış. Geçmişten gelen bu hücresel korku, şimdiki hayatınızda açıklanamayan anksiyete, hastalık evhamı veya tehlike beklentisi olarak yüzeye çıkabilir.',
+        liberationKey: 'Anlık sezgilerinize güvenin. Bedeninizin verdiği ilk ses daima doğrudur. Geleceğin belirsizliğini zihinle kontrol etmeye çalışmak yerine bedeninizin doğal bilgeliğine teslim olun.'
+      };
+    case 'Solar Pleksus':
+      return {
+        dominantCenter: 'Solar Pleksus',
+        centerTitle: 'Solar Pleksus Merkezi - Duygusal Suçluluk & Utanç Travması',
+        traumaMechanism: 'Son nefeste derin bir duygusal hayal kırıklığı, dışlanma, sevdiklerinin acısına sebep olma veya sevilmediğini hissederek ölme travması taşınıyor. Bilinçaltınız insanları memnun etmeye çalışırken kendi duygularını bastırma veya aniden öfkeyle patlama döngüsüne girebilir.',
+        liberationKey: 'Duygusal dalgalanmaların en dibindeyken karar almayın. Başkalarının onayını kazanmak için kendi sınırlarınızı feda etmekten vazgeçin; duygusal özgürlük, suçluluk duymadan "Hayır" diyebilmektir.'
+      };
+    case 'Tepe (Taç)':
+    case 'Ajna (Zihin)':
+      return {
+        dominantCenter: 'Ajna / Tepe',
+        centerTitle: 'Taç & Ajna Merkezi - Zihinsel Sis & İnanç İhaneti Travması',
+        traumaMechanism: 'Son nefeste fikirleri, inançları veya bildiği sırlar yüzünden cezalandırılma, zihinsel dengesini kaybetme veya inandığı tüm sistemin çöküşünü izleme korkusu bilinçaltına yerleşmiş. Bu hayatta aşırı düşünme, her şeyi analiz etme takıntısı ve yanılma korkusu yaratır.',
+        liberationKey: 'Her sorunun zihinsel bir cevabı olmak zorunda değildir. Zihninizi bir rehber olarak kullanın, bir gardiyan değil. Bilinmeyenin içindeki ilahi düzene teslim olun.'
+      };
+    case 'Kalp (Ego)':
+      return {
+        dominantCenter: 'Kalp (Ego)',
+        centerTitle: 'Kalp (Ego) Merkezi - İrade Kırılması & Değersizlik Travması',
+        traumaMechanism: 'Son nefeste iradenin zorbalıkla kırılması, verilen sözlerin tutulamaması, köleleştirilme veya itibarını kaybederek ölme travması taşınıyor. Bu durum şimdiki hayatta kendini sürekli ispatlama, aşırı güç gösterme veya değersizlik korkusu doğurabilir.',
+        liberationKey: 'Değerinizi hiçbir dış başarıya, unvana veya başkalarının onayına bağlamayın. Siz hiçbir şey kanıtlamak zorunda değilsiniz; varoluşunuz tek başına kutsaldır.'
+      };
+    case 'Kök':
+      return {
+        dominantCenter: 'Kök',
+        centerTitle: 'Kök Merkezi - Ağır Yük & Sürekli Baskı Travması',
+        traumaMechanism: 'Son nefeste bitmeyen bir savaş, ağır sorumluluklar altında ezilme veya yetiştirilemeyen zaman baskısı ile ölme hafızası kayıtlıdır. Şimdiki hayatınızda her şeyi hemen bitirme telaşı ve kronik stres üretebilir.',
+        liberationKey: 'Hayat bir yarış değildir. Sahte aciliyetlerin sizi esir almasına izin vermeyin; derin nefes alın ve dinlenmenin en kutsal hak olduğunu kabul edin.'
+      };
+    case 'Benlik (G)':
+      return {
+        dominantCenter: 'Benlik (G)',
+        centerTitle: 'Benlik (G) Merkezi - Yön Yitimi & Aidiyetsizlik Travması',
+        traumaMechanism: 'Son nefeste sürgün edilme, kimsesiz kalma, nereye gideceğini bilememe ve ruhsal köklerinden koparılma travması taşınıyor. Bu durum şimdiki hayatta sürekli kim olduğunu ve nereye ait olduğunu arama huzursuzluğu yaratır.',
+        liberationKey: 'Doğru yer ve doğru insanları aramak yerine kendi kalbinizin merkezinde evinizi bulun. Siz kendinizle barıştığınızda evren sizi doğru yöne zahmetsizce çekecektir.'
+      };
+    case 'Sakral':
+      return {
+        dominantCenter: 'Sakral',
+        centerTitle: 'Sakral Merkezi - Yaşam Gücünün Sömürülmesi & Tükenmişlik',
+        traumaMechanism: 'Son nefeste tüm yaşam enerjisinin başkalarının hizmetinde son damlasına kadar tüketilmesi, köle gibi çalıştırılma ve kendi arzularını yaşayamadan ölme travması mevcuttur.',
+        liberationKey: 'Sadece karnınızdan, derinlerinizden coşkulu bir "Evet" gelen işlere ve insanlara enerjinizi verin. Tükendiğiniz yerde durmayı kutsal bir sınır olarak görün.'
+      };
+    case 'Boğaz':
+    default:
+      return {
+        dominantCenter: 'Boğaz',
+        centerTitle: 'Boğaz Merkezi - Susturulma & Hakikati Haykıramama',
+        traumaMechanism: 'Son nefeste söylemek istediklerini söyleyememe, sesi kesilerek veya sırları mezara götürerek ölme travması taşınıyor. Şimdiki hayatta kendini ifade ederken boğazda düğümlenme veya konuşmaktan çekinme yaratabilir.',
+        liberationKey: 'Sözünüzün kudretini fark edin. Doğru zaman geldiğinde kimseden onay beklemeden kendi hakikatinizi nezaketle ama tavizsizce dile getirin.'
+      };
+  }
+}
+
+export function getChironHDGateSynthesis(gate: number, line: number): ChironHDGateSynthesis {
+  const gateData = GATE_TITLES[gate] || { title: 'Bilinmeyen Kapı', gift: 'Ruhsal Şifa', shadow: 'Yara' };
+  const center = GATE_TO_CENTER[gate] || 'Bilinmeyen Merkez';
+  const lineData = LINE_BEHAVIOR_PROFILES[line] || LINE_BEHAVIOR_PROFILES[1];
+
+  const woundKey = `Kiron ${gate}. Kapı (${gateData.title}) ve ${line}. Çizgide (${center} Merkezi) yerleşmiştir. Ruhsal yaranızın kökeni: "${gateData.shadow}" frekansıdır. Bilinçaltınız ${lineData.rootFear.toLowerCase()} sebebiyle kendini doğuştan yaralı veya eksik hissetmiştir.`;
+  const healingGift = `Bu yara sizin kapanmayacak kusurunuz değil; dünyaya sunacağınız en yüce şifa armağanıdır: "${gateData.gift}". Bu alanda derin bir sızı çektiğiniz için, aynı yarayı taşıyan insanları hemen fark eder ve ${lineData.harmoniousBehavior.toLowerCase()} dehasıyla onlara yol gösterirsiniz.`;
+  const transformationPractice = `${lineData.actionableRemedy} Başkalarına şifa verirken kendi yaranızın da dönüştüğünü ve kutsal bir ışık kaynağına evrildiğini göreceksiniz.`;
+
+  return {
+    gate,
+    line,
+    title: gateData.title,
+    center,
+    lineArchetype: lineData.archetype,
+    woundKey,
+    healingGift,
+    transformationPractice
+  };
+}
+
+export function getKADHDGateSynthesis(gate: number, line: number): KADHDGateSynthesis {
+  const gateData = GATE_TITLES[gate] || { title: 'Bilinmeyen Kapı', gift: 'Gelecek Işığı', shadow: 'Atalet' };
+  const center = GATE_TO_CENTER[gate] || 'Bilinmeyen Merkez';
+  const lineData = LINE_BEHAVIOR_PROFILES[line] || LINE_BEHAVIOR_PROFILES[1];
+
+  const evolutionGoal = `Kuzey Düğümünüz ${gate}. Kapı (${gateData.title}) ve ${line}. Çizgidedir (${center} Merkezi). Ruhunuzun bu hayatta açığa çıkarması gereken ana potansiyel: "${gateData.gift}".`;
+  const evolutionPath = `Bu yaşamda ${lineData.archetype} duruşunu sahiplenmeli ve ${lineData.generalTendency.toLowerCase()} doğrultusunda cesur adımlar atmalısınız. "${gateData.shadow}" gölgesine düşmekten çekinmeyin; gölgeyle yüzleştiğinizde "${gateData.gift}" dehası serbest kalacaktır.`;
+  const actionableDharma = lineData.actionableRemedy;
+
+  return {
+    gate,
+    line,
+    title: gateData.title,
+    center,
+    lineArchetype: lineData.archetype,
+    evolutionGoal,
+    evolutionPath,
+    actionableDharma
+  };
+}
+
+export function getIncarnationCrossDetails(
+  consciousSunGate: number,
+  consciousEarthGate: number,
+  unconsciousSunGate: number,
+  unconsciousEarthGate: number,
+  profile: string
+): IncarnationCrossDetails {
+  const code = `(${consciousSunGate}/${consciousEarthGate} | ${unconsciousSunGate}/${unconsciousEarthGate})`;
+  const sunGateData = GATE_TITLES[consciousSunGate] || { title: 'Kozmik Kapı', gift: 'Ruhsal Uyanış', shadow: 'Amaçsızlık' };
+  const family = CROSS_FAMILIES[consciousSunGate] || {
+    name: 'The Cross of Purpose',
+    trName: 'Evrensel Yaşam Amacı Çaprazı',
+    theme: 'Kozmik bilincin uyanışı ve bireysel ruhsal amacın dünyaya taşınması.'
+  };
+
+  let angleType: 'Right Angle (Kişisel Kader)' | 'Juxtaposition (Sabit Kader)' | 'Left Angle (Kişilerarası Kader)';
+  let angleDescription = '';
+
+  if (profile === '4/1') {
+    angleType = 'Juxtaposition (Sabit Kader)';
+    angleDescription = 'Kişisel kader ile kolektif kader arasında sarsılmaz bir köprü görevi görürsünüz. Yaşam rotanız son derece nettir ve dış etkilerle kolay kolay rotasından sapmaz. Belirli ve odaklanmış bir ruhsal misyona kilitlenmişsinizdir.';
+  } else if (profile.startsWith('5/') || profile.startsWith('6/')) {
+    angleType = 'Left Angle (Kişilerarası Kader)';
+    angleDescription = 'Kişilerarası ve kolektif bir misyonla bu dünyadasınız. Hayatınız, başkalarıyla kesişerek onlara rehberlik etmek, geçmiş karmik düğümleri çözmek ve toplumsal bir dönüşüm başlatmak için tasarlanmıştır. Başkalarına bıraktığınız etki sizin asıl tekâmülünüzdür.';
+  } else {
+    angleType = 'Right Angle (Kişisel Kader)';
+    angleDescription = 'Bağımsız ve kişisel bir tekâmül sürecine odaklısınız. Dünyadaki varoluşunuz, kendi kararlarınız ve bireysel deneyimleriniz üzerinden yeni yollar keşfetmeye ayarlıdır. Başkalarının beklentilerinden bağımsız, kendi özgün patikanızı inşa etmek için buradasınız.';
+  }
+
+  const title = `${angleType.split(' ')[0]} Cross of ${family.name} (${family.trName})`;
+  const gatesSummary = `Bilinçli Güneş: Kapı ${consciousSunGate} (Yaşam Işığı: ${sunGateData.gift}) | Bilinçli Dünya: Kapı ${consciousEarthGate} (Topraklanma) | Bilinçdışı Güneş: Kapı ${unconsciousSunGate} (Ruhsal İtici Güç) | Bilinçdışı Dünya: Kapı ${unconsciousEarthGate} (Karmik Temel)`;
+  const soulMission = `${angleDescription} ${family.trName} altında doğarak ruhunuz şu büyük temayı gerçekleştirmeyi seçti: "${family.theme}". Bilinçli Güneşinizin ${consciousSunGate}. Kapıdaki (${sunGateData.title}) dehasını açığa çıkardığınızda, bu çapraz tüm ihtişamıyla hayatınızda parlar.`;
+
+  return {
+    code,
+    title,
+    angleType,
+    sunGateTitle: sunGateData.title,
+    description: angleDescription,
+    gatesSummary,
+    soulMission
+  };
+}
+
+export interface InterceptedSignPolarityData {
+  polarityLabel: string;
+  karmicRootCause: string;
+  lockedPsychology: string;
+  unlockKey: string;
+  shadowTrap: string;
+}
+
+export interface InterceptedSignKarmicInfo {
+  sign: ZodiacSign;
+  oppositeSign: ZodiacSign;
+  archetype: string;
+  active: InterceptedSignPolarityData;
+  passive: InterceptedSignPolarityData;
+}
+
+export const INTERCEPTED_SIGN_KARMIC_DATA: Record<ZodiacSign, InterceptedSignKarmicInfo> = {
+  'Koç': {
+    sign: 'Koç',
+    oppositeSign: 'Terazi',
+    archetype: 'Kilitli Cesaret & Bastırılmış İrade',
+    active: {
+      polarityLabel: 'Aktif İrade Aşırılığı & Zorbalık Borcu',
+      karmicRootCause: 'Geçmiş yaşamlarda kontrolsüz bir öfkeyle hareket ettiniz; savaşlarda veya liderlik pozisyonlarında kaba kuvvet uygulayarak başkalarının iradesini ezdiniz. Bu eylemlerin yarattığı derin vicdani ağırlık yüzünden bu hayatta iradenizi ve cesaretinizi sandığa kilitlediniz.',
+      lockedPsychology: 'Kendi gücünden veya öfkelenmekten bilinçdışı bir dehşet duyma; "Harekete geçersem yine zarar veririm" inancıyla önemli kararlarda felç olma.',
+      unlockKey: 'Cesareti yok etmek yerine onu adil ve koruyucu bir ruhsal savaşçı dehasına dönüştürmek; yıkıcı değil yapıcı liderliği hayata geçirmek.',
+      shadowTrap: 'Öfkeyi ve hakkını bastırıp patlama noktasına kadar içinde zehir gibi biriktirmek.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Boyun Eğme & Bastırılmış İrade',
+      karmicRootCause: 'Geçmiş yaşamlarda kendi isteklerinizi ve haklarınızı savunduğunuzda ağır şiddetle cezalandırıldınız; iradeniz zorbalarca kırıldı ve başkalarına mutlak boyun eğmek zorunda bırakıldınız.',
+      lockedPsychology: 'Kendi hakkını savunurken donup kalma, çatışmadan panikle kaçınma, "Benim isteklerimin hiçbir önemi yok" diyerek hemen geri çekilme.',
+      unlockKey: 'Kendi adına eyleme geçme ve "Hayır" diyebilme kutsal hakkını geri kazanmak; kurban rolünden çıkıp kendi hayatının mutlak egemeni olmak.',
+      shadowTrap: 'Haksızlığa boyun eğip içten içe pasif-agresif bir kin ve çaresizlik beslemek.'
+    }
+  },
+  'Boğa': {
+    sign: 'Boğa',
+    oppositeSign: 'Akrep',
+    archetype: 'Kilitli Özdeğer & Maddi Güven',
+    active: {
+      polarityLabel: 'Aktif Mülkiyet Tahakkümü & Açgözlülük',
+      karmicRootCause: 'Geçmiş yaşamlarda doyumsuz bir açgözlülükle kaynakları ve toprakları gaspederek insanları yokluğa mahkum ettiniz; her şeyi aniden kaybedince dünyevi zenginliği bir lanet gibi algılayıp arzularınızı kilitlediniz.',
+      lockedPsychology: 'Maddi güvence hissettiğinde aniden her şeyi kaybetme korkusu, refahı ve bolluğu hak etmediği bilinçaltı inancı.',
+      unlockKey: 'Maddiyatın bir hükmetme aracı değil, ilahi bir emanet olduğunu fark ederek paylaşarak çoğalmayı öğrenmek.',
+      shadowTrap: 'Kaybetme korkusuyla cimrileşmek ve her şeyi kontrol etmeye çalışmak.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Mülkiyetsizlik & Kıtlık Travması',
+      karmicRootCause: 'Geçmiş yaşamlarda emeğiniz, toprağınız, eviniz ve bedeniniz zorbalar tarafından elinizden alındı; sefalet ve kıtlık içinde yaşamaya mahkum edilerek özdeğeriniz ayaklar altına alındı.',
+      lockedPsychology: 'Kendi değerini belirlemekte zorlanma, parayla veya sahip olduklarıyla sürekli bir eksiklik ve yetersizlik hissi, azına razı olma refleksi.',
+      unlockKey: 'Kendi emeğinin ve bedeninin kutsallığına inanmak; evrenin sınırsız rızkına güvenerek kendi bereket alanını korkusuzca inşa etmek.',
+      shadowTrap: 'Değersizlik hissiyle hak ettiği karşılığı talep etmekten utanmak.'
+    }
+  },
+  'İkizler': {
+    sign: 'İkizler',
+    oppositeSign: 'Yay',
+    archetype: 'Kilitli Ses & Susturulmuş Merak',
+    active: {
+      polarityLabel: 'Aktif Bilgi Manipülasyonu & İftira Borcu',
+      karmicRootCause: 'Geçmiş yaşamlarda zekanızı ve söz gücünüzü dedikodu, iftira, yalan ve zihinsel manipülasyon için kullandınız; sözlerinizle masum insanların hayatını kararttığınız için bu hayatta sesinizi sandığa kilitlediniz.',
+      lockedPsychology: 'Düşüncelerini söylerken yanlış anlaşılacağı veya zarar vereceği korkusu, zihninin konuşması ama gerçeği söylerken tutulup kalması.',
+      unlockKey: 'Sözcükleri bir silah değil, gerçeği aydınlatan kutsal bir köprü olarak kullanmak; sözün şifa gücüne sadık kalmak.',
+      shadowTrap: 'Yüzeysel konuşmalar ve gevezelikle derin hakikatten kaçmak.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Sansür & Susturulmuş Ses',
+      karmicRootCause: 'Geçmiş yaşamlarda gerçeği söylediğiniz, düşündüklerinizi ifade ettiğiniz veya bilgiyi yaymaya çalıştığınız için susturuldunuz, alaya alındınız veya zindanlara kapatıldınız.',
+      lockedPsychology: 'Fikirlerini açıklamaktan çekinme, "Beni kimse dinlemez ya da ciddiye almaz" inancı, kendini ifade ederken boğazda düğümlenme.',
+      unlockKey: 'Kendi düşüncelerinin özgünlüğüne güvenmek; merakını, bilgisini ve kelimelerini korkusuzca dünyaya aktarmak.',
+      shadowTrap: 'Anlaşılmayacağını düşünerek tamamen suskunluğa çekilmek.'
+    }
+  },
+  'Yengeç': {
+    sign: 'Yengeç',
+    oppositeSign: 'Oğlak',
+    archetype: 'Kilitli Şefkat & Bastırılmış Yuva',
+    active: {
+      polarityLabel: 'Aktif Duygusal Şantaj & Boğucu Kontrol',
+      karmicRootCause: 'Geçmişte sevgiyi ve şefkati bir kontrol mekanizması olarak kullandınız; suçluluk hissettirerek sevdiklerinizi kendinize bağımlı kıldınız ve bu bağların kopmasıyla kalbinizi derin bir suçlulukla kilitlediniz.',
+      lockedPsychology: 'Duygusal bağlanmaktan ve tekrar kontrolcü olmaktan korkma, duygusal mesafeyle kendini korumaya alma.',
+      unlockKey: 'Koşulsuz şefkati öğrenmek; sevdiklerini özgür bırakarak da güvenli ve saf bir bağ kurulabileceğini idrak etmek.',
+      shadowTrap: 'Duygularını gizleyip soğuk bir kabuk arkasına saklanmak.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Aidiyetsizlik & Kök Travması',
+      karmicRootCause: 'Geçmiş yaşamlarda ailenizden, köklerinizden veya sevdiklerinizden zorla koparıldınız; duygusal kırılganlık gösterdiğiniz için acımasızca ezildiniz ve duyguların bir zayıflık olduğuna inandırıldınız.',
+      lockedPsychology: 'Hiçbir yere ait hissedememe, şefkat beklerken katı durma, içindeki yaralı çocuğu duymaktan kaçınma.',
+      unlockKey: 'Kendi içindeki güvenli yuvayı inşa etmek; kırılganlığın bir zafiyet değil, ruhun en derin şifa gücü olduğunu kabul etmek.',
+      shadowTrap: 'Kırılmaktan korktuğu için kimseyi kalbine yaklaştırmamak.'
+    }
+  },
+  'Aslan': {
+    sign: 'Aslan',
+    oppositeSign: 'Kova',
+    archetype: 'Kilitli Işık & Bastırılmış Görkem',
+    active: {
+      polarityLabel: 'Aktif Kibir & Egosal Tahakküm Borcu',
+      karmicRootCause: 'Geçmiş yaşamınızda egonuzu, gücünüzü ve yaratıcılığınızı bir tahakküm aracı olarak kullandınız; kibriniz yüzünden başkalarını gölgede bıraktınız ve bunun sonucunda büyük bir utanç yaşayarak ışığınızı sandığa kilitlediniz.',
+      lockedPsychology: 'Öne çıkmaktan, sahnede olmaktan veya liderlik yapmaktan bilinçdışı bir suçluluk duyma, "Parlarsam yine başkalarını ezerim" korkusu.',
+      unlockKey: 'Kalp merkezini (Anahata) açarak, egonun alkışı için değil varoluşun sevinci için içindeki çocuğu ve yaratıcı dehasını cömertçe parlatmak.',
+      shadowTrap: 'Kendini arka plana atıp içten içe takdir edilmemenin gizli kibrini ve kırgınlığını yaşamak.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Bastırılma & Görünmezlik Travması',
+      karmicRootCause: 'Geçmiş yaşamınızda eşsiz yetenekleriniz ve yaratıcı parlaklığınız otorite figürlerinin hasediyle acımasızca söndürüldü; öne çıkmanız, kendinizi ifade etmeniz ve sevilmeniz cezalandırıldığı için görünmez olmayı seçip ışığınızı sandığa kilitlediniz.',
+      lockedPsychology: '"Ben özel değilim", "Parlarsam beni yok ederler" inancıyla yeteneklerini gizleme, takdir edildiğinde aşırı rahatsız olma.',
+      unlockKey: 'Kendi ışığının kimseden izin alması gerekmediğini anlamak; korkusuzca sahneye çıkıp ruhsal dehasını dünyaya sunmak.',
+      shadowTrap: 'Başkalarını parlatırken kendi hayatında daima seyirci koltuğunda kalmak.'
+    }
+  },
+  'Başak': {
+    sign: 'Başak',
+    oppositeSign: 'Balık',
+    archetype: 'Kilitli Düzen & Bastırılmış Ustalık',
+    active: {
+      polarityLabel: 'Aktif Kusur Arayıcılığı & Katı Eleştiri',
+      karmicRootCause: 'Geçmişte aşırı mükemmeliyetçilikle başkalarının en ufak hatalarını cezalandırdınız; insanları kusurlu bularak köle gibi çalıştırdınız ve bu katılık yüzünden hayatın sevgisini yok ettiniz.',
+      lockedPsychology: 'Hata yapmaktan dehşete düşme, sürekli bir kontrol ve kusursuzluk takıntısıyla zihnini ve bedenini tüketme.',
+      unlockKey: 'Kusurluluğun içindeki ilahi güzelliği görmek; mükemmellik baskısını bırakıp şefkatli bir hizmet anlayışına geçmek.',
+      shadowTrap: 'Detaylarda boğulup büyük resmi tamamen kaçırmak.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Yetersizlik & Emeği Sömürülme',
+      karmicRootCause: 'Geçmiş yaşamlarda gece gündüz çalıştığınız halde emeğiniz hiçe sayıldı; sürekli kusurlu ve eksik bulunarak aşağılandınız, ne yaparsanız yapın yetersiz olduğunuza inandırıldınız.',
+      lockedPsychology: 'Sürekli bir "Ben yetersizim" hissi, sunduğu hizmetin ve zanaatın değerini görememe, kendini feda edercesine çalışma.',
+      unlockKey: 'Kendi bedeninin, emeğinin ve zanaatının bilgeliğini kutsamak; hak ettiği dinlenme ve takdiri kendine cömertçe sunmak.',
+      shadowTrap: 'Kendini acımasızca eleştirerek harekete geçmeyi ertelemek.'
+    }
+  },
+  'Terazi': {
+    sign: 'Terazi',
+    oppositeSign: 'Koç',
+    archetype: 'Kilitli Denge & Bastırılmış Eşitlik',
+    active: {
+      polarityLabel: 'Aktif Çıkarcı Diplomasi & Adaleti İhlal',
+      karmicRootCause: 'Geçmişte ilişkileri ve ortaklıkları sahte bir diplomasiyle manipüle ettiniz; kendi konforunuz için adaleti çarpıttınız ve bu ilahi yasayı ihlal etmenin ağırlığıyla dengeyi kilitlediniz.',
+      lockedPsychology: 'İlişkilerde güven kuramama, adil davranırken aşırı tereddüt yaşama, karar vermekten felç olma derecesinde korkma.',
+      unlockKey: 'Hakiki dürüstlüğü ve adaleti kendi merkezinde inşa etmek; menfaat için değil ruhsal uyum için ilişki kurmak.',
+      shadowTrap: 'Sahte bir nezaket arkasında samimiyetsiz kalmak.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Bağımlılık & Kurban Edilmiş Denge',
+      karmicRootCause: 'Geçmiş yaşamlarda ortaklıklarda veya evliliklerde tüm haklarınızı teslim etmek zorunda bırakıldınız; çatışma çıkmasın diye yok sayıldınız ve sesinizi çıkaramadığınız için sömürüldünüz.',
+      lockedPsychology: 'Yalnız kalmaktan korktuğu için sınır çizememe, başkalarının isteklerine boyun eğme, "Benim dengem yok" hissi.',
+      unlockKey: 'Taviz vermeden de sevilebileceğini kabul etmek; kendi sınırlarını onurlandırarak eşit ve adil ortaklıklar kurmak.',
+      shadowTrap: 'Huzur bozulmasın diye boyun eğip içten içe adaletsizlik duygusuyla dolmak.'
+    }
+  },
+  'Akrep': {
+    sign: 'Akrep',
+    oppositeSign: 'Boğa',
+    archetype: 'Kilitli Dönüşüm & Mühürlü Simya',
+    active: {
+      polarityLabel: 'Aktif Güç İstismarı & Okült Manipülasyon',
+      karmicRootCause: 'Geçmişte okült güçlerinizi, cinselliği veya psikolojik kontrolü başkalarını köleleştirmek ve intikam almak için kullandınız; bu güçlerin yarattığı felaketin ardından derin bir vicdani korkuyla simyasal gücünüzü kilitlediniz.',
+      lockedPsychology: 'Kendi tutkusundan ve sezgisel gücünden korkma, derin bağlar kurmaktan kaçınma, gücü eline almaktan ürkme.',
+      unlockKey: 'Gücün başkalarını kontrol etmek için değil, ruhsal dönüşüm ve şifa için var olduğunu kabul etmek; teslimiyetin en büyük güç olduğunu görmek.',
+      shadowTrap: 'Aşırı kontrolcülükle herkesi manipüle etmeye çalışmak.'
+    },
+    passive: {
+      polarityLabel: 'Pasif İhanet Travması & Bastırılmış Sezgi',
+      karmicRootCause: 'Geçmişte en güvendiğiniz kişiler tarafından sırtınızdan vuruldunuz; derin sezgileriniz veya dönüştürücü yetenekleriniz yüzünden büyücülükle suçlanıp yok edildiniz.',
+      lockedPsychology: 'Kimseye güvenememe, sürekli tetikte ve savunmada yaşama, derin duygulardan korkma.',
+      unlockKey: 'Karanlığı ışığa dönüştürme yeteneğine güvenmek; korkularıyla yüzleşip ilahi korumaya teslim olarak sezgilerini açığa çıkarmak.',
+      shadowTrap: 'İhanete uğrama korkusuyla herkesi düşman bilip kendini yalnızlığa mahkum etmek.'
+    }
+  },
+  'Yay': {
+    sign: 'Yay',
+    oppositeSign: 'İkizler',
+    archetype: 'Kilitli İnanç & Mühürlü Vizyon',
+    active: {
+      polarityLabel: 'Aktif Dogmatizm & İnanç Baskısı',
+      karmicRootCause: 'Geçmişte dini veya felsefi bir otorite olarak kendi dogmalarınızı başkalarına zorla dayattınız; farklı inananları yargıladınız ve bu fanatizmin yıkımıyla inanç merkezinizi kilitlediniz.',
+      lockedPsychology: 'Kendi inançlarına ve sezgisel rehberliğine güvenmekte zorlanma, anlam arayışında kaybolma hissi.',
+      unlockKey: 'Gerçeğin tek bir kalıba sığmayacağını anlamak; yargılamadan evrensel hakikatin öğrencisi olmak.',
+      shadowTrap: 'Ya dogmatik olmak ya da hiçbir şeye inanmayıp anlamsızlığa düşmek.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Sürgün & Bastırılmış İnanç',
+      karmicRootCause: 'Geçmiş yaşamlarda inancınız, vizyonunuz veya hakikat arayışınız yüzünden aforoz edildiniz, topraklarınızdan sürüldünüz ve kendi hakikatinizi yaşamanız yasaklandı.',
+      lockedPsychology: 'Kendi vizyonunu küçümseme, dar bir çerçevenin dışına çıkmaktan korkma, evrenin adaletine güvenememe.',
+      unlockKey: 'İçsel bilge pusulasına yeniden güvenmek; dünyayı ve yüksek bilinci cesaretle keşfe çıkmak.',
+      shadowTrap: 'Kendi büyük hayallerini "imkansız" diyerek erkenden terk etmek.'
+    }
+  },
+  'Oğlak': {
+    sign: 'Oğlak',
+    oppositeSign: 'Yengeç',
+    archetype: 'Kilitli Otorite & Bastırılmış Saygınlık',
+    active: {
+      polarityLabel: 'Aktif Tiranlık & Otorite İstismarı',
+      karmicRootCause: 'Geçmişte bir yönetici veya otorite olarak insanlara karşı kalpsiz ve acımasız kurallar koydunuz; başarı uğruna insanların duygularını ezdiniz ve bu soğukluğun vicdan azabıyla otoritenizi kilitlediniz.',
+      lockedPsychology: 'Sorumluluk almaktan veya lider olmaktan bilinçdışı kaçınma, soğuk görünmekten korkma.',
+      unlockKey: 'Kalpli bir otorite olmayı öğrenmek; saygınlığın baskıyla değil adalet ve sevgiyle kazanıldığını idrak etmek.',
+      shadowTrap: 'Duygusuz bir işkolikliğe sığınarak insanlarla bağını koparmak.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Ezilme & Yük Taşıma Travması',
+      karmicRootCause: 'Geçmişte çocuk yaşta üzerinize taşınamayacak kadar ağır sorumluluklar yüklendi; otorite figürleri tarafından ezildiniz ve başarı hakkınız tamamen engellendi.',
+      lockedPsychology: 'Kendi hayatının efendisi olduğuna inanamama, başarısızlıktan dehşete düşme, sürekli bir yük altında ezilme hissi.',
+      unlockKey: 'Başkalarının yüklerini bırakıp yalnızca kendi ruhsal tekâmülünün mimarı olmak; sabırla kendi zirvesine yürümek.',
+      shadowTrap: 'Başarısızlık korkusuyla sorumluluk almaktan kaçıp çocuk kalmak.'
+    }
+  },
+  'Kova': {
+    sign: 'Kova',
+    oppositeSign: 'Aslan',
+    archetype: 'Kilitli Özgünlük & Mühürlü Deha',
+    active: {
+      polarityLabel: 'Aktif Elitizm & Soğuk Kibir',
+      karmicRootCause: 'Geçmişte zekanız ve dehanız yüzünden insanları küçümsediniz; kibirli bir elitizmle topluluktan koptunuz ve insanlara tepeden baktığınız için kolektif bağlarınızı kilitlediniz.',
+      lockedPsychology: 'Kendi zekasını veya vizyonunu sunarken soğuk ve mesafeli olma, insanlarla kalpten bağ kurmakta zorlanma.',
+      unlockKey: 'Dehayı insanlığa hizmet eden bir şefkate dönüştürmek; herkesin eşit bir ilahi kıvılcım taşıdığını hatırlamak.',
+      shadowTrap: 'İnsanları aşağılayıp entelektüel bir fildişi kuleye çekilmek.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Dışlanma & Bastırılmış Deha',
+      karmicRootCause: 'Geçmiş yaşamlarda farklı düşündüğünüz, devrimci fikirleriniz veya marjinal kimliğiniz yüzünden kabileden kovuldunuz, taşlandınız ve toplumdan dışlandınız.',
+      lockedPsychology: 'Farklı olmaktan korkma, dışlanmamak için sıradanlaşmaya çalışma, topluluk içinde güvensiz hissetme.',
+      unlockKey: 'Kendi özgünlüğünü ve farklılığını kutsal bir armağan olarak kutlamak; kolektifi uyandırmak için sürüden ayrılma cesaretini göstermek.',
+      shadowTrap: 'Uyum sağlamak uğruna kendi eşsiz dehasını tamamen çöpe atmak.'
+    }
+  },
+  'Balık': {
+    sign: 'Balık',
+    oppositeSign: 'Başak',
+    archetype: 'Kilitli Teslimiyet & Mühürlü Sezgi',
+    active: {
+      polarityLabel: 'Aktif İllüzyon & Kurban Rolü İstismarı',
+      karmicRootCause: 'Geçmişte spiritüel veya mistik yeteneklerinizi insanları kandırmak, hayal dünyalarına hapsetmek veya sahte kurban rolüyle başkalarını sömürmek için kullandınız; bu illüzyonun ağırlığıyla sezgilerinizi kilitlediniz.',
+      lockedPsychology: 'Sezgisel ve ruhsal deneyimlerden ürkme, gerçeklikten kopmaktan korkma, spiritüel konulara şüpheyle yaklaşma.',
+      unlockKey: 'Sezgiyi dünyevi sorumlulukla dengelemek; illüzyonlara değil hakiki birlik bilincine ve saf sevgiye hizmet etmek.',
+      shadowTrap: 'Gerçeklerden kaçmak için bağımlılıklara veya sahte hayallere sığınmak.'
+    },
+    passive: {
+      polarityLabel: 'Pasif Kurban Travması & Mühürlü Sezgi',
+      karmicRootCause: 'Geçmiş yaşamlarda aşırı fedakarlık yapıp herkesin günahını üstlendiniz; kurban edildiniz, dünyadan koparılıp manastırlara kapatıldınız ya da şifacılığınız yüzünden cezalandırıldınız.',
+      lockedPsychology: 'Kendi sınırlarını koruyamama, herkesin acısını sünger gibi çekip hastalanma, sezgilerini kapatmak için aşırı mantıkçılığa sığınma.',
+      unlockKey: 'Kurban olmadan da şifacı olunabileceğini bilmek; sağlıklı ruhsal sınırlar çizerek ilahi ilhamı ve sanatı dünyaya akıtmak.',
+      shadowTrap: 'Acı çekmeyi bir erdem sanıp kurban rolünde takılı kalmak.'
+    }
+  }
+};
+
+export interface AnareticDegreeInfo {
+  degreeType: '29° Anaretik Derece' | '28° Kritik Eşik' | '0°-1° Taze Tohum' | 'Dengeli Seyir';
+  badgeTitle: string;
+  badgeColor: string;
+  karmicStage: string;
+  evolutionSummary: string;
+}
+
+export function getAnareticDegreeInfo(
+  degreeInSign: number,
+  minutes: number,
+  natalSign: ZodiacSign,
+  progressedSign: ZodiacSign,
+  progressedAge: number,
+  currentAge: number | null
+): AnareticDegreeInfo {
+  if (degreeInSign === 29) {
+    return {
+      degreeType: '29° Anaretik Derece',
+      badgeTitle: '29° Anaretik Derece (Karmik Kapanış & Usta Eşik)',
+      badgeColor: '#EF4444',
+      karmicStage: 'Tamamlanmış Ruhsal Döngü',
+      evolutionSummary: `Doğum anınızda Güneş ${natalSign} burcunun 29. son derecesindedir. Ezoterik astrolojide 29° bir kriz değil, "Karmik Mühür" derecesidir. Ruhunuz ${natalSign} burcunun tüm derslerini geçmiş yaşamlarda tamamlamış ve bu hayata o kapıyı kapatmaya gelmiştir. İkincil İlerletilmiş Haritanızda henüz ${progressedAge} yaşındayken Güneşiniz ${progressedSign} burcuna geçmiş ve ruhsal bilinciniz çocukluğunuzun hemen başında bir sonraki basamağa sıçramıştır.${currentAge !== null ? ` Şu an ${currentAge} yaşındasınız ve yaşam kararlarınızı ${progressedSign} frekansının olgunluğuyla almaktasınız.` : ''}`
+    };
+  }
+  if (degreeInSign === 28) {
+    return {
+      degreeType: '28° Kritik Eşik',
+      badgeTitle: '28° Kritik Geçiş Eşiği',
+      badgeColor: '#F59E0B',
+      karmicStage: 'Kabuk Değişimi Hazırlığı',
+      evolutionSummary: `Güneşiniz ${natalSign} burcunun 28. derecesinde olup son eşiktedir. Ruhunuz bu burcun son sınavlarını verirken bir yandan da ${progressedSign} burcunun enerjisine çekilir. İkincil İlerletilmiş Haritanızda yaklaşık ${progressedAge} yaşında Güneşiniz ${progressedSign} burcuna adım atmış ve yaşamınızda köklü bir mizaç ve rota değişimi tetiklenmiştir.${currentAge !== null && currentAge >= progressedAge ? ` Şu an ${currentAge} yaşındasınız ve ruhunuz ${progressedSign} burcunun derin bilinciyle hareket etmektedir.` : ''}`
+    };
+  }
+  if (degreeInSign === 0 || (degreeInSign === 1 && minutes <= 30)) {
+    return {
+      degreeType: '0°-1° Taze Tohum',
+      badgeTitle: '0°-1° Taze Tohum (Yeni Evrimsel Başlangıç)',
+      badgeColor: '#10B981',
+      karmicStage: 'Saf Keşif Alanı',
+      evolutionSummary: `Güneşiniz ${natalSign} burcunun en başında (0°-1°) yer almaktadır. Bu, ruhunuzun ${natalSign} arketipiyle yepyeni bir sayfaya başladığını gösterir. Geçmiş yaşam yükü en az olan, saf bir öğrenme ve inşa etme dönemindesiniz. Önünüzde yaklaşık 30 yıllık kesintisiz bir ${natalSign} ustalığı yolculuğu bulunmaktadır.`
+    };
+  }
+  return {
+    degreeType: 'Dengeli Seyir',
+    badgeTitle: 'Dengeli Tekâmül Seyri',
+    badgeColor: '#6366F1',
+    karmicStage: 'Kademeli Ruhsal İnşa',
+    evolutionSummary: `Güneşiniz ${natalSign} burcunun ${degreeInSign}. derecesindedir. Ruhunuz bu arketipte dengeli bir ustalık sürecindedir. İkincil İlerletilmiş Haritanıza göre yaklaşık ${progressedAge} yaşına geldiğinizde Güneşiniz sınırları aşarak ${progressedSign} burcuna geçecek ve ruhunuz yeni bir tekâmül evresine adım atacaktır.${currentAge !== null && currentAge >= progressedAge ? ` Şu an ${currentAge} yaşındasınız ve bu geçiş gerçekleşmiş durumdadır; ${progressedSign} frekansını hayatınıza entegre etmişsinizdir.` : ''}`
+  };
+}
+

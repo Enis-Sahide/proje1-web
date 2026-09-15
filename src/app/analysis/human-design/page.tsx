@@ -407,6 +407,7 @@ export default function HumanDesignPage() {
   const router = useRouter();
   const { role, user } = useAuth();
   const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
+  const isMasterOrAdmin = role === 'master' || role === 'admin';
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [showLockModal, setShowLockModal] = useState(false);
@@ -797,39 +798,41 @@ export default function HumanDesignPage() {
                   </div>
                </div>
 
-              {/* Tab Switcher */}
-              <div className="flex items-center justify-center gap-3 mb-8 bg-white/5 p-1.5 rounded-2xl border border-white/10 max-w-md mx-auto">
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('bodygraph')}
-                  className={`flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${
-                    activeTab === 'bodygraph'
-                      ? 'bg-[#32D74B] text-black font-bold shadow-lg shadow-[#32D74B]/20'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <Zap size={16} />
-                  Tasarım Şeması
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('synthesis')}
-                  className={`flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 relative ${
-                    activeTab === 'synthesis'
-                      ? 'bg-gradient-to-r from-amber-400 via-emerald-400 to-teal-400 text-black font-bold shadow-lg shadow-amber-400/20'
-                      : 'text-gray-400 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <Sparkles size={16} />
-                  Kozmik Sentez (Astro-HD)
-                  <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
-                  </span>
-                </button>
-              </div>
+              {/* Tab Switcher - Yalnızca Usta / Admin seviyesinde görünür */}
+              {isMasterOrAdmin && (
+                <div className="flex items-center justify-center gap-3 mb-8 bg-white/5 p-1.5 rounded-2xl border border-white/10 max-w-md mx-auto">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('bodygraph')}
+                    className={`flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 ${
+                      activeTab === 'bodygraph'
+                        ? 'bg-[#32D74B] text-black font-bold shadow-lg shadow-[#32D74B]/20'
+                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <Zap size={16} />
+                    Tasarım Şeması
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('synthesis')}
+                    className={`flex-1 py-2.5 px-4 rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 relative ${
+                      activeTab === 'synthesis'
+                        ? 'bg-gradient-to-r from-amber-400 via-emerald-400 to-teal-400 text-black font-bold shadow-lg shadow-amber-400/20'
+                        : 'text-gray-400 hover:text-white hover:bg-white/5'
+                    }`}
+                  >
+                    <Sparkles size={16} />
+                    Kozmik Sentez (Astro-HD)
+                    <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500"></span>
+                    </span>
+                  </button>
+                </div>
+              )}
 
-              {activeTab === 'bodygraph' && (
+              {(!isMasterOrAdmin || activeTab === 'bodygraph') && (
                 <div className="space-y-8 animate-in fade-in duration-500">
                   <div className="flex flex-col lg:flex-row justify-center items-start gap-8 mb-10">
                     {/* Left Column - Design */}
@@ -1041,7 +1044,7 @@ export default function HumanDesignPage() {
                 </div>
               )}
 
-              {activeTab === 'synthesis' && (
+              {isMasterOrAdmin && activeTab === 'synthesis' && (
                 <div className="space-y-8 animate-in fade-in duration-500 text-left">
                   {/* Hero Introduction */}
                   <div className="bg-gradient-to-r from-amber-500/10 via-emerald-500/10 to-teal-500/10 rounded-3xl border border-white/10 p-6 md:p-8">
@@ -1120,21 +1123,21 @@ export default function HumanDesignPage() {
                         </div>
                       </div>
 
-                      {/* 🎯 KÖK DAVRANIŞ TEŞHİSİ (Astrolojik Olasılıklardan Kesin Çizgi Teşhisine) */}
+                      {/* 🎯 KÖK DAVRANIŞ TEŞHİSİ (Doğrudan Çizgi Davranış Mekanizması & Çıkış Reçetesi) */}
                       {synthesisReport.keyBehavioralDiagnoses && synthesisReport.keyBehavioralDiagnoses.length > 0 && (
                         <div className="space-y-4">
                           <div className="flex flex-col md:flex-row md:items-center justify-between gap-2">
                             <div>
                               <div className="flex items-center gap-2 text-rose-400 font-bold text-xs uppercase tracking-wider mb-1">
                                 <ShieldAlert size={16} />
-                                <span>Kişiselleştirilmiş Kök Neden Teşhisi</span>
+                                <span>Kişiselleştirilmiş Davranış & Kök Teşhis</span>
                               </div>
                               <h3 className="text-xl md:text-2xl font-serif font-bold text-white">
-                                Astrolojik Sınavlar × 6 Çizgi Davranış Mekaniği
+                                Sende Geçerli Olan Davranış Mekanizması
                               </h3>
                             </div>
                             <p className="text-xs text-gray-400 max-w-md">
-                              Genel astrolojik olasılıklar yerine, Human Design kapı ve çizginizin (Line 1-6) belirlediği sizde geçerli olan kesin davranış refleksi:
+                              Genel olasılıklar yerine, Human Design çizginizin belirlediği somut reaktif davranışınız ve çıkış reçetesi:
                             </p>
                           </div>
 
@@ -1142,7 +1145,7 @@ export default function HumanDesignPage() {
                             {synthesisReport.keyBehavioralDiagnoses.map((diag, dIdx) => (
                               <div
                                 key={`diag-${diag.planetKey}-${dIdx}`}
-                                className="bg-gradient-to-b from-white/[0.07] to-white/[0.02] border border-white/10 rounded-2xl p-5 space-y-4 hover:border-amber-400/30 transition-all"
+                                className="bg-gradient-to-b from-white/[0.07] to-white/[0.02] border border-white/10 rounded-2xl p-5 space-y-3.5 hover:border-amber-400/30 transition-all"
                               >
                                 <div className="flex items-start justify-between gap-3 pb-3 border-b border-white/10">
                                   <div className="flex items-center gap-3">
@@ -1156,46 +1159,35 @@ export default function HumanDesignPage() {
                                           {diag.house}. Ev ({diag.houseTheme})
                                         </span>
                                       </h4>
-                                      <span className="text-xs text-rose-300/80 font-medium">
-                                        {diag.aspectSummary}
+                                      <span className="text-xs text-gray-400 font-medium">
+                                        Kapı {diag.gate} ({diag.gateName})
                                       </span>
                                     </div>
                                   </div>
                                   <div className="text-right">
                                     <span className="inline-block px-2.5 py-1 rounded-lg bg-amber-400/15 border border-amber-400/30 text-amber-300 text-xs font-bold">
-                                      Kapı {diag.gate}.{diag.line}
-                                    </span>
-                                    <span className="block text-[11px] text-gray-400 mt-1 font-medium">
                                       {diag.lineArchetype}
                                     </span>
                                   </div>
                                 </div>
 
-                                <div className="bg-black/30 rounded-xl p-3 border border-white/5 space-y-1.5">
-                                  <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 block">
-                                    ❓ Astroloji Haritasındaki Genel Olasılıklar
-                                  </span>
-                                  <p className="text-xs text-gray-300 leading-relaxed italic">
-                                    "{diag.astroChallengeProbabilities}"
-                                  </p>
-                                </div>
-
-                                <div className="bg-rose-950/20 rounded-xl p-3.5 border border-rose-500/30 space-y-2">
+                                {/* 🎯 Doğrudan Teşhis (Gereksiz açılar ve genel ihtimaller kaldırıldı) */}
+                                <div className="bg-rose-950/25 rounded-xl p-4 border border-rose-500/30 space-y-2">
                                   <div className="flex items-center justify-between">
                                     <span className="text-xs font-bold uppercase tracking-wider text-rose-400 flex items-center gap-1.5">
-                                      <span>🎯 Sende Geçerli Olan Kesin Teşhis</span>
+                                      <span>🎯 Sende Çalışan Davranış Refleksi</span>
                                     </span>
-                                    <span className="text-[10px] bg-rose-500/20 text-rose-300 px-2 py-0.5 rounded border border-rose-500/30 font-bold">
+                                    <span className="text-[10px] bg-rose-500/20 text-rose-300 px-2.5 py-0.5 rounded-full border border-rose-500/30 font-semibold">
                                       Kök Korku: {diag.rootFear.split(',')[0]}
                                     </span>
                                   </div>
-                                  <p className="text-xs text-rose-100 leading-relaxed">
+                                  <p className="text-sm text-rose-100 leading-relaxed font-medium">
                                     {diag.preciseBehavioralDiagnosis}
                                   </p>
                                 </div>
 
-                                <div className="bg-emerald-950/20 rounded-xl p-3 border border-emerald-500/30 flex items-start gap-2.5">
-                                  <span className="text-emerald-400 text-sm mt-0.5">💡</span>
+                                <div className="bg-emerald-950/20 rounded-xl p-3.5 border border-emerald-500/30 flex items-start gap-2.5">
+                                  <span className="text-emerald-400 text-base mt-0.5">💡</span>
                                   <div>
                                     <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 block mb-0.5">
                                       Çıkış Yolu & Hizalanma Reçetesi
@@ -1265,21 +1257,12 @@ export default function HumanDesignPage() {
                                 </div>
                               </div>
 
-                              <div className="bg-white/5 rounded-xl p-3 mb-3 border border-white/5 space-y-1.5">
-                                <div className="text-xs font-semibold text-white">
-                                  {item.synthesisTitle}
-                                </div>
-                                <p className="text-xs text-gray-300 leading-relaxed">
-                                  {item.synthesisInterpretation}
-                                </p>
-                              </div>
-
-                              <div className="bg-black/30 rounded-xl p-3 mb-3 border border-white/5 space-y-1">
+                              <div className="bg-black/30 rounded-xl p-3.5 mb-3 border border-white/5 space-y-1.5">
                                 <div className="flex items-center justify-between text-[11px]">
                                   <span className="text-amber-300 font-semibold">{item.lineArchetype}</span>
                                   <span className="text-rose-400/90 text-[10px] font-medium">Kök Korku: {item.rootFear.split(',')[0]}</span>
                                 </div>
-                                <p className="text-xs text-gray-300 leading-relaxed">
+                                <p className="text-xs text-gray-200 leading-relaxed font-medium">
                                   {item.preciseBehavioralDiagnosis}
                                 </p>
                               </div>
