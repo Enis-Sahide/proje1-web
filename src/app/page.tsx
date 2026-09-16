@@ -9,6 +9,7 @@ import { ChevronDown, Quote, Loader2, Smartphone, Sparkles, ChevronRight } from 
 import MoonCyclesWidget from '@/features/astrology/components/MoonCyclesWidget';
 import SchumannMiniWidget from '@/features/astrology/components/SchumannMiniWidget';
 import Link from 'next/link';
+import Image from 'next/image';
 import { PLANET_DAY_GUIDELINES } from '@/utils/PlanetaryHours';
 
 // CHAKRA_MODULES içeriği DB'den gelir (/api/content/chakras → modules)
@@ -145,9 +146,12 @@ export default function Home() {
             <div className="relative w-full max-w-[320px] md:max-w-[400px] bg-black/20 backdrop-blur-md rounded-[3rem] border border-mystic-surface-light shadow-2xl overflow-hidden order-1 lg:order-2 shrink-0">
               <div className="relative w-full">
                 {/* Silhouette Image */}
-                <img 
-                  src="https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/human_silhouette.png" 
+                <Image 
+                  src="/human_silhouette.webp" 
                   alt="Human Silhouette"
+                  width={1024}
+                  height={1024}
+                  priority
                   className="w-full h-auto opacity-80 mix-blend-screen block"
                 />
 
