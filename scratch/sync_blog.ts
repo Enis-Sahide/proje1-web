@@ -7,12 +7,25 @@ import * as schema from '../src/db/schema';
 import { BLOG_POSTS } from '../src/db/seedExtra';
 import { eq } from 'drizzle-orm';
 
+import * as fs from 'fs';
+import * as path from 'path';
+
 async function main() {
   console.log('Connecting to database...');
   const pool = new Pool({ connectionString: process.env.DATABASE_URL });
   const db = drizzle(pool, { schema });
 
+  // Read latest markdown article for sun/gaia if exists
+  const articleMdPath = path.resolve('src/data/articles/gunes-gaia-ve-gunes-alerjisi-ezoterik-anlami.md');
+  let sunGaiaContent: string | null = null;
+  if (fs.existsSync(articleMdPath)) {
+    sunGaiaContent = fs.readFileSync(articleMdPath, 'utf-8');
+  }
+
   for (const post of BLOG_POSTS) {
+    const contentToUse = (post.slug === 'gunes-gaia-ve-gunes-alerjisi-ezoterik-anlami' && sunGaiaContent)
+      ? sunGaiaContent
+      : post.content;
     const existing = await db
       .select()
       .from(schema.blogPosts)
@@ -23,7 +36,7 @@ async function main() {
       await db.insert(schema.blogPosts).values({
         title: post.title,
         slug: post.slug,
-        content: post.content,
+        content: contentToUse,
         imageUrl: post.imageUrl,
         category: post.category,
         published: post.published,
@@ -35,7 +48,7 @@ async function main() {
         .update(schema.blogPosts)
         .set({
           title: post.title,
-          content: post.content,
+          content: contentToUse,
           imageUrl: post.imageUrl,
           category: post.category,
           published: post.published,
