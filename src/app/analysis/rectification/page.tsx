@@ -32,10 +32,23 @@ import {
   ChevronDown,
   ChevronUp,
   CalendarDays,
-  Sun
+  Sun,
+  Compass,
+  Target,
+  HelpCircle,
+  ShieldAlert,
+  Check
 } from 'lucide-react';
 import { ASTRO_CITIES, AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 import { EventType, LifeEvent, RectificationResult, TimelinePoint, CandidateScore, DayCandidate } from '@/features/astrology/engine/RectificationEngine';
+import {
+  generateTriangulationQuestions,
+  evaluateTriangulationAnswers,
+  TriangulationResult,
+  CandidateHDData,
+  CandidateEvaluationScore,
+  DisambiguationQuestion
+} from '@/features/astrology/engine/HDRectificationTriangulator';
 
 interface EventTemplate {
   type: EventType;
@@ -191,6 +204,44 @@ export default function RectificationPage() {
   const [selectedPeak, setSelectedPeak] = useState<CandidateScore | null>(null);
   const [hoveredPoint, setHoveredPoint] = useState<TimelinePoint | null>(null);
 
+  // Human Design & Hermetik Triangülasyon State
+  const [triangulationData, setTriangulationData] = useState<TriangulationResult | null>(null);
+  const [triangulationAnswers, setTriangulationAnswers] = useState<Record<string, string>>({});
+  const [triangulationScores, setTriangulationScores] = useState<CandidateEvaluationScore[]>([]);
+
+  const handleSelectDisambiguationOption = (questionId: string, optionId: string) => {
+    const updatedAnswers = {
+      ...triangulationAnswers,
+      [questionId]: optionId
+    };
+    setTriangulationAnswers(updatedAnswers);
+
+    if (triangulationData) {
+      const evaluated = evaluateTriangulationAnswers(
+        triangulationData.candidatesData,
+        triangulationData.questions,
+        updatedAnswers
+      );
+      setTriangulationScores(evaluated);
+
+      const topWinner = evaluated.find(e => e.isTopMatch) || evaluated[0];
+      if (topWinner && result) {
+        const matchingCand = result.topCandidates.find(c => c.timeStr === topWinner.timeStr);
+        if (matchingCand) {
+          setSelectedPeak(matchingCand);
+        }
+      }
+    }
+  };
+
+  const handleResetTriangulation = () => {
+    setTriangulationAnswers({});
+    setTriangulationScores([]);
+    if (result) {
+      setSelectedPeak(result.bestCandidate);
+    }
+  };
+
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
   const handleLoadPreset = (preset: BenchmarkPreset) => {
@@ -285,6 +336,20 @@ export default function RectificationPage() {
 
       setResult(data.data);
       setSelectedPeak(data.data.bestCandidate);
+
+      // Human Design & Hermetik Triangülasyon Sorularını Üret
+      if (data.data?.topCandidates && data.data.topCandidates.length > 1) {
+        const activeBirthDate = dateKnowledgeMode === 'exact' ? birthDate : (data.data.selectedDateStr || birthDate);
+        const tri = generateTriangulationQuestions(data.data.topCandidates, activeBirthDate, selectedCity);
+        setTriangulationData(tri);
+        setTriangulationAnswers({});
+        setTriangulationScores([]);
+      } else {
+        setTriangulationData(null);
+        setTriangulationAnswers({});
+        setTriangulationScores([]);
+      }
+
       setCurrentStep(4);
     } catch (err: any) {
       setErrorMsg(err.message || 'Hesaplama sırasında bir hata oluştu.');
@@ -1107,6 +1172,187 @@ export default function RectificationPage() {
               </div>
             </div>
 
+            {/* ======================================================== */}
+            {/* 🎯 NOKTA ATIŞI DOĞRULAMA (HUMAN DESIGN & ENERJİ TRİANGÜLASYONU) */}
+            {/* ======================================================== */}
+            {triangulationData && triangulationData.hasDisambiguation && (
+              <div className="bg-gradient-to-br from-[#1c1810] via-[#121212] to-[#18140c] border-2 border-[#D4AF37]/60 rounded-3xl p-6 sm:p-8 backdrop-blur-2xl shadow-[0_0_40px_rgba(212,175,55,0.15)] space-y-6 relative overflow-hidden">
+                {/* Arka plan dekoratif parıltı */}
+                <div className="absolute top-0 right-0 w-96 h-96 bg-[#D4AF37]/5 rounded-full blur-3xl pointer-events-none" />
+
+                {/* Başlık ve Açıklama */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5">
+                  <div>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] text-xs font-bold uppercase tracking-wider mb-2">
+                      <Target size={14} className="animate-pulse" />
+                      Nokta Atışı Doğrulama (Human Design & Enerji Triangülasyonu)
+                    </div>
+                    <h3 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
+                      Aday Saatleri Teke İndirgeme Testi
+                    </h3>
+                    <p className="text-xs text-mystic-text-muted mt-1 max-w-2xl">
+                      Aday doğum saatleriniz arasında gökyüzü <strong className="text-white">İç Otoriteyi</strong>, <strong className="text-white">Human Design Profilini</strong> veya <strong className="text-white">Enerji Tipini</strong> değiştirmektedir. Aşağıdaki {triangulationData.questions.length} soruyu yanıtlayarak kesin doğum saatinizi sabitleyin:
+                    </p>
+                  </div>
+
+                  {Object.keys(triangulationAnswers).length > 0 && (
+                    <button
+                      onClick={handleResetTriangulation}
+                      className="self-start sm:self-center inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-xs text-white/80 font-medium border border-white/10 transition-colors"
+                    >
+                      <RotateCcw size={14} />
+                      Yanıtları Sıfırla
+                    </button>
+                  )}
+                </div>
+
+                {/* SORULAR LİSTESİ */}
+                <div className="space-y-6">
+                  {triangulationData.questions.map((q, qIdx) => {
+                    const selectedOptId = triangulationAnswers[q.id];
+
+                    return (
+                      <div key={q.id} className="bg-white/5 border border-white/10 rounded-2xl p-5 space-y-4">
+                        <div className="flex items-start gap-3">
+                          <div className="p-2.5 rounded-xl bg-[#D4AF37]/20 text-[#D4AF37] shrink-0 mt-0.5">
+                            {q.category === 'authority' && <Compass size={18} />}
+                            {q.category === 'profile' && <Sparkles size={18} />}
+                            {q.category === 'type' && <Zap size={18} />}
+                            {q.category === 'center' && <ShieldAlert size={18} />}
+                            {q.category === 'hermetic' && <Award size={18} />}
+                          </div>
+                          <div>
+                            <div className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider">
+                              Soru {qIdx + 1}: {q.categoryLabel}
+                            </div>
+                            <h4 className="text-sm sm:text-base font-bold text-white mt-0.5">
+                              {q.title}
+                            </h4>
+                            <p className="text-xs text-white/60 mt-1">
+                              {q.question}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Seçenek Kartları */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                          {q.options.map(opt => {
+                            const isChosen = selectedOptId === opt.id;
+                            return (
+                              <button
+                                key={opt.id}
+                                onClick={() => handleSelectDisambiguationOption(q.id, opt.id)}
+                                className={`p-4 rounded-xl border text-left transition-all relative cursor-pointer ${
+                                  isChosen
+                                    ? 'bg-[#D4AF37]/25 border-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.25)] ring-1 ring-[#D4AF37]'
+                                    : 'bg-white/5 border-white/10 hover:border-white/20 hover:bg-white/10'
+                                }`}
+                              >
+                                <div className="flex items-start justify-between gap-2 mb-1.5">
+                                  <span className={`text-xs font-bold ${isChosen ? 'text-[#D4AF37]' : 'text-white'}`}>
+                                    {opt.label}
+                                  </span>
+                                  {isChosen && (
+                                    <span className="p-1 rounded-full bg-[#D4AF37] text-black shrink-0">
+                                      <Check size={12} strokeWidth={3} />
+                                    </span>
+                                  )}
+                                </div>
+                                {opt.subLabel && (
+                                  <div className="text-[11px] text-amber-200/90 font-medium italic mb-1.5">
+                                    "{opt.subLabel}"
+                                  </div>
+                                )}
+                                <p className="text-[11px] text-white/70 leading-relaxed">
+                                  {opt.description}
+                                </p>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* TRİANGÜLASYON KAZANAN SAAT KARTI (SONUÇ ROZETİ) */}
+                {(() => {
+                  const answeredCount = Object.keys(triangulationAnswers).length;
+                  const totalQuestions = triangulationData.questions.length;
+                  const topWinnerScore = triangulationScores.find(s => s.isTopMatch);
+                  const winningCandidateHD = triangulationData.candidatesData.find(c => c.candidate.timeStr === topWinnerScore?.timeStr);
+
+                  if (answeredCount === 0 || !topWinnerScore || !winningCandidateHD) {
+                    return (
+                      <div className="p-4 rounded-2xl bg-white/5 border border-dashed border-white/20 text-center text-xs text-white/50">
+                        Soruları yanıtladıkça sistem aday saatleri eleyecek ve kesinleşen saatinizi burada ilan edecektir.
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <div className="bg-gradient-to-r from-emerald-950/40 via-[#181818] to-amber-950/40 border-2 border-emerald-500/60 rounded-2xl p-5 sm:p-6 space-y-4 animate-in fade-in zoom-in-95 duration-300 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="flex items-center gap-3">
+                          <div className="p-3 rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 shadow-lg">
+                            <Target size={26} />
+                          </div>
+                          <div>
+                            <div className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                              <CheckCircle2 size={14} /> Nokta Atışı Doğrulanan Saat
+                            </div>
+                            <div className="text-2xl sm:text-3xl font-black text-white flex items-center gap-3 mt-0.5">
+                              {winningCandidateHD.candidate.timeStr.slice(0, 5)}
+                              <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
+                                %{topWinnerScore.confidencePercent} Triangülasyon Uyumu
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="text-right sm:text-right">
+                          <span className="text-[11px] text-white/60">İlerleme: </span>
+                          <strong className="text-xs text-[#D4AF37]">{answeredCount} / {totalQuestions} Soru Yanıtlandı</strong>
+                        </div>
+                      </div>
+
+                      {/* Doğrulanan Human Design & Astroloji Özeti */}
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-2">
+                        <div className="p-3 rounded-xl bg-black/40 border border-white/10 text-center">
+                          <span className="block text-[10px] uppercase font-bold text-white/40">Human Design Tipi</span>
+                          <span className="text-xs sm:text-sm font-bold text-amber-300 mt-0.5 block">{winningCandidateHD.cleanType}</span>
+                        </div>
+                        <div className="p-3 rounded-xl bg-black/40 border border-white/10 text-center">
+                          <span className="block text-[10px] uppercase font-bold text-white/40">İç Otorite</span>
+                          <span className="text-xs sm:text-sm font-bold text-emerald-300 mt-0.5 block">{winningCandidateHD.cleanAuthority}</span>
+                        </div>
+                        <div className="p-3 rounded-xl bg-black/40 border border-white/10 text-center">
+                          <span className="block text-[10px] uppercase font-bold text-white/40">Yaşam Profili</span>
+                          <span className="text-xs sm:text-sm font-bold text-cyan-300 mt-0.5 block">{winningCandidateHD.cleanProfile}</span>
+                        </div>
+                        <div className="p-3 rounded-xl bg-black/40 border border-white/10 text-center">
+                          <span className="block text-[10px] uppercase font-bold text-white/40">Astrolojik Yükselen</span>
+                          <span className="text-xs sm:text-sm font-bold text-purple-300 mt-0.5 block">{winningCandidateHD.candidate.ascSign} ({winningCandidateHD.candidate.ascDegree.toFixed(1)}°)</span>
+                        </div>
+                      </div>
+
+                      {/* Eşleşen Karakteristikler */}
+                      {topWinnerScore.matchedTraits.length > 0 && (
+                        <div className="pt-2 border-t border-white/10 flex flex-wrap items-center gap-2">
+                          <span className="text-[11px] text-white/60">Doğrulanan Nitelikler:</span>
+                          {topWinnerScore.matchedTraits.map((t, idx) => (
+                            <span key={idx} className="text-[11px] px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                              <Check size={10} strokeWidth={3} /> {t}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
+              </div>
+            )}
+
             {/* TÜM BELİRGİN ZİRVELERİN LİSTESİ */}
             <div className="bg-[#121212]/90 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-xl shadow-xl space-y-4">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
@@ -1123,32 +1369,47 @@ export default function RectificationPage() {
                   const pt = result.timelinePoints.find(p => p.hour === cand.hour && Math.abs(p.minute - cand.minute) < 4);
                   const wavePercent = pt?.probabilityPercent || 85;
 
+                  const triScore = triangulationScores.find(s => s.timeStr === cand.timeStr);
+                  const candHD = triangulationData?.candidatesData.find(c => c.candidate.timeStr === cand.timeStr);
+
                   return (
                     <button
                       key={idx}
                       onClick={() => setSelectedPeak(cand)}
                       className={`p-4 rounded-2xl border text-left transition-all cursor-pointer relative overflow-hidden ${
-                        isSelected 
-                          ? 'bg-[#D4AF37]/20 border-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.2)]' 
-                          : 'bg-white/5 border-white/10 hover:border-white/20 hover:bg-white/10'
+                        triScore?.isTopMatch
+                          ? 'bg-gradient-to-br from-[#D4AF37]/25 to-emerald-950/40 border-[#D4AF37] shadow-[0_0_25px_rgba(212,175,55,0.3)] ring-1 ring-[#D4AF37]'
+                          : isSelected 
+                            ? 'bg-[#D4AF37]/20 border-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.2)]' 
+                            : 'bg-white/5 border-white/10 hover:border-white/20 hover:bg-white/10'
                       }`}
                     >
                       <div className="flex justify-between items-center mb-1.5">
                         <span className="text-xs font-bold text-[#D4AF37]">
-                          {idx === 0 ? '🏆 1. Ana Zirve' : `${idx + 1}. Zirve Noktası`}
+                          {triScore?.isTopMatch ? '🎯 Nokta Atışı Kazananı' : idx === 0 ? '🏆 1. Ana Zirve' : `${idx + 1}. Zirve Noktası`}
                         </span>
-                        <span className="px-2 py-0.5 rounded-full bg-white/10 text-emerald-400 text-[10px] font-mono font-bold">
-                          Rezonans: %{wavePercent}
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                          triScore?.isTopMatch ? 'bg-emerald-500/20 text-emerald-300' : 'bg-white/10 text-emerald-400'
+                        }`}>
+                          {triScore ? `Triangülasyon: %${triScore.confidencePercent}` : `Rezonans: %${wavePercent}`}
                         </span>
                       </div>
 
-                      <div className="text-2xl font-black text-white my-1">
-                        {cand.timeStr.slice(0, 5)}
+                      <div className="text-2xl font-black text-white my-1 flex items-center justify-between">
+                        <span>{cand.timeStr.slice(0, 5)}</span>
+                        {candHD && (
+                          <span className="text-[11px] font-normal px-2 py-0.5 rounded-md bg-white/10 text-amber-200">
+                            {candHD.cleanType} • {candHD.cleanProfile}
+                          </span>
+                        )}
                       </div>
 
                       <div className="space-y-0.5 text-xs text-white/70 mt-2 pt-2 border-t border-white/10">
                         <div>Yükselen (ASC): <strong className="text-white">{cand.ascSign} ({cand.ascDegree.toFixed(1)}°)</strong></div>
                         <div>Tepe Noktası (MC): <strong className="text-white">{cand.mcSign}</strong></div>
+                        {candHD && (
+                          <div className="text-[11px] text-emerald-300/80">Otorite: <strong>{candHD.cleanAuthority}</strong></div>
+                        )}
                       </div>
                     </button>
                   );
