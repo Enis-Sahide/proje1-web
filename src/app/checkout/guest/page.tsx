@@ -44,7 +44,7 @@ function GuestCheckoutForm() {
   const [dateStr, setDateStr] = useState('');
   const [timeStr, setTimeStr] = useState('12:00');
   const [cityKey, setCityKey] = useState<AstroCity | null>(null);
-  const [agreedTerms, setAgreedTerms] = useState(true);
+  const [agreedTerms, setAgreedTerms] = useState(false);
 
   // Fatura profilleri — kayıtlı profillerden seçilir; yoksa önce oluşturulur.
   const [profiles, setProfiles] = useState<BillingProfile[] | null>(null);
@@ -441,7 +441,7 @@ function GuestCheckoutForm() {
 
             <button 
               type="submit"
-              disabled={loading || amount === null}
+              disabled={loading || amount === null || !agreedTerms}
               className="w-full bg-gradient-to-r from-[#D4AF37] via-[#f5db8b] to-[#D4AF37] hover:brightness-110 text-black font-bold py-3.5 px-6 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center text-sm mt-4 shadow-lg shadow-[#D4AF37]/20 cursor-pointer"
             >
               {loading ? (
