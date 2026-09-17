@@ -17,8 +17,23 @@ export default function ClarityProvider() {
 
   useEffect(() => {
     if (initialized || process.env.NODE_ENV !== 'production') return;
-    Clarity.init(CLARITY_PROJECT_ID);
-    initialized = true;
+
+    const startClarity = () => {
+      try {
+        Clarity.init(CLARITY_PROJECT_ID);
+        initialized = true;
+      } catch (e) {
+        console.warn('Clarity init error:', e);
+      }
+    };
+
+    if (typeof window !== 'undefined') {
+      if ('requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(() => setTimeout(startClarity, 1500));
+      } else {
+        setTimeout(startClarity, 2500);
+      }
+    }
   }, []);
 
   useEffect(() => {
