@@ -1220,6 +1220,7 @@ export default function RectificationPage() {
                             {q.category === 'type' && <Zap size={18} />}
                             {q.category === 'center' && <ShieldAlert size={18} />}
                             {q.category === 'hermetic' && <Award size={18} />}
+                            {q.category === 'mission' && <Target size={18} />}
                           </div>
                           <div>
                             <div className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider">
