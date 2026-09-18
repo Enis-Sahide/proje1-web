@@ -1,5 +1,9 @@
 import jsPDF from 'jspdf';
-import type { CosmicMatrixReport, PlanetaryDynamicDiagnosis } from '@/features/astrology/engine/CosmicMatrixEngine';
+import type { 
+  CosmicMatrixReport, 
+  MultiWorldCosmicMatrixReport, 
+  PlanetaryDynamicDiagnosis 
+} from '@/features/astrology/engine/CosmicMatrixEngine';
 import type { DruidTree } from '@/features/astrology/engine/DruidTreeEngine';
 
 // Helper to convert ArrayBuffer to Base64
@@ -31,9 +35,6 @@ const drawTextWithBold = (
     .replace(/<img.*?src=".*?".*?>/g, '')
     .replace(/^\s*>\s*/gm, '')
     .replace(/\*\*\*(.*?)\*\*\*/g, '**$1**')
-    .replace(/(?<!\*)\*([^*\n]+?)\*(?!\*)/g, '**$1**')
-    .replace(/\*\((.*?)\)\*/g, '**$1**');
-
   const parts = sanitizedText.split(/(\s+|\*\*)/);
   let isBold = false;
 
@@ -70,7 +71,7 @@ const drawTextWithBold = (
 };
 
 export const downloadCosmicMatrixPDF = async (
-  report: CosmicMatrixReport,
+  report: CosmicMatrixReport | MultiWorldCosmicMatrixReport,
   druidTree: DruidTree | null,
   userName: string,
   birthInfo: {
@@ -78,8 +79,7 @@ export const downloadCosmicMatrixPDF = async (
     localTime: string;
     cityName: string;
     country?: string;
-  },
-  activeWorldTitle: string = '1. Assiah Âlemi (Fiziksel Beden & Eylem)'
+  }
 ) => {
   const doc = new jsPDF();
 
@@ -182,7 +182,7 @@ export const downloadCosmicMatrixPDF = async (
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(11);
   doc.setTextColor(...white);
-  doc.text(`4 Katmanlı Kozmik Çözümleme • ${activeWorldTitle}`, 105, curY, { align: 'center' });
+  doc.text('4 Âlem Bilinç Katmanı & 13 Gezegen Dinamik Teşhisi (Master Analiz)', 105, curY, { align: 'center' });
 
   // Künye Kartı
   curY += 8;
@@ -371,75 +371,150 @@ export const downloadCosmicMatrixPDF = async (
   }
 
   // ==========================================
-  // 4. 13 GEZEGEN DİNAMİKLERİ VE REÇETELERİ
+  // FREKANS AYNASI & 4 ÂLEM ENTEGRASYON REHBERİ
   // ==========================================
-  ensureSpace(45);
-  doc.setFont('LiberationSans', 'bold');
-  doc.setFontSize(14);
-  doc.setTextColor(...gold);
-  doc.text(`13 Gezegen Dinamik Teşhisi (${activeWorldTitle})`, 15, curY);
-
-  curY += 3;
-  doc.setDrawColor(...gold);
+  ensureSpace(58);
+  doc.setFillColor(15, 25, 45); // Derin lacivert
+  doc.roundedRect(15, curY, 180, 52, 3, 3, 'F');
+  doc.setDrawColor(14, 165, 233); // Cyan kenarlık
   doc.setLineWidth(0.5);
-  doc.line(15, curY, 195, curY);
-  curY += 7;
+  doc.roundedRect(15, curY, 180, 52, 3, 3, 'D');
 
-  report.planetaryDynamics.forEach((planet: PlanetaryDynamicDiagnosis) => {
-    ensureSpace(68);
+  doc.setFont('LiberationSans', 'bold');
+  doc.setFontSize(11.5);
+  doc.setTextColor(14, 165, 233);
+  doc.text('⚡ FREKANS AYNASI REHBERİ: HANGİ ÂLEMİNİZİ ÇALIŞTIRIYORSUNUZ?', 22, curY + 8);
 
-    // Gezegen Başlık Çubuğu
-    doc.setFillColor(...cardDark);
-    doc.roundedRect(15, curY, 180, 11, 2, 2, 'F');
-    doc.setDrawColor(...gold);
-    doc.setLineWidth(0.3);
-    doc.roundedRect(15, curY, 180, 11, 2, 2, 'D');
+  doc.setFont('LiberationSans', 'normal');
+  doc.setFontSize(9.8);
+  doc.setTextColor(230, 235, 245);
+  const faDesc = `Bu raporda varlığınızın 4 temel âlemdeki (Assiah, Yetzirah, Beriyah, Atzilut) 13 gezegen dinamikleri ve aromaterapi reçeteleri eksiksiz sunulmuştur. Hayatın her evresinde aynı katmanı çalıştırmazsınız. Hangi katmandaki bitkisel reçeteyi ne zaman uygulayacağınızı tespit etmek için: 7Layers Frekans Aynası analizimizdeki güncel kozmik sınavınıza ve tutumunuza bakarak o an hangi haritanızı (Beden, Ruh, Zihin veya Kudret) çalıştırdığınızı teşhis edebilir ve doğrudan o âleme ait dengeleyici reçeteleri hayata geçirebilirsiniz.`;
+  drawTextWithBold(doc, faDesc, 22, curY + 15.5, 166, 5.0);
+
+  curY += 60;
+
+  // ==========================================
+  // 4 ÂLEM 13 GEZEGEN DİNAMİK TEŞHİSLERİ
+  // ==========================================
+  const worldsData = (report as any).worlds ? [
+    {
+      key: 'assiah',
+      title: 'BÖLÜM 1: 1. ASSİAH ÂLEMİ (FİZİKSEL BEDEN & EYLEM)',
+      tech: 'Standart Tropikal Jeosentrik Harita',
+      desc: 'Fiziksel bedenin dünyevi alışkanlıkları, somut eylem tarzınız ve dünyevi mücadelelerinizdeki gezegen yerleşimleriniz.',
+      report: (report as any).worlds.assiah as CosmicMatrixReport
+    },
+    {
+      key: 'yetzirah',
+      title: 'BÖLÜM 2: 2. YETZİRAH ÂLEMİ (DUYGUSAL RUH & HAFIZA)',
+      tech: 'Drakonik Ruh Haritası (Kuzey Düğümü 0° Koç)',
+      desc: 'Ruhunuzun derin bilinçaltı hafızası, geçmiş yaşam izleri ve kalbinizin gerçekte hangi enerjilerle şifalanmak istediği.',
+      report: (report as any).worlds.yetzirah as CosmicMatrixReport
+    },
+    {
+      key: 'beriyah',
+      title: 'BÖLÜM 3: 3. BERİYAH ÂLEMİ (ZİHİNSEL BİLGELİK & YÜKSEK DHARMA)',
+      tech: '9. Harmonik (Navamsa) Zihin Haritası',
+      desc: 'Yüksek akıl, hayat felsefeniz, kadersel yaşam gayeniz (Dharma) ve zihninizin kurguladığı büyük ilahi mimari.',
+      report: (report as any).worlds.beriyah as CosmicMatrixReport
+    },
+    {
+      key: 'atzilut',
+      title: 'BÖLÜM 4: 4. ATZİLUT ÂLEMİ (RUHSAL BİRLİK & İLAHİ KUDRET)',
+      tech: 'Güneş Merkezli (Heliosentrik) Harita',
+      desc: 'Dünya egosundan arınmış, Güneş merkezli saf kozmik irade ve evrensel birliğe hizmet eden ilahi potansiyeliniz.',
+      report: (report as any).worlds.atzilut as CosmicMatrixReport
+    }
+  ] : [
+    {
+      key: 'assiah',
+      title: '13 GEZEGEN DİNAMİK TEŞHİSİ & BİTKİSEL FREKANS REÇETELERİ',
+      tech: 'Standart Tropikal Harita',
+      desc: 'Fiziksel bedenin dünyevi alışkanlıkları ve somut eylem tarzınız.',
+      report: report as CosmicMatrixReport
+    }
+  ];
+
+  worldsData.forEach((wData) => {
+    // Her âlem yeni bir sayfada başlar
+    doc.addPage();
+    currentPage++;
+    drawHeaderAndFooter(currentPage);
+    curY = 24;
 
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(12);
+    doc.setFontSize(14.5);
     doc.setTextColor(...gold);
-    const directionTag = planet.energyDirection === 'inward' ? '[İçe Dönük / Yin]' : '[Dışa Aktarılan / Yang]';
-    doc.text(`${planet.planetName} (${planet.sign}, ${planet.house}. Ev) ${directionTag}`, 20, curY + 7.5);
+    doc.text(wData.title, 15, curY);
 
+    curY += 3;
+    doc.setDrawColor(...gold);
+    doc.setLineWidth(0.5);
+    doc.line(15, curY, 195, curY);
+
+    curY += 6;
     doc.setFont('LiberationSans', 'normal');
-    doc.setFontSize(10);
-    doc.setTextColor(...muted);
-    doc.text(`HD Kapı ${planet.gate}.${planet.line} (${planet.center})`, 190, curY + 7.5, { align: 'right' });
-
-    curY += 15;
-
-    // Teşhis ve Ruhsal Mesaj
-    doc.setFont('LiberationSans', 'normal');
-    doc.setFontSize(11);
+    doc.setFontSize(10.2);
     doc.setTextColor(...white);
-    curY = drawTextWithBold(doc, `**Arketip & Akış:** ${planet.archetypeTheme}`, 17, curY, 176, 6.2);
-    curY = drawTextWithBold(doc, `**Tezahür & Etki:** ${planet.activeManifestation}`, 17, curY, 176, 6.2);
-    curY = drawTextWithBold(doc, `**Kabala & Ruhsal Ders:** ${planet.kabbalahSephira} (${planet.kabbalahWorld}) - ${planet.kabbalahLesson}`, 17, curY, 176, 6.2);
+    curY = drawTextWithBold(doc, `**Astrolojik Yöntem:** ${wData.tech} | **Kozmik Boyut:** ${wData.desc}`, 15, curY, 180, 5.5);
+    curY += 6;
 
-    // Dengeleyici Bitkisel Frekans & Buhur
-    if (planet.botanical) {
+    wData.report.planetaryDynamics.forEach((planet: PlanetaryDynamicDiagnosis) => {
+      ensureSpace(68);
+
+      // Gezegen Başlık Çubuğu
+      doc.setFillColor(...cardDark);
+      doc.roundedRect(15, curY, 180, 11, 2, 2, 'F');
+      doc.setDrawColor(...gold);
+      doc.setLineWidth(0.3);
+      doc.roundedRect(15, curY, 180, 11, 2, 2, 'D');
+
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(12);
+      doc.setTextColor(...gold);
+      const directionTag = planet.energyDirection === 'inward' ? '[İçe Dönük / Yin]' : '[Dışa Aktarılan / Yang]';
+      doc.text(`${planet.planetName} (${planet.sign}, ${planet.house}. Ev) ${directionTag}`, 20, curY + 7.5);
+
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(...muted);
+      doc.text(`HD Kapı ${planet.gate}.${planet.line} (${planet.center})`, 190, curY + 7.5, { align: 'right' });
+
+      curY += 15;
+
+      // Teşhis ve Ruhsal Mesaj
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(11);
-      doc.setTextColor(160, 240, 200);
-      curY = drawTextWithBold(
-        doc,
-        `**Bitkisel Denge & Buhur:** ${planet.botanical.tree} | Buhur/Uçucu Yağ: ${planet.botanical.essentialOil} (${planet.botanical.theme})`,
-        17,
-        curY,
-        176,
-        6.2
-      );
-    }
+      doc.setTextColor(...white);
+      curY = drawTextWithBold(doc, `**Arketip & Akış:** ${planet.archetypeTheme}`, 17, curY, 176, 6.2);
+      curY = drawTextWithBold(doc, `**Tezahür & Etki:** ${planet.activeManifestation}`, 17, curY, 176, 6.2);
+      curY = drawTextWithBold(doc, `**Kabala & Ruhsal Ders:** ${planet.kabbalahSephira} (${planet.kabbalahWorld}) - ${planet.kabbalahLesson}`, 17, curY, 176, 6.2);
 
-    // Pratik Dengeleme Önerisi
-    if (planet.practicalRemedy) {
-      doc.setFont('LiberationSans', 'normal');
-      doc.setFontSize(11);
-      doc.setTextColor(255, 230, 160);
-      curY = drawTextWithBold(doc, `**Pratik Dengeleme Reçetesi:** ${planet.practicalRemedy}`, 17, curY, 176, 6.2);
-    }
+      // Dengeleyici Bitkisel Frekans & Buhur
+      if (planet.botanical) {
+        doc.setFont('LiberationSans', 'normal');
+        doc.setFontSize(11);
+        doc.setTextColor(160, 240, 200);
+        curY = drawTextWithBold(
+          doc,
+          `**Bitkisel Denge & Buhur:** ${planet.botanical.tree} | Buhur/Uçucu Yağ: ${planet.botanical.essentialOil} (${planet.botanical.theme})`,
+          17,
+          curY,
+          176,
+          6.2
+        );
+      }
 
-    curY += 5;
+      // Pratik Dengeleme Önerisi
+      if (planet.practicalRemedy) {
+        doc.setFont('LiberationSans', 'normal');
+        doc.setFontSize(11);
+        doc.setTextColor(255, 230, 160);
+        curY = drawTextWithBold(doc, `**Pratik Dengeleme Reçetesi:** ${planet.practicalRemedy}`, 17, curY, 176, 6.2);
+      }
+
+      curY += 5;
+    });
   });
 
   // Save the PDF

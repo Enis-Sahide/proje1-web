@@ -173,12 +173,12 @@ export default function CosmicMatrixPage() {
   };
 
   const handleDownloadPdf = async () => {
-    if (!report) return;
+    const targetReport = multiReport || report;
+    if (!targetReport) return;
     try {
       setIsPdfLoading(true);
-      const activeWorldConfig = WORLDS_INFO.find(w => w.id === selectedWorld);
       await downloadCosmicMatrixPDF(
-        report,
+        targetReport,
         druidTree || null,
         name || (user?.user_metadata?.full_name || user?.fullName || 'Misafir'),
         {
@@ -186,8 +186,7 @@ export default function CosmicMatrixPage() {
           localTime: timeStr,
           cityName: city?.name || 'İstanbul',
           country: city?.country || 'Türkiye'
-        },
-        activeWorldConfig?.name ? `${activeWorldConfig.number} ${activeWorldConfig.name} (${activeWorldConfig.tech})` : undefined
+        }
       );
     } catch (err) {
       console.error('Kozmik Matris PDF indirme hatası:', err);
@@ -746,6 +745,24 @@ export default function CosmicMatrixPage() {
                   </div>
                 );
               })()}
+
+              {/* Frekans Aynası Entegrasyon & Tespit Kartı */}
+              <div className="bg-gradient-to-r from-sky-950/40 via-black/40 to-blue-950/30 border border-sky-500/30 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-sky-400 font-bold text-xs uppercase tracking-wider">
+                    <Zap size={15} /> Frekans Aynası ile Aktif Katmanınızı Keşfedin
+                  </div>
+                  <p className="text-xs text-gray-300 leading-relaxed max-w-2xl">
+                    Şu anki hayat sınavınızda hangi âleminizi (Beden, Ruh, Zihin veya Kudret) çalıştırdığınızı bilmiyor musunuz? <strong>Frekans Aynası</strong> analiziyle güncel gökyüzü tetikleyicilerinizi sorgulayabilir, tutumunuza göre hangi katmanda olduğunuzu netleştirip buradaki ilgili reçeteyi uygulayabilirsiniz.
+                  </p>
+                </div>
+                <Link
+                  href="/analysis/frekans-aynasi"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-sky-500 hover:bg-sky-400 text-black font-bold text-xs transition-all shrink-0 shadow-lg shadow-sky-500/20"
+                >
+                  <Eye size={14} /> Frekans Aynası'nı Aç
+                </Link>
+              </div>
             </div>
 
             {/* 4. 13 Gezegen Enerji Çalışma Dinamikleri (İçe vs Dışa) */}
