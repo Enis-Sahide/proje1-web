@@ -23,50 +23,6 @@ export default function AnalysisPage() {
 
   const tools: ToolItem[] = [
     {
-      id: 'cosmic-matrix',
-      title: '7Layers Kozmik Matris',
-      icon: <Compass size={22} />,
-      color: '#F59E0B',
-      link: '/analysis/cosmic-matrix',
-      isLocked: true
-    },
-    {
-      id: 'druid-tree',
-      title: 'Kelt Druid Ağacı Analizi',
-      icon: <TreePine size={22} />,
-      color: '#10B981',
-      link: '/analysis/druid-tree'
-    },
-    {
-      id: 'incarnation',
-      title: 'Karmik & Enkarnasyon',
-      icon: <Scroll size={22} />,
-      color: '#FFD700',
-      link: '/analysis/incarnation',
-      isLocked: true
-    },
-    {
-      id: 'rectification',
-      title: 'Doğum Saati Keşfi (Beta)',
-      icon: <Clock size={22} />,
-      color: '#E0AA3E',
-      link: '/analysis/rectification'
-    },
-    {
-      id: 'kabbalah',
-      title: 'Kabalistik 4 Alem',
-      icon: <MoonStar size={22} />,
-      color: '#D4AF37',
-      link: '/analysis/kabbalah'
-    },
-    {
-      id: 'frekans-aynasi',
-      title: 'Frekans Aynası (Canlı)',
-      icon: <Sparkles size={22} />,
-      color: '#0EA5E9',
-      link: '/analysis/frekans-aynasi'
-    },
-    {
       id: 'astrology',
       title: 'Doğum Haritası',
       icon: <MoonStar size={22} />,
@@ -81,11 +37,18 @@ export default function AnalysisPage() {
       link: '/analysis/transits'
     },
     {
-      id: 'numerology',
-      title: 'Numeroloji',
-      icon: <Hexagon size={22} />,
-      color: '#AF52DE',
-      link: '/analysis/numerology'
+      id: 'chakra',
+      title: 'Çakra Analizi',
+      icon: <Sparkles size={22} />,
+      color: '#FF2D55',
+      link: '/analysis/chakra'
+    },
+    {
+      id: 'frekans-aynasi',
+      title: 'Frekans Aynası (Canlı)',
+      icon: <Sparkles size={22} />,
+      color: '#0EA5E9',
+      link: '/analysis/frekans-aynasi'
     },
     {
       id: 'human-design',
@@ -95,11 +58,32 @@ export default function AnalysisPage() {
       link: '/analysis/human-design'
     },
     {
-      id: 'chakra',
-      title: 'Çakra Analizi',
-      icon: <Sparkles size={22} />,
-      color: '#FF2D55',
-      link: '/analysis/chakra'
+      id: 'numerology',
+      title: 'Numeroloji',
+      icon: <Hexagon size={22} />,
+      color: '#AF52DE',
+      link: '/analysis/numerology'
+    },
+    {
+      id: 'kabbalah',
+      title: 'Kabalistik 4 Alem',
+      icon: <MoonStar size={22} />,
+      color: '#D4AF37',
+      link: '/analysis/kabbalah'
+    },
+    {
+      id: 'druid-tree',
+      title: 'Kelt Druid Ağacı Analizi',
+      icon: <TreePine size={22} />,
+      color: '#10B981',
+      link: '/analysis/druid-tree'
+    },
+    {
+      id: 'rectification',
+      title: 'Doğum Saati Keşfi (Beta)',
+      icon: <Clock size={22} />,
+      color: '#E0AA3E',
+      link: '/analysis/rectification'
     },
     {
       id: 'schumann',
@@ -107,6 +91,22 @@ export default function AnalysisPage() {
       icon: <Activity size={22} />,
       color: '#00E5FF',
       link: '/analysis/schumann'
+    },
+    {
+      id: 'cosmic-matrix',
+      title: '7Layers Kozmik Matris',
+      icon: <Compass size={22} />,
+      color: '#F59E0B',
+      link: '/analysis/cosmic-matrix',
+      isLocked: true
+    },
+    {
+      id: 'incarnation',
+      title: 'Karmik & Enkarnasyon',
+      icon: <Scroll size={22} />,
+      color: '#FFD700',
+      link: '/analysis/incarnation',
+      isLocked: true
     }
   ];
 
