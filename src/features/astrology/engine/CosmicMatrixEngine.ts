@@ -140,6 +140,25 @@ export interface PersonalTalismanFormula {
   incenseAndHerbs?: string;
 }
 
+export type CosmicWorld = 'assiah' | 'yetzirah' | 'beriyah' | 'atzilut';
+
+export interface MultiWorldCosmicMatrixReport {
+  activeWorld: CosmicWorld;
+  worlds: {
+    assiah: CosmicMatrixReport;
+    yetzirah: CosmicMatrixReport;
+    beriyah: CosmicMatrixReport;
+    atzilut: CosmicMatrixReport;
+  };
+  fourWorldsBalance: FourWorldsBalance;
+  personalTalisman: PersonalTalismanFormula;
+  coreLifeMission: {
+    title: string;
+    description: string;
+    keyArchetype: string;
+  };
+}
+
 export interface CosmicMatrixReport {
   items: CosmicMatrixItem[];
   planetaryDynamics: PlanetaryDynamicDiagnosis[];
@@ -1088,5 +1107,33 @@ function selectPersonalTalisman(
       description: `Ruhunuz bu enkarnasyonda **${fourWorldsBalance.dominantWorld}** katmanının tecrübelerini tamamlayarak **${fourWorldsBalance.growthWorld}** âleminin yüksek idrakine sıçramak üzere kodlanmıştır. Haritanızdaki 13 gezegen enerjisini içe veya dışa taşırırken aşırılıklara kaçmadan, Human Design çizgilerinizin dehasını ve Rune mühürlerinizi denge anahtarı olarak kullanabilirsiniz.`,
       keyArchetype: `${items[0]?.humanDesign.lineArchetype || '3. Çizgi: Deneyimci'}`
     }
+  };
+}
+
+export function synthesizeMultiWorldCosmicMatrix(
+  charts: {
+    assiah: { planets: PlanetaryInput[]; aspects?: AspectInput[] };
+    yetzirah: { planets: PlanetaryInput[]; aspects?: AspectInput[] };
+    beriyah: { planets: PlanetaryInput[]; aspects?: AspectInput[] };
+    atzilut: { planets: PlanetaryInput[]; aspects?: AspectInput[] };
+  },
+  hdChart?: HDChartInput | any
+): MultiWorldCosmicMatrixReport {
+  const assiah = synthesizeCosmicMatrix(charts.assiah.planets, charts.assiah.aspects || [], hdChart);
+  const yetzirah = synthesizeCosmicMatrix(charts.yetzirah.planets, charts.yetzirah.aspects || [], hdChart);
+  const beriyah = synthesizeCosmicMatrix(charts.beriyah.planets, charts.beriyah.aspects || [], hdChart);
+  const atzilut = synthesizeCosmicMatrix(charts.atzilut.planets, charts.atzilut.aspects || [], hdChart);
+
+  return {
+    activeWorld: 'assiah',
+    worlds: {
+      assiah,
+      yetzirah,
+      beriyah,
+      atzilut
+    },
+    fourWorldsBalance: assiah.fourWorldsBalance,
+    personalTalisman: assiah.personalTalisman,
+    coreLifeMission: assiah.coreLifeMission
   };
 }

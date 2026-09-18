@@ -18,10 +18,70 @@ import { AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 import { generateChart } from '@/utils/HumanDesignEngine';
 import { 
   synthesizeCosmicMatrix, 
+  synthesizeMultiWorldCosmicMatrix,
   CosmicMatrixReport, 
+  MultiWorldCosmicMatrixReport,
+  CosmicWorld,
   PlanetaryDynamicDiagnosis 
 } from '@/features/astrology/engine/CosmicMatrixEngine';
 import { getDruidTreeByDate } from '@/features/astrology/engine/DruidTreeEngine';
+
+const WORLDS_INFO: Array<{
+  id: CosmicWorld;
+  number: string;
+  name: string;
+  dimension: string;
+  tech: string;
+  badge: string;
+  icon: string;
+  desc: string;
+  activeBg: string;
+}> = [
+  {
+    id: 'assiah',
+    number: '1. Âlem',
+    name: 'Assiah (Beden)',
+    dimension: 'Fiziksel Eylem & Tezahür',
+    tech: 'Standart Tropikal Harita',
+    badge: 'Maddi Dünya & Eylemler',
+    icon: '🌍',
+    desc: 'Fiziksel bedeninizin dünyevi alışkanlıkları, somut eylem tarzınız ve dünyevi gezegen yerleşimleriniz.',
+    activeBg: 'bg-amber-400 text-black font-bold shadow-[0_0_20px_rgba(251,191,36,0.35)]'
+  },
+  {
+    id: 'yetzirah',
+    number: '2. Âlem',
+    name: 'Yetzirah (Ruh)',
+    dimension: 'Duygusal Şifa & Ruhsal Hafıza',
+    tech: 'Drakonik Harita',
+    badge: 'Ruhsal Hafıza & Düğümler',
+    icon: '🌙',
+    desc: 'Ruhunuzun derin bilinçaltı hafızası, geçmiş yaşam izleri ve kalbinizin gerçekte hangi enerjilerle şifalanmak istediği.',
+    activeBg: 'bg-sky-400 text-black font-bold shadow-[0_0_20px_rgba(56,189,248,0.35)]'
+  },
+  {
+    id: 'beriyah',
+    number: '3. Âlem',
+    name: 'Beriyah (Zihin)',
+    dimension: 'Bilge İrade & Yüksek Dharma',
+    tech: '9. Harmonik (Navamsa)',
+    badge: 'Yüksek Zihin & Hayat Amacı',
+    icon: '☀️',
+    desc: 'Yüksek akıl, hayat felsefeniz, kadersel yaşam gayeniz (Dharma) ve zihninizin kurguladığı büyük ilahi mimari.',
+    activeBg: 'bg-purple-400 text-black font-bold shadow-[0_0_20px_rgba(192,132,252,0.35)]'
+  },
+  {
+    id: 'atzilut',
+    number: '4. Âlem',
+    name: 'Atzilut (Kudret)',
+    dimension: 'Kozmik Birlik & Saf İrade',
+    tech: 'Güneş Merkezli (Heliosentrik)',
+    badge: 'Saf Bilinç & Birlik',
+    icon: '👑',
+    desc: 'Dünya egosundan arınmış, Güneş merkezli saf kozmik irade ve evrensel birliğe hizmet eden ilahi potansiyeliniz.',
+    activeBg: 'bg-emerald-400 text-black font-bold shadow-[0_0_20px_rgba(52,211,153,0.35)]'
+  }
+];
 
 const formatTurkishDate = (dStr: string) => {
   if (!dStr) return '';
@@ -73,11 +133,24 @@ export default function CosmicMatrixPage() {
   const [isPdfLoading, setIsPdfLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [report, setReport] = useState<CosmicMatrixReport | null>(null);
+  const [multiReport, setMultiReport] = useState<MultiWorldCosmicMatrixReport | null>(null);
+  const [selectedWorld, setSelectedWorld] = useState<CosmicWorld>('assiah');
   const [activeFilter, setActiveFilter] = useState<'all' | 'inward' | 'outward'>('all');
   const [selectedPlanet, setSelectedPlanet] = useState<PlanetaryDynamicDiagnosis | null>(null);
 
   const [bYear, bMonth, bDay] = (dateStr || '1990-01-01').split('-').map(Number);
   const druidTree = getDruidTreeByDate(bDay || 1, bMonth || 1);
+
+  const handleSelectWorld = (world: CosmicWorld) => {
+    setSelectedWorld(world);
+    if (multiReport) {
+      const wRep = multiReport.worlds[world];
+      setReport(wRep);
+      if (wRep.planetaryDynamics.length > 0) {
+        setSelectedPlanet(wRep.planetaryDynamics[0]);
+      }
+    }
+  };
 
   const handlePurchaseReport = () => {
     const query = new URLSearchParams({
@@ -103,6 +176,7 @@ export default function CosmicMatrixPage() {
     if (!report) return;
     try {
       setIsPdfLoading(true);
+      const activeWorldConfig = WORLDS_INFO.find(w => w.id === selectedWorld);
       await downloadCosmicMatrixPDF(
         report,
         druidTree || null,
@@ -112,7 +186,8 @@ export default function CosmicMatrixPage() {
           localTime: timeStr,
           cityName: city?.name || 'İstanbul',
           country: city?.country || 'Türkiye'
-        }
+        },
+        activeWorldConfig?.name ? `${activeWorldConfig.number} ${activeWorldConfig.name} (${activeWorldConfig.tech})` : undefined
       );
     } catch (err) {
       console.error('Kozmik Matris PDF indirme hatası:', err);
@@ -130,14 +205,15 @@ export default function CosmicMatrixPage() {
 
     setIsCalculating(true);
     try {
-      // 1. Astroloji Harita Hesaplaması
+      // 1. Astroloji Harita Hesaplaması (4 Âlem dahil)
       const astroRes = await fetch('/api/astrology/calculate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           localDate: dateStr,
           localTime: timeStr,
-          cityData: city
+          cityData: city,
+          calcAllWorlds: true
         })
       });
 
@@ -156,16 +232,33 @@ export default function CosmicMatrixPage() {
       }
       const hdChart = generateChart(m.toDate());
 
-      // 3. Kozmik Matris (4 Katman Sentezi)
-      const matrixReport = synthesizeCosmicMatrix(
-        astroJson.data.planets,
-        astroJson.data.aspects,
-        hdChart
-      );
-
-      setReport(matrixReport);
-      if (matrixReport.planetaryDynamics.length > 0) {
-        setSelectedPlanet(matrixReport.planetaryDynamics[0]);
+      // 3. Kozmik Matris (4 Âlem Sentezi)
+      if (astroJson.data.assiah && astroJson.data.yetzirah) {
+        const fullMulti = synthesizeMultiWorldCosmicMatrix(
+          {
+            assiah: astroJson.data.assiah,
+            yetzirah: astroJson.data.yetzirah,
+            beriyah: astroJson.data.beriyah,
+            atzilut: astroJson.data.atzilut
+          },
+          hdChart
+        );
+        setMultiReport(fullMulti);
+        const cur = fullMulti.worlds[selectedWorld];
+        setReport(cur);
+        if (cur.planetaryDynamics.length > 0) {
+          setSelectedPlanet(cur.planetaryDynamics[0]);
+        }
+      } else {
+        const singleReport = synthesizeCosmicMatrix(
+          astroJson.data.planets,
+          astroJson.data.aspects,
+          hdChart
+        );
+        setReport(singleReport);
+        if (singleReport.planetaryDynamics.length > 0) {
+          setSelectedPlanet(singleReport.planetaryDynamics[0]);
+        }
       }
     } catch (err: any) {
       console.error(err);
@@ -578,6 +671,83 @@ export default function CosmicMatrixPage() {
               </div>
             </div>
 
+            {/* 4 Âlem Bilinç Katmanı Seçicisi */}
+            <div className="bg-gradient-to-r from-amber-950/20 via-black/50 to-purple-950/20 border border-amber-500/25 rounded-3xl p-6 sm:p-8 space-y-6 backdrop-blur-md shadow-2xl">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-white/10">
+                <div>
+                  <span className="text-xs font-bold uppercase tracking-widest text-amber-400 block mb-1 flex items-center gap-1.5">
+                    <Layers size={15} className="text-amber-400" /> Kabalistik 4 Âlem Bilinç Katmanı Teşhisi
+                  </span>
+                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-white">
+                    Hangi Âleminizin Frekansını İnceliyorsunuz?
+                  </h3>
+                  <p className="text-xs text-gray-400 mt-1 max-w-2xl leading-relaxed">
+                    13 Gezegen enerjiniz sabit ve tek boyutlu değildir. Bedeninizde (Assiah), ruhunuzda (Yetzirah), zihninizde (Beriyah) veya saf özünüzde (Atzilut) hangi potansiyeli aktive ettiğinizi aşağıdan seçerek 13 gezegeninizin o katmandaki yerleşimlerini ve reçetelerini inceleyebilirsiniz:
+                  </p>
+                </div>
+              </div>
+
+              {/* 4 Katman Kart Butonları */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                {WORLDS_INFO.map((w) => {
+                  const isSelected = selectedWorld === w.id;
+                  return (
+                    <button
+                      key={w.id}
+                      type="button"
+                      onClick={() => handleSelectWorld(w.id)}
+                      className={`text-left p-4 rounded-2xl border transition-all relative overflow-hidden flex flex-col justify-between gap-3 group ${
+                        isSelected 
+                          ? `${w.activeBg} scale-[1.02]` 
+                          : 'bg-black/40 border-white/10 text-gray-300 hover:bg-white/5 hover:border-white/20'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <span className="text-2xl">{w.icon}</span>
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${
+                          isSelected ? 'bg-black/20 border-black/30 text-black' : 'bg-white/5 border-white/10 text-gray-400'
+                        }`}>
+                          {w.tech}
+                        </span>
+                      </div>
+                      <div>
+                        <span className={`text-[10px] font-bold uppercase tracking-wider block ${
+                          isSelected ? 'text-black/80' : 'text-amber-400'
+                        }`}>
+                          {w.number}
+                        </span>
+                        <h4 className={`text-base font-bold leading-tight ${isSelected ? 'text-black' : 'text-white'}`}>
+                          {w.name}
+                        </h4>
+                        <p className={`text-xs mt-1 line-clamp-1 ${isSelected ? 'text-black/90 font-medium' : 'text-gray-400'}`}>
+                          {w.dimension}
+                        </p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Aktif Katman Ezoterik Rehber Notu */}
+              {(() => {
+                const curW = WORLDS_INFO.find(w => w.id === selectedWorld) || WORLDS_INFO[0];
+                return (
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-4 flex items-start gap-3 text-xs text-gray-300">
+                    <div className="text-2xl shrink-0 mt-0.5">{curW.icon}</div>
+                    <div className="space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="font-bold text-white text-sm">{curW.name} Frekansı Aktif:</span>
+                        <span className="text-amber-300 font-semibold">[{curW.tech} • {curW.dimension}]</span>
+                      </div>
+                      <p className="text-gray-300 leading-relaxed">
+                        {curW.desc} Aşağıdaki 13 gezegen teşhisi, burç yerleşimleri, enerji akış yönelimleri (İçe/Dışa) ve dengeleyici bitkisel buhur reçeteleri doğrudan <strong>{curW.name}</strong> katmanına göre güncellenmiştir.
+                      </p>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+
             {/* 4. 13 Gezegen Enerji Çalışma Dinamikleri (İçe vs Dışa) */}
             <div className="space-y-6">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -585,9 +755,12 @@ export default function CosmicMatrixPage() {
                   <h2 className="text-xl sm:text-2xl font-serif font-bold text-white flex items-center gap-2">
                     <CompassIcon size={22} className="text-amber-400" />
                     13 Gezegenin Enerji Çalışma Dinamikleri
+                    <span className="text-sm font-sans font-normal text-amber-300/90 ml-2 px-2.5 py-0.5 rounded-full bg-amber-400/10 border border-amber-400/20">
+                      {WORLDS_INFO.find(w => w.id === selectedWorld)?.name || 'Assiah'}
+                    </span>
                   </h2>
                   <p className="text-xs text-gray-400 mt-1">
-                    Ahlaki etiketler olmadan, enerjinizin içe mi (Yin) yoksa dışa mı (Yang) aktığının somut teşhisi:
+                    Seçilen bilinç katmanında ({WORLDS_INFO.find(w => w.id === selectedWorld)?.tech || 'Tropikal'}), enerjinizin içe mi (Yin) yoksa dışa mı (Yang) aktığının somut teşhisi:
                   </p>
                 </div>
 

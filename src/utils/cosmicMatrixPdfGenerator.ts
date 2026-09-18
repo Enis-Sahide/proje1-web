@@ -78,7 +78,8 @@ export const downloadCosmicMatrixPDF = async (
     localTime: string;
     cityName: string;
     country?: string;
-  }
+  },
+  activeWorldTitle: string = '1. Assiah Âlemi (Fiziksel Beden & Eylem)'
 ) => {
   const doc = new jsPDF();
 
@@ -181,7 +182,7 @@ export const downloadCosmicMatrixPDF = async (
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(11);
   doc.setTextColor(...white);
-  doc.text('4 Katmanlı Kozmik Çözümleme & 13 Gezegen Dinamik Teşhisi', 105, curY, { align: 'center' });
+  doc.text(`4 Katmanlı Kozmik Çözümleme • ${activeWorldTitle}`, 105, curY, { align: 'center' });
 
   // Künye Kartı
   curY += 8;
@@ -376,7 +377,7 @@ export const downloadCosmicMatrixPDF = async (
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(14);
   doc.setTextColor(...gold);
-  doc.text('13 Gezegen Dinamik Teşhisi & Bitkisel Frekans Reçeteleri', 15, curY);
+  doc.text(`13 Gezegen Dinamik Teşhisi (${activeWorldTitle})`, 15, curY);
 
   curY += 3;
   doc.setDrawColor(...gold);
