@@ -3,6 +3,7 @@ import { elderFuthark2 } from '@/data/runes/elderFuthark2';
 import { elderFuthark3 } from '@/data/runes/elderFuthark3';
 import { runeBindingsData } from '@/data/runes/bindings';
 import { GATE_TITLES, GATE_TO_CENTER, LINE_BEHAVIOR_PROFILES } from './AstroHumanDesignSynthesis';
+import { getGateAndLine } from '@/utils/HumanDesignEngine';
 
 export const ALL_RUNES = [...elderFuthark1, ...elderFuthark2, ...elderFuthark3];
 
@@ -578,6 +579,25 @@ export function normalizePlanetKey(name: string): string {
   return name;
 }
 
+const ZODIAC_SIGNS_ORDER = [
+  'aries', 'taurus', 'gemini', 'cancer', 'leo', 'virgo',
+  'libra', 'scorpio', 'sagittarius', 'capricorn', 'aquarius', 'pisces'
+];
+const ZODIAC_SIGNS_ORDER_TR = [
+  'koç', 'boğa', 'ikizler', 'yengeç', 'aslan', 'başak',
+  'terazi', 'akrep', 'yay', 'oğlak', 'kova', 'balık'
+];
+
+function getLongitudeFromSignAndDegree(sign: string, degree: number): number {
+  const s = (sign || '').toLowerCase().trim();
+  let signIndex = ZODIAC_SIGNS_ORDER.findIndex(z => s.includes(z));
+  if (signIndex === -1) {
+    signIndex = ZODIAC_SIGNS_ORDER_TR.findIndex(z => s.includes(z));
+  }
+  if (signIndex === -1) signIndex = 0;
+  return ((signIndex * 30) + (degree || 0)) % 360;
+}
+
 export function synthesizeCosmicMatrix(
   astroPlanets: PlanetaryInput[],
   astroAspects: AspectInput[],
@@ -626,11 +646,22 @@ export function synthesizeCosmicMatrix(
     else if (p.house === 12) assignedWorld = 'Atzilut';
     worldCounts[assignedWorld] = (worldCounts[assignedWorld] || 0) + 1;
 
-    // Human Design Eşleşmesi (Doğru İngilizce normKey ile arama)
+    // Human Design Eşleşmesi (Doğru İngilizce normKey ile arama veya boylamdan kesin astronomik hesap)
     const hdCon = hdChart.conscious.find((c) => c.planet === normKey);
     const hdUnc = hdChart.unconscious.find((u) => u.planet === normKey);
-    const activeGate = hdCon?.gate || hdUnc?.gate || (Math.floor(Math.random() * 64) + 1);
-    const activeLine = hdCon?.line || hdUnc?.line || 3;
+    
+    let activeGate = hdCon?.gate || hdUnc?.gate;
+    let activeLine = hdCon?.line || hdUnc?.line;
+
+    if (!activeGate || !activeLine) {
+      const planetLon = (p.longitude !== undefined && p.longitude !== null && !isNaN(p.longitude))
+        ? p.longitude
+        : getLongitudeFromSignAndDegree(p.sign, p.degree);
+      const calculated = getGateAndLine(planetLon);
+      if (!activeGate) activeGate = calculated.gate;
+      if (!activeLine) activeLine = calculated.line;
+    }
+
     const gateInfo = GATE_TITLES[activeGate] || {
       title: 'Kozmik Kapı',
       gift: 'Denge ve Farkındalık',
