@@ -276,146 +276,289 @@ export function calculateCosmicOrigin(natalChart: NatalChartData): CosmicOriginR
   };
 }
 
+const SIGN_TO_RULERS: Record<ZodiacSign, string[]> = {
+  'Koç': ['Mars'],
+  'Boğa': ['Venüs'],
+  'İkizler': ['Merkür'],
+  'Yengeç': ['Ay'],
+  'Aslan': ['Güneş'],
+  'Başak': ['Merkür'],
+  'Terazi': ['Venüs'],
+  'Akrep': ['Plüton', 'Mars'],
+  'Yay': ['Jüpiter'],
+  'Oğlak': ['Satürn'],
+  'Kova': ['Uranüs', 'Satürn'],
+  'Balık': ['Neptün', 'Jüpiter']
+};
+
+interface HistoricalEraDef {
+  id: string;
+  result: HistoricalEraResult;
+  primarySigns: ZodiacSign[];
+  secondarySigns: ZodiacSign[];
+  primaryHouses: number[];
+  secondaryHouses: number[];
+  rulerPlanets: string[];
+  bonusPlanet?: { name: string; house: number };
+}
+
 /**
  * 2. Tarihsel Zaman Tüneli & Geçmiş Yaşam Dünya Çağı
- * GAD Burcu, Evi, Yöneticisi ve Plüton/Satürn konumlarından sentezlenir.
+ * GAD Burcu, Evi, Yöneticisi, 12. Ev ve Gezegen dinamiklerinden çok faktörlü astrolojik puanlamayla sentezlenir.
  */
 export function calculateHistoricalEra(
   natalChart: NatalChartData,
   gadSign: ZodiacSign,
   gadHouse: number
 ): HistoricalEraResult {
-  const pluto = natalChart.planets.find(p => p.name === 'Plüton');
-  const saturn = natalChart.planets.find(p => p.name === 'Satürn');
-  const mars = natalChart.planets.find(p => p.name === 'Mars');
+  const gadRulers = SIGN_TO_RULERS[gadSign] || ['Mars'];
+  const h12Sign = natalChart.houses && natalChart.houses.length >= 12 ? natalChart.houses[11]?.sign : null;
 
-  // GAD Burç ve Ev kombinasyonuna göre 12 ana tarihsel çağ haritası
-  if (['Akrep', 'Başak'].includes(gadSign) || gadHouse === 8 || (pluto && pluto.house === 8)) {
-    return {
-      eraName: 'Geç Orta Çağ, Büyük Veba & Engizisyon Dönemi',
-      timeSpan: 'M.S. 1340 – 1490 civarı',
-      century: '14. - 15. Yüzyıl',
-      archetypeRole: 'Bitki Şifacısı, Lonca Hekimi, Manastır Ebesi veya Gizli Bilgi Koruyucusu',
-      geographyCulture: 'Orta ve Batı Avrupa (İngiltere, Fransa, Ren Vadisi veya İberya)',
-      atmosphere: 'Kara Veba salgınının yarattığı kitlesel kayıplar, kilisenin sert denetimi ve cadı avlarının gölgesinde hayatta kalma mücadelesi.',
-      karmicImprint: 'İftiraya uğrama ve yeteneklerini gizleme korkusu; aşırı hijyen/sağlık anksiyetesi ve derin bir hayatta kalma refleksi.',
-      soulMemoryKey: 'Geçmişte insanlara şifa verirken cezalandırıldığınız için bu yaşamda ruhsal gücünüzü ortaya koymaktan çekinebilirsiniz.'
-    };
+  const planetHouseMap: Record<string, number> = {};
+  if (natalChart.planets) {
+    natalChart.planets.forEach(p => {
+      planetHouseMap[p.name] = p.house;
+    });
   }
 
-  if (['Terazi', 'Boğa', 'İkizler'].includes(gadSign) && [5, 7, 3].includes(gadHouse)) {
-    return {
-      eraName: 'Rönesans & Büyük Aydınlanma Çağı',
-      timeSpan: 'M.S. 1500 – 1650 civarı',
-      century: '16. - 17. Yüzyıl',
-      archetypeRole: 'Rönesans Ressamı/Heykeltıraşı, Hümanist Düşünür, Matbaacı veya İtalyan Tüccarı',
-      geographyCulture: 'İtalya (Floransa, Venedik), Flandre veya Erken Aydınlanma Avrupası',
-      atmosphere: 'Sanatın, anatomik ve coğrafi keşiflerin, klasik antik bilgeliğin yeniden doğduğu büyüleyici estetik uyanış.',
-      karmicImprint: 'Estetik mükemmeliyetçilik, zarafet tutkusu ve kaba ortamlara karşı derin tahammülsüzlük.',
-      soulMemoryKey: 'Eserleriniz veya fikirlerinizle dünyayı güzelleştirdiniz; bu hayatta da estetik ve adaleti ruhunuzun gıdası sayarsınız.'
-    };
-  }
+  const ERAS: HistoricalEraDef[] = [
+    {
+      id: 'veba',
+      primarySigns: ['Akrep'],
+      secondarySigns: ['Başak', 'Balık'],
+      primaryHouses: [8],
+      secondaryHouses: [6, 12],
+      rulerPlanets: ['Plüton', 'Mars'],
+      bonusPlanet: { name: 'Plüton', house: 8 },
+      result: {
+        eraName: 'Geç Orta Çağ, Büyük Veba & Engizisyon Dönemi',
+        timeSpan: 'M.S. 1340 – 1490 civarı',
+        century: '14. - 15. Yüzyıl',
+        archetypeRole: 'Bitki Şifacısı, Lonca Hekimi, Manastır Ebesi veya Gizli Bilgi Koruyucusu',
+        geographyCulture: 'Orta ve Batı Avrupa (İngiltere, Fransa, Ren Vadisi veya İberya)',
+        atmosphere: 'Kara Veba salgınının yarattığı kitlesel kayıplar, kilisenin sert denetimi ve cadı avlarının gölgesinde hayatta kalma mücadelesi.',
+        karmicImprint: 'İftiraya uğrama ve yeteneklerini gizleme korkusu; aşırı hijyen/sağlık anksiyetesi ve derin bir hayatta kalma refleksi.',
+        soulMemoryKey: 'Geçmişte insanlara şifa verirken cezalandırıldığınız için bu yaşamda ruhsal gücünüzü ortaya koymaktan çekinebilirsiniz.'
+      }
+    },
+    {
+      id: 'ronesans',
+      primarySigns: ['Terazi'],
+      secondarySigns: ['Boğa', 'İkizler'],
+      primaryHouses: [5, 7],
+      secondaryHouses: [3, 11],
+      rulerPlanets: ['Venüs', 'Merkür'],
+      bonusPlanet: { name: 'Venüs', house: 5 },
+      result: {
+        eraName: 'Rönesans & Büyük Aydınlanma Çağı',
+        timeSpan: 'M.S. 1500 – 1650 civarı',
+        century: '16. - 17. Yüzyıl',
+        archetypeRole: 'Rönesans Ressamı/Heykeltıraşı, Hümanist Düşünür, Matbaacı veya İtalyan Tüccarı',
+        geographyCulture: 'İtalya (Floransa, Venedik), Flandre veya Erken Aydınlanma Avrupası',
+        atmosphere: 'Sanatın, anatomik ve coğrafi keşiflerin, klasik antik bilgeliğin yeniden doğduğu büyüleyici estetik uyanış.',
+        karmicImprint: 'Estetik mükemmeliyetçilik, zarafet tutkusu ve kaba ortamlara karşı derin tahammülsüzlük.',
+        soulMemoryKey: 'Eserleriniz veya fikirlerinizle dünyayı güzelleştirdiniz; bu hayatta da estetik ve adaleti ruhunuzun gıdası sayarsınız.'
+      }
+    },
+    {
+      id: 'roma',
+      primarySigns: ['Koç'],
+      secondarySigns: ['Oğlak', 'Aslan'],
+      primaryHouses: [10],
+      secondaryHouses: [1, 6],
+      rulerPlanets: ['Mars', 'Satürn'],
+      bonusPlanet: { name: 'Mars', house: 10 },
+      result: {
+        eraName: 'Antik Roma İmparatorluğu & Lejyonlar Çağı',
+        timeSpan: 'M.Ö. 100 – M.S. 330 civarı',
+        century: 'M.Ö. 1. yy - M.S. 4. yy',
+        archetypeRole: 'Roma Lejyon Komutanı, Senatör, Taş/Yol Mimarı veya Hukukçu',
+        geographyCulture: 'Akdeniz Havzası, İtalya, Galya veya Küçük Asya (Anadolu Roma Eyaletleri)',
+        atmosphere: 'Demir disiplin, imparatorluk inşası, askeri nizam ve hukukun katı kurallarıyla örülü bir fetih dünyası.',
+        karmicImprint: 'Görev bilinci uğruna duyguları bastırma, ihanete uğrama ihtiyatı ve her durumu askeri bir strateji gibi yönetme eğilimi.',
+        soulMemoryKey: 'Büyük sorumluluklar ve otorite taşıdınız; bu yaşamda yumuşamayı, teslimiyeti ve kalbinizi açmayı öğreniyorsunuz.'
+      }
+    },
+    {
+      id: 'misir',
+      primarySigns: ['Aslan'],
+      secondarySigns: ['Boğa', 'Akrep'],
+      primaryHouses: [9],
+      secondaryHouses: [1, 5, 8],
+      rulerPlanets: ['Güneş', 'Plüton'],
+      bonusPlanet: { name: 'Güneş', house: 9 },
+      result: {
+        eraName: 'Antik Mısır & Nil Tapınakları Çağı',
+        timeSpan: 'M.Ö. 2000 – 1200 civarı',
+        century: 'M.Ö. 2. Binyıl',
+        archetypeRole: 'Güneş Tapınağı İnisiyesi, Astronom Rahip/Rahibe, Kutsal Geometri Mimarı veya Hanedan Mensubu',
+        geographyCulture: 'Nil Deltası, Thebes, Memphis veya Heliopolis',
+        atmosphere: 'Sirius ve Güneş kültü, mumyalama ve ölüm ötesi bilgeliği, piramitlerin ve hiyerogliflerin kutsal ritüelleri.',
+        karmicImprint: 'Doğal bir asalet, sıradanlığa tahammülsüzlük, ezoterik sembollere ve ritüellere karşı çocukluktan gelen aşinalık.',
+        soulMemoryKey: 'Kutsal bilgiye ve yüksek statüye sahiptiniz; bu enkarnasyonda gücünüzü kibirsizce, sevgiyle dünyevi yaşama entegre etmeniz bekleniyor.'
+      }
+    },
+    {
+      id: 'yunan',
+      primarySigns: ['İkizler'],
+      secondarySigns: ['Yay', 'Kova'],
+      primaryHouses: [9, 3],
+      secondaryHouses: [11],
+      rulerPlanets: ['Merkür', 'Jüpiter'],
+      bonusPlanet: { name: 'Merkür', house: 9 },
+      result: {
+        eraName: 'Antik Yunan, İskenderiye & Felsefe Çağı',
+        timeSpan: 'M.Ö. 450 – M.Ö. 150 civarı',
+        century: 'M.Ö. 5. - 2. Yüzyıl',
+        archetypeRole: 'Akademi Filozofu, İskenderiye Kütüphanecisi, Gezgin Hekim veya Matematikçi',
+        geographyCulture: 'Atina, İskenderiye (Mısır), Efes veya Miletos',
+        atmosphere: 'Felsefi münazaralar, tiyatro, geometri, hakikat arayışı ve antik parşömenlerin altın çağı.',
+        karmicImprint: 'Dogmalara ve kör inançlara karşı alerji, durmaksızın gerçeği sorgulama ve entelektüel özgürlük tutkusu.',
+        soulMemoryKey: 'Fikirleriniz döneminizin çok ötesindeydi; bu yaşamda da anlaşılmama korkusu yaşamadan bildiğiniz hakikati anlatmalısınız.'
+      }
+    },
+    {
+      id: 'manastir',
+      primarySigns: ['Balık'],
+      secondarySigns: ['Yengeç', 'Başak'],
+      primaryHouses: [12],
+      secondaryHouses: [4, 6],
+      rulerPlanets: ['Neptün', 'Ay'],
+      bonusPlanet: { name: 'Neptün', house: 12 },
+      result: {
+        eraName: 'Erken Orta Çağ & Manastır / İnziva Dönemi',
+        timeSpan: 'M.S. 500 – 950 civarı',
+        century: '6. - 10. Yüzyıl',
+        archetypeRole: 'Manastır Şifacısı, Münzevi İnzivacı, Kutsal Metin Kâtibi veya Yetimhane Koruyucusu',
+        geographyCulture: 'İrlanda, İskoçya Yaylaları, Kapadokya veya Bizans Kırsalı',
+        atmosphere: 'Sessizlik yeminleri, dünyevi gürültüden el etek çekme, dualar ve ruhsal adanmışlıkla geçen derin bir yalnızlık.',
+        karmicImprint: 'Kalabalıklardan çabuk yorulma, dünyayı fazla hoyrat bulma ve kendi ihtiyaçlarını başkaları için feda etme refleksi.',
+        soulMemoryKey: 'Ruhunuz geçmişte uzun süre sessizlikte kaldı; bu yaşamda dünyadan kaçmak yerine dünyanın içinde ışığınızı parlatmalısınız.'
+      }
+    },
+    {
+      id: 'hacli',
+      primarySigns: ['Yay'],
+      secondarySigns: ['Koç'],
+      primaryHouses: [9],
+      secondaryHouses: [8, 1],
+      rulerPlanets: ['Mars', 'Jüpiter'],
+      bonusPlanet: { name: 'Mars', house: 9 },
+      result: {
+        eraName: 'Feodal Dönem & Haçlı Seferleri Çağı',
+        timeSpan: 'M.S. 1095 – 1290 civarı',
+        century: '11. - 13. Yüzyıl',
+        archetypeRole: 'Şövalye, Kale Muhafızı, Kutsal Toprak Yolcusu veya Feodal Baron',
+        geographyCulture: 'Levant (Kudüs, Antakya), Güney Fransa veya Doğu Akdeniz',
+        atmosphere: 'İnanç uğruna at sırtında yapılan aylar süren yolculuklar, kale kuşatmaları ve kutsal emanet savaşları.',
+        karmicImprint: 'Büyük idealler uğruna her şeyi terk edebilme cesareti, ancak savaşın masumiyet üzerindeki tahribatından kalan gizli hüzün.',
+        soulMemoryKey: 'İnandığınız değerler için savaştınız; bu yaşamda savaşınız dış dünyayla değil, kendi içsel barışınızladır.'
+      }
+    },
+    {
+      id: 'osmanli',
+      primarySigns: ['Boğa'],
+      secondarySigns: ['Yay', 'Yengeç'],
+      primaryHouses: [2],
+      secondaryHouses: [9, 7],
+      rulerPlanets: ['Jüpiter', 'Venüs'],
+      bonusPlanet: { name: 'Jüpiter', house: 2 },
+      result: {
+        eraName: 'Osmanlı & İpek Yolu Doğu Medeniyetleri',
+        timeSpan: 'M.S. 1450 – 1750 civarı',
+        century: '15. - 18. Yüzyıl',
+        archetypeRole: 'İpek Yolu Kervan Tüccarı, Medrese Müderrisi, Dergâh Dervişi veya Saray Hekimi',
+        geographyCulture: 'İstanbul, Semerkand, İsfahan, Şam veya Tebriz',
+        atmosphere: 'Kervansaraylar, baharat pazarları, tasavvuf meclisleri, kubbe mimarisi ve Doğu ile Batı arasındaki köprü.',
+        karmicImprint: 'Misafirperverlik, derin tevekkül, yolculuk tutkusu ve ticarette adalet hassasiyeti.',
+        soulMemoryKey: 'Geniş coğrafyaları birbirine bağladınız; bu yaşamda da farklı kültürleri ve insanları kaynaştıran bilge bir köprüsünüz.'
+      }
+    },
+    {
+      id: 'sanayi',
+      primarySigns: ['Oğlak'],
+      secondarySigns: ['Kova', 'Başak'],
+      primaryHouses: [6, 10],
+      secondaryHouses: [11],
+      rulerPlanets: ['Satürn', 'Uranüs'],
+      bonusPlanet: { name: 'Satürn', house: 6 },
+      result: {
+        eraName: 'Sanayi Devrimi & Viktorya Dönemi',
+        timeSpan: 'M.S. 1780 – 1900 civarı',
+        century: '18. - 19. Yüzyıl',
+        archetypeRole: 'Fabrika Mühendisi, Lokomotif Tasarımcısı, Emekçi Savunucusu veya Katı Bürokrasi Yöneticisi',
+        geographyCulture: 'İngiltere (Manchester, Londra), Ruhr Vadisi (Almanya) veya New England (Amerika)',
+        atmosphere: 'Kömür dumanları, buhar makineleri, fabrika çarkları, saat disiplini ve sınıfsal dönüşüm mücadeleleri.',
+        karmicImprint: 'Sürekli üretme ve çalışma baskısı, dinlenirken içsel suçluluk duyma ve duyguları mantığa kurban etme korkusu.',
+        soulMemoryKey: 'Makineler ve sistemler inşa ettiniz; bu hayatta ruhunuzun da beslenmeye ve dinlenmeye hakkı olduğunu hatırlamalısınız.'
+      }
+    },
+    {
+      id: 'samanik',
+      primarySigns: ['Yengeç'],
+      secondarySigns: ['Boğa', 'Balık', 'Akrep'],
+      primaryHouses: [4],
+      secondaryHouses: [12, 8],
+      rulerPlanets: ['Ay', 'Neptün'],
+      bonusPlanet: { name: 'Ay', house: 4 },
+      result: {
+        eraName: 'Kadim Doğa & Şamanik Kabile Döngüsü',
+        timeSpan: 'Tarih Ötesi / Kadim Zamanlar',
+        century: 'Kadim Döngü',
+        archetypeRole: 'Kabile Şamanı, Ateş Koruyucusu, Bitki Bilgesi veya Avcı Rehber',
+        geographyCulture: 'Kuzey Avrasya Bozkırları, Mezopotamya Yaylaları veya Yerli Amerikan Ormanları',
+        atmosphere: 'Şehirlerden uzak; yıldızların, rüzgârın, kurtların ve doğa ruhlarının diliyle nefes alınan saf kabile yaşamı.',
+        karmicImprint: 'Modern betonarme binalara ve yapay düzene derin bir yabancılık; orman, toprak ve gökyüzü hasreti.',
+        soulMemoryKey: 'Doğanın saf zekasıyla yaşadınız; bu hayatta da toprağa dokunduğunuzda ve iç sesinizi dinlediğinizde anında şifalanırsınız.'
+      }
+    }
+  ];
 
-  if (['Koç', 'Oğlak'].includes(gadSign) || gadHouse === 10 || (mars && mars.house === 10)) {
-    return {
-      eraName: 'Antik Roma İmparatorluğu & Lejyonlar Çağı',
-      timeSpan: 'M.Ö. 100 – M.S. 330 civarı',
-      century: 'M.Ö. 1. yy - M.S. 4. yy',
-      archetypeRole: 'Roma Lejyon Komutanı, Senatör, Taş/Yol Mimarı veya Hukukçu',
-      geographyCulture: 'Akdeniz Havzası, İtalya, Galya veya Küçük Asya (Anadolu Roma Eyaletleri)',
-      atmosphere: 'Demir disiplin, imparatorluk inşası, askeri nizam ve hukukun katı kurallarıyla örülü bir fetih dünyası.',
-      karmicImprint: 'Görev bilinci uğruna duyguları bastırma, ihanete uğrama ihtiyatı ve her durumu askeri bir strateji gibi yönetme eğilimi.',
-      soulMemoryKey: 'Büyük sorumluluklar ve otorite taşıdınız; bu yaşamda yumuşamayı, teslimiyeti ve kalbinizi açmayı öğreniyorsunuz.'
-    };
-  }
+  let bestEra = ERAS[0];
+  let maxScore = -1;
 
-  if (['Aslan', 'Boğa'].includes(gadSign) && [5, 9, 1].includes(gadHouse)) {
-    return {
-      eraName: 'Antik Mısır & Nil Tapınakları Çağı',
-      timeSpan: 'M.Ö. 2000 – 1200 civarı',
-      century: 'M.Ö. 2. Binyıl',
-      archetypeRole: 'Güneş Tapınağı İnisiyesi, Astronom Rahip/Rahibe, Kutsal Geometri Mimarı veya Hanedan Mensubu',
-      geographyCulture: 'Nil Deltası, Thebes, Memphis veya Heliopolis',
-      atmosphere: 'Sirius ve Güneş kültü, mumyalama ve ölüm ötesi bilgeliği, piramitlerin ve hiyerogliflerin kutsal ritüelleri.',
-      karmicImprint: 'Doğal bir asalet, sıradanlığa tahammülsüzlük, ezoterik sembollere ve ritüellere karşı çocukluktan gelen aşinalık.',
-      soulMemoryKey: 'Kutsal bilgiye ve yüksek statüye sahiptiniz; bu enkarnasyonda gücünüzü kibirsizce, sevgiyle dünyevi yaşama entegre etmeniz bekleniyor.'
-    };
-  }
+  ERAS.forEach((era, eIdx) => {
+    let score = 0;
 
-  if (['Yay', 'İkizler'].includes(gadSign) && [9, 3].includes(gadHouse)) {
-    return {
-      eraName: 'Antik Yunan, İskenderiye & Felsefe Çağı',
-      timeSpan: 'M.Ö. 450 – M.Ö. 150 civarı',
-      century: 'M.Ö. 5. - 2. Yüzyıl',
-      archetypeRole: 'Akademi Filozofu, İskenderiye Kütüphanecisi, Gezgin Hekim veya Matematikçi',
-      geographyCulture: 'Atina, İskenderiye (Mısır), Efes veya Miletos',
-      atmosphere: 'Felsefi münazaralar, tiyatro, geometri, hakikat arayışı ve antik parşömenlerin altın çağı.',
-      karmicImprint: 'Dogmalara ve kör inançlara karşı alerji, durmaksızın gerçeği sorgulama ve entelektüel özgürlük tutkusu.',
-      soulMemoryKey: 'Fikirleriniz döneminizin çok ötesindeydi; bu yaşamda da anlaşılmama korkusu yaşamadan bildiğiniz hakikati anlatmalısınız.'
-    };
-  }
+    // 1. GAD Burcu uyumu (Temel Arketip: 4 / 2 puan)
+    if (era.primarySigns.includes(gadSign)) {
+      score += 4.0;
+    } else if (era.secondarySigns.includes(gadSign)) {
+      score += 2.0;
+    }
 
-  if (['Balık', 'Yengeç'].includes(gadSign) && [12, 4].includes(gadHouse)) {
-    return {
-      eraName: 'Erken Orta Çağ & Manastır / İnziva Dönemi',
-      timeSpan: 'M.S. 500 – 950 civarı',
-      century: '6. - 10. Yüzyıl',
-      archetypeRole: 'Manastır Şifacısı, Münzevi İnzivacı, Kutsal Metin Kâtibi veya Yetimhane Koruyucusu',
-      geographyCulture: 'İrlanda, İskoçya Yaylaları, Kapadokya veya Bizans Kırsalı',
-      atmosphere: 'Sessizlik yeminleri, dünyevi gürültüden el etek çekme, dualar ve ruhsal adanmışlıkla geçen derin bir yalnızlık.',
-      karmicImprint: 'Kalabalıklardan çabuk yorulma, dünyayı fazla hoyrat bulma ve kendi ihtiyaçlarını başkaları için feda etme refleksi.',
-      soulMemoryKey: 'Ruhunuz geçmişte uzun süre sessizlikte kaldı; bu yaşamda dünyadan kaçmak yerine dünyanın içinde ışığınızı parlatmalısınız.'
-    };
-  }
+    // 2. GAD Evi uyumu (Deneyim Alanı: 3 / 1.5 puan)
+    if (era.primaryHouses.includes(gadHouse)) {
+      score += 3.0;
+    } else if (era.secondaryHouses.includes(gadHouse)) {
+      score += 1.5;
+    }
 
-  if (['Yay', 'Koç'].includes(gadSign) && [8, 9].includes(gadHouse)) {
-    return {
-      eraName: 'Feodal Dönem & Haçlı Seferleri Çağı',
-      timeSpan: 'M.S. 1095 – 1290 civarı',
-      century: '11. - 13. Yüzyıl',
-      archetypeRole: 'Şövalye, Kale Muhafızı, Kutsal Toprak Yolcusu veya Feodal Baron',
-      geographyCulture: 'Levant (Kudüs, Antakya), Güney Fransa veya Doğu Akdeniz',
-      atmosphere: 'İnanç uğruna at sırtında yapılan aylar süren yolculuklar, kale kuşatmaları ve kutsal emanet savaşları.',
-      karmicImprint: 'Büyük idealler uğruna her şeyi terk edebilme cesareti, ancak savaşın masumiyet üzerindeki tahribatından kalan gizli hüzün.',
-      soulMemoryKey: 'İnandığınız değerler için savaştınız; bu yaşamda savaşınız dış dünyayla değil, kendi içsel barışınızladır.'
-    };
-  }
+    // 3. GAD Yöneticisi Gezegen uyumu (Karmik Cetvel: 2.5 puan)
+    if (gadRulers.some((r: string) => era.rulerPlanets.includes(r))) {
+      score += 2.5;
+    }
 
-  if (['Yay', 'Boğa', 'Aslan'].includes(gadSign) && [2, 9].includes(gadHouse)) {
-    return {
-      eraName: 'Osmanlı & İpek Yolu Doğu Medeniyetleri',
-      timeSpan: 'M.S. 1450 – 1750 civarı',
-      century: '15. - 18. Yüzyıl',
-      archetypeRole: 'İpek Yolu Kervan Tüccarı, Medrese Müderrisi, Dergâh Dervişi veya Saray Hekimi',
-      geographyCulture: 'İstanbul, Semerkand, İsfahan, Şam veya Tebriz',
-      atmosphere: 'Kervansaraylar, baharat pazarları, tasavvuf meclisleri, kubbe mimarisi ve Doğu ile Batı arasındaki köprü.',
-      karmicImprint: 'Misafirperverlik, derin tevekkül, yolculuk tutkusu ve ticarette adalet hassasiyeti.',
-      soulMemoryKey: 'Geniş coğrafyaları birbirine bağladınız; bu yaşamda da farklı kültürleri ve insanları kaynaştıran bilge bir köprüsünüz.'
-    };
-  }
+    // 4. 12. Ev (Son Nefes / Bilinçaltı) uyumu (1.5 / 0.8 puan)
+    if (h12Sign) {
+      if (era.primarySigns.includes(h12Sign)) score += 1.5;
+      else if (era.secondarySigns.includes(h12Sign)) score += 0.8;
+    }
 
-  if (['Oğlak', 'Kova', 'Başak'].includes(gadSign) && [6, 10, 11].includes(gadHouse)) {
-    return {
-      eraName: 'Sanayi Devrimi & Viktorya Dönemi',
-      timeSpan: 'M.S. 1780 – 1900 civarı',
-      century: '18. - 19. Yüzyıl',
-      archetypeRole: 'Fabrika Mühendisi, Lokomotif Tasarımcısı, Emekçi Savunucusu veya Katı Bürokrasi Yöneticisi',
-      geographyCulture: 'İngiltere (Manchester, Londra), Ruhr Vadisi (Almanya) veya New England (Amerika)',
-      atmosphere: 'Kömür dumanları, buhar makineleri, fabrika çarkları, saat disiplini ve sınıfsal dönüşüm mücadeleleri.',
-      karmicImprint: 'Sürekli üretme ve çalışma baskısı, dinlenirken içsel suçluluk duyma ve duyguları mantığa kurban etme korkusu.',
-      soulMemoryKey: 'Makineler ve sistemler inşa ettiniz; bu hayatta ruhunuzun da beslenmeye ve dinlenmeye hakkı olduğunu hatırlamalısınız.'
-    };
-  }
+    // 5. Özel Gezegen bonusu (1.5 puan)
+    if (era.bonusPlanet && planetHouseMap[era.bonusPlanet.name] === era.bonusPlanet.house) {
+      score += 1.5;
+    }
 
-  // Varsayılan: Kadim Doğa ve Şamanik Kültürler
-  return {
-    eraName: 'Kadim Doğa & Şamanik Kabile Döngüsü',
-    timeSpan: 'Tarih Ötesi / Kadim Zamanlar',
-    century: 'Kadim Döngü',
-    archetypeRole: 'Kabile Şamanı, Ateş Koruyucusu, Bitki Bilgesi veya Avcı Rehber',
-    geographyCulture: 'Kuzey Avrasya Bozkırları, Mezopotamya Yaylaları veya Yerli Amerikan Ormanları',
-    atmosphere: 'Şehirlerden uzak; yıldızların, rüzgârın, kurtların ve doğa ruhlarının diliyle nefes alınan saf kabile yaşamı.',
-    karmicImprint: 'Modern betonarme binalara ve yapay düzene derin bir yabancılık; orman, toprak ve gökyüzü hasreti.',
-    soulMemoryKey: 'Doğanın saf zekasıyla yaşadınız; bu hayatta da toprağa dokunduğunuzda ve iç sesinizi dinlediğinizde anında şifalanırsınız.'
-  };
+    // 6. Eşitlik durumunda adil deterministik hafif ofset
+    const hash = Math.abs(Math.sin((gadHouse * 31) + (gadSign.charCodeAt(0) * 17) + (eIdx * 13))) * 0.1;
+    score += hash;
+
+    if (score > maxScore) {
+      maxScore = score;
+      bestEra = era;
+    }
+  });
+
+  return bestEra.result;
 }
