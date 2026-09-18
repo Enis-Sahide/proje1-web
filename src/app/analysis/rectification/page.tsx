@@ -445,28 +445,61 @@ export default function RectificationPage() {
           </div>
 
           {isMethodologyOpen && (
-            <div className="mt-4 pt-4 border-t border-white/10 space-y-3.5 text-xs text-white/80 leading-relaxed">
+            <div className="mt-4 pt-4 border-t border-white/10 space-y-4 text-xs text-white/80 leading-relaxed">
+              
+              {/* AKADEMİK & BİLİMSEL ÇİFT-KÖR ÇALIŞMA KAYNAĞI */}
+              <div className="p-4 bg-red-950/20 border border-red-500/30 rounded-2xl space-y-2">
+                <div className="flex items-center gap-2 text-red-300 font-bold text-xs uppercase tracking-wider">
+                  <ShieldAlert size={16} className="text-red-400" />
+                  Akademik & Bilimsel Araştırma Gerçeği: Dr. Geoffrey Dean Çift-Kör Rektifikasyon Deneyi
+                </div>
+                <p className="text-white/80 text-[11px] leading-relaxed">
+                  <strong>Kaynak:</strong> <em>Correlation: Journal of Research in Astrology (Dean & Mather)</em> ve Uluslararası Astroloji Araştırmaları Derneği (ISAR) kör testleri.
+                </p>
+                <p className="text-white/70 text-[11px] leading-relaxed">
+                  Doğum belgeli resmi doğum saatleri saniyesine kadar bilinen kişilerin 10 büyük kadersel yaşam olayı (evlilik, kaza, vefat, terfi) alınmış ve dünyanın en ünlü <strong>22 usta rektifikasyon uzmanına</strong> çift-kör (double-blind) olarak verilmiştir. 
+                  <strong>Çarpıcı Sonuç:</strong> 22 uzman astrolog da birbirinden taban tabana zıt saatler çıkarmış; hiçbir astrolog gerçek doğum belgesi saatini rastgele bir tahminden daha yüksek bir oranla tutturamamıştır. Bu araştırma, rektifikasyonun <em>laboratuvarda kesin dakika bulan bir bilim olmadığını</em>, sembolik bir rezonans hipotezi olduğunu akademik olarak kanıtlamıştır.
+                </p>
+              </div>
+
+              {/* AÇI VE ORB GERÇEĞİ */}
               <div className="flex items-start gap-2.5">
                 <Info className="text-amber-400 shrink-0 mt-0.5" size={16} />
                 <div>
-                  <strong className="text-amber-200">Tek Bir Mutlak Saat Dayatmaz:</strong> Bu sistem, doğum saatini veya gününü tam bilmeyen kullanıcılar için geliştirilmiş bir **Kozmik Olasılık ve Araştırma Modelidir (Beta)**. Girdiğiniz kadersel olayların günün hangi saatlerinde gökyüzüyle en yüksek rezonansı ürettiğini gösterir.
+                  <strong className="text-amber-200">Açı ve Orb Gerçeği (Neden "Tekil Bir Dakika" İddiası Yanıltıcıdır?):</strong>
+                  <p className="text-white/70 mt-1">
+                    Klasik ve modern astrolojide (Robert Hand & Noel Tyl ekolü) hiçbir kadersel olay gökyüzünde <code>0°00'</code> tam dakikaya vurduğu an bir elektrik şalteri gibi patlamaz. Olaylar açının yaklaşma <em>(applying)</em> veya uzaklaşma <em>(separating)</em> fazında, haftalar veya aylar sürebilen tolerans pencerelerinde tetiklenir. Bu sebeple bir algoritmanın ya da astroloğun "Sen tam 09:14'te doğdun" demesi bilimsel değil, bir pazarlama illüzyonudur.
+                  </p>
                 </div>
               </div>
 
+              {/* İLK NEFES PENCERESİ */}
+              <div className="flex items-start gap-2.5">
+                <Clock className="text-amber-400 shrink-0 mt-0.5" size={16} />
+                <div>
+                  <strong className="text-amber-200">Biyolojik "İlk Nefes" Tolerans Penceresi:</strong>
+                  <p className="text-white/70 mt-1">
+                    Doğum tek bir saniye değil; başın çıkması, göbek bağının kesilmesi ve bebeğin ciğerlerine ilk havayı çekip ağlaması (kadim Prana anı) dahil 2-4 dakikalık biyolojik bir süreçtir. Sistemimiz bu nedenle aday saatleri mutlak dogmalar olarak değil, <strong>±4 dakikalık Rezonans Pencereleri</strong> olarak sunar.
+                  </p>
+                </div>
+              </div>
+
+              {/* KULLANILAN TEKNİKLER */}
               <div className="flex items-start gap-2.5">
                 <BookOpen className="text-amber-400 shrink-0 mt-0.5" size={16} />
                 <div>
-                  <strong className="text-amber-200">Kullanılan Uluslararası Kaynaklar & Ekoller:</strong>
+                  <strong className="text-amber-200">Sistemimizde Çalışan Matematiksel Altyapı:</strong>
                   <ul className="list-disc list-inside mt-1.5 space-y-1 text-white/70">
-                    <li><span className="text-white font-semibold">Solar Arc Directions (Noel Tyl & Frank Glahn Ekolü):</span> Yılda yaklaşık 1° ilerleme kuralıyla evlilik, kariyer, vefat ve çocuk gibi kadersel dönüm noktalarının köşe evlere (ASC, MC, DSC, IC) kilitlenmesi.</li>
-                    <li><span className="text-white font-semibold">İkincil İlerletimler (Alan Leo / Secondary Progressions):</span> Gün = Yıl kuralıyla progresif Ay ve Güneş döngüleri.</li>
-                    <li><span className="text-white font-semibold">NASA Swiss Ephemeris Altyapısı:</span> Saniyenin binde biri hassasiyetinde yüksek doğruluklu gök mekaniği.</li>
+                    <li><span className="text-white font-semibold">Solar Arc Directions (Noel Tyl Ekolü):</span> Olayların köşe evlere (ASC, MC) olan matematiksel izdüşümü.</li>
+                    <li><span className="text-white font-semibold">İkincil İlerletimler (Secondary Progressions):</span> Progresif Ay ve Güneş döngüleri.</li>
+                    <li><span className="text-white font-semibold">NASA Swiss Ephemeris Altyapısı:</span> Yüksek hassasiyetli gök mekaniği kütüphanesi.</li>
+                    <li><span className="text-white font-semibold">Human Design Çaprazlama:</span> Aday zaman pencereleri arasındaki iç otorite ve profil zıtlıklarını ayırt eden enerji filtresi.</li>
                   </ul>
                 </div>
               </div>
 
               <div className="p-3 bg-white/5 rounded-2xl border border-white/10 text-[11px] text-white/60">
-                <strong className="text-amber-300">Astrolojik Şeffaflık Notu:</strong> Astroloji tarihinde tek ve mutlak bir "rektifikasyon formülü" bulunmamaktadır; Helenistik, Vedik, Hermetik (Hermes Trutine) ve Modern ekoller haritaları farklı açılardan yorumlar. Bu araç, en güçlü rezonansa sahip zaman pencerelerini incelemeniz için bir kılavuzdur.
+                <strong className="text-amber-300">Şeffaflık Taahhüdü:</strong> Bu araç kullanıcılarımıza gerçekçi olmayan sahte bir "nokta atışı doğum dakikası" satmaz; astrolojinin ve insan tasarımının ortak rezonans ürettiği en güçlü olasılık pencerelerini şeffafça keşfetmeniz için bir rehberdir.
               </div>
             </div>
           )}
@@ -986,6 +1019,20 @@ export default function RectificationPage() {
         {currentStep === 4 && result && selectedPeak && (
           <div className="space-y-8 animate-in fade-in zoom-in duration-500">
             
+            {/* BİLİMSEL GERÇEKLİK & EĞİTİM NİTELİĞİ UYARISI BANNER'I */}
+            <div className="bg-gradient-to-r from-amber-950/40 via-[#181510] to-[#121212] border-2 border-amber-500/40 rounded-3xl p-5 sm:p-6 backdrop-blur-xl shadow-xl space-y-2">
+              <div className="flex items-center gap-2 text-amber-400 font-bold text-xs uppercase tracking-wider">
+                <Info size={18} className="shrink-0 text-amber-400" />
+                Önemli Bilimsel Hatırlatma: Aday Modeller ve Gerçek Doğum Anı
+              </div>
+              <p className="text-white/85 text-xs leading-relaxed">
+                Aşağıdaki dalga grafiğinde gösterilen zirveler, girdiğiniz olayların astrolojik formüllerle oluşturduğu <strong>teorik simülasyon modelleridir</strong>.
+              </p>
+              <p className="text-white/70 text-[11px] leading-relaxed">
+                Çift-kör bilimsel araştırmaların (Dr. Geoffrey Dean ve ISAR deneyleri) kanıtladığı üzere; <strong>gerçek doğum anınız bu modellerin tamamen dışında da olabilir.</strong> Sistemimiz bu 3 modelden birinin kesinlikle sizin doğum saatiniz olduğunu taahhüt etmez; bu araç astroloji ve Human Design dinamiklerinin hayat olaylarıyla nasıl rezonans kurduğunu incelemeniz için ders ve eğitim niteliğinde bir araştırma simülatörüdür.
+              </p>
+            </div>
+            
             {/* EĞER TARİH ARALIĞI MODUNDAYSA: TESPİT EDİLEN EN OLASI DOĞUM GÜNLERİ */}
             {result.isDateRangeMode && result.topDateCandidates && (
               <div className="bg-[#121212]/95 border-2 border-[#D4AF37]/50 rounded-3xl p-6 sm:p-8 backdrop-blur-2xl shadow-2xl space-y-4">
@@ -1185,13 +1232,13 @@ export default function RectificationPage() {
                   <div>
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] text-xs font-bold uppercase tracking-wider mb-2">
                       <Target size={14} className="animate-pulse" />
-                      Nokta Atışı Doğrulama (Human Design & Enerji Triangülasyonu)
+                      Kozmik Rezonans & Enerji Filtresi (Human Design Çaprazlama)
                     </div>
                     <h3 className="text-xl sm:text-2xl font-black text-white flex items-center gap-2">
-                      Aday Saatleri Teke İndirgeme Testi
+                      Aday Zaman Pencereleri Arasında Enerji Uyumu Testi
                     </h3>
                     <p className="text-xs text-mystic-text-muted mt-1 max-w-2xl">
-                      Aday doğum saatleriniz arasında gökyüzü <strong className="text-white">İç Otoriteyi</strong>, <strong className="text-white">Human Design Profilini</strong> veya <strong className="text-white">Enerji Tipini</strong> değiştirmektedir. Aşağıdaki {triangulationData.questions.length} soruyu yanıtlayarak kesin doğum saatinizi sabitleyin:
+                      Aday doğum saatleriniz arasında gökyüzü <strong className="text-white">İç Otoriteyi</strong>, <strong className="text-white">Human Design Profilini</strong> veya <strong className="text-white">Enerji Tipini</strong> değiştirmektedir. Aşağıdaki {triangulationData.questions.length} soruyu yanıtlayarak doğanıza en yakın rezonans aralığını belirleyin:
                     </p>
                   </div>
 
@@ -1286,10 +1333,16 @@ export default function RectificationPage() {
                   if (answeredCount === 0 || !topWinnerScore || !winningCandidateHD) {
                     return (
                       <div className="p-4 rounded-2xl bg-white/5 border border-dashed border-white/20 text-center text-xs text-white/50">
-                        Soruları yanıtladıkça sistem aday saatleri eleyecek ve kesinleşen saatinizi burada ilan edecektir.
+                        Soruları yanıtladıkça sistem aday saatleri eleyecek ve en yüksek rezonans pencerenizi burada gösterecektir.
                       </div>
                     );
                   }
+
+                  const totalMins = winningCandidateHD.candidate.hour * 60 + winningCandidateHD.candidate.minute;
+                  const startM = Math.max(0, totalMins - 4);
+                  const endM = Math.min(1439, totalMins + 4);
+                  const formatT = (m: number) => `${String(Math.floor(m / 60)).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
+                  const windowStr = `${formatT(startM)} - ${formatT(endM)}`;
 
                   return (
                     <div className="bg-gradient-to-r from-emerald-950/40 via-[#181818] to-amber-950/40 border-2 border-emerald-500/60 rounded-2xl p-5 sm:p-6 space-y-4 animate-in fade-in zoom-in-95 duration-300 shadow-[0_0_30px_rgba(16,185,129,0.2)]">
@@ -1300,13 +1353,16 @@ export default function RectificationPage() {
                           </div>
                           <div>
                             <div className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-                              <CheckCircle2 size={14} /> Nokta Atışı Doğrulanan Saat
+                              <CheckCircle2 size={14} /> İşaretlediğiniz Niteliklerle En Çok Örtüşen Model
                             </div>
                             <div className="text-2xl sm:text-3xl font-black text-white flex items-center gap-3 mt-0.5">
                               {winningCandidateHD.candidate.timeStr.slice(0, 5)}
                               <span className="text-xs px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30">
-                                %{topWinnerScore.confidencePercent} Triangülasyon Uyumu
+                                %{topWinnerScore.confidencePercent} Nitelik Uyumu
                               </span>
+                            </div>
+                            <div className="text-[11px] text-emerald-300/80 mt-1 font-mono">
+                              Teorik Simülasyon Doruğu (Aday Saatler Arasında Karşılaştırma)
                             </div>
                           </div>
                         </div>
@@ -1340,7 +1396,7 @@ export default function RectificationPage() {
                       {/* Eşleşen Karakteristikler */}
                       {topWinnerScore.matchedTraits.length > 0 && (
                         <div className="pt-2 border-t border-white/10 flex flex-wrap items-center gap-2">
-                          <span className="text-[11px] text-white/60">Doğrulanan Nitelikler:</span>
+                          <span className="text-[11px] text-white/60">Örtüşen Nitelikler:</span>
                           {topWinnerScore.matchedTraits.map((t, idx) => (
                             <span key={idx} className="text-[11px] px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
                               <Check size={10} strokeWidth={3} /> {t}
@@ -1348,6 +1404,10 @@ export default function RectificationPage() {
                           ))}
                         </div>
                       )}
+
+                      <div className="text-[10px] text-white/40 italic pt-1">
+                        * Bilimsel Hatırlatma: Bu sonuç bir kesinlik taahhüdü değildir; gerçek doğum anınız bu 3 modelin tamamen dışında da olabilir.
+                      </div>
                     </div>
                   );
                 })()}
@@ -1358,10 +1418,10 @@ export default function RectificationPage() {
             <div className="bg-[#121212]/90 border border-white/10 rounded-3xl p-6 sm:p-8 backdrop-blur-xl shadow-xl space-y-4">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
                 <BarChart3 className="text-[#D4AF37]" size={20} />
-                Tespit Edilen Belirgin Rezonans Zirveleri ({result.topCandidates.length} Zirve)
+                Tespit Edilen Teorik Simülasyon Modelleri ({result.topCandidates.length} Model)
               </h3>
               <p className="text-xs text-mystic-text-muted">
-                Kadersel olaylarınızın oluşturduğu ana tepe noktaları rezonans sırasına göre aşağıdadır. Detayını görmek istediğiniz zirveye tıklayınız:
+                Kadersel olaylarınızın matematiksel algoritmada oluşturduğu tepe noktaları aşağıdadır. (Gerçek doğum anınız bu modellerin dışında da olabilir):
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5 mt-4">
@@ -1387,12 +1447,12 @@ export default function RectificationPage() {
                     >
                       <div className="flex justify-between items-center mb-1.5">
                         <span className="text-xs font-bold text-[#D4AF37]">
-                          {triScore?.isTopMatch ? '🎯 Nokta Atışı Kazananı' : idx === 0 ? '🏆 1. Ana Zirve' : `${idx + 1}. Zirve Noktası`}
+                          {triScore?.isTopMatch ? '🏆 En Yüksek Uyumlu Model' : `${idx + 1}. Simülasyon Modeli`}
                         </span>
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
                           triScore?.isTopMatch ? 'bg-emerald-500/20 text-emerald-300' : 'bg-white/10 text-emerald-400'
                         }`}>
-                          {triScore ? `Triangülasyon: %${triScore.confidencePercent}` : `Rezonans: %${wavePercent}`}
+                          {triScore ? `Nitelik Uyumu: %${triScore.confidencePercent}` : `Simülasyon Rezonansı: %${wavePercent}`}
                         </span>
                       </div>
 
@@ -1406,6 +1466,7 @@ export default function RectificationPage() {
                       </div>
 
                       <div className="space-y-0.5 text-xs text-white/70 mt-2 pt-2 border-t border-white/10">
+                        <div>Teorik Model Doruğu: <strong className="text-white font-mono text-[11px]">{cand.timeStr.slice(0, 5)}</strong></div>
                         <div>Yükselen (ASC): <strong className="text-white">{cand.ascSign} ({cand.ascDegree.toFixed(1)}°)</strong></div>
                         <div>Tepe Noktası (MC): <strong className="text-white">{cand.mcSign}</strong></div>
                         {candHD && (
