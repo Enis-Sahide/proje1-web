@@ -17,6 +17,83 @@ const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
   return window.btoa(binary);
 };
 
+// Helper to draw rounded rectangle on Canvas
+const drawCanvasRoundedRect = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number
+) => {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+};
+
+// Offscreen Canvas helper to render authentic golden Elder Futhark rune symbols into a high-DPI image
+const renderRuneBadgeDataUrl = (symbols: string[]): string | null => {
+  if (typeof document === 'undefined' || !symbols || symbols.length === 0) {
+    return null;
+  }
+  try {
+    const canvas = document.createElement('canvas');
+    const scale = 3; // 3x Retina DPI for crisp PDF printing
+    const w = 220;
+    const h = 72;
+    canvas.width = w * scale;
+    canvas.height = h * scale;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    ctx.scale(scale, scale);
+
+    // Dark mystic background gradient
+    const bgGrad = ctx.createLinearGradient(0, 0, w, h);
+    bgGrad.addColorStop(0, '#0a0914');
+    bgGrad.addColorStop(0.5, '#120f26');
+    bgGrad.addColorStop(1, '#080811');
+    ctx.fillStyle = bgGrad;
+
+    const pad = 4;
+    drawCanvasRoundedRect(ctx, pad, pad, w - pad * 2, h - pad * 2, 14);
+    ctx.fill();
+
+    // Outer gold border
+    ctx.strokeStyle = '#D4AF37';
+    ctx.lineWidth = 1.8;
+    ctx.stroke();
+
+    // Inner subtle gold ring
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.28)';
+    ctx.lineWidth = 1;
+    drawCanvasRoundedRect(ctx, pad + 3, pad + 3, w - pad * 2 - 6, h - pad * 2 - 6, 11);
+    ctx.stroke();
+
+    // Render golden runes with generous spacing
+    ctx.fillStyle = '#FBBF24'; // Bright warm gold
+    ctx.font = 'bold 36px "Segoe UI Symbol", "Apple Symbols", "Noto Sans Runic", "BabelStone Runic", serif, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+
+    const text = symbols.join('   ');
+    ctx.fillText(text, w / 2, h / 2 + 1);
+
+    return canvas.toDataURL('image/png');
+  } catch (e) {
+    console.warn('Canvas rune badge rendering error:', e);
+    return null;
+  }
+};
+
 // Word-wrap text renderer that supports inline markdown bold/italic formatting (**text**, *text*, ***text***)
 const drawTextWithBold = (
   doc: jsPDF,
@@ -338,17 +415,29 @@ export const downloadCosmicMatrixPDF = async (
     doc.line(15, curY, 195, curY);
     curY += 6;
 
+    // Generate Rune Badge image if symbols exist
+    const runeBadgeDataUrl = report.personalTalisman.symbols && report.personalTalisman.symbols.length > 0
+      ? renderRuneBadgeDataUrl(report.personalTalisman.symbols)
+      : null;
+
+    const badgeW = 56;
+    const badgeH = 17;
+    const badgeExtraH = runeBadgeDataUrl ? (badgeH + 6) : 0;
+
     // Calculate dynamic height for talisman card
     const runesLines = doc.splitTextToSize(`Kullanılan Rünik & Göksel Semboller: ${report.personalTalisman.runesUsed}`, 166);
     const purposeLines = doc.splitTextToSize(`Amacı & Ruhsal Etkisi: ${report.personalTalisman.purpose}`, 166);
+    const bridgeLines = report.personalTalisman.kabbalisticBridge
+      ? doc.splitTextToSize(`Ezoterik & Kabbalistik Köprü: ${report.personalTalisman.kabbalisticBridge}`, 166)
+      : [];
     const usageLines = doc.splitTextToSize(`Uygulama & Odaklanma: ${report.personalTalisman.usageInstructions}`, 166);
     const incenseLines = report.personalTalisman.incenseAndHerbs 
       ? doc.splitTextToSize(`Önerilen Doğal Tütsü/Bitki: ${report.personalTalisman.incenseAndHerbs}`, 166) 
       : [];
 
     const lineH = 6.2;
-    const totalLinesCount = runesLines.length + purposeLines.length + usageLines.length + incenseLines.length;
-    const talismanCardH = 14 + (totalLinesCount * lineH) + (incenseLines.length > 0 ? 6 : 4);
+    const totalLinesCount = runesLines.length + purposeLines.length + bridgeLines.length + usageLines.length + incenseLines.length;
+    const talismanCardH = 14 + badgeExtraH + (totalLinesCount * lineH) + (incenseLines.length > 0 ? 6 : 4);
 
     doc.setFillColor(...cardDark);
     doc.roundedRect(15, curY, 180, talismanCardH, 3, 3, 'F');
@@ -362,11 +451,21 @@ export const downloadCosmicMatrixPDF = async (
     doc.text(report.personalTalisman.title, 22, curY + 8.5);
 
     let textY = curY + 16;
+    if (runeBadgeDataUrl) {
+      const badgeX = 15 + (180 - badgeW) / 2;
+      const badgeY = curY + 12;
+      doc.addImage(runeBadgeDataUrl, 'PNG', badgeX, badgeY, badgeW, badgeH);
+      textY = badgeY + badgeH + 6;
+    }
+
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(10.8);
     doc.setTextColor(...white);
     textY = drawTextWithBold(doc, `**Kullanılan Rünik & Göksel Semboller:** ${report.personalTalisman.runesUsed}`, 22, textY, 166, lineH);
     textY = drawTextWithBold(doc, `**Amacı & Ruhsal Etkisi:** ${report.personalTalisman.purpose}`, 22, textY, 166, lineH);
+    if (report.personalTalisman.kabbalisticBridge) {
+      textY = drawTextWithBold(doc, `**Ezoterik & Kabbalistik Köprü:** ${report.personalTalisman.kabbalisticBridge}`, 22, textY, 166, lineH);
+    }
     textY = drawTextWithBold(doc, `**Uygulama & Odaklanma:** ${report.personalTalisman.usageInstructions}`, 22, textY, 166, lineH);
     if (report.personalTalisman.incenseAndHerbs) {
       drawTextWithBold(doc, `**Önerilen Doğal Tütsü/Bitki:** ${report.personalTalisman.incenseAndHerbs}`, 22, textY, 166, lineH);
