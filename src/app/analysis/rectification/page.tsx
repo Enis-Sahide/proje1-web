@@ -158,6 +158,30 @@ const BENCHMARK_PRESETS: BenchmarkPreset[] = [
       { id: 'o3', type: 'child_birth', title: 'Malia Doğumu (1. Çocuk)', date: '1998-07-04' },
       { id: 'o4', type: 'career_promotion', title: 'ABD Başkanı Seçilmesi', date: '2008-11-04' },
     ]
+  },
+  {
+    id: 'x_person',
+    name: 'X Kişisi',
+    title: 'Özel Analiz Vakası',
+    officialTime: '18:05 (Gerçek Saat)',
+    birthDate: '1995-03-17',
+    cityName: 'İstanbul',
+    element: 'water',
+    bodyType: 'slender',
+    timeWindowType: 'all',
+    events: [
+      { id: 'x1', type: 'graduation', title: 'Mezuniyet', date: '2015-06-15' },
+      { id: 'x2', type: 'relocation', title: 'İl Değişimi', date: '2016-09-16' },
+      { id: 'x3', type: 'death_relative', title: 'Babaanne Vefatı', date: '2019-11-26' },
+      { id: 'x4', type: 'marriage', title: 'İlk Evlilik', date: '2020-07-16' },
+      { id: 'x5', type: 'career_promotion', title: 'İş Yerinde Terfi', date: '2022-05-20' },
+      { id: 'x6', type: 'relocation', title: 'İl Değişimi', date: '2023-08-11' },
+      { id: 'x7', type: 'relocation', title: 'İl Değişimi', date: '2023-10-20' },
+      { id: 'x8', type: 'divorce', title: 'Boşanma', date: '2023-11-21' },
+      { id: 'x9', type: 'marriage', title: '2. Evlilik (İmam Nikahı)', date: '2023-12-20' },
+      { id: 'x10', type: 'relocation', title: 'İl Değişimi', date: '2025-01-08' },
+      { id: 'x11', type: 'marriage', title: 'Resmi Nikah', date: '2025-04-29' },
+    ]
   }
 ];
 
@@ -515,7 +539,7 @@ export default function RectificationPage() {
           <p className="text-xs text-mystic-text-muted mb-4">
             Algoritmanın rezonans dalga grafiğini test etmek için aşağıdaki kişilerden birine tıklayınız; resmi doğum bilgileri otomatik yüklenecektir:
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             {BENCHMARK_PRESETS.map(preset => (
               <button
                 key={preset.id}
