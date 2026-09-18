@@ -7,9 +7,11 @@ import {
   ArrowLeft, Loader2, Sparkles, Layers, Compass, Shield, 
   RotateCcw, Flame, Droplets, Wind, Mountain, Sun, Moon, 
   CheckCircle2, AlertCircle, Bookmark, Compass as CompassIcon, 
-  Eye, Zap, RefreshCw, Leaf, Lock, Calendar, Clock, MapPin, User
+  Eye, Zap, RefreshCw, Leaf, Lock, Calendar, Clock, MapPin, User, Download
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import AuthPromptModal from '@/components/AuthPromptModal';
+import { downloadCosmicMatrixPDF } from '@/utils/cosmicMatrixPdfGenerator';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import moment from 'moment-timezone';
 import { AstroCity } from '@/features/astrology/engine/AstrologyConstants';
@@ -53,7 +55,7 @@ const renderFormattedText = (text: string) => {
 
 export default function CosmicMatrixPage() {
   const router = useRouter();
-  const { role } = useAuth();
+  const { user, role } = useAuth();
   const isMasterOrAdmin = role === 'master' || role === 'admin';
 
   const [name, setName] = useState('');
@@ -68,9 +70,56 @@ export default function CosmicMatrixPage() {
   });
 
   const [isCalculating, setIsCalculating] = useState(false);
+  const [isPdfLoading, setIsPdfLoading] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [report, setReport] = useState<CosmicMatrixReport | null>(null);
   const [activeFilter, setActiveFilter] = useState<'all' | 'inward' | 'outward'>('all');
   const [selectedPlanet, setSelectedPlanet] = useState<PlanetaryDynamicDiagnosis | null>(null);
+
+  const [bYear, bMonth, bDay] = (dateStr || '1990-01-01').split('-').map(Number);
+  const druidTree = getDruidTreeByDate(bDay || 1, bMonth || 1);
+
+  const handlePurchaseReport = () => {
+    const query = new URLSearchParams({
+      type: 'cosmic-matrix',
+      date: dateStr,
+      time: timeStr,
+      city: city?.name || '',
+      lat: (city?.lat || '').toString(),
+      lon: (city?.lon || '').toString(),
+      tz: city?.tz || '',
+      email: user?.email || '',
+      name: name || ''
+    }).toString();
+
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    router.push(`/checkout/guest?${query}`);
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!report) return;
+    try {
+      setIsPdfLoading(true);
+      await downloadCosmicMatrixPDF(
+        report,
+        druidTree || null,
+        name || (user?.user_metadata?.full_name || user?.fullName || 'Misafir'),
+        {
+          localDate: dateStr,
+          localTime: timeStr,
+          cityName: city?.name || 'İstanbul',
+          country: city?.country || 'Türkiye'
+        }
+      );
+    } catch (err) {
+      console.error('Kozmik Matris PDF indirme hatası:', err);
+    } finally {
+      setIsPdfLoading(false);
+    }
+  };
 
   const handleCalculate = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -131,9 +180,6 @@ export default function CosmicMatrixPage() {
     return d.energyDirection === activeFilter;
   }) || [];
 
-  const [bYear, bMonth, bDay] = (dateStr || '1990-01-01').split('-').map(Number);
-  const druidTree = getDruidTreeByDate(bDay || 1, bMonth || 1);
-
   return (
     <div className="min-h-screen bg-[#0A0D14] text-gray-100 font-sans selection:bg-amber-500/20 selection:text-amber-300 pt-28 pb-20 overflow-x-hidden">
       {/* Arka Plan Mistik Işıklandırma */}
@@ -171,13 +217,22 @@ export default function CosmicMatrixPage() {
               7Layers Kozmik Matris Analizi; Astroloji, Kabalistik 4 Âlem, Human Design ve Kadim Futhark Runelerini
               tek bir sentezde birleştiren ileri düzey bir araçtır. Bu analiz yalnızca <strong className="text-amber-300">Usta (Master)</strong> ve üstü seviyelere açıktır.
             </p>
-            <button
-              onClick={() => router.push('/profile')}
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-600 hover:brightness-110 text-black font-bold py-3.5 px-8 rounded-2xl transition-all shadow-lg shadow-amber-500/25 text-sm cursor-pointer"
-            >
-              <Sparkles size={18} />
-              Seviyeni Yükselt
-            </button>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <button
+                onClick={() => router.push('/profile')}
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-600 hover:brightness-110 text-black font-bold py-3.5 px-8 rounded-2xl transition-all shadow-lg shadow-amber-500/25 text-sm cursor-pointer"
+              >
+                <Sparkles size={18} />
+                Seviyeni Yükselt
+              </button>
+              <button
+                onClick={handlePurchaseReport}
+                className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 text-white font-bold py-3.5 px-6 rounded-2xl border border-white/20 transition-all text-sm cursor-pointer shadow-lg hover:border-amber-500/40"
+              >
+                <Lock size={16} className="text-amber-400" />
+                <span>PDF Raporunu Satın Al (1.111 TL)</span>
+              </button>
+            </div>
             <p className="text-xs text-mystic-text-muted mt-5">
               Mevcut seviyeniz: <span className="text-amber-400 font-semibold capitalize">{role || 'Üye'}</span>
             </p>
@@ -292,13 +347,28 @@ export default function CosmicMatrixPage() {
                   </div>
                 </div>
 
-                <button
-                  onClick={() => setReport(null)}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-xs font-medium border border-white/10 transition-colors"
-                >
-                  <RefreshCw size={14} />
-                  <span>Yeni Hesaplama</span>
-                </button>
+                <div className="flex items-center gap-2.5">
+                  <button
+                    onClick={handleDownloadPdf}
+                    disabled={isPdfLoading}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 hover:brightness-110 text-black font-bold text-xs transition-all shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50"
+                  >
+                    {isPdfLoading ? (
+                      <Loader2 size={14} className="animate-spin" />
+                    ) : (
+                      <Download size={14} />
+                    )}
+                    <span>{isPdfLoading ? 'PDF Hazırlanıyor...' : 'PDF Raporu İndir'}</span>
+                  </button>
+
+                  <button
+                    onClick={() => setReport(null)}
+                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-xs font-medium border border-white/10 transition-colors"
+                  >
+                    <RefreshCw size={14} />
+                    <span>Yeni Hesaplama</span>
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4">
@@ -795,6 +865,12 @@ export default function CosmicMatrixPage() {
           </>
         )}
       </div>
+
+      <AuthPromptModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        redirectUrl={`/checkout/guest?type=cosmic-matrix&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(city?.name || '')}&lat=${city?.lat || ''}&lon=${city?.lon || ''}&tz=${city?.tz || ''}&name=${encodeURIComponent(name || '')}`}
+      />
     </div>
   );
 }

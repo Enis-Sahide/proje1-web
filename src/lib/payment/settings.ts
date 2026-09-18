@@ -60,6 +60,7 @@ export type ReportProductRow = typeof reportProducts.$inferSelect;
 export function normalizeProductType(raw: string | null | undefined): string {
   const v = (raw || '').trim().toLowerCase();
   if (v === 'human_design') return 'human-design';
+  if (v === 'cosmic_matrix') return 'cosmic-matrix';
   return v;
 }
 

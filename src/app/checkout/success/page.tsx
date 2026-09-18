@@ -7,6 +7,7 @@ import { downloadKabbalahPDF } from '@/utils/kabbalahPdfGenerator';
 import { downloadChartPDF } from '@/utils/pdfGenerator';
 import { downloadHumanDesignPDF } from '@/utils/humanDesignPdfGenerator';
 import { downloadIncarnationPDF } from '@/utils/incarnationPdfGenerator';
+import { downloadCosmicMatrixPDF } from '@/utils/cosmicMatrixPdfGenerator';
 
 function CheckoutSuccessContent() {
   const router = useRouter();
@@ -81,6 +82,18 @@ function CheckoutSuccessContent() {
             country: cityData.country || 'Türkiye'
           }
         );
+      } else if (analysisType === 'cosmic-matrix' || analysisType === 'cosmic_matrix') {
+        await downloadCosmicMatrixPDF(
+          result.cosmicMatrix,
+          result.druidTree || null,
+          orderData.name || orderData.email || '',
+          {
+            localDate,
+            localTime,
+            cityName: cityData.name,
+            country: cityData.country || 'Türkiye'
+          }
+        );
       } else {
         // Standard Astrology PDF
         downloadChartPDF(
@@ -130,6 +143,8 @@ function CheckoutSuccessContent() {
     ? 'Human Design Kapsamlı Yaşam Rehberi Raporu'
     : (orderData?.analysisType === 'incarnation' || orderData?.analysisType === 'karmic')
     ? 'Karmik & Enkarnasyon Analizi Raporu'
+    : (orderData?.analysisType === 'cosmic-matrix' || orderData?.analysisType === 'cosmic_matrix')
+    ? '7Layers Kozmik Matris Sentez Raporu'
     : 'Doğum Haritası Analizi Raporu';
 
   return (
