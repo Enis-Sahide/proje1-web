@@ -285,9 +285,9 @@ export default function CosmicMatrixPage() {
                     <User size={20} />
                   </div>
                   <div>
-                    <span className="text-[11px] uppercase tracking-wider font-semibold text-amber-400 block">Kozmik Yolcu</span>
+                    <span className="text-[11px] uppercase tracking-wider font-semibold text-amber-400 block">7Layers Sentez Künyesi</span>
                     <h2 className="text-lg sm:text-xl font-bold text-white tracking-wide">
-                      {name.trim() || 'Kişiye Özel Doğum Haritası'}
+                      {name.trim() ? `${name.trim()} - Kozmik Matris Sentezi` : 'Kozmik Matris Sentez Künyesi'}
                     </h2>
                   </div>
                 </div>
@@ -334,86 +334,37 @@ export default function CosmicMatrixPage() {
               </div>
             </div>
 
-            {/* 0.1 Kişisel Ruhsal Koruyucu Druid Ağacı Kartı */}
+            {/* 0.1 Kompakt Ruhsal Kök Ağacı & Gezegen Frekans Rehberi */}
             {druidTree && (
-              <div className="relative overflow-hidden bg-gradient-to-br from-emerald-950/40 via-black/80 to-emerald-900/20 border border-emerald-500/30 rounded-3xl p-5 sm:p-7 shadow-2xl backdrop-blur-md space-y-5">
-                <div className="absolute top-0 right-0 w-72 h-72 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none" />
-
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-emerald-500/20 pb-4">
-                  <div className="flex items-start sm:items-center gap-3.5">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-2xl font-serif shrink-0">
-                      🌲
-                    </div>
+              <div className="bg-gradient-to-r from-emerald-950/40 via-black/70 to-emerald-900/20 border border-emerald-500/25 rounded-2xl p-4 sm:p-5 shadow-lg backdrop-blur-md">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-white/5">
+                  <div className="flex items-center gap-2.5">
+                    <span className="text-xl">🌲</span>
                     <div>
-                      <div className="inline-flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-emerald-400 mb-0.5">
-                        <span>Ruhsal Koruyucu Ağacınız (Kelt / Druid Kimliği)</span>
-                      </div>
-                      <h2 className="text-xl sm:text-2xl font-serif font-bold text-white flex flex-wrap items-baseline gap-2">
-                        <span>{druidTree.name}</span>
-                        <span className="text-xs sm:text-sm font-normal text-emerald-300/80 italic font-sans">({druidTree.botanicalName})</span>
-                      </h2>
+                      <span className="text-[10px] text-emerald-400 uppercase tracking-widest font-bold block">
+                        Ruhsal Kök Ağacınız (Kelt / Druid)
+                      </span>
+                      <span className="text-base sm:text-lg font-bold text-white">
+                        {druidTree.name} <span className="text-xs font-normal text-emerald-300/80 italic font-sans">({druidTree.botanicalName})</span>
+                      </span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2.5 bg-emerald-950/70 border border-emerald-500/30 px-4 py-2 rounded-2xl self-start sm:self-auto">
-                    <span className="text-xs text-emerald-300 font-medium">Ogham:</span>
-                    <span className="text-2xl text-emerald-400 font-serif font-bold leading-none">{druidTree.oghamSymbol}</span>
-                    <span className="text-xs text-gray-300 font-semibold font-sans">({druidTree.oghamName})</span>
+                  <div className="inline-flex items-center gap-2 bg-emerald-950/60 border border-emerald-500/25 px-3 py-1 rounded-xl w-fit text-xs">
+                    <span className="text-gray-400">Ogham:</span>
+                    <span className="text-lg text-emerald-400 font-serif font-bold leading-none">{druidTree.oghamSymbol}</span>
+                    <span className="text-gray-300 font-medium">({druidTree.oghamName})</span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div className="bg-black/40 border border-emerald-500/15 rounded-2xl p-4 space-y-1.5">
-                    <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider block">
-                      Ruhsal Mizaç & Arketip
-                    </span>
-                    <p className="text-sm font-semibold text-white">
-                      {druidTree.archetype}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      Element: <span className="text-emerald-300 font-medium">{druidTree.element}</span> • Yönetici: <span className="text-gray-300">{druidTree.rulingPlanets}</span>
-                    </p>
-                  </div>
-
-                  <div className="bg-black/40 border border-emerald-500/15 rounded-2xl p-4 space-y-1.5">
-                    <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider block">
-                      Ağaçla Temas & Topraklanma (Shinrin-Yoku)
-                    </span>
-                    <p className="text-xs text-gray-300 leading-relaxed">
-                      {druidTree.natureRitual.grounding}
-                    </p>
-                  </div>
-
-                  <div className="bg-black/40 border border-emerald-500/15 rounded-2xl p-4 space-y-1.5">
-                    <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider block">
-                      Doğal Ruhsal Koku & Buhur
-                    </span>
-                    <p className="text-xs text-gray-300 leading-relaxed">
-                      {druidTree.natureRitual.ambientAroma}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-emerald-200/90 italic bg-emerald-950/30 border border-emerald-500/20 rounded-2xl px-4 py-3">
-                  <p className="leading-relaxed">
-                    "{druidTree.druidicProverb}"
+                <div className="pt-3 space-y-2">
+                  <p className="text-xs text-gray-300 leading-relaxed">
+                    Doğum gününüz gereği ruhsal rezonansınız ve doğadaki kökünüz <strong className="text-emerald-300 font-semibold">{druidTree.name}</strong> ile temas halindedir. Aşağıdaki 13 gezegen kartında analiz edilen bitkisel frekanslar ve aromaterapiler ise sizin ağaç kimliğiniz olmayıp; haritanızdaki göksel enerjileri içe ve dışa aktarırken dengelemek üzere kadim ilkelerle eşleştirilmiştir.
                   </p>
-                  <span className="text-[11px] text-emerald-400/80 not-italic shrink-0 font-medium font-sans">
-                    — Kadim Kelt / Druid Bilgeliği
-                  </span>
-                </div>
-
-                {/* Kozmik Botanik Ayrım Notu */}
-                <div className="flex items-start gap-2.5 bg-black/50 border border-emerald-500/25 rounded-2xl p-3.5 text-xs text-gray-300">
-                  <span className="text-emerald-400 text-sm mt-0.5">ℹ️</span>
-                  <div className="space-y-0.5">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300 block">
-                      Kozmik Botanik & Ağaç Rehberi
-                    </span>
-                    <p className="text-xs text-gray-300/90 leading-relaxed">
-                      Ruhunuzla doğrudan rezonansta olan tek ve asıl koruyucu Druid ağacınız yukarıda belirtilen <strong className="text-emerald-300 font-semibold">{druidTree.name}</strong>'dır. Aşağıdaki 13 gezegen kartında göreceğiniz bitkisel ve aromaterapi önerileri ağaç kimliğiniz olmayıp; yalnızca o gezegenin anlık enerjisini dengeleyen yardımcı ortam buhurlarıdır.
-                    </p>
-                  </div>
+                  <p className="text-[11px] text-amber-300/90 font-medium flex items-center gap-1.5">
+                    <span>✨</span>
+                    <span>Hangi gezegeninizin hangi bitkisel koku ve frekansla dengelendiğini aşağıdaki analizlerden inceleyebilirsiniz.</span>
+                  </p>
                 </div>
               </div>
             )}
