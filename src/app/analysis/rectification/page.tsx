@@ -1429,8 +1429,20 @@ export default function RectificationPage() {
                         </div>
                       )}
 
+                      {/* Uyuşmayan Karakteristikler */}
+                      {topWinnerScore.mismatchedTraits.length > 0 && (
+                        <div className="pt-1 flex flex-wrap items-center gap-2">
+                          <span className="text-[11px] text-rose-400/80">Uyuşmayan Nitelikler:</span>
+                          {topWinnerScore.mismatchedTraits.map((t, idx) => (
+                            <span key={idx} className="text-[11px] px-2.5 py-0.5 rounded-lg bg-rose-500/15 text-rose-300 border border-rose-500/25 flex items-center gap-1">
+                              ✕ {t}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
                       <div className="text-[10px] text-white/40 italic pt-1">
-                        * Bilimsel Hatırlatma: Bu sonuç bir kesinlik taahhüdü değildir; gerçek doğum anınız bu 3 modelin tamamen dışında da olabilir.
+                        * Bilimsel Hatırlatma: Bu sonuç bir kesinlik taahhüdü değildir; gerçek doğum anınız bu modellerin tamamen dışında da olabilir.
                       </div>
                     </div>
                   );

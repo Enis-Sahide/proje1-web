@@ -52,6 +52,46 @@ export interface CandidateEvaluationScore {
   mismatchedTraits: string[];
 }
 
+export interface LineArchetype {
+  name: string;
+  subLabel: string;
+  descModifier: string;
+}
+
+// Human Design 6 Temel Hat (Line) Arketipi
+export const LINE_ARCHETYPES: Record<number, LineArchetype> = {
+  1: {
+    name: '1. Çizgi: Temel & Araştırma (Investigator)',
+    subLabel: 'Konunun en derinine inip temelini sağlam kurarak güven kazanma',
+    descModifier: 'Bu yaşam misyonunu derin araştırmalarla, detayları hatmedip temeli en sağlam hale getirerek dünyaya sunarsınız.'
+  },
+  2: {
+    name: '2. Çizgi: Doğal Yetenek & Münzevi Çağrı (Hermit)',
+    subLabel: 'Kendi kabuğunda akışta üretme; dışarıdan fark edilip çağrılma',
+    descModifier: 'Bu misyon doğuştan gelen zahmetsiz bir yetenektir. Kendi alanınızda sakince üretirken başkalarının sizi fark edip sahneye çağırmasıyla parlar.'
+  },
+  3: {
+    name: '3. Çizgi: Deneyci & Uyum Sağlama (Martyr / Explorer)',
+    subLabel: 'Deneme-yanılma ve pratik tecrübeyle neyin çalıştığını keşfetme',
+    descModifier: 'Teoriler yerine sahada bizzat yaşayıp yanılarak öğrenirsiniz. Hataları ve krizleri pratik mutasyona ve uyum sağlama gücüne dönüştürürsünüz.'
+  },
+  4: {
+    name: '4. Çizgi: Fırsatçı & Dostluk Ağı (Opportunist)',
+    subLabel: 'Fırsatları ve krizleri yakın güvenli çevre ve dert ortaklığıyla aşma',
+    descModifier: 'Bu misyon yabancılardan ziyade dostluklar ve yakın güven ağları üzerinden akar. Paylaşılan samimi bağlar üzerinden fırsatlar filizlenir.'
+  },
+  5: {
+    name: '5. Çizgi: Evrensel Çözüm & Kurtarıcı Lider (Heretic)',
+    subLabel: 'Kriz anlarında yabancılara ve kitlelere pratik çözümler sunma',
+    descModifier: 'Başkaları krizde savrulurken sizden pratik bir kurtarıcı çıkış yolu ve liderlik beklenir; krizleri evrensel bir rehberliğe dönüştürürsünüz.'
+  },
+  6: {
+    name: '6. Çizgi: Rol Modeli & Tarafsız Bilgelik (Role Model)',
+    subLabel: 'Çatıya çekilip izleme; olgunlukta dünyaya ilham veren bilge örnek',
+    descModifier: 'Gençlikte hayatı deneyimleyip olgunlukta yüksek bir tepeden süreci izler; dünyaya tarafsız bir bilgelik ve yaşayan bir örnek olarak ışık tutarsınız.'
+  }
+};
+
 // Güneş Kapıları için Temel Arketip Açıklamaları
 const GATE_THEMES: Record<number, { title: string; desc: string }> = {
   1: { title: 'Özgün Yaratıcılık & İlham', desc: 'Kimseye benzemeyen özgün bir ifade biçimiyle sanatsal veya vizyoner bir şeyler üretme arzusu.' },
@@ -559,15 +599,31 @@ export function generateTriangulationQuestions(
   });
 
   const missionOptions: DisambiguationOption[] = [];
+  const allGateEntries = Array.from(gateMap.values());
+  const hasMultipleLinesForSameGate = allGateEntries.some((entry, idx) =>
+    allGateEntries.some((other, oIdx) => idx !== oIdx && entry.gate === other.gate)
+  );
+
   gateMap.forEach((info, key) => {
     const gTheme = GATE_THEMES[info.gate] || { title: `${info.gate}. Kapı Arketipi`, desc: 'Kişiliğinizin dünyaya sunduğu ana frekans ve yaşam misyonu.' };
-    const formattedTimes = info.times.map(t => t.slice(0, 5)).join(', ');
+    const lineArch = LINE_ARCHETYPES[info.line] || {
+      name: `${info.line}. Çizgi`,
+      subLabel: `${info.line}. Çizgi Dinamiği`,
+      descModifier: ''
+    };
+
+    // Eğer aday saatler aynı kapıyı paylaşıyorsa (örn. Kapı 36.4 ve Kapı 36.5), Hat farkını başlıkta ve açıklamada güçlü biçimde vurgula
+    const labelTitle = hasMultipleLinesForSameGate
+      ? `${gTheme.title} — ${lineArch.name}`
+      : `${gTheme.title} (Kapı ${key})`;
+
+    const descriptionText = `${gTheme.desc} ${lineArch.descModifier}`;
 
     missionOptions.push({
       id: `gate_${info.gate}_${info.line}`,
-      label: `${gTheme.title} (Kapı ${key})`,
-      subLabel: `Aday Saat Modelleri: ${formattedTimes}`,
-      description: gTheme.desc,
+      label: labelTitle,
+      subLabel: lineArch.subLabel, // Kör test ilkesi: saatleri doğrudan ifşa etmeyip hattın psikolojik mizaç sloganını gösteriyoruz
+      description: descriptionText,
       favoredCandidateTimes: info.times,
       traitKey: 'sunGate',
       traitValue: key
@@ -581,7 +637,7 @@ export function generateTriangulationQuestions(
     missionOptions.push({
       id: `gate_alt_${altGateNum}`,
       label: `${altTheme.title} (Alternatif Yaşam Misyonu)`,
-      subLabel: 'Kişiliğinizin bu alternatif temayla rezonansı',
+      subLabel: 'Kişiliğinizin aday modellerin dışındaki bu alternatif temayla rezonansı',
       description: altTheme.desc,
       favoredCandidateTimes: [],
       traitKey: 'sunGate',
@@ -631,10 +687,13 @@ export function evaluateTriangulationAnswers(
       const isFavored = chosenOpt.favoredCandidateTimes.includes(cd.candidate.timeStr);
       if (isFavored) {
         hdBonus += 40;
-        matchedTraits.push(`${q.categoryLabel}: ${chosenOpt.label.split('(')[0].trim()}`);
-      } else if (chosenOpt.favoredCandidateTimes.length > 0) {
+        const cleanTraitName = chosenOpt.label.split('(')[0].split('—')[0].trim();
+        matchedTraits.push(`${q.categoryLabel}: ${cleanTraitName}`);
+      } else {
+        // İster başka bir aday saatin şıkkı seçilsin, ister hiçbir adaya ait olmayan zıt alternatif şık seçilsin:
+        // Bu aday saati bu özellikle uyuşmuyor demektir!
         hdBonus -= 30;
-        mismatchedTraits.push(`${q.categoryLabel} uyumsuzluğu`);
+        mismatchedTraits.push(`${q.categoryLabel} uyuşmazlığı`);
       }
     });
 
