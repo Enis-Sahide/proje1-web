@@ -549,18 +549,45 @@ export function generateTriangulationQuestions(
   // ========================================================
   // 6. SORU: KADERSEL ODAK NOKTASI & GÜNEŞ KAPISI (ENKARNASYON MİSYONU)
   // ========================================================
-  const missionOptions: DisambiguationOption[] = candidatesData.map(cd => {
-    const gTheme = GATE_THEMES[cd.sunGate] || { title: `${cd.sunGate}. Kapı Arketipi`, desc: 'Kişiliğinizin dünyaya sunduğu ana frekans ve yaşam misyonu.' };
-    return {
-      id: `gate_${cd.sunGate}_${cd.sunLine}`,
-      label: `${gTheme.title} (Kapı ${cd.sunGate}.${cd.sunLine})`,
-      subLabel: `Doğum Saati Adayı: ${cd.candidate.timeStr.slice(0, 5)}`,
-      description: gTheme.desc,
-      favoredCandidateTimes: [cd.candidate.timeStr],
-      traitKey: 'sunGate',
-      traitValue: `${cd.sunGate}.${cd.sunLine}`
-    };
+  const gateMap = new Map<string, { gate: number; line: number; times: string[] }>();
+  candidatesData.forEach(cd => {
+    const key = `${cd.sunGate}.${cd.sunLine}`;
+    if (!gateMap.has(key)) {
+      gateMap.set(key, { gate: cd.sunGate, line: cd.sunLine, times: [] });
+    }
+    gateMap.get(key)!.times.push(cd.candidate.timeStr);
   });
+
+  const missionOptions: DisambiguationOption[] = [];
+  gateMap.forEach((info, key) => {
+    const gTheme = GATE_THEMES[info.gate] || { title: `${info.gate}. Kapı Arketipi`, desc: 'Kişiliğinizin dünyaya sunduğu ana frekans ve yaşam misyonu.' };
+    const formattedTimes = info.times.map(t => t.slice(0, 5)).join(', ');
+
+    missionOptions.push({
+      id: `gate_${info.gate}_${info.line}`,
+      label: `${gTheme.title} (Kapı ${key})`,
+      subLabel: `Aday Saat Modelleri: ${formattedTimes}`,
+      description: gTheme.desc,
+      favoredCandidateTimes: info.times,
+      traitKey: 'sunGate',
+      traitValue: key
+    });
+  });
+
+  if (gateMap.size === 1) {
+    const activeGate = Array.from(gateMap.values())[0].gate;
+    const altGateNum = activeGate === 1 ? 2 : 1;
+    const altTheme = GATE_THEMES[altGateNum];
+    missionOptions.push({
+      id: `gate_alt_${altGateNum}`,
+      label: `${altTheme.title} (Alternatif Yaşam Misyonu)`,
+      subLabel: 'Kişiliğinizin bu alternatif temayla rezonansı',
+      description: altTheme.desc,
+      favoredCandidateTimes: [],
+      traitKey: 'sunGate',
+      traitValue: 'alt_gate'
+    });
+  }
 
   questions.push({
     id: 'q_mission',
