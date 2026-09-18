@@ -7,7 +7,7 @@ import {
   ArrowLeft, Loader2, Sparkles, Layers, Compass, Shield, 
   RotateCcw, Flame, Droplets, Wind, Mountain, Sun, Moon, 
   CheckCircle2, AlertCircle, Bookmark, Compass as CompassIcon, 
-  Eye, Zap, RefreshCw, Leaf, Lock
+  Eye, Zap, RefreshCw, Leaf, Lock, Calendar, Clock, MapPin, User
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
@@ -19,6 +19,21 @@ import {
   CosmicMatrixReport, 
   PlanetaryDynamicDiagnosis 
 } from '@/features/astrology/engine/CosmicMatrixEngine';
+
+const formatTurkishDate = (dStr: string) => {
+  if (!dStr) return '';
+  const months = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
+  const parts = dStr.split('-');
+  if (parts.length === 3) {
+    const year = parts[0];
+    const mIdx = parseInt(parts[1], 10) - 1;
+    const day = parseInt(parts[2], 10);
+    if (mIdx >= 0 && mIdx < 12) {
+      return `${day} ${months[mIdx]} ${year}`;
+    }
+  }
+  return dStr;
+};
 
 const renderFormattedText = (text: string) => {
   if (!text) return null;
@@ -257,7 +272,64 @@ export default function CosmicMatrixPage() {
           </div>
         ) : (
           /* SONUÇ EKRANI */
-          <div className="space-y-10">
+          <div className="space-y-8">
+            {/* 0. Doğum Künyesi & Analiz Edilen Kişi Bilgileri */}
+            <div className="bg-gradient-to-r from-amber-500/15 via-black/70 to-purple-500/15 border border-amber-500/30 rounded-3xl p-5 sm:p-6 shadow-xl backdrop-blur-md">
+              <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-white/10">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400">
+                    <User size={20} />
+                  </div>
+                  <div>
+                    <span className="text-[11px] uppercase tracking-wider font-semibold text-amber-400 block">Kozmik Yolcu</span>
+                    <h2 className="text-lg sm:text-xl font-bold text-white tracking-wide">
+                      {name.trim() || 'Kişiye Özel Doğum Haritası'}
+                    </h2>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => setReport(null)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 hover:text-white text-xs font-medium border border-white/10 transition-colors"
+                >
+                  <RefreshCw size={14} />
+                  <span>Yeni Hesaplama</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4">
+                <div className="flex items-center gap-2.5 bg-black/40 border border-white/5 rounded-xl px-3.5 py-2.5">
+                  <Calendar size={16} className="text-amber-400 shrink-0" />
+                  <div>
+                    <span className="text-[10px] text-gray-400 uppercase tracking-wider block">Doğum Tarihi</span>
+                    <span className="text-xs sm:text-sm font-semibold text-gray-200">
+                      {formatTurkishDate(dateStr)}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2.5 bg-black/40 border border-white/5 rounded-xl px-3.5 py-2.5">
+                  <Clock size={16} className="text-amber-400 shrink-0" />
+                  <div>
+                    <span className="text-[10px] text-gray-400 uppercase tracking-wider block">Doğum Saati</span>
+                    <span className="text-xs sm:text-sm font-semibold text-gray-200">
+                      {timeStr || '12:00'}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="col-span-2 sm:col-span-1 flex items-center gap-2.5 bg-black/40 border border-white/5 rounded-xl px-3.5 py-2.5">
+                  <MapPin size={16} className="text-amber-400 shrink-0" />
+                  <div className="truncate">
+                    <span className="text-[10px] text-gray-400 uppercase tracking-wider block">Doğum Yeri</span>
+                    <span className="text-xs sm:text-sm font-semibold text-gray-200 truncate block" title={city?.name}>
+                      {city?.name || 'Bilinmiyor'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* 1. Başlık & Yaşam Misyonu */}
             <div className="bg-gradient-to-br from-amber-500/10 via-purple-500/10 to-transparent border border-white/10 rounded-3xl p-6 sm:p-8 space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -270,13 +342,6 @@ export default function CosmicMatrixPage() {
                     {name ? `${name} - ` : ''}{report.coreLifeMission.title}
                   </h1>
                 </div>
-                <button
-                  onClick={() => setReport(null)}
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-gray-300 text-xs font-medium border border-white/10 transition-colors w-fit"
-                >
-                  <RefreshCw size={14} />
-                  <span>Yeni Hesaplama</span>
-                </button>
               </div>
               <p className="text-sm text-gray-300 leading-relaxed max-w-4xl">
                 {renderFormattedText(report.coreLifeMission.description)}

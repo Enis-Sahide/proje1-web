@@ -816,30 +816,235 @@ export function synthesizeCosmicMatrix(
   fourWorldsBalance.dominantWorld = maxW;
   fourWorldsBalance.growthWorld = minW;
 
-  // Kişiye Özel Kadim Rune Bağlama Mührü (Tılsım Formülü)
-  // İçe dönük eğilimler çoğunluktaysa cesaret ve koruma, dışa dönükler çoğunluktaysa denge ve uyum
-  const inwardCount = planetaryDynamics.filter(d => d.energyDirection === 'inward').length;
-  let selectedBinding = runeBindingsData[0];
+const RUNE_GLYPH_MAP: Record<string, string> = {
+  fehu: 'ᚠ',
+  uruz: 'ᚢ',
+  thurisaz: 'ᚦ',
+  ansuz: 'ᚨ',
+  raidho: 'ᚱ',
+  rad: 'ᚱ',
+  kenaz: 'ᚲ',
+  kauna: 'ᚲ',
+  gebo: 'ᚷ',
+  wunjo: 'ᚹ',
+  hagalaz: 'ᚺ',
+  nauthiz: 'ᚾ',
+  isa: 'ᛁ',
+  jera: 'ᛃ',
+  eihwaz: 'ᛇ',
+  perthro: 'ᛈ',
+  algiz: 'ᛉ',
+  algız: 'ᛉ',
+  sowilo: 'ᛋ',
+  tiwaz: 'ᛏ',
+  berkano: 'ᛒ',
+  ehwaz: 'ᛖ',
+  mannaz: 'ᛗ',
+  laguz: 'ᛚ',
+  ingwaz: 'ᛜ',
+  dagaz: 'ᛞ',
+  othala: 'ᛟ'
+};
 
-  if (inwardCount > planetaryDynamics.length / 2) {
-    selectedBinding = runeBindingsData.find(b => b.id === 'korunma_tilsimi') || runeBindingsData[0];
-  } else {
-    selectedBinding = runeBindingsData.find(b => b.id === 'iliskide_denge') || runeBindingsData[2];
+function selectPersonalTalisman(
+  planets: PlanetaryInput[],
+  aspects: AspectInput[],
+  fourWorldsBalance: FourWorldsBalance,
+  planetaryDynamics: PlanetaryDynamicDiagnosis[]
+): {
+  selectedBinding: (typeof runeBindingsData)[0];
+  incenseAndHerbs: string;
+} {
+  const scores: Record<string, number> = {};
+  runeBindingsData.forEach(b => {
+    scores[b.id] = 0;
+  });
+
+  const saturn = planets.find(p => p.name.toLowerCase() === 'saturn');
+  const mars = planets.find(p => p.name.toLowerCase() === 'mars');
+  const venus = planets.find(p => p.name.toLowerCase() === 'venus');
+  const jupiter = planets.find(p => p.name.toLowerCase() === 'jupiter');
+  const mercury = planets.find(p => p.name.toLowerCase() === 'mercury');
+
+  // 1. Dört Âlem Dengesi (Kişinin Gelişim / Büyüme Düzlemi)
+  switch (fourWorldsBalance.growthWorld) {
+    case 'Assiah':
+      scores['bolluk_bereket'] = (scores['bolluk_bereket'] || 0) + 6;
+      scores['alim_satim'] = (scores['alim_satim'] || 0) + 4;
+      scores['borc'] = (scores['borc'] || 0) + 4;
+      break;
+    case 'Yetzirah':
+      scores['iliskide_denge'] = (scores['iliskide_denge'] || 0) + 6;
+      scores['evlilik_uyum'] = (scores['evlilik_uyum'] || 0) + 4;
+      scores['begenilmek'] = (scores['begenilmek'] || 0) + 3;
+      break;
+    case 'Beriyah':
+      scores['is_bulma'] = (scores['is_bulma'] || 0) + 6;
+      scores['alim_satim'] = (scores['alim_satim'] || 0) + 4;
+      scores['sans_mucize'] = (scores['sans_mucize'] || 0) + 3;
+      break;
+    case 'Atzilut':
+      scores['ruya_kapani'] = (scores['ruya_kapani'] || 0) + 6;
+      scores['korunma_tilsimi'] = (scores['korunma_tilsimi'] || 0) + 4;
+      scores['nazar'] = (scores['nazar'] || 0) + 3;
+      break;
   }
+
+  // 2. Elementel Dağılım
+  const fireSigns = ['koç', 'aslan', 'yay', 'aries', 'leo', 'sagittarius'];
+  const earthSigns = ['boğa', 'başak', 'oğlak', 'taurus', 'virgo', 'capricorn'];
+  const airSigns = ['ikizler', 'terazi', 'kova', 'gemini', 'libra', 'aquarius'];
+  const waterSigns = ['yengeç', 'akrep', 'balık', 'cancer', 'scorpio', 'pisces'];
+
+  let fire = 0, earth = 0, air = 0, water = 0;
+  planets.forEach(p => {
+    const s = (p.sign || '').toLowerCase();
+    if (fireSigns.some(fs => s.includes(fs))) fire++;
+    else if (earthSigns.some(es => s.includes(es))) earth++;
+    else if (airSigns.some(as => s.includes(as))) air++;
+    else if (waterSigns.some(ws => s.includes(ws))) water++;
+  });
+
+  const maxElement = Math.max(fire, earth, air, water);
+  if (fire === maxElement) {
+    scores['begenilmek'] = (scores['begenilmek'] || 0) + 3;
+    scores['sans_mucize'] = (scores['sans_mucize'] || 0) + 3;
+    scores['korkuyu_yenmek'] = (scores['korkuyu_yenmek'] || 0) + 2;
+  } else if (earth === maxElement) {
+    scores['bolluk_bereket'] = (scores['bolluk_bereket'] || 0) + 4;
+    scores['alim_satim'] = (scores['alim_satim'] || 0) + 3;
+    scores['fiziksel_yara'] = (scores['fiziksel_yara'] || 0) + 2;
+  } else if (air === maxElement) {
+    scores['is_bulma'] = (scores['is_bulma'] || 0) + 4;
+    scores['iliskide_denge'] = (scores['iliskide_denge'] || 0) + 3;
+  } else if (water === maxElement) {
+    scores['ruya_kapani'] = (scores['ruya_kapani'] || 0) + 4;
+    scores['nazar'] = (scores['nazar'] || 0) + 3;
+    scores['korunma_tilsimi'] = (scores['korunma_tilsimi'] || 0) + 3;
+  }
+
+  // 3. Ev Yerleşimleri ve Kadersel İhtiyaçlar
+  planets.forEach(p => {
+    if ([8, 12].includes(p.house)) {
+      scores['korunma_tilsimi'] = (scores['korunma_tilsimi'] || 0) + 2;
+      scores['ruya_kapani'] = (scores['ruya_kapani'] || 0) + 2;
+      scores['nazar'] = (scores['nazar'] || 0) + 2;
+    }
+    if ([2, 10].includes(p.house)) {
+      scores['bolluk_bereket'] = (scores['bolluk_bereket'] || 0) + 2;
+      scores['is_bulma'] = (scores['is_bulma'] || 0) + 2;
+    }
+    if ([7].includes(p.house)) {
+      scores['iliskide_denge'] = (scores['iliskide_denge'] || 0) + 3;
+      scores['evlilik_uyum'] = (scores['evlilik_uyum'] || 0) + 2;
+    }
+    if ([6].includes(p.house)) {
+      scores['fiziksel_yara'] = (scores['fiziksel_yara'] || 0) + 2;
+      scores['bagirsak'] = (scores['bagirsak'] || 0) + 2;
+    }
+  });
+
+  // 4. Gezegen Özel Durumları (Retro ve Zorlayıcı Dinamikler)
+  if (saturn?.isRetrograde || [8, 12].includes(saturn?.house || 0)) {
+    scores['korkuyu_yenmek'] = (scores['korkuyu_yenmek'] || 0) + 4;
+    scores['depresyon'] = (scores['depresyon'] || 0) + 3;
+  }
+  if (mars?.isRetrograde || [8, 12].includes(mars?.house || 0)) {
+    scores['korunma_tilsimi'] = (scores['korunma_tilsimi'] || 0) + 3;
+    scores['nazar'] = (scores['nazar'] || 0) + 3;
+  }
+  if (venus && [7, 8].includes(venus.house)) {
+    scores['evlilik_uyum'] = (scores['evlilik_uyum'] || 0) + 3;
+    scores['iliskide_denge'] = (scores['iliskide_denge'] || 0) + 3;
+  }
+  if (jupiter && [9, 11, 1].includes(jupiter.house)) {
+    scores['sans_mucize'] = (scores['sans_mucize'] || 0) + 4;
+  }
+  if (mercury?.isRetrograde || [3, 9, 10].includes(mercury?.house || 0)) {
+    scores['is_bulma'] = (scores['is_bulma'] || 0) + 2;
+    scores['alim_satim'] = (scores['alim_satim'] || 0) + 2;
+  }
+
+  // 5. İçe / Dışa Yönelim Dağılımı
+  const inwardCount = planetaryDynamics.filter(d => d.energyDirection === 'inward').length;
+  if (inwardCount > planetaryDynamics.length / 2) {
+    scores['korkuyu_yenmek'] = (scores['korkuyu_yenmek'] || 0) + 2;
+    scores['ruya_kapani'] = (scores['ruya_kapani'] || 0) + 2;
+    scores['depresyon'] = (scores['depresyon'] || 0) + 2;
+  } else {
+    scores['begenilmek'] = (scores['begenilmek'] || 0) + 2;
+    scores['sans_mucize'] = (scores['sans_mucize'] || 0) + 2;
+    scores['alim_satim'] = (scores['alim_satim'] || 0) + 2;
+  }
+
+  // 6. Kişisel Derece & Doğum Verisi Dağıtıcı (Hash / Tie-breaker)
+  const degreeSum = planets.reduce((acc, p) => acc + Math.round((p.degree || 0) * 10), 0);
+  const bindingKeys = runeBindingsData.map(b => b.id);
+  const seedIndex = Math.abs(degreeSum) % bindingKeys.length;
+  const seedKey = bindingKeys[seedIndex];
+  if (seedKey) {
+    scores[seedKey] = (scores[seedKey] || 0) + 1.5;
+  }
+
+  // En yüksek skoru alan bağlamayı seç
+  let bestId = runeBindingsData[0].id;
+  let bestScore = -1;
+  Object.entries(scores).forEach(([id, score]) => {
+    if (score > bestScore) {
+      bestScore = score;
+      bestId = id;
+    }
+  });
+
+  const selectedBinding = runeBindingsData.find(b => b.id === bestId) || runeBindingsData[0];
+
+  // Tılsıma özel tütsü ve bitkisel frekans
+  let incenseAndHerbs = 'Defne yaprağı ve Sedir Ağacı tütsüsü eşliğinde uygulanması aura frekansını yükseltir.';
+  if (['korunma_tilsimi', 'nazar'].includes(selectedBinding.id)) {
+    incenseAndHerbs = 'Aura arındırıcı ve psişik kalkanı mühürleyen Defne yaprağı, Adaçayı & Sedir Ağacı tütsüsü eşliğinde uygulanması formülün koruma frekansını katbekat yükseltir.';
+  } else if (['ruya_kapani'].includes(selectedBinding.id)) {
+    incenseAndHerbs = 'Bilinçaltı ve üçüncü göz frekansını açan Lavanta, Mür & Sandal Ağacı tütsüsü ile uygulanması gece vizyonlarını ve rüya hafızasını berraklaştırır.';
+  } else if (['bolluk_bereket', 'alim_satim', 'borc'].includes(selectedBinding.id)) {
+    incenseAndHerbs = 'Maddi akışı ve bereket mıknatısını harekete geçiren Çubuk Tarçın, Paçuli & Karanfil tütsüsü ile uygulanması bolluk rezonansını hızlandırır.';
+  } else if (['begenilmek', 'sans_mucize'].includes(selectedBinding.id)) {
+    incenseAndHerbs = 'Aura parlaklığını ve manyetik çekim gücünü artıran Portakal Çiçeği, Akgünlük & Yasemin tütsüsü eşliğinde uygulanması tavsiye edilir.';
+  } else if (['iliskide_denge', 'evlilik_uyum'].includes(selectedBinding.id)) {
+    incenseAndHerbs = 'Kalp çakrası titreşimini yükselten ve sevgi frekansını mühürleyen Gül yaprakları, Ylang-Ylang & Akgünlük (Frankincense) tütsüsü tesiri derinleştirir.';
+  } else if (['korkuyu_yenmek', 'depresyon', 'fiziksel_yara', 'bagirsak'].includes(selectedBinding.id)) {
+    incenseAndHerbs = 'Köklenmeyi ve derin hücresel huzuru destekleyen Vetiver, Biberiye & Çam reçinesi tütsüsü şifa ve denge sürecini hızlandırır.';
+  }
+
+  return { selectedBinding, incenseAndHerbs };
+}
+
+  // Kişiye Özel Kadim Rune Bağlama Mührü (Tılsım Formülü)
+  const { selectedBinding, incenseAndHerbs } = selectPersonalTalisman(
+    effectivePlanets,
+    astroAspects,
+    fourWorldsBalance,
+    planetaryDynamics
+  );
 
   const personalTalisman: PersonalTalismanFormula = {
     title: `Kozmik Denge Mührü: ${selectedBinding.title}`,
     runesUsed: selectedBinding.runesUsed,
     symbols: selectedBinding.runesUsed.split(' - ').map(rName => {
-      const match = ALL_RUNES.find(r => r.name.toLowerCase() === rName.trim().toLowerCase());
-      return match ? match.symbol : 'ᚱ';
+      const cleanName = rName
+        .replace(/\(.*?\)/g, '')
+        .trim()
+        .toLowerCase()
+        .replace(/ı/g, 'i')
+        .replace(/İ/g, 'i');
+      if (RUNE_GLYPH_MAP[cleanName]) {
+        return RUNE_GLYPH_MAP[cleanName];
+      }
+      const match = ALL_RUNES.find(r => r.name.toLowerCase().replace(/ı/g, 'i') === cleanName);
+      return match ? match.symbol : 'ᛉ';
     }),
     purpose: selectedBinding.description,
     usageInstructions: selectedBinding.usageInstructions,
     kabbalisticBridge: `Bu tılsım, ${fourWorldsBalance.dominantWorld} âlemindeki aşırı yoğunluğu ${fourWorldsBalance.growthWorld} âlemine aktararak aura dengesini tesis eder.`,
-    incenseAndHerbs: inwardCount > planetaryDynamics.length / 2
-      ? 'Aura arındırıcı ve koruyucu Defne yaprağı & Sedir Ağacı tütsüsü eşliğinde uygulanması frekansı katbekat yükseltir.'
-      : 'Kalp ferahlığı ve denge için Gül yaprakları & Akgünlük (Frankincense) tütsüsü eşliğinde uygulanması tesiri hızlandırır.'
+    incenseAndHerbs
   };
 
   return {
