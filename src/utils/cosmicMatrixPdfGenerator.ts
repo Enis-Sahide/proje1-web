@@ -624,6 +624,9 @@ export const downloadCosmicMatrixPDF = async (
   // Save the PDF
   const safeName = userName.trim()
     ? userName.trim().replace(/[^a-zA-Z0-9çğıöşüÇĞİÖŞÜ_ -]/g, '').replace(/\s+/g, '_')
-    : `Analiz_${birthInfo.localDate}`;
-  doc.save(`7Layers_Kozmik_Matris_${safeName}.pdf`);
+    : '';
+  const fileName = safeName
+    ? `7Layers_Kozmik_Matris_${safeName}.pdf`
+    : `7Layers_Kozmik_Matris_${birthInfo.localDate}.pdf`;
+  doc.save(fileName);
 };

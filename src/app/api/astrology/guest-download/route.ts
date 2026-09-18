@@ -143,6 +143,7 @@ export async function GET(request: Request) {
     return json({
       success: true,
       email: order.email,
+      name: (order.birthData as any)?.name || '',
       analysisType: order.analysisType,
       birthData: order.birthData,
       result: resultData

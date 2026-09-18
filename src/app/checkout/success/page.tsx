@@ -86,7 +86,7 @@ function CheckoutSuccessContent() {
         await downloadCosmicMatrixPDF(
           result.cosmicMatrix,
           result.druidTree || null,
-          orderData.name || '',
+          orderData.name || orderData.birthData?.name || '',
           {
             localDate,
             localTime,
