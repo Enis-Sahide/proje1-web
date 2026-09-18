@@ -2,13 +2,13 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Lock, Activity, AlertCircle, X, Clock, Scroll, TreePine } from 'lucide-react';
+import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Lock, Activity, AlertCircle, Clock, Scroll, TreePine, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 interface ToolItem {
   id: string;
   title: string;
-  description: string;
+  description?: string;
   icon: React.ReactNode;
   color: string;
   link: string;
@@ -25,8 +25,7 @@ export default function AnalysisPage() {
     {
       id: 'cosmic-matrix',
       title: '7Layers Kozmik Matris',
-      description: 'Astroloji, Kabalistik 4 Âlem, Human Design ve Kadim Futhark Runelerini birleştiren bütünleşik kadersel teşhis ve tılsım analizi.',
-      icon: <Compass size={32} />,
+      icon: <Compass size={22} />,
       color: '#F59E0B',
       link: '/analysis/cosmic-matrix',
       isLocked: true
@@ -34,16 +33,14 @@ export default function AnalysisPage() {
     {
       id: 'druid-tree',
       title: 'Kelt Druid Ağacı Analizi',
-      description: 'Doğum gününüzün 13 kutsal Ogham ağacındaki ruhsal arketipini, kadim ağaç harfini, ışık & gölge potansiyelleri ile orman topraklanması (Shinrin-Yoku) ritüelini keşfedin.',
-      icon: <TreePine size={32} />,
+      icon: <TreePine size={22} />,
       color: '#10B981',
       link: '/analysis/druid-tree'
     },
     {
       id: 'incarnation',
       title: 'Karmik & Enkarnasyon',
-      description: 'Önceki yaşam kimliğiniz, karmik borçlarınız, Drakonik ruh haritanız ve gelecek enkarnasyon potansiyeliniz.',
-      icon: <Scroll size={32} />,
+      icon: <Scroll size={22} />,
       color: '#FFD700',
       link: '/analysis/incarnation',
       isLocked: true
@@ -51,93 +48,86 @@ export default function AnalysisPage() {
     {
       id: 'rectification',
       title: 'Doğum Saati Keşfi (Beta)',
-      description: 'Doğum saatinizi tam bilmiyor musunuz? Yaşam olaylarınızla günün olası kozmik rezonans spektrumunu çıkarın.',
-      icon: <Clock size={32} />,
+      icon: <Clock size={22} />,
       color: '#E0AA3E',
       link: '/analysis/rectification'
     },
     {
       id: 'kabbalah',
       title: 'Kabalistik 4 Alem',
-      description: 'Sefirot ağacındaki kadersel sıçrama noktalarınızı bulun.',
-      icon: <MoonStar size={32} />,
+      icon: <MoonStar size={22} />,
       color: '#D4AF37',
       link: '/analysis/kabbalah'
     },
     {
       id: 'frekans-aynasi',
       title: 'Frekans Aynası (Canlı)',
-      description: 'Günün gökyüzü transit sınavı karşısında 4 alemden (Madde, Duygu, Zihin, Kudret) hangi haritanızı çalıştırdığınızı anlık teşhis edin.',
-      icon: <Sparkles size={32} />,
+      icon: <Sparkles size={22} />,
       color: '#0EA5E9',
       link: '/analysis/frekans-aynasi'
     },
     {
       id: 'astrology',
       title: 'Doğum Haritası',
-      description: 'Gezegenlerin doğum anınızdaki konumlarıyla ruhunuzun şifresini çözün.',
-      icon: <MoonStar size={32} />,
+      icon: <MoonStar size={22} />,
       color: '#D4AF37',
       link: '/analysis/astrology'
     },
     {
       id: 'transits',
       title: 'Anlık Gökyüzü',
-      description: 'Şu anki transitlerin (gezegen hareketlerinin) günlük hayatınıza ve çakralarınıza olan etkisi.',
-      icon: <Compass size={32} />,
+      icon: <Compass size={22} />,
       color: '#32ADE6',
       link: '/analysis/transits'
     },
     {
       id: 'numerology',
       title: 'Numeroloji',
-      description: 'Doğum tarihinizle Kader Sayınızı, Yaşam Yolunuzu ve ruhsal potansiyelinizi öğrenin.',
-      icon: <Hexagon size={32} />,
+      icon: <Hexagon size={22} />,
       color: '#AF52DE',
       link: '/analysis/numerology'
     },
     {
       id: 'human-design',
       title: 'Human Design (Tasarımınız)',
-      description: 'Enerji Tipinizi, Otoritenizi ve Stratejinizi öğrenerek hayatın akışında doğru kararlar verin.',
-      icon: <Fingerprint size={32} />,
+      icon: <Fingerprint size={22} />,
       color: '#34C759',
       link: '/analysis/human-design'
     },
     {
       id: 'chakra',
-      title: 'Çakra',
-      description: 'Anlık olarak çakra durumunuzu analiz edin.',
-      icon: <Sparkles size={32} />,
+      title: 'Çakra Analizi',
+      icon: <Sparkles size={22} />,
       color: '#FF2D55',
       link: '/analysis/chakra'
     },
     {
       id: 'schumann',
       title: 'Schumann Rezonansı',
-      description: 'Dünya\'nın kalp atışlarını ve anlık elektromanyetik alan etkilerini takip edin.',
-      icon: <Activity size={32} />,
+      icon: <Activity size={22} />,
       color: '#00E5FF',
       link: '/analysis/schumann'
     }
   ];
 
   return (
-    <div className="min-h-screen pt-32 pb-24 px-4 sm:px-6 relative overflow-x-hidden">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center justify-center p-3 rounded-full bg-mystic-primary/10 border border-mystic-primary/30 text-mystic-primary mb-6">
-            <Sparkles size={32} />
+    <div className="min-h-screen pt-28 pb-20 px-4 sm:px-6 relative overflow-x-hidden text-white">
+      <div className="max-w-6xl mx-auto">
+        {/* Başlık Alanı */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center p-2.5 rounded-2xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] mb-3 shadow-[0_0_20px_rgba(212,175,55,0.15)]">
+            <Sparkles size={24} />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-mystic-primary to-[#FFD700] mb-4">
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-white to-[#D4AF37] mb-2 tracking-tight">
             Ruhsal Analiz Merkezi
           </h1>
-          <p className="text-lg text-mystic-text-muted max-w-2xl mx-auto">
-            Astroloji, Numeroloji ve Human Design öğretilerini kullanarak kendinizi daha derin bir boyutta keşfedin. Bilgi, kendi karanlığınızı aydınlatacak en güçlü ışıktır.
+          <p className="text-sm text-mystic-text-muted max-w-xl mx-auto">
+            Astroloji, Kabala, Numeroloji ve Human Design analizlerinize doğrudan ulaşın.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {/* Kompakt ve Net Analiz Izgarası */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
           {tools.map((tool) => (
             <div 
               key={tool.id}
@@ -149,35 +139,32 @@ export default function AnalysisPage() {
                 }
                 router.push(tool.link);
               }}
-              className="bg-mystic-surface/40 backdrop-blur-md rounded-3xl p-8 border border-mystic-surface-light hover:border-mystic-primary/40 transition-all duration-300 hover:shadow-[0_0_30px_rgba(212,175,55,0.15)] group relative overflow-hidden flex flex-col justify-between cursor-pointer"
+              className="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-[#D4AF37]/50 transition-all duration-200 group cursor-pointer flex items-center justify-between gap-3 relative overflow-hidden backdrop-blur-md shadow-sm hover:shadow-[0_0_25px_rgba(212,175,55,0.15)]"
             >
-              <div className="flex items-start justify-between mb-6">
+              <div className="flex items-center gap-3 min-w-0">
                 <div 
-                  className="p-4 rounded-2xl bg-white/5 border border-white/10 transition-transform duration-300 group-hover:scale-110"
+                  className="p-2.5 rounded-xl bg-white/5 border border-white/10 transition-transform duration-200 group-hover:scale-105 shrink-0"
                   style={{ color: tool.color }}
                 >
                   {tool.icon}
                 </div>
-                {tool.isLocked && !isMasterOrAdmin && (
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-mystic-text-muted text-xs font-semibold">
-                    <Lock size={12} className="text-mystic-primary" />
-                    <span>Usta Seviyesi</span>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <h3 className="text-sm font-bold text-white group-hover:text-[#D4AF37] transition-colors truncate">
+                      {tool.title}
+                    </h3>
                   </div>
-                )}
+                  {tool.isLocked && !isMasterOrAdmin && (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-400/90 bg-amber-400/10 border border-amber-400/20 px-1.5 py-0.5 rounded-md mt-0.5">
+                      <Lock size={10} />
+                      Usta Seviyesi
+                    </span>
+                  )}
+                </div>
               </div>
 
-              <div>
-                <h3 className="text-2xl font-bold text-white mb-2 group-hover:text-mystic-accent transition-colors flex items-center gap-2">
-                  {tool.title}
-                </h3>
-                <p className="text-mystic-text-muted text-sm leading-relaxed mb-6">
-                  {tool.description}
-                </p>
-              </div>
-
-              <div className="flex items-center gap-2 text-sm font-semibold text-mystic-primary group-hover:text-mystic-accent transition-colors">
-                <span>Analizi Başlat</span>
-                <span className="transform group-hover:translate-x-1 transition-transform">→</span>
+              <div className="text-white/30 group-hover:text-[#D4AF37] group-hover:translate-x-0.5 transition-all shrink-0">
+                <ChevronRight size={18} />
               </div>
             </div>
           ))}
