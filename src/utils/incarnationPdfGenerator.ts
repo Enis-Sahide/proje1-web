@@ -385,7 +385,7 @@ export const downloadIncarnationPDF = async (
     if (data.cosmicOrigin.secondaryStars && data.cosmicOrigin.secondaryStars.length > 0) {
       curY += 2.5;
       const secAlignmentsText = data.cosmicOrigin.secondaryStars
-        .map(s => `${s.starName.split(' ')[0]} (${s.layer.includes('Bilinçdışı') ? 'Bilinçdışı Tasarım' : s.layer.includes('Beriyah') ? '3. Harita' : 'Natal'}, ${s.orb}° orb)`)
+        .map(s => `${s.starName.split(' ')[0]} (${s.layer.includes('Bilinçdışı') ? 'Bilinçdışı Tasarım' : s.layer.includes('Drakonik') ? 'Drakonik' : s.layer.includes('Beriyah') ? '3. Harita' : 'Natal'}, ${s.orb}° orb)`)
         .join(' • ');
       curY = drawTextWithBold(doc, `**Katmanlar Arası Hizalanan Yıldızlar:** ${secAlignmentsText}`, 15, curY, 180, 5.0);
     }
@@ -393,7 +393,7 @@ export const downloadIncarnationPDF = async (
     if (data.cosmicOrigin.royalStarsActive && data.cosmicOrigin.royalStarsActive.length > 0) {
       curY += 2;
       const royalText = data.cosmicOrigin.royalStarsActive
-        .map(r => `${r.starName} (${r.layer.includes('Beriyah') ? '3. Harita' : 'Natal'}, ${r.pointName}, ${r.orb}° orb)`)
+        .map(r => `${r.starName} (${r.layer.includes('Beriyah') ? '3. Harita' : r.layer.includes('Drakonik') ? 'Drakonik' : 'Natal'}, ${r.pointName}, ${r.orb}° orb)`)
         .join(' • ');
       doc.setTextColor(...gold);
       curY = drawTextWithBold(doc, `**Aktif Kraliyet Yıldızları (4 Melek Kalkanı):** ${royalText}`, 15, curY, 180, 5.0);

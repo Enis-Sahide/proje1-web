@@ -150,6 +150,15 @@ const GALACTIC_FIXED_STARS: FixedStarDef[] = [
     challenge: 'Dünyanın kakofonisi ve estetik yoksunluğu karşısında aşırı duyusal yorgunluk.'
   },
   {
+    name: 'Polaris (Alfa Ursae Minoris / Kutup Yıldızı)',
+    longitude: 88.57, // 28°34' İkizler
+    constellation: 'Küçük Ayı (Ursa Minor)',
+    frequencyBadge: 'Polaris (Kozmik İstikamet & Kutup Direği)',
+    mission: 'Kozmik pusula olma; fırtınalarda yönünü kaybeden ruhlara istikamet ve sarsılmaz ilahi nizam getirme görevi.',
+    gift: 'Sarsılmaz içsel pusula, krizlerde anında doğru yönü bulma ve kitleleri savrulmaktan koruyan manevi ağırlık.',
+    challenge: 'Aşırı katılık, esneyememe ve herkesin kendisi kadar kararlı olmasını beklemenin getirdiği hayal kırıklığı.'
+  },
+  {
     name: 'Canopus (Alfa Carinae)',
     longitude: 104.97, // 14°58' Yengeç
     constellation: 'Carina (Gemi Omurgası)',
@@ -239,20 +248,20 @@ export function calculateCosmicOrigin(
   // ==========================================
   if (draconicChart && draconicChart.planets) {
     draconicChart.planets.forEach(p => {
-      const isLum = ['Güneş', 'Ay', 'Kuzey Ay Düğümü', 'Lilith'].includes(p.name);
+      const isKey = ['Güneş', 'Ay', 'Kuzey Ay Düğümü', 'Lilith', 'Venüs', 'Merkür', 'Mars'].includes(p.name);
       pointsToTest.push({
         name: `Drakonik ${p.name}`,
         longitude: p.longitude,
-        weight: isLum ? 3.3 : 2.5,
-        maxOrb: isLum ? 2.2 : 1.85,
+        weight: isKey ? 3.3 : 2.5,
+        maxOrb: isKey ? 3.0 : 2.5,
         layer: 'Drakonik (Ruh Haritası)'
       });
     });
     if (draconicChart.houses && draconicChart.houses.length > 0) {
       const dAsc = draconicChart.houses.find(h => h.house === 1);
-      if (dAsc) pointsToTest.push({ name: 'Drakonik Yükselen (ASC)', longitude: dAsc.longitude, weight: 3.2, maxOrb: 2.2, layer: 'Drakonik (Ruh Haritası)' });
+      if (dAsc) pointsToTest.push({ name: 'Drakonik Yükselen (ASC)', longitude: dAsc.longitude, weight: 3.2, maxOrb: 3.0, layer: 'Drakonik (Ruh Haritası)' });
       const dMc = draconicChart.houses.find(h => h.house === 10);
-      if (dMc) pointsToTest.push({ name: 'Drakonik Tepe Noktası (MC)', longitude: dMc.longitude, weight: 2.8, maxOrb: 2.0, layer: 'Drakonik (Ruh Haritası)' });
+      if (dMc) pointsToTest.push({ name: 'Drakonik Tepe Noktası (MC)', longitude: dMc.longitude, weight: 2.8, maxOrb: 2.5, layer: 'Drakonik (Ruh Haritası)' });
     }
   }
 
@@ -352,7 +361,7 @@ export function calculateCosmicOrigin(
   // ==========================================
   if (beriyahChart && beriyahChart.planets) {
     beriyahChart.planets.forEach(p => {
-      const isKey = ['Güneş', 'Ay', 'Venüs', 'Merkür', 'Mars', 'Lilith'].includes(p.name);
+      const isKey = ['Güneş', 'Ay', 'Venüs', 'Merkür', 'Mars', 'Lilith', 'Vertex (Vx)', 'Kuzey Ay Düğümü'].includes(p.name);
       pointsToTest.push({
         name: `3. Harita ${p.name}`,
         longitude: p.longitude,
@@ -361,6 +370,24 @@ export function calculateCosmicOrigin(
         layer: '3. Harita (Beriyah / Zihin)'
       });
     });
+    if (beriyahChart.ascendant) {
+      pointsToTest.push({
+        name: '3. Harita Yükselen (ASC)',
+        longitude: beriyahChart.ascendant.longitude,
+        weight: 2.3,
+        maxOrb: 3.0,
+        layer: '3. Harita (Beriyah / Zihin)'
+      });
+    }
+    if (beriyahChart.midheaven) {
+      pointsToTest.push({
+        name: '3. Harita Tepe Noktası (MC)',
+        longitude: beriyahChart.midheaven.longitude,
+        weight: 2.0,
+        maxOrb: 2.5,
+        layer: '3. Harita (Beriyah / Zihin)'
+      });
+    }
   }
 
   // ==========================================
@@ -376,9 +403,10 @@ export function calculateCosmicOrigin(
   }
 
   const getStarFamily = (starName: string): string => {
+    if (starName.includes('Polaris')) return 'Polaris';
+    if (starName.includes('Sirius') || starName.includes('Canopus')) return 'Sirius';
     if (starName.includes('Pleiades')) return 'Pleiades';
     if (starName.includes('Orion') || starName.includes('Rigel') || starName.includes('Betelgeuse') || starName.includes('Bellatrix')) return 'Orion';
-    if (starName.includes('Sirius') || starName.includes('Canopus')) return 'Sirius';
     if (starName.includes('Fomalhaut')) return 'Fomalhaut';
     if (starName.includes('Aldebaran')) return 'Aldebaran';
     if (starName.includes('Antares')) return 'Antares';
@@ -390,7 +418,7 @@ export function calculateCosmicOrigin(
     return starName.split(' ')[0];
   };
 
-  const CORE_STARSEED_FAMILIES = new Set(['Pleiades', 'Orion', 'Sirius', 'Arcturus', 'Andromeda', 'Vega']);
+  const CORE_STARSEED_FAMILIES = new Set(['Pleiades', 'Orion', 'Sirius', 'Arcturus', 'Andromeda', 'Vega', 'Polaris']);
   const ROYAL_STARS = new Set(['Regulus', 'Antares', 'Aldebaran', 'Fomalhaut']);
   const allMatches: MatchItem[] = [];
   const royalActivations: RoyalStarActivation[] = [];
@@ -464,9 +492,12 @@ export function calculateCosmicOrigin(
 
       // Varsa 3. Starseed veya portal rezonansı
       const resonantAdditions: string[] = [];
-      if (sortedStarseedFamilies.length >= 3) resonantAdditions.push(sortedStarseedFamilies[2].family);
+      if (allMatches.some(m => m.family === 'Sirius') && f1 !== 'Sirius' && f2 !== 'Sirius') resonantAdditions.push('Sirius Işığı');
       if (allMatches.some(m => m.family === 'Galaktik Merkez')) resonantAdditions.push('Galaktik Merkez');
-      if (royalActivations.length > 0) resonantAdditions.push(`${royalActivations[0].starName} Işığı`);
+      if (sortedStarseedFamilies.length >= 3 && !resonantAdditions.includes(sortedStarseedFamilies[2].family)) {
+        resonantAdditions.push(sortedStarseedFamilies[2].family);
+      }
+      if (royalActivations.length > 0) resonantAdditions.push(`${royalActivations[0].starName} Kalkanı`);
 
       if (resonantAdditions.length > 0) {
         frequencyBadge = `${hybridTitle} (${resonantAdditions.slice(0, 2).join(' & ')} Rezonanslı)`;
@@ -474,7 +505,10 @@ export function calculateCosmicOrigin(
         frequencyBadge = `${hybridTitle} (Çok Boyutlu Işık Tohumu)`;
       }
 
-      soulMission = `${bestMatch.star.mission} Aynı zamanda ruhunuz ${f2} frekansıyla da melezlenmiş olup, iki galaktik bilinç arasında evrensel bir köprü kurma ve yüksek bilgiyi yeryüzüne sentezleme vazifesi taşımaktadır.`;
+      const siriusMatch = allMatches.find(m => m.family === 'Sirius');
+      const siriusExtra = siriusMatch ? ` Ayrıca ${siriusMatch.point.name} (${siriusMatch.point.layer}) üzerinden aktive olan kadim Sirius (Şi'ra) hattı, ruhunuzun hafızasında saklı olan Atlantis ve ezoterik bilgelik kodlarını uyandırmaktadır.` : '';
+
+      soulMission = `${bestMatch.star.mission} Aynı zamanda ruhunuz ${f2} frekansıyla da melezlenmiş olup, iki galaktik bilinç arasında evrensel bir köprü kurma ve yüksek bilgiyi yeryüzüne sentezleme vazifesi taşımaktadır.${siriusExtra}`;
       cosmicGift = `${bestMatch.star.gift} Melez galaktik kökeniniz sayesinde zıt boyutları anında kavrama, hem sezgisel hem de stratejik bilgiyi aynı anda işleyebilme dehanız vardır.`;
       earthlyChallenge = `${bestMatch.star.challenge} Farklı yıldız frekanslarını tek bir biyolojik bedende taşımanın getirdiği içsel dalgalanma ve dünyaya ait hissedememe sancısı.`;
     }

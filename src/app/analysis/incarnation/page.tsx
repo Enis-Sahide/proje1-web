@@ -719,12 +719,20 @@ export default function IncarnationAnalysisPage() {
                                   <span>
                                     {align.starName.includes('Galaktik Merkez') 
                                       ? 'Galaktik Merkez' 
+                                      : align.starName.includes('Sirius')
+                                      ? 'Sirius (Şi\'ra)'
+                                      : align.starName.includes('Polaris')
+                                      ? 'Polaris (Kutup Yıldızı)'
+                                      : align.starName.includes('Canopus')
+                                      ? 'Canopus (Süheyl)'
                                       : align.starName.includes('Pleiades')
                                       ? 'Pleiades (Alcyone)'
                                       : align.starName.includes('Betelgeuse')
                                       ? 'Orion (Betelgeuse)'
                                       : align.starName.includes('Rigel')
                                       ? 'Orion (Rigel)'
+                                      : align.starName.includes('Bellatrix')
+                                      ? 'Orion (Bellatrix)'
                                       : align.starName.includes('Mirach')
                                       ? 'Andromeda (Mirach)'
                                       : align.starName.split(' ')[0]}
@@ -733,11 +741,13 @@ export default function IncarnationAnalysisPage() {
                                 <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${
                                   align.layer.includes('Bilinçdışı') 
                                     ? 'bg-purple-500/20 text-purple-200' 
+                                    : align.layer.includes('Drakonik')
+                                    ? 'bg-amber-500/20 text-amber-200'
                                     : align.layer.includes('Beriyah') 
                                     ? 'bg-emerald-500/20 text-emerald-200' 
                                     : 'bg-blue-500/20 text-blue-200'
                                 }`}>
-                                  {align.layer.includes('Bilinçdışı') ? 'Bilinçdışı Ruh Kökü' : align.layer.includes('Beriyah') ? '3. Harita (Beriyah)' : 'Natal'}
+                                  {align.layer.includes('Bilinçdışı') ? 'Bilinçdışı Ruh Kökü' : align.layer.includes('Drakonik') ? 'Drakonik (2. Harita)' : align.layer.includes('Beriyah') ? '3. Harita (Beriyah)' : 'Natal'}
                                 </span>
                               </div>
                               <div className="text-[11px] text-white/60 truncate">
