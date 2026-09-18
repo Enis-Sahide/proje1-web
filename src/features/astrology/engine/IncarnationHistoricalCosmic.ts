@@ -1,4 +1,5 @@
 import type { NatalChartData, ZodiacSign } from './AstrologyConstants';
+import { generateChart } from '@/utils/HumanDesignEngine';
 
 export interface HistoricalEraResult {
   eraName: string;
@@ -11,6 +12,23 @@ export interface HistoricalEraResult {
   soulMemoryKey: string;
 }
 
+export interface StarAlignment {
+  starName: string;
+  constellation: string;
+  connectedPoint: string;
+  orb: number;
+  layer: 'Natal (Fiziksel)' | 'Bilinçdışı Tasarım (Ruh Kökü)' | '3. Harita (Beriyah / Zihin)';
+  frequencyBadge: string;
+  isRoyalStar?: boolean;
+}
+
+export interface RoyalStarActivation {
+  starName: string;
+  layer: string;
+  pointName: string;
+  orb: number;
+}
+
 export interface CosmicOriginResult {
   isStarseed: boolean;
   starName: string;
@@ -21,6 +39,12 @@ export interface CosmicOriginResult {
   cosmicGift: string;
   earthlyChallenge: string;
   frequencyBadge: string;
+  // Hibrit ve Çoklu Yıldız Alanları
+  isHybrid?: boolean;
+  hybridTitle?: string;
+  secondaryStars?: StarAlignment[];
+  allAlignments?: StarAlignment[];
+  royalStarsActive?: RoyalStarActivation[];
 }
 
 interface FixedStarDef {
@@ -108,6 +132,15 @@ const GALACTIC_FIXED_STARS: FixedStarDef[] = [
     challenge: 'Ruhsal tükenmişlik hissi ve devasa sorumlulukların ağırlığı altında ezilme.'
   },
   {
+    name: 'Orion / Bellatrix (Gamma Orionis)',
+    longitude: 81.10, // 21°06' İkizler
+    constellation: 'Orion (Avcı)',
+    frequencyBadge: 'Bellatrix (Orion Savaşçı Elçisi)',
+    mission: 'Galaktik adaleti koruma, cesur inisiyasyonlar ve stratejik zihin gücünü yeryüzüne aktarma.',
+    gift: 'Korkusuz liderlik, zorlu engeller karşısında anında stratejik çözüm üretme ve yüksek irade.',
+    challenge: 'Aşırı sertlik, duyguları bastırma ve empati kurmakta zorlanma riski.'
+  },
+  {
     name: 'Vega (Alfa Lyrae)',
     longitude: 285.32, // 15°19' Oğlak
     constellation: 'Lira (Çalgı)',
@@ -179,86 +212,271 @@ function angleDifference(a: number, b: number): number {
 }
 
 /**
- * 1. Galaktik Ruh Kökeni & Sabit Yıldız Taraması
- * TÜM gezegenler, GAD/KAD, ASC ve MC eksiksiz taranır ve ağırlıklandırılır.
+ * 1. Galaktik Ruh Kökeni, Çoklu Sabit Yıldız & Melez (Hibrit Starseed) Taraması
+ * - 1. Katman: Natal (Fiziksel Düzlem)
+ * - 2. Katman: Bilinçdışı Tasarım (Human Design Design / 88° Güneş Kayması / Ruh Kökü)
+ * - 3. Katman: 3. Harita (Beriyah / 9. Harmonik / Ruhun Dharması & Yaratım)
  */
-export function calculateCosmicOrigin(natalChart: NatalChartData): CosmicOriginResult {
-  const pointsToTest: { name: string; longitude: number; weight: number; maxOrb: number }[] = [];
+export function calculateCosmicOrigin(
+  natalChart: NatalChartData,
+  birthDate?: Date | null,
+  beriyahChart?: NatalChartData | null
+): CosmicOriginResult {
+  interface TestPoint {
+    name: string;
+    longitude: number;
+    weight: number;
+    maxOrb: number;
+    layer: 'Natal (Fiziksel)' | 'Bilinçdışı Tasarım (Ruh Kökü)' | '3. Harita (Beriyah / Zihin)';
+  }
 
-  // 1. Işıklar ve Köşe Noktalar (En Yüksek Öncelik & Geniş Orb 2.2°)
+  const pointsToTest: TestPoint[] = [];
+
+  // ==========================================
+  // 1. KATMAN: NATAL HARİTA (Fiziksel Beden & Enkarnasyon)
+  // ==========================================
   const kad = natalChart.planets.find(p => p.name === 'Kuzey Ay Düğümü');
   if (kad) {
-    pointsToTest.push({ name: 'Kuzey Ay Düğümü (KAD)', longitude: kad.longitude, weight: 3, maxOrb: 2.2 });
+    pointsToTest.push({ name: 'Kuzey Ay Düğümü (KAD)', longitude: kad.longitude, weight: 3, maxOrb: 2.2, layer: 'Natal (Fiziksel)' });
     const gadLon = (kad.longitude + 180) % 360;
-    pointsToTest.push({ name: 'Güney Ay Düğümü (GAD)', longitude: gadLon, weight: 3, maxOrb: 2.2 });
+    pointsToTest.push({ name: 'Güney Ay Düğümü (GAD)', longitude: gadLon, weight: 3, maxOrb: 2.2, layer: 'Natal (Fiziksel)' });
   }
 
   const sun = natalChart.planets.find(p => p.name === 'Güneş');
-  if (sun) pointsToTest.push({ name: 'Güneş', longitude: sun.longitude, weight: 3, maxOrb: 2.2 });
+  if (sun) pointsToTest.push({ name: 'Güneş', longitude: sun.longitude, weight: 3, maxOrb: 2.2, layer: 'Natal (Fiziksel)' });
 
   const moon = natalChart.planets.find(p => p.name === 'Ay');
-  if (moon) pointsToTest.push({ name: 'Ay', longitude: moon.longitude, weight: 3, maxOrb: 2.2 });
+  if (moon) pointsToTest.push({ name: 'Ay', longitude: moon.longitude, weight: 3, maxOrb: 2.2, layer: 'Natal (Fiziksel)' });
 
   if (natalChart.houses && natalChart.houses.length > 0) {
     const ascHouse = natalChart.houses.find(h => h.house === 1);
-    if (ascHouse) pointsToTest.push({ name: 'Yükselen (ASC)', longitude: ascHouse.longitude, weight: 3, maxOrb: 2.2 });
+    if (ascHouse) pointsToTest.push({ name: 'Yükselen (ASC)', longitude: ascHouse.longitude, weight: 3, maxOrb: 2.2, layer: 'Natal (Fiziksel)' });
 
     const mcHouse = natalChart.houses.find(h => h.house === 10);
-    if (mcHouse) pointsToTest.push({ name: 'Tepe Noktası (MC)', longitude: mcHouse.longitude, weight: 2.5, maxOrb: 2.0 });
+    if (mcHouse) pointsToTest.push({ name: 'Tepe Noktası (MC)', longitude: mcHouse.longitude, weight: 2.5, maxOrb: 2.0, layer: 'Natal (Fiziksel)' });
   }
 
-  // 2. Kişisel Gezegenler (Ağırlık: 2, Orb: 1.85°)
+  const lilith = natalChart.planets.find(p => p.name === 'Lilith');
+  if (lilith) pointsToTest.push({ name: 'Lilith', longitude: lilith.longitude, weight: 2.5, maxOrb: 2.0, layer: 'Natal (Fiziksel)' });
+
+  // Kişisel Gezegenler
   const personalPlanets = ['Merkür', 'Venüs', 'Mars', 'Kiron'];
   natalChart.planets.forEach(p => {
     if (personalPlanets.includes(p.name)) {
-      pointsToTest.push({ name: p.name, longitude: p.longitude, weight: 2, maxOrb: 1.85 });
+      pointsToTest.push({ name: p.name, longitude: p.longitude, weight: 2.2, maxOrb: 1.85, layer: 'Natal (Fiziksel)' });
     }
   });
 
-  // 3. Kolektif & Sosyal Gezegenler (Ağırlık: 1.5, Orb: 1.75°)
+  // Kolektif & Sosyal Gezegenler
   const outerPlanets = ['Jüpiter', 'Satürn', 'Uranüs', 'Neptün', 'Plüton'];
   natalChart.planets.forEach(p => {
     if (outerPlanets.includes(p.name)) {
-      pointsToTest.push({ name: p.name, longitude: p.longitude, weight: 1.5, maxOrb: 1.75 });
+      pointsToTest.push({ name: p.name, longitude: p.longitude, weight: 1.5, maxOrb: 1.75, layer: 'Natal (Fiziksel)' });
     }
   });
 
-  let bestMatch: {
+  // ==========================================
+  // 2. KATMAN: BİLİNÇDIŞI TASARIM (Human Design 88° Sun Shift / Ruh Kökü)
+  // ==========================================
+  if (birthDate && !isNaN(birthDate.getTime())) {
+    try {
+      const hdChart = generateChart(birthDate);
+      if (hdChart && hdChart.unconscious) {
+        const trMap: Record<string, string> = {
+          'Sun': 'Tasarım Güneşi',
+          'Earth': 'Tasarım Dünyası',
+          'Moon': 'Tasarım Ayı',
+          'NorthNode': 'Tasarım KAD',
+          'SouthNode': 'Tasarım GAD',
+          'Mercury': 'Tasarım Merkürü',
+          'Venus': 'Tasarım Venüsü',
+          'Mars': 'Tasarım Marsı',
+          'Jupiter': 'Tasarım Jüpiteri',
+          'Saturn': 'Tasarım Satürnü',
+          'Uranus': 'Tasarım Uranüsü',
+          'Neptune': 'Tasarım Neptünü',
+          'Pluto': 'Tasarım Plütonu'
+        };
+
+        hdChart.unconscious.forEach(p => {
+          const isLum = ['Sun', 'Earth', 'Moon', 'NorthNode', 'SouthNode'].includes(p.planet);
+          pointsToTest.push({
+            name: trMap[p.planet] || `Tasarım ${p.planet}`,
+            longitude: p.longitude,
+            weight: isLum ? 2.8 : 2.0,
+            maxOrb: isLum ? 2.0 : 1.75,
+            layer: 'Bilinçdışı Tasarım (Ruh Kökü)'
+          });
+        });
+
+        // Tasarım Lilith (Bilinçdışı apogee ortalama 9.77° geridedir)
+        if (lilith) {
+          pointsToTest.push({
+            name: 'Tasarım Lilith',
+            longitude: ((lilith.longitude - 9.77) % 360 + 360) % 360,
+            weight: 2.4,
+            maxOrb: 2.0,
+            layer: 'Bilinçdışı Tasarım (Ruh Kökü)'
+          });
+        }
+      }
+    } catch (e) {
+      console.warn('Bilinçdışı tasarım haritası hesaplanamadı:', e);
+    }
+  }
+
+  // ==========================================
+  // 3. KATMAN: 3. HARİTA (Beriyah / 9. Harmonik / Navamsa Ruh Dharması)
+  // ==========================================
+  if (beriyahChart && beriyahChart.planets) {
+    beriyahChart.planets.forEach(p => {
+      const isKey = ['Güneş', 'Ay', 'Venüs', 'Merkür', 'Mars', 'Lilith'].includes(p.name);
+      pointsToTest.push({
+        name: `3. Harita ${p.name}`,
+        longitude: p.longitude,
+        weight: isKey ? 2.3 : 1.6,
+        maxOrb: isKey ? 3.0 : 2.2, // Harmonik haritalarda yüksek dharmik temaslar için 3.0° geniş orb
+        layer: '3. Harita (Beriyah / Zihin)'
+      });
+    });
+  }
+
+  // ==========================================
+  // SABİT YILDIZ & KRALİYET YILDIZI TARAMASI
+  // ==========================================
+  interface MatchItem {
     star: FixedStarDef;
-    pointName: string;
+    point: TestPoint;
     orb: number;
     score: number;
-  } | null = null;
+    family: string;
+    isRoyal: boolean;
+  }
+
+  const getStarFamily = (starName: string): string => {
+    if (starName.includes('Pleiades')) return 'Pleiades';
+    if (starName.includes('Orion') || starName.includes('Rigel') || starName.includes('Betelgeuse') || starName.includes('Bellatrix')) return 'Orion';
+    if (starName.includes('Sirius') || starName.includes('Canopus')) return 'Sirius';
+    if (starName.includes('Fomalhaut')) return 'Fomalhaut';
+    if (starName.includes('Aldebaran')) return 'Aldebaran';
+    if (starName.includes('Antares')) return 'Antares';
+    if (starName.includes('Regulus')) return 'Regulus';
+    if (starName.includes('Arcturus') || starName.includes('Spica')) return 'Arcturus';
+    if (starName.includes('Andromeda')) return 'Andromeda';
+    if (starName.includes('Vega')) return 'Vega';
+    if (starName.includes('Galaktik Merkez')) return 'Galaktik Merkez';
+    return starName.split(' ')[0];
+  };
+
+  const ROYAL_STARS = ['Regulus', 'Antares', 'Aldebaran', 'Fomalhaut'];
+  const allMatches: MatchItem[] = [];
+  const royalActivations: RoyalStarActivation[] = [];
 
   for (const star of GALACTIC_FIXED_STARS) {
+    const isRoyal = ROYAL_STARS.some(rs => star.name.includes(rs));
+    const family = getStarFamily(star.name);
+
     for (const pt of pointsToTest) {
       const diff = angleDifference(star.longitude, pt.longitude);
       if (diff <= pt.maxOrb) {
-        // Puan: Ağırlık yüksek ve orb dar oldukça skor yükselir
-        const score = pt.weight * 10 - diff * 3;
-        if (!bestMatch || score > bestMatch.score) {
-          bestMatch = {
-            star,
+        const roundedOrb = Math.round(diff * 100) / 100;
+        const score = pt.weight * 10 - diff * 2.8;
+
+        allMatches.push({
+          star,
+          point: pt,
+          orb: roundedOrb,
+          score,
+          family,
+          isRoyal
+        });
+
+        if (isRoyal) {
+          royalActivations.push({
+            starName: star.name.split(' ')[0],
+            layer: pt.layer,
             pointName: pt.name,
-            orb: Math.round(diff * 100) / 100,
-            score
-          };
+            orb: roundedOrb
+          });
         }
       }
     }
   }
 
-  if (bestMatch) {
+  // Skorlara göre sırala (en güçlü temas en üstte)
+  allMatches.sort((a, b) => b.score - a.score);
+
+  if (allMatches.length > 0) {
+    const bestMatch = allMatches[0];
+
+    // Farklı galaktik aileleri tespit et
+    const distinctFamilies = Array.from(new Set(allMatches.map(m => m.family)));
+    const isHybrid = distinctFamilies.length >= 2;
+
+    // İkincil yıldızları topla (en yüksek puanlı diğer yıldızlar)
+    const secondaryMatches = allMatches.filter(m => m.star.name !== bestMatch.star.name);
+    const uniqueSecondaryList: StarAlignment[] = [];
+    const seenStars = new Set<string>([bestMatch.star.name]);
+
+    for (const m of secondaryMatches) {
+      if (!seenStars.has(m.star.name)) {
+        seenStars.add(m.star.name);
+        uniqueSecondaryList.push({
+          starName: m.star.name,
+          constellation: m.star.constellation,
+          connectedPoint: `${m.point.name} (${m.point.layer}) ile ${m.orb}° orb`,
+          orb: m.orb,
+          layer: m.point.layer,
+          frequencyBadge: m.star.frequencyBadge,
+          isRoyalStar: m.isRoyal
+        });
+      }
+      if (uniqueSecondaryList.length >= 4) break;
+    }
+
+    const allAlignmentsList: StarAlignment[] = allMatches.slice(0, 8).map(m => ({
+      starName: m.star.name,
+      constellation: m.star.constellation,
+      connectedPoint: `${m.point.name} (${m.point.layer}) ile ${m.orb}° orb`,
+      orb: m.orb,
+      layer: m.point.layer,
+      frequencyBadge: m.star.frequencyBadge,
+      isRoyalStar: m.isRoyal
+    }));
+
+    // Hibrit Başlığı ve Sentez Metinleri
+    let hybridTitle = bestMatch.star.name;
+    let frequencyBadge = bestMatch.star.frequencyBadge;
+    let soulMission = bestMatch.star.mission;
+    let cosmicGift = bestMatch.star.gift;
+    let earthlyChallenge = bestMatch.star.challenge;
+
+    if (isHybrid) {
+      const secFamilies = distinctFamilies.filter(f => f !== bestMatch.family);
+      hybridTitle = `${bestMatch.family} & ${secFamilies.slice(0, 2).join('-')} Galaktik Melezi`;
+      frequencyBadge = `${hybridTitle} (Çok Boyutlu Işık Tohumu)`;
+
+      const secNames = uniqueSecondaryList.map(s => s.starName.split(' ')[0]).join(', ');
+      soulMission = `${bestMatch.star.mission} Aynı zamanda ruhunuz derin katmanlarında (${secNames}) frekanslarıyla da mühürlenmiş olup, farklı yıldız sistemleri arasında kozmik bir köprü kurma ve evrensel bilgiyi yeryüzüne sentezleme vazifesi taşımaktadır.`;
+      cosmicGift = `${bestMatch.star.gift} Melez galaktik kökeniniz sayesinde zıt boyutları anında kavrama, hem teknolojik/stratejik hem de sezgisel/kalp merkezli bilgiyi aynı anda işleyebilme dehanız vardır.`;
+      earthlyChallenge = `${bestMatch.star.challenge} Farklı yıldız frekanslarını tek bir biyolojik bedende taşımanın getirdiği içsel dalgalanma ve dünyaya ait hissedememe sancısı.`;
+    }
+
     return {
       isStarseed: true,
       starName: bestMatch.star.name,
       constellation: bestMatch.star.constellation,
-      connectedPoint: `${bestMatch.pointName} ile Kavuşum (${bestMatch.orb}° orb)`,
+      connectedPoint: `${bestMatch.point.name} (${bestMatch.point.layer}) ile Kavuşum (${bestMatch.orb}° orb)`,
       orb: bestMatch.orb,
-      soulMission: bestMatch.star.mission,
-      cosmicGift: bestMatch.star.gift,
-      earthlyChallenge: bestMatch.star.challenge,
-      frequencyBadge: bestMatch.star.frequencyBadge
+      soulMission,
+      cosmicGift,
+      earthlyChallenge,
+      frequencyBadge,
+      isHybrid,
+      hybridTitle,
+      secondaryStars: uniqueSecondaryList,
+      allAlignments: allAlignmentsList,
+      royalStarsActive: royalActivations
     };
   }
 
@@ -272,7 +490,8 @@ export function calculateCosmicOrigin(natalChart: NatalChartData): CosmicOriginR
     soulMission: 'Dünya gezegeninin elemental hafızasında ustalaşmak; madde ile mana arasındaki kutsal köprüyü inşa etmek ve yeryüzüne sağlam kök salmak.',
     cosmicGift: 'Kuvvetli pratik sağduyu, dünyevi krizlerde sarsılmaz dirayet, doğanın mevsimleriyle doğrudan uyumlanma ve yaşamı güvenle inşa etme kudreti.',
     earthlyChallenge: 'Madde dünyasının ağırlığına kapılıp ruhsal kanatlarını unutma riski; dünyevi kaygıları aşarak ilahi güveni koruma sınavı.',
-    frequencyBadge: 'Kadim Dünya Muhafızı (Gaia)'
+    frequencyBadge: 'Kadim Dünya Muhafızı (Gaia)',
+    isHybrid: false
   };
 }
 

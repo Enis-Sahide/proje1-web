@@ -638,24 +638,29 @@ export default function IncarnationAnalysisPage() {
                             <span className="text-xs uppercase tracking-wider text-indigo-400 font-bold">
                               Kozmik Ruh Kökeni (Starseed İzi)
                             </span>
+                            {resultData.cosmicOrigin.isHybrid && (
+                              <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-gradient-to-r from-amber-500/30 to-purple-500/30 text-amber-200 border border-amber-400/40 shadow-sm flex items-center gap-1">
+                                <span>✨</span> Galaktik Melez (Hibrit Starseed)
+                              </span>
+                            )}
                             <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-500/20 text-indigo-200 border border-indigo-500/30">
                               {resultData.cosmicOrigin.frequencyBadge}
                             </span>
                           </div>
-                          <h3 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-                            <span>{resultData.cosmicOrigin.starName}</span>
+                          <h3 className="text-xl sm:text-2xl font-bold text-white flex flex-wrap items-center gap-2">
+                            <span>{resultData.cosmicOrigin.isHybrid && resultData.cosmicOrigin.hybridTitle ? resultData.cosmicOrigin.hybridTitle : resultData.cosmicOrigin.starName}</span>
                           </h3>
                         </div>
                       </div>
 
                       <div className="px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-left sm:text-right">
-                        <div className="text-[11px] text-mystic-text-muted">Kozmik Hiza & Takımyıldız</div>
+                        <div className="text-[11px] text-mystic-text-muted">Birincil Kozmik Hiza</div>
                         <div className="text-xs font-semibold text-indigo-200">{resultData.cosmicOrigin.constellation}</div>
                         <div className="text-[10px] text-white/50">{resultData.cosmicOrigin.connectedPoint}</div>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
                       <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
                         <span className="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
                           <span>🌌</span> Kozmik Yaşam Misyonu
@@ -683,6 +688,54 @@ export default function IncarnationAnalysisPage() {
                         </p>
                       </div>
                     </div>
+
+                    {/* Katmanlar Arası Çoklu Galaktik Sabit Yıldız & Kraliyet Yıldızı Hizalanmaları */}
+                    {resultData.cosmicOrigin.allAlignments && resultData.cosmicOrigin.allAlignments.length > 0 && (
+                      <div className="pt-5 border-t border-white/10 space-y-3">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <span className="text-xs uppercase tracking-wider text-indigo-300 font-bold flex items-center gap-1.5">
+                            <span>🛰️</span> Katmanlar Arası Galaktik Sabit Yıldız & Kraliyet Hizalanmaları
+                          </span>
+                          {resultData.cosmicOrigin.royalStarsActive && resultData.cosmicOrigin.royalStarsActive.length > 0 && (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                              👑 {resultData.cosmicOrigin.royalStarsActive.length} Kraliyet Yıldızı Teması Aktif
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                          {resultData.cosmicOrigin.allAlignments.map((align, idx) => (
+                            <div 
+                              key={idx} 
+                              className={`p-3 rounded-xl border text-xs flex flex-col justify-between gap-1.5 transition-all ${
+                                align.isRoyalStar 
+                                  ? 'bg-amber-950/20 border-amber-500/30 text-amber-200' 
+                                  : 'bg-white/5 border-white/10 text-white/80'
+                              }`}
+                            >
+                              <div className="flex items-center justify-between gap-2">
+                                <span className="font-bold flex items-center gap-1">
+                                  {align.isRoyalStar && <span>👑</span>}
+                                  <span>{align.starName.split(' ')[0]}</span>
+                                </span>
+                                <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${
+                                  align.layer.includes('Bilinçdışı') 
+                                    ? 'bg-purple-500/20 text-purple-200' 
+                                    : align.layer.includes('Beriyah') 
+                                    ? 'bg-emerald-500/20 text-emerald-200' 
+                                    : 'bg-blue-500/20 text-blue-200'
+                                }`}>
+                                  {align.layer.includes('Bilinçdışı') ? 'Bilinçdışı Ruh Kökü' : align.layer.includes('Beriyah') ? '3. Harita (Beriyah)' : 'Natal'}
+                                </span>
+                              </div>
+                              <div className="text-[11px] text-white/60 truncate">
+                                {align.connectedPoint}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
 

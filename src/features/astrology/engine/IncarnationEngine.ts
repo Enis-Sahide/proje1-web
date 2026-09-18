@@ -4,7 +4,7 @@ import {
   ZodiacSign, 
   ZODIAC_SIGNS 
 } from './AstrologyConstants';
-import { getSignAndDegree, calculateDraconicChart } from './AstrologyEngine';
+import { getSignAndDegree, calculateDraconicChart, calculateHarmonicChart } from './AstrologyEngine';
 import {
   generateChart,
   HumanDesignChart,
@@ -882,7 +882,8 @@ export function calculateIncarnationAnalysis(
 
   // 10. Tarihsel Zaman Tüneli & Galaktik Ruh Kökeni (Aşama 1)
   const historicalEra = calculateHistoricalEra(natalChart, gadData.sign, gadHouse);
-  const cosmicOrigin = calculateCosmicOrigin(natalChart);
+  const beriyahChart = calculateHarmonicChart(natalChart, 9);
+  const cosmicOrigin = calculateCosmicOrigin(natalChart, birthDate, beriyahChart);
 
   return {
     gad: {

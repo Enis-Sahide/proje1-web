@@ -356,28 +356,49 @@ export const downloadIncarnationPDF = async (
 
   // KOZMİK RUH KÖKENİ & GALAKTİK İZİ (STARSEED)
   if (data.cosmicOrigin) {
-    ensureSpace(42);
+    ensureSpace(45);
     curY += 6;
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(14.5);
     doc.setTextColor(180, 200, 255);
-    doc.text(`Kozmik Ruh Kökeni: ${data.cosmicOrigin.starName}`, 15, curY);
+    const starTitle = data.cosmicOrigin.isHybrid && data.cosmicOrigin.hybridTitle
+      ? `Kozmik Ruh Kökeni: ${data.cosmicOrigin.hybridTitle} (Galaktik Melez)`
+      : `Kozmik Ruh Kökeni: ${data.cosmicOrigin.starName}`;
+    doc.text(starTitle, 15, curY);
 
     curY += 5.5;
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(10.5);
+    doc.setFontSize(10);
     doc.setTextColor(190, 220, 255);
     doc.text(`Frekans: ${data.cosmicOrigin.frequencyBadge} | Hiza: ${data.cosmicOrigin.connectedPoint}`, 15, curY);
 
-    curY += 6.5;
+    curY += 6;
     doc.setFont('LiberationSans', 'normal');
-    doc.setFontSize(10);
+    doc.setFontSize(9.5);
     doc.setTextColor(...white);
-    curY = drawTextWithBold(doc, `**Kozmik Yaşam Misyonu:** ${data.cosmicOrigin.soulMission}`, 15, curY, 180, 5.5);
-    curY += 2.5;
-    curY = drawTextWithBold(doc, `**Kozmik Deha & Hediye:** ${data.cosmicOrigin.cosmicGift}`, 15, curY, 180, 5.5);
-    curY += 2.5;
-    curY = drawTextWithBold(doc, `**Hücresel Yabancılık & Sınav:** ${data.cosmicOrigin.earthlyChallenge}`, 15, curY, 180, 5.5);
+    curY = drawTextWithBold(doc, `**Kozmik Yaşam Misyonu:** ${data.cosmicOrigin.soulMission}`, 15, curY, 180, 5.2);
+    curY += 2;
+    curY = drawTextWithBold(doc, `**Kozmik Deha & Hediye:** ${data.cosmicOrigin.cosmicGift}`, 15, curY, 180, 5.2);
+    curY += 2;
+    curY = drawTextWithBold(doc, `**Hücresel Yabancılık & Sınav:** ${data.cosmicOrigin.earthlyChallenge}`, 15, curY, 180, 5.2);
+
+    if (data.cosmicOrigin.secondaryStars && data.cosmicOrigin.secondaryStars.length > 0) {
+      curY += 2.5;
+      const secAlignmentsText = data.cosmicOrigin.secondaryStars
+        .map(s => `${s.starName.split(' ')[0]} (${s.layer.includes('Bilinçdışı') ? 'Bilinçdışı Tasarım' : s.layer.includes('Beriyah') ? '3. Harita' : 'Natal'}, ${s.orb}° orb)`)
+        .join(' • ');
+      curY = drawTextWithBold(doc, `**Katmanlar Arası Hizalanan Yıldızlar:** ${secAlignmentsText}`, 15, curY, 180, 5.0);
+    }
+
+    if (data.cosmicOrigin.royalStarsActive && data.cosmicOrigin.royalStarsActive.length > 0) {
+      curY += 2;
+      const royalText = data.cosmicOrigin.royalStarsActive
+        .map(r => `${r.starName} (${r.layer.includes('Beriyah') ? '3. Harita' : 'Natal'}, ${r.pointName}, ${r.orb}° orb)`)
+        .join(' • ');
+      doc.setTextColor(...gold);
+      curY = drawTextWithBold(doc, `**Aktif Kraliyet Yıldızları (4 Melek Kalkanı):** ${royalText}`, 15, curY, 180, 5.0);
+      doc.setTextColor(...white);
+    }
   }
 
   // ================= PAGE 3: KARMIC DEBTS =================
