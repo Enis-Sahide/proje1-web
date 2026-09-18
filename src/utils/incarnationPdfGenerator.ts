@@ -28,7 +28,10 @@ const drawTextWithBold = (
     .replace(/\r\n/g, '\n')
     .replace(/!\[.*?\]\(.*?\)/g, '')
     .replace(/<img.*?src=".*?".*?>/g, '')
-    .replace(/^\s*>\s*/gm, '');
+    .replace(/^\s*>\s*/gm, '')
+    .replace(/\*\*\*(.*?)\*\*\*/g, '**$1**')
+    .replace(/(?<!\*)\*([^*\n]+?)\*(?!\*)/g, '**$1**')
+    .replace(/\*\((.*?)\)\*/g, '**$1**');
      
   const parts = sanitizedText.split(/(\s+|\*\*)/);
   let isBold = false;
@@ -47,13 +50,17 @@ const drawTextWithBold = (
     }
     if (part === '') continue;
     
-    const wordWidth = doc.getTextWidth(part);
-    if (curX + wordWidth > x + maxWidth && part.trim() !== '') {
+    // Strip any rogue remaining asterisks so raw stars never leak to PDF
+    const cleanWord = part.replace(/\*/g, '');
+    if (!cleanWord && part !== '') continue;
+
+    const wordWidth = doc.getTextWidth(cleanWord);
+    if (curX + wordWidth > x + maxWidth && cleanWord.trim() !== '') {
       curX = x;
       curY += lineHeight;
     }
     
-    doc.text(part, curX, curY);
+    doc.text(cleanWord, curX, curY);
     curX += wordWidth;
   }
   

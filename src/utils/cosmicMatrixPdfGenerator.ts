@@ -13,7 +13,7 @@ const arrayBufferToBase64 = (buffer: ArrayBuffer): string => {
   return window.btoa(binary);
 };
 
-// Word-wrap text renderer that supports inline markdown bold formatting (**text**)
+// Word-wrap text renderer that supports inline markdown bold/italic formatting (**text**, *text*, ***text***)
 const drawTextWithBold = (
   doc: jsPDF,
   text: string,
@@ -29,7 +29,10 @@ const drawTextWithBold = (
     .replace(/\r\n/g, '\n')
     .replace(/!\[.*?\]\(.*?\)/g, '')
     .replace(/<img.*?src=".*?".*?>/g, '')
-    .replace(/^\s*>\s*/gm, '');
+    .replace(/^\s*>\s*/gm, '')
+    .replace(/\*\*\*(.*?)\*\*\*/g, '**$1**')
+    .replace(/(?<!\*)\*([^*\n]+?)\*(?!\*)/g, '**$1**')
+    .replace(/\*\((.*?)\)\*/g, '**$1**');
 
   const parts = sanitizedText.split(/(\s+|\*\*)/);
   let isBold = false;
@@ -48,13 +51,17 @@ const drawTextWithBold = (
     }
     if (part === '') continue;
 
-    const wordWidth = doc.getTextWidth(part);
-    if (curX + wordWidth > x + maxWidth && part.trim() !== '') {
+    // Strip any rogue remaining asterisks so raw stars never leak to PDF
+    const cleanWord = part.replace(/\*/g, '');
+    if (!cleanWord && part !== '') continue;
+
+    const wordWidth = doc.getTextWidth(cleanWord);
+    if (curX + wordWidth > x + maxWidth && cleanWord.trim() !== '') {
       curX = x;
       curY += lineHeight;
     }
 
-    doc.text(part, curX, curY);
+    doc.text(cleanWord, curX, curY);
     curX += wordWidth;
   }
 
@@ -285,12 +292,12 @@ export const downloadCosmicMatrixPDF = async (
 
   // Yaşam Misyonu
   if (report.coreLifeMission) {
-    ensureSpace(35);
+    ensureSpace(38);
     doc.setFillColor(...cardDark);
-    doc.roundedRect(15, curY, 180, 28, 3, 3, 'F');
+    doc.roundedRect(15, curY, 180, 32, 3, 3, 'F');
     doc.setDrawColor(...gold);
     doc.setLineWidth(0.4);
-    doc.roundedRect(15, curY, 180, 28, 3, 3, 'D');
+    doc.roundedRect(15, curY, 180, 32, 3, 3, 'D');
 
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(10);
@@ -301,10 +308,9 @@ export const downloadCosmicMatrixPDF = async (
     doc.setFontSize(8.5);
     doc.setTextColor(...white);
     const mDesc = report.coreLifeMission.description;
-    const mLines = doc.splitTextToSize(mDesc, 166);
-    doc.text(mLines, 22, curY + 16);
+    drawTextWithBold(doc, mDesc, 22, curY + 15, 166, 4.3);
 
-    curY += 34;
+    curY += 38;
   }
 
   // ==========================================
