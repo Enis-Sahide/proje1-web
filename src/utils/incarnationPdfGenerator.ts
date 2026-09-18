@@ -399,6 +399,35 @@ export const downloadIncarnationPDF = async (
       curY = drawTextWithBold(doc, `**Aktif Kraliyet Yıldızları (4 Melek Kalkanı):** ${royalText}`, 15, curY, 180, 5.0);
       doc.setTextColor(...white);
     }
+
+    // Öne çıkan sabit yıldız temaslarının ezoterik tezahürleri
+    if (data.cosmicOrigin.allAlignments && data.cosmicOrigin.allAlignments.length > 0) {
+      const topInterpreted = data.cosmicOrigin.allAlignments
+        .filter(a => !!a.interpretation)
+        .slice(0, 2);
+      if (topInterpreted.length > 0) {
+        curY += 3;
+        doc.setFont('LiberationSans', 'bold');
+        doc.setFontSize(10.5);
+        doc.setTextColor(...gold);
+        doc.text('Öne Çıkan Sabit Yıldız İnisiyasyonları & Kadersel Tezahürü:', 15, curY);
+        curY += 4.5;
+
+        topInterpreted.forEach(align => {
+          if (!align.interpretation || curY > 265) return;
+          doc.setFont('LiberationSans', 'bold');
+          doc.setFontSize(9);
+          doc.setTextColor(190, 220, 255);
+          doc.text(`• ${align.interpretation.title} (${align.orb}° orb)`, 15, curY);
+          curY += 4;
+          doc.setFont('LiberationSans', 'normal');
+          doc.setFontSize(8);
+          doc.setTextColor(...white);
+          curY = drawTextWithBold(doc, `  ${align.interpretation.esotericMeaning}`, 15, curY, 180, 4.0);
+          curY += 1.5;
+        });
+      }
+    }
   }
 
   // ================= PAGE 3: KARMIC DEBTS =================

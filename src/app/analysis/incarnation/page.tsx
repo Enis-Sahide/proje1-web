@@ -29,6 +29,7 @@ import {
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import type { AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 import type { IncarnationAnalysisResult } from '@/features/astrology/engine/IncarnationEngine';
+import type { StarAlignment } from '@/features/astrology/engine/IncarnationHistoricalCosmic';
 import { downloadIncarnationPDF } from '@/utils/incarnationPdfGenerator';
 import { useAuth } from '@/context/AuthContext';
 import AuthPromptModal from '@/components/AuthPromptModal';
@@ -66,6 +67,7 @@ export default function IncarnationAnalysisPage() {
   // Modals
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showLockModal, setShowLockModal] = useState(false);
+  const [selectedStarAlignment, setSelectedStarAlignment] = useState<StarAlignment | null>(null);
 
   // Active Tab
   const [activeTab, setActiveTab] = useState<'past_life' | 'cosmic_origin' | 'karmic_debts' | 'draconic' | 'progressed' | 'next_life'>('past_life');
@@ -813,18 +815,19 @@ export default function IncarnationAnalysisPage() {
                         {resultData.cosmicOrigin.allAlignments.map((align, idx) => (
                           <div 
                             key={idx} 
-                            className={`p-3.5 rounded-xl border text-xs flex flex-col justify-between gap-2 transition-all ${
+                            onClick={() => setSelectedStarAlignment(align)}
+                            className={`p-3.5 rounded-xl border text-xs flex flex-col justify-between gap-2.5 transition-all cursor-pointer group hover:scale-[1.02] hover:shadow-lg ${
                               align.isRoyalStar 
-                                ? 'bg-amber-950/25 border-amber-500/40 text-amber-200 shadow-md' 
+                                ? 'bg-amber-950/25 border-amber-500/40 hover:border-amber-400 text-amber-200 shadow-md' 
                                 : align.starName.includes('Sirius')
-                                ? 'bg-indigo-950/30 border-cyan-400/40 text-cyan-200 shadow-md'
+                                ? 'bg-indigo-950/30 border-cyan-400/40 hover:border-cyan-300 text-cyan-200 shadow-md'
                                 : align.starName.includes('Polaris')
-                                ? 'bg-purple-950/30 border-purple-400/40 text-purple-200 shadow-md'
-                                : 'bg-white/5 border-white/10 text-white/80'
+                                ? 'bg-purple-950/30 border-purple-400/40 hover:border-purple-300 text-purple-200 shadow-md'
+                                : 'bg-white/5 border-white/10 hover:border-white/25 text-white/80'
                             }`}
                           >
                             <div className="flex items-center justify-between gap-2">
-                              <span className="font-bold flex items-center gap-1 text-sm">
+                              <span className="font-bold flex items-center gap-1.5 text-sm">
                                 {align.isRoyalStar && <span>👑</span>}
                                 {align.starName.includes('Sirius') && <span>✨</span>}
                                 {align.starName.includes('Polaris') && <span>🧭</span>}
@@ -864,6 +867,10 @@ export default function IncarnationAnalysisPage() {
                             </div>
                             <div className="text-[11px] text-white/70">
                               {align.connectedPoint}
+                            </div>
+                            <div className="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10px] font-bold text-indigo-300 group-hover:text-amber-300 transition-colors">
+                              <span>Ezoterik Anlamı İncele</span>
+                              <span>➜</span>
                             </div>
                           </div>
                         ))}
@@ -1580,6 +1587,92 @@ export default function IncarnationAnalysisPage() {
           </div>
         )}
       </div>
+
+      {/* Sabit Yıldız Derin Ezoterik Detay Modalı */}
+      {selectedStarAlignment && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => setSelectedStarAlignment(null)}
+        >
+          <div 
+            className="relative w-full max-w-xl bg-gradient-to-b from-[#12121a] via-[#0d0d14] to-black border border-[#D4AF37]/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            <button 
+              onClick={() => setSelectedStarAlignment(null)}
+              className="absolute top-5 right-5 p-2 rounded-full bg-white/10 text-white/70 hover:text-white hover:bg-white/20 transition-all cursor-pointer"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="flex items-start gap-4 pb-4 border-b border-white/10">
+              <div className="p-3.5 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-[#D4AF37] shadow-inner">
+                <Sparkles size={26} className="text-amber-300 animate-pulse" />
+              </div>
+              <div className="pr-8">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-indigo-500/20 text-indigo-200 border border-indigo-500/30">
+                    {selectedStarAlignment.layer}
+                  </span>
+                  <span className="text-[11px] text-amber-300 font-semibold">
+                    {selectedStarAlignment.orb}° Orb ile Kavuşum
+                  </span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold text-white leading-snug">
+                  {selectedStarAlignment.interpretation?.title || `${selectedStarAlignment.starName} & ${selectedStarAlignment.connectedPoint}`}
+                </h3>
+                <div className="text-xs text-mystic-text-muted mt-0.5">
+                  {selectedStarAlignment.constellation} • {selectedStarAlignment.connectedPoint}
+                </div>
+              </div>
+            </div>
+
+            {selectedStarAlignment.interpretation ? (
+              <div className="space-y-4 text-xs sm:text-sm">
+                <div className="p-4 rounded-2xl bg-black/40 border border-indigo-500/20 space-y-1.5 shadow-sm">
+                  <div className="flex items-center gap-2 font-bold text-indigo-300 text-xs uppercase tracking-wider">
+                    <span>🔮</span> Ezoterik Anlam & Kozmik Portal
+                  </div>
+                  <p className="text-white/85 leading-relaxed">
+                    {selectedStarAlignment.interpretation.esotericMeaning}
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-black/40 border border-cyan-500/20 space-y-1.5 shadow-sm">
+                  <div className="flex items-center gap-2 font-bold text-cyan-300 text-xs uppercase tracking-wider">
+                    <span>🌍</span> Hayattaki Tezahürü & Karakteristik Etkisi
+                  </div>
+                  <p className="text-white/85 leading-relaxed">
+                    {selectedStarAlignment.interpretation.lifeManifestation}
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-black/40 border border-amber-500/20 space-y-1.5 shadow-sm">
+                  <div className="flex items-center gap-2 font-bold text-[#FFD700] text-xs uppercase tracking-wider">
+                    <span>🧭</span> Ruhsal Görev & Kozmik Sınav
+                  </div>
+                  <p className="text-white/85 leading-relaxed">
+                    {selectedStarAlignment.interpretation.spiritualMission}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="text-xs text-mystic-text-muted leading-relaxed">
+                Bu sabit yıldız kavuşumu, ruhunuzun geçmiş enkarnasyonlardan taşıdığı kadim yetenekleri ve kadersel inisiyasyonu bu yaşam planına yansıtmaktadır.
+              </div>
+            )}
+
+            <div className="pt-2 flex justify-end">
+              <button
+                onClick={() => setSelectedStarAlignment(null)}
+                className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition-all cursor-pointer"
+              >
+                Kapat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Auth Prompt Modal */}
       <AuthPromptModal

@@ -12,6 +12,13 @@ export interface HistoricalEraResult {
   soulMemoryKey: string;
 }
 
+export interface StarPointInterpretation {
+  title: string;
+  esotericMeaning: string;
+  lifeManifestation: string;
+  spiritualMission: string;
+}
+
 export interface StarAlignment {
   starName: string;
   constellation: string;
@@ -20,6 +27,8 @@ export interface StarAlignment {
   layer: 'Natal (Fiziksel)' | 'Drakonik (Ruh Haritası)' | 'Bilinçdışı Tasarım (Ruh Kökü)' | '3. Harita (Beriyah / Zihin)';
   frequencyBadge: string;
   isRoyalStar?: boolean;
+  pointName?: string;
+  interpretation?: StarPointInterpretation;
 }
 
 export interface RoyalStarActivation {
@@ -218,6 +227,183 @@ const GALACTIC_FIXED_STARS: FixedStarDef[] = [
 function angleDifference(a: number, b: number): number {
   let diff = Math.abs(a - b) % 360;
   return diff > 180 ? 360 - diff : diff;
+}
+
+export function generateStarPointInterpretation(
+  starName: string,
+  pointName: string,
+  layer: string,
+  orb: number
+): StarPointInterpretation {
+  const isSirius = starName.includes('Sirius');
+  const isPolaris = starName.includes('Polaris');
+  const isOrion = starName.includes('Orion') || starName.includes('Betelgeuse') || starName.includes('Rigel') || starName.includes('Bellatrix');
+  const isAndromeda = starName.includes('Andromeda') || starName.includes('Mirach') || starName.includes('Alpheratz');
+  const isPleiades = starName.includes('Pleiades') || starName.includes('Alcyone');
+  const isArcturus = starName.includes('Arcturus');
+  const isGalacticCenter = starName.includes('Galaktik Merkez');
+  const isSpica = starName.includes('Spica');
+  const isVega = starName.includes('Vega');
+  const isCanopus = starName.includes('Canopus');
+
+  const isAldebaran = starName.includes('Aldebaran');
+  const isRegulus = starName.includes('Regulus');
+  const isAntares = starName.includes('Antares');
+  const isFomalhaut = starName.includes('Fomalhaut');
+
+  const pLower = pointName.toLowerCase();
+  const isVenus = pLower.includes('venüs') || pLower.includes('venus');
+  const isVertex = pLower.includes('vertex');
+  const isSun = pLower.includes('güneş') || pLower.includes('sun');
+  const isMoon = pLower.includes('ay') || pLower.includes('moon');
+  const isAsc = pLower.includes('yükselen') || pLower.includes('asc');
+  const isMc = pLower.includes('tepe') || pLower.includes('mc');
+  const isMars = pLower.includes('mars');
+  const isMercury = pLower.includes('merkür') || pLower.includes('mercury');
+  const isNeptune = pLower.includes('neptün') || pLower.includes('neptune');
+  const isUranus = pLower.includes('uranüs') || pLower.includes('uranus');
+
+  // 1. SIRIUS (Şİ'RA) ÖZEL KOMBİNASYONLARI
+  if (isSirius) {
+    if (isVenus) {
+      return {
+        title: "Sirius (Şi'ra) & Venüs: İlahi Kalp & Kozmik Şifa Kapısı",
+        esotericMeaning: "Ruhunuzun ilahi aşk, değer ve estetik merkezi (Venüs), Kuran'da adı geçen tek yıldız olan Şi'ra'nın 6. boyut mavi ışık frekansıyla mühürlenmiştir. Bu kavuşum, Atlantis ve Antik Mısır tapınaklarında inisiye edilmiş şifacı ve bilgelik elçisi kıdemli ruhlarda görülür.",
+        lifeManifestation: "Dünyevi sığ ilişkilere, menfaat bağlarına ve yüzeysel heveslere asla tahammül edemezsiniz. İlişkilerinizde aradığınız şey aslında ruh eşiniz değil, Sirius'taki kozmik ailenizin yüksek frekansıdır. Sanat, estetik, hücresel şifa ve insanlara karşılıksız sevgi akıtma konusunda doğal bir manyetizmanız vardır.",
+        spiritualMission: "Dünyanın kaba ve bencil sevgi kalıplarını dönüştürmek; koşulsuz sevgi ve kadim şifa frekansını insan ilişkilerine demirlemek."
+      };
+    }
+    if (isVertex) {
+      return {
+        title: "Sirius (Şi'ra) & Vertex (Vx): Kadersel Uyanış & İlahi Randevular Kapısı",
+        esotericMeaning: "Astrolojide Vertex 'Kadersel Girdap Kapısı'dır; kişinin kendi iradesi dışındaki ilahi eşzamanlılıkları ve kadersel sıçramaları yönetir. Sirius ile kavuşumu, hayatınızın belirli dönemlerinde kadersel portalların aniden açılacağını gösterir.",
+        lifeManifestation: "Karşınıza çıkan bazı kilit insanlar ve yaşadığınız ani kadersel karşılaşmalar asla rastlantı değildir. Bu karşılaşmalar, ruhunuzun derinliklerinde uyuyan kadim Sirius kodlarını uyandırmak üzere evrensel bir plan tarafından sahnelenir. Kriz gibi görünen dönüm noktaları sizi bir anda yüksek ruhsal misyonunuza taşır.",
+        spiritualMission: "İlahi eşzamanlılıklara ve kadersel randevulara güvenmek; hayatın akışında karşınıza çıkan kozmik işaretleri okuyarak kitlelere pusula olmak."
+      };
+    }
+    if (isAsc) {
+      return {
+        title: "Sirius (Şi'ra) & Yükselen (ASC): Mavi Işık Ruhsal Aurası",
+        esotericMeaning: "Auranız doğrudan Sirius frekansıyla parlar. İnsanlar sizin yanınızda açıklayamadıkları bir huzur, saygı ve ruhsal arınma hissederler.",
+        lifeManifestation: "Odaya girdiğinizde söz söylemeseniz dahi varlığınız ortamın frekansını yükseltir. Ruhsal kanallık ve sezgisel rehberlik yeteneğiniz çok güçlüdür.",
+        spiritualMission: "Karanlık ortamlara ilahi ışığı ve yüksek Sirius bilgelik frekansını yaymak."
+      };
+    }
+    return {
+      title: `Sirius (Şi'ra) & ${pointName} İnisiyasyonu`,
+      esotericMeaning: `Sirius'un kadim şifa ve ilahi rehberlik enerjisi haritanızdaki ${pointName} noktası üzerinden aktive olmaktadır. Ruhsal hafızanızda yüksek inisiyasyon bilgisi saklıdır.`,
+      lifeManifestation: `${pointName} temsil ettiği yaşam alanında derin bir sezgisellik, sahtelikleri anında sezme ve ilahi adalet arayışı yaşarsınız.`,
+      spiritualMission: "Dünyevi yanılsamaları aşıp Sirius'un kadim hakikat ışığını yeryüzüne aktarmak."
+    };
+  }
+
+  // 2. POLARIS (KUTUP YILDIZI)
+  if (isPolaris) {
+    return {
+      title: `Polaris (Kutup Yıldızı) & ${pointName}: Kozmik Pusula & Arşın Direği`,
+      esotericMeaning: "Kutup Yıldızı, gökkubbenin ve arşın etrafında döndüğü sarsılmaz merkezdir. Haritanızdaki bu kavuşum, ruhunuzun fırtınalarda asla savrulmayan bir kozmik pusula olduğunu simgeler.",
+      lifeManifestation: "Hayatınız boyunca krizler, kaoslar ve kitlelerin yönsüz kaldığı anlarda herkes içgüdüsel olarak size bakar. Doğal bir içsel istikametiniz vardır; insanlar sizin yanınızda güvende hisseder.",
+      spiritualMission: "Karanlıkta yönünü kaybeden ruhlara istikamet vermek ve evrensel ilahi nizamı yeryüzünde temsil etmek."
+    };
+  }
+
+  // 3. GALAKTİK MERKEZ
+  if (isGalacticCenter) {
+    return {
+      title: `Galaktik Merkez & ${pointName}: Samanyolu Çekirdeğinden Kozmik Elçilik`,
+      esotericMeaning: "Doğrudan Samanyolu'nun kalbinden gelen ilahi yayın frekansıdır. Ruhunuzun bilinci evrensel kaynak kodlara bağlıdır.",
+      lifeManifestation: "Küçük dünyevi hedefler sizi asla doyurmaz. Doğrudan ilham ve vahiy gibi aniden gelen derin idraklere sahipsiniz. Bilgiyi kaynaktan doğrudan 'download' edersiniz.",
+      spiritualMission: "Eski dar zihinsel kalıpları yıkıp kitleleri yeni galaktik bilinç çağına uyandırmak."
+    };
+  }
+
+  // 4. KRALİYET YILDIZLARI
+  if (isAldebaran) {
+    return {
+      title: `Aldebaran & ${pointName}: Başmelek Mikâil'in Hakikat Terazisi`,
+      esotericMeaning: "Doğu Kraliyet Yıldızı Aldebaran, Başmelek Mikâil'in kozmik kılıcı ve hakikat terazisidir. Dürüstlük, sözün namusu ve ilahi adalet sınavıdır.",
+      lifeManifestation: "Büyüleyici bir söz kudretine ve dürüstlüğe sahipsiniz. En ufak bir yalan veya hakkaniyetsizlik anında sistem sizi sınavlara çeker; doğru yolda kaldığınızda ise göksel bir koruma kalkanı verir.",
+      spiritualMission: "Yeryüzünde hakikati ve ilahi adaleti tavizsiz savunmak."
+    };
+  }
+  if (isRegulus) {
+    return {
+      title: `Regulus & ${pointName}: Başmelek Raphaël'in Asil Liderlik Mührü`,
+      esotericMeaning: "Kuzey Kraliyet Yıldızı Regulus, Başmelek Raphaël'in şifa ve soylu liderlik kapısıdır. Asalet, cömertlik ve bağışlayıcılık sınavıdır.",
+      lifeManifestation: "Doğal bir karizmanız ve kitleleri peşinizden sürükleme yeteneğiniz vardır. İntikam duygusundan arındığınız ve affedici olduğunuz sürece hayatınızda kadersel bir yükseliş vaat eder.",
+      spiritualMission: "Güç ve liderliği egonun değil, ilahi adaletin ve şifanın hizmetine sunmak."
+    };
+  }
+  if (isAntares) {
+    return {
+      title: `Antares & ${pointName}: Başmelek Azrail & Uriel'in Simya Kapısı`,
+      esotericMeaning: "Batı Kraliyet Yıldızı Antares, ölüm ve yeniden doğumun, karanlığın kalbine inip ışıkla çıkmanın simyasıdır.",
+      lifeManifestation: "Hayatınızda en büyük krizler ve yıkımlar, sizin en büyük gücünüze ve manevi uyanışınıza dönüşür. Korkusuz bir psikolojik ve okült algılama kabiliyetiniz vardır.",
+      spiritualMission: "Karanlık ve kriz içindeki ruhları aydınlığa çıkarmak ve simyasal dönüşümü yönetmek."
+    };
+  }
+  if (isFomalhaut) {
+    return {
+      title: `Fomalhaut & ${pointName}: Başmelek Cebrail'in Mistik Vizyon Kapısı`,
+      esotericMeaning: "Güney Kraliyet Yıldızı Fomalhaut, Başmelek Cebrail'in ilahi vahyinin, sanatsal dehasının ve mistik rüyalarının kanalıdır.",
+      lifeManifestation: "Geleceğe dair rüyalar, ilhamla gelen sanatsal deha ve derin bir mistik çekim. Niyetiniz saf olduğu sürece mucizevi eşzamanlılıklar yaşarsınız.",
+      spiritualMission: "Manevi alemler ile dünya arasında sanatsal ve sezgisel bir köprü olmak."
+    };
+  }
+
+  // 5. DİĞER GALAKTİK SABİT YILDIZLAR
+  if (isOrion) {
+    return {
+      title: `Orion (${starName.split(' ')[0]}) & ${pointName}: Kadim Bilgelik & Işık Savaşçısı`,
+      esotericMeaning: "Galaktik Işık ve Karanlık savaşlarından geçmiş, bilgeliğe ve kalp-akıl dengesine evrilen kıdemli ruh inisiyasyonu.",
+      lifeManifestation: "Muazzam bir içsel direnç, haksızlıklara karşı sarsılmaz cesaret ve kriz anlarında anında stratejik çözüm üretebilme gücü.",
+      spiritualMission: "Yeryüzünde adaleti, gerçeği ve ilahi dengeyi her ne pahasına olursa olsun savunmak."
+    };
+  }
+
+  if (isPleiades) {
+    return {
+      title: `Pleiades (Ülker) & ${pointName}: 5. Boyut Kalp Çakrası Frekansı`,
+      esotericMeaning: "5. Boyut koşulsuz sevgi, yüksek empati ve yaratıcı ışığı yeryüzüne tohumlama görevi.",
+      lifeManifestation: "Aşırı duyarlılık, telepatik sezgiler, sanat, müzik ve hayvanlarla kelimesiz anlaşabilme yeteneği.",
+      spiritualMission: "Dünyanın katılaşmış kalplerini sevgi, şefkat ve ilahi zarafetle yumuşatmak."
+    };
+  }
+
+  if (isArcturus) {
+    return {
+      title: `Arcturus & ${pointName}: 5. Boyut Bilinç Mimarisi & Geometrik Şifa`,
+      esotericMeaning: "İleri teknolojik zihin, geometrik şifa ve evrensel adalet frekansı.",
+      lifeManifestation: "Karmaşık sistemleri ve krizleri anında geometrik bir netlikle çözme dehası, yüksek stratejik akıl.",
+      spiritualMission: "Dünyanın ilkel ve hantal sistemlerini dönüştürerek yüksek ilahi nizamı kurmak."
+    };
+  }
+
+  if (isAndromeda) {
+    return {
+      title: `Andromeda & ${pointName}: Kozmik Özgürlük & Boyut Gezginliği`,
+      esotericMeaning: "Kozmik bağımsızlık, otoriter dogmaları kırma ve yeni bilinç kapılarını açma elçiliği.",
+      lifeManifestation: "Baskılara asla boyun eğmeme, sınırlanamaz özgür irade ve vizyoner öncülük gücü.",
+      spiritualMission: "Kozmik zincirleri kırmak ve insan bilincine özgürlük aşılamak."
+    };
+  }
+
+  if (isCanopus) {
+    return {
+      title: `Canopus (Süheyl) & ${pointName}: Büyük Kozmik Seyyah & Ruhsal Kılavuz`,
+      esotericMeaning: "Ruhların boyutlar arası yolculuklarında yön bulmalarını sağlayan kadim seyir yıldızı.",
+      lifeManifestation: "En karmaşık labirentlerden bile selametle çıkabilme, insanlara hayat yolculuklarında manevi rehberlik etme kabiliyeti.",
+      spiritualMission: "Yolunu kaybetmiş ruhlara deniz feneri gibi kılavuzluk etmek."
+    };
+  }
+
+  // Genel Fallback
+  return {
+    title: `${starName.split(' ')[0]} & ${pointName} Kozmik Hizalanması`,
+    esotericMeaning: `${starName} sabit yıldızının kadim frekansı, haritanızdaki ${pointName} noktasıyla ${orb}° orb ile rezonansa girmektedir.`,
+    lifeManifestation: `Bu yaşam alanında sıradan dünyevi sınırların ötesinde bir çekim, derin bir ruhsal arayış ve kadersel sorumluluk hissedersiniz.`,
+    spiritualMission: "Ruhunuzun geçmiş enkarnasyonlardan getirdiği kadim bilgiyi bu noktada dünya planına aktarmak."
+  };
 }
 
 /**
@@ -530,42 +716,49 @@ export function calculateCosmicOrigin(
       frequencyBadge = `${topRoyal.family} (Kraliyet Bekçisi)`;
     }
 
-    // İkincil yıldızları topla (en yüksek puanlı diğer yıldızlar)
-    const secondaryMatches = allMatches.filter(m => m.star.name !== bestMatch.star.name);
-    const uniqueSecondaryList: StarAlignment[] = [];
-    const seenStars = new Set<string>([bestMatch.star.name]);
+    // Tüm bireysel sabit yıldız temaslarını müstakil olarak koru ve her birine özel ezoterik anlam ata
+    const allAlignmentsList: StarAlignment[] = allMatches.slice(0, 12).map(m => {
+      const cleanConnectedPoint = `${m.point.name} ile ${m.orb}° orb`;
+      const interpretation = generateStarPointInterpretation(m.star.name, m.point.name, m.point.layer, m.orb);
+      return {
+        starName: m.star.name,
+        constellation: m.star.constellation,
+        connectedPoint: cleanConnectedPoint,
+        orb: m.orb,
+        layer: m.point.layer,
+        frequencyBadge: m.star.frequencyBadge,
+        isRoyalStar: m.isRoyal,
+        pointName: m.point.name,
+        interpretation
+      };
+    });
 
-    for (const m of secondaryMatches) {
-      if (!seenStars.has(m.star.name)) {
-        seenStars.add(m.star.name);
+    // İkincil yıldızları topla (en yüksek puanlı diğer yıldızlar)
+    const seenStarNames = new Set<string>([bestMatch.star.name]);
+    const uniqueSecondaryList: StarAlignment[] = [];
+    for (const m of allMatches) {
+      if (!seenStarNames.has(m.star.name)) {
+        seenStarNames.add(m.star.name);
         uniqueSecondaryList.push({
           starName: m.star.name,
           constellation: m.star.constellation,
-          connectedPoint: `${m.point.name} (${m.point.layer}) ile ${m.orb}° orb`,
+          connectedPoint: `${m.point.name} ile ${m.orb}° orb`,
           orb: m.orb,
           layer: m.point.layer,
           frequencyBadge: m.star.frequencyBadge,
-          isRoyalStar: m.isRoyal
+          isRoyalStar: m.isRoyal,
+          pointName: m.point.name,
+          interpretation: generateStarPointInterpretation(m.star.name, m.point.name, m.point.layer, m.orb)
         });
       }
       if (uniqueSecondaryList.length >= 5) break;
     }
 
-    const allAlignmentsList: StarAlignment[] = allMatches.slice(0, 10).map(m => ({
-      starName: m.star.name,
-      constellation: m.star.constellation,
-      connectedPoint: `${m.point.name} (${m.point.layer}) ile ${m.orb}° orb`,
-      orb: m.orb,
-      layer: m.point.layer,
-      frequencyBadge: m.star.frequencyBadge,
-      isRoyalStar: m.isRoyal
-    }));
-
     return {
       isStarseed,
       starName: bestMatch.star.name,
       constellation: bestMatch.star.constellation,
-      connectedPoint: `${bestMatch.point.name} (${bestMatch.point.layer}) ile Kavuşum (${bestMatch.orb}° orb)`,
+      connectedPoint: `${bestMatch.point.name} ile Kavuşum (${bestMatch.orb}° orb)`,
       orb: bestMatch.orb,
       soulMission,
       cosmicGift,
