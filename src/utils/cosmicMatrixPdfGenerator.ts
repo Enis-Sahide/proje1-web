@@ -200,10 +200,15 @@ export const downloadCosmicMatrixPDF = async (
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(10.2);
   doc.setTextColor(...white);
-  const displayName = userName.trim() ? userName.trim() : 'Bilinmeyen İsim';
-  doc.text(`İsim: ${displayName}`, 22, curY + 15);
-  doc.text(`Tarih: ${birthInfo.localDate}   |   Saat: ${birthInfo.localTime}`, 22, curY + 21);
-  doc.text(`Konum: ${birthInfo.cityName}${birthInfo.country ? ', ' + birthInfo.country : ''}`, 115, curY + 15);
+  const displayName = userName.trim();
+  if (displayName) {
+    doc.text(`İsim: ${displayName}`, 22, curY + 15);
+    doc.text(`Tarih: ${birthInfo.localDate}   |   Saat: ${birthInfo.localTime}`, 22, curY + 21);
+    doc.text(`Konum: ${birthInfo.cityName}${birthInfo.country ? ', ' + birthInfo.country : ''}`, 115, curY + 15);
+  } else {
+    doc.text(`Tarih: ${birthInfo.localDate}   |   Saat: ${birthInfo.localTime}`, 22, curY + 17);
+    doc.text(`Konum: ${birthInfo.cityName}${birthInfo.country ? ', ' + birthInfo.country : ''}`, 115, curY + 17);
+  }
 
   curY += 32;
 
@@ -518,9 +523,8 @@ export const downloadCosmicMatrixPDF = async (
   });
 
   // Save the PDF
-  const safeName = (userName || 'Kozmik_Matris')
-    .trim()
-    .replace(/[^a-zA-Z0-9çğıöşüÇĞİÖŞÜ_ -]/g, '')
-    .replace(/\s+/g, '_');
+  const safeName = userName.trim()
+    ? userName.trim().replace(/[^a-zA-Z0-9çğıöşüÇĞİÖŞÜ_ -]/g, '').replace(/\s+/g, '_')
+    : `Analiz_${birthInfo.localDate}`;
   doc.save(`7Layers_Kozmik_Matris_${safeName}.pdf`);
 };

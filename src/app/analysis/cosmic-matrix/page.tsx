@@ -180,7 +180,7 @@ export default function CosmicMatrixPage() {
       await downloadCosmicMatrixPDF(
         targetReport,
         druidTree || null,
-        name || (user?.user_metadata?.full_name || user?.fullName || 'Misafir'),
+        name.trim(),
         {
           localDate: dateStr,
           localTime: timeStr,
