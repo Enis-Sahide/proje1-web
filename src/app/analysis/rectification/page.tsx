@@ -165,7 +165,7 @@ const BENCHMARK_PRESETS: BenchmarkPreset[] = [
     title: 'Özel Analiz Vakası',
     officialTime: '18:05 (Gerçek Saat)',
     birthDate: '1995-03-17',
-    cityName: 'İstanbul',
+    cityName: 'Giresun',
     element: 'water',
     bodyType: 'slender',
     timeWindowType: 'all',
