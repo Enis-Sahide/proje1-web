@@ -399,23 +399,26 @@ export const downloadIncarnationPDF = async (
     data.retroDebts.forEach(debt => {
       // Split each text line to fit within card width (168mm)
       doc.setFont('LiberationSans', 'bold');
-      doc.setFontSize(12.5);
+      doc.setFontSize(12);
       const titleStr = `${debt.planet} Rx: ${debt.title}${debt.polarityLabel ? ` [${debt.polarityLabel}]` : ''}`;
+      const titleLines = doc.splitTextToSize(titleStr, 168);
 
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(10.5);
       const hdDiagLines = debt.hdDiagnosis ? doc.splitTextToSize(`⚡ Human Design Teşhisi: ${debt.hdDiagnosis}`, 168) : [];
 
-      doc.setFontSize(11.5);
+      doc.setFontSize(11);
       const pastLifeLines = doc.splitTextToSize(`Geçmiş Yaşam Nedeni: ${debt.pastLifeCause}`, 168);
       const currentKarmaLines = doc.splitTextToSize(`Bu Yaşamdaki Borç: ${debt.currentLifeKarma}`, 168);
       doc.setFont('LiberationSans', 'bold');
       const dharmaLines = doc.splitTextToSize(`Dharma Reçetesi: ${debt.dharmaRemedy}`, 168);
 
-      const lineHeight = 5.6;
-      const totalTextLinesCount = hdDiagLines.length + pastLifeLines.length + currentKarmaLines.length + dharmaLines.length;
-      // title(8mm) + lines + padding
-      const cardHeight = 18 + (totalTextLinesCount * lineHeight) + (hdDiagLines.length ? 4 : 0) + 6;
+      const lineHeight = 5.4;
+      const titleHeight = titleLines.length * 5.8;
+      const hdHeight = hdDiagLines.length > 0 ? (hdDiagLines.length * 4.8 + 2.5) : 0;
+      const totalTextLinesCount = pastLifeLines.length + currentKarmaLines.length + dharmaLines.length;
+      
+      const cardHeight = 10 + titleHeight + hdHeight + (totalTextLinesCount * lineHeight) + 8;
 
       ensureSpace(cardHeight + 6);
 
@@ -426,12 +429,12 @@ export const downloadIncarnationPDF = async (
       doc.setLineWidth(0.5);
       doc.roundedRect(15, curY, 180, cardHeight, 3, 3, 'D');
 
-      let textY = curY + 8;
+      let textY = curY + 7;
       doc.setFont('LiberationSans', 'bold');
-      doc.setFontSize(12.5);
+      doc.setFontSize(12);
       doc.setTextColor(...gold);
-      doc.text(titleStr, 20, textY);
-      textY += 7;
+      doc.text(titleLines, 20, textY);
+      textY += titleLines.length * 5.8 + 2;
 
       if (hdDiagLines.length > 0) {
         doc.setFont('LiberationSans', 'normal');
@@ -442,7 +445,7 @@ export const downloadIncarnationPDF = async (
       }
 
       doc.setFont('LiberationSans', 'normal');
-      doc.setFontSize(11.5);
+      doc.setFontSize(11);
       doc.setTextColor(...white);
       doc.text(pastLifeLines, 20, textY);
       textY += pastLifeLines.length * lineHeight + 2;
@@ -515,28 +518,37 @@ export const downloadIncarnationPDF = async (
 
   if (data.incarnationCross) {
     curY += 4;
-    ensureSpace(38);
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(11.5);
+    const crossTitleLines = doc.splitTextToSize(`⚡ ENKARNASYON ÇAPRAZI: ${data.incarnationCross.title} ${data.incarnationCross.code}`, 168);
+    const crossMissionLines = doc.splitTextToSize(`Ruhun Büyük Misyonu: ${data.incarnationCross.soulMission}`, 168);
+    
+    const crossBoxHeight = 16 + (crossTitleLines.length * 5.5) + (Math.min(2, crossMissionLines.length) * 5);
+    ensureSpace(crossBoxHeight + 6);
+
     doc.setFillColor(...cardDark);
-    doc.roundedRect(15, curY, 180, 32, 3, 3, 'F');
+    doc.roundedRect(15, curY, 180, crossBoxHeight, 3, 3, 'F');
     doc.setDrawColor(...gold);
     doc.setLineWidth(0.6);
-    doc.roundedRect(15, curY, 180, 32, 3, 3, 'D');
+    doc.roundedRect(15, curY, 180, crossBoxHeight, 3, 3, 'D');
 
+    let cY = curY + 7;
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(12);
+    doc.setFontSize(11.5);
     doc.setTextColor(...gold);
-    doc.text(`⚡ ENKARNASYON ÇAPRAZI: ${data.incarnationCross.title} ${data.incarnationCross.code}`, 20, curY + 8);
+    doc.text(crossTitleLines, 20, cY);
+    cY += crossTitleLines.length * 5.5 + 2;
 
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(10);
     doc.setTextColor(255, 255, 255);
-    doc.text(`Açı Tipi: ${data.incarnationCross.angleType}`, 20, curY + 15);
+    doc.text(`Açı Tipi: ${data.incarnationCross.angleType}`, 20, cY);
+    cY += 6;
 
-    const crossMissionLines = doc.splitTextToSize(`Ruhun Büyük Misyonu: ${data.incarnationCross.soulMission}`, 168);
     doc.setTextColor(215, 225, 255);
-    doc.text(crossMissionLines.slice(0, 2), 20, curY + 22);
+    doc.text(crossMissionLines.slice(0, 2), 20, cY);
 
-    curY += 36;
+    curY += crossBoxHeight + 6;
   }
 
   curY += 6;
