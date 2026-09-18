@@ -883,7 +883,7 @@ export function calculateIncarnationAnalysis(
   // 10. Tarihsel Zaman Tüneli & Galaktik Ruh Kökeni (Aşama 1)
   const historicalEra = calculateHistoricalEra(natalChart, gadData.sign, gadHouse);
   const beriyahChart = calculateHarmonicChart(natalChart, 9);
-  const cosmicOrigin = calculateCosmicOrigin(natalChart, birthDate, beriyahChart);
+  const cosmicOrigin = calculateCosmicOrigin(natalChart, birthDate, beriyahChart, draconicChart);
 
   return {
     gad: {

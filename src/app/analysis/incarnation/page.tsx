@@ -716,7 +716,19 @@ export default function IncarnationAnalysisPage() {
                               <div className="flex items-center justify-between gap-2">
                                 <span className="font-bold flex items-center gap-1">
                                   {align.isRoyalStar && <span>👑</span>}
-                                  <span>{align.starName.split(' ')[0]}</span>
+                                  <span>
+                                    {align.starName.includes('Galaktik Merkez') 
+                                      ? 'Galaktik Merkez' 
+                                      : align.starName.includes('Pleiades')
+                                      ? 'Pleiades (Alcyone)'
+                                      : align.starName.includes('Betelgeuse')
+                                      ? 'Orion (Betelgeuse)'
+                                      : align.starName.includes('Rigel')
+                                      ? 'Orion (Rigel)'
+                                      : align.starName.includes('Mirach')
+                                      ? 'Andromeda (Mirach)'
+                                      : align.starName.split(' ')[0]}
+                                  </span>
                                 </span>
                                 <span className={`px-1.5 py-0.5 rounded text-[10px] font-semibold ${
                                   align.layer.includes('Bilinçdışı') 
