@@ -4,7 +4,7 @@ export const runeBindingsData = [
     title: 'Skjaldmær: Kadim Aura Kalkanı ve Psişik Korunma (Biargrúnar)',
     description: 'Sigrdrífumál öğretisindeki Biargrúnar (koruma ve sığınak) geleneğine dayanan bu üçleme; Algiz\'in ilahi koruma kalkanını Othala\'nın soy ve hane dokunulmazlığıyla birleştirerek aurayı negatif tesirlerden mühürler.',
     runesUsed: 'Algiz - Othala - Algiz',
-    usageInstructions: 'Küçük beyaz bir kağıda siyah kalemle çizgileri aşağıdan yukarı doğru çizerek hazırlayın. Cüzdanınızda, çantanızda taşıyabilir veya evinizin/odanızın dış kapı pervazının üzerine yerleştirebilirsiniz. Düşük frekansları ve psişik ağırlığı anında bloke eder.',
+    usageInstructions: 'Kadim gelenekte dişbudak ahşabına veya evin giriş eşiğindeki taşa aşağıdan yukarıya kazınarak uygulanan bu mühür; günümüzde pratik olarak küçük beyaz bir kağıda siyah kalemle çizilerek de uygulanabilir. Cüzdanınızda taşıyabilir veya odanızın/evinizin kapı pervazının üzerine yerleştirebilirsiniz.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/bindrune_korunma.png' }
   },
   {
@@ -12,7 +12,7 @@ export const runeBindingsData = [
     title: 'Hugrúnar: Bilinçaltı ve Rüya Sezgisi Mührü (Laguz Galdrı)',
     description: 'Poetic Edda\'da zihinsel berraklık ve ruhsal idrak için geçen Hugrúnar geleneğidir. Laguz bilinçaltının derin akışını açarken, Ansuz ilahi rehberlik fısıltılarını taşır, Kenaz ise bu vizyonları uyanışta net bir kavrayış meşalesine dönüştürür.',
     runesUsed: 'Laguz - Ansuz - Kenaz',
-    usageInstructions: 'Mavi bir kağıt zemin üzerine siyah kalemle bu üçlemeyi çizin. Özellikle rüya rehberliğine ihtiyaç duyduğunuz gecelerde (örn: dolunay veya karar aşamalarında) yastığınızın altına veya komodinin üzerine yerleştirin. Uyumadan önce sembole odaklanıp niyetinizi derinleştirin.',
+    usageInstructions: 'Kadim İskandinav geleneğinde huş ağacı kabuğuna veya nehir taşına kazınarak hazırlanan bu formül; günümüzde pratik olarak mavi bir kağıt zemin üzerine siyah kalemle çizilerek de aynı niyetle uygulanabilir. Özellikle rüya rehberliği aradığınız gecelerde yastığınızın altına veya komodinin üzerine yerleştirin.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/bindrune_ruya.png' }
   },
   {
@@ -20,7 +20,7 @@ export const runeBindingsData = [
     title: 'Fehu & Gebo: Kutsal Denge ve Bereket Akışı (Auðr Galdrı)',
     description: 'Hávamál\'ın "Bir hediye daima karşılık bekler" kadim yasasına dayanan bu mühür; evrensel alma-verme dengesini (Gebo) neşe ve refah bereketiyle (Wunjo) mühürleyerek maddi akışı canlandırır.',
     runesUsed: 'Gebo - Wunjo - Gebo',
-    usageInstructions: 'Yeşil veya sarı renkli küçük bir kağıda kurşun kalemle çizip cüzdanınızda paraların arasına veya çalışma masanızın bereket köşesine yerleştirin. Çizerken bolluk ve refahın yaşamınıza aktığını niyet edin.',
+    usageInstructions: 'Kadim gelenekte meyve veren bir ağacın (elma veya meşe) dalına kazınarak bereketi çağıran bu tılsım; günümüzde pratik olarak yeşil veya sarı renkli bir kağıda kurşun kalemle çizilerek de uygulanabilir. Cüzdanınızda nakit paraların arasına veya çalışma masanızın bereket köşesine koyabilirsiniz.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/bindrune_bolluk.png' }
   },
   {
@@ -28,7 +28,7 @@ export const runeBindingsData = [
     title: 'Ljóss: Aura Parlatıcı Manyetizma ve Karizma (Solrúnar)',
     description: 'Güneşin saf ışığı Sowilo, zafer neşesi Wunjo ve yaratıcı meşale Kenaz\'ın birleşimidir. Kişinin aurik alanını aydınlatarak saygınlık, görünürlük ve doğal bir çekim gücü inşa eder.',
     runesUsed: 'Sowilo - Wunjo - Kenaz',
-    usageInstructions: 'Yeşil renkli bir kağıda kurşun kalemle çizerek hazırlayın. Önemli bir toplantıya, davete veya görüşmeye giderken cüzdanınızda ya da göğüs cebinizde üzerinizde taşıyın. Auranızın parlaklığını ve manyetik çekimini güçlendirir.',
+    usageInstructions: 'Kadim gelenekte bronz/pirinç bir madalyona kazınarak kalp hizasında taşınan bu formül; günümüzde pratik olarak yeşil renkli bir kağıda kurşun kalemle çizilerek de hazırlanabilir. Önemli bir davete veya toplantıya giderken göğüs cebinizde ya da çantanızda üzerinizde bulundurabilirsiniz.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/bindrune_begenilmek.png' }
   },
   {
@@ -36,7 +36,7 @@ export const runeBindingsData = [
     title: 'Friðr: Kalp Uyumu ve Ruhsal Denge Mührü',
     description: 'İki ruh arasındaki çatışmaları dindiren, gönül kırgınlıklarını onaran ve sevgi alışverişinde ilahi adaleti tesis eden kutsal uyum bağlamasıdır.',
     runesUsed: 'Gebo - Wunjo - Gebo',
-    usageInstructions: 'Yeşil veya pembe bir kağıda kurşun kalemle çizilerek yatak odasında başucuna konulabilir veya cüzdanda taşınabilir. İkili ilişkilerdeki çatışmaları yumuşatarak iki taraf arasında sakin ve adil bir sevgi bağı kurar.',
+    usageInstructions: 'Kadim gelenekte iki nehrin birleştiği yerden alınan pürüzsüz bir taşa kazınarak saklanan bu formül; günümüzde pratik olarak yeşil veya pembe bir kağıda kurşun kalemle çizilerek de uygulanabilir. Yatak odasında başucuna yerleştirebilir veya cüzdanınızda taşıyabilirsiniz.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/bindrune_denge.png' }
   },
   {
@@ -44,7 +44,7 @@ export const runeBindingsData = [
     title: 'Heill: Kadersel Fırsat ve Zafer Döngüsü (Sigrúnar)',
     description: 'Wunjo\'nun refahı, Sowilo\'nun kozmik ışığı ve Dagaz\'ın şafak vaktini simgeleyen yeni başlangıç gücüyle; tıkanan kadersel döngüleri aniden aydınlatan şans ve mucize bağlamasıdır.',
     runesUsed: 'Wunjo - Sowilo - Dagaz',
-    usageInstructions: 'Sarı veya beyaz bir kağıda mavi tükenmez kalemle çizilerek cüzdanda veya telefon kılıfınızın arkasında taşınabilir. Günlük akışta tıkanan işleri hızlandırmak ve beklenmedik kapıları aralamak için güçlü bir şans rezonansı üretir.',
+    usageInstructions: 'Kadim gelenekte şafak vaktinde güneşin ilk ışıklarıyla parşömene veya taşa kazınan bu tılsım; günümüzde pratik olarak sarı ya da beyaz bir kağıda mavi tükenmez kalemle çizilerek hazırlanabilir. Cüzdanda veya telefon kılıfınızın arkasında kadersel kapıları açmak için taşınabilir.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/bindrune_sans.png' }
   },
   {
@@ -52,7 +52,7 @@ export const runeBindingsData = [
     title: 'Limrúnar: Canlılık ve Hücresel Şifa Mührü',
     description: 'Sigrdrífumál\'da "ağaçların ve bedenin yaralarını saran rünler" olarak anılan kadim Limrúnar formülüdür. Uruz\'un ilkel yaşam gücü, Laguz\'un şifalı sıvı akışı ve Kenaz\'ın onarıcı ısısıyla bedenin kendini yenilemesini destekler.',
     runesUsed: 'Uruz - Laguz - Kenaz',
-    usageInstructions: 'Beyaz bir kağıda mavi kalemle çizilerek ağrıyan veya şifalanmasını istediğiniz bölgeye yakın tutulabilir ya da içme suyu bardağınızın altına yerleştirilebilir. Bedenin hücresel yenilenme hızını ve canlılığını destekler.',
+    usageInstructions: 'Kadim Limrúnar geleneğinde doğal keten bir beze veya şifalı taşlara çizilerek yaraya yakın tutulan bu mühür; günümüzde pratik olarak beyaz bir kağıda mavi kalemle çizilerek de uygulanabilir. Şifalanmasını istediğiniz bölgeye yakın tutabilir veya içme suyu bardağınızın altına koyabilirsiniz.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/bindrune_yara.png' }
   },
   {
@@ -60,7 +60,7 @@ export const runeBindingsData = [
     title: 'Ást: Kutsal Birlik ve Tutku Dengesi',
     description: 'Gebo\'nun adil ortaklığı, Uruz\'un köklü bedensel tutkusu ve Wunjo\'nun huzurlu saadetiyle evlilik ve derin ortaklıklarda sadakati, anlayışı ve tensel uyumu perçinler.',
     runesUsed: 'Gebo - Uruz - Wunjo',
-    usageInstructions: 'Pembe veya yeşil bir kağıda kurşun kalemle çizilip yatak başlığının altına veya iki tarafın ortak kullandığı bir alana yerleştirilir. Çiftler arasındaki kalp bağını, şefkati ve tensel uyumu perçinler.',
+    usageInstructions: 'Kadim gelenekte evliliğin kurulduğu ahşap yatak başlığına aşağıdan yukarıya doğru kazınan bu kutsal bağlama; günümüzde pratik olarak pembe veya yeşil bir kağıda kurşun kalemle çizilerek yatak başlığının altına veya ortak alana yerleştirilebilir.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/bindrune_evlilik.png' }
   },
   {
@@ -68,7 +68,7 @@ export const runeBindingsData = [
     title: 'Skilnaðr: Barışçıl Çözülme ve Karmik Bağ Kesme',
     description: 'Hagalaz ile tükenmiş döngüyü yıkar, Isa ile öfke ve kavgaları dondurur, Tiwaz ile taraflara adil ve onurlu bir ayrılık sağlar. Karmik yükü şiddete dönüştürmeden barışçıl vedalaşma formülüdür.',
     runesUsed: 'Hagalaz - Isa - Tiwaz',
-    usageInstructions: 'Beyaz bir kağıda siyah kalemle çizilerek ayrılık, mahkeme veya zorlu müzakere görüşmelerine giderken cebinizde taşınır. Süreç barışçıl ve adil biçimde kapandığında kağıt toprağa gömülerek veya suya bırakılarak vedalaşılır.',
+    usageInstructions: 'Kadim gelenekte barışçıl ayrılık niyetleriyle bir taşa kazınıp süreç bitince nehre bırakılan bu formül; günümüzde pratik olarak beyaz bir kağıda siyah kalemle çizilerek ayrılık veya mahkeme görüşmelerine giderken taşınabilir. Süreç bittiğinde kağıt toprağa gömülerek döngü kapatılır.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/bindrune_bitirme.png' }
   },
   {
@@ -76,7 +76,7 @@ export const runeBindingsData = [
     title: 'Þróttr: Cesaret, Kararlılık ve Köklenme (Tiwaz Galdrı)',
     description: 'Adalet ve savaş tanrısı Tyr\'ın sarsılmaz oku Tiwaz, Algiz\'in ruhsal kalkanı ve Uruz\'un vahşi dayanıklılığıyla içsel panik, anksiyete ve kök çakra korkularını sarsılmaz bir cesarete dönüştürür.',
     runesUsed: 'Tiwaz - Algiz - Uruz',
-    usageInstructions: 'Beyaz bir kağıda kurşun kalemle çizilerek hazırlanır. Özellikle panik, endişe veya sınav/yüzleşme anlarında bu kağıdı sol avucunuzun içine alarak 3 derin nefesle niyetinizi fısıldayın; cebinizde güvenle taşıyın.',
+    usageInstructions: 'Kadim Þróttr geleneğinde meşe palamuduna veya kalkanın iç yüzeyine kazınan bu cesaret mührü; günümüzde pratik olarak beyaz bir kağıda kurşun kalemle çizilerek sol avuç içine alınıp 3 derin nefesle niyet edilebilir; zorlu yüzleşmeler öncesinde cepte güvenle taşınır.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/fear_bindrune.png' }
   },
   {
@@ -84,7 +84,7 @@ export const runeBindingsData = [
     title: 'Iðrar: İçsel Arınma ve Sindirim Ritmi',
     description: 'Uruz bedensel gücü yeniler, Isa iltihabi ve aşırı yangılı süreçleri dondurarak sakinleştirir, Jera ise sindirim ve boşaltım sisteminin doğal döngüsünü ritmine kavuşturur.',
     runesUsed: 'Uruz - Isa - Jera',
-    usageInstructions: 'Beyaz bir kağıda kurşun kalemle çizip günlük içtiğiniz su sürahisinin veya bardağının altına koyun. Sindirim sisteminin doğal ritmine kavuşmasını ve karın bölgesindeki gerginliğin yatışmasını destekler.',
+    usageInstructions: 'Kadim gelenekte kuyu suyunun veya şifalı taşların üzerine okunup kazınan bu sindirim mührü; günümüzde pratik olarak beyaz bir kağıda kurşun kalemle çizilip günlük içilen su sürahisinin veya bardağının altına konularak uygulanabilir.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/bindrune_bagirsak.png' }
   },
   {
@@ -92,7 +92,7 @@ export const runeBindingsData = [
     title: 'Móðsefi: Ruhsal Diriliş ve İçsel Işığın Uyanışı',
     description: 'Karanlık kışın ardından güneşi çağıran İskandinav ruhsal diriliş formülüdür. Sowilo\'nun güneşi içteki donmuşluğu eritir, Tiwaz yeniden ayağa kalkma iradesi verir, Wunjo ise yaşama sevincini auranın merkezine yerleştirir.',
     runesUsed: 'Wunjo - Sowilo - Tiwaz',
-    usageInstructions: 'Beyaz bir kağıda mavi mürekkeple çizilerek sol bileğe yakın cepte veya çantada taşınır. Sabahları gün ışığında birkaç saniye sembolün içsel ışığınızı canlandırdığını imgeleyerek niyet edin.',
+    usageInstructions: 'Kadim Móðsefi geleneğinde kış sonrası güneşi çağırmak için huş ağacına çizilen bu diriliş formülü; günümüzde pratik olarak beyaz bir kağıda mavi mürekkeple çizilerek hazırlanabilir. Sabahları birkaç saniye sembolün içsel ışığınızı parlattığını imgeleyerek üzerinizde taşıyabilirsiniz.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/bindrune_depresyon.png' }
   },
   {
@@ -100,7 +100,7 @@ export const runeBindingsData = [
     title: 'Kaup: Ticari Bereket ve Mülk Kolaylaştırıcı',
     description: 'Fehu hareketli serveti, Othala gayrimenkul ve sabit mülkleri, Jera ise zamanı geldiğinde hasat toplamayı simgeler. Alım, satım ve ticari tıkanıklıkları adil ve bereketli şekilde çözer.',
     runesUsed: 'Fehu - Othala - Jera',
-    usageInstructions: 'Sarı veya beyaz bir kağıda kurşun kalemle çizilerek satışı veya alımı yapılacak mülkün, aracın veya evrakların yanında bulundurulur. Ticari tıkanıklıkları açarak adil ve bereketli bir anlaşma sağlar.',
+    usageInstructions: 'Kadim ticaret yollarında kervan sandıklarına veya pazar eşiklerine kazınan bu mülk tılsımı; günümüzde pratik olarak sarı veya beyaz bir kağıda kurşun kalemle çizilerek satışı/alımı yapılacak mülkün evraklarının veya anahtarının yanında bulundurulabilir.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/bindrune_alimsatim.png' }
   },
   {
@@ -108,7 +108,7 @@ export const runeBindingsData = [
     title: 'Málrúnar: Kariyer Kapıları ve İkna Kabiliyeti',
     description: 'Ansuz ilahi hitabet ve kendini doğru ifade etme yeteneği bahşederken, Fehu hak edilen emeğin karşılığını, Wunjo ise mülakatın zafer ve memnuniyetle sonuçlanmasını sağlar.',
     runesUsed: 'Fehu - Ansuz - Wunjo',
-    usageInstructions: 'Beyaz bir kağıda mavi tükenmez kalemle çizilerek mülakata giderken cüzdanda veya başvuru dosyasının arasında taşınır. Kendinizi en doğru şekilde ifade etmenizi ve kapıların kolaylıkla açılmasını destekler.',
+    usageInstructions: 'Kadim Málrúnar geleneğinde meclis ve divan görüşmelerine giderken boyna asılan bu hitabet rünü; günümüzde pratik olarak beyaz bir kağıda mavi tükenmez kalemle çizilerek mülakat evraklarının arasında veya cüzdanda taşınabilir.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/bindrune_isbulma.png' }
   },
   {
@@ -116,7 +116,7 @@ export const runeBindingsData = [
     title: 'Varna: Kem Göz ve Toksik Enerjiden Arınma',
     description: 'Hagalaz dışarıdan gelen düşük titreşimli fırtınaları kırar, Thurisaz koruyucu bir diken gibi negatif okları kaynağına geri püskürtür, Algiz ise auranın etrafına dokunulmaz bir kalkan örer.',
     runesUsed: 'Hagalaz - Thurisaz - Algiz',
-    usageInstructions: 'Küçük beyaz bir kağıda siyah kalemle çizilerek evin dış kapı girişine yakın bir yere asılır veya üzerinizde taşınır. Düşük frekanslı kıskançlıkları, negatif bakışları ve enerjisel sızıntıları anında bertaraf eder.',
+    usageInstructions: 'Kadim Varna geleneğinde hanenin dış kapı eşiğine veya demir bir kolyeye kazınan bu koruma kalkanı; günümüzde pratik olarak küçük beyaz bir kağıda siyah kalemle çizilip evin giriş kapısına asılabilir veya üzerinizde taşınabilir.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/bindrune_nazar.png' }
   },
   {
@@ -124,7 +124,7 @@ export const runeBindingsData = [
     title: 'Skuld: Borç Döngüsünü Kapatma ve Finansal Kurtuluş',
     description: 'Norn tanrıçası Skuld\'un (kader ve borçlar) yasasına dayanır. Fehu ile maddi akış çağrılır, Hagalaz ile borç batağının kısır döngüsü parçalanır, Jera ile adil ve dengeli bir bereket hasadına geçilir.',
     runesUsed: 'Fehu - Hagalaz - Jera',
-    usageInstructions: 'Beyaz veya kraft bir kağıda siyah kalemle çizilerek cüzdanda banka kartlarının veya nakit paranın yanında taşınır. Borç döngüsünü kapatmak ve alma-verme dengesini yeniden inşa etmek için güçlü bir niyet çıpasıdır.',
+    usageInstructions: 'Kadim Skuld öğretisinde borç ve alacak defterlerinin köşesine kazınan bu denge mühür; günümüzde pratik olarak beyaz veya kraft bir kağıda siyah kalemle çizilerek cüzdanda banka kartları ve nakit paranın yanında taşınabilir.',
     image: { uri: 'https://mbqjklupfoqbcfxusigs.supabase.co/storage/v1/object/public/app-assets/images/runes/bindrune_borc.png' }
   }
 ];
