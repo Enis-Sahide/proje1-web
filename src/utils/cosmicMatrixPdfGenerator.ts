@@ -186,58 +186,57 @@ export const downloadCosmicMatrixPDF = async (
   // Künye Kartı
   curY += 10;
   doc.setFillColor(...cardDark);
-  doc.roundedRect(15, curY, 180, 28, 3, 3, 'F');
+  doc.roundedRect(15, curY, 180, 30, 3, 3, 'F');
   doc.setDrawColor(...gold);
   doc.setLineWidth(0.4);
-  doc.roundedRect(15, curY, 180, 28, 3, 3, 'D');
+  doc.roundedRect(15, curY, 180, 30, 3, 3, 'D');
 
   doc.setFont('LiberationSans', 'bold');
-  doc.setFontSize(10);
+  doc.setFontSize(11);
   doc.setTextColor(...gold);
   doc.text('DANIŞAN / HARİTA SAHİBİ KÜNYESİ', 22, curY + 8);
 
   doc.setFont('LiberationSans', 'normal');
-  doc.setFontSize(9.5);
+  doc.setFontSize(10.5);
   doc.setTextColor(...white);
   const displayName = userName.trim() ? userName.trim() : 'Bilinmeyen İsim';
-  doc.text(`İsim: ${displayName}`, 22, curY + 16);
-  doc.text(`Tarih: ${birthInfo.localDate}   |   Saat: ${birthInfo.localTime}`, 22, curY + 23);
-  doc.text(`Konum: ${birthInfo.cityName}${birthInfo.country ? ', ' + birthInfo.country : ''}`, 115, curY + 16);
+  doc.text(`İsim: ${displayName}`, 22, curY + 17);
+  doc.text(`Tarih: ${birthInfo.localDate}   |   Saat: ${birthInfo.localTime}`, 22, curY + 24);
+  doc.text(`Konum: ${birthInfo.cityName}${birthInfo.country ? ', ' + birthInfo.country : ''}`, 115, curY + 17);
 
-  curY += 36;
+  curY += 38;
 
   // Druid Kök Ağacı Kartı
   if (druidTree) {
     doc.setFillColor(15, 30, 25);
-    doc.roundedRect(15, curY, 180, 48, 3, 3, 'F');
+    doc.roundedRect(15, curY, 180, 56, 3, 3, 'F');
     doc.setDrawColor(...emerald);
     doc.setLineWidth(0.5);
-    doc.roundedRect(15, curY, 180, 48, 3, 3, 'D');
+    doc.roundedRect(15, curY, 180, 56, 3, 3, 'D');
 
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(11);
+    doc.setFontSize(12.5);
     doc.setTextColor(...emerald);
     doc.text(`RUHSAL KÖK AĞACINIZ: ${druidTree.name.toUpperCase()} (${druidTree.botanicalName})`, 22, curY + 9);
 
     doc.setFont('LiberationSans', 'normal');
-    doc.setFontSize(8.5);
+    doc.setFontSize(10.5);
     doc.setTextColor(...white);
-    doc.text(`Kelt Ogham Sembolü: ${druidTree.oghamSymbol} (${druidTree.oghamName})   |   Element: ${druidTree.element}   |   Yönetici: ${druidTree.rulingPlanets}`, 22, curY + 17);
+    doc.text(`Kelt Ogham Sembolü: ${druidTree.oghamSymbol} (${druidTree.oghamName})   |   Element: ${druidTree.element}   |   Yönetici: ${druidTree.rulingPlanets}`, 22, curY + 18);
 
     const druidDesc = `Doğum gününüz gereği ruhsal rezonansınız ve doğadaki temel kökünüz ${druidTree.name} ile temas halindedir. Bu raporda incelenen 13 gezegenin bitkisel frekansları sizin ağaç kimliğiniz olmayıp; göksel enerjileri içe ve dışa aktarırken dengeleyen kadim aromaterapi frekanslarıdır.`;
-    const dLines = doc.splitTextToSize(druidDesc, 166);
     doc.setFont('LiberationSans', 'normal');
-    doc.setFontSize(8.5);
+    doc.setFontSize(10.8);
     doc.setTextColor(...muted);
-    doc.text(dLines, 22, curY + 25);
+    drawTextWithBold(doc, druidDesc, 22, curY + 26, 166, 5.8);
 
-    curY += 56;
+    curY += 62;
   }
 
   // 4 Âlem / Element Dengesi Özeti
   if (report.fourWorldsBalance) {
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(13);
+    doc.setFontSize(14);
     doc.setTextColor(...gold);
     doc.text('4 Âlem & Element Dağılım Dengesi', 15, curY);
 
@@ -259,58 +258,58 @@ export const downloadCosmicMatrixPDF = async (
     elementsData.forEach((el, i) => {
       const elX = 15 + (i * 45);
       doc.setFillColor(...cardDark);
-      doc.roundedRect(elX, curY, colW, 24, 2, 2, 'F');
+      doc.roundedRect(elX, curY, colW, 30, 2, 2, 'F');
       doc.setDrawColor(60, 70, 95);
       doc.setLineWidth(0.3);
-      doc.roundedRect(elX, curY, colW, 24, 2, 2, 'D');
+      doc.roundedRect(elX, curY, colW, 30, 2, 2, 'D');
 
       doc.setFont('LiberationSans', 'bold');
-      doc.setFontSize(11);
+      doc.setFontSize(14.5);
       doc.setTextColor(...gold);
-      doc.text(el.percent, elX + (colW / 2), curY + 9, { align: 'center' });
+      doc.text(el.percent, elX + (colW / 2), curY + 11, { align: 'center' });
 
       doc.setFont('LiberationSans', 'normal');
-      doc.setFontSize(7.5);
+      doc.setFontSize(10.0);
       doc.setTextColor(...white);
-      doc.text(el.count, elX + (colW / 2), curY + 16, { align: 'center' });
+      doc.text(el.count, elX + (colW / 2), curY + 19, { align: 'center' });
 
       doc.setFont('LiberationSans', 'normal');
-      doc.setFontSize(6.5);
+      doc.setFontSize(9.2);
       doc.setTextColor(...muted);
       const shortName = el.name.split(' (')[0];
-      doc.text(shortName, elX + (colW / 2), curY + 21, { align: 'center' });
+      doc.text(shortName, elX + (colW / 2), curY + 26, { align: 'center' });
     });
 
-    curY += 32;
+    curY += 37;
 
     doc.setFont('LiberationSans', 'normal');
-    doc.setFontSize(8.5);
+    doc.setFontSize(11.2);
     doc.setTextColor(...white);
-    curY = drawTextWithBold(doc, `**Baskın Âlem / Enerji:** ${fw.dominantWorld} | **Tekâmül ve Gelişim Âlemi:** ${fw.growthWorld}`, 15, curY, 180, 5.5);
+    curY = drawTextWithBold(doc, `**Baskın Âlem / Enerji:** ${fw.dominantWorld} | **Tekâmül ve Gelişim Âlemi:** ${fw.growthWorld}`, 15, curY, 180, 6.2);
     curY += 4;
   }
 
   // Yaşam Misyonu
   if (report.coreLifeMission) {
-    ensureSpace(38);
+    ensureSpace(46);
     doc.setFillColor(...cardDark);
-    doc.roundedRect(15, curY, 180, 32, 3, 3, 'F');
+    doc.roundedRect(15, curY, 180, 44, 3, 3, 'F');
     doc.setDrawColor(...gold);
     doc.setLineWidth(0.4);
-    doc.roundedRect(15, curY, 180, 32, 3, 3, 'D');
+    doc.roundedRect(15, curY, 180, 44, 3, 3, 'D');
 
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(10);
+    doc.setFontSize(12);
     doc.setTextColor(...gold);
-    doc.text(`ÇEKİRDEK YAŞAM MİSYONU: ${report.coreLifeMission.title.toUpperCase()}`, 22, curY + 8);
+    doc.text(`ÇEKİRDEK YAŞAM MİSYONU: ${report.coreLifeMission.title.toUpperCase()}`, 22, curY + 9);
 
     doc.setFont('LiberationSans', 'normal');
-    doc.setFontSize(8.5);
+    doc.setFontSize(11.2);
     doc.setTextColor(...white);
     const mDesc = report.coreLifeMission.description;
-    drawTextWithBold(doc, mDesc, 22, curY + 15, 166, 4.3);
+    drawTextWithBold(doc, mDesc, 22, curY + 17, 166, 6.2);
 
-    curY += 38;
+    curY += 48;
   }
 
   // ==========================================
@@ -322,7 +321,7 @@ export const downloadCosmicMatrixPDF = async (
   curY = 24;
 
   doc.setFont('LiberationSans', 'bold');
-  doc.setFontSize(14);
+  doc.setFontSize(15);
   doc.setTextColor(...gold);
   doc.text('13 Gezegen Dinamik Teşhisi & Bitkisel Frekans Reçeteleri', 15, curY);
 
@@ -333,40 +332,40 @@ export const downloadCosmicMatrixPDF = async (
   curY += 7;
 
   report.planetaryDynamics.forEach((planet: PlanetaryDynamicDiagnosis) => {
-    ensureSpace(58);
+    ensureSpace(74);
 
     // Gezegen Başlık Çubuğu
     doc.setFillColor(...cardDark);
-    doc.roundedRect(15, curY, 180, 10, 2, 2, 'F');
+    doc.roundedRect(15, curY, 180, 12, 2, 2, 'F');
     doc.setDrawColor(...gold);
     doc.setLineWidth(0.3);
-    doc.roundedRect(15, curY, 180, 10, 2, 2, 'D');
+    doc.roundedRect(15, curY, 180, 12, 2, 2, 'D');
 
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(9.5);
+    doc.setFontSize(12.5);
     doc.setTextColor(...gold);
     const directionTag = planet.energyDirection === 'inward' ? '[İçe Dönük / Yin]' : '[Dışa Aktarılan / Yang]';
-    doc.text(`${planet.planetName} (${planet.sign}, ${planet.house}. Ev) ${directionTag}`, 20, curY + 6.8);
+    doc.text(`${planet.planetName} (${planet.sign}, ${planet.house}. Ev) ${directionTag}`, 20, curY + 8);
 
     doc.setFont('LiberationSans', 'normal');
-    doc.setFontSize(8);
+    doc.setFontSize(10.5);
     doc.setTextColor(...muted);
-    doc.text(`HD Kapı ${planet.gate}.${planet.line} (${planet.center})`, 190, curY + 6.8, { align: 'right' });
+    doc.text(`HD Kapı ${planet.gate}.${planet.line} (${planet.center})`, 190, curY + 8, { align: 'right' });
 
-    curY += 13;
+    curY += 16;
 
     // Teşhis ve Ruhsal Mesaj
     doc.setFont('LiberationSans', 'normal');
-    doc.setFontSize(8.5);
+    doc.setFontSize(11.2);
     doc.setTextColor(...white);
-    curY = drawTextWithBold(doc, `**Arketip & Akış:** ${planet.archetypeTheme}`, 17, curY, 176, 5);
-    curY = drawTextWithBold(doc, `**Tezahür & Etki:** ${planet.activeManifestation}`, 17, curY, 176, 5);
-    curY = drawTextWithBold(doc, `**Kabala & Ruhsal Ders:** ${planet.kabbalahSephira} (${planet.kabbalahWorld}) - ${planet.kabbalahLesson}`, 17, curY, 176, 5);
+    curY = drawTextWithBold(doc, `**Arketip & Akış:** ${planet.archetypeTheme}`, 17, curY, 176, 6.6);
+    curY = drawTextWithBold(doc, `**Tezahür & Etki:** ${planet.activeManifestation}`, 17, curY, 176, 6.6);
+    curY = drawTextWithBold(doc, `**Kabala & Ruhsal Ders:** ${planet.kabbalahSephira} (${planet.kabbalahWorld}) - ${planet.kabbalahLesson}`, 17, curY, 176, 6.6);
 
     // Dengeleyici Bitkisel Frekans & Buhur
     if (planet.botanical) {
       doc.setFont('LiberationSans', 'normal');
-      doc.setFontSize(8.5);
+      doc.setFontSize(11.2);
       doc.setTextColor(160, 240, 200);
       curY = drawTextWithBold(
         doc,
@@ -374,29 +373,29 @@ export const downloadCosmicMatrixPDF = async (
         17,
         curY,
         176,
-        5
+        6.6
       );
     }
 
     // Pratik Dengeleme Önerisi
     if (planet.practicalRemedy) {
       doc.setFont('LiberationSans', 'normal');
-      doc.setFontSize(8.5);
+      doc.setFontSize(11.2);
       doc.setTextColor(255, 230, 160);
-      curY = drawTextWithBold(doc, `**Pratik Dengeleme Reçetesi:** ${planet.practicalRemedy}`, 17, curY, 176, 5);
+      curY = drawTextWithBold(doc, `**Pratik Dengeleme Reçetesi:** ${planet.practicalRemedy}`, 17, curY, 176, 6.6);
     }
 
-    curY += 4;
+    curY += 6;
   });
 
   // ==========================================
   // KİŞİSEL TILSIM & MÜHÜR FORMÜLÜ (SON SAYFA)
   // ==========================================
   if (report.personalTalisman) {
-    ensureSpace(65);
+    ensureSpace(85);
 
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(13);
+    doc.setFontSize(14);
     doc.setTextColor(...gold);
     doc.text('Kişisel Kozmik Denge Mührü & Tılsım Formülü', 15, curY);
 
@@ -407,25 +406,25 @@ export const downloadCosmicMatrixPDF = async (
     curY += 7;
 
     doc.setFillColor(...cardDark);
-    doc.roundedRect(15, curY, 180, 50, 3, 3, 'F');
+    doc.roundedRect(15, curY, 180, 75, 3, 3, 'F');
     doc.setDrawColor(...gold);
     doc.setLineWidth(0.4);
-    doc.roundedRect(15, curY, 180, 50, 3, 3, 'D');
+    doc.roundedRect(15, curY, 180, 75, 3, 3, 'D');
 
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(10);
+    doc.setFontSize(12.5);
     doc.setTextColor(...gold);
-    doc.text(report.personalTalisman.title, 22, curY + 8);
+    doc.text(report.personalTalisman.title, 22, curY + 9);
 
     doc.setFont('LiberationSans', 'normal');
-    doc.setFontSize(8.5);
+    doc.setFontSize(11.2);
     doc.setTextColor(...white);
-    curY += 15;
-    curY = drawTextWithBold(doc, `**Kullanılan Rünik & Göksel Semboller:** ${report.personalTalisman.runesUsed}`, 22, curY, 166, 5);
-    curY = drawTextWithBold(doc, `**Amacı & Ruhsal Etkisi:** ${report.personalTalisman.purpose}`, 22, curY, 166, 5);
-    curY = drawTextWithBold(doc, `**Uygulama & Odaklanma:** ${report.personalTalisman.usageInstructions}`, 22, curY, 166, 5);
+    curY += 17;
+    curY = drawTextWithBold(doc, `**Kullanılan Rünik & Göksel Semboller:** ${report.personalTalisman.runesUsed}`, 22, curY, 166, 6.5);
+    curY = drawTextWithBold(doc, `**Amacı & Ruhsal Etkisi:** ${report.personalTalisman.purpose}`, 22, curY, 166, 6.5);
+    curY = drawTextWithBold(doc, `**Uygulama & Odaklanma:** ${report.personalTalisman.usageInstructions}`, 22, curY, 166, 6.5);
     if (report.personalTalisman.incenseAndHerbs) {
-      curY = drawTextWithBold(doc, `**Önerilen Doğal Tütsü/Bitki:** ${report.personalTalisman.incenseAndHerbs}`, 22, curY, 166, 5);
+      curY = drawTextWithBold(doc, `**Önerilen Doğal Tütsü/Bitki:** ${report.personalTalisman.incenseAndHerbs}`, 22, curY, 166, 6.5);
     }
   }
 
