@@ -270,12 +270,12 @@ export const downloadIncarnationPDF = async (
   doc.addPage();
   drawHeader();
 
-  // SECTION 2: 12. EV & SON NEFES
-  curY = 30;
-  doc.setFont('LiberationSans', 'bold');
-  doc.setFontSize(19);
-  doc.setTextColor(...gold);
-  doc.text('2. 12. Ev Karmik Hafızası & Son Nefes Şartları', 15, curY);
+    // SECTION 2: 12. EV & SON NEFES
+    curY = 30;
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(19);
+    doc.setTextColor(...gold);
+    doc.text('12. Ev Karmik Hafızası & Son Nefes Şartları', 15, curY);
 
   curY += 6;
   doc.setDrawColor(...gold);
@@ -354,49 +354,62 @@ export const downloadIncarnationPDF = async (
     curY = drawTextWithBold(doc, `**Ruhun Kök Hatırlayışı:** ${data.historicalEra.soulMemoryKey}`, 15, curY, 180, 5.5);
   }
 
-  // KOZMİK RUH KÖKENİ & GALAKTİK İZİ (STARSEED)
+  // ================= PAGE: KOZMİK RUH KÖKENİ & GALAKTİK İZİ (STARSEED) =================
   if (data.cosmicOrigin) {
-    ensureSpace(45);
-    curY += 6;
+    doc.addPage();
+    drawHeader();
+
+    curY = 30;
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(14.5);
+    doc.setFontSize(19);
+    doc.setTextColor(...gold);
+    doc.text('2. Kozmik Ruh Kökeni & Galaktik Yıldız Hizalanmaları', 15, curY);
+
+    curY += 6;
+    doc.setDrawColor(...gold);
+    doc.setLineWidth(0.6);
+    doc.line(15, curY, 195, curY);
+
+    curY += 10;
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(15);
     doc.setTextColor(180, 200, 255);
     const starTitle = data.cosmicOrigin.isHybrid && data.cosmicOrigin.hybridTitle
       ? `Kozmik Ruh Kökeni: ${data.cosmicOrigin.hybridTitle} (Galaktik Melez)`
       : `Kozmik Ruh Kökeni: ${data.cosmicOrigin.starName}`;
     doc.text(starTitle, 15, curY);
 
-    curY += 5.5;
+    curY += 6;
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(10);
+    doc.setFontSize(11);
     doc.setTextColor(190, 220, 255);
     doc.text(`Frekans: ${data.cosmicOrigin.frequencyBadge} | Hiza: ${data.cosmicOrigin.connectedPoint}`, 15, curY);
 
-    curY += 6;
+    curY += 7;
     doc.setFont('LiberationSans', 'normal');
-    doc.setFontSize(9.5);
+    doc.setFontSize(11.5);
     doc.setTextColor(...white);
-    curY = drawTextWithBold(doc, `**Kozmik Yaşam Misyonu:** ${data.cosmicOrigin.soulMission}`, 15, curY, 180, 5.2);
-    curY += 2;
-    curY = drawTextWithBold(doc, `**Kozmik Deha & Hediye:** ${data.cosmicOrigin.cosmicGift}`, 15, curY, 180, 5.2);
-    curY += 2;
-    curY = drawTextWithBold(doc, `**Hücresel Yabancılık & Sınav:** ${data.cosmicOrigin.earthlyChallenge}`, 15, curY, 180, 5.2);
+    curY = drawTextWithBold(doc, `**Kozmik Yaşam Misyonu:** ${data.cosmicOrigin.soulMission}`, 15, curY, 180, 6.0);
+    curY += 3;
+    curY = drawTextWithBold(doc, `**Kozmik Deha & Hediye:** ${data.cosmicOrigin.cosmicGift}`, 15, curY, 180, 6.0);
+    curY += 3;
+    curY = drawTextWithBold(doc, `**Hücresel Yabancılık & Sınav:** ${data.cosmicOrigin.earthlyChallenge}`, 15, curY, 180, 6.0);
 
     if (data.cosmicOrigin.secondaryStars && data.cosmicOrigin.secondaryStars.length > 0) {
-      curY += 2.5;
+      curY += 3;
       const secAlignmentsText = data.cosmicOrigin.secondaryStars
         .map(s => `${s.starName.split(' ')[0]} (${s.layer.includes('Bilinçdışı') ? 'Bilinçdışı Tasarım' : s.layer.includes('Drakonik') ? 'Drakonik' : s.layer.includes('Beriyah') ? '3. Harita' : 'Natal'}, ${s.orb}° orb)`)
         .join(' • ');
-      curY = drawTextWithBold(doc, `**Katmanlar Arası Hizalanan Yıldızlar:** ${secAlignmentsText}`, 15, curY, 180, 5.0);
+      curY = drawTextWithBold(doc, `**Katmanlar Arası Hizalanan Yıldızlar:** ${secAlignmentsText}`, 15, curY, 180, 5.8);
     }
 
     if (data.cosmicOrigin.royalStarsActive && data.cosmicOrigin.royalStarsActive.length > 0) {
-      curY += 2;
+      curY += 3;
       const royalText = data.cosmicOrigin.royalStarsActive
         .map(r => `${r.starName} (${r.layer.includes('Beriyah') ? '3. Harita' : r.layer.includes('Drakonik') ? 'Drakonik' : 'Natal'}, ${r.pointName}, ${r.orb}° orb)`)
         .join(' • ');
       doc.setTextColor(...gold);
-      curY = drawTextWithBold(doc, `**Aktif Kraliyet Yıldızları (4 Melek Kalkanı):** ${royalText}`, 15, curY, 180, 5.0);
+      curY = drawTextWithBold(doc, `**Aktif Kraliyet Yıldızları (4 Melek Kalkanı):** ${royalText}`, 15, curY, 180, 5.8);
       doc.setTextColor(...white);
     }
 
@@ -404,27 +417,50 @@ export const downloadIncarnationPDF = async (
     if (data.cosmicOrigin.allAlignments && data.cosmicOrigin.allAlignments.length > 0) {
       const topInterpreted = data.cosmicOrigin.allAlignments
         .filter(a => !!a.interpretation)
-        .slice(0, 2);
+        .slice(0, 3);
       if (topInterpreted.length > 0) {
-        curY += 3;
+        curY += 5;
         doc.setFont('LiberationSans', 'bold');
-        doc.setFontSize(10.5);
+        doc.setFontSize(13);
         doc.setTextColor(...gold);
         doc.text('Öne Çıkan Sabit Yıldız İnisiyasyonları & Kadersel Tezahürü:', 15, curY);
-        curY += 4.5;
+        curY += 7;
 
         topInterpreted.forEach(align => {
-          if (!align.interpretation || curY > 265) return;
+          if (!align.interpretation) return;
+
           doc.setFont('LiberationSans', 'bold');
-          doc.setFontSize(9);
-          doc.setTextColor(190, 220, 255);
-          doc.text(`• ${align.interpretation.title} (${align.orb}° orb)`, 15, curY);
-          curY += 4;
+          doc.setFontSize(11.5);
+          const starTitleLines = doc.splitTextToSize(`★ ${align.interpretation.title} (${align.orb}° orb - ${align.connectedPoint})`, 168);
+
           doc.setFont('LiberationSans', 'normal');
-          doc.setFontSize(8);
+          doc.setFontSize(10.5);
+          const meaningLines = doc.splitTextToSize(align.interpretation.esotericMeaning, 168);
+
+          const lineHeight = 5.2;
+          const cardHeight = 10 + (starTitleLines.length * 5.6) + (meaningLines.length * lineHeight) + 6;
+
+          ensureSpace(cardHeight + 6);
+
+          doc.setFillColor(...cardDark);
+          doc.roundedRect(15, curY, 180, cardHeight, 3, 3, 'F');
+          doc.setDrawColor(90, 110, 180);
+          doc.setLineWidth(0.4);
+          doc.roundedRect(15, curY, 180, cardHeight, 3, 3, 'D');
+
+          let textY = curY + 6.5;
+          doc.setFont('LiberationSans', 'bold');
+          doc.setFontSize(11.5);
+          doc.setTextColor(255, 215, 0);
+          doc.text(starTitleLines, 20, textY);
+          textY += (starTitleLines.length * 5.6) + 2;
+
+          doc.setFont('LiberationSans', 'normal');
+          doc.setFontSize(10.5);
           doc.setTextColor(...white);
-          curY = drawTextWithBold(doc, `  ${align.interpretation.esotericMeaning}`, 15, curY, 180, 4.0);
-          curY += 1.5;
+          doc.text(meaningLines, 20, textY);
+
+          curY += cardHeight + 6;
         });
       }
     }
@@ -683,11 +719,16 @@ export const downloadIncarnationPDF = async (
     curY += 8;
 
     // Aydınlanma Uyarısı
+    doc.setFont('LiberationSans', 'normal');
+    doc.setFontSize(9.5);
+    const alertLines = doc.splitTextToSize('Doğum haritanızda ruhsal tekâmülünüzü doğrudan mühürleyen özel bir karmik eşik/kilit tespit edilmiştir. Bu gösterge sıradan bir yerleşim değil, geçmiş yaşamlardan bu enkarnasyona taşınan gizli bir inisiyasyon sınavıdır.', 168);
+    const alertBoxHeight = 10 + (alertLines.length * 4.8) + 4;
+
     doc.setFillColor(...cardDark);
-    doc.roundedRect(15, curY, 180, 18, 3, 3, 'F');
+    doc.roundedRect(15, curY, 180, alertBoxHeight, 3, 3, 'F');
     doc.setDrawColor(...gold);
     doc.setLineWidth(0.4);
-    doc.roundedRect(15, curY, 180, 18, 3, 3, 'D');
+    doc.roundedRect(15, curY, 180, alertBoxHeight, 3, 3, 'D');
 
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(10.5);
@@ -696,10 +737,9 @@ export const downloadIncarnationPDF = async (
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(9.5);
     doc.setTextColor(...white);
-    const alertLines = doc.splitTextToSize('Doğum haritanızda ruhsal tekâmülünüzü doğrudan mühürleyen özel bir karmik eşik/kilit tespit edilmiştir. Bu gösterge sıradan bir yerleşim değil, geçmiş yaşamlardan bu enkarnasyona taşınan gizli bir inisiyasyon sınavıdır.', 170);
     doc.text(alertLines, 20, curY + 12);
 
-    curY += 24;
+    curY += alertBoxHeight + 6;
 
     // SADECE 28°-29° ANARATİK SINIR DERECESİ VARSA
     if (data.progressedEvolution.isCriticalDegree) {
@@ -716,35 +756,40 @@ export const downloadIncarnationPDF = async (
 
       curY += 4;
       // Box for Natal vs Progressed Sun
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(9.5);
+      const shiftNote = data.progressedEvolution.hasShifted
+        ? `Ruhunuz ${data.progressedEvolution.progressedAge} yaşında kabuk değiştirerek ${data.progressedEvolution.progressedSunSign} bilincine evrilmiştir.`
+        : `${data.progressedEvolution.progressedAge} yaşında Güneş sınırları aşarak ${data.progressedEvolution.progressedSunSign} burcuna sıçrayacaktır.`;
+      const shiftLines = doc.splitTextToSize(shiftNote, 168);
+      const sunBoxHeight = 17 + (shiftLines.length * 4.8) + 4;
+
       doc.setFillColor(...cardDark);
-      doc.roundedRect(15, curY, 180, 24, 3, 3, 'F');
+      doc.roundedRect(15, curY, 180, sunBoxHeight, 3, 3, 'F');
       doc.setDrawColor(80, 70, 140);
-      doc.roundedRect(15, curY, 180, 24, 3, 3, 'D');
+      doc.roundedRect(15, curY, 180, sunBoxHeight, 3, 3, 'D');
 
       doc.setFont('LiberationSans', 'bold');
       doc.setFontSize(10.5);
       doc.setTextColor(200, 180, 255);
-      doc.text('Natal Güneş (Doğum Anı):', 20, curY + 7);
+      doc.text('Natal Güneş (Doğum Anı):', 20, curY + 6.5);
       doc.setFont('LiberationSans', 'normal');
       doc.setTextColor(...white);
-      doc.text(`${data.progressedEvolution.natalSunSign} (${data.progressedEvolution.natalSunDegree}°${data.progressedEvolution.natalSunMinutes}')`, 75, curY + 7);
+      doc.text(`${data.progressedEvolution.natalSunSign} (${data.progressedEvolution.natalSunDegree}°${data.progressedEvolution.natalSunMinutes}')`, 75, curY + 6.5);
 
       doc.setFont('LiberationSans', 'bold');
       doc.setTextColor(...gold);
-      doc.text('İlerletilmiş Güneş (Progressed):', 20, curY + 14);
+      doc.text('İlerletilmiş Güneş (Progressed):', 20, curY + 13);
       doc.setFont('LiberationSans', 'normal');
       doc.setTextColor(...white);
-      doc.text(`${data.progressedEvolution.progressedSunSign} (Geçiş Yaşı: ${data.progressedEvolution.progressedAge} Yaş)`, 85, curY + 14);
+      doc.text(`${data.progressedEvolution.progressedSunSign} (Geçiş Yaşı: ${data.progressedEvolution.progressedAge} Yaş)`, 85, curY + 13);
 
-      doc.setFont('LiberationSans', 'italic');
+      doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(9.5);
       doc.setTextColor(...muted);
-      const shiftNote = data.progressedEvolution.hasShifted
-        ? `Ruhunuz ${data.progressedEvolution.progressedAge} yaşında kabuk değiştirerek ${data.progressedEvolution.progressedSunSign} bilincine evrilmiştir.`
-        : `${data.progressedEvolution.progressedAge} yaşında Güneş sınırları aşarak ${data.progressedEvolution.progressedSunSign} burcuna sıçrayacaktır.`;
-      doc.text(shiftNote, 20, curY + 20);
+      doc.text(shiftLines, 20, curY + 19);
 
-      curY += 29;
+      curY += sunBoxHeight + 6;
     }
 
     // SADECE SIKIŞTIRILMIŞ BURÇLAR VARSA
@@ -756,47 +801,66 @@ export const downloadIncarnationPDF = async (
 
       curY += 8;
       data.progressedEvolution.interceptedSigns.forEach(inter => {
-        ensureSpace(48);
-        doc.setFillColor(...cardDark);
-        doc.roundedRect(15, curY, 180, 44, 3, 3, 'F');
-        doc.setDrawColor(...gold);
-        doc.setLineWidth(0.3);
-        doc.roundedRect(15, curY, 180, 44, 3, 3, 'D');
+        const polText = inter.polarityLabel ? ` [${inter.polarityLabel}]` : '';
+        const titleText = `${inter.sign} Burcu (${inter.archetype}) - ${inter.house}. Evde Hapsolmuş${polText}`;
 
         doc.setFont('LiberationSans', 'bold');
         doc.setFontSize(11);
-        doc.setTextColor(...gold);
-        const polText = inter.polarityLabel ? ` [${inter.polarityLabel}]` : '';
-        doc.text(`${inter.sign} Burcu (${inter.archetype}) - ${inter.house}. Evde Hapsolmuş${polText}`, 20, curY + 7);
+        const titleLines = doc.splitTextToSize(titleText, 168);
 
-        let boxY = curY + 13;
-        if (inter.hdDiagnosis) {
-          doc.setFont('LiberationSans', 'italic');
-          doc.setFontSize(9);
+        doc.setFont('LiberationSans', 'normal');
+        doc.setFontSize(9.5);
+        const hdLines = inter.hdDiagnosis ? doc.splitTextToSize(`HD Teşhisi: ${inter.hdDiagnosis}`, 168) : [];
+        const causeLines = doc.splitTextToSize(`Geçmiş Kök Neden: ${inter.karmicRootCause}`, 168);
+        const lockLines = doc.splitTextToSize(`Bilinçaltı Kilit: ${inter.lockedPsychology}`, 168);
+
+        doc.setFont('LiberationSans', 'bold');
+        const keyLines = doc.splitTextToSize(`Açılış Anahtarı: ${inter.unlockKey}`, 168);
+
+        const lineHeight = 4.8;
+        let cardHeight = 10 + (titleLines.length * 5.4);
+        if (hdLines.length > 0) cardHeight += (hdLines.length * lineHeight) + 2;
+        cardHeight += (causeLines.length * lineHeight) + 2;
+        cardHeight += (lockLines.length * lineHeight) + 2;
+        cardHeight += (keyLines.length * lineHeight) + 4;
+
+        ensureSpace(cardHeight + 6);
+        doc.setFillColor(...cardDark);
+        doc.roundedRect(15, curY, 180, cardHeight, 3, 3, 'F');
+        doc.setDrawColor(...gold);
+        doc.setLineWidth(0.3);
+        doc.roundedRect(15, curY, 180, cardHeight, 3, 3, 'D');
+
+        let textY = curY + 6.5;
+        doc.setFont('LiberationSans', 'bold');
+        doc.setFontSize(11);
+        doc.setTextColor(...gold);
+        doc.text(titleLines, 20, textY);
+        textY += (titleLines.length * 5.4) + 1.5;
+
+        if (hdLines.length > 0) {
+          doc.setFont('LiberationSans', 'normal');
+          doc.setFontSize(9.5);
           doc.setTextColor(255, 215, 0);
-          const hdLines = doc.splitTextToSize(`HD Teşhisi: ${inter.hdDiagnosis}`, 170);
-          doc.text(hdLines.slice(0, 1), 20, boxY);
-          boxY += 6;
+          doc.text(hdLines, 20, textY);
+          textY += (hdLines.length * lineHeight) + 2;
         }
 
         doc.setFont('LiberationSans', 'normal');
         doc.setFontSize(9.5);
         doc.setTextColor(255, 180, 180);
-        const causeLines = doc.splitTextToSize(`Geçmiş Kök Neden: ${inter.karmicRootCause}`, 170);
-        doc.text(causeLines.slice(0, 2), 20, boxY);
-        boxY += causeLines.slice(0, 2).length * 4.5 + 1;
+        doc.text(causeLines, 20, textY);
+        textY += (causeLines.length * lineHeight) + 2;
 
         doc.setTextColor(255, 230, 180);
-        const lockLines = doc.splitTextToSize(`Bilinçaltı Kilit: ${inter.lockedPsychology}`, 170);
-        doc.text(lockLines.slice(0, 2), 20, boxY);
-        boxY += lockLines.slice(0, 2).length * 4.5 + 1;
+        doc.text(lockLines, 20, textY);
+        textY += (lockLines.length * lineHeight) + 2;
 
         doc.setFont('LiberationSans', 'bold');
         doc.setTextColor(...white);
-        const keyLines = doc.splitTextToSize(`Açılış Anahtarı: ${inter.unlockKey}`, 170);
-        doc.text(keyLines.slice(0, 2), 20, boxY);
+        doc.text(keyLines, 20, textY);
 
-        curY += 48;
+        curY += cardHeight + 6;
       });
     }
   }
