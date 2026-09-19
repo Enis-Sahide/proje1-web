@@ -4,6 +4,7 @@ import { users } from './auth';
 export const siteVisits = pgTable('site_visits', {
   id: serial('id').primaryKey(),
   ipHash: text('ip_hash').notNull(),
+  visitorId: text('visitor_id'),
   path: text('path').notNull(),
   country: text('country'),
   region: text('region'),
