@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Calendar, User, Sparkles, BookOpen, Share2, Link } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Sparkles, BookOpen, Share2, Link, AlertCircle, Info } from 'lucide-react';
 
 const parseItalics = (text: string) => {
   if (!text) return '';
@@ -89,14 +89,107 @@ const renderContent = (content: string) => {
       continue;
     }
 
-    // Blockquote (> )
+    // Markdown Table handling (| ... |)
+    if (trimmed.startsWith('|') && trimmed.includes('|')) {
+      const tableLines: string[] = [];
+      while (i < lines.length && lines[i].trim().startsWith('|') && lines[i].trim().includes('|')) {
+        tableLines.push(lines[i].trim());
+        i++;
+      }
+      i--; // adjust loop counter
+
+      if (tableLines.length >= 2) {
+        const parseRow = (rowStr: string) => {
+          const cleaned = rowStr.replace(/^\|/, '').replace(/\|$/, '');
+          return cleaned.split('|').map(cell => cell.trim());
+        };
+
+        const headers = parseRow(tableLines[0]);
+        // Check if second line is a separator like |:---|:---|
+        const isSeparator = /^\|?[\s\-:]+(\|[\s\-:]+)+\|?$/.test(tableLines[1]);
+        const dataRows = isSeparator 
+          ? tableLines.slice(2).map(parseRow) 
+          : tableLines.slice(1).map(parseRow);
+
+        elements.push(
+          <div key={`table-${i}`} className="my-8 overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-md shadow-[0_8px_30px_rgba(0,0,0,0.3)]">
+            <table className="w-full text-left border-collapse min-w-[540px]">
+              <thead>
+                <tr className="border-b border-mystic-primary/30 bg-mystic-primary/10">
+                  {headers.map((h, hIdx) => (
+                    <th key={hIdx} className="py-3.5 px-4 text-xs sm:text-sm font-extrabold text-mystic-primary tracking-wider uppercase">
+                      {parseInlineMarkdown(h)}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-white/5 text-xs sm:text-sm text-white/90">
+                {dataRows.map((row, rIdx) => (
+                  <tr key={rIdx} className="hover:bg-white/[0.03] transition-colors">
+                    {row.map((cell, cIdx) => (
+                      <td key={cIdx} className="py-3.5 px-4 leading-relaxed align-top">
+                        {parseInlineMarkdown(cell)}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+        continue;
+      }
+    }
+
+    // Blockquote and Alert blocks (> )
     if (trimmed.startsWith('> ') || trimmed === '>') {
-      const quoteText = trimmed.replace(/^>\s*/, '');
-      elements.push(
-        <blockquote key={`quote-${i}`} className="my-5 border-l-4 border-mystic-primary bg-mystic-primary/10 pl-4 sm:pl-6 py-3.5 pr-4 rounded-r-2xl text-white/95 text-sm sm:text-base leading-relaxed italic shadow-sm backdrop-blur-sm">
-          {parseInlineMarkdown(quoteText)}
-        </blockquote>
-      );
+      const quoteLines: string[] = [];
+      while (i < lines.length && (lines[i].trim().startsWith('>') || (lines[i].trim() !== '' && quoteLines.length > 0 && !lines[i].trim().startsWith('#') && !lines[i].trim().startsWith('|')))) {
+        if (lines[i].trim().startsWith('>')) {
+          quoteLines.push(lines[i].trim().replace(/^>\s*/, ''));
+        } else if (lines[i].trim() === '') {
+          break;
+        } else {
+          quoteLines.push(lines[i].trim());
+        }
+        i++;
+      }
+      i--;
+
+      const fullQuote = quoteLines.join('\n');
+      const isImportant = fullQuote.includes('[!IMPORTANT]');
+      const isNote = fullQuote.includes('[!NOTE]');
+      const isWarning = fullQuote.includes('[!WARNING]');
+
+      const cleanLines = quoteLines.map(l => l.replace(/\[!(IMPORTANT|NOTE|WARNING|TIP|CAUTION)\]/g, '').trim()).filter(Boolean);
+
+      if (isImportant || isNote || isWarning) {
+        elements.push(
+          <div key={`alert-${i}`} className="my-6 p-4 sm:p-5 rounded-2xl border border-mystic-primary/40 bg-gradient-to-r from-mystic-primary/15 via-mystic-primary/5 to-transparent backdrop-blur-md shadow-lg flex items-start gap-3.5">
+            <div className="p-2 rounded-xl bg-mystic-primary/20 text-mystic-primary border border-mystic-primary/30 shrink-0 mt-0.5">
+              {isImportant ? <AlertCircle size={20} /> : <Sparkles size={20} />}
+            </div>
+            <div className="flex-1 text-xs sm:text-sm text-white/95 leading-relaxed">
+              <div className="font-extrabold text-mystic-primary uppercase text-[11px] tracking-wider mb-1.5 flex items-center gap-1.5">
+                <span>{isImportant ? 'Önemli Vurgu' : isWarning ? 'Uyarı' : 'Önemli Not'}</span>
+              </div>
+              <div className="space-y-1.5">
+                {cleanLines.map((l, lIdx) => (
+                  <p key={lIdx}>{parseInlineMarkdown(l)}</p>
+                ))}
+              </div>
+            </div>
+          </div>
+        );
+      } else {
+        elements.push(
+          <blockquote key={`quote-${i}`} className="my-5 border-l-4 border-mystic-primary bg-mystic-primary/10 pl-4 sm:pl-6 py-3.5 pr-4 rounded-r-2xl text-white/95 text-sm sm:text-base leading-relaxed italic shadow-sm backdrop-blur-sm space-y-1.5">
+            {cleanLines.map((l, lIdx) => (
+              <p key={lIdx}>{parseInlineMarkdown(l)}</p>
+            ))}
+          </blockquote>
+        );
+      }
       continue;
     }
 
