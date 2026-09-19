@@ -173,7 +173,9 @@ VALUES
   ('human-design', 'Human Design Kapsamlı Yaşam Rehberi Raporu',
    'Tip, otorite, profil ve kapı yorumlarını içeren kapsamlı PDF rapor.', '555', '20', 3),
   ('incarnation', 'Karmik & Enkarnasyon Analizi Raporu',
-   'Geçmiş yaşam, karmik borçlar, Drakonik ruh haritası ve gelecek enkarnasyon potansiyelini içeren kapsamlı PDF rapor.', '888', '20', 4)
+   'Geçmiş yaşam, karmik borçlar, Drakonik ruh haritası ve gelecek enkarnasyon potansiyelini içeren kapsamlı PDF rapor.', '888', '20', 4),
+  ('cosmic-matrix', '7Layers Kozmik Matris Sentez Raporu',
+   'Astroloji, Human Design, Kabala ve Kelt/Druid kök ağacı sentezi; 4 element, 4 alem, 13 gezegen teşhisi ve bitkisel aromaterapi frekanslarını içeren kapsamlı PDF rapor.', '1111', '20', 5)
 ON CONFLICT ("id") DO NOTHING;
 
 -- Ayar satırlarını boş olarak hazırla; anahtarlar admin panelinden girilir.

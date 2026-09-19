@@ -28,6 +28,7 @@ function PaymentCheckout() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [agreedTerms, setAgreedTerms] = useState(false);
 
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let val = e.target.value.replace(/\D/g, '');
@@ -64,6 +65,10 @@ function PaymentCheckout() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!agreedTerms) {
+      setError('Lütfen devam etmek için Mesafeli Satış Sözleşmesi ve İptal/İade Koşullarını kabul ediniz.');
+      return;
+    }
     if (!cardName || cardNumber.length < 19 || expiry.length < 5 || cvv.length < 3) {
       setError('Lütfen tüm ödeme bilgilerini eksiksiz doldurun.');
       return;
@@ -212,9 +217,31 @@ function PaymentCheckout() {
           </div>
         </div>
 
+        {/* Agreement Checkbox */}
+        <div className="pt-2">
+          <label className="flex items-start gap-2 text-[11px] text-white/70 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={agreedTerms}
+              onChange={e => setAgreedTerms(e.target.checked)}
+              className="mt-0.5 rounded border-white/20 text-[#D4AF37] focus:ring-[#D4AF37] accent-[#D4AF37]"
+            />
+            <span>
+              <Link href="/mesafeli-satis-sozlesmesi" target="_blank" className="text-[#D4AF37] hover:underline">
+                Mesafeli Satış Sözleşmesi
+              </Link>
+              'ni ve{' '}
+              <Link href="/iptal-ve-iade" target="_blank" className="text-[#D4AF37] hover:underline">
+                İptal/İade Koşulları
+              </Link>
+              'nı okudum, kabul ediyorum.
+            </span>
+          </label>
+        </div>
+
         <button 
           type="submit" 
-          disabled={loading}
+          disabled={loading || !agreedTerms}
           className="w-full bg-gradient-to-r from-mystic-primary to-mystic-accent text-black font-bold py-3.5 rounded-xl hover:shadow-[0_0_30px_rgba(212,175,55,0.4)] transition-all duration-300 uppercase tracking-wider text-xs flex items-center justify-center gap-2 cursor-pointer mt-8"
         >
           {loading ? (

@@ -114,6 +114,24 @@ export async function GET(request: Request) {
         natalChart,
         incarnation
       };
+    } else if (order.analysisType === 'cosmic-matrix' || order.analysisType === 'cosmic_matrix') {
+      const { generateChart } = require('@/utils/HumanDesignEngine');
+      const { synthesizeCosmicMatrix } = require('@/features/astrology/engine/CosmicMatrixEngine');
+      const { getDruidTreeByDate } = require('@/features/astrology/engine/DruidTreeEngine');
+
+      const natalChart = await generateAstrologyChart(dateObj, cityData, false);
+      const hdChart = generateChart(dateObj);
+      const cosmicMatrix = synthesizeCosmicMatrix(natalChart.planets, natalChart.aspects, hdChart);
+
+      const parts = localDate.split('-');
+      const druidTree = getDruidTreeByDate(parseInt(parts[2], 10) || 1, parseInt(parts[1], 10) || 1);
+
+      resultData = {
+        natalChart,
+        hdChart,
+        cosmicMatrix,
+        druidTree
+      };
     } else {
       // Standard Esoteric Astrology Chart
       const assiahChart = await generateAstrologyChart(dateObj, cityData, false);
@@ -125,6 +143,7 @@ export async function GET(request: Request) {
     return json({
       success: true,
       email: order.email,
+      name: (order.birthData as any)?.name || '',
       analysisType: order.analysisType,
       birthData: order.birthData,
       result: resultData

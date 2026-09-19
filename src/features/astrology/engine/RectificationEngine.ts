@@ -2,7 +2,7 @@ import { SwissEph, Constants } from '@fusionstrings/swisseph-wasi';
 import fs from 'fs';
 import path from 'path';
 import moment from 'moment-timezone';
-import { AstroCity, ASTRO_CITIES, ZODIAC_SIGNS, ZodiacSign, NatalChartData } from './AstrologyConstants';
+import { AstroCity, ASTRO_CITIES, NatalChartData } from './AstrologyConstants';
 import { generateAstrologyChart, getSignAndDegree } from './AstrologyEngine';
 
 function mod360(x: number): number {

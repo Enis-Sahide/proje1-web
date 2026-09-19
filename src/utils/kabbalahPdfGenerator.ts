@@ -18,7 +18,7 @@ const tr = (str: string | number | null | undefined): string => {
   return String(str);
 };
 
-// Word-wrap text renderer that supports inline markdown bold formatting (**text**)
+// Word-wrap text renderer that supports inline markdown bold/italic formatting (**text**, *text*, ***text***)
 const drawTextWithBold = (
   doc: jsPDF,
   text: string,
@@ -44,8 +44,9 @@ const drawTextWithBold = (
     .replace(/!\[.*?\]\(.*?\)/g, '')
     .replace(/<img.*?src=".*?".*?>/g, '')
     .replace(/^\s*>\s*/gm, '')
-    .replace(/\*\((.*?)\)\*/g, '$1')
-    .replace(/\*\((.*?)\)\s*\*/g, '$1');
+    .replace(/\*\*\*(.*?)\*\*\*/g, '**$1**')
+    .replace(/(?<!\*)\*([^*\n]+?)\*(?!\*)/g, '**$1**')
+    .replace(/\*\((.*?)\)\*/g, '**$1**');
      
   const parts = sanitizedText.split(/(\s+|\*\*)/);
   let isBold = false;
@@ -72,8 +73,12 @@ const drawTextWithBold = (
     }
     if (part === '') continue;
     
-    const wordWidth = doc.getTextWidth(part);
-    if (curX + wordWidth > x + maxWidth && part.trim() !== '') {
+    // Strip any rogue remaining asterisks so raw stars never leak to PDF
+    const cleanWord = part.replace(/\*/g, '');
+    if (!cleanWord && part !== '') continue;
+
+    const wordWidth = doc.getTextWidth(cleanWord);
+    if (curX + wordWidth > x + maxWidth && cleanWord.trim() !== '') {
       curX = x;
       curY += lineHeight;
       if (curY > maxY) {
@@ -84,7 +89,7 @@ const drawTextWithBold = (
       }
     }
     
-    doc.text(part, curX, curY);
+    doc.text(cleanWord, curX, curY);
     curX += wordWidth;
   }
   
@@ -404,18 +409,18 @@ export const downloadKabbalahPDF = async (
   // --- Active Consciousness & Frequency Mirror Section ---
   if ((kabbalahAnalysis as any).activeConsciousness) {
     const ac = (kabbalahAnalysis as any).activeConsciousness;
-    checkSpace(125);
+    checkSpace(140);
     currentY += 4;
     
     // Header for active consciousness
     doc.setTextColor(gold[0], gold[1], gold[2]);
-    doc.setFontSize(12);
+    doc.setFontSize(13);
     doc.setFont('LiberationSans', 'bold');
     doc.text("Kozmik Sınav & Frekans Aynanız (Hangi Haritanızı Çalıştırıyorsunuz?)", 20, currentY);
-    currentY += 5;
+    currentY += 6;
 
     const boxStartY = currentY;
-    const boxHeight = 118;
+    const boxHeight = 145;
 
     // Draw background rectangle (dark blue with cyan border)
     doc.setFillColor(15, 25, 45);
@@ -424,32 +429,32 @@ export const downloadKabbalahPDF = async (
 
     // Title: Güncel Sınav
     doc.setTextColor(14, 165, 233);
-    doc.setFontSize(11);
+    doc.setFontSize(12.5);
     doc.setFont('LiberationSans', 'bold');
     const challengeTitle = ac.currentTheme || ac.title;
-    doc.text(`Güncel Sınav: ${challengeTitle}`, 24, boxStartY + 7);
+    doc.text(`Güncel Sınav: ${challengeTitle}`, 24, boxStartY + 8.5);
 
     // Challenge description
     doc.setTextColor(240, 240, 240);
-    doc.setFontSize(8.5);
+    doc.setFontSize(10.5);
     doc.setFont('LiberationSans', 'normal');
     const challengeDesc = ac.cosmicChallenge || ac.explanation;
-    let textY = drawTextWithBold(doc, challengeDesc, 24, boxStartY + 12, 162, 4.2);
+    let textY = drawTextWithBold(doc, challengeDesc, 24, boxStartY + 15, 162, 5.2);
 
     // Trigger
     doc.setTextColor(56, 189, 248);
-    doc.setFontSize(8);
+    doc.setFontSize(10.0);
     doc.setFont('LiberationSans', 'normal');
     const triggerSummary = `⚡ Tetikleyici: ${ac.transitSummary || ac.reason}`;
-    textY = drawTextWithBold(doc, triggerSummary, 24, textY + 1, 162, 3.8);
+    textY = drawTextWithBold(doc, triggerSummary, 24, textY + 1.5, 162, 4.8);
 
     // 4 Spectrum levels
     if (ac.spectrum) {
       doc.setTextColor(gold[0], gold[1], gold[2]);
-      doc.setFontSize(8.5);
+      doc.setFontSize(11.0);
       doc.setFont('LiberationSans', 'bold');
-      doc.text("4 Alem Frekans Spektrumu (Tutumunuza Göre Teşhis):", 24, textY + 3);
-      textY += 7;
+      doc.text("4 Alem Frekans Spektrumu (Tutumunuza Göre Teşhis):", 24, textY + 4);
+      textY += 8;
 
       const spectrumItems = [
         { 
@@ -481,26 +486,26 @@ export const downloadKabbalahPDF = async (
       for (const item of spectrumItems) {
         if (!item.desc) continue;
         doc.setTextColor(item.color[0], item.color[1], item.color[2]);
-        doc.setFontSize(8);
+        doc.setFontSize(10.5);
         doc.setFont('LiberationSans', 'bold');
         doc.text(`• ${item.world} [${item.tag}]:`, 24, textY);
         
         doc.setTextColor(215, 215, 215);
-        doc.setFontSize(7.8);
+        doc.setFontSize(10.2);
         doc.setFont('LiberationSans', 'normal');
-        textY = drawTextWithBold(doc, item.desc, 27, textY + 3.5, 159, 3.5);
-        textY += 1;
+        textY = drawTextWithBold(doc, item.desc, 27, textY + 4.2, 159, 4.8);
+        textY += 1.8;
       }
     }
 
     // Footnote
     doc.setTextColor(140, 140, 140);
-    doc.setFontSize(7);
+    doc.setFontSize(9.0);
     doc.setFont('LiberationSans', 'normal');
     const footnote = "Ezoterik İlke: Hayat deneyimlerindeki bilinçli farkındalığınız, o an hangi âlemin potansiyelini aktive ettiğinizi belirler. Deneyimlerinizi eylem boyutundan (Assiah) bilgelik, sezgi ve içsel huzura (Beriyah & Atzilut) kolaylıkla dönüştürebilirsiniz.";
-    drawTextWithBold(doc, footnote, 24, boxStartY + boxHeight - 8, 162, 3.4);
+    drawTextWithBold(doc, footnote, 24, boxStartY + boxHeight - 9, 162, 4.2);
 
-    currentY = boxStartY + boxHeight + 6;
+    currentY = boxStartY + boxHeight + 8;
   }
 
   // --- 4 Worlds Analysis ---
@@ -606,21 +611,21 @@ export const downloadKabbalahPDF = async (
       const interp = interpretations?.[world]?.[p.name];
       if (!interp) continue;
 
-      checkSpace(50);
+      checkSpace(55);
       doc.setFont('LiberationSans', 'bold');
-      doc.setFontSize(12);
+      doc.setFontSize(13);
       doc.setTextColor(gold[0], gold[1], gold[2]);
       
       // Build a title using the interpreted title directly (it already includes the planet name)
       const titleStr = interp.title;
       doc.text(tr(titleStr), 20, currentY);
-      currentY += 7;
+      currentY += 8;
 
       doc.setFont('LiberationSans', 'normal');
-      doc.setFontSize(10);
+      doc.setFontSize(11.2);
       doc.setTextColor(230, 230, 230);
 
-      currentY = drawTextWithBold(doc, interp.content, 20, currentY, 170, 5.5);
+      currentY = drawTextWithBold(doc, interp.content, 20, currentY, 170, 6.5);
       currentY += 10;
     }
   }

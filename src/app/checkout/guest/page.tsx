@@ -18,7 +18,7 @@ function GuestCheckoutForm() {
   const searchParams = useSearchParams();
   const { user } = useAuth();
   
-  // Default type: kabbalah (999 TL), human-design (555 TL), incarnation (888 TL), or astrology (444 TL)
+  // Default type: kabbalah (999 TL), human-design (555 TL), incarnation (888 TL), cosmic-matrix (1111 TL), or astrology (444 TL)
   const rawType = searchParams.get('type') || 'kabbalah';
   const analysisType = (rawType === 'astrology') 
     ? 'astrology' 
@@ -26,6 +26,8 @@ function GuestCheckoutForm() {
     ? 'human-design' 
     : (rawType === 'incarnation') 
     ? 'incarnation' 
+    : (rawType === 'cosmic-matrix' || rawType === 'cosmic_matrix')
+    ? 'cosmic-matrix'
     : 'kabbalah';
 
   const title = analysisType === 'kabbalah'
@@ -34,6 +36,8 @@ function GuestCheckoutForm() {
     ? 'Human Design Kapsamlı Yaşam Rehberi Raporu'
     : analysisType === 'incarnation'
     ? 'Karmik & Enkarnasyon Analizi Raporu'
+    : analysisType === 'cosmic-matrix'
+    ? '7Layers Kozmik Matris Sentez Raporu'
     : 'Doğum Haritası Analizi Raporu';
 
   // Step state: 'info' -> 'payment' (Treps'e yönlendirme anı)
@@ -44,7 +48,7 @@ function GuestCheckoutForm() {
   const [dateStr, setDateStr] = useState('');
   const [timeStr, setTimeStr] = useState('12:00');
   const [cityKey, setCityKey] = useState<AstroCity | null>(null);
-  const [agreedTerms, setAgreedTerms] = useState(true);
+  const [agreedTerms, setAgreedTerms] = useState(false);
 
   // Fatura profilleri — kayıtlı profillerden seçilir; yoksa önce oluşturulur.
   const [profiles, setProfiles] = useState<BillingProfile[] | null>(null);
@@ -441,7 +445,7 @@ function GuestCheckoutForm() {
 
             <button 
               type="submit"
-              disabled={loading || amount === null}
+              disabled={loading || amount === null || !agreedTerms}
               className="w-full bg-gradient-to-r from-[#D4AF37] via-[#f5db8b] to-[#D4AF37] hover:brightness-110 text-black font-bold py-3.5 px-6 rounded-xl transition-all disabled:opacity-50 flex items-center justify-center text-sm mt-4 shadow-lg shadow-[#D4AF37]/20 cursor-pointer"
             >
               {loading ? (

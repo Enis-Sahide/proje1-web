@@ -29,6 +29,7 @@ import {
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import type { AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 import type { IncarnationAnalysisResult } from '@/features/astrology/engine/IncarnationEngine';
+import type { StarAlignment } from '@/features/astrology/engine/IncarnationHistoricalCosmic';
 import { downloadIncarnationPDF } from '@/utils/incarnationPdfGenerator';
 import { useAuth } from '@/context/AuthContext';
 import AuthPromptModal from '@/components/AuthPromptModal';
@@ -66,9 +67,10 @@ export default function IncarnationAnalysisPage() {
   // Modals
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showLockModal, setShowLockModal] = useState(false);
+  const [selectedStarAlignment, setSelectedStarAlignment] = useState<StarAlignment | null>(null);
 
   // Active Tab
-  const [activeTab, setActiveTab] = useState<'past_life' | 'karmic_debts' | 'draconic' | 'progressed' | 'next_life'>('past_life');
+  const [activeTab, setActiveTab] = useState<'past_life' | 'cosmic_origin' | 'karmic_debts' | 'draconic' | 'progressed' | 'next_life'>('past_life');
 
   useEffect(() => {
     if (resultData && activeTab === 'progressed' && !resultData.progressedEvolution?.hasSpecialLocks) {
@@ -347,6 +349,10 @@ export default function IncarnationAnalysisPage() {
                         ✦ <strong className="text-emerald-300">Gaia Sentezi:</strong> Ruhunuz doğrudan Dünya gezegeninin elemental hafızasında kök salmış ({resultData.soulMaturity.tier} - {resultData.soulMaturity.dominantElement} Elementi), yeryüzünün kutsal dengesini ve kadim bilgelik mirasını koruyan bir Dünya Muhafızıdır.
                       </p>
                     )}
+                    <p className="text-[11px] text-[#D4AF37]/80 pt-1.5 flex items-center gap-1.5 border-t border-white/5 mt-2">
+                      <span>ℹ️</span>
+                      <span><strong>Ezoterik Not:</strong> Bu puan bir üstünlük ölçüsü veya ruhsal rütbe değildir; ruhun geçmiş enkarnasyonlardan bu yaşama devrettiği karmik ders, retro sorumluluk ve deneyim yoğunluğunu ifade eder.</span>
+                    </p>
                   </div>
                 </div>
 
@@ -378,7 +384,7 @@ export default function IncarnationAnalysisPage() {
             </div>
 
             {/* TAB NAVIGATION */}
-            <div className={`grid ${resultData.progressedEvolution?.hasSpecialLocks ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5' : 'grid-cols-2 md:grid-cols-4'} gap-2 bg-black/40 p-1.5 rounded-2xl border border-white/10`}>
+            <div className={`grid ${resultData.progressedEvolution?.hasSpecialLocks ? 'grid-cols-2 sm:grid-cols-3 md:grid-cols-6' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5'} gap-2 bg-black/40 p-1.5 rounded-2xl border border-white/10`}>
               <button
                 onClick={() => setActiveTab('past_life')}
                 className={`flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
@@ -392,6 +398,18 @@ export default function IncarnationAnalysisPage() {
               </button>
 
               <button
+                onClick={() => setActiveTab('cosmic_origin')}
+                className={`flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+                  activeTab === 'cosmic_origin'
+                    ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-600 text-white shadow-lg shadow-indigo-500/30 font-bold'
+                    : 'text-indigo-300/90 hover:text-white hover:bg-indigo-500/10'
+                }`}
+              >
+                <Sparkles size={16} className={activeTab === 'cosmic_origin' ? 'text-amber-300 animate-pulse' : 'text-indigo-400'} />
+                <span>2. Kozmik Ruh Kökeni</span>
+              </button>
+
+              <button
                 onClick={() => setActiveTab('karmic_debts')}
                 className={`flex items-center justify-center gap-2 py-3 px-3 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
                   activeTab === 'karmic_debts'
@@ -400,7 +418,7 @@ export default function IncarnationAnalysisPage() {
                 }`}
               >
                 <ShieldAlert size={16} />
-                <span>2. Karmik Borçlar</span>
+                <span>3. Karmik Borçlar</span>
               </button>
 
               <button
@@ -412,7 +430,7 @@ export default function IncarnationAnalysisPage() {
                 }`}
               >
                 <Compass size={16} />
-                <span>3. Drakonik Ruh</span>
+                <span>4. Drakonik Ruh</span>
               </button>
 
               {resultData.progressedEvolution?.hasSpecialLocks && (
@@ -425,7 +443,7 @@ export default function IncarnationAnalysisPage() {
                   }`}
                 >
                   <Key size={16} className="text-amber-400" />
-                  <span>4. Karmik Kilitler</span>
+                  <span>5. Karmik Kilitler</span>
                 </button>
               )}
 
@@ -438,7 +456,7 @@ export default function IncarnationAnalysisPage() {
                 }`}
               >
                 <Flame size={16} />
-                <span>{resultData.progressedEvolution?.hasSpecialLocks ? '5. Dharma & Gelecek' : '4. Dharma & Gelecek'}</span>
+                <span>{resultData.progressedEvolution?.hasSpecialLocks ? '6. Dharma & Gelecek' : '5. Dharma & Gelecek'}</span>
               </button>
             </div>
 
@@ -625,66 +643,7 @@ export default function IncarnationAnalysisPage() {
                   </div>
                 )}
 
-                {/* 1.2 KOZMİK RUH KÖKENİ & GALAKTİK İZİ (STARSEED) */}
-                {resultData.cosmicOrigin && (
-                  <div className="bg-gradient-to-r from-indigo-950/40 via-mystic-surface/60 to-purple-950/40 border border-indigo-500/30 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-xl">
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-white/10">
-                      <div className="flex items-center gap-3">
-                        <div className="p-3 rounded-2xl bg-indigo-500/15 border border-indigo-500/30 text-indigo-300">
-                          <Star size={24} />
-                        </div>
-                        <div>
-                          <div className="flex flex-wrap items-center gap-2 mb-1">
-                            <span className="text-xs uppercase tracking-wider text-indigo-400 font-bold">
-                              Kozmik Ruh Kökeni (Starseed İzi)
-                            </span>
-                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-500/20 text-indigo-200 border border-indigo-500/30">
-                              {resultData.cosmicOrigin.frequencyBadge}
-                            </span>
-                          </div>
-                          <h3 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-2">
-                            <span>{resultData.cosmicOrigin.starName}</span>
-                          </h3>
-                        </div>
-                      </div>
 
-                      <div className="px-4 py-2 rounded-2xl bg-white/5 border border-white/10 text-left sm:text-right">
-                        <div className="text-[11px] text-mystic-text-muted">Kozmik Hiza & Takımyıldız</div>
-                        <div className="text-xs font-semibold text-indigo-200">{resultData.cosmicOrigin.constellation}</div>
-                        <div className="text-[10px] text-white/50">{resultData.cosmicOrigin.connectedPoint}</div>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-                      <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
-                        <span className="text-xs font-bold text-indigo-300 flex items-center gap-1.5">
-                          <span>🌌</span> Kozmik Yaşam Misyonu
-                        </span>
-                        <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
-                          {resultData.cosmicOrigin.soulMission}
-                        </p>
-                      </div>
-
-                      <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
-                        <span className="text-xs font-bold text-emerald-300 flex items-center gap-1.5">
-                          <span>🎁</span> Dünyaya Getirdiği Kozmik Deha
-                        </span>
-                        <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
-                          {resultData.cosmicOrigin.cosmicGift}
-                        </p>
-                      </div>
-
-                      <div className="p-4 rounded-2xl bg-black/40 border border-white/5 space-y-2">
-                        <span className="text-xs font-bold text-rose-300 flex items-center gap-1.5">
-                          <span>⚡</span> Dünyadaki Yabancılık & Hücresel Sınav
-                        </span>
-                        <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
-                          {resultData.cosmicOrigin.earthlyChallenge}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                )}
 
                 {/* 12th House & Last Breath Card */}
                 <div className="bg-mystic-surface/50 border border-white/10 rounded-3xl p-6 sm:p-8">
@@ -770,6 +729,236 @@ export default function IncarnationAnalysisPage() {
                       </div>
                     </div>
                   )}
+                </div>
+              </div>
+            )}
+
+            {/* TAB CONTENT: 2. KOZMİK RUH KÖKENİ & SABİT YILDIZLAR */}
+            {activeTab === 'cosmic_origin' && resultData.cosmicOrigin && (
+              <div className="space-y-6">
+                {/* 2.1 ANA GALAKTİK KÖKEN KARTI */}
+                <div className="bg-gradient-to-r from-indigo-950/50 via-mystic-surface/70 to-purple-950/50 border border-indigo-500/40 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl">
+                  <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none -z-0" />
+                  
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-6 border-b border-white/10 relative z-10">
+                    <div className="flex items-center gap-3">
+                      <div className="p-3.5 rounded-2xl bg-indigo-500/20 border border-indigo-500/40 text-indigo-300 shadow-inner">
+                        <Sparkles size={26} className="animate-pulse text-amber-300" />
+                      </div>
+                      <div>
+                        <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                          <span className="text-xs uppercase tracking-wider text-indigo-400 font-extrabold">
+                            Kozmik Ruh Kökeni & Yıldız Tohumu (Starseed)
+                          </span>
+                          {resultData.cosmicOrigin.isHybrid && (
+                            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-gradient-to-r from-amber-500/30 to-purple-500/30 text-amber-200 border border-amber-400/40 shadow-sm flex items-center gap-1">
+                              <span>✨</span> Galaktik Melez (Hibrit Starseed)
+                            </span>
+                          )}
+                          <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-500/20 text-indigo-200 border border-indigo-500/30">
+                            {resultData.cosmicOrigin.frequencyBadge}
+                          </span>
+                        </div>
+                        <h3 className="text-2xl sm:text-3xl font-extrabold text-white flex flex-wrap items-center gap-2">
+                          <span>{resultData.cosmicOrigin.isHybrid && resultData.cosmicOrigin.hybridTitle ? resultData.cosmicOrigin.hybridTitle : resultData.cosmicOrigin.starName}</span>
+                        </h3>
+                      </div>
+                    </div>
+
+                    <div className="px-5 py-3 rounded-2xl bg-black/40 border border-white/15 text-left sm:text-right shadow-md">
+                      <div className="text-[11px] text-indigo-300 font-semibold uppercase tracking-wider">Birincil Kozmik Hizalanma</div>
+                      <div className="text-sm font-bold text-white mt-0.5">{resultData.cosmicOrigin.constellation}</div>
+                      <div className="text-[11px] text-amber-300/80 font-medium">{resultData.cosmicOrigin.connectedPoint}</div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6 relative z-10">
+                    <div className="p-5 rounded-2xl bg-black/40 border border-white/5 space-y-2.5 shadow-sm">
+                      <span className="text-xs font-bold text-indigo-300 flex items-center gap-1.5 uppercase tracking-wide">
+                        <span>🌌</span> Kozmik Yaşam Misyonu
+                      </span>
+                      <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
+                        {resultData.cosmicOrigin.soulMission}
+                      </p>
+                    </div>
+
+                    <div className="p-5 rounded-2xl bg-black/40 border border-white/5 space-y-2.5 shadow-sm">
+                      <span className="text-xs font-bold text-emerald-300 flex items-center gap-1.5 uppercase tracking-wide">
+                        <span>🎁</span> Dünyaya Getirdiği Kozmik Deha
+                      </span>
+                      <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
+                        {resultData.cosmicOrigin.cosmicGift}
+                      </p>
+                    </div>
+
+                    <div className="p-5 rounded-2xl bg-black/40 border border-white/5 space-y-2.5 shadow-sm">
+                      <span className="text-xs font-bold text-rose-300 flex items-center gap-1.5 uppercase tracking-wide">
+                        <span>⚡</span> Dünyadaki Yabancılık & Hücresel Sınav
+                      </span>
+                      <p className={`text-xs sm:text-sm text-mystic-text-muted leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
+                        {resultData.cosmicOrigin.earthlyChallenge}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Katmanlar Arası Çoklu Galaktik Sabit Yıldız & Kraliyet Yıldızı Hizalanmaları */}
+                  {resultData.cosmicOrigin.allAlignments && resultData.cosmicOrigin.allAlignments.length > 0 && (
+                    <div className="pt-6 border-t border-white/10 space-y-3 relative z-10">
+                      <div className="flex flex-wrap items-center justify-between gap-2">
+                        <span className="text-xs uppercase tracking-wider text-indigo-300 font-bold flex items-center gap-1.5">
+                          <span>🛰️</span> Harita Katmanlarınızdaki Galaktik Sabit Yıldız & Kraliyet Temasları
+                        </span>
+                        {resultData.cosmicOrigin.royalStarsActive && resultData.cosmicOrigin.royalStarsActive.length > 0 && (
+                          <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-sm">
+                            👑 {resultData.cosmicOrigin.royalStarsActive.length} Kraliyet Yıldızı Kalkanı Aktif
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                        {resultData.cosmicOrigin.allAlignments.map((align, idx) => (
+                          <div 
+                            key={idx} 
+                            onClick={() => setSelectedStarAlignment(align)}
+                            className={`p-3.5 rounded-xl border text-xs flex flex-col justify-between gap-2.5 transition-all cursor-pointer group hover:scale-[1.02] hover:shadow-lg ${
+                              align.isRoyalStar 
+                                ? 'bg-amber-950/25 border-amber-500/40 hover:border-amber-400 text-amber-200 shadow-md' 
+                                : align.starName.includes('Sirius')
+                                ? 'bg-indigo-950/30 border-cyan-400/40 hover:border-cyan-300 text-cyan-200 shadow-md'
+                                : align.starName.includes('Polaris')
+                                ? 'bg-purple-950/30 border-purple-400/40 hover:border-purple-300 text-purple-200 shadow-md'
+                                : 'bg-white/5 border-white/10 hover:border-white/25 text-white/80'
+                            }`}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="font-bold flex items-center gap-1.5 text-sm">
+                                {align.isRoyalStar && <span>👑</span>}
+                                {align.starName.includes('Sirius') && <span>✨</span>}
+                                {align.starName.includes('Polaris') && <span>🧭</span>}
+                                <span>
+                                  {align.starName.includes('Galaktik Merkez') 
+                                    ? 'Galaktik Merkez' 
+                                    : align.starName.includes('Sirius')
+                                    ? 'Sirius (Şi\'ra)'
+                                    : align.starName.includes('Polaris')
+                                    ? 'Polaris (Kutup Yıldızı)'
+                                    : align.starName.includes('Canopus')
+                                    ? 'Canopus (Süheyl)'
+                                    : align.starName.includes('Pleiades')
+                                    ? 'Pleiades (Alcyone)'
+                                    : align.starName.includes('Betelgeuse')
+                                    ? 'Orion (Betelgeuse)'
+                                    : align.starName.includes('Rigel')
+                                    ? 'Orion (Rigel)'
+                                    : align.starName.includes('Bellatrix')
+                                    ? 'Orion (Bellatrix)'
+                                    : align.starName.includes('Mirach')
+                                    ? 'Andromeda (Mirach)'
+                                    : align.starName.split(' ')[0]}
+                                </span>
+                              </span>
+                              <span className={`px-2 py-0.5 rounded text-[10px] font-semibold ${
+                                align.layer.includes('Bilinçdışı') 
+                                  ? 'bg-purple-500/20 text-purple-200 border border-purple-500/30' 
+                                  : align.layer.includes('Drakonik')
+                                  ? 'bg-amber-500/20 text-amber-200 border border-amber-500/30'
+                                  : align.layer.includes('Beriyah') 
+                                  ? 'bg-emerald-500/20 text-emerald-200 border border-emerald-500/30' 
+                                  : 'bg-blue-500/20 text-blue-200 border border-blue-500/30'
+                              }`}>
+                                {align.layer.includes('Bilinçdışı') ? 'Bilinçdışı Ruh Kökü' : align.layer.includes('Drakonik') ? 'Drakonik (2. Harita)' : align.layer.includes('Beriyah') ? '3. Harita (Beriyah)' : 'Natal'}
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-white/70">
+                              {align.connectedPoint}
+                            </div>
+                            <div className="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10px] font-bold text-indigo-300 group-hover:text-amber-300 transition-colors">
+                              <span>Ezoterik Anlamı İncele</span>
+                              <span>➜</span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {!isMasterOrAdmin && renderLockedSectionNotice()}
+                </div>
+
+                {/* 2.2 KADİM YILDIZLAR & SIRIUS BİLGELİK REHBERİ (AÇIKLAYICI PANEL) */}
+                <div className="bg-mystic-surface/40 border border-white/10 rounded-3xl p-6 sm:p-8 space-y-6">
+                  <div className="flex items-center gap-3 pb-4 border-b border-white/10">
+                    <div className="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-[#D4AF37]">
+                      <Scroll size={22} />
+                    </div>
+                    <div>
+                      <h4 className="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+                        <span>Kadim Sabit Yıldızlar, Sirius & Kraliyet Melekleri Rehberi</span>
+                      </h4>
+                      <p className="text-xs text-mystic-text-muted mt-0.5">
+                        Sabit yıldızların hiyerarşisi, Kuran'daki sırrı ve haritanızda bulunup bulunmamasının derin ezoterik anlamı
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    {/* SÜTUN 1: SIRIUS (Şİ'RA) */}
+                    <div className="p-5 rounded-2xl bg-gradient-to-b from-cyan-950/30 to-black/50 border border-cyan-500/30 space-y-3">
+                      <div className="flex items-center gap-2 text-cyan-300 font-bold text-sm">
+                        <span className="text-base">✨</span>
+                        <span>Sirius (Şi'ra): Güneşlerin Güneşi</span>
+                      </div>
+                      <div className="space-y-2 text-xs text-white/80 leading-relaxed">
+                        <p>
+                          <strong className="text-cyan-200">Kuran'daki Yeri:</strong> Necm Suresi 49. Ayet'te <em className="text-amber-200">"Ve şüphesiz O, Şi'ra'nın Rabbidir"</em> buyurularak kutsal kitapta ismi açıkça zikredilen <strong>tek yıldızdır</strong>.
+                        </p>
+                        <p>
+                          <strong className="text-cyan-200">Kozmik Statüsü:</strong> Güneş sistemimizin manevi kalbi ve galaktik üst yönetim meclisidir ("Büyük Merkezi Güneş"). 4 Kraliyet Yıldızı Zodyak'ın dünyevi sütunlarıyken; Sirius, bu sistemin üzerindeki ilahi irade ve inisiyasyon kapısıdır.
+                        </p>
+                        <p>
+                          <strong className="text-cyan-200">Haritanızdaki Anlamı:</strong> Ruh haritanızda (Drakonik) <strong className="text-[#FFD700]">Venüs</strong> ile kavuşumdadır. Kalp merkezinizin ve sevgi anlayışınızın sıradan dünyevi heveslerden öte; Atlantis ve Mısır ekollerinden taşınan koşulsuz sevgi ve şifa hafızasıyla mühürlendiğini gösterir.
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* SÜTUN 2: 4 KRALİYET YILDIZI */}
+                    <div className="p-5 rounded-2xl bg-gradient-to-b from-amber-950/30 to-black/50 border border-amber-500/30 space-y-3">
+                      <div className="flex items-center gap-2 text-[#FFD700] font-bold text-sm">
+                        <span className="text-base">👑</span>
+                        <span>4 Kraliyet Yıldızı: Başmelek Kapıları</span>
+                      </div>
+                      <div className="space-y-2 text-xs text-white/80 leading-relaxed">
+                        <p>
+                          Zodyak'ın arşını taşıyan 4 ana yön direğidir. Her biri ilahi bir başmeleğin ve mutlak bir ahlaki erdemin kozmik bekçisidir:
+                        </p>
+                        <ul className="space-y-1.5 pl-1 text-[11px] text-white/85">
+                          <li>• <strong className="text-amber-300">Aldebaran (Doğu - Başmelek Mikâil):</strong> Sarsılmaz dürüstlük, sözün namusu ve ilahi hakkaniyet.</li>
+                          <li>• <strong className="text-amber-300">Regulus (Kuzey - Başmelek Raphaël):</strong> İntikam ve kibirden arınmış soylu liderlik ve bağışlama.</li>
+                          <li>• <strong className="text-amber-300">Antares (Batı - Başmelek Azrail/Uriel):</strong> Karanlığın kalbine inip ışıkla çıkma, ölüm-yeniden doğum simyası.</li>
+                          <li>• <strong className="text-amber-300">Fomalhaut (Güney - Başmelek Cebrail):</strong> Mistik vizyon, ilahi ilham ve saf niyetle gelen koruma.</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* SÜTUN 3: HARİTADA OLUP OLMAMASININ ANLAMI */}
+                    <div className="p-5 rounded-2xl bg-gradient-to-b from-purple-950/30 to-black/50 border border-purple-500/30 space-y-3">
+                      <div className="flex items-center gap-2 text-purple-300 font-bold text-sm">
+                        <span className="text-base">🧭</span>
+                        <span>Sabit Yıldız Teması Ne İfade Eder?</span>
+                      </div>
+                      <div className="space-y-2 text-xs text-white/80 leading-relaxed">
+                        <p>
+                          <strong className="text-purple-200">Haritada Varsa:</strong> Ruh bu dünyaya sadece şahsi bir ömür tüketmeye gelmemiştir. Hayatı kişisel olmaktan çıkıp kolektif bir misyona bağlanır. İlahi sistem kişiyi görünmez bir zırhla korur; ancak ahlaki tavizlerde sınavı sıradan insanlara göre çok daha hızlı ve sarsıcı olur.
+                        </p>
+                        <p>
+                          <strong className="text-purple-200">Haritada Yoksa:</strong> Ruhun bu enkarnasyonda galaktik veya kolektif ağır yükümlülükleri yoktur. Daha çok kendi bireysel karmasını, aile bağlarını ve yerel tekamülünü tamamlamaya odaklanmıştır.
+                        </p>
+                        <p className="text-[11px] text-purple-300/80 italic">
+                          Kullanıcının haritasında Polaris, Sirius, Betelgeuse, Aldebaran ve Fomalhaut gibi çoklu hizalanmalar bulunması, ruhun son derece kıdemli ve çok katmanlı bir kozmik göreve sahip olduğunu doğrular.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             )}
@@ -1402,6 +1591,92 @@ export default function IncarnationAnalysisPage() {
           </div>
         )}
       </div>
+
+      {/* Sabit Yıldız Derin Ezoterik Detay Modalı */}
+      {selectedStarAlignment && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200"
+          onClick={() => setSelectedStarAlignment(null)}
+        >
+          <div 
+            className="relative w-full max-w-xl bg-gradient-to-b from-[#12121a] via-[#0d0d14] to-black border border-[#D4AF37]/40 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 max-h-[90vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            <button 
+              onClick={() => setSelectedStarAlignment(null)}
+              className="absolute top-5 right-5 p-2 rounded-full bg-white/10 text-white/70 hover:text-white hover:bg-white/20 transition-all cursor-pointer"
+            >
+              <X size={18} />
+            </button>
+
+            <div className="flex items-start gap-4 pb-4 border-b border-white/10">
+              <div className="p-3.5 rounded-2xl bg-amber-500/15 border border-amber-500/30 text-[#D4AF37] shadow-inner">
+                <Sparkles size={26} className="text-amber-300 animate-pulse" />
+              </div>
+              <div className="pr-8">
+                <div className="flex flex-wrap items-center gap-2 mb-1">
+                  <span className="px-2 py-0.5 rounded text-[10px] font-extrabold bg-indigo-500/20 text-indigo-200 border border-indigo-500/30">
+                    {selectedStarAlignment.layer}
+                  </span>
+                  <span className="text-[11px] text-amber-300 font-semibold">
+                    {selectedStarAlignment.orb}° Orb ile Kavuşum
+                  </span>
+                </div>
+                <h3 className="text-xl sm:text-2xl font-bold text-white leading-snug">
+                  {selectedStarAlignment.interpretation?.title || `${selectedStarAlignment.starName} & ${selectedStarAlignment.connectedPoint}`}
+                </h3>
+                <div className="text-xs text-mystic-text-muted mt-0.5">
+                  {selectedStarAlignment.constellation} • {selectedStarAlignment.connectedPoint}
+                </div>
+              </div>
+            </div>
+
+            {selectedStarAlignment.interpretation ? (
+              <div className="space-y-4 text-xs sm:text-sm">
+                <div className="p-4 rounded-2xl bg-black/40 border border-indigo-500/20 space-y-1.5 shadow-sm">
+                  <div className="flex items-center gap-2 font-bold text-indigo-300 text-xs uppercase tracking-wider">
+                    <span>🔮</span> Ezoterik Anlam & Kozmik Portal
+                  </div>
+                  <p className="text-white/85 leading-relaxed">
+                    {selectedStarAlignment.interpretation.esotericMeaning}
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-black/40 border border-cyan-500/20 space-y-1.5 shadow-sm">
+                  <div className="flex items-center gap-2 font-bold text-cyan-300 text-xs uppercase tracking-wider">
+                    <span>🌍</span> Hayattaki Tezahürü & Karakteristik Etkisi
+                  </div>
+                  <p className="text-white/85 leading-relaxed">
+                    {selectedStarAlignment.interpretation.lifeManifestation}
+                  </p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-black/40 border border-amber-500/20 space-y-1.5 shadow-sm">
+                  <div className="flex items-center gap-2 font-bold text-[#FFD700] text-xs uppercase tracking-wider">
+                    <span>🧭</span> Ruhsal Görev & Kozmik Sınav
+                  </div>
+                  <p className="text-white/85 leading-relaxed">
+                    {selectedStarAlignment.interpretation.spiritualMission}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="text-xs text-mystic-text-muted leading-relaxed">
+                Bu sabit yıldız kavuşumu, ruhunuzun geçmiş enkarnasyonlardan taşıdığı kadim yetenekleri ve kadersel inisiyasyonu bu yaşam planına yansıtmaktadır.
+              </div>
+            )}
+
+            <div className="pt-2 flex justify-end">
+              <button
+                onClick={() => setSelectedStarAlignment(null)}
+                className="px-5 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition-all cursor-pointer"
+              >
+                Kapat
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Auth Prompt Modal */}
       <AuthPromptModal
