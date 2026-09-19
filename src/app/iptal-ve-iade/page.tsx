@@ -61,7 +61,7 @@ export default function IptalVeIadePage() {
               Ödemesi tamamlanmış olmasına rağmen teknik bir arıza nedeniyle raporu indirilemeyen veya e-posta sunucu filtreleri nedeniyle indirme linkine ulaşamayan kullanıcılarımızın hakları korunmaktadır. 
             </p>
             <p className="mt-2">
-              Böyle bir durumda <strong>destek@7layers.tr</strong> adresine sipariş numaranız ve e-posta adresinizle başvurduğunuz takdirde, raporunuz kontrol edilerek 24 saat içerisinde doğrudan e-posta adresinize PDF olarak manuel olarak iletilir veya teknik arıza giderilemiyorsa tahsil edilen ücret kesintisiz iade edilir.
+              Böyle bir durumda <strong>info@7layers.tr</strong> adresine sipariş numaranız ve e-posta adresinizle başvurduğunuz takdirde, raporunuz kontrol edilerek 24 saat içerisinde doğrudan e-posta adresinize PDF olarak manuel olarak iletilir veya teknik arıza giderilemiyorsa tahsil edilen ücret kesintisiz iade edilir.
             </p>
           </div>
 

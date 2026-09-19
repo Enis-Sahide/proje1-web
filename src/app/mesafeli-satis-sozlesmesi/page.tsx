@@ -34,7 +34,7 @@ export default function MesafeliSatisSozlesmesiPage() {
               <p><strong>SATICI / SAĞLAYICI:</strong></p>
               <p>Ünvan: 7Layers Dijital Hizmetler & Bilişim (MySportsSchool)</p>
               <p>Web Sitesi: https://www.7layers.tr</p>
-              <p>E-Posta: destek@7layers.tr / noreply@7layers.tr</p>
+              <p>E-Posta: info@7layers.tr</p>
               <div className="pt-2 border-t border-white/10 mt-2">
                 <p><strong>ALICI (MÜŞTERİ):</strong></p>
                 <p>Web sitesi üzerinden dijital analiz raporu siparişi verirken e-posta adresi ve doğum bilgilerini beyan eden kişi.</p>

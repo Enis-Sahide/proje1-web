@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ShieldCheck, Lock } from 'lucide-react';
+import { ShieldCheck, Lock, Mail } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export default function Footer() {
@@ -23,8 +23,8 @@ export default function Footer() {
           <span>© {new Date().getFullYear()} Tüm Hakları Saklıdır.</span>
         </div>
 
-        {/* Center: Legal Links */}
-        <div className="flex flex-wrap items-center justify-center gap-4 text-[11px]">
+        {/* Center: Legal & Contact Links */}
+        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-4 text-[11px]">
           <Link href="/mesafeli-satis-sozlesmesi" className="hover:text-[#D4AF37] transition-colors">
             Mesafeli Satış Sözleşmesi
           </Link>
@@ -36,6 +36,15 @@ export default function Footer() {
           <Link href="/privacy" className="hover:text-[#D4AF37] transition-colors">
             Gizlilik ve KVKK
           </Link>
+          <span className="text-white/20">•</span>
+          <a
+            href="mailto:info@7layers.tr"
+            className="hover:text-[#D4AF37] text-white/70 transition-colors flex items-center gap-1.5"
+            title="E-Posta Gönder"
+          >
+            <Mail size={12} className="text-[#D4AF37]" />
+            <span>info@7layers.tr</span>
+          </a>
         </div>
 
         {/* Right: Security Badge */}
