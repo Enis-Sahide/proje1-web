@@ -227,7 +227,11 @@ export const downloadIncarnationPDF = async (
     ? `${data.soulMaturity.description} Kozmik Hiza: Ruhunuz dünyada derin bir geçmiş yaşam birikimine (${data.soulMaturity.tier} - ${data.soulMaturity.dominantElement} Elementi) sahip olmakla birlikte, kök bilinci ${data.cosmicOrigin.frequencyBadge} ile mühürlenmiş yüksek boyutlu bir elçidir.`
     : `${data.soulMaturity.description} Kozmik Hiza: Ruhunuz doğrudan Dünya gezegeninin kökleriyle rezonansta olan bilge bir Kadim Gaia Muhafızıdır.`;
   const mLines = doc.splitTextToSize(synthText, 166);
-  const bannerHeight = 26 + (mLines.length * 5.2);
+
+  const footnoteText = 'Ezoterik Not: Bu puan bir üstünlük ölçüsü veya ruhsal rütbe değildir; ruhun geçmiş enkarnasyonlardan devraldığı karmik ders, retro sorumluluk ve deneyim yoğunluğunu ifade eder.';
+  const fnLines = doc.splitTextToSize(footnoteText, 166);
+
+  const bannerHeight = 28 + (mLines.length * 5.2) + (fnLines.length * 4.4) + 4;
 
   doc.setFillColor(28, 36, 60);
   doc.roundedRect(15, 80, 180, bannerHeight, 3, 3, 'F');
@@ -254,6 +258,12 @@ export const downloadIncarnationPDF = async (
   doc.setFontSize(10);
   doc.setTextColor(...white);
   doc.text(mLines, 22, 103);
+
+  const fnY = 103 + (mLines.length * 5.2) + 4;
+  doc.setFont('LiberationSans', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(212, 175, 55); // gold
+  doc.text(fnLines, 22, fnY);
 
   // SECTION 1: ÖNCEKİ ENKARNASYON & GAD
   curY = 80 + bannerHeight + 14;

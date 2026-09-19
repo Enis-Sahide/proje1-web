@@ -349,6 +349,10 @@ export default function IncarnationAnalysisPage() {
                         ✦ <strong className="text-emerald-300">Gaia Sentezi:</strong> Ruhunuz doğrudan Dünya gezegeninin elemental hafızasında kök salmış ({resultData.soulMaturity.tier} - {resultData.soulMaturity.dominantElement} Elementi), yeryüzünün kutsal dengesini ve kadim bilgelik mirasını koruyan bir Dünya Muhafızıdır.
                       </p>
                     )}
+                    <p className="text-[11px] text-[#D4AF37]/80 pt-1.5 flex items-center gap-1.5 border-t border-white/5 mt-2">
+                      <span>ℹ️</span>
+                      <span><strong>Ezoterik Not:</strong> Bu puan bir üstünlük ölçüsü veya ruhsal rütbe değildir; ruhun geçmiş enkarnasyonlardan bu yaşama devrettiği karmik ders, retro sorumluluk ve deneyim yoğunluğunu ifade eder.</span>
+                    </p>
                   </div>
                 </div>
 
