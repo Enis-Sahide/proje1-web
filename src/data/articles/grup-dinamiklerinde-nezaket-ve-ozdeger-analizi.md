@@ -7,8 +7,8 @@
 Bu gruplarda neredeyse her zaman şu profile rastlarız: **Herkese karşı verici, sürekli alttan alan, yumuşak, hoşgörülü ve çatışmadan kaçınan bir grup üyesi.**
 
 Gruptaki diğer üyeler bu kişiyi gözlemlerken genellikle iki zıt analize varırlar:
-1. *"Bu insan çok olgun, egolarını aşmış, frekansı yüksek, grubu bir arada tutan birleştirici bir güç."*
-2. *"Bu insanın ciddi bir öz-değer eksikliği var; sınır çizemiyor, herkese şirin görünüp kendini sevdirmeye ve gruba yaranmaya çalışıyor."*
+1. **"Bu insan çok olgun, egolarını aşmış, frekansı yüksek, grubu bir arada tutan birleştirici bir güç."**
+2. **"Bu insanın ciddi bir öz-değer eksikliği var; sınır çizemiyor, herkese şirin görünüp kendini sevdirmeye ve gruba yaranmaya çalışıyor."**
 
 Peki gerçek hangisidir? Daha da kritik soru: **Bu analizi yapan kişinin kendi iç dünyası ve bilinç seviyesi bu tespiti yaparken nerede durmaktadır?**
 
@@ -42,7 +42,7 @@ Dışarıdan bakıldığında iki davranış birbirinin kopyası gibi durur: Pro
 
 ## BÖLÜM 2: "Kendini Sevdirmeye Çalışıyor" Diyen Gözlemcinin Analizi
 
-Grupta bir başkası hakkında *"O kişi öz-değer eksikliği yaşıyor, sırf kendini sevdirmek için herkese taviz veriyor"* tespitini öne süren kişinin bilinç frekansı nerededir?
+Grupta bir başkası hakkında **"O kişi öz-değer eksikliği yaşıyor, sırf kendini sevdirmek için herkese taviz veriyor"** tespitini öne süren kişinin bilinç frekansı nerededir?
 
 Psikolojideki **Projeksiyon (Yansıtma)** ilkesi ve evrensel ayna yasası uyarınca; bir insanın başkasına baktığında ilk gördüğü şey, kendi zihninin çalışma prensibidir.
 
@@ -74,13 +74,13 @@ Hangi grupta olursanız olun (iş, spor, sanat, arkadaş ortamı), şu iki aynay
 1. Grup içinde istemediğim bir şeye "Hayır" dediğimde içimi derin bir kaybetme veya suçluluk korkusu kaplıyor mu?
 2. Provalarda, antrenmanlarda veya iş dağılımında fazladan üstlendiğim yüklerin ardından içten içe bir övgü bekliyor muyum?
 3. O övgü veya teşekkür gelmediğinde gruba karşı içimde gizli bir soğuma veya kırgınlık başlıyor mu?  
-👉 *Eğer bu sorulara yanıtınız evet ise; tavrınız yüksek bilgelikten değil, onaylanmak isteyen yaralı parçanızın kontrol stratejisinden kaynaklanmaktadır.*
+👉 **Eğer bu sorulara yanıtınız evet ise; tavrınız yüksek bilgelikten değil, onaylanmak isteyen yaralı parçanızın kontrol stratejisinden kaynaklanmaktadır.**
 
 ### Test B: Teşhis Kovan Gözlemci İçin
 1. Gruptaki birinin yumuşaklığını analiz ederken içimde gizli bir tatmin, "ben herkesi çözerim" kibri var mı?
 2. Bir insanın hiçbir çıkarı veya korkusu olmadan, sadece o işi ve grubu sevdiği için sabırlı olabileceği fikri bana neden imkansız geliyor?
 3. Ben kendim bu grupta karşılık beklemeden ne kadar katkı sunabiliyorum?  
-👉 *Eğer bu analizinizde küçümseme ve sertlik varsa; tespitiniz teknik olarak doğru olsa bile, bunu dile getiren mekanizma sizin egonuzun güç savaşıdır.*
+👉 **Eğer bu analizinizde küçümseme ve sertlik varsa; tespitiniz teknik olarak doğru olsa bile, bunu dile getiren mekanizma sizin egonuzun güç savaşıdır.**
 
 ---
 
