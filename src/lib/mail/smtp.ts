@@ -74,7 +74,7 @@ export function mailProvider(): 'resend' | 'smtp' {
  * Tek gönderim noktası. Başarıda sağlayıcının mesaj id'sini döner.
  * @throws Sağlayıcı hatası — çağıran taraf yakalar ve false döner.
  */
-const DEFAULT_FROM_ADDRESS = 'noreply@7layers.tr';
+const DEFAULT_FROM_ADDRESS = 'info@7layers.tr';
 
 /**
  * SMTP_FROM'u `Name <email>` biçimine normalize eder. Resend bu biçimi zorunlu
@@ -89,6 +89,7 @@ export function resolveFrom(): string {
 
 export async function sendMail(msg: MailMessage): Promise<string> {
   const from = resolveFrom();
+  const replyTo = msg.replyTo || 'info@7layers.tr';
 
   const client = getResend();
   if (client) {
@@ -98,7 +99,7 @@ export async function sendMail(msg: MailMessage): Promise<string> {
       subject: msg.subject,
       html: msg.html,
       text: msg.text,
-      replyTo: msg.replyTo,
+      replyTo,
       headers: msg.headers,
     });
     if (error) throw new Error(`Resend: ${error.name} — ${error.message}`);
@@ -111,7 +112,7 @@ export async function sendMail(msg: MailMessage): Promise<string> {
     subject: msg.subject,
     html: msg.html,
     text: msg.text,
-    replyTo: msg.replyTo,
+    replyTo,
     headers: msg.headers,
   });
   return info?.messageId ?? '';
@@ -231,7 +232,7 @@ export async function sendResetPasswordEmail(email: string, token: string): Prom
         </div>
         <div class="footer">
           <p>© 2026 7Layers. Tüm Hakları Saklıdır.<br>
-          Destek veya sorularınız için lütfen <a href="${appUrl}">web sitemizi</a> ziyaret edin.</p>
+          Destek veya sorularınız için: <a href="mailto:info@7layers.tr">info@7layers.tr</a></p>
         </div>
       </div>
     </body>
@@ -371,7 +372,7 @@ export async function sendGuestDownloadEmail(email: string, token: string, analy
         </div>
         <div class="footer">
           <p>© 2026 7Layers. Tüm Hakları Saklıdır.<br>
-          Destek veya sorularınız için lütfen <a href="${appUrl}">web sitemizi</a> ziyaret edin.</p>
+          Destek veya sorularınız için: <a href="mailto:info@7layers.tr">info@7layers.tr</a></p>
         </div>
       </div>
     </body>
@@ -509,19 +510,19 @@ export async function sendVerificationCodeEmail(email: string, code: string): Pr
         </div>
         <div class="footer">
           <p>© 2026 7Layers. Tüm Hakları Saklıdır.<br>
-          <a href="${appUrl}">7layers.tr</a></p>
+          Destek: <a href="mailto:info@7layers.tr">info@7layers.tr</a> | <a href="${appUrl}">7layers.tr</a></p>
         </div>
       </div>
     </body>
     </html>
   `;
 
-  const text = `7Layers Kayıt Doğrulama Kodunuz: ${code}\n\nBu kod 15 dakika boyunca geçerlidir.\n\nEğer bu talebi siz yapmadıysanız bu e-postayı güvenle yok sayabilirsiniz.\n\n7layers.tr`;
+  const text = `7Layers Kayıt Doğrulama Kodunuz: ${code}\n\nBu kod 15 dakika boyunca geçerlidir.\n\nEğer bu talebi siz yapmadıysanız bu e-postayı güvenle yok sayabilirsiniz.\n\nDestek: info@7layers.tr\n7layers.tr`;
 
   try {
     const id = await sendMail({
       to: email,
-      replyTo: 'noreply@7layers.tr',
+      replyTo: 'info@7layers.tr',
       subject: `7Layers - Doğrulama Kodunuz: ${code}`,
       text,
       html,

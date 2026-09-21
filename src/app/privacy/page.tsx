@@ -78,7 +78,7 @@ export default function PrivacyPage() {
             <div>
               <h2 className="text-xl font-bold text-white mb-2">4. Veri Silme ve Kullanıcı Hakları (Kişisel Verileri Silme Talebi)</h2>
               <p className="text-white/70 text-sm">
-                Dilediğiniz zaman profil ayarlarınız üzerinden veya doğrudan destek ekibimizle iletişime geçerek hesabınızın, analiz geçmişinizin ve tüm ilişkili verilerinizin veritabanımızdan kalıcı olarak silinmesini talep edebilirsiniz. Talebiniz üzerine tüm kişisel bilgileriniz Supabase sistemlerimizden geri döndürülemeyecek şekilde silinir.
+                Dilediğiniz zaman profil ayarlarınız üzerinden veya doğrudan <a href="mailto:info@7layers.tr" className="text-mystic-primary underline hover:text-white">info@7layers.tr</a> adresine yazarak hesabınızın, analiz geçmişinizin ve tüm ilişkili verilerinizin veritabanımızdan kalıcı olarak silinmesini talep edebilirsiniz. Talebiniz üzerine tüm kişisel bilgileriniz Supabase sistemlerimizden geri döndürülemeyecek şekilde silinir.
               </p>
             </div>
           </div>
@@ -87,7 +87,7 @@ export default function PrivacyPage() {
           <div className="mt-8 bg-black/40 border border-mystic-primary/20 rounded-2xl p-5 flex items-center gap-4">
             <Sparkles className="text-mystic-accent shrink-0" size={24} />
             <p className="text-xs text-white/60 leading-normal">
-              Bu gizlilik politikası, 7Layers uygulamasının Google Play Store kurallarına ve KVKK / GDPR standartlarına tam uyum sağlaması amacıyla hazırlanmıştır. Sorularınız için bizimle her zaman iletişime geçebilirsiniz.
+              Bu gizlilik politikası, 7Layers uygulamasının Google Play Store kurallarına ve KVKK / GDPR standartlarına tam uyum sağlaması amacıyla hazırlanmıştır. Sorularınız veya destek talepleriniz için bize <a href="mailto:info@7layers.tr" className="text-mystic-primary font-semibold underline">info@7layers.tr</a> adresinden her zaman ulaşabilirsiniz.
             </p>
           </div>
 
