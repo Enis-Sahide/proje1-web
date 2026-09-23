@@ -281,7 +281,7 @@ export default function ContactPage() {
 
                 {/* Resmi E-Posta Masası */}
                 <a
-                  href="mailto:destek@7layers.com"
+                  href="mailto:info@7layers.tr"
                   className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#D4AF37]/50 text-xs font-medium text-white transition-all duration-200 group"
                 >
                   <div className="flex items-center gap-2.5">
@@ -290,7 +290,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <div className="text-xs font-semibold text-white">Resmi E-Posta Masası</div>
-                      <div className="text-[10px] text-white/50">destek@7layers.com</div>
+                      <div className="text-[10px] text-white/50">info@7layers.tr</div>
                     </div>
                   </div>
                   <ArrowRight size={14} className="text-[#D4AF37] group-hover:translate-x-1 transition-transform" />
