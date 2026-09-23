@@ -37,6 +37,10 @@ export default function Footer() {
             Gizlilik ve KVKK
           </Link>
           <span className="text-white/20">•</span>
+          <Link href="/iletisim" className="hover:text-[#D4AF37] transition-colors font-medium">
+            İletişim
+          </Link>
+          <span className="text-white/20">•</span>
           <a
             href="mailto:info@7layers.tr"
             className="hover:text-[#D4AF37] text-white/70 transition-colors flex items-center gap-1.5"

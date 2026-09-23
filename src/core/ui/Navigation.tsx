@@ -66,6 +66,7 @@ export default function Navigation() {
     { name: 'Blog', href: '/blog' },
     { name: 'Dersler', href: '/kadim-dersler', requiresAuth: true },
     { name: 'Seviyeler', href: '/membership', requiresAuth: true, isLockedForNonAdmin: true },
+    { name: 'İletişim', href: '/iletisim' },
   ];
 
   const isMaster = role === 'master';
