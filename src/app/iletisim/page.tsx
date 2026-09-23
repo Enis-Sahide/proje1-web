@@ -208,20 +208,23 @@ export default function ContactPage() {
 
             {/* Sosyal Medya & Topluluk */}
             <div className="p-6 rounded-2xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/10">
-              <h3 className="text-sm font-semibold text-white mb-2 flex items-center gap-2">
-                <InstagramIcon size={16} className="text-[#D4AF37]" />
-                <span>Instagram & Topluluk</span>
+              <h3 className="text-sm font-semibold text-white mb-2 flex items-center justify-between">
+                <span className="flex items-center gap-2">
+                  <InstagramIcon size={16} className="text-[#D4AF37]" />
+                  <span>Instagram & Topluluk</span>
+                </span>
+                <span className="text-[11px] font-mono text-[#D4AF37]">@7layers.tr</span>
               </h3>
               <p className="text-xs text-white/60 mb-4 leading-relaxed">
-                Kozmik gökyüzü transitleri, günlük frekans rehberleri ve yeni analiz duyurularımızı Instagram hesabımızdan takip edebilirsiniz.
+                Kozmik gökyüzü transitleri, günlük frekans rehberleri ve yeni analiz duyurularımızı resmi Instagram hesabımızdan takip edebilirsiniz.
               </p>
               <a
-                href="https://instagram.com"
+                href="https://www.instagram.com/7layers.tr?stkn=MXRnbnl0Nnp0dmxoNQ=="
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#D4AF37]/50 text-xs font-medium text-white transition-all duration-200 group"
               >
-                <span>Instagram'da Takip Et</span>
+                <span>Instagram'da Takip Et (@7layers.tr)</span>
                 <ArrowRight size={14} className="text-[#D4AF37] group-hover:translate-x-1 transition-transform" />
               </a>
             </div>
