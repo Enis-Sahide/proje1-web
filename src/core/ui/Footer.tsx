@@ -74,6 +74,53 @@ export default function Footer() {
             </svg>
             <span>@7layers.tr</span>
           </a>
+          <span className="text-white/20">•</span>
+          <a
+            href="https://www.youtube.com/@enissahidekesik"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[#D4AF37] text-white/70 transition-colors flex items-center gap-1.5"
+            title="YouTube Kanalı"
+          >
+            <svg 
+              width={13} 
+              height={13} 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              className="text-[#D4AF37]"
+            >
+              <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z" />
+              <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" />
+            </svg>
+            <span>YouTube</span>
+          </a>
+          <span className="text-white/20">•</span>
+          <a
+            href="https://wa.me/905384623588"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hover:text-[#D4AF37] text-white/70 transition-colors flex items-center gap-1.5"
+            title="WhatsApp Destek & Danışma"
+          >
+            <svg 
+              width={12} 
+              height={12} 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              className="text-[#D4AF37]"
+            >
+              <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+            </svg>
+            <span>WhatsApp</span>
+          </a>
         </div>
 
         {/* Right: Security Badge */}

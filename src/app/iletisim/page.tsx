@@ -39,6 +39,43 @@ function InstagramIcon({ size = 16, className = "" }: { size?: number; className
   );
 }
 
+function YouTubeIcon({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg 
+      width={size} 
+      height={size} 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      className={className}
+    >
+      <path d="M22.54 6.42a2.78 2.78 0 0 0-1.94-2C18.88 4 12 4 12 4s-6.88 0-8.6.46a2.78 2.78 0 0 0-1.94 2A29 29 0 0 0 1 11.75a29 29 0 0 0 .46 5.33A2.78 2.78 0 0 0 3.4 19c1.72.46 8.6.46 8.6.46s6.88 0 8.6-.46a2.78 2.78 0 0 0 1.94-2 29 29 0 0 0 .46-5.25 29 29 0 0 0-.46-5.33z" />
+      <polygon points="9.75 15.02 15.5 11.75 9.75 8.48 9.75 15.02" />
+    </svg>
+  );
+}
+
+function WhatsAppIcon({ size = 16, className = "" }: { size?: number; className?: string }) {
+  return (
+    <svg 
+      width={size} 
+      height={size} 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="2" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+      className={className}
+    >
+      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
+    </svg>
+  );
+}
+
 const CATEGORIES = [
   { id: 'report_support', label: 'Analiz Raporu & Sipariş Desteği' },
   { id: 'birth_correction', label: 'Doğum Saati / Bilgi Düzeltme' },
@@ -206,27 +243,79 @@ export default function ContactPage() {
               </div>
             </div>
 
-            {/* Sosyal Medya & Topluluk */}
-            <div className="p-6 rounded-2xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/10">
-              <h3 className="text-sm font-semibold text-white mb-2 flex items-center justify-between">
-                <span className="flex items-center gap-2">
-                  <InstagramIcon size={16} className="text-[#D4AF37]" />
-                  <span>Instagram & Topluluk</span>
-                </span>
-                <span className="text-[11px] font-mono text-[#D4AF37]">@7layers.tr</span>
-              </h3>
-              <p className="text-xs text-white/60 mb-4 leading-relaxed">
-                Kozmik gökyüzü transitleri, günlük frekans rehberleri ve yeni analiz duyurularımızı resmi Instagram hesabımızdan takip edebilirsiniz.
-              </p>
-              <a
-                href="https://www.instagram.com/7layers.tr?stkn=MXRnbnl0Nnp0dmxoNQ=="
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#D4AF37]/50 text-xs font-medium text-white transition-all duration-200 group"
-              >
-                <span>Instagram'da Takip Et (@7layers.tr)</span>
-                <ArrowRight size={14} className="text-[#D4AF37] group-hover:translate-x-1 transition-transform" />
-              </a>
+            {/* Sosyal Medya, YouTube & WhatsApp Kanalları */}
+            <div className="p-6 rounded-2xl bg-gradient-to-br from-white/[0.04] to-white/[0.01] border border-white/10 space-y-4">
+              <div>
+                <h3 className="text-sm font-semibold text-white mb-1 flex items-center justify-between">
+                  <span className="flex items-center gap-2">
+                    <Sparkles size={15} className="text-[#D4AF37]" />
+                    <span>Resmi Kanallarımız & Topluluk</span>
+                  </span>
+                  <span className="text-[11px] font-mono text-[#D4AF37]">@7layers.tr</span>
+                </h3>
+                <p className="text-xs text-white/60 leading-relaxed">
+                  Kozmik gökyüzü transitleri, rehberlik videoları ve analiz duyurularımızı resmi hesaplarımızdan takip edebilir, WhatsApp üzerinden danışabilirsiniz.
+                </p>
+              </div>
+
+              <div className="flex flex-col gap-2 pt-1">
+                {/* Instagram */}
+                <a
+                  href="https://www.instagram.com/7layers.tr?stkn=MXRnbnl0Nnp0dmxoNQ=="
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#D4AF37]/50 text-xs font-medium text-white transition-all duration-200 group"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-1.5 rounded-lg bg-pink-500/10 text-pink-400">
+                      <InstagramIcon size={16} />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-white">Instagram</div>
+                      <div className="text-[10px] text-white/50">@7layers.tr</div>
+                    </div>
+                  </div>
+                  <ArrowRight size={14} className="text-[#D4AF37] group-hover:translate-x-1 transition-transform" />
+                </a>
+
+                {/* YouTube */}
+                <a
+                  href="https://www.youtube.com/@enissahidekesik"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#D4AF37]/50 text-xs font-medium text-white transition-all duration-200 group"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-1.5 rounded-lg bg-red-500/10 text-red-400">
+                      <YouTubeIcon size={16} />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-white">YouTube Kanalı</div>
+                      <div className="text-[10px] text-white/50">Enis Şahide KESİK | 7Layers</div>
+                    </div>
+                  </div>
+                  <ArrowRight size={14} className="text-[#D4AF37] group-hover:translate-x-1 transition-transform" />
+                </a>
+
+                {/* WhatsApp */}
+                <a
+                  href="https://wa.me/905384623588"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#D4AF37]/50 text-xs font-medium text-white transition-all duration-200 group"
+                >
+                  <div className="flex items-center gap-2.5">
+                    <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
+                      <WhatsAppIcon size={16} />
+                    </div>
+                    <div>
+                      <div className="text-xs font-semibold text-white">WhatsApp Danışma</div>
+                      <div className="text-[10px] text-white/50">+90 538 462 35 88</div>
+                    </div>
+                  </div>
+                  <ArrowRight size={14} className="text-[#D4AF37] group-hover:translate-x-1 transition-transform" />
+                </a>
+              </div>
             </div>
 
             {/* Mini Sıkça Sorulan Sorular (Hızlı Çözümler) */}
