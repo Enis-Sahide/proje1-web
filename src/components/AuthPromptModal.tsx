@@ -4,6 +4,8 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock, UserPlus, LogIn, X, Sparkles } from 'lucide-react';
 
+import GoogleAuthButton from '@/components/auth/GoogleAuthButton';
+
 interface AuthPromptModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -66,10 +68,22 @@ export default function AuthPromptModal({
 
         {/* Action Buttons */}
         <div className="space-y-3">
+          {/* Hızlı ve Sürtünmesiz Google ile Giriş */}
+          <GoogleAuthButton 
+            redirectUrl={redirectUrl} 
+            label="Google ile Hızlı Devam Et" 
+          />
+
+          <div className="relative flex items-center justify-center my-3">
+            <div className="border-t border-white/10 w-full"></div>
+            <span className="bg-[#0f0f18] px-3 text-[11px] uppercase tracking-wider text-white/40">veya e-posta ile</span>
+            <div className="border-t border-white/10 w-full"></div>
+          </div>
+
           <button
             type="button"
             onClick={handleLogin}
-            className="w-full bg-gradient-to-r from-[#D4AF37] via-[#f5db8b] to-[#D4AF37] hover:brightness-110 text-black font-bold py-3.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm shadow-lg shadow-[#D4AF37]/20 cursor-pointer"
+            className="w-full bg-gradient-to-r from-[#D4AF37] via-[#f5db8b] to-[#D4AF37] hover:brightness-110 text-black font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm shadow-lg shadow-[#D4AF37]/20 cursor-pointer"
           >
             <LogIn size={16} />
             <span>Giriş Yap</span>
@@ -78,7 +92,7 @@ export default function AuthPromptModal({
           <button
             type="button"
             onClick={handleRegister}
-            className="w-full bg-white/5 hover:bg-white/10 border border-white/15 text-white font-medium py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm cursor-pointer"
+            className="w-full bg-white/5 hover:bg-white/10 border border-white/15 text-white font-medium py-2.5 px-4 rounded-xl transition-all flex items-center justify-center gap-2 text-sm cursor-pointer"
           >
             <UserPlus size={16} />
             <span>Ücretsiz Hesap Oluştur</span>
