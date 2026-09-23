@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Lock, Loader2, Sparkles, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { apiFetch } from '@/lib/apiClient';
+import GoogleAuthButton from '@/components/auth/GoogleAuthButton';
 
 function LoginContent() {
   const router = useRouter();
@@ -87,6 +88,18 @@ function LoginContent() {
             )}
           </div>
         )}
+
+        <GoogleAuthButton 
+          redirectUrl={searchParams.get('redirect') || '/'} 
+          label="Google ile Giriş Yap" 
+          className="mb-6"
+        />
+
+        <div className="relative flex items-center justify-center mb-6">
+          <div className="border-t border-mystic-surface-light w-full"></div>
+          <span className="bg-mystic-surface px-3 text-xs uppercase tracking-wider text-mystic-text-muted">veya e-posta ile</span>
+          <div className="border-t border-mystic-surface-light w-full"></div>
+        </div>
 
         <form onSubmit={handleLogin} className="space-y-5">
           <div>

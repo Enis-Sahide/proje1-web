@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Mail, Lock, User, Loader2, Sparkles, AlertCircle, CheckCircle, ArrowLeft, RefreshCw, KeyRound } from 'lucide-react';
 import { apiFetch } from '@/lib/apiClient';
+import GoogleAuthButton from '@/components/auth/GoogleAuthButton';
 
 function RegisterForm() {
   const router = useRouter();
@@ -184,7 +185,20 @@ function RegisterForm() {
 
       {/* ADIM 1: KAYIT FORMU */}
       {step === 'form' && (
-        <form onSubmit={handleRegister} className="space-y-5">
+        <>
+          <GoogleAuthButton 
+            redirectUrl={searchParams.get('redirect') || '/'} 
+            label="Google ile Hızlı Kayıt Ol" 
+            className="mb-6"
+          />
+
+          <div className="relative flex items-center justify-center mb-6">
+            <div className="border-t border-mystic-surface-light w-full"></div>
+            <span className="bg-mystic-surface px-3 text-xs uppercase tracking-wider text-mystic-text-muted">veya e-posta ile</span>
+            <div className="border-t border-mystic-surface-light w-full"></div>
+          </div>
+
+          <form onSubmit={handleRegister} className="space-y-5">
           {/* Honeypot gizli bot alanı (tarayıcı autofill'inin tetiklememesi için güvenli gizleme) */}
           <div style={{ position: 'absolute', opacity: 0, zIndex: -1, pointerEvents: 'none', width: 0, height: 0, overflow: 'hidden' }} aria-hidden="true">
             <input
@@ -281,7 +295,8 @@ function RegisterForm() {
           >
             {loading ? <Loader2 className="animate-spin mr-2" /> : 'Doğrulama Kodu Al ve Kayıt Ol'}
           </button>
-        </form>
+          </form>
+        </>
       )}
 
       {/* ADIM 2: E-POSTA DOĞRULAMA KODU (OTP) */}

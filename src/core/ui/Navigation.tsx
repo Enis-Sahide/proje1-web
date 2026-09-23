@@ -66,6 +66,7 @@ export default function Navigation() {
     { name: 'Blog', href: '/blog' },
     { name: 'Dersler', href: '/kadim-dersler', requiresAuth: true },
     { name: 'Seviyeler', href: '/membership', requiresAuth: true, isLockedForNonAdmin: true },
+    { name: 'İletişim', href: '/iletisim' },
   ];
 
   const isMaster = role === 'master';
@@ -94,8 +95,8 @@ export default function Navigation() {
       <div className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
         {/* Logo */}
         <Link href={isAdmin ? "/admin/dashboard" : "/"} className="flex items-center gap-2.5 group shrink-0 mr-2 lg:mr-4 xl:mr-8">
-          <div className="relative rounded-full p-[2px] bg-gradient-to-tr from-mystic-primary via-mystic-accent to-mystic-primary shadow-[0_0_8px_rgba(212,175,55,0.9),0_0_16px_rgba(212,175,55,0.5),0_0_32px_rgba(212,175,55,0.15)] group-hover:shadow-[0_0_12px_rgba(212,175,55,1),0_0_24px_rgba(212,175,55,0.7),0_0_40px_rgba(212,175,55,0.3)] transition-all duration-500">
-            <Image src="/logo.png" alt="7Layers Ancient Knowledge School" width={34} height={34} className="rounded-full bg-mystic-dark block" />
+          <div className="relative shrink-0 transition-transform duration-300 group-hover:scale-105">
+            <Image src="/gold-logo.png" alt="7Layers Ancient Knowledge School" width={38} height={38} className="rounded-full block" />
           </div>
           <div className="flex flex-col">
             <span className="text-lg xl:text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-mystic-primary via-mystic-accent to-mystic-primary whitespace-nowrap tracking-wide leading-none">
