@@ -107,7 +107,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
       {/* Marka */}
       <div className="px-5 py-6 border-b border-white/5">
         <Link href="/admin/dashboard" onClick={onNavigate} className="flex items-center gap-3">
-          <Image src="/logo.png" alt="7Layers" width={36} height={36} className="rounded-lg" />
+          <Image src="/gold-logo.png" alt="7Layers" width={36} height={36} className="rounded-lg" />
           <div className="min-w-0">
             <p className="text-sm font-bold text-white leading-tight">7Layers</p>
             <p className="text-[11px] text-mystic-primary flex items-center gap-1 leading-tight">

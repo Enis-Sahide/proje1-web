@@ -43,9 +43,9 @@ export const metadata: Metadata = {
     google: 'a15kbuAKAeY4DSM8hNw31SrHZjIoSb1IIyMFTBEhq14',
   },
   icons: {
-    icon: '/logo.png',
-    shortcut: '/logo.png',
-    apple: '/logo.png',
+    icon: '/gold-logo.png',
+    shortcut: '/gold-logo.png',
+    apple: '/gold-logo.png',
   },
   openGraph: {
     title: "7Layers Ancient Knowledge School | Kadim Bilgiler Okulu",
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     siteName: '7Layers Ancient Knowledge School',
     images: [
       {
-        url: '/logo.png',
+        url: '/gold-logo.png',
         width: 512,
         height: 512,
         alt: '7Layers Ancient Knowledge School Logo',
@@ -67,7 +67,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: "7Layers Ancient Knowledge School | Kadim Bilgiler Okulu",
     description: "İnsan Tasarımı, Çakra Analizi, Schumann Rezonansı ve Kadim İlimler Okulu.",
-    images: ['/logo.png'],
+    images: ['/gold-logo.png'],
   },
 };
 
