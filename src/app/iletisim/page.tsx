@@ -77,10 +77,6 @@ const FAQS = [
     a: 'Sipariş numaranız ve doğru doğum bilgilerinizle birlikte iletişim formundan veya info@7layers.tr adresinden bize ulaştığınızda, teknik ekibimiz raporunuzu ücretsiz olarak güncelleyip e-postanıza yeniden iletir.'
   },
   {
-    q: 'Misafir olarak ödeme yaptım, raporuma daha sonra nasıl ulaşabilirim?',
-    a: 'Siparişiniz sırasında girdiğiniz e-posta adresine tek kullanımlık güvenli indirme bağlantısı iletilir. Ayrıca aynı e-posta ile sitemize ücretsiz hesap açtığınızda geçmiş tüm raporlarınız otomatik olarak profilinize bağlanır.'
-  },
-  {
     q: 'Raporumu e-posta kutumda göremiyorum, ne yapmalıyım?',
     a: 'Lütfen öncelikle Spam / İstenmeyen veya Tanıtımlar klasörlerinizi kontrol ediniz. Yine de bulamadıysanız aşağıdaki formdan bize sipariş e-postanızı iletmeniz yeterlidir; ekibimiz hemen manuel gönderim sağlar.'
   }
