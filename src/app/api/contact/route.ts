@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 import { sendMail } from '@/lib/mail/smtp';
+import { db } from '@/db/client';
+import { contactMessages } from '@/db/schema';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,6 +45,22 @@ export async function POST(req: Request) {
     const sanitizedCategory = subjectCategory ? String(subjectCategory).trim() : 'Genel Danışma';
     const sanitizedOrderCode = orderCode ? String(orderCode).trim() : 'Belirtilmedi';
     const sanitizedMessage = message.trim();
+
+    // 1. Veritabanına kaydet (Admin panelinde görünmesi için)
+    const messageId = `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    try {
+      await db.insert(contactMessages).values({
+        id: messageId,
+        name: sanitizedName,
+        email: sanitizedEmail,
+        subjectCategory: sanitizedCategory,
+        orderCode: sanitizedOrderCode === 'Belirtilmedi' ? null : sanitizedOrderCode,
+        message: sanitizedMessage,
+        status: 'unread',
+      });
+    } catch (dbError) {
+      console.error('[Contact API] DB kayıt hatası:', dbError);
+    }
 
     const targetEmail = process.env.CONTACT_EMAIL || process.env.SMTP_USER || 'info@7layers.tr';
 

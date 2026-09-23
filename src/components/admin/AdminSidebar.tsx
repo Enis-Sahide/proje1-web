@@ -12,6 +12,7 @@ import {
   LayoutDashboard,
   LogOut,
   Menu,
+  MessageSquare,
   Shield,
   Users,
   X,
@@ -32,6 +33,12 @@ export const ADMIN_NAV: AdminNavItem[] = [
     label: 'Genel Bakış',
     icon: LayoutDashboard,
     description: 'Platform özeti ve anlık göstergeler',
+  },
+  {
+    href: '/admin/messages',
+    label: 'Destek & Mesajlar',
+    icon: MessageSquare,
+    description: 'İletişim talepleri ve e-posta yanıtlama',
   },
   {
     href: '/admin/members',
