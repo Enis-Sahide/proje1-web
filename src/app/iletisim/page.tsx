@@ -58,24 +58,6 @@ function YouTubeIcon({ size = 16, className = "" }: { size?: number; className?:
   );
 }
 
-function WhatsAppIcon({ size = 16, className = "" }: { size?: number; className?: string }) {
-  return (
-    <svg 
-      width={size} 
-      height={size} 
-      viewBox="0 0 24 24" 
-      fill="none" 
-      stroke="currentColor" 
-      strokeWidth="2" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-      className={className}
-    >
-      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z" />
-    </svg>
-  );
-}
-
 const CATEGORIES = [
   { id: 'report_support', label: 'Analiz Raporu & Sipariş Desteği' },
   { id: 'birth_correction', label: 'Doğum Saati / Bilgi Düzeltme' },
@@ -254,7 +236,7 @@ export default function ContactPage() {
                   <span className="text-[11px] font-mono text-[#D4AF37]">@7layers.tr</span>
                 </h3>
                 <p className="text-xs text-white/60 leading-relaxed">
-                  Kozmik gökyüzü transitleri, rehberlik videoları ve analiz duyurularımızı resmi hesaplarımızdan takip edebilir, WhatsApp üzerinden danışabilirsiniz.
+                  Kozmik gökyüzü transitleri, rehberlik videoları ve analiz duyurularımızı resmi hesaplarımızdan takip edebilir, sorularınız için iletişim formumuz veya e-posta üzerinden bize 7/24 ulaşabilirsiniz.
                 </p>
               </div>
 
@@ -297,20 +279,18 @@ export default function ContactPage() {
                   <ArrowRight size={14} className="text-[#D4AF37] group-hover:translate-x-1 transition-transform" />
                 </a>
 
-                {/* WhatsApp */}
+                {/* Resmi E-Posta Masası */}
                 <a
-                  href="https://wa.me/905384623588"
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  href="mailto:destek@7layers.com"
                   className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-[#D4AF37]/50 text-xs font-medium text-white transition-all duration-200 group"
                 >
                   <div className="flex items-center gap-2.5">
                     <div className="p-1.5 rounded-lg bg-emerald-500/10 text-emerald-400">
-                      <WhatsAppIcon size={16} />
+                      <Mail size={16} />
                     </div>
                     <div>
-                      <div className="text-xs font-semibold text-white">WhatsApp Danışma</div>
-                      <div className="text-[10px] text-white/50">+90 538 462 35 88</div>
+                      <div className="text-xs font-semibold text-white">Resmi E-Posta Masası</div>
+                      <div className="text-[10px] text-white/50">destek@7layers.com</div>
                     </div>
                   </div>
                   <ArrowRight size={14} className="text-[#D4AF37] group-hover:translate-x-1 transition-transform" />
