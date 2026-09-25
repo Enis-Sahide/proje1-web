@@ -36,7 +36,7 @@ const drawTextWithBold = (
 
   if (curY > maxY) {
     doc.addPage();
-    doc.setFillColor(15, 18, 28);
+    doc.setFillColor(15, 23, 42);
     doc.rect(0, 0, 210, 297, 'F');
     curY = startY;
     doc.setTextColor(activeColor);
@@ -67,7 +67,7 @@ const drawTextWithBold = (
         curY += lineHeight;
         if (curY > maxY) {
           doc.addPage();
-          doc.setFillColor(15, 18, 28);
+          doc.setFillColor(15, 23, 42);
           doc.rect(0, 0, 210, 297, 'F');
           curY = startY;
           doc.setTextColor(activeColor);
@@ -87,7 +87,7 @@ const drawTextWithBold = (
       curY += lineHeight;
       if (curY > maxY) {
         doc.addPage();
-        doc.setFillColor(15, 18, 28);
+        doc.setFillColor(15, 23, 42);
         doc.rect(0, 0, 210, 297, 'F');
         curY = startY;
         doc.setTextColor(activeColor);
@@ -733,20 +733,27 @@ export const downloadHumanDesignPDF = async (
   const white: [number, number, number] = [255, 255, 255];
   const grayText: [number, number, number] = [180, 180, 180];
 
+  // Override addPage to automatically paint the dark background on all new pages (e.g. from autotable, pagination, etc.)
+  const originalAddPage = doc.addPage.bind(doc);
+  doc.addPage = function(this: any, ...args: any[]) {
+    const result = originalAddPage(...args);
+    doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
+    doc.rect(0, 0, 210, 297, 'F');
+    return result;
+  };
+
+  // Initial Cover Page background
+  doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
+  doc.rect(0, 0, 210, 297, 'F');
+
   let currentY = 25;
 
   const checkSpace = (required: number) => {
     if (currentY + required > 275) {
       doc.addPage();
-      doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
-      doc.rect(0, 0, 210, 297, 'F');
       currentY = 25;
     }
   };
-
-  // --- Cover Page ---
-  doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
-  doc.rect(0, 0, 210, 297, 'F');
 
   doc.setDrawColor(gold[0], gold[1], gold[2]);
   doc.setLineWidth(1.5);
