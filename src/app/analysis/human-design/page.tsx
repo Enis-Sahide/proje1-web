@@ -685,7 +685,7 @@ export default function HumanDesignPage() {
           </div>
         </div>
 
-        {!showResult ? (
+        {(!showResult || !chart) ? (
           <div className="bg-black/50 backdrop-blur-md border border-white/10 p-8 rounded-3xl shadow-2xl relative overflow-hidden max-w-2xl mx-auto">
             {isAnalyzing && (
               <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center text-[#32D74B]">
@@ -790,6 +790,7 @@ export default function HumanDesignPage() {
                         setChart(null);
                         setSynthesisReport(null);
                         setActiveTab('bodygraph');
+                        setShowResult(false);
                       }} 
                       className="text-xs sm:text-sm px-5 py-2.5 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap text-center"
                     >
