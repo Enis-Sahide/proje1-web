@@ -951,10 +951,13 @@ export const downloadHumanDesignPDF = async (
     const planetSymbol = PLANET_SYMBOLS[con.planet] || '';
     const planetName = planetTranslations[con.planet] || con.planet;
     
-    const conDir = con.isRetrograde ? '▼ (R)' : '▲ (D)';
-    const unconDir = uncon.isRetrograde ? '▼ (R)' : '▲ (D)';
-    const conText = `${con.gate}.${con.line} ${conDir} (${GATE_NAMES[con.gate]?.split(' / ')[0] || ''})`;
-    const unconText = `${uncon.gate}.${uncon.line} ${unconDir} (${GATE_NAMES[uncon.gate]?.split(' / ')[0] || ''})`;
+    const conFix = con.fixation === 'exalted' ? ' ▲' : con.fixation === 'detriment' ? ' ▼' : '';
+    const conR = con.isRetrograde ? ' (R)' : '';
+    const conText = `${con.gate}.${con.line}${conFix}${conR} (${GATE_NAMES[con.gate]?.split(' / ')[0] || ''})`;
+
+    const unconFix = uncon.fixation === 'exalted' ? ' ▲' : uncon.fixation === 'detriment' ? ' ▼' : '';
+    const unconR = uncon.isRetrograde ? ' (R)' : '';
+    const unconText = `${uncon.gate}.${uncon.line}${unconFix}${unconR} (${GATE_NAMES[uncon.gate]?.split(' / ')[0] || ''})`;
 
     tableRows.push([
       tr(`${planetSymbol} ${planetName}`),
@@ -983,23 +986,23 @@ export const downloadHumanDesignPDF = async (
   currentY = (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 8 : currentY + 10;
   checkSpace(32);
   
-  // Gezegen Hareket Yönleri Açıklama Kutusu
+  // Rave I'Ching Çizgi Fiksasyonları Açıklama Kutusu (Dünya Standardı)
   doc.setFillColor(secondaryDark[0], secondaryDark[1], secondaryDark[2]);
-  doc.roundedRect(20, currentY, 170, 24, 3, 3, 'F');
+  doc.roundedRect(20, currentY, 170, 26, 3, 3, 'F');
   
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(8.5);
   doc.setTextColor(gold[0], gold[1], gold[2]);
-  doc.text(tr("GEZEGEN HAREKET YÖNLERİ (▲ DİREKT / ▼ RETROGRAD) REHBERİ"), 24, currentY + 6);
+  doc.text(tr("RAVE I'CHING ÇİZGİ FİKSASYONLARI REHBERİ (RESMİ STANDART)"), 24, currentY + 6);
 
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(7.5);
   doc.setTextColor(grayText[0], grayText[1], grayText[2]);
-  doc.text(tr("• ▲ (D) Direkt / İleri Hareket: Gezegen enerjisi dış dünyaya açık, aktif ve doğrudan dünyevi tezahürle çalışır."), 24, currentY + 12);
-  doc.text(tr("• ▼ (R) Retrograd / Geri Hareket: Gezegen enerjisi içe dönüktür. Kapının arketipini derin bir içsel muhakeme,"), 24, currentY + 17);
-  doc.text(tr("  karmik arınma ve kişisel deneyim yoluyla özgün bir bilgeliğe dönüştürmeyi sağlar."), 24, currentY + 21);
+  doc.text(tr("• ▲ Yücelim (Exaltation): Gezegen bu kapı ve çizginin en saf, yapıcı ve yüksek potansiyelini aktive eder."), 24, currentY + 12);
+  doc.text(tr("• ▼ Düşüş (Detriment): Gezegen bu kapı ve çizginin gölge, içsel sınav ve arınma gerektiren tarafını çalıştırır."), 24, currentY + 17);
+  doc.text(tr("• (R) Retrograd: Gezegen gökyüzünde geri harekettedir; enerjisi içe dönük ve derin karmik süreçleri yansıtır."), 24, currentY + 22);
 
-  currentY += 30;
+  currentY += 32;
 
   // --- Section 5: Detailed Active Gates Analysis ---
   if (gatesData && gatesData.length > 0) {
