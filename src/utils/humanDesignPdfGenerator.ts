@@ -732,6 +732,8 @@ export const downloadHumanDesignPDF = async (
   const gold: [number, number, number] = [212, 175, 55]; // #D4AF37
   const white: [number, number, number] = [255, 255, 255];
   const grayText: [number, number, number] = [180, 180, 180];
+  const emeraldGreen: [number, number, number] = [16, 185, 129];
+  const detrimentRed: [number, number, number] = [244, 63, 94];
 
   // Override addPage to automatically paint the dark background on all new pages (e.g. from autotable, pagination, etc.)
   const originalAddPage = doc.addPage.bind(doc);
@@ -984,25 +986,70 @@ export const downloadHumanDesignPDF = async (
   });
 
   currentY = (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 8 : currentY + 10;
-  checkSpace(32);
+  checkSpace(75);
   
-  // Rave I'Ching Çizgi Fiksasyonları Açıklama Kutusu (Dünya Standardı)
+  // Rave I'Ching Çizgi Fiksasyonları ve 1-6 Çizgi Derin Analiz Rehberi
   doc.setFillColor(secondaryDark[0], secondaryDark[1], secondaryDark[2]);
-  doc.roundedRect(20, currentY, 170, 26, 3, 3, 'F');
+  doc.roundedRect(20, currentY, 170, 72, 3, 3, 'F');
   
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(8.5);
   doc.setTextColor(gold[0], gold[1], gold[2]);
-  doc.text(tr("RAVE I'CHING ÇİZGİ FİKSASYONLARI REHBERİ (RESMİ STANDART)"), 24, currentY + 6);
+  doc.text(tr("RAVE I'CHING ÇİZGİ FİKSASYONLARI VE ÇİZGİ ANATOMİSİ REHBERİ"), 24, currentY + 6);
 
   doc.setFont('LiberationSans', 'normal');
-  doc.setFontSize(7.5);
+  doc.setFontSize(7);
   doc.setTextColor(grayText[0], grayText[1], grayText[2]);
-  doc.text(tr("• ▲ Yücelim (Exaltation): Gezegen bu kapı ve çizginin en saf, yapıcı ve yüksek potansiyelini aktive eder."), 24, currentY + 12);
-  doc.text(tr("• ▼ Düşüş (Detriment): Gezegen bu kapı ve çizginin gölge, içsel sınav ve arınma gerektiren tarafını çalıştırır."), 24, currentY + 17);
-  doc.text(tr("• (R) Retrograd: Gezegen gökyüzünde geri harekettedir; enerjisi içe dönük ve derin karmik süreçleri yansıtır."), 24, currentY + 22);
+  
+  let gy = currentY + 11;
+  doc.text(tr("• Fiksasyon Mekaniği (384 Çizgi Rezonansı): Her kapı 6 genetik çizgiden oluşur. Gezegenlerin nötrino akışı"), 24, gy); gy += 4;
+  doc.text(tr("  o kapının çizgi arketipiyle belirli bir kutupta kilitlendiğinde Yücelim (▲) veya Düşüş (▼) fiksasyonu doğar."), 24, gy); gy += 5;
 
-  currentY += 32;
+  doc.setFont('LiberationSans', 'bold');
+  doc.setTextColor(emeraldGreen[0], emeraldGreen[1], emeraldGreen[2]);
+  doc.text(tr("▲ YÜCELİM (Exaltation):"), 24, gy);
+  doc.setFont('LiberationSans', 'normal');
+  doc.setTextColor(grayText[0], grayText[1], grayText[2]);
+  doc.text(tr(" Gezegen o çizginin en yapıcı, saf ve yüksek potansiyelini zahmetsizce açığa çıkarır."), 56, gy); gy += 5;
+
+  doc.setFont('LiberationSans', 'bold');
+  doc.setTextColor(detrimentRed[0], detrimentRed[1], detrimentRed[2]);
+  doc.text(tr("▼ DÜŞÜŞ (Detriment):"), 24, gy);
+  doc.setFont('LiberationSans', 'normal');
+  doc.setTextColor(grayText[0], grayText[1], grayText[2]);
+  doc.text(tr(" Gölge ve sürtüşmeli potansiyeldir; ruhun tekamülü ve içsel sınavı için derin bir uyanış sahasıdır."), 54, gy); gy += 5;
+
+  doc.setFont('LiberationSans', 'bold');
+  doc.setTextColor(white[0], white[1], white[2]);
+  doc.text(tr("• İşaretsiz Kapılar:"), 24, gy);
+  doc.setFont('LiberationSans', 'normal');
+  doc.setTextColor(grayText[0], grayText[1], grayText[2]);
+  doc.text(tr(" Gezegen o çizgiyle kilitlenmemiştir; çizginin enerjisi nötr ve dengeli şekilde akar (çoğunluk böyledir)."), 51, gy); gy += 5;
+
+  doc.setFont('LiberationSans', 'bold');
+  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.text(tr("• (R) Retrograd:"), 24, gy);
+  doc.setFont('LiberationSans', 'normal');
+  doc.setTextColor(grayText[0], grayText[1], grayText[2]);
+  doc.text(tr(" Gezegen gökyüzünde geri harekettedir; enerjisi dışa akmak yerine içsel derinleşme ve karmik arınma sunar."), 46, gy); gy += 6;
+
+  // 1'den 6'ya Çizgi Katmanları Özeti
+  doc.setFont('LiberationSans', 'bold');
+  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.text(tr("1'den 6'ya Çizgi Katmanlarının Anlamı:"), 24, gy); gy += 4.5;
+
+  doc.setFont('LiberationSans', 'normal');
+  doc.setTextColor(215, 215, 215);
+  doc.text(tr(".1 Araştırmacı: Güven arayışı, derin bilgi ve sağlam temel inşa etme."), 24, gy);
+  doc.text(tr(".2 Münzevi: Doğal ve çabasız yetenek, dışarıdan çağrılmayı bekleme."), 105, gy); gy += 4;
+
+  doc.text(tr(".3 Deneyimci: Deneme-yanılma, mutasyon, neyin çalışmadığını keşfetme."), 24, gy);
+  doc.text(tr(".4 Fırsatçı: Kalp bağı, güvenilir dostluk ağları ve yakın çevreye aktarım."), 105, gy); gy += 4;
+
+  doc.text(tr(".5 Kafir / Lider: Evrensel çözümler, toplumsal projeksiyonlar ve pratik kurtarıcılık."), 24, gy);
+  doc.text(tr(".6 Rol Modeli: Çatıya çekilme, tarafsız gözlem ve yaşayan bilgeliğe dönüşme."), 105, gy);
+
+  currentY += 78;
 
   // --- Section 5: Detailed Active Gates Analysis ---
   if (gatesData && gatesData.length > 0) {
@@ -1034,7 +1081,22 @@ export const downloadHumanDesignPDF = async (
         statusLabel = "Tasarım (Bilinçdışı - Kırmızı)";
       }
 
-      checkSpace(32);
+      // Gezegen aktivasyon çizgileri ve fiksasyon detayları
+      const actDetails: string[] = [];
+      personalityActivations.forEach((p: any) => {
+        const fixStr = p.fixation === 'exalted' ? ' [▲ Yücelim]' : p.fixation === 'detriment' ? ' [▼ Düşüş]' : '';
+        const retroStr = p.isRetrograde ? ' (R)' : '';
+        const pName = planetTranslations[p.planet] || p.planet;
+        actDetails.push(`${pName} (Çizgi ${p.line}${fixStr}${retroStr} - Kişilik)`);
+      });
+      designActivations.forEach((p: any) => {
+        const fixStr = p.fixation === 'exalted' ? ' [▲ Yücelim]' : p.fixation === 'detriment' ? ' [▼ Düşüş]' : '';
+        const retroStr = p.isRetrograde ? ' (R)' : '';
+        const pName = planetTranslations[p.planet] || p.planet;
+        actDetails.push(`${pName} (Çizgi ${p.line}${fixStr}${retroStr} - Tasarım)`);
+      });
+
+      checkSpace(38);
       doc.setFont('LiberationSans', 'bold');
       doc.setFontSize(12);
       doc.setTextColor(gold[0], gold[1], gold[2]);
@@ -1046,6 +1108,14 @@ export const downloadHumanDesignPDF = async (
       doc.setTextColor(white[0], white[1], white[2]);
       doc.text(`Aktivasyon Durumu: ${statusLabel}`, 20, currentY);
       currentY += 5;
+
+      if (actDetails.length > 0) {
+        doc.setFont('LiberationSans', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(gold[0], gold[1], gold[2]);
+        doc.text(tr(`Gezegen Aktivasyonları: ${actDetails.join(' | ')}`), 20, currentY);
+        currentY += 5;
+      }
 
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(9.5);
