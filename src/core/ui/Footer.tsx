@@ -18,7 +18,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Left: Brand & Copyright */}
         <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
-          <span className="font-semibold text-white/70">7Layers Ancient Knowledge School</span>
+          <span className="font-semibold text-white/70">7Layers Ancient Knowledge Realm</span>
           <span className="hidden sm:inline text-white/20">|</span>
           <span>© {new Date().getFullYear()} Tüm Hakları Saklıdır.</span>
         </div>

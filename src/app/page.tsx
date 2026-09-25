@@ -45,7 +45,7 @@ export default function Home() {
           <div className="text-center mb-12">
             <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-mystic-primary/10 border border-mystic-primary/30 text-mystic-primary text-xs font-semibold tracking-wider uppercase mb-4 shadow-[0_0_15px_rgba(212,175,55,0.15)]">
               <Sparkles size={14} className="text-mystic-accent" />
-              <span>Ancient Knowledge School • Kadim Bilgiler Okulu</span>
+              <span>Ancient Knowledge Realm • Kadim Bilgiler Alanı</span>
             </div>
             <h1 className="text-5xl md:text-7xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-mystic-accent via-mystic-text to-mystic-primary mb-4 tracking-tight drop-shadow-lg py-2">
               İçsel Uyanış
@@ -202,11 +202,11 @@ export default function Home() {
           <div className="flex items-center gap-2">
             <span className="font-bold text-mystic-primary">7LAYERS</span>
             <span className="text-white/40">•</span>
-            <span>Ancient Knowledge School</span>
+            <span>Ancient Knowledge Realm</span>
             <span className="text-white/40">•</span>
-            <span className="text-mystic-accent">Kadim Bilgiler Okulu</span>
+            <span className="text-mystic-accent">Kadim Bilgiler Alanı</span>
           </div>
-          <p>© {new Date().getFullYear()} 7Layers Ancient Knowledge School. Tüm hakları saklıdır.</p>
+          <p>© {new Date().getFullYear()} 7Layers Ancient Knowledge Realm. Tüm hakları saklıdır.</p>
         </div>
       </footer>
 

@@ -61,7 +61,7 @@ export async function POST(
         <div class="card">
           <div class="header">
             <h1 class="logo-text">7Layers Destek Ekibi</h1>
-            <div class="subtitle">Kozmik Bilgiler & Analiz Okulu</div>
+            <div class="subtitle">Kozmik Bilgiler & Analiz Alanı</div>
           </div>
           <div class="content">
             <div class="greeting">Merhaba Sayın ${message.name},</div>
