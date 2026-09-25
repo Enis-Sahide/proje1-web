@@ -476,7 +476,7 @@ const convertSvgToPng = (svgString: string, width: number = 640, height: number 
 };
 
 const generateHumanDesignSvgString = (chart: HumanDesignChart): string => {
-  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="1080" viewBox="40 10 320 540">`;
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="980" height="1080" viewBox="-45 10 490 540">`;
   
   // Defs: Gold Gradient background
   svg += `<defs>
@@ -614,6 +614,70 @@ const generateHumanDesignSvgString = (chart: HumanDesignChart): string => {
     } else {
       svg += `<text x="${textX}" y="${textY + 2.5}" font-family="Arial, Helvetica, sans-serif" font-size="8" fill="#64748B" stroke="#FFFFFF" stroke-width="2" paint-order="stroke fill" font-weight="bold" text-anchor="middle">${gNum}</text>`;
     }
+  });
+
+  // 5. Sol Sütun (Design - Bilinçdışı / Kırmızı)
+  svg += `<text x="-5" y="32" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="900" fill="#E63946" text-anchor="middle" letter-spacing="2">DESIGN</text>`;
+  const startY = 46;
+  const rowStep = 37;
+  const boxW = 70;
+  const boxH = 32;
+
+  chart.unconscious.forEach((p, i) => {
+    const boxX = -40;
+    const boxY = startY + i * rowStep;
+    const planetSymbol = PLANET_SYMBOLS[p.planet] || '';
+    
+    // Kutu
+    svg += `<rect x="${boxX}" y="${boxY}" width="${boxW}" height="${boxH}" rx="6" fill="#152033" stroke="#E63946" stroke-width="1.2" stroke-opacity="0.5"/>`;
+    
+    // Gezegen Sembolü
+    svg += `<text x="${boxX + 13}" y="${boxY + 22}" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="bold" fill="#E63946" text-anchor="middle">${planetSymbol}</text>`;
+    
+    // Retrograd R (varsa)
+    if (p.isRetrograde) {
+      svg += `<text x="${boxX + 25}" y="${boxY + 14}" font-family="Arial, Helvetica, sans-serif" font-size="8.5" font-weight="900" fill="#F59E0B">R</text>`;
+    }
+
+    // Kapı.Çizgi
+    svg += `<text x="${boxX + 46}" y="${boxY + 21}" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="bold" fill="#E63946" text-anchor="middle">${p.gate}.${p.line}</text>`;
+
+    // Fiksasyon Oku (Yücelim ▲ / Düşüş ▼)
+    if (p.fixation === 'exalted') {
+      svg += `<text x="${boxX + 62}" y="${boxY + 21}" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="900" fill="#10B981">▲</text>`;
+    } else if (p.fixation === 'detriment') {
+      svg += `<text x="${boxX + 62}" y="${boxY + 21}" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="900" fill="#F43F5E">▼</text>`;
+    }
+  });
+
+  // 6. Sağ Sütun (Personality - Bilinçli / Beyaz)
+  svg += `<text x="405" y="32" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="2">PERSONALITY</text>`;
+
+  chart.conscious.forEach((p, i) => {
+    const boxX = 370;
+    const boxY = startY + i * rowStep;
+    const planetSymbol = PLANET_SYMBOLS[p.planet] || '';
+
+    // Kutu
+    svg += `<rect x="${boxX}" y="${boxY}" width="${boxW}" height="${boxH}" rx="6" fill="#152033" stroke="#FFFFFF" stroke-width="1.2" stroke-opacity="0.35"/>`;
+
+    // Fiksasyon Oku (Yücelim ▲ / Düşüş ▼)
+    if (p.fixation === 'exalted') {
+      svg += `<text x="${boxX + 9}" y="${boxY + 21}" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="900" fill="#10B981">▲</text>`;
+    } else if (p.fixation === 'detriment') {
+      svg += `<text x="${boxX + 9}" y="${boxY + 21}" font-family="Arial, Helvetica, sans-serif" font-size="10" font-weight="900" fill="#F43F5E">▼</text>`;
+    }
+
+    // Kapı.Çizgi
+    svg += `<text x="${boxX + 26}" y="${boxY + 21}" font-family="Arial, Helvetica, sans-serif" font-size="12" font-weight="bold" fill="#FFFFFF" text-anchor="middle">${p.gate}.${p.line}</text>`;
+
+    // Retrograd R (varsa)
+    if (p.isRetrograde) {
+      svg += `<text x="${boxX + 46}" y="${boxY + 14}" font-family="Arial, Helvetica, sans-serif" font-size="8.5" font-weight="900" fill="#F59E0B">R</text>`;
+    }
+
+    // Gezegen Sembolü
+    svg += `<text x="${boxX + 57}" y="${boxY + 22}" font-family="Arial, Helvetica, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF" text-anchor="middle">${planetSymbol}</text>`;
   });
 
   svg += `</svg>`;
@@ -796,31 +860,31 @@ export const downloadHumanDesignPDF = async (
     ["Enkarnasyon Haçı", tr(chart.incarnationCross.split(' (')[0])]
   ];
 
-  // Render autoTable on the left (width 95mm)
+  // Render autoTable on the left (width 78mm)
   autoTable(doc, {
     startY: currentY,
     margin: { left: 20 },
-    tableWidth: 95,
+    tableWidth: 78,
     head: [['Parametre', 'Değer']],
     body: summaryBody,
     theme: 'grid',
-    styles: { font: 'LiberationSans', overflow: 'linebreak', cellPadding: 2.2, valign: 'middle' },
+    styles: { font: 'LiberationSans', overflow: 'linebreak', cellPadding: 2, valign: 'middle' },
     columnStyles: {
-      0: { cellWidth: 35, fontStyle: 'bold' },
-      1: { cellWidth: 60 }
+      0: { cellWidth: 30, fontStyle: 'bold' },
+      1: { cellWidth: 48 }
     },
     headStyles: { fillColor: gold, textColor: primaryDark, fontStyle: 'bold', font: 'LiberationSans' },
-    bodyStyles: { fillColor: secondaryDark, textColor: [255, 255, 255], font: 'LiberationSans', fontSize: 8.5 },
+    bodyStyles: { fillColor: secondaryDark, textColor: [255, 255, 255], font: 'LiberationSans', fontSize: 8 },
     alternateRowStyles: { fillColor: primaryDark },
   });
 
   const tableFinalY = (doc as any).lastAutoTable.finalY;
 
-  // Render High-Resolution Vector Bodygraph on the right
-  const imageX = 122;
-  const imageY = currentY - 5;
-  const imageW = 68;
-  const imageH = 114.75; // aspect ratio 320:540 -> 68 * (540 / 320)
+  // Render High-Resolution Vector Bodygraph (Design + BodyGraph + Personality) on the right
+  const imageX = 104;
+  const imageY = currentY - 4;
+  const imageW = 86;
+  const imageH = imageW * (540 / 490); // aspect ratio 490:540 -> 86 * 1.102 = 94.7 mm
 
   if (chartImageBase64) {
     doc.addImage(chartImageBase64, 'PNG', imageX, imageY, imageW, imageH);
