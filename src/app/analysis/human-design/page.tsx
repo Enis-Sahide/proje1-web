@@ -853,7 +853,15 @@ export default function HumanDesignPage() {
                           }}
                         >
                           <span className="text-xl font-bold text-[#E63946]">{PLANET_SYMBOLS[p.planet]}</span>
-                          <span className="text-sm font-bold text-[#E63946]">{p.gate}.{p.line}</span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-sm font-bold text-[#E63946]">{p.gate}.{p.line}</span>
+                            <span 
+                              className={`text-xs font-bold ${p.isRetrograde ? 'text-amber-400' : 'text-emerald-400'}`}
+                              title={p.isRetrograde ? 'Retrograd (Geri Hareket - İçe Dönük/Karmik)' : 'Direkt (İleri Hareket - Dışa Aktif)'}
+                            >
+                              {p.isRetrograde ? '▼' : '▲'}
+                            </span>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -883,10 +891,46 @@ export default function HumanDesignPage() {
                             }
                           }}
                         >
-                          <span className="text-sm font-bold text-white">{p.gate}.{p.line}</span>
+                          <div className="flex items-center gap-1.5">
+                            <span 
+                              className={`text-xs font-bold ${p.isRetrograde ? 'text-amber-400' : 'text-emerald-400'}`}
+                              title={p.isRetrograde ? 'Retrograd (Geri Hareket - İçe Dönük/Karmik)' : 'Direkt (İleri Hareket - Dışa Aktif)'}
+                            >
+                              {p.isRetrograde ? '▼' : '▲'}
+                            </span>
+                            <span className="text-sm font-bold text-white">{p.gate}.{p.line}</span>
+                          </div>
                           <span className="text-xl font-bold text-white">{PLANET_SYMBOLS[p.planet]}</span>
                         </div>
                       ))}
+                    </div>
+                  </div>
+
+                  {/* Gezegen Okları Açıklama Rehberi */}
+                  <div className="max-w-2xl mx-auto mb-10 p-4 bg-gradient-to-r from-amber-500/10 via-black/40 to-emerald-500/10 border border-white/10 rounded-2xl">
+                    <div className="flex items-center gap-2 mb-2 text-amber-300 font-semibold text-sm">
+                      <span>✦</span>
+                      <h4>Gezegen Hareket Yönleri &amp; Okların Anlamı</h4>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-stone-300">
+                      <div className="flex items-start gap-2 bg-black/40 p-2.5 rounded-xl border border-emerald-500/20">
+                        <span className="text-emerald-400 font-bold text-sm">▲</span>
+                        <div>
+                          <span className="font-bold text-emerald-300">Direkt (İleri Hareket):</span>
+                          <p className="mt-0.5 text-stone-400 leading-relaxed">
+                            Gezegen enerjisi doğal kozmik akışında, dış dünyaya açık ve aktiftir. Kapının yetenekleri doğrudan, engelsiz ve dünyevi tezahürle çalışır.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2 bg-black/40 p-2.5 rounded-xl border border-amber-500/20">
+                        <span className="text-amber-400 font-bold text-sm">▼</span>
+                        <div>
+                          <span className="font-bold text-amber-300">Retrograd (Geri Hareket):</span>
+                          <p className="mt-0.5 text-stone-400 leading-relaxed">
+                            Gezegen enerjisi içe dönüktür. Kapının arketipi doğrudan dışa akmak yerine derin bir içsel gözlem, muhasebe, karmik arınma ve özgün bilgelik sağlar.
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
