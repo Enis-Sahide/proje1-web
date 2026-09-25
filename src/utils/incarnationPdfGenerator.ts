@@ -401,12 +401,10 @@ export const downloadIncarnationPDF = async (
     curY = renderText(`**Ruhun Kök Hatırlayışı:** ${data.historicalEra.soulMemoryKey}`, 15, curY, 180, 5.6);
   }
 
-  // ================= PAGE: KOZMİK RUH KÖKENİ & GALAKTİK İZİ (STARSEED) =================
+  // ================= BÖLÜM 2: KOZMİK RUH KÖKENİ & GALAKTİK İZİ (STARSEED) =================
   if (data.cosmicOrigin) {
-    doc.addPage();
-    drawHeader();
-
-    curY = 30;
+    ensureSpace(50);
+    curY += 6;
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(19);
     doc.setTextColor(...gold);
@@ -514,11 +512,9 @@ export const downloadIncarnationPDF = async (
     }
   }
 
-  // ================= PAGE 3: KARMIC DEBTS =================
-  doc.addPage();
-  drawHeader();
-
-  curY = 30;
+  // ================= BÖLÜM 3: KARMIC DEBTS =================
+  ensureSpace(50);
+  curY += 6;
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(19);
   doc.setTextColor(...gold);
@@ -634,11 +630,9 @@ export const downloadIncarnationPDF = async (
     }
   }
 
-  // ================= PAGE 4: DRACONIC CARDS =================
-  doc.addPage();
-  drawHeader();
-
-  curY = 30;
+  // ================= BÖLÜM 4: DRACONIC CARDS =================
+  ensureSpace(50);
+  curY += 6;
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(19);
   doc.setTextColor(...gold);
@@ -747,12 +741,10 @@ export const downloadIncarnationPDF = async (
     curY += cardHeight + 6;
   });
 
-  // ================= PAGE 5: PROGRESSED EVOLUTION & INTERCEPTED SIGNS =================
+  // ================= BÖLÜM 5: PROGRESSED EVOLUTION & INTERCEPTED SIGNS =================
   if (data.progressedEvolution?.hasSpecialLocks) {
-    doc.addPage();
-    drawHeader();
-
-    curY = 30;
+    ensureSpace(50);
+    curY += 6;
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(19);
     doc.setTextColor(...gold);
@@ -915,12 +907,10 @@ export const downloadIncarnationPDF = async (
     }
   }
 
-  // ================= PAGE 6 (veya 5): DHARMA & NEXT LIFE =================
-  doc.addPage();
-  drawHeader();
-
+  // ================= BÖLÜM 6 (veya 5): DHARMA & NEXT LIFE =================
+  ensureSpace(50);
   const dharmaPageTitleNum = data.progressedEvolution?.hasSpecialLocks ? '6' : '5';
-  curY = 30;
+  curY += 6;
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(19);
   doc.setTextColor(...gold);

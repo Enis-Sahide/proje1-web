@@ -865,7 +865,7 @@ export const downloadHumanDesignPDF = async (
 
   // --- Incarnation Cross ---
   const crossDetails = getIncarnationCrossDetails(chart.incarnationCross);
-  checkSpace(70);
+  checkSpace(35);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(13);
   doc.setTextColor(gold[0], gold[1], gold[2]);
@@ -880,7 +880,7 @@ export const downloadHumanDesignPDF = async (
 
   // --- Holistic Synthesis ---
   const synthesis = getHolisticSynthesisText(chart.type);
-  checkSpace(70);
+  checkSpace(35);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(13);
   doc.setTextColor(gold[0], gold[1], gold[2]);
@@ -894,11 +894,7 @@ export const downloadHumanDesignPDF = async (
   currentY += 12;
 
   // --- Section 3: Energy Centers Analysis ---
-  doc.addPage();
-  doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
-  doc.rect(0, 0, 210, 297, 'F');
-  currentY = 25;
-
+  checkSpace(40);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(15);
   doc.setTextColor(gold[0], gold[1], gold[2]);
@@ -928,11 +924,7 @@ export const downloadHumanDesignPDF = async (
   }
 
   // --- Section 4: Planetary Activations (Gates) ---
-  doc.addPage();
-  doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
-  doc.rect(0, 0, 210, 297, 'F');
-  currentY = 25;
-
+  checkSpace(45);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(15);
   doc.setTextColor(gold[0], gold[1], gold[2]);
@@ -981,11 +973,7 @@ export const downloadHumanDesignPDF = async (
 
   // --- Section 5: Detailed Active Gates Analysis ---
   if (gatesData && gatesData.length > 0) {
-    doc.addPage();
-    doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
-    doc.rect(0, 0, 210, 297, 'F');
-    currentY = 25;
-
+    checkSpace(40);
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(15);
     doc.setTextColor(gold[0], gold[1], gold[2]);
@@ -1013,7 +1001,7 @@ export const downloadHumanDesignPDF = async (
         statusLabel = "Tasarım (Bilinçdışı - Kırmızı)";
       }
 
-      checkSpace(60);
+      checkSpace(32);
       doc.setFont('LiberationSans', 'bold');
       doc.setFontSize(12);
       doc.setTextColor(gold[0], gold[1], gold[2]);

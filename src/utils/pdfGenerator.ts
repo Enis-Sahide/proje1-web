@@ -466,13 +466,10 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
     alternateRowStyles: { fillColor: [18, 23, 38] },
   });
 
-  currentY = (doc as any).lastAutoTable.finalY + 15;
-
-  // Start Section 2 (Interpretations) on a new page so the first planet (Güneş) begins cleanly at the top
-  doc.addPage();
-  currentY = 25;
+  currentY = (doc as any).lastAutoTable.finalY + 12;
 
   // 2. Gezegen Yorumları
+  checkSpace(55);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(15);
   doc.setTextColor(gold[0], gold[1], gold[2]);
