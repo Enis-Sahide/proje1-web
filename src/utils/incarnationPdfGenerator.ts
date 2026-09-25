@@ -240,18 +240,21 @@ export const downloadIncarnationPDF = async (
   doc.roundedRect(15, 80, 180, bannerHeight, 3, 3, 'D');
 
   doc.setFont('LiberationSans', 'bold');
-  doc.setFontSize(12.5);
+  doc.setFontSize(12);
   doc.setTextColor(...gold);
-  doc.text(`RUHSAL OLGUNLUK: ${data.soulMaturity.tier.toUpperCase()} (${data.soulMaturity.score}/100) - ${data.soulMaturity.dominantElement} ELEMENTİ`, 22, 89);
+  const maturityTitle = `RUHSAL OLGUNLUK: ${data.soulMaturity.tier.toUpperCase()} (${data.soulMaturity.score}/100) - ${data.soulMaturity.dominantElement} ELEMENTİ`;
+  doc.text(doc.splitTextToSize(maturityTitle, 166), 22, 89);
 
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(10.5);
   if (data.cosmicOrigin?.isStarseed) {
     doc.setTextColor(190, 220, 255);
-    doc.text(`KOZMİK KÖKEN: YÜKSEK BOYUTLU VARLIK (STARSEED / IŞIK ELÇİSİ)`, 22, 96);
+    const starseedTitle = `KOZMİK KÖKEN: YÜKSEK BOYUTLU VARLIK (STARSEED / IŞIK ELÇİSİ)`;
+    doc.text(doc.splitTextToSize(starseedTitle, 166), 22, 96);
   } else {
     doc.setTextColor(160, 240, 180);
-    doc.text(`KOZMİK KÖKEN: KADİM GAİA YERLİSİ (DÜNYA MUHAFIZI)`, 22, 96);
+    const gaiaTitle = `KOZMİK KÖKEN: KADİM GAİA YERLİSİ (DÜNYA MUHAFIZI)`;
+    doc.text(doc.splitTextToSize(gaiaTitle, 166), 22, 96);
   }
 
   doc.setFont('LiberationSans', 'normal');
@@ -529,10 +532,11 @@ export const downloadIncarnationPDF = async (
   curY += 10;
   if (data.retroDebts.length === 0) {
     doc.setFont('LiberationSans', 'normal');
-    doc.setFontSize(13.5);
+    doc.setFontSize(11);
     doc.setTextColor(...white);
-    doc.text('Haritanızda doğrudan retrogezegen karmik borcu bulunmamaktadır. Ruhunuz geçmiş borçlarını büyük ölçüde arındırmış ve bu yaşama temiz bir karmik sayfa ile başlamıştır.', 15, curY);
-    curY += 20;
+    const noDebtText = 'Haritanızda doğrudan retrogezegen karmik borcu bulunmamaktadır. Ruhunuz geçmiş borçlarını büyük ölçüde arındırmış ve bu yaşama temiz bir karmik sayfa ile başlamıştır.';
+    curY = renderText(noDebtText, 15, curY, 180, 6.5);
+    curY += 8;
   } else {
     data.retroDebts.forEach(debt => {
       // Split each text line to fit within card width (168mm)
@@ -787,11 +791,12 @@ export const downloadIncarnationPDF = async (
     // SADECE 28°-29° ANARATİK SINIR DERECESİ VARSA
     if (data.progressedEvolution.isCriticalDegree) {
       doc.setFont('LiberationSans', 'bold');
-      doc.setFontSize(13);
+      doc.setFontSize(12.5);
       doc.setTextColor(...white);
-      doc.text(`Anaretik Eşik Durumu: ${data.progressedEvolution.badgeTitle}`, 15, curY);
-
-      curY += 7;
+      const anareticTitle = `Anaretik Eşik Durumu: ${data.progressedEvolution.badgeTitle}`;
+      const anareticLines = doc.splitTextToSize(anareticTitle, 180);
+      doc.text(anareticLines, 15, curY);
+      curY += anareticLines.length * 6 + 2;
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(10.5);
       doc.setTextColor(...white);
@@ -838,11 +843,13 @@ export const downloadIncarnationPDF = async (
     // SADECE SIKIŞTIRILMIŞ BURÇLAR VARSA
     if (data.progressedEvolution.hasInterceptedSigns) {
       doc.setFont('LiberationSans', 'bold');
-      doc.setFontSize(14);
+      doc.setFontSize(13.5);
       doc.setTextColor(...gold);
-      doc.text('Sıkıştırılmış Burçlar (Kilitli Sandıklar & Gizli Potansiyeller)', 15, curY);
+      const interceptedTitle = 'Sıkıştırılmış Burçlar (Kilitli Sandıklar & Gizli Potansiyeller)';
+      const interceptedLines = doc.splitTextToSize(interceptedTitle, 180);
+      doc.text(interceptedLines, 15, curY);
 
-      curY += 8;
+      curY += interceptedLines.length * 6.5 + 2;
       data.progressedEvolution.interceptedSigns.forEach(inter => {
         const polText = inter.polarityLabel ? ` [${inter.polarityLabel}]` : '';
         const titleText = `${inter.sign} Burcu (${inter.archetype}) - ${inter.house}. Evde Hapsolmuş${polText}`;
@@ -951,13 +958,15 @@ export const downloadIncarnationPDF = async (
 
   if (data.incarnationCross) {
     curY += 6;
-    ensureSpace(32);
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(14);
+    doc.setFontSize(13);
     doc.setTextColor(...gold);
-    doc.text(`Enkarnasyon Çaprazı: ${data.incarnationCross.title}`, 15, curY);
+    const crossTitle = `Enkarnasyon Çaprazı: ${data.incarnationCross.title}`;
+    const crossTitleLines = doc.splitTextToSize(crossTitle, 180);
+    ensureSpace(crossTitleLines.length * 6.5 + 30);
+    doc.text(crossTitleLines, 15, curY);
+    curY += crossTitleLines.length * 6.5 + 3;
 
-    curY += 6;
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(11);
     doc.setTextColor(...white);

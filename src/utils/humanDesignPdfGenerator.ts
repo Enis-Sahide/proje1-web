@@ -19,22 +19,37 @@ const tr = (str: string | number | null | undefined): string => {
   return String(str);
 };
 
-// Word-wrap text renderer that supports inline markdown bold formatting (**text**)
+// Word-wrap text renderer that supports inline markdown bold formatting (**text**) and auto-pagination
 const drawTextWithBold = (
   doc: jsPDF,
   text: string,
   x: number,
   y: number,
   maxWidth: number,
-  lineHeight: number = 6
+  lineHeight: number = 6,
+  maxY: number = 275,
+  startY: number = 25
 ): number => {
   let curX = x;
   let curY = y;
+  const activeColor = (doc as any).getTextColor ? (doc as any).getTextColor() : '#ffffff';
+
+  if (curY > maxY) {
+    doc.addPage();
+    doc.setFillColor(15, 18, 28);
+    doc.rect(0, 0, 210, 297, 'F');
+    curY = startY;
+    doc.setTextColor(activeColor);
+  }
   
   const sanitizedText = text
+    .replace(/\r\n/g, '\n')
     .replace(/!\[.*?\]\(.*?\)/g, '')
     .replace(/<img.*?src=".*?".*?>/g, '')
-    .replace(/^\s*>\s*/gm, '');
+    .replace(/^\s*>\s*/gm, '')
+    .replace(/\*\*\*(.*?)\*\*\*/g, '**$1**')
+    .replace(/(?<!\*)\*([^*\n]+?)\*(?!\*)/g, '**$1**')
+    .replace(/\*\((.*?)\)\*/g, '**$1**');
      
   const parts = sanitizedText.split(/(\s+|\*\*)/);
   let isBold = false;
@@ -45,20 +60,42 @@ const drawTextWithBold = (
       doc.setFont('LiberationSans', isBold ? 'bold' : 'normal');
       continue;
     }
-    if (part === '\n') {
+    if (part.includes('\n')) {
+      const newlineCount = (part.match(/\n/g) || []).length;
       curX = x;
-      curY += lineHeight;
+      for (let i = 0; i < newlineCount; i++) {
+        curY += lineHeight;
+        if (curY > maxY) {
+          doc.addPage();
+          doc.setFillColor(15, 18, 28);
+          doc.rect(0, 0, 210, 297, 'F');
+          curY = startY;
+          doc.setTextColor(activeColor);
+          doc.setFont('LiberationSans', isBold ? 'bold' : 'normal');
+        }
+      }
       continue;
     }
     if (part === '') continue;
+
+    const cleanWord = part.replace(/\*/g, '');
+    if (!cleanWord && part !== '') continue;
     
-    const wordWidth = doc.getTextWidth(part);
-    if (curX + wordWidth > x + maxWidth && part.trim() !== '') {
+    const wordWidth = doc.getTextWidth(cleanWord);
+    if (curX + wordWidth > x + maxWidth && cleanWord.trim() !== '') {
       curX = x;
       curY += lineHeight;
+      if (curY > maxY) {
+        doc.addPage();
+        doc.setFillColor(15, 18, 28);
+        doc.rect(0, 0, 210, 297, 'F');
+        curY = startY;
+        doc.setTextColor(activeColor);
+        doc.setFont('LiberationSans', isBold ? 'bold' : 'normal');
+      }
     }
     
-    doc.text(part, curX, curY);
+    doc.text(cleanWord, curX, curY);
     curX += wordWidth;
   }
   
@@ -758,6 +795,11 @@ export const downloadHumanDesignPDF = async (
     head: [['Parametre', 'Değer']],
     body: summaryBody,
     theme: 'grid',
+    styles: { font: 'LiberationSans', overflow: 'linebreak', cellPadding: 2.2, valign: 'middle' },
+    columnStyles: {
+      0: { cellWidth: 35, fontStyle: 'bold' },
+      1: { cellWidth: 60 }
+    },
     headStyles: { fillColor: gold, textColor: primaryDark, fontStyle: 'bold', font: 'LiberationSans' },
     bodyStyles: { fillColor: secondaryDark, textColor: [255, 255, 255], font: 'LiberationSans', fontSize: 8.5 },
     alternateRowStyles: { fillColor: primaryDark },
@@ -926,6 +968,12 @@ export const downloadHumanDesignPDF = async (
     head: [['Gezegen', 'Kişilik (Bilinçli - Siyah)', 'Tasarım (Bilinçdışı - Kırmızı)']],
     body: tableRows,
     theme: 'grid',
+    styles: { font: 'LiberationSans', overflow: 'linebreak', cellPadding: 2.5, valign: 'middle' },
+    columnStyles: {
+      0: { cellWidth: 40, fontStyle: 'bold' },
+      1: { cellWidth: 65 },
+      2: { cellWidth: 65 }
+    },
     headStyles: { fillColor: gold, textColor: primaryDark, fontStyle: 'bold', font: 'LiberationSans' },
     bodyStyles: { fillColor: secondaryDark, textColor: [255, 255, 255], font: 'LiberationSans' },
     alternateRowStyles: { fillColor: primaryDark },

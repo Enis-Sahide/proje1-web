@@ -454,6 +454,13 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
     head: [['Gezegen', 'Burç', 'Derece', 'Ev']],
     body: planetsBody,
     theme: 'grid',
+    styles: { font: 'LiberationSans', overflow: 'linebreak', cellPadding: 2.5, valign: 'middle' },
+    columnStyles: {
+      0: { cellWidth: 45, fontStyle: 'bold' },
+      1: { cellWidth: 40 },
+      2: { cellWidth: 45 },
+      3: { cellWidth: 40 }
+    },
     headStyles: { fillColor: gold, textColor: primaryDark, fontStyle: 'bold', font: 'LiberationSans' },
     bodyStyles: { fillColor: [24, 30, 48], textColor: [255, 255, 255], font: 'LiberationSans' },
     alternateRowStyles: { fillColor: [18, 23, 38] },
