@@ -579,7 +579,7 @@ export default function NumerologyPage() {
                     <label className="block text-sm font-medium text-mystic-text-muted mb-2">Slogan veya Ek Unvan (İsteğe Bağlı)</label>
                     <input 
                       type="text" 
-                      placeholder="Örn: Ancient Knowledge School, Kadim Bilgiler Okulu, Creative Labs"
+                      placeholder="Örn: Ancient Knowledge Realm, Kadim Bilgiler Alanı, Creative Labs"
                       value={brandSlogan}
                       onChange={(e) => setBrandSlogan(e.target.value)}
                       className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors" 

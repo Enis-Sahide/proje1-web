@@ -267,7 +267,7 @@ export default function ExamTakingPage() {
       resultColorClass = "text-amber-400";
     } else {
       resultTitle = "Arayışta";
-      resultMessage = "Henüz sırlar okulunun başındasın. Öğretileri sessizlikte tekrar dinlemeli ve idrak etmelisin.";
+      resultMessage = "Henüz bu kadim yolun başındasın. Öğretileri sessizlikte tekrar dinlemeli ve idrak etmelisin.";
       resultColorClass = "text-red-400";
     }
 

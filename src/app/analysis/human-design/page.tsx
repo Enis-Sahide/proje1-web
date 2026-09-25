@@ -685,7 +685,7 @@ export default function HumanDesignPage() {
           </div>
         </div>
 
-        {!showResult ? (
+        {(!showResult || !chart) ? (
           <div className="bg-black/50 backdrop-blur-md border border-white/10 p-8 rounded-3xl shadow-2xl relative overflow-hidden max-w-2xl mx-auto">
             {isAnalyzing && (
               <div className="absolute inset-0 bg-black/80 backdrop-blur-sm z-10 flex flex-col items-center justify-center text-[#32D74B]">
@@ -790,6 +790,7 @@ export default function HumanDesignPage() {
                         setChart(null);
                         setSynthesisReport(null);
                         setActiveTab('bodygraph');
+                        setShowResult(false);
                       }} 
                       className="text-xs sm:text-sm px-5 py-2.5 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap text-center"
                     >
@@ -836,6 +837,7 @@ export default function HumanDesignPage() {
                 <div className="space-y-8 animate-in fade-in duration-500">
                   <div className="flex flex-col lg:flex-row justify-center items-start gap-8 mb-10">
                     {/* Left Column - Design */}
+                    {/* Left Column - Design */}
                     <div className="w-full lg:w-48 bg-black/40 border border-white/5 rounded-2xl p-4 flex flex-col gap-2">
                       <h3 className="text-center font-bold uppercase tracking-wider text-[#E63946] mb-2 text-sm">Design</h3>
                       {chart.unconscious.map((p, i) => (
@@ -851,8 +853,23 @@ export default function HumanDesignPage() {
                             }
                           }}
                         >
-                          <span className="text-xl font-bold text-[#E63946]">{PLANET_SYMBOLS[p.planet]}</span>
-                          <span className="text-sm font-bold text-[#E63946]">{p.gate}.{p.line}</span>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-xl font-bold text-[#E63946]">{PLANET_SYMBOLS[p.planet]}</span>
+                            {p.isRetrograde && (
+                              <span className="text-[10px] font-extrabold px-1 py-0.2 bg-amber-500/20 text-amber-300 rounded border border-amber-500/30" title="Retrograd (Geri Hareket)">
+                                R
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            <span className="text-sm font-bold text-[#E63946]">{p.gate}.{p.line}</span>
+                            {p.fixation === 'exalted' && (
+                              <span className="text-xs font-bold text-emerald-400" title="Yücelim (Exaltation ▲)">▲</span>
+                            )}
+                            {p.fixation === 'detriment' && (
+                              <span className="text-xs font-bold text-rose-400" title="Düşüş (Detriment ▼)">▼</span>
+                            )}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -882,11 +899,69 @@ export default function HumanDesignPage() {
                             }
                           }}
                         >
-                          <span className="text-sm font-bold text-white">{p.gate}.{p.line}</span>
-                          <span className="text-xl font-bold text-white">{PLANET_SYMBOLS[p.planet]}</span>
+                          <div className="flex items-center gap-1.5">
+                            {p.fixation === 'exalted' && (
+                              <span className="text-xs font-bold text-emerald-400" title="Yücelim (Exaltation ▲)">▲</span>
+                            )}
+                            {p.fixation === 'detriment' && (
+                              <span className="text-xs font-bold text-rose-400" title="Düşüş (Detriment ▼)">▼</span>
+                            )}
+                            <span className="text-sm font-bold text-white">{p.gate}.{p.line}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            {p.isRetrograde && (
+                              <span className="text-[10px] font-extrabold px-1 py-0.2 bg-amber-500/20 text-amber-300 rounded border border-amber-500/30" title="Retrograd (Geri Hareket)">
+                                R
+                              </span>
+                            )}
+                            <span className="text-xl font-bold text-white">{PLANET_SYMBOLS[p.planet]}</span>
+                          </div>
                         </div>
                       ))}
                     </div>
+                  </div>
+
+                  {/* Rave I'Ching Çizgi Fiksasyonları Açıklama Rehberi (Dünya Standardı) */}
+                  <div className="max-w-2xl mx-auto mb-10 p-4 bg-gradient-to-r from-emerald-500/10 via-black/40 to-rose-500/10 border border-white/10 rounded-2xl">
+                    <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-center gap-2 text-amber-300 font-semibold text-sm">
+                        <span>✦</span>
+                        <h4>Rave I&apos;Ching Çizgi Fiksasyonları Rehberi (Resmi Standart)</h4>
+                      </div>
+                      <span className="text-[11px] text-stone-400 bg-white/5 px-2 py-0.5 rounded border border-white/10">384 Çizgi Rezonansı</span>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-stone-300">
+                      <div className="flex items-start gap-2 bg-black/40 p-2.5 rounded-xl border border-emerald-500/20">
+                        <span className="text-emerald-400 font-bold text-sm">▲</span>
+                        <div>
+                          <span className="font-bold text-emerald-300">Yücelim (Exaltation):</span>
+                          <p className="mt-0.5 text-stone-400 leading-relaxed text-[11px]">
+                            Gezegen, bu çizginin en saf, yapıcı ve yüksek titreşimli potansiyelini aktive eder.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2 bg-black/40 p-2.5 rounded-xl border border-rose-500/20">
+                        <span className="text-rose-400 font-bold text-sm">▼</span>
+                        <div>
+                          <span className="font-bold text-rose-300">Düşüş (Detriment):</span>
+                          <p className="mt-0.5 text-stone-400 leading-relaxed text-[11px]">
+                            Gezegen, bu çizginin gölge, içsel sınav ve deneyimsel arınma gerektiren tarafını çalıştırır.
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-start gap-2 bg-black/40 p-2.5 rounded-xl border border-amber-500/20">
+                        <span className="text-amber-400 font-bold text-xs bg-amber-500/20 px-1.5 py-0.5 rounded">R</span>
+                        <div>
+                          <span className="font-bold text-amber-300">Retrograd (Geri):</span>
+                          <p className="mt-0.5 text-stone-400 leading-relaxed text-[11px]">
+                            Gezegen gökyüzünde geri harekettedir; enerjisi içe dönük ve derin karmik süreçleri temsil eder.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    <p className="mt-2 text-[10px] text-stone-400 italic text-center">
+                      * Yanında ok bulunmayan kapılar bu çizginin fiksasyonuna tabi değildir; temel potansiyeli nötr ve dengelidir.
+                    </p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">

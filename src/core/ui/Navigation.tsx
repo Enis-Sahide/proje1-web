@@ -96,14 +96,14 @@ export default function Navigation() {
         {/* Logo */}
         <Link href={isAdmin ? "/admin/dashboard" : "/"} className="flex items-center gap-2.5 group shrink-0 mr-2 lg:mr-4 xl:mr-8">
           <div className="relative shrink-0 transition-transform duration-300 group-hover:scale-105">
-            <Image src="/gold-logo.png" alt="7Layers Ancient Knowledge School" width={38} height={38} className="rounded-full block" />
+            <Image src="/gold-logo.png" alt="7Layers Ancient Knowledge Realm" width={38} height={38} className="rounded-full block" />
           </div>
           <div className="flex flex-col">
             <span className="text-lg xl:text-xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-mystic-primary via-mystic-accent to-mystic-primary whitespace-nowrap tracking-wide leading-none">
               7LAYERS
             </span>
             <span className="text-[7.5px] xl:text-[8.5px] tracking-[0.16em] uppercase text-mystic-primary/80 font-medium whitespace-nowrap mt-1 group-hover:text-mystic-accent transition-colors">
-              Ancient Knowledge School
+              Ancient Knowledge Realm
             </span>
           </div>
         </Link>

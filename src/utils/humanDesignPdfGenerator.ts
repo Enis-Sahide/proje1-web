@@ -19,22 +19,37 @@ const tr = (str: string | number | null | undefined): string => {
   return String(str);
 };
 
-// Word-wrap text renderer that supports inline markdown bold formatting (**text**)
+// Word-wrap text renderer that supports inline markdown bold formatting (**text**) and auto-pagination
 const drawTextWithBold = (
   doc: jsPDF,
   text: string,
   x: number,
   y: number,
   maxWidth: number,
-  lineHeight: number = 6
+  lineHeight: number = 6,
+  maxY: number = 275,
+  startY: number = 25
 ): number => {
   let curX = x;
   let curY = y;
+  const activeColor = (doc as any).getTextColor ? (doc as any).getTextColor() : '#ffffff';
+
+  if (curY > maxY) {
+    doc.addPage();
+    doc.setFillColor(15, 23, 42);
+    doc.rect(0, 0, 210, 297, 'F');
+    curY = startY;
+    doc.setTextColor(activeColor);
+  }
   
   const sanitizedText = text
+    .replace(/\r\n/g, '\n')
     .replace(/!\[.*?\]\(.*?\)/g, '')
     .replace(/<img.*?src=".*?".*?>/g, '')
-    .replace(/^\s*>\s*/gm, '');
+    .replace(/^\s*>\s*/gm, '')
+    .replace(/\*\*\*(.*?)\*\*\*/g, '**$1**')
+    .replace(/(?<!\*)\*([^*\n]+?)\*(?!\*)/g, '**$1**')
+    .replace(/\*\((.*?)\)\*/g, '**$1**');
      
   const parts = sanitizedText.split(/(\s+|\*\*)/);
   let isBold = false;
@@ -45,20 +60,42 @@ const drawTextWithBold = (
       doc.setFont('LiberationSans', isBold ? 'bold' : 'normal');
       continue;
     }
-    if (part === '\n') {
+    if (part.includes('\n')) {
+      const newlineCount = (part.match(/\n/g) || []).length;
       curX = x;
-      curY += lineHeight;
+      for (let i = 0; i < newlineCount; i++) {
+        curY += lineHeight;
+        if (curY > maxY) {
+          doc.addPage();
+          doc.setFillColor(15, 23, 42);
+          doc.rect(0, 0, 210, 297, 'F');
+          curY = startY;
+          doc.setTextColor(activeColor);
+          doc.setFont('LiberationSans', isBold ? 'bold' : 'normal');
+        }
+      }
       continue;
     }
     if (part === '') continue;
+
+    const cleanWord = part.replace(/\*/g, '');
+    if (!cleanWord && part !== '') continue;
     
-    const wordWidth = doc.getTextWidth(part);
-    if (curX + wordWidth > x + maxWidth && part.trim() !== '') {
+    const wordWidth = doc.getTextWidth(cleanWord);
+    if (curX + wordWidth > x + maxWidth && cleanWord.trim() !== '') {
       curX = x;
       curY += lineHeight;
+      if (curY > maxY) {
+        doc.addPage();
+        doc.setFillColor(15, 23, 42);
+        doc.rect(0, 0, 210, 297, 'F');
+        curY = startY;
+        doc.setTextColor(activeColor);
+        doc.setFont('LiberationSans', isBold ? 'bold' : 'normal');
+      }
     }
     
-    doc.text(part, curX, curY);
+    doc.text(cleanWord, curX, curY);
     curX += wordWidth;
   }
   
@@ -439,7 +476,7 @@ const convertSvgToPng = (svgString: string, width: number = 640, height: number 
 };
 
 const generateHumanDesignSvgString = (chart: HumanDesignChart): string => {
-  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="640" height="1080" viewBox="40 10 320 540">`;
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" width="1044" height="1080" viewBox="-60 10 522 540">`;
   
   // Defs: Gold Gradient background
   svg += `<defs>
@@ -579,6 +616,70 @@ const generateHumanDesignSvgString = (chart: HumanDesignChart): string => {
     }
   });
 
+  // 5. Sol Sütun (Design - Bilinçdışı / Kırmızı)
+  svg += `<text x="-6" y="32" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="900" fill="#E63946" text-anchor="middle" letter-spacing="1.5">DESIGN</text>`;
+  const startY = 46;
+  const rowStep = 37;
+  const boxW = 72;
+  const boxH = 32;
+
+  chart.unconscious.forEach((p, i) => {
+    const boxX = -42;
+    const boxY = startY + i * rowStep;
+    const planetSymbol = PLANET_SYMBOLS[p.planet] || '';
+    
+    // Kutu
+    svg += `<rect x="${boxX}" y="${boxY}" width="${boxW}" height="${boxH}" rx="6" fill="#152033" stroke="#E63946" stroke-width="1.2" stroke-opacity="0.5"/>`;
+    
+    // Gezegen Sembolü
+    svg += `<text x="${boxX + 14}" y="${boxY + 22}" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#E63946" text-anchor="middle">${planetSymbol}</text>`;
+    
+    // Retrograd R (varsa)
+    if (p.isRetrograde) {
+      svg += `<text x="${boxX + 26}" y="${boxY + 14}" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="900" fill="#F59E0B">R</text>`;
+    }
+
+    // Kapı.Çizgi
+    svg += `<text x="${boxX + 47}" y="${boxY + 21}" font-family="Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#E63946" text-anchor="middle">${p.gate}.${p.line}</text>`;
+
+    // Fiksasyon Oku (Yücelim ▲ / Düşüş ▼)
+    if (p.fixation === 'exalted') {
+      svg += `<text x="${boxX + 63}" y="${boxY + 21}" font-family="Arial, Helvetica, sans-serif" font-size="9.5" font-weight="900" fill="#10B981">▲</text>`;
+    } else if (p.fixation === 'detriment') {
+      svg += `<text x="${boxX + 63}" y="${boxY + 21}" font-family="Arial, Helvetica, sans-serif" font-size="9.5" font-weight="900" fill="#F43F5E">▼</text>`;
+    }
+  });
+
+  // 6. Sağ Sütun (Personality - Bilinçli / Beyaz)
+  svg += `<text x="406" y="32" font-family="Arial, Helvetica, sans-serif" font-size="9.5" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="0.8">PERSONALITY</text>`;
+
+  chart.conscious.forEach((p, i) => {
+    const boxX = 370;
+    const boxY = startY + i * rowStep;
+    const planetSymbol = PLANET_SYMBOLS[p.planet] || '';
+
+    // Kutu
+    svg += `<rect x="${boxX}" y="${boxY}" width="${boxW}" height="${boxH}" rx="6" fill="#152033" stroke="#FFFFFF" stroke-width="1.2" stroke-opacity="0.35"/>`;
+
+    // Fiksasyon Oku (Yücelim ▲ / Düşüş ▼)
+    if (p.fixation === 'exalted') {
+      svg += `<text x="${boxX + 9}" y="${boxY + 21}" font-family="Arial, Helvetica, sans-serif" font-size="9.5" font-weight="900" fill="#10B981">▲</text>`;
+    } else if (p.fixation === 'detriment') {
+      svg += `<text x="${boxX + 9}" y="${boxY + 21}" font-family="Arial, Helvetica, sans-serif" font-size="9.5" font-weight="900" fill="#F43F5E">▼</text>`;
+    }
+
+    // Kapı.Çizgi
+    svg += `<text x="${boxX + 26}" y="${boxY + 21}" font-family="Arial, Helvetica, sans-serif" font-size="11.5" font-weight="bold" fill="#FFFFFF" text-anchor="middle">${p.gate}.${p.line}</text>`;
+
+    // Retrograd R (varsa)
+    if (p.isRetrograde) {
+      svg += `<text x="${boxX + 46}" y="${boxY + 14}" font-family="Arial, Helvetica, sans-serif" font-size="8" font-weight="900" fill="#F59E0B">R</text>`;
+    }
+
+    // Gezegen Sembolü
+    svg += `<text x="${boxX + 58}" y="${boxY + 22}" font-family="Arial, Helvetica, sans-serif" font-size="15" font-weight="bold" fill="#FFFFFF" text-anchor="middle">${planetSymbol}</text>`;
+  });
+
   svg += `</svg>`;
   return svg;
 };
@@ -695,21 +796,30 @@ export const downloadHumanDesignPDF = async (
   const gold: [number, number, number] = [212, 175, 55]; // #D4AF37
   const white: [number, number, number] = [255, 255, 255];
   const grayText: [number, number, number] = [180, 180, 180];
+  const emeraldGreen: [number, number, number] = [16, 185, 129];
+  const detrimentRed: [number, number, number] = [244, 63, 94];
+
+  // Override addPage to automatically paint the dark background on all new pages (e.g. from autotable, pagination, etc.)
+  const originalAddPage = doc.addPage.bind(doc);
+  doc.addPage = function(this: any, ...args: any[]) {
+    const result = originalAddPage(...args);
+    doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
+    doc.rect(0, 0, 210, 297, 'F');
+    return result;
+  };
+
+  // Initial Cover Page background
+  doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
+  doc.rect(0, 0, 210, 297, 'F');
 
   let currentY = 25;
 
   const checkSpace = (required: number) => {
     if (currentY + required > 275) {
       doc.addPage();
-      doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
-      doc.rect(0, 0, 210, 297, 'F');
       currentY = 25;
     }
   };
-
-  // --- Cover Page ---
-  doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
-  doc.rect(0, 0, 210, 297, 'F');
 
   doc.setDrawColor(gold[0], gold[1], gold[2]);
   doc.setLineWidth(1.5);
@@ -750,26 +860,31 @@ export const downloadHumanDesignPDF = async (
     ["Enkarnasyon Haçı", tr(chart.incarnationCross.split(' (')[0])]
   ];
 
-  // Render autoTable on the left (width 95mm)
+  // Render autoTable on the left (width 76mm)
   autoTable(doc, {
     startY: currentY,
     margin: { left: 20 },
-    tableWidth: 95,
+    tableWidth: 76,
     head: [['Parametre', 'Değer']],
     body: summaryBody,
     theme: 'grid',
+    styles: { font: 'LiberationSans', overflow: 'linebreak', cellPadding: 2, valign: 'middle' },
+    columnStyles: {
+      0: { cellWidth: 29, fontStyle: 'bold' },
+      1: { cellWidth: 47 }
+    },
     headStyles: { fillColor: gold, textColor: primaryDark, fontStyle: 'bold', font: 'LiberationSans' },
-    bodyStyles: { fillColor: secondaryDark, textColor: [255, 255, 255], font: 'LiberationSans', fontSize: 8.5 },
+    bodyStyles: { fillColor: secondaryDark, textColor: [255, 255, 255], font: 'LiberationSans', fontSize: 8 },
     alternateRowStyles: { fillColor: primaryDark },
   });
 
   const tableFinalY = (doc as any).lastAutoTable.finalY;
 
-  // Render High-Resolution Vector Bodygraph on the right
-  const imageX = 122;
-  const imageY = currentY - 5;
-  const imageW = 68;
-  const imageH = 114.75; // aspect ratio 320:540 -> 68 * (540 / 320)
+  // Render High-Resolution Vector Bodygraph (Design + BodyGraph + Personality) on the right
+  const imageX = 102;
+  const imageY = currentY - 4;
+  const imageW = 88;
+  const imageH = imageW * (540 / 522); // aspect ratio 522:540 -> 88 * 1.034 = 91.0 mm
 
   if (chartImageBase64) {
     doc.addImage(chartImageBase64, 'PNG', imageX, imageY, imageW, imageH);
@@ -823,7 +938,7 @@ export const downloadHumanDesignPDF = async (
 
   // --- Incarnation Cross ---
   const crossDetails = getIncarnationCrossDetails(chart.incarnationCross);
-  checkSpace(70);
+  checkSpace(35);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(13);
   doc.setTextColor(gold[0], gold[1], gold[2]);
@@ -838,7 +953,7 @@ export const downloadHumanDesignPDF = async (
 
   // --- Holistic Synthesis ---
   const synthesis = getHolisticSynthesisText(chart.type);
-  checkSpace(70);
+  checkSpace(35);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(13);
   doc.setTextColor(gold[0], gold[1], gold[2]);
@@ -852,11 +967,7 @@ export const downloadHumanDesignPDF = async (
   currentY += 12;
 
   // --- Section 3: Energy Centers Analysis ---
-  doc.addPage();
-  doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
-  doc.rect(0, 0, 210, 297, 'F');
-  currentY = 25;
-
+  checkSpace(40);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(15);
   doc.setTextColor(gold[0], gold[1], gold[2]);
@@ -886,11 +997,7 @@ export const downloadHumanDesignPDF = async (
   }
 
   // --- Section 4: Planetary Activations (Gates) ---
-  doc.addPage();
-  doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
-  doc.rect(0, 0, 210, 297, 'F');
-  currentY = 25;
-
+  checkSpace(45);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(15);
   doc.setTextColor(gold[0], gold[1], gold[2]);
@@ -910,8 +1017,13 @@ export const downloadHumanDesignPDF = async (
     const planetSymbol = PLANET_SYMBOLS[con.planet] || '';
     const planetName = planetTranslations[con.planet] || con.planet;
     
-    const conText = `${con.gate}.${con.line} (${GATE_NAMES[con.gate]?.split(' / ')[0] || ''})`;
-    const unconText = `${uncon.gate}.${uncon.line} (${GATE_NAMES[uncon.gate]?.split(' / ')[0] || ''})`;
+    const conFix = con.fixation === 'exalted' ? ' ▲' : con.fixation === 'detriment' ? ' ▼' : '';
+    const conR = con.isRetrograde ? ' (R)' : '';
+    const conText = `${con.gate}.${con.line}${conFix}${conR} (${GATE_NAMES[con.gate]?.split(' / ')[0] || ''})`;
+
+    const unconFix = uncon.fixation === 'exalted' ? ' ▲' : uncon.fixation === 'detriment' ? ' ▼' : '';
+    const unconR = uncon.isRetrograde ? ' (R)' : '';
+    const unconText = `${uncon.gate}.${uncon.line}${unconFix}${unconR} (${GATE_NAMES[uncon.gate]?.split(' / ')[0] || ''})`;
 
     tableRows.push([
       tr(`${planetSymbol} ${planetName}`),
@@ -926,18 +1038,86 @@ export const downloadHumanDesignPDF = async (
     head: [['Gezegen', 'Kişilik (Bilinçli - Siyah)', 'Tasarım (Bilinçdışı - Kırmızı)']],
     body: tableRows,
     theme: 'grid',
+    styles: { font: 'LiberationSans', overflow: 'linebreak', cellPadding: 2.5, valign: 'middle' },
+    columnStyles: {
+      0: { cellWidth: 40, fontStyle: 'bold' },
+      1: { cellWidth: 65 },
+      2: { cellWidth: 65 }
+    },
     headStyles: { fillColor: gold, textColor: primaryDark, fontStyle: 'bold', font: 'LiberationSans' },
     bodyStyles: { fillColor: secondaryDark, textColor: [255, 255, 255], font: 'LiberationSans' },
     alternateRowStyles: { fillColor: primaryDark },
   });
 
+  currentY = (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 8 : currentY + 10;
+  checkSpace(75);
+  
+  // Rave I'Ching Çizgi Fiksasyonları ve 1-6 Çizgi Derin Analiz Rehberi
+  doc.setFillColor(secondaryDark[0], secondaryDark[1], secondaryDark[2]);
+  doc.roundedRect(20, currentY, 170, 72, 3, 3, 'F');
+  
+  doc.setFont('LiberationSans', 'bold');
+  doc.setFontSize(8.5);
+  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.text(tr("RAVE I'CHING ÇİZGİ FİKSASYONLARI VE ÇİZGİ ANATOMİSİ REHBERİ"), 24, currentY + 6);
+
+  doc.setFont('LiberationSans', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(grayText[0], grayText[1], grayText[2]);
+  
+  let gy = currentY + 11;
+  doc.text(tr("• Fiksasyon Mekaniği (384 Çizgi Rezonansı): Her kapı 6 genetik çizgiden oluşur. Gezegenlerin nötrino akışı"), 24, gy); gy += 4;
+  doc.text(tr("  o kapının çizgi arketipiyle belirli bir kutupta kilitlendiğinde Yücelim (▲) veya Düşüş (▼) fiksasyonu doğar."), 24, gy); gy += 5;
+
+  doc.setFont('LiberationSans', 'bold');
+  doc.setTextColor(emeraldGreen[0], emeraldGreen[1], emeraldGreen[2]);
+  doc.text(tr("▲ YÜCELİM (Exaltation):"), 24, gy);
+  doc.setFont('LiberationSans', 'normal');
+  doc.setTextColor(grayText[0], grayText[1], grayText[2]);
+  doc.text(tr(" Gezegen o çizginin en yapıcı, saf ve yüksek potansiyelini zahmetsizce açığa çıkarır."), 56, gy); gy += 5;
+
+  doc.setFont('LiberationSans', 'bold');
+  doc.setTextColor(detrimentRed[0], detrimentRed[1], detrimentRed[2]);
+  doc.text(tr("▼ DÜŞÜŞ (Detriment):"), 24, gy);
+  doc.setFont('LiberationSans', 'normal');
+  doc.setTextColor(grayText[0], grayText[1], grayText[2]);
+  doc.text(tr(" Gölge ve sürtüşmeli potansiyeldir; ruhun tekamülü ve içsel sınavı için derin bir uyanış sahasıdır."), 54, gy); gy += 5;
+
+  doc.setFont('LiberationSans', 'bold');
+  doc.setTextColor(white[0], white[1], white[2]);
+  doc.text(tr("• İşaretsiz Kapılar:"), 24, gy);
+  doc.setFont('LiberationSans', 'normal');
+  doc.setTextColor(grayText[0], grayText[1], grayText[2]);
+  doc.text(tr(" Gezegen o çizgiyle kilitlenmemiştir; çizginin enerjisi nötr ve dengeli şekilde akar (çoğunluk böyledir)."), 51, gy); gy += 5;
+
+  doc.setFont('LiberationSans', 'bold');
+  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.text(tr("• (R) Retrograd:"), 24, gy);
+  doc.setFont('LiberationSans', 'normal');
+  doc.setTextColor(grayText[0], grayText[1], grayText[2]);
+  doc.text(tr(" Gezegen gökyüzünde geri harekettedir; enerjisi dışa akmak yerine içsel derinleşme ve karmik arınma sunar."), 46, gy); gy += 6;
+
+  // 1'den 6'ya Çizgi Katmanları Özeti
+  doc.setFont('LiberationSans', 'bold');
+  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.text(tr("1'den 6'ya Çizgi Katmanlarının Anlamı:"), 24, gy); gy += 4.5;
+
+  doc.setFont('LiberationSans', 'normal');
+  doc.setTextColor(215, 215, 215);
+  doc.text(tr(".1 Araştırmacı: Güven arayışı, derin bilgi ve sağlam temel inşa etme."), 24, gy);
+  doc.text(tr(".2 Münzevi: Doğal ve çabasız yetenek, dışarıdan çağrılmayı bekleme."), 105, gy); gy += 4;
+
+  doc.text(tr(".3 Deneyimci: Deneme-yanılma, mutasyon, neyin çalışmadığını keşfetme."), 24, gy);
+  doc.text(tr(".4 Fırsatçı: Kalp bağı, güvenilir dostluk ağları ve yakın çevreye aktarım."), 105, gy); gy += 4;
+
+  doc.text(tr(".5 Kafir / Lider: Evrensel çözümler, toplumsal projeksiyonlar ve pratik kurtarıcılık."), 24, gy);
+  doc.text(tr(".6 Rol Modeli: Çatıya çekilme, tarafsız gözlem ve yaşayan bilgeliğe dönüşme."), 105, gy);
+
+  currentY += 78;
+
   // --- Section 5: Detailed Active Gates Analysis ---
   if (gatesData && gatesData.length > 0) {
-    doc.addPage();
-    doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
-    doc.rect(0, 0, 210, 297, 'F');
-    currentY = 25;
-
+    checkSpace(40);
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(15);
     doc.setTextColor(gold[0], gold[1], gold[2]);
@@ -965,7 +1145,22 @@ export const downloadHumanDesignPDF = async (
         statusLabel = "Tasarım (Bilinçdışı - Kırmızı)";
       }
 
-      checkSpace(60);
+      // Gezegen aktivasyon çizgileri ve fiksasyon detayları
+      const actDetails: string[] = [];
+      personalityActivations.forEach((p: any) => {
+        const fixStr = p.fixation === 'exalted' ? ' [▲ Yücelim]' : p.fixation === 'detriment' ? ' [▼ Düşüş]' : '';
+        const retroStr = p.isRetrograde ? ' (R)' : '';
+        const pName = planetTranslations[p.planet] || p.planet;
+        actDetails.push(`${pName} (Çizgi ${p.line}${fixStr}${retroStr} - Kişilik)`);
+      });
+      designActivations.forEach((p: any) => {
+        const fixStr = p.fixation === 'exalted' ? ' [▲ Yücelim]' : p.fixation === 'detriment' ? ' [▼ Düşüş]' : '';
+        const retroStr = p.isRetrograde ? ' (R)' : '';
+        const pName = planetTranslations[p.planet] || p.planet;
+        actDetails.push(`${pName} (Çizgi ${p.line}${fixStr}${retroStr} - Tasarım)`);
+      });
+
+      checkSpace(38);
       doc.setFont('LiberationSans', 'bold');
       doc.setFontSize(12);
       doc.setTextColor(gold[0], gold[1], gold[2]);
@@ -977,6 +1172,14 @@ export const downloadHumanDesignPDF = async (
       doc.setTextColor(white[0], white[1], white[2]);
       doc.text(`Aktivasyon Durumu: ${statusLabel}`, 20, currentY);
       currentY += 5;
+
+      if (actDetails.length > 0) {
+        doc.setFont('LiberationSans', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(gold[0], gold[1], gold[2]);
+        doc.text(tr(`Gezegen Aktivasyonları: ${actDetails.join(' | ')}`), 20, currentY);
+        currentY += 5;
+      }
 
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(9.5);

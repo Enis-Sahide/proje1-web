@@ -205,7 +205,7 @@ export const runeQuizzes: Record<string, RuneQuiz> = {
   },
   runeFinal: {
     id: "runeFinal",
-    title: "Üstat Kademe: Büyük Sırlar Okulu Finali",
+    title: "Üstat Kademe: Büyük Kadim Sırlar Finali",
     description: "Semboller, mitoloji, gezegenler ve bağlamalara dair elde ettiğiniz tüm ezoterik kadim bilgilerinizi sınayan büyük final.",
     questions: [
       {

@@ -298,14 +298,16 @@ export const downloadCosmicMatrixPDF = async (
     doc.roundedRect(15, curY, 180, 50, 3, 3, 'D');
 
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(12);
+    doc.setFontSize(11.5);
     doc.setTextColor(...emerald);
-    doc.text(`RUHSAL KÖK AĞACINIZ: ${druidTree.name.toUpperCase()} (${druidTree.botanicalName})`, 22, curY + 8);
+    const treeTitle = `RUHSAL KÖK AĞACINIZ: ${druidTree.name.toUpperCase()} (${druidTree.botanicalName})`;
+    doc.text(doc.splitTextToSize(treeTitle, 166), 22, curY + 8);
 
     doc.setFont('LiberationSans', 'normal');
-    doc.setFontSize(10);
+    doc.setFontSize(9.5);
     doc.setTextColor(...white);
-    doc.text(`Kelt Ogham Sembolü: ${druidTree.oghamSymbol} (${druidTree.oghamName})   |   Element: ${druidTree.element}   |   Yönetici: ${druidTree.rulingPlanets}`, 22, curY + 16);
+    const oghamInfo = `Kelt Ogham Sembolü: ${druidTree.oghamSymbol} (${druidTree.oghamName})   |   Element: ${druidTree.element}   |   Yönetici: ${druidTree.rulingPlanets}`;
+    doc.text(doc.splitTextToSize(oghamInfo, 166), 22, curY + 16);
 
     const druidDesc = `Doğum gününüz gereği ruhsal rezonansınız ve doğadaki temel kökünüz ${druidTree.name} ile temas halindedir. Bu raporda incelenen 13 gezegenin bitkisel frekansları sizin ağaç kimliğiniz olmayıp; göksel enerjileri içe ve dışa aktarırken dengeleyen kadim aromaterapi frekanslarıdır.`;
     doc.setFont('LiberationSans', 'normal');
@@ -381,9 +383,10 @@ export const downloadCosmicMatrixPDF = async (
     doc.roundedRect(15, curY, 180, 38, 3, 3, 'D');
 
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(11.5);
+    doc.setFontSize(11);
     doc.setTextColor(...gold);
-    doc.text(`ÇEKİRDEK YAŞAM MİSYONU: ${report.coreLifeMission.title.toUpperCase()}`, 22, curY + 8.5);
+    const missionTitle = `ÇEKİRDEK YAŞAM MİSYONU: ${report.coreLifeMission.title.toUpperCase()}`;
+    doc.text(doc.splitTextToSize(missionTitle, 166), 22, curY + 8.5);
 
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(10.5);
