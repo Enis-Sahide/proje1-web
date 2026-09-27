@@ -19,7 +19,7 @@ async function main() {
     title: 'Kendini Tanımak Neden Bu Kadar Zor? Kadim Bilgiler Yolu',
     slug: 'kendini-tanimak-neden-bu-kadar-zor',
     content: content,
-    imageUrl: '/seven_initiations.jpg',
+    imageUrl: '/knowing_oneself_mirror.jpg',
     category: 'Kadim Bilgelik',
     published: true,
   };

@@ -51,7 +51,3 @@ Burada amaç sana hazır reçeteler veya yüzeysel tanımlamalar sunmak değildi
 Bu yolculuk bir dış cevap arayışından önce, insanın **kendine doğru attığı en cesur adımdır.**
 
 Hatırla: *Gerçek katman katmandır ve yapman gereken unuttuklarını hatırlayarak katmanları açmaktır. Hatırladıkça aydınlık artacak ve ışığın kaynağını bulacaksın...*
-
----
-
-*Takipte kalın. Bir sonraki çalışmamızda, insanın kendini anlamak için kullanabileceği 7 farklı sembolik yaklaşımı tek tek mercek altına alacağız.*
