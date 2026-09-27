@@ -20,7 +20,7 @@ async function main() {
     slug: 'kendini-tanimak-neden-bu-kadar-zor',
     content: content,
     imageUrl: '/knowing_oneself_mirror.jpg',
-    category: 'Kadim Bilgelik',
+    category: 'Kişisel Gelişim',
     published: true,
   };
 
