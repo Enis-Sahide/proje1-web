@@ -74,9 +74,7 @@ export default function DruidTreePage() {
     try {
       setDownloadingImage(true);
       const imgUrl = isCard
-        ? (analyzedName 
-            ? `/api/astrology/druid-tree-card?treeId=${treeId}&name=${encodeURIComponent(analyzedName)}&t=${cacheBuster}`
-            : `/druid-trees/${treeId}-card.jpg?t=${cacheBuster}`)
+        ? `/druid-trees/${treeId}-card.jpg?t=${cacheBuster}`
         : `/druid-trees/${treeId}.jpg?t=${cacheBuster}`;
       const response = await fetch(imgUrl);
       const blob = await response.blob();
@@ -101,7 +99,7 @@ export default function DruidTreePage() {
   const handleCopyShare = () => {
     if (!currentTree) return;
     const cleanPrefix = analyzedName ? `${analyzedName}'in ` : '';
-    const shareText = `🌲 ${cleanPrefix}Kelt Druid Ağacı: ${currentTree.name} (${currentTree.oghamSymbol} ${currentTree.oghamName})\n` +
+    const shareText = `🌲 ${cleanPrefix}Kelt Druid Ağacı: ${currentTree.name} (Ogham: ${currentTree.oghamName})\n` +
       `✨ Ruhsal Karakter: ${currentTree.archetype}\n` +
       `🪐 Yönetici Güç: ${currentTree.rulingPlanets} | Element: ${currentTree.element}\n` +
       `📜 Druid Bilgeliği: "${currentTree.druidicProverb}"\n\n` +
@@ -115,7 +113,7 @@ export default function DruidTreePage() {
   const handleNativeShare = async () => {
     if (!currentTree) return;
     const cleanPrefix = analyzedName ? `${analyzedName}'in ` : '';
-    const shareText = `🌲 ${cleanPrefix}Kelt Druid Ağacı: ${currentTree.name} (${currentTree.oghamSymbol} ${currentTree.oghamName})\n` +
+    const shareText = `🌲 ${cleanPrefix}Kelt Druid Ağacı: ${currentTree.name} (Ogham: ${currentTree.oghamName})\n` +
       `✨ Ruhsal Karakter: ${currentTree.archetype}\n` +
       `🪐 Element: ${currentTree.element} | Yönetici: ${currentTree.rulingPlanets}\n` +
       `📜 "${currentTree.druidicProverb}"\n\n` +
@@ -123,12 +121,10 @@ export default function DruidTreePage() {
 
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
-        const imgUrl = analyzedName
-          ? `/api/astrology/druid-tree-card?treeId=${currentTree.id}&name=${encodeURIComponent(analyzedName)}&t=${cacheBuster}`
-          : `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`;
+        const imgUrl = `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`;
         const response = await fetch(imgUrl);
         const blob = await response.blob();
-        const file = new File([blob], `${analyzedName ? `${analyzedName}_` : ''}${currentTree.id}-card.jpg`, { type: 'image/jpeg' });
+        const file = new File([blob], `${currentTree.id}-card.jpg`, { type: 'image/jpeg' });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({
             files: [file],
@@ -544,9 +540,7 @@ export default function DruidTreePage() {
                     <img 
                       src={
                         activeShareFormat === 'card'
-                          ? (analyzedName
-                              ? `/api/astrology/druid-tree-card?treeId=${currentTree.id}&name=${encodeURIComponent(analyzedName)}&t=${cacheBuster}`
-                              : `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`)
+                          ? `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`
                           : `/druid-trees/${currentTree.id}.jpg?t=${cacheBuster}`
                       } 
                       alt={`${analyzedName ? `${analyzedName}'in ` : ''}${currentTree.name} - Kelt Druid Ağacı`} 
@@ -582,8 +576,8 @@ export default function DruidTreePage() {
                     </button>
 
                     <a
-                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                        `🌲 ${analyzedName ? `${analyzedName}'in ` : ''}Kelt Druid Ağacı: ${currentTree.name} (${currentTree.archetype})!\n` +
+                      href={`https://wa.me/?text=${encodeURIComponent(
+                        `🌲 ${analyzedName ? `${analyzedName}'in ` : ''}Kelt Druid Ağacı: ${currentTree.name} (Ogham: ${currentTree.oghamName}) - ${currentTree.archetype}!\n` +
                         `📜 "${currentTree.druidicProverb}"\n\n` +
                         `Sen de kendi kutsal Kelt Druid ağacını keşfet: https://7layers.tr/analysis/druid-tree`
                       )}`}
