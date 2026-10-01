@@ -101,20 +101,20 @@ export default function DruidTreePage() {
       const personalizedTitle = formatTurkishPossessive(cleanName);
       const footerText = `✨ ${cleanName} İçin Özel Analiz • 7layers.tr/analysis/druid-tree ✨`;
 
-      // 2. Sol üst başlık alanını yumuşak geçişle temizle
-      const topGrad = ctx.createLinearGradient(80, 70, 480, 106);
+      // 2. Sol üst başlık alanını yumuşak geçişle temizle (sadece sol 75..345px aralığı, asla ortadaki ağaç adına taşmaz)
+      const topGrad = ctx.createLinearGradient(75, 70, 350, 106);
       topGrad.addColorStop(0, '#060C12');
       topGrad.addColorStop(1, '#070E15');
       ctx.fillStyle = topGrad;
-      ctx.fillRect(75, 70, 390, 36);
+      ctx.fillRect(75, 70, 270, 36);
 
-      // 3. Kişiye özel başlığı altın sarısı yaz
+      // 3. Kişiye özel başlığı altın sarısı yaz (maksimum 270px genişlik sınırı ile)
       const fontSize = personalizedTitle.length > 25 ? 16 : 19;
       ctx.fillStyle = '#FCD34D';
       ctx.font = `800 ${fontSize}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
       ctx.textBaseline = 'alphabetic';
       ctx.textAlign = 'start';
-      ctx.fillText(`✨ ${personalizedTitle}`, 80, 96);
+      ctx.fillText(`✨ ${personalizedTitle}`, 80, 96, 270);
 
       // 4. Alt marka çizgisini temizle ve kişiye özel dipnotu ekle
       ctx.fillStyle = '#03080C';
