@@ -352,125 +352,6 @@ export default function DruidTreePage() {
                 </div>
               </div>
 
-              {/* Ruhsal Öz & Kelt Hikayesi */}
-              <div className="bg-white/[0.03] border border-white/10 rounded-3xl p-6 sm:p-8 space-y-4">
-                <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm tracking-wider uppercase">
-                  <BookOpen size={18} />
-                  <span>Mitolojik Köken & Ruhsal Öz</span>
-                </div>
-                <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-normal">
-                  {currentTree.spiritualEssence}
-                </p>
-              </div>
-
-              {/* Işık ve Gölge Kutupları */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {/* Işık Potansiyeli */}
-                <div className="bg-emerald-950/20 border border-emerald-500/30 rounded-3xl p-6 sm:p-8 space-y-4">
-                  <div className="flex items-center gap-2 text-emerald-300 font-bold text-sm tracking-wider uppercase">
-                    <Sun size={18} className="text-emerald-400" />
-                    <span>Işık Potansiyelleri & Ruhsal Erdemler</span>
-                  </div>
-                  <ul className="space-y-3 text-xs sm:text-sm text-gray-300">
-                    {currentTree.lightTraits.map((trait, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5 leading-relaxed">
-                        <span className="text-emerald-400 text-base leading-none shrink-0">✦</span>
-                        <span>{trait}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* Gölge Taraf & Fırtına Sınavı */}
-                <div className="bg-amber-950/20 border border-amber-500/30 rounded-3xl p-6 sm:p-8 space-y-4">
-                  <div className="flex items-center gap-2 text-amber-300 font-bold text-sm tracking-wider uppercase">
-                    <Shield size={18} className="text-amber-400" />
-                    <span>Gölge Sınavı & Olgunlaşma Fırtınası</span>
-                  </div>
-                  <ul className="space-y-3 text-xs sm:text-sm text-gray-300">
-                    {currentTree.shadowTraits.map((trait, idx) => (
-                      <li key={idx} className="flex items-start gap-2.5 leading-relaxed">
-                        <span className="text-amber-400 text-base leading-none shrink-0">❖</span>
-                        <span>{trait}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-
-              {/* Doğa Ritüeli, Ortam Aromaterapisi & Günlük Pratik */}
-              <div className="bg-gradient-to-r from-emerald-950/40 via-teal-950/30 to-amber-950/30 border border-emerald-500/30 rounded-3xl p-6 sm:p-8 space-y-6">
-                <div className="flex items-center gap-2 text-teal-300 font-bold text-sm tracking-wider uppercase">
-                  <Leaf size={18} className="text-teal-400" />
-                  <span>Kadim Kelt Doğayla Rezonans Ritüeli</span>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs sm:text-sm">
-                  {/* Ağaç Topraklanması */}
-                  <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-2">
-                    <div className="flex items-center gap-2 text-emerald-300 font-bold">
-                      <TreePine size={16} />
-                      <span>Orman Banyosu & Topraklanma (Shinrin-Yoku)</span>
-                    </div>
-                    <p className="text-gray-300 text-xs leading-relaxed">
-                      {currentTree.natureRitual.grounding}
-                    </p>
-                  </div>
-
-                  {/* Güvenli Ortam Aromaterapisi */}
-                  <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-2">
-                    <div className="flex items-center gap-2 text-amber-300 font-bold">
-                      <Wind size={16} />
-                      <span>Ortam Buhuru & Doğal Koku (Difüzör)</span>
-                    </div>
-                    <p className="text-gray-300 text-xs leading-relaxed">
-                      {currentTree.natureRitual.ambientAroma}
-                    </p>
-                  </div>
-
-                  {/* Günlük Ruhsal Pratik */}
-                  <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-2">
-                    <div className="flex items-center gap-2 text-teal-300 font-bold">
-                      <Sparkles size={16} />
-                      <span>Ruhsal Dengeleyici Günlük Alışkanlık</span>
-                    </div>
-                    <p className="text-gray-300 text-xs leading-relaxed">
-                      {currentTree.natureRitual.soulPractice}
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Ruhsal Ağaç Uyumu */}
-              <div className="bg-white/[0.03] border border-white/10 rounded-3xl p-6 sm:p-8 space-y-4">
-                <div className="flex items-center gap-2 text-pink-300 font-bold text-sm tracking-wider uppercase">
-                  <Heart size={18} className="text-pink-400" />
-                  <span>Ruhsal Ağaç Uyumu (İlişkiler & Rezonans)</span>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
-                  <div className="bg-black/30 p-4 rounded-2xl border border-white/5 space-y-2">
-                    <span className="text-emerald-400 font-bold block">Ruhsal Rezonanstaki Uyumlu Ağaçlar:</span>
-                    <div className="flex flex-wrap gap-2">
-                      {currentTree.relationships.resonantTrees.map((t, idx) => (
-                        <span key={idx} className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs">
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="bg-black/30 p-4 rounded-2xl border border-white/5 space-y-2">
-                    <span className="text-amber-400 font-bold block">Geliştiren Zıt Ağaçlar (Katalizör):</span>
-                    <div className="flex flex-wrap gap-2">
-                      {currentTree.relationships.catalystTrees.map((t, idx) => (
-                        <span key={idx} className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs">
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
               {/* Sosyal Medya & Canlı Kelt Ağacı Sanat Kartı Merkezi */}
               <div className="bg-gradient-to-br from-emerald-950/70 via-[#0A1218] to-teal-950/50 border border-emerald-400/40 rounded-3xl p-6 sm:p-8 text-center space-y-6 shadow-2xl relative overflow-hidden">
                 {/* Parıltı arka plan halkası */}
@@ -592,6 +473,125 @@ export default function DruidTreePage() {
                     <p className="text-[11px] sm:text-xs text-gray-300 leading-relaxed">
                       <strong className="text-emerald-300">İpucu:</strong> İndirdiğiniz yüksek çözünürlüklü kartı <strong>Instagram Hikayenizde (Story)</strong> veya <strong>WhatsApp Durumunuzda</strong> doğrudan tam ekran paylaşabilir, sevdiklerinizin de kendi Kelt ağacını analiz etmesini sağlayabilirsiniz.
                     </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ruhsal Öz & Kelt Hikayesi */}
+              <div className="bg-white/[0.03] border border-white/10 rounded-3xl p-6 sm:p-8 space-y-4">
+                <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm tracking-wider uppercase">
+                  <BookOpen size={18} />
+                  <span>Mitolojik Köken & Ruhsal Öz</span>
+                </div>
+                <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-normal">
+                  {currentTree.spiritualEssence}
+                </p>
+              </div>
+
+              {/* Işık ve Gölge Kutupları */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Işık Potansiyeli */}
+                <div className="bg-emerald-950/20 border border-emerald-500/30 rounded-3xl p-6 sm:p-8 space-y-4">
+                  <div className="flex items-center gap-2 text-emerald-300 font-bold text-sm tracking-wider uppercase">
+                    <Sun size={18} className="text-emerald-400" />
+                    <span>Işık Potansiyelleri & Ruhsal Erdemler</span>
+                  </div>
+                  <ul className="space-y-3 text-xs sm:text-sm text-gray-300">
+                    {currentTree.lightTraits.map((trait, idx) => (
+                      <li key={idx} className="flex items-start gap-2.5 leading-relaxed">
+                        <span className="text-emerald-400 text-base leading-none shrink-0">✦</span>
+                        <span>{trait}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Gölge Taraf & Fırtına Sınavı */}
+                <div className="bg-amber-950/20 border border-amber-500/30 rounded-3xl p-6 sm:p-8 space-y-4">
+                  <div className="flex items-center gap-2 text-amber-300 font-bold text-sm tracking-wider uppercase">
+                    <Shield size={18} className="text-amber-400" />
+                    <span>Gölge Sınavı & Olgunlaşma Fırtınası</span>
+                  </div>
+                  <ul className="space-y-3 text-xs sm:text-sm text-gray-300">
+                    {currentTree.shadowTraits.map((trait, idx) => (
+                      <li key={idx} className="flex items-start gap-2.5 leading-relaxed">
+                        <span className="text-amber-400 text-base leading-none shrink-0">❖</span>
+                        <span>{trait}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Doğa Ritüeli, Ortam Aromaterapisi & Günlük Pratik */}
+              <div className="bg-gradient-to-r from-emerald-950/40 via-teal-950/30 to-amber-950/30 border border-emerald-500/30 rounded-3xl p-6 sm:p-8 space-y-6">
+                <div className="flex items-center gap-2 text-teal-300 font-bold text-sm tracking-wider uppercase">
+                  <Leaf size={18} className="text-teal-400" />
+                  <span>Kadim Kelt Doğayla Rezonans Ritüeli</span>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs sm:text-sm">
+                  {/* Ağaç Topraklanması */}
+                  <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-2">
+                    <div className="flex items-center gap-2 text-emerald-300 font-bold">
+                      <TreePine size={16} />
+                      <span>Orman Banyosu & Topraklanma (Shinrin-Yoku)</span>
+                    </div>
+                    <p className="text-gray-300 text-xs leading-relaxed">
+                      {currentTree.natureRitual.grounding}
+                    </p>
+                  </div>
+
+                  {/* Güvenli Ortam Aromaterapisi */}
+                  <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-2">
+                    <div className="flex items-center gap-2 text-amber-300 font-bold">
+                      <Wind size={16} />
+                      <span>Ortam Buhuru & Doğal Koku (Difüzör)</span>
+                    </div>
+                    <p className="text-gray-300 text-xs leading-relaxed">
+                      {currentTree.natureRitual.ambientAroma}
+                    </p>
+                  </div>
+
+                  {/* Günlük Ruhsal Pratik */}
+                  <div className="bg-black/40 border border-white/10 rounded-2xl p-4 space-y-2">
+                    <div className="flex items-center gap-2 text-teal-300 font-bold">
+                      <Sparkles size={16} />
+                      <span>Ruhsal Dengeleyici Günlük Alışkanlık</span>
+                    </div>
+                    <p className="text-gray-300 text-xs leading-relaxed">
+                      {currentTree.natureRitual.soulPractice}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Ruhsal Ağaç Uyumu */}
+              <div className="bg-white/[0.03] border border-white/10 rounded-3xl p-6 sm:p-8 space-y-4">
+                <div className="flex items-center gap-2 text-pink-300 font-bold text-sm tracking-wider uppercase">
+                  <Heart size={18} className="text-pink-400" />
+                  <span>Ruhsal Ağaç Uyumu (İlişkiler & Rezonans)</span>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs sm:text-sm">
+                  <div className="bg-black/30 p-4 rounded-2xl border border-white/5 space-y-2">
+                    <span className="text-emerald-400 font-bold block">Ruhsal Rezonanstaki Uyumlu Ağaçlar:</span>
+                    <div className="flex flex-wrap gap-2">
+                      {currentTree.relationships.resonantTrees.map((t, idx) => (
+                        <span key={idx} className="px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs">
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="bg-black/30 p-4 rounded-2xl border border-white/5 space-y-2">
+                    <span className="text-amber-400 font-bold block">Geliştiren Zıt Ağaçlar (Katalizör):</span>
+                    <div className="flex flex-wrap gap-2">
+                      {currentTree.relationships.catalystTrees.map((t, idx) => (
+                        <span key={idx} className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs">
+                          {t}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
