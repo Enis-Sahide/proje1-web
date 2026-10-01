@@ -8,6 +8,23 @@ const nextConfig: NextConfig = {
   async headers() {
     return [
       {
+        source: '/druid-trees/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-cache, no-store, must-revalidate',
+          },
+          {
+            key: 'Pragma',
+            value: 'no-cache',
+          },
+          {
+            key: 'Expires',
+            value: '0',
+          },
+        ],
+      },
+      {
         source: '/:all*(svg|jpg|jpeg|png|webp|ico|woff|woff2)',
         headers: [
           {

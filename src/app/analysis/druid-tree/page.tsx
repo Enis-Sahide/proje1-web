@@ -46,6 +46,7 @@ export default function DruidTreePage() {
 
   const [activeShareFormat, setActiveShareFormat] = useState<'card' | 'portrait'>('card');
   const [downloadingImage, setDownloadingImage] = useState(false);
+  const [cacheBuster] = useState(() => Date.now());
 
   const resultRef = useRef<HTMLDivElement>(null);
 
@@ -74,9 +75,9 @@ export default function DruidTreePage() {
       setDownloadingImage(true);
       const imgUrl = isCard
         ? (analyzedName 
-            ? `/api/astrology/druid-tree-card?treeId=${treeId}&name=${encodeURIComponent(analyzedName)}&v=classic-v4`
-            : `/druid-trees/${treeId}-card.jpg?v=classic-v4`)
-        : `/druid-trees/${treeId}.jpg?v=7layers-art-v2`;
+            ? `/api/astrology/druid-tree-card?treeId=${treeId}&name=${encodeURIComponent(analyzedName)}&t=${cacheBuster}`
+            : `/druid-trees/${treeId}-card.jpg?t=${cacheBuster}`)
+        : `/druid-trees/${treeId}.jpg?t=${cacheBuster}`;
       const response = await fetch(imgUrl);
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
@@ -123,8 +124,8 @@ export default function DruidTreePage() {
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
         const imgUrl = analyzedName
-          ? `/api/astrology/druid-tree-card?treeId=${currentTree.id}&name=${encodeURIComponent(analyzedName)}&v=classic-v4`
-          : `/druid-trees/${currentTree.id}-card.jpg?v=classic-v4`;
+          ? `/api/astrology/druid-tree-card?treeId=${currentTree.id}&name=${encodeURIComponent(analyzedName)}&t=${cacheBuster}`
+          : `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`;
         const response = await fetch(imgUrl);
         const blob = await response.blob();
         const file = new File([blob], `${analyzedName ? `${analyzedName}_` : ''}${currentTree.id}-card.jpg`, { type: 'image/jpeg' });
@@ -544,9 +545,9 @@ export default function DruidTreePage() {
                       src={
                         activeShareFormat === 'card'
                           ? (analyzedName
-                              ? `/api/astrology/druid-tree-card?treeId=${currentTree.id}&name=${encodeURIComponent(analyzedName)}&v=classic-v4`
-                              : `/druid-trees/${currentTree.id}-card.jpg?v=classic-v4`)
-                          : `/druid-trees/${currentTree.id}.jpg?v=7layers-art-v2`
+                              ? `/api/astrology/druid-tree-card?treeId=${currentTree.id}&name=${encodeURIComponent(analyzedName)}&t=${cacheBuster}`
+                              : `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`)
+                          : `/druid-trees/${currentTree.id}.jpg?t=${cacheBuster}`
                       } 
                       alt={`${analyzedName ? `${analyzedName}'in ` : ''}${currentTree.name} - Kelt Druid Ağacı`} 
                       className="relative w-full max-w-[340px] sm:max-w-[380px] mx-auto rounded-3xl shadow-2xl border-2 border-emerald-400/40 transform transition-transform duration-300 hover:scale-[1.01]"
