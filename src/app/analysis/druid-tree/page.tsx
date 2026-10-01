@@ -17,7 +17,9 @@ import {
   Sun,
   Leaf,
   Wind,
-  X
+  X,
+  Download,
+  MessageCircle
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -42,6 +44,9 @@ export default function DruidTreePage() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedModalTree, setSelectedModalTree] = useState<DruidTree | null>(null);
 
+  const [activeShareFormat, setActiveShareFormat] = useState<'card' | 'portrait'>('card');
+  const [downloadingImage, setDownloadingImage] = useState(false);
+
   const resultRef = useRef<HTMLDivElement>(null);
 
   // Gün sayısını aya göre sınırla
@@ -64,17 +69,86 @@ export default function DruidTreePage() {
 
   const currentTree: DruidTree | null = analyzedData ? analyzedData.tree : null;
 
+  const handleDownloadImage = async (treeId: string, treeName: string, isCard: boolean = true) => {
+    try {
+      setDownloadingImage(true);
+      const imgUrl = isCard
+        ? `/api/astrology/druid-tree-card?treeId=${treeId}${analyzedName ? `&name=${encodeURIComponent(analyzedName)}` : ''}`
+        : `/druid-trees/${treeId}.jpg`;
+      const response = await fetch(imgUrl);
+      const blob = await response.blob();
+      const blobUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = blobUrl;
+      const cleanPrefix = analyzedName ? `${analyzedName.replace(/\s+/g, '_')}_` : '';
+      link.download = isCard 
+        ? `${cleanPrefix}${treeName.replace(/\s+/g, '_')}_Druid_Agaci_Karti_7layers.jpg`
+        : `${cleanPrefix}${treeName.replace(/\s+/g, '_')}_Druid_Agaci_Sanati_7layers.jpg`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(blobUrl);
+    } catch (e) {
+      console.error('Görsel indirme hatası:', e);
+    } finally {
+      setDownloadingImage(false);
+    }
+  };
+
   const handleCopyShare = () => {
     if (!currentTree) return;
-    const shareText = `🌲 Kelt Druid Ağacı Analizim: ${currentTree.name} (${currentTree.oghamSymbol} ${currentTree.oghamName})\n` +
+    const cleanPrefix = analyzedName ? `${analyzedName}'in ` : '';
+    const shareText = `🌲 ${cleanPrefix}Kelt Druid Ağacı: ${currentTree.name} (${currentTree.oghamSymbol} ${currentTree.oghamName})\n` +
       `✨ Ruhsal Karakter: ${currentTree.archetype}\n` +
       `🪐 Yönetici Güç: ${currentTree.rulingPlanets} | Element: ${currentTree.element}\n` +
       `📜 Druid Bilgeliği: "${currentTree.druidicProverb}"\n\n` +
-      `Sen de kendi kutsal Kelt ağacını analiz et: 7layers.tr/analysis/druid-tree`;
+      `Sen de kendi kutsal Kelt ağacını analiz et: https://7layers.tr/analysis/druid-tree`;
 
     navigator.clipboard.writeText(shareText);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
+  };
+
+  const handleNativeShare = async () => {
+    if (!currentTree) return;
+    const cleanPrefix = analyzedName ? `${analyzedName}'in ` : '';
+    const shareText = `🌲 ${cleanPrefix}Kelt Druid Ağacı: ${currentTree.name} (${currentTree.oghamSymbol} ${currentTree.oghamName})\n` +
+      `✨ Ruhsal Karakter: ${currentTree.archetype}\n` +
+      `🪐 Element: ${currentTree.element} | Yönetici: ${currentTree.rulingPlanets}\n` +
+      `📜 "${currentTree.druidicProverb}"\n\n` +
+      `Sen de kendi kutsal Kelt ağacını keşfet: https://7layers.tr/analysis/druid-tree`;
+
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        const imgUrl = `/api/astrology/druid-tree-card?treeId=${currentTree.id}${analyzedName ? `&name=${encodeURIComponent(analyzedName)}` : ''}`;
+        const response = await fetch(imgUrl);
+        const blob = await response.blob();
+        const file = new File([blob], `${analyzedName ? `${analyzedName}_` : ''}${currentTree.id}-card.jpg`, { type: 'image/jpeg' });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({
+            files: [file],
+            title: `${cleanPrefix}${currentTree.name} - Kelt Druid Ağacı`,
+            text: shareText
+          });
+          return;
+        }
+      } catch {
+        // Dosya paylaşımı desteklenmiyorsa URL paylaşımına geç
+      }
+
+      try {
+        await navigator.share({
+          title: `${cleanPrefix}${currentTree.name} - Kelt Druid Ağacı`,
+          text: shareText,
+          url: 'https://7layers.tr/analysis/druid-tree'
+        });
+        return;
+      } catch {
+        // İptal edildi
+      }
+    }
+
+    handleCopyShare();
   };
 
   // Ansiklopedi listesi (13 Kutsal Ogham Ağacı)
@@ -410,39 +484,120 @@ export default function DruidTreePage() {
                 </div>
               </div>
 
-              {/* Sosyal Medya Hikaye Kartı (Viral Format) */}
-              <div className="bg-gradient-to-br from-emerald-950/60 via-[#0A1118] to-amber-950/40 border border-emerald-400/40 rounded-3xl p-6 sm:p-8 text-center space-y-4 shadow-2xl relative">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-xs font-semibold text-white/90 mb-2">
-                  <Share2 size={14} className="text-emerald-300" />
-                  <span>Sosyal Medya Hikayesi İçin Hazır Kart</span>
-                </div>
-                <div className="max-w-md mx-auto bg-gradient-to-b from-[#0F1C18] to-[#080D12] border-2 border-emerald-400/30 rounded-2xl p-6 shadow-2xl space-y-4 text-left">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                    <span className="text-[11px] font-mono tracking-widest text-emerald-400 uppercase">
-                      7LAYERS KELT DRUİD AĞACI ANALİZİ
-                    </span>
-                    <span className="text-2xl text-emerald-300">{currentTree.oghamSymbol}</span>
+              {/* Sosyal Medya & Canlı Kelt Ağacı Sanat Kartı Merkezi */}
+              <div className="bg-gradient-to-br from-emerald-950/70 via-[#0A1218] to-teal-950/50 border border-emerald-400/40 rounded-3xl p-6 sm:p-8 text-center space-y-6 shadow-2xl relative overflow-hidden">
+                {/* Parıltı arka plan halkası */}
+                <div className="absolute -top-24 -left-24 w-60 h-60 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-24 -right-24 w-60 h-60 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+
+                {/* Başlık ve Format Seçici Butonlar */}
+                <div className="space-y-3 relative z-10">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-xs font-semibold text-emerald-300">
+                    <Sparkles size={14} className="text-amber-300 animate-pulse" />
+                    <span>Sosyal Medya Paylaşım ve Hikaye Kartı</span>
                   </div>
-                  <div>
-                    <span className="text-xs text-gray-400 block">Kutsal Kelt Ağacı Analizim:</span>
-                    <h3 className="text-xl font-serif font-bold text-white">
-                      {currentTree.name} ({currentTree.oghamName})
-                    </h3>
-                    <p className="text-xs text-amber-300 font-medium mt-0.5">
-                      {currentTree.archetype}
+                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-white">
+                    {analyzedName ? `${analyzedName}'in ` : ''}Druid Ağacı Hikaye Kartı & Sanatı
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-300 max-w-lg mx-auto">
+                    Kadim Kelt bilgeliğini ve ağacınızın ruhunu yansıtan yüksek kaliteli sanat kartını indirin; Instagram Story veya WhatsApp durumunuzda paylaşın!
+                  </p>
+
+                  {/* Format Değiştirme Butonları */}
+                  <div className="inline-flex p-1 rounded-2xl bg-black/50 border border-white/10 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => setActiveShareFormat('card')}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                        activeShareFormat === 'card'
+                          ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      <Share2 size={14} className="text-amber-200" />
+                      <span>📜 Hazır Hikaye Kartı (Story)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveShareFormat('portrait')}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                        activeShareFormat === 'portrait'
+                          ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      <Sparkles size={14} />
+                      <span>🎨 Saf Karakter Sanatı</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Aktif Format Görseli */}
+                <div className="space-y-6 relative z-10">
+                  <div className="relative inline-block mx-auto group">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 via-amber-400 to-teal-400 rounded-3xl blur-md opacity-40 group-hover:opacity-75 transition duration-500" />
+                    <img 
+                      src={
+                        activeShareFormat === 'card'
+                          ? `/api/astrology/druid-tree-card?treeId=${currentTree.id}${analyzedName ? `&name=${encodeURIComponent(analyzedName)}` : ''}`
+                          : `/druid-trees/${currentTree.id}.jpg`
+                      } 
+                      alt={`${analyzedName ? `${analyzedName}'in ` : ''}${currentTree.name} - Kelt Druid Ağacı`} 
+                      className="relative w-full max-w-[340px] sm:max-w-[380px] mx-auto rounded-3xl shadow-2xl border-2 border-emerald-400/40 transform transition-transform duration-300 hover:scale-[1.01]"
+                    />
+                  </div>
+
+                  {/* Aksiyon Butonları */}
+                  <div className="flex flex-wrap items-center justify-center gap-3 max-w-xl mx-auto">
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadImage(currentTree.id, currentTree.name, activeShareFormat === 'card')}
+                      disabled={downloadingImage}
+                      className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-white text-xs sm:text-sm font-bold shadow-lg shadow-emerald-900/40 hover:shadow-emerald-700/50 transition-all cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
+                    >
+                      <Download size={17} className={downloadingImage ? 'animate-bounce' : ''} />
+                      <span>
+                        {downloadingImage 
+                          ? 'Görsel İndiriliyor...' 
+                          : activeShareFormat === 'card' 
+                            ? '🌟 Hikaye Kartını İndir (Story / Durum)' 
+                            : '🖼️ Sanat Görselini İndir'}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleNativeShare}
+                      className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/20 text-white text-xs sm:text-sm font-semibold transition-all cursor-pointer hover:border-emerald-400/50"
+                    >
+                      <Share2 size={16} className="text-emerald-400" />
+                      <span>Sosyal Medyada Paylaş</span>
+                    </button>
+
+                    <a
+                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+                        `🌲 ${analyzedName ? `${analyzedName}'in ` : ''}Kelt Druid Ağacı: ${currentTree.name} (${currentTree.archetype})!\n` +
+                        `📜 "${currentTree.druidicProverb}"\n\n` +
+                        `Sen de kendi kutsal Kelt Druid ağacını keşfet: https://7layers.tr/analysis/druid-tree`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-[#25D366]/20 hover:bg-[#25D366]/30 border border-[#25D366]/40 text-[#25D366] hover:text-white text-xs sm:text-sm font-semibold transition-all cursor-pointer"
+                    >
+                      <MessageCircle size={16} />
+                      <span>WhatsApp'ta Gönder</span>
+                    </a>
+                  </div>
+
+                  <div className="bg-black/30 border border-white/10 rounded-2xl p-4 max-w-lg mx-auto text-left flex items-start gap-3">
+                    <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 shrink-0">
+                      <Sparkles size={16} />
+                    </div>
+                    <p className="text-[11px] sm:text-xs text-gray-300 leading-relaxed">
+                      <strong className="text-emerald-300">İpucu:</strong> İndirdiğiniz yüksek çözünürlüklü kartı <strong>Instagram Hikayenizde (Story)</strong> veya <strong>WhatsApp Durumunuzda</strong> doğrudan tam ekran paylaşabilir, sevdiklerinizin de kendi Kelt ağacını analiz etmesini sağlayabilirsiniz.
                     </p>
                   </div>
-                  <p className="text-xs text-gray-300 italic border-l-2 border-emerald-400 pl-3 py-1">
-                    "{currentTree.druidicProverb}"
-                  </p>
-                  <div className="border-t border-white/10 pt-3 flex items-center justify-between text-[10px] text-gray-400">
-                    <span>{currentTree.element} • {currentTree.rulingPlanets}</span>
-                    <span className="text-emerald-400 font-semibold">7layers.tr</span>
-                  </div>
                 </div>
-                <p className="text-xs text-gray-400 max-w-md mx-auto">
-                  Bu kartın ekran görüntüsünü alarak Instagram veya WhatsApp durumunuzda paylaşabilir, sevdiklerinizin kendi ağaçlarını keşfetmesini sağlayabilirsiniz.
-                </p>
               </div>
             </motion.div>
           )}
@@ -494,12 +649,17 @@ export default function DruidTreePage() {
               >
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-xl text-emerald-300 group-hover:border-emerald-400/60 transition-colors shrink-0">
-                      {tree.oghamSymbol}
+                    <div className="w-12 h-14 rounded-xl bg-emerald-500/10 border border-emerald-500/30 overflow-hidden relative group-hover:border-emerald-400/60 transition-colors shrink-0 flex items-center justify-center">
+                      <img 
+                        src={`/druid-trees/${tree.id}.jpg`} 
+                        alt={tree.name}
+                        className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
+                      />
                     </div>
                     <div>
-                      <h4 className="font-bold text-white text-sm group-hover:text-emerald-300 transition-colors">
-                        {tree.name}
+                      <h4 className="font-bold text-white text-sm group-hover:text-emerald-300 transition-colors flex items-center gap-1.5">
+                        <span>{tree.name}</span>
+                        <span className="text-emerald-400 text-xs font-mono font-normal">({tree.oghamSymbol})</span>
                       </h4>
                       <span className="text-[11px] text-gray-400 block">
                         {tree.oghamName} • {tree.rulingPlanets}
@@ -521,11 +681,65 @@ export default function DruidTreePage() {
                 </div>
 
                 <div className="pt-2 border-t border-white/5 flex items-center justify-between text-[11px] text-gray-400 group-hover:text-emerald-400 transition-colors">
-                  <span>Detayları ve Ritüeli İncele</span>
+                  <span>Detayları ve Karakter Sanatını Gör</span>
                   <span className="text-xs">→</span>
                 </div>
               </div>
             ))}
+          </div>
+        </div>
+
+        {/* Kelt Druid Ağaçları & Ogham Rehberi Makale Tanıtım Kartı */}
+        <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/70 via-[#0B151E] to-teal-950/60 p-6 sm:p-10 shadow-2xl">
+          {/* Arka plan ışıltı efektleri */}
+          <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+            <div className="space-y-4 max-w-2xl text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-xs font-semibold text-emerald-300">
+                <BookOpen size={14} className="text-amber-300" />
+                <span>Kapsamlı Druid Bilgeliği &amp; Tarihçe</span>
+              </div>
+              <h3 className="text-2xl sm:text-3xl font-serif font-bold text-white leading-tight">
+                Druid Ağaçları &amp; Kadim Ogham Alfabesi Hakkında Daha Fazla Bilgi Edinin
+              </h3>
+              <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-normal">
+                Druidlerin 13 Kutsal Ay döngüsü, Ogham Ağaç Alfabesinin 2000 yıllık çentik sırları, ışık-gölge arketipleri ve modern dünyada orman banyosu (Shinrin-Yoku) ile topraklanma rehberimizi derinlemesine inceleyin.
+              </p>
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
+                <Link
+                  href="/blog/kelt-druid-agaclari-ve-ogham-rehberi"
+                  className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-white font-bold text-sm shadow-lg shadow-emerald-900/40 hover:shadow-emerald-700/50 transition-all cursor-pointer transform hover:-translate-y-0.5"
+                >
+                  <BookOpen size={17} />
+                  <span>Kapsamlı Druid Ağaçları Makalesini Oku</span>
+                  <span>→</span>
+                </Link>
+                <div className="text-xs text-gray-400 flex items-center gap-1.5">
+                  <Sparkles size={14} className="text-amber-400" />
+                  <span>7 Dakikalık Aydınlatıcı Okuma</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Sağ Görsel Önizleme */}
+            <Link 
+              href="/blog/kelt-druid-agaclari-ve-ogham-rehberi"
+              className="group relative shrink-0 block overflow-hidden rounded-2xl border-2 border-emerald-400/30 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:border-emerald-400/60"
+            >
+              <img 
+                src="/druid-tree-blog-cover.jpg" 
+                alt="Kelt Druid Ağaçları ve Ogham Rehberi" 
+                className="w-full max-w-[320px] sm:max-w-[360px] h-48 sm:h-52 object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-4">
+                <span className="text-xs font-semibold text-emerald-300 group-hover:text-white transition-colors flex items-center gap-1.5">
+                  <span>Makaleye Git</span>
+                  <span>↗</span>
+                </span>
+              </div>
+            </Link>
           </div>
         </div>
 
@@ -552,19 +766,32 @@ export default function DruidTreePage() {
                   <X size={18} />
                 </button>
 
-                {/* Modal Başlık */}
-                <div className="flex items-center gap-4 border-b border-white/10 pb-5 pr-10">
-                  <div className="w-14 h-14 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center text-3xl text-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.3)] shrink-0">
-                    {selectedModalTree.oghamSymbol}
+                {/* Modal Başlık ve Canlı Maskot */}
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 border-b border-white/10 pb-5 pr-10">
+                  <div className="relative group shrink-0">
+                    <img 
+                      src={`/druid-trees/${selectedModalTree.id}.jpg`} 
+                      alt={selectedModalTree.name}
+                      className="w-24 h-32 sm:w-28 sm:h-36 rounded-2xl border-2 border-emerald-400/40 shadow-xl object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadImage(selectedModalTree.id, selectedModalTree.name, true)}
+                      title="Hazır Hikaye Kartını İndir"
+                      className="absolute -bottom-2 -right-2 py-1 px-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white shadow-md transition-all cursor-pointer flex items-center gap-1 text-[11px] font-semibold"
+                    >
+                      <Download size={12} />
+                      <span>Kartı İndir</span>
+                    </button>
                   </div>
-                  <div>
+                  <div className="text-center sm:text-left">
                     <span className="text-xs uppercase tracking-widest text-emerald-400 font-bold block">
-                      Kadim Ağaç Alfabesi (Ogham): {selectedModalTree.oghamName}
+                      Kadim Ağaç Alfabesi (Ogham): {selectedModalTree.oghamName} ({selectedModalTree.oghamSymbol})
                     </span>
                     <h3 className="text-2xl font-serif font-bold text-white">
                       {selectedModalTree.name}
                     </h3>
-                    <p className="text-xs text-gray-400 italic">
+                    <p className="text-xs text-gray-400 italic mt-0.5">
                       {selectedModalTree.botanicalName} • {selectedModalTree.periods.map(p => p.label).join(', ')}
                     </p>
                   </div>
