@@ -51,7 +51,7 @@ async function buildTreeCard(tree: any, rawImgPath: string, outputPath: string) 
     .png()
     .toBuffer();
 
-  const oghamTitle = `OGHAM: ${tree.oghamName.toUpperCase()} (${tree.oghamSymbol})`;
+  const oghamTitle = `KELTÇE İSMİ (OGHAM): ${tree.oghamName.toUpperCase()} (${tree.oghamSymbol})`;
   const proverbLines = wrapText(`"${tree.druidicProverb}"`, 44);
 
   // Overlay SVG with top header, inner image frame, and bottom card details
@@ -103,7 +103,7 @@ async function buildTreeCard(tree: any, rawImgPath: string, outputPath: string) 
         <text x="540" y="126" font-family="'Georgia', serif" font-size="52" font-weight="bold" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">
           ${escapeXml(tree.name)}
         </text>
-        <text x="540" y="164" font-family="'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="700" fill="#FCD34D" text-anchor="middle" letter-spacing="2">
+        <text x="540" y="164" font-family="'Segoe UI', Roboto, sans-serif" font-size="22" font-weight="700" fill="#FCD34D" text-anchor="middle" letter-spacing="1.5">
           ${escapeXml(oghamTitle)}
         </text>
       </g>
