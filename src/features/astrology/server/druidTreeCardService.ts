@@ -76,9 +76,13 @@ export function formatTurkishPossessive(name: string): string {
 export async function renderDruidTreeCard(tree: DruidTree, rawImagePath: string, personName?: string): Promise<Buffer> {
   const rawBuffer = await fs.promises.readFile(rawImagePath);
 
-  // Resize inner art to 920x760 with center positioning so characters are framed
+  // Preserve 100% of the original vertical portrait character using fit: contain
+  // Dark flanks seamlessly match the card's deep celestial background
   const resizedInnerImg = await sharp(rawBuffer)
-    .resize(INNER_IMG_WIDTH, INNER_IMG_HEIGHT, { fit: 'cover', position: 'center' })
+    .resize(INNER_IMG_WIDTH, INNER_IMG_HEIGHT, { 
+      fit: 'contain', 
+      background: { r: 6, g: 12, b: 18, alpha: 1 } 
+    })
     .toBuffer();
 
   // Create rounded mask for inner image
