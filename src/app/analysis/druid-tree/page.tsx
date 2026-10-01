@@ -689,6 +689,60 @@ export default function DruidTreePage() {
           </div>
         </div>
 
+        {/* Kelt Druid Ağaçları & Ogham Rehberi Makale Tanıtım Kartı */}
+        <div className="relative overflow-hidden rounded-3xl border border-emerald-500/30 bg-gradient-to-r from-emerald-950/70 via-[#0B151E] to-teal-950/60 p-6 sm:p-10 shadow-2xl">
+          {/* Arka plan ışıltı efektleri */}
+          <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
+            <div className="space-y-4 max-w-2xl text-center lg:text-left">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-xs font-semibold text-emerald-300">
+                <BookOpen size={14} className="text-amber-300" />
+                <span>Kapsamlı Druid Bilgeliği &amp; Tarihçe</span>
+              </div>
+              <h3 className="text-2xl sm:text-3xl font-serif font-bold text-white leading-tight">
+                Druid Ağaçları &amp; Kadim Ogham Alfabesi Hakkında Daha Fazla Bilgi Edinin
+              </h3>
+              <p className="text-sm sm:text-base text-gray-300 leading-relaxed font-normal">
+                Druidlerin 13 Kutsal Ay döngüsü, Ogham Ağaç Alfabesinin 2000 yıllık çentik sırları, ışık-gölge arketipleri ve modern dünyada orman banyosu (Shinrin-Yoku) ile topraklanma rehberimizi derinlemesine inceleyin.
+              </p>
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 pt-2">
+                <Link
+                  href="/blog/kelt-druid-agaclari-ve-ogham-rehberi"
+                  className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-white font-bold text-sm shadow-lg shadow-emerald-900/40 hover:shadow-emerald-700/50 transition-all cursor-pointer transform hover:-translate-y-0.5"
+                >
+                  <BookOpen size={17} />
+                  <span>Kapsamlı Druid Ağaçları Makalesini Oku</span>
+                  <span>→</span>
+                </Link>
+                <div className="text-xs text-gray-400 flex items-center gap-1.5">
+                  <Sparkles size={14} className="text-amber-400" />
+                  <span>7 Dakikalık Aydınlatıcı Okuma</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Sağ Görsel Önizleme */}
+            <Link 
+              href="/blog/kelt-druid-agaclari-ve-ogham-rehberi"
+              className="group relative shrink-0 block overflow-hidden rounded-2xl border-2 border-emerald-400/30 shadow-2xl transition-all duration-300 hover:scale-[1.02] hover:border-emerald-400/60"
+            >
+              <img 
+                src="/druid-tree-blog-cover.jpg" 
+                alt="Kelt Druid Ağaçları ve Ogham Rehberi" 
+                className="w-full max-w-[320px] sm:max-w-[360px] h-48 sm:h-52 object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent flex items-end p-4">
+                <span className="text-xs font-semibold text-emerald-300 group-hover:text-white transition-colors flex items-center gap-1.5">
+                  <span>Makaleye Git</span>
+                  <span>↗</span>
+                </span>
+              </div>
+            </Link>
+          </div>
+        </div>
+
         {/* Ağaç Detay Modalı (Açılır Pencere) */}
         <AnimatePresence>
           {selectedModalTree && (
