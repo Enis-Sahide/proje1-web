@@ -27,15 +27,20 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    const rawImagePath = path.join(process.cwd(), 'public', 'druid-trees', `${tree.id}.jpg`);
-    if (!fs.existsSync(rawImagePath)) {
-      return new Response(JSON.stringify({ error: 'Ağaç görseli bulunamadı' }), {
-        status: 404,
-        headers: { 'Content-Type': 'application/json' }
-      });
+    const staticCardPath = path.join(process.cwd(), 'public', 'druid-trees', `${tree.id}-card.jpg`);
+    let imageBuffer: Buffer;
+    if (fs.existsSync(staticCardPath)) {
+      imageBuffer = await fs.promises.readFile(staticCardPath);
+    } else {
+      const rawImagePath = path.join(process.cwd(), 'public', 'druid-trees', `${tree.id}.jpg`);
+      if (!fs.existsSync(rawImagePath)) {
+        return new Response(JSON.stringify({ error: 'Ağaç görseli bulunamadı' }), {
+          status: 404,
+          headers: { 'Content-Type': 'application/json' }
+        });
+      }
+      imageBuffer = await renderDruidTreeCard(tree, rawImagePath, name);
     }
-
-    const imageBuffer = await renderDruidTreeCard(tree, rawImagePath, name);
 
     return new Response(new Uint8Array(imageBuffer), {
       status: 200,
