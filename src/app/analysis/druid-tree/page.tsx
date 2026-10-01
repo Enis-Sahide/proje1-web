@@ -26,7 +26,8 @@ import {
   DRUID_TREES, 
   getDruidTreeAnalysis, 
   DruidTree,
-  DruidTreeAnalysis 
+  DruidTreeAnalysis,
+  formatTurkishPossessive
 } from '@/features/astrology/engine/DruidTreeEngine';
 
 const MONTH_NAMES = [
@@ -48,6 +49,7 @@ export default function DruidTreePage() {
   const [downloadingImage, setDownloadingImage] = useState(false);
   const [cacheBuster] = useState(() => Date.now());
   const [sharedFile, setSharedFile] = useState<File | null>(null);
+  const [personalizedCardUrl, setPersonalizedCardUrl] = useState<string | null>(null);
 
   const resultRef = useRef<HTMLDivElement>(null);
 
@@ -71,9 +73,77 @@ export default function DruidTreePage() {
 
   const currentTree: DruidTree | null = analyzedData ? analyzedData.tree : null;
 
-  // Paylaşım görselini arka planda önceden File nesnesine dönüştür (Instagram/WhatsApp Story için 0 gecikme)
+  // Kişiselleştirilmiş İsimli Kartı Tarayıcıda (HTML5 Canvas) Sıfır Hatayla Üret
   useEffect(() => {
     if (!currentTree) return;
+    if (activeShareFormat !== 'card' || !analyzedName.trim()) {
+      setPersonalizedCardUrl(null);
+      return;
+    }
+
+    let isCancelled = false;
+    const baseImgUrl = `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      if (isCancelled) return;
+      const canvas = document.createElement('canvas');
+      canvas.width = 1080;
+      canvas.height = 1440;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // 1. Temel kartı çiz
+      ctx.drawImage(img, 0, 0, 1080, 1440);
+
+      const cleanName = analyzedName.trim();
+      const personalizedTitle = formatTurkishPossessive(cleanName);
+      const footerText = `✨ ${cleanName} İçin Özel Analiz • 7layers.tr/analysis/druid-tree ✨`;
+
+      // 2. Sol üst başlık alanını yumuşak geçişle temizle
+      const topGrad = ctx.createLinearGradient(80, 70, 480, 106);
+      topGrad.addColorStop(0, '#060C12');
+      topGrad.addColorStop(1, '#070E15');
+      ctx.fillStyle = topGrad;
+      ctx.fillRect(75, 70, 390, 36);
+
+      // 3. Kişiye özel başlığı altın sarısı yaz
+      const fontSize = personalizedTitle.length > 25 ? 16 : 19;
+      ctx.fillStyle = '#FCD34D';
+      ctx.font = `800 ${fontSize}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.textBaseline = 'alphabetic';
+      ctx.textAlign = 'start';
+      ctx.fillText(`✨ ${personalizedTitle}`, 80, 96);
+
+      // 4. Alt marka çizgisini temizle ve kişiye özel dipnotu ekle
+      ctx.fillStyle = '#03080C';
+      ctx.fillRect(100, 1302, 880, 36);
+
+      ctx.fillStyle = '#34D399';
+      ctx.font = '700 20px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textBaseline = 'alphabetic';
+      ctx.textAlign = 'center';
+      ctx.fillText(footerText, 540, 1320);
+
+      canvas.toBlob((blob) => {
+        if (!isCancelled && blob) {
+          const url = URL.createObjectURL(blob);
+          setPersonalizedCardUrl(url);
+          const file = new File([blob], `${cleanName.replace(/\s+/g, '_')}_${currentTree.id}-hikaye-karti.jpg`, { type: 'image/jpeg' });
+          setSharedFile(file);
+        }
+      }, 'image/jpeg', 0.94);
+    };
+    img.src = baseImgUrl;
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [currentTree, activeShareFormat, analyzedName, cacheBuster]);
+
+  // İsim girilmediğinde veya saf sanat formatında genel dosya hazırla
+  useEffect(() => {
+    if (!currentTree || analyzedName.trim()) return;
     let isCancelled = false;
     const preloadShareFile = async () => {
       try {
@@ -98,13 +168,13 @@ export default function DruidTreePage() {
     return () => {
       isCancelled = true;
     };
-  }, [currentTree, activeShareFormat, cacheBuster]);
+  }, [currentTree, activeShareFormat, analyzedName, cacheBuster]);
 
   const handleDownloadImage = async (treeId: string, treeName: string, isCard: boolean = true) => {
     try {
       setDownloadingImage(true);
       const imgUrl = isCard
-        ? `/druid-trees/${treeId}-card.jpg?t=${cacheBuster}`
+        ? (personalizedCardUrl || `/druid-trees/${treeId}-card.jpg?t=${cacheBuster}`)
         : `/druid-trees/${treeId}.jpg?t=${cacheBuster}`;
       const response = await fetch(imgUrl);
       const blob = await response.blob();
@@ -467,7 +537,7 @@ export default function DruidTreePage() {
                     <img 
                       src={
                         activeShareFormat === 'card'
-                          ? `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`
+                          ? (personalizedCardUrl || `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`)
                           : `/druid-trees/${currentTree.id}.jpg?t=${cacheBuster}`
                       } 
                       alt={`${analyzedName ? `${analyzedName}'in ` : ''}${currentTree.name} - Kelt Druid Ağacı`} 
