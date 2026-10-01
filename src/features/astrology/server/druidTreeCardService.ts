@@ -4,26 +4,8 @@ import { DruidTree } from '../engine/DruidTreeEngine';
 
 const CARD_WIDTH = 1080;
 const CARD_HEIGHT = 1440;
-const PORTRAIT_WIDTH = 750;
-const PORTRAIT_HEIGHT = 1000; // Exact 3:4 aspect ratio
-const PORTRAIT_TOP = 50;
-const PORTRAIT_LEFT = (CARD_WIDTH - PORTRAIT_WIDTH) / 2; // 165px
-
-export const TREE_ENGLISH_NAMES: Record<string, string> = {
-  birch: 'BIRCH',
-  rowan: 'ROWAN',
-  ash: 'ASH',
-  alder: 'ALDER',
-  willow: 'WILLOW',
-  hawthorn: 'HAWTHORN',
-  oak: 'OAK',
-  holly: 'HOLLY',
-  hazel: 'HAZEL',
-  vine: 'VINE',
-  ivy: 'IVY',
-  reed: 'REED',
-  elder: 'ELDER'
-};
+const INNER_IMG_WIDTH = 920;
+const INNER_IMG_HEIGHT = 760;
 
 function escapeXml(unsafe: string): string {
   return unsafe.replace(/[<>&'"]/g, (c) => {
@@ -38,7 +20,7 @@ function escapeXml(unsafe: string): string {
   });
 }
 
-function wrapText(text: string, maxCharsPerLine: number = 48): string[] {
+function wrapText(text: string, maxCharsPerLine: number = 44): string[] {
   const words = text.split(' ');
   const lines: string[] = [];
   let currentLine = '';
@@ -57,6 +39,12 @@ function wrapText(text: string, maxCharsPerLine: number = 48): string[] {
 
 /**
  * Türkçe büyük ünlü ve ses uyumuna göre isme tam uygun iyelik eki oluşturur
+ * Örnek: Baha -> BAHA'NIN DRUİD AĞACI
+ *        Ali -> ALİ'NİN DRUİD AĞACI
+ *        Mehmet -> MEHMET'İN DRUİD AĞACI
+ *        Can -> CAN'IN DRUİD AĞACI
+ *        Onur -> ONUR'UN DRUİD AĞACI
+ *        Gül -> GÜL'ÜN DRUİD AĞACI
  */
 export function formatTurkishPossessive(name: string): string {
   const clean = name.trim();
@@ -82,158 +70,134 @@ export function formatTurkishPossessive(name: string): string {
   else if (['o', 'u'].includes(lastVowel)) suffix = isLastCharVowel ? 'NUN' : 'UN';
   else if (['ö', 'ü'].includes(lastVowel)) suffix = isLastCharVowel ? 'NÜN' : 'ÜN';
 
-  return `${clean.toLocaleUpperCase('tr-TR')}'${suffix} KUTSAL AĞACI`;
-}
-
-/**
- * Yan sütunlarda harfleri dikey alt alta dizen yardımcı fonksiyon
- */
-function renderVerticalText(text: string, x: number, startY: number, maxHeight: number, maxFontSize: number, fill: string): string {
-  const chars = Array.from(text);
-  const count = chars.length;
-  if (count === 0) return '';
-
-  const stepY = Math.min(42, Math.floor(maxHeight / count));
-  const fontSize = Math.min(maxFontSize, Math.max(16, Math.floor(stepY * 0.65)));
-
-  return chars.map((char, i) => {
-    if (char === ' ') return ''; // Boşluk satır atlaması yaratır
-    const y = startY + i * stepY;
-    return `<text x="${x}" y="${y}" font-family="'Segoe UI', Roboto, sans-serif" font-size="${fontSize}" font-weight="800" fill="${fill}" text-anchor="middle">${escapeXml(char)}</text>`;
-  }).join('\n');
+  return `${clean.toLocaleUpperCase('tr-TR')}'${suffix} DRUİD AĞACI`;
 }
 
 export async function renderDruidTreeCard(tree: DruidTree, rawImagePath: string, personName?: string): Promise<Buffer> {
   const rawBuffer = await fs.promises.readFile(rawImagePath);
 
-  // Resize raw image to exact 3:4 portrait (750x1000)
-  const resizedPortrait = await sharp(rawBuffer)
-    .resize(PORTRAIT_WIDTH, PORTRAIT_HEIGHT, { fit: 'cover', position: 'center' })
+  // Resize inner art to 920x760 with center positioning so characters are framed
+  const resizedInnerImg = await sharp(rawBuffer)
+    .resize(INNER_IMG_WIDTH, INNER_IMG_HEIGHT, { fit: 'cover', position: 'center' })
     .toBuffer();
 
-  // Create rounded mask for portrait image
+  // Create rounded mask for inner image
   const maskSvg = `
-    <svg width="${PORTRAIT_WIDTH}" height="${PORTRAIT_HEIGHT}">
-      <rect width="${PORTRAIT_WIDTH}" height="${PORTRAIT_HEIGHT}" rx="24" fill="#FFF"/>
+    <svg width="${INNER_IMG_WIDTH}" height="${INNER_IMG_HEIGHT}">
+      <rect x="0" y="0" width="${INNER_IMG_WIDTH}" height="${INNER_IMG_HEIGHT}" rx="32" ry="32" fill="#FFF"/>
     </svg>
   `;
-  const roundedPortrait = await sharp(resizedPortrait)
+  const roundedInnerImg = await sharp(resizedInnerImg)
     .composite([{ input: Buffer.from(maskSvg), blend: 'dest-in' }])
     .png()
     .toBuffer();
 
-  const cleanName = personName ? personName.trim() : '';
-  const titleLeft = cleanName ? formatTurkishPossessive(cleanName) : tree.name.toLocaleUpperCase('tr-TR');
-  const enName = TREE_ENGLISH_NAMES[tree.id] || tree.id.toUpperCase();
-  const titleRight = `${enName} • ${tree.oghamName.toUpperCase()}`;
-  const proverbLines = wrapText(`"${tree.druidicProverb}"`, 48);
+  const oghamTitle = `KELTÇE İSMİ (OGHAM): ${tree.oghamName.toUpperCase()} (${tree.oghamSymbol})`;
+  const proverbLines = wrapText(`"${tree.druidicProverb}"`, 44);
 
+  const cleanName = personName ? personName.trim() : '';
+  const personalizedTitle = cleanName ? formatTurkishPossessive(cleanName) : 'KUTSAL DRUİD AĞACI';
   const footerText = cleanName 
-    ? `✦ 7LAYERS.COM ✦ ${cleanName.toLocaleUpperCase('tr-TR')} İÇİN ÖZEL ANALİZ ✦`
-    : `✦ 7LAYERS.COM ✦ KENDİ KUTSAL AĞACINI KEŞFET ✦`;
+    ? `✨ ${escapeXml(cleanName)} İçin Özel Analiz • 7layers.tr/analysis/druid-tree ✨`
+    : `✨ Kendi Ruh Ağacını Keşfet: 7layers.tr/analysis/druid-tree ✨`;
 
   const overlaySvg = `
     <svg width="${CARD_WIDTH}" height="${CARD_HEIGHT}" viewBox="0 0 ${CARD_WIDTH} ${CARD_HEIGHT}" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <radialGradient id="bgGlow" cx="50%" cy="40%" r="65%">
-          <stop offset="0%" stop-color="#0B1A1E" stop-opacity="1"/>
-          <stop offset="60%" stop-color="#050C10" stop-opacity="1"/>
-          <stop offset="100%" stop-color="#020507" stop-opacity="1"/>
-        </radialGradient>
-        <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="3" result="blur" />
-          <feComposite in="SourceGraphic" in2="blur" operator="over" />
-        </filter>
-        <filter id="emeraldGlow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="4" result="blur" />
-          <feComposite in="SourceGraphic" in2="blur" operator="over" />
+        <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#060C12"/>
+          <stop offset="45%" stop-color="#09141B"/>
+          <stop offset="100%" stop-color="#03080C"/>
+        </linearGradient>
+
+        <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#FCD34D"/>
+          <stop offset="50%" stop-color="#34D399"/>
+          <stop offset="100%" stop-color="#10B981"/>
+        </linearGradient>
+
+        <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#34D399" stop-opacity="0.7"/>
+          <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.2"/>
+          <stop offset="100%" stop-color="#F59E0B" stop-opacity="0.7"/>
+        </linearGradient>
+
+        <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="8" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
         </filter>
       </defs>
 
       <!-- Background -->
-      <rect width="${CARD_WIDTH}" height="${CARD_HEIGHT}" fill="url(#bgGlow)"/>
+      <rect width="${CARD_WIDTH}" height="${CARD_HEIGHT}" fill="url(#bgGrad)"/>
 
-      <!-- Outer Card Border -->
-      <rect x="20" y="20" width="${CARD_WIDTH - 40}" height="${CARD_HEIGHT - 40}" rx="28" fill="none" stroke="#F59E0B" stroke-opacity="0.35" stroke-width="1.5"/>
-      <rect x="28" y="28" width="${CARD_WIDTH - 56}" height="${CARD_HEIGHT - 56}" rx="22" fill="none" stroke="#34D399" stroke-opacity="0.2" stroke-width="1"/>
+      <!-- Outer Luxury Border -->
+      <rect x="24" y="24" width="${CARD_WIDTH - 48}" height="${CARD_HEIGHT - 48}" rx="44" fill="none" stroke="url(#borderGrad)" stroke-width="2.5"/>
+      <rect x="34" y="34" width="${CARD_WIDTH - 68}" height="${CARD_HEIGHT - 68}" rx="36" fill="none" stroke="#FFFFFF" stroke-opacity="0.04" stroke-width="1.5"/>
 
-      <!-- Left Flank: Ogham Rune & Vertical Turkish Title (Center X: 82) -->
+      <!-- Header Section -->
       <g transform="translate(0, 0)">
-        <!-- Top Ogham Rune Emblem -->
-        <circle cx="82" cy="95" r="34" fill="#040A10" stroke="#F59E0B" stroke-opacity="0.5" stroke-width="1.5"/>
-        <text x="82" y="108" font-family="'Segoe UI', Roboto, sans-serif" font-size="34" fill="#FCD34D" text-anchor="middle" filter="url(#goldGlow)">
-          ${escapeXml(tree.oghamSymbol)}
+        <!-- Top Pill Badge -->
+        <rect x="360" y="32" width="360" height="32" rx="16" fill="#FFFFFF" fill-opacity="0.06" stroke="#34D399" stroke-opacity="0.4" stroke-width="1.2"/>
+        <text x="540" y="53" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#34D399" text-anchor="middle" letter-spacing="3">
+          🌲 7LAYERS KELT DRUİD AĞACI 🌲
         </text>
 
-        <!-- Vertical Line Accent -->
-        <line x1="82" y1="145" x2="82" y2="185" stroke="#F59E0B" stroke-opacity="0.4" stroke-width="1.5"/>
-
-        <!-- Vertical Tree Name -->
-        ${renderVerticalText(titleLeft, 82, 225, 480, 24, '#FFFFFF')}
-
-        <!-- Vertical 7LAYERS mark -->
-        <line x1="82" y1="740" x2="82" y2="780" stroke="#34D399" stroke-opacity="0.4" stroke-width="1.5"/>
-        ${renderVerticalText("7LAYERS", 82, 820, 210, 16, '#34D399')}
-        <circle cx="82" cy="1035" r="4" fill="#34D399" opacity="0.6"/>
-      </g>
-
-      <!-- Central Image Golden Frame -->
-      <rect x="${PORTRAIT_LEFT - 6}" y="${PORTRAIT_TOP - 6}" width="${PORTRAIT_WIDTH + 12}" height="${PORTRAIT_HEIGHT + 12}" rx="30" fill="none" stroke="#F59E0B" stroke-opacity="0.5" stroke-width="2"/>
-      <rect x="${PORTRAIT_LEFT - 12}" y="${PORTRAIT_TOP - 12}" width="${PORTRAIT_WIDTH + 24}" height="${PORTRAIT_HEIGHT + 24}" rx="34" fill="none" stroke="#34D399" stroke-opacity="0.25" stroke-width="1"/>
-
-      <!-- Right Flank: Celtic Seal & Vertical English/Celtic Name (Center X: 998) -->
-      <g transform="translate(0, 0)">
-        <!-- Top Celtic Seal -->
-        <circle cx="998" cy="95" r="34" fill="#040A10" stroke="#34D399" stroke-opacity="0.5" stroke-width="1.5"/>
-        <text x="998" y="107" font-family="'Segoe UI', Roboto, sans-serif" font-size="28" fill="#34D399" text-anchor="middle" filter="url(#emeraldGlow)">
-          ☸
+        <!-- Kişiye Özel İsim Şeridi -->
+        <text x="540" y="93" font-family="'Segoe UI', Roboto, sans-serif" font-size="23" font-weight="800" fill="#FCD34D" text-anchor="middle" letter-spacing="2">
+          ✨ ${escapeXml(personalizedTitle)} ✨
         </text>
 
-        <!-- Vertical Line Accent -->
-        <line x1="998" y1="145" x2="998" y2="185" stroke="#34D399" stroke-opacity="0.4" stroke-width="1.5"/>
+        <!-- Ağaç Adı -->
+        <text x="540" y="137" font-family="'Georgia', serif" font-size="44" font-weight="bold" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">
+          ${escapeXml(tree.name)}
+        </text>
 
-        <!-- Vertical English/Celtic Title -->
-        ${renderVerticalText(titleRight, 998, 225, 480, 22, '#FCD34D')}
-
-        <!-- Vertical DRUID mark -->
-        <line x1="998" y1="740" x2="998" y2="780" stroke="#F59E0B" stroke-opacity="0.4" stroke-width="1.5"/>
-        ${renderVerticalText("DRUID", 998, 820, 210, 16, '#FCD34D')}
-        <circle cx="998" cy="1035" r="4" fill="#FCD34D" opacity="0.6"/>
+        <!-- Keltçe İsmi & Ogham -->
+        <text x="540" y="167" font-family="'Segoe UI', Roboto, sans-serif" font-size="19" font-weight="700" fill="#6EE7B7" text-anchor="middle" letter-spacing="1.5">
+          ${escapeXml(oghamTitle)}
+        </text>
       </g>
 
-      <!-- Bottom Panel (Y: 1075 to 1400) -->
-      <g transform="translate(50, 1075)">
+      <!-- Inner Image Border Glow -->
+      <rect x="76" y="181" width="${INNER_IMG_WIDTH + 8}" height="${INNER_IMG_HEIGHT + 8}" rx="36" fill="none" stroke="url(#goldGrad)" stroke-width="3" opacity="0.8" filter="url(#glow)"/>
+
+      <!-- Bottom Card Details -->
+      <g transform="translate(0, 965)">
         <!-- Archetype Box -->
-        <rect x="0" y="0" width="${CARD_WIDTH - 100}" height="84" rx="18" fill="#040A10" fill-opacity="0.85" stroke="#34D399" stroke-opacity="0.35" stroke-width="1.5"/>
-        <text x="35" y="32" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="bold" fill="#34D399" letter-spacing="1.5">
-          ✨ RUHSAL ARKETİP:
+        <rect x="80" y="0" width="${CARD_WIDTH - 160}" height="96" rx="20" fill="#040A10" fill-opacity="0.75" stroke="#34D399" stroke-opacity="0.35" stroke-width="1.5"/>
+        
+        <text x="110" y="34" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="bold" fill="#34D399" letter-spacing="1.5">
+          ✨ RUHSAL ARKETİP &amp; MİZAÇ:
         </text>
-        <text x="35" y="65" font-family="'Segoe UI', Roboto, sans-serif" font-size="26" font-weight="bold" fill="#FFFFFF">
+        <text x="110" y="74" font-family="'Segoe UI', Roboto, sans-serif" font-size="29" font-weight="bold" fill="#FFFFFF">
           ${escapeXml(tree.archetype)}
         </text>
 
-        <!-- Proverb Box -->
-        <g transform="translate(0, 96)">
-          <rect x="0" y="0" width="${CARD_WIDTH - 100}" height="175" rx="18" fill="#000000" fill-opacity="0.75" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="1.5"/>
-          <line x1="3" y1="16" x2="3" y2="159" stroke="#F59E0B" stroke-width="5" stroke-linecap="round"/>
+        <!-- Proverb Box (Large, High-Contrast & Wrapped) -->
+        <g transform="translate(80, 114)">
+          <rect x="0" y="0" width="${CARD_WIDTH - 160}" height="195" rx="20" fill="#000000" fill-opacity="0.65" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="1.5"/>
+          <line x1="2" y1="18" x2="2" y2="177" stroke="#F59E0B" stroke-width="5" stroke-linecap="round"/>
 
-          <text x="35" y="34" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700" fill="#FCD34D" letter-spacing="1.5">
+          <text x="35" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="700" fill="#FCD34D" letter-spacing="2">
             📜 KADİM KELT BİLGELİĞİ:
           </text>
 
-          ${proverbLines.map((line, idx) => `
-            <text x="35" y="${68 + idx * 26}" font-family="'Georgia', serif" font-size="19" font-style="italic" fill="#E5E7EB">
-              ${escapeXml(line)}
-            </text>
-          `).join('')}
-
-          <text x="35" y="${68 + proverbLines.length * 26 + 18}" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" fill="#9CA3AF" letter-spacing="0.5">
-            Denge, güç ve köklerin kadim koruyucusu.
-          </text>
+          <g transform="translate(35, 78)">
+            ${proverbLines.map((line, idx) => `
+              <text x="0" y="${idx * 42}" font-family="'Georgia', serif" font-size="27" font-style="italic" fill="#F8FAFC" font-weight="500">
+                ${escapeXml(line)}
+              </text>
+            `).join('')}
+          </g>
         </g>
 
         <!-- Footer Brand Line -->
-        <text x="${(CARD_WIDTH - 100) / 2}" y="305" font-family="'Segoe UI', Roboto, sans-serif" font-size="19" font-weight="700" fill="#34D399" text-anchor="middle" letter-spacing="2">
+        <line x1="120" y1="335" x2="${CARD_WIDTH - 120}" y2="335" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="1"/>
+        <text x="540" y="375" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" fill="#34D399" text-anchor="middle" letter-spacing="2">
           ${footerText}
         </text>
       </g>
@@ -243,9 +207,9 @@ export async function renderDruidTreeCard(tree: DruidTree, rawImagePath: string,
   return sharp(Buffer.from(overlaySvg))
     .composite([
       {
-        input: roundedPortrait,
-        top: PORTRAIT_TOP,
-        left: PORTRAIT_LEFT
+        input: roundedInnerImg,
+        top: 185,
+        left: 80
       }
     ])
     .jpeg({ quality: 92 })
