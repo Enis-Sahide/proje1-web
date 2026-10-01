@@ -74,7 +74,7 @@ export default function DruidTreePage() {
       setDownloadingImage(true);
       const imgUrl = isCard
         ? `/api/astrology/druid-tree-card?treeId=${treeId}${analyzedName ? `&name=${encodeURIComponent(analyzedName)}` : ''}`
-        : `/druid-trees/${treeId}.jpg`;
+        : `/druid-trees/${treeId}.jpg?v=7layers-art-v2`;
       const response = await fetch(imgUrl);
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
@@ -540,7 +540,7 @@ export default function DruidTreePage() {
                       src={
                         activeShareFormat === 'card'
                           ? `/api/astrology/druid-tree-card?treeId=${currentTree.id}${analyzedName ? `&name=${encodeURIComponent(analyzedName)}` : ''}`
-                          : `/druid-trees/${currentTree.id}.jpg`
+                          : `/druid-trees/${currentTree.id}.jpg?v=7layers-art-v2`
                       } 
                       alt={`${analyzedName ? `${analyzedName}'in ` : ''}${currentTree.name} - Kelt Druid Ağacı`} 
                       className="relative w-full max-w-[340px] sm:max-w-[380px] mx-auto rounded-3xl shadow-2xl border-2 border-emerald-400/40 transform transition-transform duration-300 hover:scale-[1.01]"
@@ -651,7 +651,7 @@ export default function DruidTreePage() {
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-14 rounded-xl bg-emerald-500/10 border border-emerald-500/30 overflow-hidden relative group-hover:border-emerald-400/60 transition-colors shrink-0 flex items-center justify-center">
                       <img 
-                        src={`/druid-trees/${tree.id}.jpg`} 
+                        src={`/druid-trees/${tree.id}.jpg?v=7layers-art-v2`} 
                         alt={tree.name}
                         className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
                       />
@@ -770,7 +770,7 @@ export default function DruidTreePage() {
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 border-b border-white/10 pb-5 pr-10">
                   <div className="relative group shrink-0">
                     <img 
-                      src={`/druid-trees/${selectedModalTree.id}.jpg`} 
+                      src={`/druid-trees/${selectedModalTree.id}.jpg?v=7layers-art-v2`} 
                       alt={selectedModalTree.name}
                       className="w-24 h-32 sm:w-28 sm:h-36 rounded-2xl border-2 border-emerald-400/40 shadow-xl object-cover"
                     />
