@@ -72,16 +72,18 @@ export default function DruidTreePage() {
   const handleDownloadImage = async (treeId: string, treeName: string, isCard: boolean = true) => {
     try {
       setDownloadingImage(true);
-      const fileName = isCard ? `${treeId}-card.jpg` : `${treeId}.jpg`;
-      const imgUrl = `/druid-trees/${fileName}`;
+      const imgUrl = isCard
+        ? `/api/astrology/druid-tree-card?treeId=${treeId}${analyzedName ? `&name=${encodeURIComponent(analyzedName)}` : ''}`
+        : `/druid-trees/${treeId}.jpg`;
       const response = await fetch(imgUrl);
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = blobUrl;
+      const cleanPrefix = analyzedName ? `${analyzedName.replace(/\s+/g, '_')}_` : '';
       link.download = isCard 
-        ? `${treeName.replace(/\s+/g, '_')}_Kelt_Druid_Karti_7layers.jpg`
-        : `${treeName.replace(/\s+/g, '_')}_Kelt_Ruh_Agaci_7layers.jpg`;
+        ? `${cleanPrefix}${treeName.replace(/\s+/g, '_')}_Druid_Agaci_Karti_7layers.jpg`
+        : `${cleanPrefix}${treeName.replace(/\s+/g, '_')}_Druid_Agaci_Sanati_7layers.jpg`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -95,11 +97,12 @@ export default function DruidTreePage() {
 
   const handleCopyShare = () => {
     if (!currentTree) return;
-    const shareText = `🌲 Kelt Druid Ağacı Analizim: ${currentTree.name} (${currentTree.oghamSymbol} ${currentTree.oghamName})\n` +
+    const cleanPrefix = analyzedName ? `${analyzedName}'in ` : '';
+    const shareText = `🌲 ${cleanPrefix}Kelt Druid Ağacı: ${currentTree.name} (${currentTree.oghamSymbol} ${currentTree.oghamName})\n` +
       `✨ Ruhsal Karakter: ${currentTree.archetype}\n` +
       `🪐 Yönetici Güç: ${currentTree.rulingPlanets} | Element: ${currentTree.element}\n` +
       `📜 Druid Bilgeliği: "${currentTree.druidicProverb}"\n\n` +
-      `Sen de kendi kutsal Kelt ağacını analiz et: 7layers.tr/analysis/druid-tree`;
+      `Sen de kendi kutsal Kelt ağacını analiz et: https://7layers.tr/analysis/druid-tree`;
 
     navigator.clipboard.writeText(shareText);
     setCopied(true);
@@ -108,7 +111,8 @@ export default function DruidTreePage() {
 
   const handleNativeShare = async () => {
     if (!currentTree) return;
-    const shareText = `🌲 Kelt Druid Ağacı Totemim: ${currentTree.name} (${currentTree.oghamSymbol} ${currentTree.oghamName})\n` +
+    const cleanPrefix = analyzedName ? `${analyzedName}'in ` : '';
+    const shareText = `🌲 ${cleanPrefix}Kelt Druid Ağacı: ${currentTree.name} (${currentTree.oghamSymbol} ${currentTree.oghamName})\n` +
       `✨ Ruhsal Karakter: ${currentTree.archetype}\n` +
       `🪐 Element: ${currentTree.element} | Yönetici: ${currentTree.rulingPlanets}\n` +
       `📜 "${currentTree.druidicProverb}"\n\n` +
@@ -116,14 +120,14 @@ export default function DruidTreePage() {
 
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
-        const imgUrl = `/druid-trees/${currentTree.id}-card.jpg`;
+        const imgUrl = `/api/astrology/druid-tree-card?treeId=${currentTree.id}${analyzedName ? `&name=${encodeURIComponent(analyzedName)}` : ''}`;
         const response = await fetch(imgUrl);
         const blob = await response.blob();
-        const file = new File([blob], `${currentTree.id}-card.jpg`, { type: 'image/jpeg' });
+        const file = new File([blob], `${analyzedName ? `${analyzedName}_` : ''}${currentTree.id}-card.jpg`, { type: 'image/jpeg' });
         if (navigator.canShare && navigator.canShare({ files: [file] })) {
           await navigator.share({
             files: [file],
-            title: `${currentTree.name} - Kelt Druid Ağacı`,
+            title: `${cleanPrefix}${currentTree.name} - Kelt Druid Ağacı`,
             text: shareText
           });
           return;
@@ -134,7 +138,7 @@ export default function DruidTreePage() {
 
       try {
         await navigator.share({
-          title: `${currentTree.name} - Kelt Druid Ağacı`,
+          title: `${cleanPrefix}${currentTree.name} - Kelt Druid Ağacı`,
           text: shareText,
           url: 'https://7layers.tr/analysis/druid-tree'
         });
@@ -493,7 +497,7 @@ export default function DruidTreePage() {
                     <span>Sosyal Medya Paylaşım ve Hikaye Kartı</span>
                   </div>
                   <h3 className="text-xl sm:text-2xl font-serif font-bold text-white">
-                    {analyzedName ? `${analyzedName}'in ` : ''}Kelt Ruh Ağacı Maskotu & Hikaye Kartı
+                    {analyzedName ? `${analyzedName}'in ` : ''}Druid Ağacı Hikaye Kartı & Sanatı
                   </h3>
                   <p className="text-xs sm:text-sm text-gray-300 max-w-lg mx-auto">
                     Kadim Kelt bilgeliğini ve ağacınızın ruhunu yansıtan yüksek kaliteli sanat kartını indirin; Instagram Story veya WhatsApp durumunuzda paylaşın!
@@ -533,8 +537,12 @@ export default function DruidTreePage() {
                   <div className="relative inline-block mx-auto group">
                     <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 via-amber-400 to-teal-400 rounded-3xl blur-md opacity-40 group-hover:opacity-75 transition duration-500" />
                     <img 
-                      src={`/druid-trees/${currentTree.id}${activeShareFormat === 'card' ? '-card' : ''}.jpg`} 
-                      alt={`${currentTree.name} - Kelt Druid Ağacı`} 
+                      src={
+                        activeShareFormat === 'card'
+                          ? `/api/astrology/druid-tree-card?treeId=${currentTree.id}${analyzedName ? `&name=${encodeURIComponent(analyzedName)}` : ''}`
+                          : `/druid-trees/${currentTree.id}.jpg`
+                      } 
+                      alt={`${analyzedName ? `${analyzedName}'in ` : ''}${currentTree.name} - Kelt Druid Ağacı`} 
                       className="relative w-full max-w-[340px] sm:max-w-[380px] mx-auto rounded-3xl shadow-2xl border-2 border-emerald-400/40 transform transition-transform duration-300 hover:scale-[1.01]"
                     />
                   </div>
@@ -568,9 +576,9 @@ export default function DruidTreePage() {
 
                     <a
                       href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
-                        `🌲 Kelt Druid Ağacı Totemim: ${currentTree.name} (${currentTree.archetype})!\n` +
+                        `🌲 ${analyzedName ? `${analyzedName}'in ` : ''}Kelt Druid Ağacı: ${currentTree.name} (${currentTree.archetype})!\n` +
                         `📜 "${currentTree.druidicProverb}"\n\n` +
-                        `Sen de kendi kutsal Kelt ağacını keşfet: https://7layers.tr/analysis/druid-tree`
+                        `Sen de kendi kutsal Kelt Druid ağacını keşfet: https://7layers.tr/analysis/druid-tree`
                       )}`}
                       target="_blank"
                       rel="noopener noreferrer"
