@@ -26,7 +26,8 @@ import {
   DRUID_TREES, 
   getDruidTreeAnalysis, 
   DruidTree,
-  DruidTreeAnalysis 
+  DruidTreeAnalysis,
+  formatTurkishPossessive
 } from '@/features/astrology/engine/DruidTreeEngine';
 
 const MONTH_NAMES = [
@@ -48,6 +49,8 @@ export default function DruidTreePage() {
   const [downloadingImage, setDownloadingImage] = useState(false);
   const [cacheBuster] = useState(() => Date.now());
   const [sharedFile, setSharedFile] = useState<File | null>(null);
+  const [personalizedCardUrl, setPersonalizedCardUrl] = useState<string | null>(null);
+  const [instagramToast, setInstagramToast] = useState(false);
 
   const resultRef = useRef<HTMLDivElement>(null);
 
@@ -71,9 +74,77 @@ export default function DruidTreePage() {
 
   const currentTree: DruidTree | null = analyzedData ? analyzedData.tree : null;
 
-  // Paylaşım görselini arka planda önceden File nesnesine dönüştür (Instagram/WhatsApp Story için 0 gecikme)
+  // Kişiselleştirilmiş İsimli Kartı Tarayıcıda (HTML5 Canvas) Sıfır Hatayla Üret
   useEffect(() => {
     if (!currentTree) return;
+    if (activeShareFormat !== 'card' || !analyzedName.trim()) {
+      setPersonalizedCardUrl(null);
+      return;
+    }
+
+    let isCancelled = false;
+    const baseImgUrl = `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`;
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      if (isCancelled) return;
+      const canvas = document.createElement('canvas');
+      canvas.width = 1080;
+      canvas.height = 1440;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+
+      // 1. Temel kartı çiz
+      ctx.drawImage(img, 0, 0, 1080, 1440);
+
+      const cleanName = analyzedName.trim();
+      const personalizedTitle = formatTurkishPossessive(cleanName);
+      const footerText = `✨ ${cleanName} İçin Özel Analiz • 7layers.tr/analysis/druid-tree ✨`;
+
+      // 2. Sol üst başlık alanını yumuşak geçişle temizle (sadece sol 75..345px aralığı, asla ortadaki ağaç adına taşmaz)
+      const topGrad = ctx.createLinearGradient(75, 70, 350, 106);
+      topGrad.addColorStop(0, '#060C12');
+      topGrad.addColorStop(1, '#070E15');
+      ctx.fillStyle = topGrad;
+      ctx.fillRect(75, 70, 270, 36);
+
+      // 3. Kişiye özel başlığı altın sarısı yaz (maksimum 270px genişlik sınırı ile)
+      const fontSize = personalizedTitle.length > 25 ? 16 : 19;
+      ctx.fillStyle = '#FCD34D';
+      ctx.font = `800 ${fontSize}px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.textBaseline = 'alphabetic';
+      ctx.textAlign = 'start';
+      ctx.fillText(`✨ ${personalizedTitle}`, 80, 96, 270);
+
+      // 4. Alt marka çizgisini temizle ve kişiye özel dipnotu ekle
+      ctx.fillStyle = '#03080C';
+      ctx.fillRect(100, 1302, 880, 36);
+
+      ctx.fillStyle = '#34D399';
+      ctx.font = '700 20px system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+      ctx.textBaseline = 'alphabetic';
+      ctx.textAlign = 'center';
+      ctx.fillText(footerText, 540, 1320);
+
+      canvas.toBlob((blob) => {
+        if (!isCancelled && blob) {
+          const url = URL.createObjectURL(blob);
+          setPersonalizedCardUrl(url);
+          const file = new File([blob], `${cleanName.replace(/\s+/g, '_')}_${currentTree.id}-hikaye-karti.jpg`, { type: 'image/jpeg' });
+          setSharedFile(file);
+        }
+      }, 'image/jpeg', 0.94);
+    };
+    img.src = baseImgUrl;
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [currentTree, activeShareFormat, analyzedName, cacheBuster]);
+
+  // İsim girilmediğinde veya saf sanat formatında genel dosya hazırla
+  useEffect(() => {
+    if (!currentTree || analyzedName.trim()) return;
     let isCancelled = false;
     const preloadShareFile = async () => {
       try {
@@ -98,13 +169,13 @@ export default function DruidTreePage() {
     return () => {
       isCancelled = true;
     };
-  }, [currentTree, activeShareFormat, cacheBuster]);
+  }, [currentTree, activeShareFormat, analyzedName, cacheBuster]);
 
   const handleDownloadImage = async (treeId: string, treeName: string, isCard: boolean = true) => {
     try {
       setDownloadingImage(true);
       const imgUrl = isCard
-        ? `/druid-trees/${treeId}-card.jpg?t=${cacheBuster}`
+        ? (personalizedCardUrl || `/druid-trees/${treeId}-card.jpg?t=${cacheBuster}`)
         : `/druid-trees/${treeId}.jpg?t=${cacheBuster}`;
       const response = await fetch(imgUrl);
       const blob = await response.blob();
@@ -138,6 +209,30 @@ export default function DruidTreePage() {
     navigator.clipboard.writeText(shareText);
     setCopied(true);
     setTimeout(() => setCopied(false), 2500);
+  };
+
+  const handleInstagramShare = async () => {
+    if (!currentTree) return;
+    
+    // 1. Kartı kullanıcının cihazına otomatik indir
+    await handleDownloadImage(currentTree.id, currentTree.name, activeShareFormat === 'card');
+    
+    // 2. Kullanıcıya görsel rehber kutusunu göster
+    setInstagramToast(true);
+    setTimeout(() => setInstagramToast(false), 9000);
+
+    // 3. Instagram'ı aç (mobilde uygulama, bilgisayarda web sitesi)
+    setTimeout(() => {
+      const isMobile = typeof navigator !== 'undefined' && /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+      if (isMobile) {
+        window.location.href = 'instagram://camera';
+        setTimeout(() => {
+          window.open('https://www.instagram.com', '_blank');
+        }, 1500);
+      } else {
+        window.open('https://www.instagram.com', '_blank');
+      }
+    }, 500);
   };
 
   const handleNativeShare = async () => {
@@ -467,7 +562,7 @@ export default function DruidTreePage() {
                     <img 
                       src={
                         activeShareFormat === 'card'
-                          ? `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`
+                          ? (personalizedCardUrl || `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`)
                           : `/druid-trees/${currentTree.id}.jpg?t=${cacheBuster}`
                       } 
                       alt={`${analyzedName ? `${analyzedName}'in ` : ''}${currentTree.name} - Kelt Druid Ağacı`} 
@@ -477,6 +572,7 @@ export default function DruidTreePage() {
 
                   {/* Aksiyon Butonları */}
                   <div className="flex flex-wrap items-center justify-center gap-3 max-w-xl mx-auto">
+                    {/* 1. Doğrudan İndirme */}
                     <button
                       type="button"
                       onClick={() => handleDownloadImage(currentTree.id, currentTree.name, activeShareFormat === 'card')}
@@ -488,29 +584,22 @@ export default function DruidTreePage() {
                         {downloadingImage 
                           ? 'Görsel İndiriliyor...' 
                           : activeShareFormat === 'card' 
-                            ? '🌟 Hikaye Kartını İndir (Story / Durum)' 
+                            ? '🌟 Hikaye Kartını İndir' 
                             : '🖼️ Sanat Görselini İndir'}
                       </span>
                     </button>
 
+                    {/* 2. Doğrudan Instagram'da Paylaş */}
                     <button
                       type="button"
-                      onClick={handleNativeShare}
-                      className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-gradient-to-r from-purple-600/30 via-pink-600/30 to-amber-600/30 hover:from-purple-600/40 hover:to-pink-600/40 border border-pink-500/40 text-white text-xs sm:text-sm font-semibold transition-all cursor-pointer hover:border-pink-400/60 shadow-lg"
+                      onClick={handleInstagramShare}
+                      className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-95 text-white text-xs sm:text-sm font-bold shadow-lg shadow-pink-900/40 hover:shadow-pink-700/50 transition-all cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
                     >
-                      {copied ? (
-                        <>
-                          <Check size={16} className="text-emerald-400" />
-                          <span className="text-emerald-300 font-bold">Özet Kopyalandı!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Share2 size={16} className="text-pink-300" />
-                          <span>Instagram / Sosyal Medyada Paylaş</span>
-                        </>
-                      )}
+                      <Sparkles size={16} className="text-yellow-200" />
+                      <span>📸 Instagram'da Paylaş</span>
                     </button>
 
+                    {/* 3. WhatsApp Butonu */}
                     <a
                       href={`https://wa.me/?text=${encodeURIComponent(
                         `🌲 ${analyzedName ? `${analyzedName}'in ` : ''}Kelt Druid Ağacı: ${currentTree.name} (Ogham: ${currentTree.oghamName}) - ${currentTree.archetype}!\n` +
@@ -524,7 +613,43 @@ export default function DruidTreePage() {
                       <MessageCircle size={16} />
                       <span>WhatsApp'ta Gönder</span>
                     </a>
+
+                    {/* 4. Diğer Uygulamalarda Paylaş */}
+                    <button
+                      type="button"
+                      onClick={handleNativeShare}
+                      className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/20 text-white text-xs sm:text-sm font-semibold transition-all cursor-pointer hover:border-emerald-400/50"
+                    >
+                      {copied ? (
+                        <>
+                          <Check size={16} className="text-emerald-400" />
+                          <span className="text-emerald-300 font-bold">Özet Kopyalandı!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Share2 size={16} className="text-gray-300" />
+                          <span>Diğer Uygulamalar</span>
+                        </>
+                      )}
+                    </button>
                   </div>
+
+                  {/* Instagram Bildirim & Rehber Kutusu */}
+                  {instagramToast && (
+                    <div className="bg-gradient-to-r from-purple-900/60 via-pink-900/60 to-amber-900/60 border border-pink-400/50 rounded-2xl p-4 max-w-lg mx-auto text-left flex items-start gap-3 shadow-xl">
+                      <div className="p-2 rounded-xl bg-pink-500/20 text-pink-300 shrink-0">
+                        <Sparkles size={18} />
+                      </div>
+                      <div className="space-y-1">
+                        <p className="text-xs sm:text-sm font-bold text-white">
+                          📸 Kartınız İndirildi &amp; Instagram Açılıyor!
+                        </p>
+                        <p className="text-[11px] sm:text-xs text-pink-200/90 leading-relaxed">
+                          Açılan Instagram ekranında hikaye kameranızdan indirilen kartı seçip hemen takipçilerinizle paylaşabilirsiniz.
+                        </p>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="bg-black/30 border border-white/10 rounded-2xl p-4 max-w-lg mx-auto text-left flex items-start gap-3">
                     <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 shrink-0">
