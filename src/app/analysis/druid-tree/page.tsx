@@ -121,31 +121,17 @@ export default function DruidTreePage() {
 
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
-        const imgUrl = `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`;
-        const response = await fetch(imgUrl);
-        const blob = await response.blob();
-        const file = new File([blob], `${currentTree.id}-card.jpg`, { type: 'image/jpeg' });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({
-            files: [file],
-            title: `${cleanPrefix}${currentTree.name} - Kelt Druid Ağacı`,
-            text: shareText
-          });
-          return;
-        }
-      } catch {
-        // Dosya paylaşımı desteklenmiyorsa URL paylaşımına geç
-      }
-
-      try {
         await navigator.share({
           title: `${cleanPrefix}${currentTree.name} - Kelt Druid Ağacı`,
           text: shareText,
           url: 'https://7layers.tr/analysis/druid-tree'
         });
         return;
-      } catch {
-        // İptal edildi
+      } catch (err: unknown) {
+        // Kullanıcı paylaşım menüsünü açtıktan sonra vazgeçtiyse (AbortError) işlem yapma
+        if (err instanceof Error && err.name === 'AbortError') {
+          return;
+        }
       }
     }
 
@@ -571,8 +557,17 @@ export default function DruidTreePage() {
                       onClick={handleNativeShare}
                       className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/20 text-white text-xs sm:text-sm font-semibold transition-all cursor-pointer hover:border-emerald-400/50"
                     >
-                      <Share2 size={16} className="text-emerald-400" />
-                      <span>Sosyal Medyada Paylaş</span>
+                      {copied ? (
+                        <>
+                          <Check size={16} className="text-emerald-400" />
+                          <span className="text-emerald-300 font-bold">Özet Kopyalandı!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Share2 size={16} className="text-emerald-400" />
+                          <span>Sosyal Medyada Paylaş</span>
+                        </>
+                      )}
                     </button>
 
                     <a
