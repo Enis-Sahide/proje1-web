@@ -12,13 +12,30 @@ function escapeXml(unsafe: string): string {
     .replace(/'/g, '&apos;');
 }
 
+function wrapText(text: string, maxCharsPerLine: number = 42): string[] {
+  const words = text.split(' ');
+  const lines: string[] = [];
+  let currentLine = '';
+
+  for (const word of words) {
+    if ((currentLine + ' ' + word).trim().length <= maxCharsPerLine) {
+      currentLine = (currentLine + ' ' + word).trim();
+    } else {
+      if (currentLine) lines.push(currentLine);
+      currentLine = word;
+    }
+  }
+  if (currentLine) lines.push(currentLine);
+  return lines;
+}
+
 const CARD_WIDTH = 1080;
 const CARD_HEIGHT = 1440;
 const INNER_IMG_WIDTH = 920;
-const INNER_IMG_HEIGHT = 920;
+const INNER_IMG_HEIGHT = 760;
 
 async function buildTreeCard(tree: any, rawImgPath: string, outputPath: string) {
-  // Resize raw image to square or rounded rectangle for inner card
+  // Resize raw image to rectangle for inner card
   const resizedInnerImg = await sharp(rawImgPath)
     .resize(INNER_IMG_WIDTH, INNER_IMG_HEIGHT, { fit: 'cover', position: 'top' })
     .toBuffer();
@@ -35,7 +52,7 @@ async function buildTreeCard(tree: any, rawImgPath: string, outputPath: string) 
     .toBuffer();
 
   const oghamTitle = `OGHAM: ${tree.oghamName.toUpperCase()} (${tree.oghamSymbol})`;
-  const proverb = `"${tree.druidicProverb}"`;
+  const proverbLines = wrapText(`"${tree.druidicProverb}"`, 44);
 
   // Overlay SVG with top header, inner image frame, and bottom card details
   const overlaySvg = `
@@ -43,8 +60,8 @@ async function buildTreeCard(tree: any, rawImgPath: string, outputPath: string) 
       <defs>
         <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
           <stop offset="0%" stop-color="#060C12"/>
-          <stop offset="50%" stop-color="#09141B"/>
-          <stop offset="100%" stop-color="#04080D"/>
+          <stop offset="45%" stop-color="#09141B"/>
+          <stop offset="100%" stop-color="#03080C"/>
         </linearGradient>
 
         <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -54,9 +71,9 @@ async function buildTreeCard(tree: any, rawImgPath: string, outputPath: string) 
         </linearGradient>
 
         <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#34D399" stop-opacity="0.6"/>
-          <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.15"/>
-          <stop offset="100%" stop-color="#F59E0B" stop-opacity="0.6"/>
+          <stop offset="0%" stop-color="#34D399" stop-opacity="0.7"/>
+          <stop offset="50%" stop-color="#FFFFFF" stop-opacity="0.2"/>
+          <stop offset="100%" stop-color="#F59E0B" stop-opacity="0.7"/>
         </linearGradient>
 
         <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
@@ -77,45 +94,56 @@ async function buildTreeCard(tree: any, rawImgPath: string, outputPath: string) 
 
       <!-- Header Section -->
       <g transform="translate(0, 0)">
-        <rect x="360" y="52" width="360" height="42" rx="21" fill="#FFFFFF" fill-opacity="0.06" stroke="#34D399" stroke-opacity="0.4" stroke-width="1.5"/>
-        <text x="540" y="78" font-family="'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700" fill="#34D399" text-anchor="middle" letter-spacing="3">
+        <rect x="360" y="44" width="360" height="38" rx="19" fill="#FFFFFF" fill-opacity="0.06" stroke="#34D399" stroke-opacity="0.4" stroke-width="1.5"/>
+        <text x="540" y="69" font-family="'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="700" fill="#34D399" text-anchor="middle" letter-spacing="3">
           🌲 7LAYERS KELT DRUİD AĞACI 🌲
         </text>
 
         <!-- Tree Name and Ogham -->
-        <text x="540" y="142" font-family="'Georgia', serif" font-size="44" font-weight="bold" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">
+        <text x="540" y="126" font-family="'Georgia', serif" font-size="52" font-weight="bold" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">
           ${escapeXml(tree.name)}
         </text>
-        <text x="540" y="178" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="600" fill="#FCD34D" text-anchor="middle" letter-spacing="2">
+        <text x="540" y="164" font-family="'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="700" fill="#FCD34D" text-anchor="middle" letter-spacing="2">
           ${escapeXml(oghamTitle)}
         </text>
       </g>
 
       <!-- Inner Image Border Glow -->
-      <rect x="76" y="206" width="${INNER_IMG_WIDTH + 8}" height="${INNER_IMG_HEIGHT + 8}" rx="36" fill="none" stroke="url(#goldGrad)" stroke-width="3" opacity="0.75" filter="url(#glow)"/>
+      <rect x="76" y="181" width="${INNER_IMG_WIDTH + 8}" height="${INNER_IMG_HEIGHT + 8}" rx="36" fill="none" stroke="url(#goldGrad)" stroke-width="3" opacity="0.8" filter="url(#glow)"/>
 
       <!-- Bottom Card Details -->
-      <g transform="translate(0, 1160)">
-        <!-- Archetype & Power Badge -->
-        <rect x="80" y="0" width="${CARD_WIDTH - 160}" height="76" rx="20" fill="#000000" fill-opacity="0.45" stroke="#FFFFFF" stroke-opacity="0.1" stroke-width="1"/>
+      <g transform="translate(0, 965)">
+        <!-- Archetype Box -->
+        <rect x="80" y="0" width="${CARD_WIDTH - 160}" height="96" rx="20" fill="#040A10" fill-opacity="0.75" stroke="#34D399" stroke-opacity="0.35" stroke-width="1.5"/>
         
-        <text x="110" y="32" font-family="'Segoe UI', Roboto, sans-serif" font-size="15" font-weight="bold" fill="#34D399" letter-spacing="1.5">
-          RUHSAL ARKETİP:
+        <text x="110" y="34" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="bold" fill="#34D399" letter-spacing="1.5">
+          ✨ RUHSAL ARKETİP &amp; MİZAÇ:
         </text>
-        <text x="110" y="58" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="bold" fill="#FFFFFF">
+        <text x="110" y="74" font-family="'Segoe UI', Roboto, sans-serif" font-size="29" font-weight="bold" fill="#FFFFFF">
           ${escapeXml(tree.archetype)}
         </text>
 
-        <!-- Proverb Quote -->
-        <g transform="translate(80, 95)">
-          <text x="${(CARD_WIDTH - 160) / 2}" y="32" font-family="'Georgia', serif" font-size="20" font-style="italic" fill="#E2E8F0" text-anchor="middle" opacity="0.95">
-            ${escapeXml(proverb)}
+        <!-- Proverb Box (Large, High-Contrast & Wrapped) -->
+        <g transform="translate(80, 114)">
+          <rect x="0" y="0" width="${CARD_WIDTH - 160}" height="195" rx="20" fill="#000000" fill-opacity="0.65" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="1.5"/>
+          <line x1="2" y1="18" x2="2" y2="177" stroke="#F59E0B" stroke-width="5" stroke-linecap="round"/>
+
+          <text x="35" y="38" font-family="'Segoe UI', Roboto, sans-serif" font-size="18" font-weight="700" fill="#FCD34D" letter-spacing="2">
+            📜 KADİM KELT BİLGELİĞİ:
           </text>
+
+          <g transform="translate(35, 78)">
+            ${proverbLines.map((line, idx) => `
+              <text x="0" y="${idx * 42}" font-family="'Georgia', serif" font-size="27" font-style="italic" fill="#F8FAFC" font-weight="500">
+                ${escapeXml(line)}
+              </text>
+            `).join('')}
+          </g>
         </g>
 
-        <!-- Footer Brand -->
-        <line x1="120" y1="180" x2="${CARD_WIDTH - 120}" y2="180" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="1"/>
-        <text x="540" y="215" font-family="'Segoe UI', Roboto, sans-serif" font-size="17" font-weight="700" fill="#34D399" text-anchor="middle" letter-spacing="2">
+        <!-- Footer Brand Line -->
+        <line x1="120" y1="335" x2="${CARD_WIDTH - 120}" y2="335" stroke="#FFFFFF" stroke-opacity="0.12" stroke-width="1"/>
+        <text x="540" y="375" font-family="'Segoe UI', Roboto, sans-serif" font-size="21" font-weight="700" fill="#34D399" text-anchor="middle" letter-spacing="2">
           ✨ Kendi Ruh Ağacını Keşfet: 7layers.tr/analysis/druid-tree ✨
         </text>
       </g>
@@ -126,14 +154,14 @@ async function buildTreeCard(tree: any, rawImgPath: string, outputPath: string) 
     .composite([
       {
         input: roundedInnerImg,
-        top: 210,
+        top: 185,
         left: 80
       }
     ])
     .jpeg({ quality: 94 })
     .toFile(outputPath);
 
-  console.log(`Card created: ${outputPath}`);
+  console.log(`Card created with large legible typography: ${outputPath}`);
 }
 
 async function main() {
@@ -155,7 +183,7 @@ async function main() {
     fs.copyFileSync(cardOutput, mobCardOutput);
   }
 
-  console.log('All 13 Druid Tree Social Media Cards successfully built!');
+  console.log('All 13 Druid Tree Social Media Cards successfully built with high-legibility typography!');
 }
 
 main().catch(console.error);
