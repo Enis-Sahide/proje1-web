@@ -5,7 +5,8 @@ import { DruidTree } from '../engine/DruidTreeEngine';
 const CARD_WIDTH = 1080;
 const CARD_HEIGHT = 1440;
 const INNER_IMG_WIDTH = 920;
-const INNER_IMG_HEIGHT = 760;
+const INNER_IMG_HEIGHT = 780;
+const INNER_IMG_TOP = 135;
 
 function escapeXml(unsafe: string): string {
   return unsafe.replace(/[<>&'"]/g, (c) => {
@@ -20,7 +21,7 @@ function escapeXml(unsafe: string): string {
   });
 }
 
-function wrapText(text: string, maxCharsPerLine: number = 42): string[] {
+function wrapText(text: string, maxCharsPerLine: number = 44): string[] {
   const words = text.split(' ');
   const lines: string[] = [];
   let currentLine = '';
@@ -40,11 +41,6 @@ function wrapText(text: string, maxCharsPerLine: number = 42): string[] {
 /**
  * Türkçe büyük ünlü ve ses uyumuna göre isme tam uygun iyelik eki oluşturur
  * Örnek: Baha -> BAHA'NIN DRUİD AĞACI
- *        Ali -> ALİ'NİN DRUİD AĞACI
- *        Mehmet -> MEHMET'İN DRUİD AĞACI
- *        Can -> CAN'IN DRUİD AĞACI
- *        Onur -> ONUR'UN DRUİD AĞACI
- *        Gül -> GÜL'ÜN DRUİD AĞACI
  */
 export function formatTurkishPossessive(name: string): string {
   const clean = name.trim();
@@ -76,9 +72,9 @@ export function formatTurkishPossessive(name: string): string {
 export async function renderDruidTreeCard(tree: DruidTree, rawImagePath: string, personName?: string): Promise<Buffer> {
   const rawBuffer = await fs.promises.readFile(rawImagePath);
 
-  // Resize inner art to 920x760
+  // Resize inner art to 920x780 with center positioning
   const resizedInnerImg = await sharp(rawBuffer)
-    .resize(INNER_IMG_WIDTH, INNER_IMG_HEIGHT, { fit: 'cover', position: 'top' })
+    .resize(INNER_IMG_WIDTH, INNER_IMG_HEIGHT, { fit: 'cover', position: 'center' })
     .toBuffer();
 
   // Create rounded mask for inner image
@@ -92,8 +88,8 @@ export async function renderDruidTreeCard(tree: DruidTree, rawImagePath: string,
     .png()
     .toBuffer();
 
-  const oghamTitle = `KELTÇE İSMİ (OGHAM): ${tree.oghamName.toUpperCase()} (${tree.oghamSymbol})`;
   const proverbLines = wrapText(`"${tree.druidicProverb}"`, 44);
+  const oghamFull = `KELTÇE İSMİ (OGHAM): ${tree.oghamName.toUpperCase()} (${tree.oghamSymbol})`;
 
   const cleanName = personName ? personName.trim() : '';
   const personalizedTitle = cleanName ? formatTurkishPossessive(cleanName) : 'KUTSAL DRUİD AĞACI';
@@ -138,35 +134,35 @@ export async function renderDruidTreeCard(tree: DruidTree, rawImagePath: string,
       <rect x="24" y="24" width="${CARD_WIDTH - 48}" height="${CARD_HEIGHT - 48}" rx="44" fill="none" stroke="url(#borderGrad)" stroke-width="2.5"/>
       <rect x="34" y="34" width="${CARD_WIDTH - 68}" height="${CARD_HEIGHT - 68}" rx="36" fill="none" stroke="#FFFFFF" stroke-opacity="0.04" stroke-width="1.5"/>
 
-      <!-- Header Section -->
-      <g transform="translate(0, 0)">
-        <!-- Top Pill Badge -->
-        <rect x="360" y="32" width="360" height="32" rx="16" fill="#FFFFFF" fill-opacity="0.06" stroke="#34D399" stroke-opacity="0.4" stroke-width="1.2"/>
-        <text x="540" y="53" font-family="'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#34D399" text-anchor="middle" letter-spacing="3">
-          🌲 7LAYERS KELT DRUİD AĞACI 🌲
+      <!-- Top Pill Badge (7LAYERS) -->
+      <rect x="380" y="30" width="320" height="28" rx="14" fill="#FFFFFF" fill-opacity="0.06" stroke="#34D399" stroke-opacity="0.35" stroke-width="1"/>
+      <text x="540" y="49" font-family="'Segoe UI', Roboto, sans-serif" font-size="12" font-weight="700" fill="#34D399" text-anchor="middle" letter-spacing="3">
+        🌲 7LAYERS KELT DRUİD AĞACI 🌲
+      </text>
+
+      <!-- Üç Başlık Yan Yana (Y: 96) -->
+      <g transform="translate(80, 96)">
+        <!-- Sol: Kutsal Druid Ağacı / Kişiye Özel Başlık -->
+        <text x="0" y="0" font-family="'Segoe UI', Roboto, sans-serif" font-size="19" font-weight="800" fill="#FCD34D" text-anchor="start" letter-spacing="1">
+          ✨ ${escapeXml(personalizedTitle)}
         </text>
 
-        <!-- Kişiye Özel İsim Şeridi -->
-        <text x="540" y="93" font-family="'Segoe UI', Roboto, sans-serif" font-size="23" font-weight="800" fill="#FCD34D" text-anchor="middle" letter-spacing="2">
-          ✨ ${escapeXml(personalizedTitle)} ✨
-        </text>
-
-        <!-- Ağaç Adı -->
-        <text x="540" y="137" font-family="'Georgia', serif" font-size="44" font-weight="bold" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">
+        <!-- Orta: Ağaç Adı -->
+        <text x="460" y="2" font-family="'Georgia', serif" font-size="36" font-weight="bold" fill="#FFFFFF" text-anchor="middle" letter-spacing="1">
           ${escapeXml(tree.name)}
         </text>
 
-        <!-- Keltçe İsmi & Ogham -->
-        <text x="540" y="167" font-family="'Segoe UI', Roboto, sans-serif" font-size="19" font-weight="700" fill="#6EE7B7" text-anchor="middle" letter-spacing="1.5">
-          ${escapeXml(oghamTitle)}
+        <!-- Sağ: Keltçe İsmi ve Ogham Sembolü -->
+        <text x="920" y="0" font-family="'Segoe UI Historic', 'Segoe UI Symbol', 'Noto Sans Ogham', 'Segoe UI', Roboto, sans-serif" font-size="16" font-weight="700" fill="#6EE7B7" text-anchor="end" letter-spacing="1">
+          ${escapeXml(oghamFull)}
         </text>
       </g>
 
       <!-- Inner Image Border Glow -->
-      <rect x="76" y="181" width="${INNER_IMG_WIDTH + 8}" height="${INNER_IMG_HEIGHT + 8}" rx="36" fill="none" stroke="url(#goldGrad)" stroke-width="3" opacity="0.8" filter="url(#glow)"/>
+      <rect x="76" y="${INNER_IMG_TOP - 4}" width="${INNER_IMG_WIDTH + 8}" height="${INNER_IMG_HEIGHT + 8}" rx="36" fill="none" stroke="url(#goldGrad)" stroke-width="3" opacity="0.8" filter="url(#glow)"/>
 
       <!-- Bottom Card Details -->
-      <g transform="translate(0, 965)">
+      <g transform="translate(0, 945)">
         <!-- Archetype Box -->
         <rect x="80" y="0" width="${CARD_WIDTH - 160}" height="96" rx="20" fill="#040A10" fill-opacity="0.75" stroke="#34D399" stroke-opacity="0.35" stroke-width="1.5"/>
         
@@ -208,7 +204,7 @@ export async function renderDruidTreeCard(tree: DruidTree, rawImagePath: string,
     .composite([
       {
         input: roundedInnerImg,
-        top: 185,
+        top: INNER_IMG_TOP,
         left: 80
       }
     ])

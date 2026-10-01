@@ -46,6 +46,7 @@ export default function DruidTreePage() {
 
   const [activeShareFormat, setActiveShareFormat] = useState<'card' | 'portrait'>('card');
   const [downloadingImage, setDownloadingImage] = useState(false);
+  const [cacheBuster] = useState(() => Date.now());
 
   const resultRef = useRef<HTMLDivElement>(null);
 
@@ -73,8 +74,10 @@ export default function DruidTreePage() {
     try {
       setDownloadingImage(true);
       const imgUrl = isCard
-        ? `/api/astrology/druid-tree-card?treeId=${treeId}${analyzedName ? `&name=${encodeURIComponent(analyzedName)}` : ''}`
-        : `/druid-trees/${treeId}.jpg`;
+        ? (analyzedName 
+            ? `/api/astrology/druid-tree-card?treeId=${treeId}&name=${encodeURIComponent(analyzedName)}&t=${cacheBuster}`
+            : `/druid-trees/${treeId}-card.jpg?t=${cacheBuster}`)
+        : `/druid-trees/${treeId}.jpg?t=${cacheBuster}`;
       const response = await fetch(imgUrl);
       const blob = await response.blob();
       const blobUrl = window.URL.createObjectURL(blob);
@@ -120,7 +123,9 @@ export default function DruidTreePage() {
 
     if (typeof navigator !== 'undefined' && navigator.share) {
       try {
-        const imgUrl = `/api/astrology/druid-tree-card?treeId=${currentTree.id}${analyzedName ? `&name=${encodeURIComponent(analyzedName)}` : ''}`;
+        const imgUrl = analyzedName
+          ? `/api/astrology/druid-tree-card?treeId=${currentTree.id}&name=${encodeURIComponent(analyzedName)}&t=${cacheBuster}`
+          : `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`;
         const response = await fetch(imgUrl);
         const blob = await response.blob();
         const file = new File([blob], `${analyzedName ? `${analyzedName}_` : ''}${currentTree.id}-card.jpg`, { type: 'image/jpeg' });
@@ -539,8 +544,10 @@ export default function DruidTreePage() {
                     <img 
                       src={
                         activeShareFormat === 'card'
-                          ? `/api/astrology/druid-tree-card?treeId=${currentTree.id}${analyzedName ? `&name=${encodeURIComponent(analyzedName)}` : ''}`
-                          : `/druid-trees/${currentTree.id}.jpg`
+                          ? (analyzedName
+                              ? `/api/astrology/druid-tree-card?treeId=${currentTree.id}&name=${encodeURIComponent(analyzedName)}&t=${cacheBuster}`
+                              : `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`)
+                          : `/druid-trees/${currentTree.id}.jpg?t=${cacheBuster}`
                       } 
                       alt={`${analyzedName ? `${analyzedName}'in ` : ''}${currentTree.name} - Kelt Druid Ağacı`} 
                       className="relative w-full max-w-[340px] sm:max-w-[380px] mx-auto rounded-3xl shadow-2xl border-2 border-emerald-400/40 transform transition-transform duration-300 hover:scale-[1.01]"
@@ -651,7 +658,7 @@ export default function DruidTreePage() {
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-14 rounded-xl bg-emerald-500/10 border border-emerald-500/30 overflow-hidden relative group-hover:border-emerald-400/60 transition-colors shrink-0 flex items-center justify-center">
                       <img 
-                        src={`/druid-trees/${tree.id}.jpg`} 
+                        src={`/druid-trees/${tree.id}.jpg?v=7layers-art-v2`} 
                         alt={tree.name}
                         className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-300"
                       />
@@ -770,7 +777,7 @@ export default function DruidTreePage() {
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 border-b border-white/10 pb-5 pr-10">
                   <div className="relative group shrink-0">
                     <img 
-                      src={`/druid-trees/${selectedModalTree.id}.jpg`} 
+                      src={`/druid-trees/${selectedModalTree.id}.jpg?v=7layers-art-v2`} 
                       alt={selectedModalTree.name}
                       className="w-24 h-32 sm:w-28 sm:h-36 rounded-2xl border-2 border-emerald-400/40 shadow-xl object-cover"
                     />

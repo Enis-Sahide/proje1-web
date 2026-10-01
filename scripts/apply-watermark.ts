@@ -14,22 +14,22 @@ async function main() {
       continue;
     }
 
-    const inputBuffer = await fs.promises.readFile(imgPath);
+    const inputBuffer = fs.readFileSync(imgPath);
     const meta = await sharp(inputBuffer).metadata();
     const W = meta.width || 896;
     const H = meta.height || 1200;
 
-    // Seçenek 1: Lüks Yarı Saydam Rozet
+    // Seçenek 1: Belirgin, Net ve Şık 7LAYERS Rozeti (Tek Katman)
     const svgBadge = `
       <svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-            <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.8"/>
+          <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+            <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#000000" flood-opacity="0.9"/>
           </filter>
         </defs>
-        <g transform="translate(${W - 215}, ${H - 65})">
-          <rect width="185" height="38" rx="19" fill="#04090E" fill-opacity="0.75" stroke="#34D399" stroke-opacity="0.45" stroke-width="1.5"/>
-          <text x="92" y="24" font-family="'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="bold" fill="#FCD34D" text-anchor="middle" letter-spacing="2.5" filter="url(#shadow)">
+        <g transform="translate(${W - 270}, ${H - 85})">
+          <rect width="240" height="56" rx="28" fill="#04090E" fill-opacity="0.85" stroke="#34D399" stroke-opacity="0.7" stroke-width="2"/>
+          <text x="120" y="36" font-family="'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="800" fill="#FCD34D" text-anchor="middle" letter-spacing="3" filter="url(#glow)">
             ✦ 7LAYERS ✦
           </text>
         </g>
@@ -41,17 +41,17 @@ async function main() {
       .jpeg({ quality: 92 })
       .toBuffer();
 
-    await fs.promises.writeFile(imgPath, watermarkedBuffer);
+    fs.writeFileSync(imgPath, watermarkedBuffer);
     console.log(`Watermarked web: ${tree.id}.jpg`);
 
     if (fs.existsSync(mobPublicDir)) {
       const mobImgPath = path.join(mobPublicDir, `${tree.id}.jpg`);
-      await fs.promises.writeFile(mobImgPath, watermarkedBuffer);
+      fs.writeFileSync(mobImgPath, watermarkedBuffer);
       console.log(`Watermarked mobile: ${tree.id}.jpg`);
     }
   }
 
-  console.log('All 13 Druid Tree images successfully stamped with 7LAYERS badge!');
+  console.log('All 13 Druid Tree images successfully stamped with clean 7LAYERS badge!');
 }
 
 main().catch(console.error);
