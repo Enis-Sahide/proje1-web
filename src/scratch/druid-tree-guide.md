@@ -25,7 +25,7 @@ Druidler yazılı yasalar bırakmadılar; bilgiyi ezber yoluyla ve doğayı doğ
 Modern Gregoryen takvimi Güneş'in hareketlerine göre yılı 12 aya bölerken; Keltler doğanın nabzını **Ay’ın ritmiyle** tuttular.
 
 * Ay, Dünya etrafındaki döngüsünü yaklaşık **28 günde** tamamlar.
-* $13 \times 28 = 364$ gün eder.
+* **13 × 28 = 364 gün** eder.
 * Geriye kalan 1 gün (Kış Gündönümü - 23 Aralık civarı), döngünün sıfırlandığı, "Zamanın Olmadığı Gün" kabul edilir.
 
 Bu 13 aylık döngünün her bir evresi, o dönemde doğanın sunduğu ruhsal enerjiye en uygun olan bir **Kutsal Ağaç** ile eşleştirildi. Kelt mitolojisinde bu takvime ilk üç ağacın Ogham adları olan **Beth (Huş) - Luis (Üvez) - Nion (Dişbudak)** kelimelerinden hareketle *"Beth-Luis-Nion"* takvimi adı verildi.
