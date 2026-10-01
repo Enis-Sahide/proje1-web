@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { 
   TreePine, 
@@ -47,6 +47,7 @@ export default function DruidTreePage() {
   const [activeShareFormat, setActiveShareFormat] = useState<'card' | 'portrait'>('card');
   const [downloadingImage, setDownloadingImage] = useState(false);
   const [cacheBuster] = useState(() => Date.now());
+  const [sharedFile, setSharedFile] = useState<File | null>(null);
 
   const resultRef = useRef<HTMLDivElement>(null);
 
@@ -69,6 +70,35 @@ export default function DruidTreePage() {
   };
 
   const currentTree: DruidTree | null = analyzedData ? analyzedData.tree : null;
+
+  // Paylaşım görselini arka planda önceden File nesnesine dönüştür (Instagram/WhatsApp Story için 0 gecikme)
+  useEffect(() => {
+    if (!currentTree) return;
+    let isCancelled = false;
+    const preloadShareFile = async () => {
+      try {
+        const imgUrl = activeShareFormat === 'card'
+          ? `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`
+          : `/druid-trees/${currentTree.id}.jpg?t=${cacheBuster}`;
+        const response = await fetch(imgUrl);
+        const blob = await response.blob();
+        if (!isCancelled) {
+          const file = new File(
+            [blob], 
+            `${currentTree.id}-${activeShareFormat === 'card' ? 'hikaye-karti' : 'sanat'}.jpg`, 
+            { type: 'image/jpeg' }
+          );
+          setSharedFile(file);
+        }
+      } catch (err) {
+        console.warn('Share file preload failed:', err);
+      }
+    };
+    preloadShareFile();
+    return () => {
+      isCancelled = true;
+    };
+  }, [currentTree, activeShareFormat, cacheBuster]);
 
   const handleDownloadImage = async (treeId: string, treeName: string, isCard: boolean = true) => {
     try {
@@ -120,6 +150,37 @@ export default function DruidTreePage() {
       `Sen de kendi kutsal Kelt ağacını keşfet: https://7layers.tr/analysis/druid-tree`;
 
     if (typeof navigator !== 'undefined' && navigator.share) {
+      // 1. Görsel dosyası ile paylaşım (Instagram Hikayeleri, WhatsApp Durum vb.)
+      let fileToShare = sharedFile;
+      if (!fileToShare) {
+        try {
+          const imgUrl = activeShareFormat === 'card'
+            ? `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`
+            : `/druid-trees/${currentTree.id}.jpg?t=${cacheBuster}`;
+          const res = await fetch(imgUrl);
+          const blob = await res.blob();
+          fileToShare = new File([blob], `${currentTree.id}-card.jpg`, { type: 'image/jpeg' });
+        } catch {
+          // fallback
+        }
+      }
+
+      if (fileToShare && navigator.canShare && navigator.canShare({ files: [fileToShare] })) {
+        try {
+          await navigator.share({
+            files: [fileToShare],
+            title: `${cleanPrefix}${currentTree.name} - Kelt Druid Ağacı`,
+            text: shareText
+          });
+          return;
+        } catch (err: unknown) {
+          if (err instanceof Error && err.name === 'AbortError') {
+            return;
+          }
+        }
+      }
+
+      // 2. Dosya desteklenmiyorsa metin ve URL ile paylaş
       try {
         await navigator.share({
           title: `${cleanPrefix}${currentTree.name} - Kelt Druid Ağacı`,
@@ -128,7 +189,6 @@ export default function DruidTreePage() {
         });
         return;
       } catch (err: unknown) {
-        // Kullanıcı paylaşım menüsünü açtıktan sonra vazgeçtiyse (AbortError) işlem yapma
         if (err instanceof Error && err.name === 'AbortError') {
           return;
         }
@@ -352,6 +412,131 @@ export default function DruidTreePage() {
                 </div>
               </div>
 
+              {/* Sosyal Medya & Canlı Kelt Ağacı Sanat Kartı Merkezi */}
+              <div className="bg-gradient-to-br from-emerald-950/70 via-[#0A1218] to-teal-950/50 border border-emerald-400/40 rounded-3xl p-6 sm:p-8 text-center space-y-6 shadow-2xl relative overflow-hidden">
+                {/* Parıltı arka plan halkası */}
+                <div className="absolute -top-24 -left-24 w-60 h-60 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+                <div className="absolute -bottom-24 -right-24 w-60 h-60 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+
+                {/* Başlık ve Format Seçici Butonlar */}
+                <div className="space-y-3 relative z-10">
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-xs font-semibold text-emerald-300">
+                    <Sparkles size={14} className="text-amber-300 animate-pulse" />
+                    <span>Sosyal Medya Paylaşım ve Hikaye Kartı</span>
+                  </div>
+                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-white">
+                    {analyzedName ? `${analyzedName}'in ` : ''}Druid Ağacı Hikaye Kartı & Sanatı
+                  </h3>
+                  <p className="text-xs sm:text-sm text-gray-300 max-w-lg mx-auto">
+                    Kadim Kelt bilgeliğini ve ağacınızın ruhunu yansıtan yüksek kaliteli sanat kartını indirin; Instagram Story veya WhatsApp durumunuzda paylaşın!
+                  </p>
+
+                  {/* Format Değiştirme Butonları */}
+                  <div className="inline-flex p-1 rounded-2xl bg-black/50 border border-white/10 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => setActiveShareFormat('card')}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                        activeShareFormat === 'card'
+                          ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      <Share2 size={14} className="text-amber-200" />
+                      <span>📜 Hazır Hikaye Kartı (Story)</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveShareFormat('portrait')}
+                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                        activeShareFormat === 'portrait'
+                          ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
+                          : 'text-gray-400 hover:text-white'
+                      }`}
+                    >
+                      <Sparkles size={14} />
+                      <span>🎨 Saf Karakter Sanatı</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Aktif Format Görseli */}
+                <div className="space-y-6 relative z-10">
+                  <div className="relative inline-block mx-auto group">
+                    <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 via-amber-400 to-teal-400 rounded-3xl blur-md opacity-40 group-hover:opacity-75 transition duration-500" />
+                    <img 
+                      src={
+                        activeShareFormat === 'card'
+                          ? `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`
+                          : `/druid-trees/${currentTree.id}.jpg?t=${cacheBuster}`
+                      } 
+                      alt={`${analyzedName ? `${analyzedName}'in ` : ''}${currentTree.name} - Kelt Druid Ağacı`} 
+                      className="relative w-full max-w-[340px] sm:max-w-[380px] mx-auto rounded-3xl shadow-2xl border-2 border-emerald-400/40 transform transition-transform duration-300 hover:scale-[1.01]"
+                    />
+                  </div>
+
+                  {/* Aksiyon Butonları */}
+                  <div className="flex flex-wrap items-center justify-center gap-3 max-w-xl mx-auto">
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadImage(currentTree.id, currentTree.name, activeShareFormat === 'card')}
+                      disabled={downloadingImage}
+                      className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-white text-xs sm:text-sm font-bold shadow-lg shadow-emerald-900/40 hover:shadow-emerald-700/50 transition-all cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
+                    >
+                      <Download size={17} className={downloadingImage ? 'animate-bounce' : ''} />
+                      <span>
+                        {downloadingImage 
+                          ? 'Görsel İndiriliyor...' 
+                          : activeShareFormat === 'card' 
+                            ? '🌟 Hikaye Kartını İndir (Story / Durum)' 
+                            : '🖼️ Sanat Görselini İndir'}
+                      </span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleNativeShare}
+                      className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-gradient-to-r from-purple-600/30 via-pink-600/30 to-amber-600/30 hover:from-purple-600/40 hover:to-pink-600/40 border border-pink-500/40 text-white text-xs sm:text-sm font-semibold transition-all cursor-pointer hover:border-pink-400/60 shadow-lg"
+                    >
+                      {copied ? (
+                        <>
+                          <Check size={16} className="text-emerald-400" />
+                          <span className="text-emerald-300 font-bold">Özet Kopyalandı!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Share2 size={16} className="text-pink-300" />
+                          <span>Instagram / Sosyal Medyada Paylaş</span>
+                        </>
+                      )}
+                    </button>
+
+                    <a
+                      href={`https://wa.me/?text=${encodeURIComponent(
+                        `🌲 ${analyzedName ? `${analyzedName}'in ` : ''}Kelt Druid Ağacı: ${currentTree.name} (Ogham: ${currentTree.oghamName}) - ${currentTree.archetype}!\n` +
+                        `📜 "${currentTree.druidicProverb}"\n\n` +
+                        `Sen de kendi kutsal Kelt Druid ağacını keşfet: https://7layers.tr/analysis/druid-tree`
+                      )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-[#25D366]/20 hover:bg-[#25D366]/30 border border-[#25D366]/40 text-[#25D366] hover:text-white text-xs sm:text-sm font-semibold transition-all cursor-pointer"
+                    >
+                      <MessageCircle size={16} />
+                      <span>WhatsApp'ta Gönder</span>
+                    </a>
+                  </div>
+
+                  <div className="bg-black/30 border border-white/10 rounded-2xl p-4 max-w-lg mx-auto text-left flex items-start gap-3">
+                    <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 shrink-0">
+                      <Sparkles size={16} />
+                    </div>
+                    <p className="text-[11px] sm:text-xs text-gray-300 leading-relaxed">
+                      <strong className="text-emerald-300">İpucu:</strong> İndirdiğiniz yüksek çözünürlüklü kartı <strong>Instagram Hikayenizde (Story)</strong> veya <strong>WhatsApp Durumunuzda</strong> doğrudan tam ekran paylaşabilir, sevdiklerinizin de kendi Kelt ağacını analiz etmesini sağlayabilirsiniz.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               {/* Ruhsal Öz & Kelt Hikayesi */}
               <div className="bg-white/[0.03] border border-white/10 rounded-3xl p-6 sm:p-8 space-y-4">
                 <div className="flex items-center gap-2 text-emerald-400 font-bold text-sm tracking-wider uppercase">
@@ -467,131 +652,6 @@ export default function DruidTreePage() {
                         </span>
                       ))}
                     </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Sosyal Medya & Canlı Kelt Ağacı Sanat Kartı Merkezi */}
-              <div className="bg-gradient-to-br from-emerald-950/70 via-[#0A1218] to-teal-950/50 border border-emerald-400/40 rounded-3xl p-6 sm:p-8 text-center space-y-6 shadow-2xl relative overflow-hidden">
-                {/* Parıltı arka plan halkası */}
-                <div className="absolute -top-24 -left-24 w-60 h-60 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
-                <div className="absolute -bottom-24 -right-24 w-60 h-60 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
-
-                {/* Başlık ve Format Seçici Butonlar */}
-                <div className="space-y-3 relative z-10">
-                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/30 text-xs font-semibold text-emerald-300">
-                    <Sparkles size={14} className="text-amber-300 animate-pulse" />
-                    <span>Sosyal Medya Paylaşım ve Hikaye Kartı</span>
-                  </div>
-                  <h3 className="text-xl sm:text-2xl font-serif font-bold text-white">
-                    {analyzedName ? `${analyzedName}'in ` : ''}Druid Ağacı Hikaye Kartı & Sanatı
-                  </h3>
-                  <p className="text-xs sm:text-sm text-gray-300 max-w-lg mx-auto">
-                    Kadim Kelt bilgeliğini ve ağacınızın ruhunu yansıtan yüksek kaliteli sanat kartını indirin; Instagram Story veya WhatsApp durumunuzda paylaşın!
-                  </p>
-
-                  {/* Format Değiştirme Butonları */}
-                  <div className="inline-flex p-1 rounded-2xl bg-black/50 border border-white/10 mt-2">
-                    <button
-                      type="button"
-                      onClick={() => setActiveShareFormat('card')}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                        activeShareFormat === 'card'
-                          ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
-                          : 'text-gray-400 hover:text-white'
-                      }`}
-                    >
-                      <Share2 size={14} className="text-amber-200" />
-                      <span>📜 Hazır Hikaye Kartı (Story)</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setActiveShareFormat('portrait')}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                        activeShareFormat === 'portrait'
-                          ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
-                          : 'text-gray-400 hover:text-white'
-                      }`}
-                    >
-                      <Sparkles size={14} />
-                      <span>🎨 Saf Karakter Sanatı</span>
-                    </button>
-                  </div>
-                </div>
-
-                {/* Aktif Format Görseli */}
-                <div className="space-y-6 relative z-10">
-                  <div className="relative inline-block mx-auto group">
-                    <div className="absolute -inset-1 bg-gradient-to-r from-emerald-500 via-amber-400 to-teal-400 rounded-3xl blur-md opacity-40 group-hover:opacity-75 transition duration-500" />
-                    <img 
-                      src={
-                        activeShareFormat === 'card'
-                          ? `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`
-                          : `/druid-trees/${currentTree.id}.jpg?t=${cacheBuster}`
-                      } 
-                      alt={`${analyzedName ? `${analyzedName}'in ` : ''}${currentTree.name} - Kelt Druid Ağacı`} 
-                      className="relative w-full max-w-[340px] sm:max-w-[380px] mx-auto rounded-3xl shadow-2xl border-2 border-emerald-400/40 transform transition-transform duration-300 hover:scale-[1.01]"
-                    />
-                  </div>
-
-                  {/* Aksiyon Butonları */}
-                  <div className="flex flex-wrap items-center justify-center gap-3 max-w-xl mx-auto">
-                    <button
-                      type="button"
-                      onClick={() => handleDownloadImage(currentTree.id, currentTree.name, activeShareFormat === 'card')}
-                      disabled={downloadingImage}
-                      className="inline-flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-white text-xs sm:text-sm font-bold shadow-lg shadow-emerald-900/40 hover:shadow-emerald-700/50 transition-all cursor-pointer transform hover:-translate-y-0.5 active:translate-y-0"
-                    >
-                      <Download size={17} className={downloadingImage ? 'animate-bounce' : ''} />
-                      <span>
-                        {downloadingImage 
-                          ? 'Görsel İndiriliyor...' 
-                          : activeShareFormat === 'card' 
-                            ? '🌟 Hikaye Kartını İndir (Story / Durum)' 
-                            : '🖼️ Sanat Görselini İndir'}
-                      </span>
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleNativeShare}
-                      className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/20 text-white text-xs sm:text-sm font-semibold transition-all cursor-pointer hover:border-emerald-400/50"
-                    >
-                      {copied ? (
-                        <>
-                          <Check size={16} className="text-emerald-400" />
-                          <span className="text-emerald-300 font-bold">Özet Kopyalandı!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Share2 size={16} className="text-emerald-400" />
-                          <span>Sosyal Medyada Paylaş</span>
-                        </>
-                      )}
-                    </button>
-
-                    <a
-                      href={`https://wa.me/?text=${encodeURIComponent(
-                        `🌲 ${analyzedName ? `${analyzedName}'in ` : ''}Kelt Druid Ağacı: ${currentTree.name} (Ogham: ${currentTree.oghamName}) - ${currentTree.archetype}!\n` +
-                        `📜 "${currentTree.druidicProverb}"\n\n` +
-                        `Sen de kendi kutsal Kelt Druid ağacını keşfet: https://7layers.tr/analysis/druid-tree`
-                      )}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-[#25D366]/20 hover:bg-[#25D366]/30 border border-[#25D366]/40 text-[#25D366] hover:text-white text-xs sm:text-sm font-semibold transition-all cursor-pointer"
-                    >
-                      <MessageCircle size={16} />
-                      <span>WhatsApp'ta Gönder</span>
-                    </a>
-                  </div>
-
-                  <div className="bg-black/30 border border-white/10 rounded-2xl p-4 max-w-lg mx-auto text-left flex items-start gap-3">
-                    <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 shrink-0">
-                      <Sparkles size={16} />
-                    </div>
-                    <p className="text-[11px] sm:text-xs text-gray-300 leading-relaxed">
-                      <strong className="text-emerald-300">İpucu:</strong> İndirdiğiniz yüksek çözünürlüklü kartı <strong>Instagram Hikayenizde (Story)</strong> veya <strong>WhatsApp Durumunuzda</strong> doğrudan tam ekran paylaşabilir, sevdiklerinizin de kendi Kelt ağacını analiz etmesini sağlayabilirsiniz.
-                    </p>
                   </div>
                 </div>
               </div>
