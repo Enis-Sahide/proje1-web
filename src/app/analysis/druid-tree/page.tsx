@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Link from 'next/link';
 import { 
   TreePine, 
@@ -47,6 +47,7 @@ export default function DruidTreePage() {
   const [activeShareFormat, setActiveShareFormat] = useState<'card' | 'portrait'>('card');
   const [downloadingImage, setDownloadingImage] = useState(false);
   const [cacheBuster] = useState(() => Date.now());
+  const [sharedFile, setSharedFile] = useState<File | null>(null);
 
   const resultRef = useRef<HTMLDivElement>(null);
 
@@ -69,6 +70,35 @@ export default function DruidTreePage() {
   };
 
   const currentTree: DruidTree | null = analyzedData ? analyzedData.tree : null;
+
+  // Paylaşım görselini arka planda önceden File nesnesine dönüştür (Instagram/WhatsApp Story için 0 gecikme)
+  useEffect(() => {
+    if (!currentTree) return;
+    let isCancelled = false;
+    const preloadShareFile = async () => {
+      try {
+        const imgUrl = activeShareFormat === 'card'
+          ? `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`
+          : `/druid-trees/${currentTree.id}.jpg?t=${cacheBuster}`;
+        const response = await fetch(imgUrl);
+        const blob = await response.blob();
+        if (!isCancelled) {
+          const file = new File(
+            [blob], 
+            `${currentTree.id}-${activeShareFormat === 'card' ? 'hikaye-karti' : 'sanat'}.jpg`, 
+            { type: 'image/jpeg' }
+          );
+          setSharedFile(file);
+        }
+      } catch (err) {
+        console.warn('Share file preload failed:', err);
+      }
+    };
+    preloadShareFile();
+    return () => {
+      isCancelled = true;
+    };
+  }, [currentTree, activeShareFormat, cacheBuster]);
 
   const handleDownloadImage = async (treeId: string, treeName: string, isCard: boolean = true) => {
     try {
@@ -120,6 +150,37 @@ export default function DruidTreePage() {
       `Sen de kendi kutsal Kelt ağacını keşfet: https://7layers.tr/analysis/druid-tree`;
 
     if (typeof navigator !== 'undefined' && navigator.share) {
+      // 1. Görsel dosyası ile paylaşım (Instagram Hikayeleri, WhatsApp Durum vb.)
+      let fileToShare = sharedFile;
+      if (!fileToShare) {
+        try {
+          const imgUrl = activeShareFormat === 'card'
+            ? `/druid-trees/${currentTree.id}-card.jpg?t=${cacheBuster}`
+            : `/druid-trees/${currentTree.id}.jpg?t=${cacheBuster}`;
+          const res = await fetch(imgUrl);
+          const blob = await res.blob();
+          fileToShare = new File([blob], `${currentTree.id}-card.jpg`, { type: 'image/jpeg' });
+        } catch {
+          // fallback
+        }
+      }
+
+      if (fileToShare && navigator.canShare && navigator.canShare({ files: [fileToShare] })) {
+        try {
+          await navigator.share({
+            files: [fileToShare],
+            title: `${cleanPrefix}${currentTree.name} - Kelt Druid Ağacı`,
+            text: shareText
+          });
+          return;
+        } catch (err: unknown) {
+          if (err instanceof Error && err.name === 'AbortError') {
+            return;
+          }
+        }
+      }
+
+      // 2. Dosya desteklenmiyorsa metin ve URL ile paylaş
       try {
         await navigator.share({
           title: `${cleanPrefix}${currentTree.name} - Kelt Druid Ağacı`,
@@ -128,7 +189,6 @@ export default function DruidTreePage() {
         });
         return;
       } catch (err: unknown) {
-        // Kullanıcı paylaşım menüsünü açtıktan sonra vazgeçtiyse (AbortError) işlem yapma
         if (err instanceof Error && err.name === 'AbortError') {
           return;
         }
@@ -436,7 +496,7 @@ export default function DruidTreePage() {
                     <button
                       type="button"
                       onClick={handleNativeShare}
-                      className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-white/10 hover:bg-white/15 border border-white/20 text-white text-xs sm:text-sm font-semibold transition-all cursor-pointer hover:border-emerald-400/50"
+                      className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-gradient-to-r from-purple-600/30 via-pink-600/30 to-amber-600/30 hover:from-purple-600/40 hover:to-pink-600/40 border border-pink-500/40 text-white text-xs sm:text-sm font-semibold transition-all cursor-pointer hover:border-pink-400/60 shadow-lg"
                     >
                       {copied ? (
                         <>
@@ -445,8 +505,8 @@ export default function DruidTreePage() {
                         </>
                       ) : (
                         <>
-                          <Share2 size={16} className="text-emerald-400" />
-                          <span>Sosyal Medyada Paylaş</span>
+                          <Share2 size={16} className="text-pink-300" />
+                          <span>Instagram / Sosyal Medyada Paylaş</span>
                         </>
                       )}
                     </button>
