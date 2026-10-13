@@ -118,7 +118,7 @@ export default function AstrologyPage() {
         node.style.opacity = '0';
         node.style.zIndex = '-9999';
 
-        download(dataUrl, 'Ezoterik_Dogum_Haritasi.png');
+        download(dataUrl, 'Dogum_Haritasi.png');
       } catch (err) {
         console.error(err);
         alert('İndirme sırasında bir hata oluştu.');
@@ -447,7 +447,7 @@ export default function AstrologyPage() {
               <div className="flex w-full flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-6 mb-8 gap-4">
                  <div>
                    <h2 className="text-2xl font-bold text-white flex items-center gap-3 mb-2">
-                     <Star className="text-[#D4AF37]" /> Ezoterik Doğum Haritası
+                     <Star className="text-[#D4AF37]" /> Doğum Haritası
                    </h2>
                    <p className="text-mystic-text-muted flex items-center gap-2 text-sm font-medium">
                      {cityKey ? cityKey.name : ''} • {dateStr.split('-').reverse().join('.')} {timeStr}
