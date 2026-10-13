@@ -29,7 +29,7 @@ const drawTextWithBold = (
 ): number => {
   let curX = x;
   let curY = y;
-  const activeColor = (doc as any).getTextColor ? (doc as any).getTextColor() : '#e6e6e6';
+  const activeColor = (doc as any).getTextColor ? (doc as any).getTextColor() : '#1f2937';
 
   if (curY > maxY) {
     doc.addPage();
@@ -140,10 +140,13 @@ const generateSvgString = (chartData: any): string => {
   const R_PLANETS = RADIUS - 15;
   const R_ASPECTS = RADIUS - 40;
 
-  let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CHART_SIZE} ${CHART_SIZE}" width="${CHART_SIZE}" height="${CHART_SIZE}" style="background-color: #141928;">`;
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CHART_SIZE} ${CHART_SIZE}" width="${CHART_SIZE}" height="${CHART_SIZE}" style="background-color: transparent;">`;
   
+  // Outer celestial medallion disc (creates a stunning dark celestial medallion circle on white paper)
+  svg += `<circle cx="${CENTER}" cy="${CENTER}" r="${RADIUS + 55}" fill="#141928" stroke="#B8860B" stroke-width="2.5" />`;
+
   // Background circle for aspect lines
-  svg += `<circle cx="${CENTER}" cy="${CENTER}" r="${R_ASPECTS}" stroke="rgba(212,175,55,0.3)" stroke-width="1" fill="rgba(0,0,0,0.4)" />`;
+  svg += `<circle cx="${CENTER}" cy="${CENTER}" r="${R_ASPECTS}" stroke="rgba(212,175,55,0.3)" stroke-width="1" fill="rgba(10,15,30,0.6)" />`;
 
   // Aspect Lines
   chartData.aspects.filter((a: any) => a.type !== 'Kavuşum').forEach((a: any) => {
@@ -266,15 +269,6 @@ const convertSvgToPng = (svgString: string): Promise<string> => {
 export const downloadChartPDF = async (chartData: any, locationStr: string, dateStr: string) => {
   const doc = new jsPDF();
 
-  // Override addPage to automatically paint the dark background on all new pages (e.g. from autotable)
-  const originalAddPage = doc.addPage.bind(doc);
-  doc.addPage = function(this: any, ...args: any[]) {
-    const result = originalAddPage(...args);
-    doc.setFillColor(20, 25, 40); // primaryDark
-    doc.rect(0, 0, 210, 297, 'F');
-    return result;
-  };
-
   // Generate chart image in background (runs in browser context)
   let chartImageBase64 = '';
   try {
@@ -310,14 +304,11 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
     console.error("Failed to load custom fonts, falling back to standard font:", error);
   }
 
-  const primaryDark: [number, number, number] = [20, 25, 40]; // #141928
-  const gold: [number, number, number] = [212, 175, 55]; // #D4AF37
-  const textLight = '#f8fafc';
-  const textMuted = '#94a3b8';
-
-  // Draw Cover Page / Header
-  doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
-  doc.rect(0, 0, 210, 297, 'F');
+  const primaryDark: [number, number, number] = [20, 25, 40]; // #141928 Deep Navy
+  const gold: [number, number, number] = [184, 134, 11]; // #B8860B Rich Dark Gold (high contrast & print-friendly)
+  const textDark: [number, number, number] = [31, 41, 55]; // #1F2937 Charcoal Body Text
+  const textMuted: [number, number, number] = [100, 116, 139]; // #64748B Slate Subtitle
+  const borderLight: [number, number, number] = [226, 232, 240]; // #E2E8F0
 
   // Decorative Header Gold Line
   doc.setDrawColor(gold[0], gold[1], gold[2]);
@@ -331,12 +322,12 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
 
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(20);
-  doc.setTextColor(255, 255, 255);
-  doc.text("EZOTERİK DOĞUM HARİTASI RAPORU", 20, 50);
+  doc.setTextColor(primaryDark[0], primaryDark[1], primaryDark[2]);
+  doc.text("DOĞUM HARİTASI RAPORU", 20, 50);
 
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(11);
-  doc.setTextColor(textMuted);
+  doc.setTextColor(textMuted[0], textMuted[1], textMuted[2]);
   doc.text(`Konum: ${locationStr}   |   Tarih & Saat: ${dateStr}`, 20, 60);
 
   // Draw visual chart on the cover page if generated successfully
@@ -347,7 +338,7 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
   // Objectivity/Software validation statement on Cover Page
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(10);
-  doc.setTextColor(148, 163, 184); // #94a3b8
+  doc.setTextColor(textMuted[0], textMuted[1], textMuted[2]);
   const infoText = "Bu analiz raporu ezoterik kadim astroloji kaynaklarından derlenmiş olup, tamamen algoritmik yazılım sistemi tarafından, insan yorumu ve kişisel önyargılardan bağımsız olarak objektif bir biçimde oluşturulmuştur.";
   doc.text(doc.splitTextToSize(infoText, 170), 20, 215);
 
@@ -359,13 +350,13 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
   // --- Kadim Astroloji Rehberi Sayfası ---
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(16);
-  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.setTextColor(primaryDark[0], primaryDark[1], primaryDark[2]);
   doc.text("KADİM ASTROLOJİ REHBERİ: GEZEGENLER VE EVLER", 20, currentY);
   currentY += 12;
 
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(10);
-  doc.setTextColor(230, 230, 230);
+  doc.setTextColor(textDark[0], textDark[1], textDark[2]);
 
   const guideIntro = "Doğum haritanız, doğduğunuz an ve konumda gökyüzünün anlık bir fotoğrafıdır. Bu haritayı doğru okumak ve yorumları anlamlandırmak için en temel iki kavram **Gezegenler** ve **Evler**dir.";
   currentY = drawTextWithBold(doc, guideIntro, 20, currentY, 170, 5.5);
@@ -379,7 +370,7 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
 
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(9.5);
-  doc.setTextColor(220, 220, 220);
+  doc.setTextColor(textDark[0], textDark[1], textDark[2]);
   
   const planetsText = 
     "Gezegenler, haritamızdaki aktif enerji odaklarıdır ve **'Ne?'** sorusuna yanıt verirler:\n" +
@@ -403,20 +394,20 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
 
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(9.5);
-  doc.setTextColor(220, 220, 220);
+  doc.setTextColor(textDark[0], textDark[1], textDark[2]);
 
   const housesText = 
     "Evler, doğum haritanızın 12 farklı dilimidir ve gezegenlerin enerjilerini **'Nerede?'** sergileyeceğini gösterir:\n" +
     "• **1. Ev (Yükselen / ASC):** Dış dünyaya sunduğunuz maske, fiziksel bedeniniz ve ilk izleniminiz.\n" +
     "• **2. Ev:** Maddi kaynaklarınız, kendi çabanızla kazandığınız para ve öz değer algınız.\n" +
     "• **3. Ev:** Yakın çevre ilişkileriniz, kardeşleriniz, kısa yolculuklar ve iletişim zihniniz.\n" +
-    "• **4. Ev:** Yuvanız, aileniz, kökleriniz, bilinçaltı güvenliğiniz ve ev hayatınız.\n" +
+    "• **4. Ev (Dip Noktası / IC):** Yuvanız, aileniz, kökleriniz, bilinçaltı güvenliğiniz ve ev hayatınız.\n" +
     "• **5. Ev:** Yaratıcılığınız, aşk hayatınız, çocuklarınız, hobileriniz ve yaşamsal neşeniz.\n" +
     "• **6. Ev:** Günlük rutinleriniz, iş ortamınız, sağlığınız ve hizmet etme bilinciniz.\n" +
-    "• **7. Ev:** İkili ilişkileriniz, evlilik, ortaklıklar ve açık düşmanlarınız.\n" +
+    "• **7. Ev (Alçalan / DSC):** İkili ilişkileriniz, evlilik, ortaklıklar ve açık düşmanlarınız.\n" +
     "• **8. Ev:** Ortaklaşa kaynaklar, miras, cinsellik, okültizm ve dönüşüm alanınız.\n" +
     "• **9. Ev:** Yüksek öğrenim, felsefe, inançlar, uzak yolculuklar ve hayat vizyonunuz.\n" +
-    "• **10. Ev (MC):** Kariyeriniz, toplumsal statünüz, hedefleriniz ve otorite ilişkileriniz.\n" +
+    "• **10. Ev (Tepe Noktası / MC):** Kariyeriniz, toplumsal statünüz, hedefleriniz ve otorite ilişkileriniz.\n" +
     "• **11. Ev:** Sosyal çevre, arkadaş grupları, idealleriniz ve toplumsal projeleriniz.\n" +
     "• **12. Ev:** Bilinçaltı, gizli düşmanlar, izolasyon, rüyalar ve ruhsal teslimiyet alanınız.";
   currentY = drawTextWithBold(doc, housesText, 20, currentY, 170, 5.2);
@@ -429,7 +420,7 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
     if (currentY + required > 275) {
       doc.addPage();
       currentY = 25;
-      doc.setTextColor(230, 230, 230);
+      doc.setTextColor(textDark[0], textDark[1], textDark[2]);
     }
   };
 
@@ -437,7 +428,7 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
   checkSpace(110);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(15);
-  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.setTextColor(primaryDark[0], primaryDark[1], primaryDark[2]);
   doc.text("1. GEZEGEN KONUMLARI", 20, currentY);
   currentY += 8;
 
@@ -454,16 +445,16 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
     head: [['Gezegen', 'Burç', 'Derece', 'Ev']],
     body: planetsBody,
     theme: 'grid',
-    styles: { font: 'LiberationSans', overflow: 'linebreak', cellPadding: 2.5, valign: 'middle' },
+    styles: { font: 'LiberationSans', overflow: 'linebreak', cellPadding: 2.5, valign: 'middle', lineColor: borderLight, lineWidth: 0.2 },
     columnStyles: {
       0: { cellWidth: 45, fontStyle: 'bold' },
       1: { cellWidth: 40 },
       2: { cellWidth: 45 },
       3: { cellWidth: 40 }
     },
-    headStyles: { fillColor: gold, textColor: primaryDark, fontStyle: 'bold', font: 'LiberationSans' },
-    bodyStyles: { fillColor: [24, 30, 48], textColor: [255, 255, 255], font: 'LiberationSans' },
-    alternateRowStyles: { fillColor: [18, 23, 38] },
+    headStyles: { fillColor: primaryDark, textColor: [255, 255, 255], fontStyle: 'bold', font: 'LiberationSans' },
+    bodyStyles: { fillColor: [255, 255, 255], textColor: textDark, font: 'LiberationSans' },
+    alternateRowStyles: { fillColor: [248, 250, 252] },
   });
 
   currentY = (doc as any).lastAutoTable.finalY + 12;
@@ -472,7 +463,7 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
   checkSpace(55);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(15);
-  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.setTextColor(primaryDark[0], primaryDark[1], primaryDark[2]);
   doc.text("2. GEZEGEN VE EV YERLEŞİM ANALİZLERİ", 20, currentY);
   currentY += 10;
 
@@ -488,7 +479,7 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
 
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(10);
-    doc.setTextColor(230, 230, 230);
+    doc.setTextColor(textDark[0], textDark[1], textDark[2]);
     
     currentY = drawTextWithBold(doc, interp.content, 20, currentY, 170, 5.5);
     currentY += 10;
@@ -498,7 +489,7 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
   checkSpace(30);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(15);
-  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.setTextColor(primaryDark[0], primaryDark[1], primaryDark[2]);
   doc.text("3. EV GİRİŞLERİ VE YAŞAM ALANLARI", 20, currentY);
   currentY += 10;
 
@@ -514,7 +505,7 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
 
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(10);
-    doc.setTextColor(230, 230, 230);
+    doc.setTextColor(textDark[0], textDark[1], textDark[2]);
     
     currentY = drawTextWithBold(doc, interp.content, 20, currentY, 170, 5.5);
     currentY += 10;
@@ -529,7 +520,7 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
     checkSpace(30);
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(15);
-    doc.setTextColor(gold[0], gold[1], gold[2]);
+    doc.setTextColor(primaryDark[0], primaryDark[1], primaryDark[2]);
     doc.text("4. KARMİK DİNAMİKLER VE AÇILAR", 20, currentY);
     currentY += 10;
 
@@ -545,7 +536,7 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
 
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(10);
-      doc.setTextColor(230, 230, 230);
+      doc.setTextColor(textDark[0], textDark[1], textDark[2]);
       
       currentY = drawTextWithBold(doc, interp.content, 20, currentY, 170, 5.5);
       currentY += 10;
@@ -558,7 +549,7 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
 
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(16);
-  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.setTextColor(primaryDark[0], primaryDark[1], primaryDark[2]);
   doc.text("7LAYERS İLE KOZMİK YOLCULUĞUNUZA DEVAM EDİN", 20, currentY);
   currentY += 9;
 
@@ -570,7 +561,7 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
 
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(10);
-  doc.setTextColor(230, 230, 230);
+  doc.setTextColor(textDark[0], textDark[1], textDark[2]);
 
   const adIntro = "Doğum haritanız ruhunuzun yeryüzü planındaki pusulasıdır. Varlığınızın diğer boyutlarını ve kaderinizin gizli katmanlarını **7LAYERS** analizleriyle keşfetmeye devam edin:";
   currentY = drawTextWithBold(doc, adIntro, 20, currentY, 170, 5);
@@ -612,7 +603,7 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
 
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(9.5);
-    doc.setTextColor(215, 215, 215);
+    doc.setTextColor(textDark[0], textDark[1], textDark[2]);
     currentY = drawTextWithBold(doc, feat.desc, 23, currentY, 167, 4.6);
     currentY += 4.5;
   }
@@ -621,10 +612,10 @@ export const downloadChartPDF = async (chartData: any, locationStr: string, date
   // Closing Call to Action
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(10);
-  doc.setTextColor(gold[0], gold[1], gold[2]);
-  const adClosing = "**7LAYERS** web platformumuz (**7layers.tr**) ve mobil uygulamamız üzerinden tüm bu derin analizlere dilediğiniz an ulaşabilir, kadim ezoterizm yolculuğunuzu derinleştirebilirsiniz.";
+  doc.setTextColor(primaryDark[0], primaryDark[1], primaryDark[2]);
+  const adClosing = "**7LAYERS** web platformumuz (**7layers.tr**) ve mobil uygulamamız üzerinden tüm bu derin analizlere dilediğiniz an ulaşabilir, kadim astroloji ve ezoterizm yolculuğunuzu derinleştirebilirsiniz.";
   currentY = drawTextWithBold(doc, adClosing, 20, currentY, 170, 5.2);
 
   // Save the PDF
-  doc.save(`Ezoterik_Dogum_Haritasi_${locationStr.replace(/\s+/g, '_')}.pdf`);
+  doc.save(`Dogum_Haritasi_${locationStr.replace(/\s+/g, '_')}.pdf`);
 };
