@@ -611,20 +611,16 @@ export default function HumanDesignPage() {
           key={center} 
           className="cursor-pointer hover:opacity-85 transition-opacity"
           onClick={() => {
-            if (isApprenticeOrAbove) {
-              setActiveGateId(null);
-              const isDefined = chart.definedCenters.includes(center as CenterCode);
-              const centerName = CENTER_NAMES[center as CenterCode];
-              const desc = CENTER_DESCRIPTIONS[center as CenterCode][isDefined ? 'defined' : 'undefined'];
-              setActiveDetail({
-                title: centerName,
-                subtitle: "Enerji Merkezi",
-                badge: isDefined ? "Tanımlı (Renkli)" : "Tanımsız (Beyaz)",
-                description: `Bu merkez haritanızda ${isDefined ? 'TANIMLI' : 'TANIMSIZ'} durumdadır.\n\n${desc}`
-              });
-            } else {
-              setShowLockModal(true);
-            }
+            setActiveGateId(null);
+            const isDefined = chart.definedCenters.includes(center as CenterCode);
+            const centerName = CENTER_NAMES[center as CenterCode];
+            const desc = CENTER_DESCRIPTIONS[center as CenterCode][isDefined ? 'defined' : 'undefined'];
+            setActiveDetail({
+              title: centerName,
+              subtitle: "Enerji Merkezi",
+              badge: isDefined ? "Tanımlı (Renkli)" : "Tanımsız (Beyaz)",
+              description: `Bu merkez haritanızda ${isDefined ? 'TANIMLI' : 'TANIMSIZ'} durumdadır.\n\n${desc}`
+            });
           }}
         >
           {drawShape()}
@@ -649,12 +645,8 @@ export default function HumanDesignPage() {
           key={`glabel-${gateId}`} 
           className="cursor-pointer hover:opacity-80 transition-opacity"
           onClick={() => {
-            if (isApprenticeOrAbove) {
-              setActiveDetail(null);
-              setActiveGateId(gNum);
-            } else {
-              setShowLockModal(true);
-            }
+            setActiveDetail(null);
+            setActiveGateId(gNum);
           }}
         >
           {isActive && <circle cx={textX} cy={textY} r={5.5} fill="#000" stroke="none" />}
@@ -845,12 +837,8 @@ export default function HumanDesignPage() {
                           key={`unc-${i}`} 
                           className="flex items-center justify-between px-2 py-1 bg-white/5 rounded border border-white/5 cursor-pointer hover:bg-white/10 hover:border-[#E63946]/30 transition-all"
                           onClick={() => {
-                            if (isApprenticeOrAbove) {
-                              setActiveDetail(null);
-                              setActiveGateId(p.gate);
-                            } else {
-                              setShowLockModal(true);
-                            }
+                            setActiveDetail(null);
+                            setActiveGateId(p.gate);
                           }}
                         >
                           <div className="flex items-center gap-1.5">
@@ -891,12 +879,8 @@ export default function HumanDesignPage() {
                           key={`con-${i}`} 
                           className="flex items-center justify-between px-2 py-1 bg-white/5 rounded border border-white/5 cursor-pointer hover:bg-white/10 hover:border-white/20 transition-all"
                           onClick={() => {
-                            if (isApprenticeOrAbove) {
-                              setActiveDetail(null);
-                              setActiveGateId(p.gate);
-                            } else {
-                              setShowLockModal(true);
-                            }
+                            setActiveDetail(null);
+                            setActiveGateId(p.gate);
                           }}
                         >
                           <div className="flex items-center gap-1.5">
@@ -968,17 +952,13 @@ export default function HumanDesignPage() {
                     <div 
                       className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
                       onClick={() => {
-                        if (isApprenticeOrAbove) {
-                          setActiveGateId(null);
-                          const match = HD_DETAILS_MAP[normalizeHDKey(chart.type)];
-                          setActiveDetail({
-                            title: chart.type,
-                            subtitle: match?.subtitle || "Tür / Tip",
-                            description: match?.description || ""
-                          });
-                        } else {
-                          setShowLockModal(true);
-                        }
+                        setActiveGateId(null);
+                        const match = HD_DETAILS_MAP[normalizeHDKey(chart.type)];
+                        setActiveDetail({
+                          title: chart.type,
+                          subtitle: match?.subtitle || "Tür / Tip",
+                          description: match?.description || ""
+                        });
                       }}
                     >
                       <span className="block text-mystic-text-muted text-sm mb-1">Tür</span>
@@ -987,17 +967,13 @@ export default function HumanDesignPage() {
                     <div 
                       className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
                       onClick={() => {
-                        if (isApprenticeOrAbove) {
-                          setActiveGateId(null);
-                          const match = HD_DETAILS_MAP[normalizeHDKey(chart.authority)];
-                          setActiveDetail({
-                            title: chart.authority,
-                            subtitle: match?.subtitle || "İç Otorite",
-                            description: match?.description || ""
-                          });
-                        } else {
-                          setShowLockModal(true);
-                        }
+                        setActiveGateId(null);
+                        const match = HD_DETAILS_MAP[normalizeHDKey(chart.authority)];
+                        setActiveDetail({
+                          title: chart.authority,
+                          subtitle: match?.subtitle || "İç Otorite",
+                          description: match?.description || ""
+                        });
                       }}
                     >
                       <span className="block text-mystic-text-muted text-sm mb-1">İç Otorite</span>
@@ -1006,17 +982,13 @@ export default function HumanDesignPage() {
                     <div 
                       className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
                       onClick={() => {
-                        if (isApprenticeOrAbove) {
-                          setActiveGateId(null);
-                          const match = HD_DETAILS_MAP[normalizeHDKey(chart.strategy)];
-                          setActiveDetail({
-                            title: chart.strategy,
-                            subtitle: match?.subtitle || "Strateji",
-                            description: match?.description || ""
-                          });
-                        } else {
-                          setShowLockModal(true);
-                        }
+                        setActiveGateId(null);
+                        const match = HD_DETAILS_MAP[normalizeHDKey(chart.strategy)];
+                        setActiveDetail({
+                          title: chart.strategy,
+                          subtitle: match?.subtitle || "Strateji",
+                          description: match?.description || ""
+                        });
                       }}
                     >
                       <span className="block text-mystic-text-muted text-sm mb-1">Strateji</span>
@@ -1025,17 +997,13 @@ export default function HumanDesignPage() {
                     <div 
                       className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
                       onClick={() => {
-                        if (isApprenticeOrAbove) {
-                          setActiveGateId(null);
-                          const match = getProfileDetails(chart.profile);
-                          setActiveDetail({
-                            title: `Profil ${chart.profile}`,
-                            subtitle: match.subtitle,
-                            description: match.description
-                          });
-                        } else {
-                          setShowLockModal(true);
-                        }
+                        setActiveGateId(null);
+                        const match = getProfileDetails(chart.profile);
+                        setActiveDetail({
+                          title: `Profil ${chart.profile}`,
+                          subtitle: match.subtitle,
+                          description: match.description
+                        });
                       }}
                     >
                       <span className="block text-mystic-text-muted text-sm mb-1">Profil</span>
@@ -1044,17 +1012,13 @@ export default function HumanDesignPage() {
                     <div 
                       className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
                       onClick={() => {
-                        if (isApprenticeOrAbove) {
-                          setActiveGateId(null);
-                          const match = HD_DETAILS_MAP[normalizeHDKey(chart.signature)];
-                          setActiveDetail({
-                            title: chart.signature,
-                            subtitle: match?.subtitle || "İmza (Hizalanma Ödülü)",
-                            description: match?.description || ""
-                          });
-                        } else {
-                          setShowLockModal(true);
-                        }
+                        setActiveGateId(null);
+                        const match = HD_DETAILS_MAP[normalizeHDKey(chart.signature)];
+                        setActiveDetail({
+                          title: chart.signature,
+                          subtitle: match?.subtitle || "İmza (Hizalanma Ödülü)",
+                          description: match?.description || ""
+                        });
                       }}
                     >
                       <span className="block text-mystic-text-muted text-sm mb-1">İmza</span>
@@ -1063,17 +1027,13 @@ export default function HumanDesignPage() {
                     <div 
                       className="bg-white/5 p-4 rounded-2xl border border-white/10 cursor-pointer hover:bg-white/10 transition-colors"
                       onClick={() => {
-                        if (isApprenticeOrAbove) {
-                          setActiveGateId(null);
-                          const match = HD_DETAILS_MAP[normalizeHDKey(chart.notSelfTheme, chart.type)];
-                          setActiveDetail({
-                            title: chart.notSelfTheme,
-                            subtitle: match?.subtitle || "Benlik Olmayan Tema",
-                            description: match?.description || ""
-                          });
-                        } else {
-                          setShowLockModal(true);
-                        }
+                        setActiveGateId(null);
+                        const match = HD_DETAILS_MAP[normalizeHDKey(chart.notSelfTheme, chart.type)];
+                        setActiveDetail({
+                          title: chart.notSelfTheme,
+                          subtitle: match?.subtitle || "Benlik Olmayan Tema",
+                          description: match?.description || ""
+                        });
                       }}
                     >
                       <span className="block text-mystic-text-muted text-sm mb-1">Benlik Olmayan Tema</span>
@@ -1082,17 +1042,13 @@ export default function HumanDesignPage() {
                     <div 
                       className="bg-white/5 p-4 rounded-2xl border border-white/10 lg:col-span-2 cursor-pointer hover:bg-white/10 transition-colors"
                       onClick={() => {
-                        if (isApprenticeOrAbove) {
-                          setActiveGateId(null);
-                          const match = getIncarnationCrossDetails(chart.incarnationCross);
-                          setActiveDetail({
-                            title: chart.incarnationCross,
-                            subtitle: match.subtitle,
-                            description: match.description
-                          });
-                        } else {
-                          setShowLockModal(true);
-                        }
+                        setActiveGateId(null);
+                        const match = getIncarnationCrossDetails(chart.incarnationCross);
+                        setActiveDetail({
+                          title: chart.incarnationCross,
+                          subtitle: match.subtitle,
+                          description: match.description
+                        });
                       }}
                     >
                       <span className="block text-mystic-text-muted text-sm mb-1">Enkarnasyon Haçı</span>
@@ -1293,12 +1249,8 @@ export default function HumanDesignPage() {
                             <div
                               key={`synth-${item.planetKey}-${idx}`}
                               onClick={() => {
-                                if (isApprenticeOrAbove) {
-                                  setActiveDetail(null);
-                                  setActiveGateId(item.gate);
-                                } else {
-                                  setShowLockModal(true);
-                                }
+                                setActiveDetail(null);
+                                setActiveGateId(item.gate);
                               }}
                               className="bg-black/40 border border-white/10 hover:border-white/20 rounded-2xl p-5 cursor-pointer transition-all hover:bg-white/5 group"
                             >
