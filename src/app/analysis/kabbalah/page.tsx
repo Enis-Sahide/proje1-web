@@ -475,9 +475,23 @@ export default function KabbalahAnalysisPage() {
                       {kabbalahAnalysis.activeConsciousness.cosmicChallenge || kabbalahAnalysis.activeConsciousness.explanation}
                     </p>
 
-                    <div className="text-xs text-sky-300/80 bg-sky-950/40 p-2.5 rounded-lg border border-sky-800/30 flex items-start gap-2">
-                      <span className="shrink-0 text-sky-400 font-bold">⚡ Göksel Rehberlik:</span>
-                      <span>{kabbalahAnalysis.activeConsciousness.transitSummary || kabbalahAnalysis.activeConsciousness.reason}</span>
+                    <div className="p-3.5 sm:p-4 rounded-xl bg-gradient-to-br from-sky-950/60 via-slate-900/60 to-cyan-950/40 border border-sky-500/30 shadow-[0_0_15px_rgba(14,165,233,0.08)]">
+                      <div className="flex items-center justify-between gap-2 mb-2 pb-2 border-b border-sky-500/20">
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded-lg bg-sky-500/20 flex items-center justify-center text-sky-400 shrink-0">
+                            <Sparkles size={14} className="animate-pulse" />
+                          </div>
+                          <span className="text-xs sm:text-sm font-bold text-sky-300 tracking-wide uppercase">
+                            Göksel Rehberlik
+                          </span>
+                        </div>
+                        <span className="text-[10px] sm:text-xs px-2 py-0.5 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20 font-medium">
+                          Aktif Transit
+                        </span>
+                      </div>
+                      <p className="text-xs sm:text-sm text-sky-100/90 leading-relaxed">
+                        {kabbalahAnalysis.activeConsciousness.transitSummary || kabbalahAnalysis.activeConsciousness.reason}
+                      </p>
                     </div>
                   </div>
 
