@@ -32,12 +32,10 @@ const drawTextWithBold = (
 ): number => {
   let curX = x;
   let curY = y;
-  const activeColor = (doc as any).getTextColor ? (doc as any).getTextColor() : '#ffffff';
+  const activeColor = (doc as any).getTextColor ? (doc as any).getTextColor() : '#1f2937';
 
   if (curY > maxY) {
     doc.addPage();
-    doc.setFillColor(15, 23, 42);
-    doc.rect(0, 0, 210, 297, 'F');
     curY = startY;
     doc.setTextColor(activeColor);
   }
@@ -67,8 +65,6 @@ const drawTextWithBold = (
         curY += lineHeight;
         if (curY > maxY) {
           doc.addPage();
-          doc.setFillColor(15, 23, 42);
-          doc.rect(0, 0, 210, 297, 'F');
           curY = startY;
           doc.setTextColor(activeColor);
           doc.setFont('LiberationSans', isBold ? 'bold' : 'normal');
@@ -87,8 +83,6 @@ const drawTextWithBold = (
       curY += lineHeight;
       if (curY > maxY) {
         doc.addPage();
-        doc.setFillColor(15, 23, 42);
-        doc.rect(0, 0, 210, 297, 'F');
         curY = startY;
         doc.setTextColor(activeColor);
         doc.setFont('LiberationSans', isBold ? 'bold' : 'normal');
@@ -791,26 +785,14 @@ export const downloadHumanDesignPDF = async (
     console.error("Failed to load custom fonts, falling back to standard font:", error);
   }
 
-  const primaryDark: [number, number, number] = [15, 23, 42]; // #0F172A
-  const secondaryDark: [number, number, number] = [30, 41, 59]; // #1E293B
-  const gold: [number, number, number] = [212, 175, 55]; // #D4AF37
-  const white: [number, number, number] = [255, 255, 255];
-  const grayText: [number, number, number] = [180, 180, 180];
-  const emeraldGreen: [number, number, number] = [16, 185, 129];
-  const detrimentRed: [number, number, number] = [244, 63, 94];
-
-  // Override addPage to automatically paint the dark background on all new pages (e.g. from autotable, pagination, etc.)
-  const originalAddPage = doc.addPage.bind(doc);
-  doc.addPage = function(this: any, ...args: any[]) {
-    const result = originalAddPage(...args);
-    doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
-    doc.rect(0, 0, 210, 297, 'F');
-    return result;
-  };
-
-  // Initial Cover Page background
-  doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
-  doc.rect(0, 0, 210, 297, 'F');
+  const primaryDark: [number, number, number] = [20, 25, 40]; // #141928 Deep Navy
+  const secondaryDark: [number, number, number] = [248, 250, 252]; // #F8FAFC
+  const gold: [number, number, number] = [184, 134, 11]; // #B8860B Rich Dark Gold
+  const white: [number, number, number] = [31, 41, 55]; // #1F2937 High Contrast Charcoal Body
+  const grayText: [number, number, number] = [100, 116, 139]; // #64748B Slate Muted
+  const borderLight: [number, number, number] = [226, 232, 240]; // #E2E8F0
+  const emeraldGreen: [number, number, number] = [4, 120, 87]; // #047857 Deep Emerald
+  const detrimentRed: [number, number, number] = [190, 18, 60]; // #BE123C Deep Red
 
   let currentY = 25;
 
@@ -818,6 +800,7 @@ export const downloadHumanDesignPDF = async (
     if (currentY + required > 275) {
       doc.addPage();
       currentY = 25;
+      doc.setTextColor(white[0], white[1], white[2]);
     }
   };
 
@@ -832,7 +815,7 @@ export const downloadHumanDesignPDF = async (
 
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(20);
-  doc.setTextColor(white[0], white[1], white[2]);
+  doc.setTextColor(primaryDark[0], primaryDark[1], primaryDark[2]);
   doc.text("HUMAN DESIGN YAŞAM REHBERİ", 20, 50);
 
   doc.setFont('LiberationSans', 'normal');
@@ -846,7 +829,7 @@ export const downloadHumanDesignPDF = async (
   checkSpace(115);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(14);
-  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.setTextColor(primaryDark[0], primaryDark[1], primaryDark[2]);
   doc.text("Tasarım Özeti ve Bodygraph", 20, currentY);
   currentY += 8;
 
@@ -868,14 +851,14 @@ export const downloadHumanDesignPDF = async (
     head: [['Parametre', 'Değer']],
     body: summaryBody,
     theme: 'grid',
-    styles: { font: 'LiberationSans', overflow: 'linebreak', cellPadding: 2, valign: 'middle' },
+    styles: { font: 'LiberationSans', overflow: 'linebreak', cellPadding: 2, valign: 'middle', lineColor: borderLight, lineWidth: 0.2 },
     columnStyles: {
       0: { cellWidth: 29, fontStyle: 'bold' },
       1: { cellWidth: 47 }
     },
-    headStyles: { fillColor: gold, textColor: primaryDark, fontStyle: 'bold', font: 'LiberationSans' },
-    bodyStyles: { fillColor: secondaryDark, textColor: [255, 255, 255], font: 'LiberationSans', fontSize: 8 },
-    alternateRowStyles: { fillColor: primaryDark },
+    headStyles: { fillColor: primaryDark, textColor: [255, 255, 255], fontStyle: 'bold', font: 'LiberationSans' },
+    bodyStyles: { fillColor: [255, 255, 255], textColor: white, font: 'LiberationSans', fontSize: 8 },
+    alternateRowStyles: { fillColor: [248, 250, 252] },
   });
 
   const tableFinalY = (doc as any).lastAutoTable.finalY;
@@ -916,7 +899,7 @@ export const downloadHumanDesignPDF = async (
 
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(10);
-    doc.setTextColor(230, 230, 230);
+    doc.setTextColor(white[0], white[1], white[2]);
     currentY = drawTextWithBold(doc, detail.description, 20, currentY, 170, 5.5);
     currentY += 10;
   }
@@ -932,7 +915,7 @@ export const downloadHumanDesignPDF = async (
 
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(10);
-  doc.setTextColor(230, 230, 230);
+  doc.setTextColor(white[0], white[1], white[2]);
   currentY = drawTextWithBold(doc, profileDetails, 20, currentY, 170, 5.5);
   currentY += 10;
 
@@ -947,7 +930,7 @@ export const downloadHumanDesignPDF = async (
 
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(10);
-  doc.setTextColor(230, 230, 230);
+  doc.setTextColor(white[0], white[1], white[2]);
   currentY = drawTextWithBold(doc, crossDetails, 20, currentY, 170, 5.5);
   currentY += 12;
 
@@ -962,7 +945,7 @@ export const downloadHumanDesignPDF = async (
 
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(10);
-  doc.setTextColor(230, 230, 230);
+  doc.setTextColor(white[0], white[1], white[2]);
   currentY = drawTextWithBold(doc, `${synthesis.text1}\n\n${synthesis.text2}`, 20, currentY, 170, 5.5);
   currentY += 12;
 
@@ -970,7 +953,7 @@ export const downloadHumanDesignPDF = async (
   checkSpace(40);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(15);
-  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.setTextColor(primaryDark[0], primaryDark[1], primaryDark[2]);
   doc.text("Enerji Merkezleri Çözümlemesi", 20, currentY);
   currentY += 10;
 
@@ -990,7 +973,7 @@ export const downloadHumanDesignPDF = async (
 
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(10);
-    doc.setTextColor(230, 230, 230);
+    doc.setTextColor(white[0], white[1], white[2]);
     const desc = isDefined ? centerDesc.defined : centerDesc.undefined;
     currentY = drawTextWithBold(doc, desc, 20, currentY, 170, 5.5);
     currentY += 10;
@@ -1000,7 +983,7 @@ export const downloadHumanDesignPDF = async (
   checkSpace(45);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(15);
-  doc.setTextColor(gold[0], gold[1], gold[2]);
+  doc.setTextColor(primaryDark[0], primaryDark[1], primaryDark[2]);
   doc.text("Gezegen Kapı Aktivasyonları", 20, currentY);
   currentY += 10;
 
@@ -1038,15 +1021,15 @@ export const downloadHumanDesignPDF = async (
     head: [['Gezegen', 'Kişilik (Bilinçli - Siyah)', 'Tasarım (Bilinçdışı - Kırmızı)']],
     body: tableRows,
     theme: 'grid',
-    styles: { font: 'LiberationSans', overflow: 'linebreak', cellPadding: 2.5, valign: 'middle' },
+    styles: { font: 'LiberationSans', overflow: 'linebreak', cellPadding: 2.5, valign: 'middle', lineColor: borderLight, lineWidth: 0.2 },
     columnStyles: {
       0: { cellWidth: 40, fontStyle: 'bold' },
       1: { cellWidth: 65 },
       2: { cellWidth: 65 }
     },
-    headStyles: { fillColor: gold, textColor: primaryDark, fontStyle: 'bold', font: 'LiberationSans' },
-    bodyStyles: { fillColor: secondaryDark, textColor: [255, 255, 255], font: 'LiberationSans' },
-    alternateRowStyles: { fillColor: primaryDark },
+    headStyles: { fillColor: primaryDark, textColor: [255, 255, 255], fontStyle: 'bold', font: 'LiberationSans' },
+    bodyStyles: { fillColor: [255, 255, 255], textColor: white, font: 'LiberationSans' },
+    alternateRowStyles: { fillColor: [248, 250, 252] },
   });
 
   currentY = (doc as any).lastAutoTable?.finalY ? (doc as any).lastAutoTable.finalY + 8 : currentY + 10;
@@ -1055,6 +1038,9 @@ export const downloadHumanDesignPDF = async (
   // Rave I'Ching Çizgi Fiksasyonları ve 1-6 Çizgi Derin Analiz Rehberi
   doc.setFillColor(secondaryDark[0], secondaryDark[1], secondaryDark[2]);
   doc.roundedRect(20, currentY, 170, 72, 3, 3, 'F');
+  doc.setDrawColor(...borderLight);
+  doc.setLineWidth(0.4);
+  doc.roundedRect(20, currentY, 170, 72, 3, 3, 'D');
   
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(8.5);
@@ -1103,7 +1089,7 @@ export const downloadHumanDesignPDF = async (
   doc.text(tr("1'den 6'ya Çizgi Katmanlarının Anlamı:"), 24, gy); gy += 4.5;
 
   doc.setFont('LiberationSans', 'normal');
-  doc.setTextColor(215, 215, 215);
+  doc.setTextColor(white[0], white[1], white[2]);
   doc.text(tr(".1 Araştırmacı: Güven arayışı, derin bilgi ve sağlam temel inşa etme."), 24, gy);
   doc.text(tr(".2 Münzevi: Doğal ve çabasız yetenek, dışarıdan çağrılmayı bekleme."), 105, gy); gy += 4;
 
@@ -1120,7 +1106,7 @@ export const downloadHumanDesignPDF = async (
     checkSpace(40);
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(15);
-    doc.setTextColor(gold[0], gold[1], gold[2]);
+    doc.setTextColor(primaryDark[0], primaryDark[1], primaryDark[2]);
     doc.text("Aktif Kapı Çözümlemeleri", 20, currentY);
     currentY += 10;
 
@@ -1191,7 +1177,7 @@ export const downloadHumanDesignPDF = async (
 
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(10);
-      doc.setTextColor(230, 230, 230);
+      doc.setTextColor(white[0], white[1], white[2]);
       
       currentY = drawTextWithBold(doc, gateInfo.description || '', 20, currentY, 170, 5.5);
       currentY += 10;

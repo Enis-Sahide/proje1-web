@@ -26,7 +26,7 @@ const drawTextWithBold = (
 ): number => {
   let curX = x;
   let curY = y;
-  const activeColor = (doc as any).getTextColor ? (doc as any).getTextColor() : '#ffffff';
+  const activeColor = (doc as any).getTextColor ? (doc as any).getTextColor() : '#1f2937';
 
   if (curY > maxY) {
     doc.addPage();
@@ -106,24 +106,11 @@ export const downloadIncarnationPDF = async (
 ) => {
   const doc = new jsPDF();
 
-  const primaryDark: [number, number, number] = [15, 18, 28]; // #0F121C
-  const cardDark: [number, number, number] = [24, 29, 45]; // #181D2D
-  const gold: [number, number, number] = [212, 175, 55]; // #D4AF37
-  const white: [number, number, number] = [255, 255, 255];
-  const muted: [number, number, number] = [170, 180, 200];
-
-  // Paint dark background on new pages
-  const originalAddPage = doc.addPage.bind(doc);
-  doc.addPage = function(this: any, ...args: any[]) {
-    const result = originalAddPage(...args);
-    doc.setFillColor(...primaryDark);
-    doc.rect(0, 0, 210, 297, 'F');
-    return result;
-  };
-
-  // Initial background
-  doc.setFillColor(...primaryDark);
-  doc.rect(0, 0, 210, 297, 'F');
+  const primaryDark: [number, number, number] = [20, 25, 40]; // #141928 Deep Navy
+  const cardDark: [number, number, number] = [248, 250, 252]; // #F8FAFC Light Card Background
+  const gold: [number, number, number] = [184, 134, 11]; // #B8860B Rich Dark Gold
+  const white: [number, number, number] = [31, 41, 55]; // #1F2937 High Contrast Charcoal Body (replaces invisible white)
+  const muted: [number, number, number] = [100, 116, 139]; // #64748B Slate Muted
 
   // Load custom fonts for Turkish characters
   try {
@@ -233,7 +220,7 @@ export const downloadIncarnationPDF = async (
 
   const bannerHeight = 28 + (mLines.length * 5.2) + (fnLines.length * 4.4) + 4;
 
-  doc.setFillColor(28, 36, 60);
+  doc.setFillColor(241, 245, 249);
   doc.roundedRect(15, 80, 180, bannerHeight, 3, 3, 'F');
   doc.setDrawColor(...gold);
   doc.setLineWidth(0.6);
@@ -248,11 +235,11 @@ export const downloadIncarnationPDF = async (
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(10.5);
   if (data.cosmicOrigin?.isStarseed) {
-    doc.setTextColor(190, 220, 255);
+    doc.setTextColor(30, 58, 138); // Deep Celestial Blue
     const starseedTitle = `KOZMİK KÖKEN: YÜKSEK BOYUTLU VARLIK (STARSEED / IŞIK ELÇİSİ)`;
     doc.text(doc.splitTextToSize(starseedTitle, 166), 22, 96);
   } else {
-    doc.setTextColor(160, 240, 180);
+    doc.setTextColor(4, 120, 87); // Deep Gaia Emerald
     const gaiaTitle = `KOZMİK KÖKEN: KADİM GAİA YERLİSİ (DÜNYA MUHAFIZI)`;
     doc.text(doc.splitTextToSize(gaiaTitle, 166), 22, 96);
   }
@@ -265,7 +252,7 @@ export const downloadIncarnationPDF = async (
   const fnY = 103 + (mLines.length * 5.2) + 4;
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(8.5);
-  doc.setTextColor(212, 175, 55); // gold
+  doc.setTextColor(...gold);
   doc.text(fnLines, 22, fnY);
 
   // SECTION 1: ÖNCEKİ ENKARNASYON & GAD
@@ -385,7 +372,7 @@ export const downloadIncarnationPDF = async (
 
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(10.5);
-    doc.setTextColor(255, 215, 0);
+    doc.setTextColor(...gold);
     curY = renderText(`**Dönem & Çağ:** ${data.historicalEra.century} (${data.historicalEra.timeSpan}) | **Coğrafya:** ${data.historicalEra.geographyCulture}`, 15, curY, 180, 5.5);
     curY += 2;
 
@@ -418,7 +405,7 @@ export const downloadIncarnationPDF = async (
     curY += 10;
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(15);
-    doc.setTextColor(180, 200, 255);
+    doc.setTextColor(30, 58, 138); // Deep Celestial Blue
     const starTitle = data.cosmicOrigin.isHybrid && data.cosmicOrigin.hybridTitle
       ? `Kozmik Ruh Kökeni: ${data.cosmicOrigin.hybridTitle} (Galaktik Melez)`
       : `Kozmik Ruh Kökeni: ${data.cosmicOrigin.starName}`;
@@ -428,7 +415,7 @@ export const downloadIncarnationPDF = async (
 
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(11);
-    doc.setTextColor(190, 220, 255);
+    doc.setTextColor(30, 58, 138); // Deep Celestial Blue
     curY = renderText(`**Frekans:** ${data.cosmicOrigin.frequencyBadge} | **Hiza:** ${data.cosmicOrigin.connectedPoint}`, 15, curY, 180, 5.6);
     curY += 3;
 
@@ -497,7 +484,7 @@ export const downloadIncarnationPDF = async (
           let textY = curY + 6.5;
           doc.setFont('LiberationSans', 'bold');
           doc.setFontSize(11.5);
-          doc.setTextColor(255, 215, 0);
+          doc.setTextColor(...gold);
           doc.text(starTitleLines, 20, textY);
           textY += (starTitleLines.length * 5.6) + 2;
 
@@ -577,7 +564,7 @@ export const downloadIncarnationPDF = async (
       if (hdDiagLines.length > 0) {
         doc.setFont('LiberationSans', 'normal');
         doc.setFontSize(10.5);
-        doc.setTextColor(130, 210, 255);
+        doc.setTextColor(30, 58, 138);
         doc.text(hdDiagLines, 20, textY);
         textY += hdDiagLines.length * 4.8 + 2;
       }
@@ -592,7 +579,7 @@ export const downloadIncarnationPDF = async (
       textY += currentKarmaLines.length * lineHeight + 2;
 
       doc.setFont('LiberationSans', 'bold');
-      doc.setTextColor(110, 230, 160);
+      doc.setTextColor(4, 120, 87);
       doc.text(dharmaLines, 20, textY);
 
       curY += cardHeight + 6;
@@ -675,11 +662,11 @@ export const downloadIncarnationPDF = async (
 
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(10);
-    doc.setTextColor(255, 255, 255);
+    doc.setTextColor(...white);
     doc.text(`Açı Tipi: ${data.incarnationCross.angleType}`, 20, cY);
     cY += 6;
 
-    doc.setTextColor(215, 225, 255);
+    doc.setTextColor(30, 58, 138);
     doc.text(crossMissionLines.slice(0, 2), 20, cY);
 
     curY += crossBoxHeight + 6;
@@ -720,17 +707,17 @@ export const downloadIncarnationPDF = async (
     doc.text(`Dünyevi (Tropikal): ${comp.tropicalSign} (${comp.tropicalDegree}°)`, 20, curY + 14.5);
 
     doc.setFont('LiberationSans', 'bold');
-    doc.setTextColor(255, 215, 0);
+    doc.setTextColor(...gold);
     doc.text(`Ruhsal (Drakonik): ${comp.draconicSign} (${comp.draconicDegree}°)`, 105, curY + 14.5);
 
     let textY = curY + 21;
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(10.5);
-    doc.setTextColor(215, 215, 225);
+    doc.setTextColor(...white);
     doc.text(tropLines, 20, textY);
     textY += tropLines.length * lineHeight + 2;
 
-    doc.setTextColor(190, 215, 255);
+    doc.setTextColor(30, 58, 138);
     doc.text(dracLines, 20, textY);
     textY += dracLines.length * lineHeight + 2;
 
@@ -811,7 +798,7 @@ export const downloadIncarnationPDF = async (
 
       doc.setFont('LiberationSans', 'bold');
       doc.setFontSize(10.5);
-      doc.setTextColor(200, 180, 255);
+      doc.setTextColor(30, 58, 138);
       doc.text('Natal Güneş (Doğum Anı):', 20, curY + 6.5);
       doc.setFont('LiberationSans', 'normal');
       doc.setTextColor(...white);
@@ -883,18 +870,18 @@ export const downloadIncarnationPDF = async (
         if (hdLines.length > 0) {
           doc.setFont('LiberationSans', 'normal');
           doc.setFontSize(9.5);
-          doc.setTextColor(255, 215, 0);
+          doc.setTextColor(...gold);
           doc.text(hdLines, 20, textY);
           textY += (hdLines.length * lineHeight) + 2;
         }
 
         doc.setFont('LiberationSans', 'normal');
         doc.setFontSize(9.5);
-        doc.setTextColor(255, 180, 180);
+        doc.setTextColor(185, 28, 28);
         doc.text(causeLines, 20, textY);
         textY += (causeLines.length * lineHeight) + 2;
 
-        doc.setTextColor(255, 230, 180);
+        doc.setTextColor(180, 83, 9);
         doc.text(lockLines, 20, textY);
         textY += (lockLines.length * lineHeight) + 2;
 
@@ -979,7 +966,7 @@ export const downloadIncarnationPDF = async (
   // Bottom Notice
   curY += 12;
   ensureSpace(34);
-  doc.setFillColor(25, 32, 50);
+  doc.setFillColor(241, 245, 249);
   doc.roundedRect(15, curY, 180, 30, 3, 3, 'F');
   doc.setDrawColor(...gold);
   doc.setLineWidth(0.4);

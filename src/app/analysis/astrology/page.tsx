@@ -118,7 +118,7 @@ export default function AstrologyPage() {
         node.style.opacity = '0';
         node.style.zIndex = '-9999';
 
-        download(dataUrl, 'Ezoterik_Dogum_Haritasi.png');
+        download(dataUrl, 'Dogum_Haritasi.png');
       } catch (err) {
         console.error(err);
         alert('İndirme sırasında bir hata oluştu.');
@@ -447,7 +447,7 @@ export default function AstrologyPage() {
               <div className="flex w-full flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-6 mb-8 gap-4">
                  <div>
                    <h2 className="text-2xl font-bold text-white flex items-center gap-3 mb-2">
-                     <Star className="text-[#D4AF37]" /> Ezoterik Doğum Haritası
+                     <Star className="text-[#D4AF37]" /> Doğum Haritası
                    </h2>
                    <p className="text-mystic-text-muted flex items-center gap-2 text-sm font-medium">
                      {cityKey ? cityKey.name : ''} • {dateStr.split('-').reverse().join('.')} {timeStr}
@@ -544,13 +544,9 @@ export default function AstrologyPage() {
                   {[...chartData.planets, chartData.ascendant, chartData.midheaven].map((p, i) => (
                     <button 
                       key={i} 
-                     onClick={() => {
-                       if (isApprenticeOrAbove) {
-                         setSelectedInterp(getFullPlanetInterpretation(p.name, p.sign, p.house));
-                       } else {
-                         setShowLockModal(true);
-                       }
-                     }}
+                      onClick={() => {
+                        setSelectedInterp(getFullPlanetInterpretation(p.name, p.sign, p.house));
+                      }}
                       className="w-full flex items-center text-left hover:bg-white/5 transition-colors p-3 sm:p-4 rounded-xl border border-transparent hover:border-white/10 group"
                     >
                       <div className="w-[45%] flex items-center gap-2 sm:gap-3 min-w-0">
@@ -598,11 +594,7 @@ export default function AstrologyPage() {
                       <button 
                         key={i} 
                         onClick={() => {
-                          if (isApprenticeOrAbove) {
-                            setSelectedInterp(getHouseCuspInterpretation(h.house, h.sign));
-                          } else {
-                            setShowLockModal(true);
-                          }
+                          setSelectedInterp(getHouseCuspInterpretation(h.house, h.sign));
                         }}
                         className="flex flex-col p-4 bg-white/5 rounded-xl hover:bg-white/10 border border-white/5 hover:border-white/20 transition-all text-left group"
                       >
@@ -666,11 +658,7 @@ export default function AstrologyPage() {
                     <button 
                       key={i} 
                       onClick={() => {
-                        if (isApprenticeOrAbove) {
-                          setSelectedInterp(getAspectInterpretation(a.planet1, a.planet2, a.type));
-                        } else {
-                          setShowLockModal(true);
-                        }
+                        setSelectedInterp(getAspectInterpretation(a.planet1, a.planet2, a.type));
                       }}
                       className="w-full flex items-center justify-between p-4 bg-white/5 rounded-xl hover:bg-white/10 border border-white/5 hover:border-white/20 transition-all text-left"
                     >

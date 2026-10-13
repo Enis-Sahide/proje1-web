@@ -1136,8 +1136,7 @@ export default function TransitsPage() {
                     fetchSkyTimeline(newRange, skyDateStr);
                   }}
                   isLoading={isSkyTimelineLoading}
-                  isPremium={isApprenticeOrAbove}
-                  onRequirePremium={() => setShowLockModal(true)}
+                  isPremium={true}
                   isMundane={true}
                   userTimezone={skyTimelineData?.timeZone || userTz}
                   tzOffsetHours={skyTimelineData?.tzOffsetHours ?? tzOffsetHours}
@@ -1440,15 +1439,11 @@ export default function TransitsPage() {
                               <button
                                 type="button"
                                 onClick={() => {
-                                  if (isApprenticeOrAbove) {
-                                    setSelectedInterp({
-                                      title: ut.humanThemeTitle,
-                                      content: ut.detailedAnalysis,
-                                      extra: ut.chakraLayer
-                                    });
-                                  } else {
-                                    setShowLockModal(true);
-                                  }
+                                  setSelectedInterp({
+                                    title: ut.humanThemeTitle,
+                                    content: ut.detailedAnalysis,
+                                    extra: ut.chakraLayer
+                                  });
                                 }}
                                 className="px-4 py-2 bg-gradient-to-r from-[#D4AF37]/20 to-[#0EA5E9]/20 hover:from-[#D4AF37]/30 hover:to-[#0EA5E9]/30 text-white border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                               >
@@ -1472,11 +1467,7 @@ export default function TransitsPage() {
                                 key={`th-${i}`} 
                                 className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-[#0EA5E9]/30 hover:bg-white/10 transition-colors cursor-pointer"
                                 onClick={() => {
-                                  if (isApprenticeOrAbove) {
-                                    setSelectedInterp(getTransitHouseInterpretation(p.name, p.house));
-                                  } else {
-                                    setShowLockModal(true);
-                                  }
+                                  setSelectedInterp(getTransitHouseInterpretation(p.name, p.house));
                                 }}
                               >
                                 <div className="flex items-center gap-3 w-1/3">
@@ -1507,11 +1498,7 @@ export default function TransitsPage() {
                                   key={`ta-${i}`} 
                                   className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/5 hover:border-white/20 hover:bg-white/10 transition-colors cursor-pointer"
                                   onClick={() => {
-                                    if (isApprenticeOrAbove) {
-                                      setSelectedInterp(getTransitAspectInterpretation(aspect.transitPlanet, aspect.natalPlanet, aspect.type));
-                                    } else {
-                                      setShowLockModal(true);
-                                    }
+                                    setSelectedInterp(getTransitAspectInterpretation(aspect.transitPlanet, aspect.natalPlanet, aspect.type));
                                   }}
                                 >
                                   <div className="flex items-center gap-2">
@@ -1561,8 +1548,7 @@ export default function TransitsPage() {
                         fetchPersonalTimeline(newRange);
                       }}
                       isLoading={isTimelineLoading}
-                      isPremium={isApprenticeOrAbove}
-                      onRequirePremium={() => setShowLockModal(true)}
+                      isPremium={true}
                       userTimezone={timelineData?.timeZone || userTz}
                       tzOffsetHours={timelineData?.tzOffsetHours ?? tzOffsetHours}
                     />
