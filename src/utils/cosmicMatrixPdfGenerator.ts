@@ -160,25 +160,13 @@ export const downloadCosmicMatrixPDF = async (
 ) => {
   const doc = new jsPDF();
 
-  const primaryDark: [number, number, number] = [10, 13, 20]; // #0A0D14
-  const cardDark: [number, number, number] = [20, 25, 38]; // #141926
-  const gold: [number, number, number] = [212, 175, 55]; // #D4AF37
-  const white: [number, number, number] = [255, 255, 255];
-  const muted: [number, number, number] = [170, 180, 200];
-  const emerald: [number, number, number] = [52, 211, 153]; // #34D399
-
-  // Paint dark background on new pages
-  const originalAddPage = doc.addPage.bind(doc);
-  doc.addPage = function (this: any, ...args: any[]) {
-    const result = originalAddPage(...args);
-    doc.setFillColor(...primaryDark);
-    doc.rect(0, 0, 210, 297, 'F');
-    return result;
-  };
-
-  // Initial page background
-  doc.setFillColor(...primaryDark);
-  doc.rect(0, 0, 210, 297, 'F');
+  const primaryDark: [number, number, number] = [20, 25, 40]; // #141928 Deep Navy
+  const cardDark: [number, number, number] = [248, 250, 252]; // #F8FAFC Light Card Background
+  const gold: [number, number, number] = [184, 134, 11]; // #B8860B Rich Dark Gold
+  const white: [number, number, number] = [31, 41, 55]; // #1F2937 High Contrast Charcoal Body
+  const muted: [number, number, number] = [100, 116, 139]; // #64748B Slate Muted
+  const borderLight: [number, number, number] = [226, 232, 240]; // #E2E8F0
+  const emerald: [number, number, number] = [4, 120, 87]; // #047857 Deep Emerald
 
   // Load custom fonts for Turkish characters
   try {
@@ -258,7 +246,7 @@ export const downloadCosmicMatrixPDF = async (
   curY += 7;
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(11);
-  doc.setTextColor(...white);
+  doc.setTextColor(...primaryDark);
   doc.text('4 Âlem Bilinç Katmanı & 13 Gezegen Dinamik Teşhisi (Master Analiz)', 105, curY, { align: 'center' });
 
   // Künye Kartı
@@ -291,7 +279,7 @@ export const downloadCosmicMatrixPDF = async (
 
   // Druid Kök Ağacı Kartı
   if (druidTree) {
-    doc.setFillColor(15, 30, 25);
+    doc.setFillColor(248, 250, 252);
     doc.roundedRect(15, curY, 180, 50, 3, 3, 'F');
     doc.setDrawColor(...emerald);
     doc.setLineWidth(0.5);
@@ -344,7 +332,7 @@ export const downloadCosmicMatrixPDF = async (
       const elX = 15 + (i * 45);
       doc.setFillColor(...cardDark);
       doc.roundedRect(elX, curY, colW, 28, 2, 2, 'F');
-      doc.setDrawColor(60, 70, 95);
+      doc.setDrawColor(...borderLight);
       doc.setLineWidth(0.3);
       doc.roundedRect(elX, curY, colW, 28, 2, 2, 'D');
 
@@ -481,20 +469,20 @@ export const downloadCosmicMatrixPDF = async (
   // FREKANS AYNASI & 4 ÂLEM ENTEGRASYON REHBERİ
   // ==========================================
   ensureSpace(58);
-  doc.setFillColor(15, 25, 45); // Derin lacivert
+  doc.setFillColor(248, 250, 252);
   doc.roundedRect(15, curY, 180, 52, 3, 3, 'F');
-  doc.setDrawColor(14, 165, 233); // Cyan kenarlık
+  doc.setDrawColor(2, 132, 199);
   doc.setLineWidth(0.5);
   doc.roundedRect(15, curY, 180, 52, 3, 3, 'D');
 
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(11.5);
-  doc.setTextColor(14, 165, 233);
+  doc.setTextColor(2, 132, 199);
   doc.text('⚡ FREKANS AYNASI REHBERİ: HANGİ ÂLEMİNİZİ ÇALIŞTIRIYORSUNUZ?', 22, curY + 8);
 
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(9.8);
-  doc.setTextColor(230, 235, 245);
+  doc.setTextColor(...white);
   const faDesc = `Bu raporda varlığınızın 4 temel âlemdeki (Assiah, Yetzirah, Beriyah, Atzilut) 13 gezegen dinamikleri ve aromaterapi reçeteleri eksiksiz sunulmuştur. Hayatın her evresinde aynı katmanı çalıştırmazsınız. Hangi katmandaki bitkisel reçeteyi ne zaman uygulayacağınızı tespit etmek için: 7Layers Frekans Aynası analizimizdeki güncel kozmik sınavınıza ve tutumunuza bakarak o an hangi haritanızı (Beden, Ruh, Zihin veya Kudret) çalıştırdığınızı teşhis edebilir ve doğrudan o âleme ait dengeleyici reçeteleri hayata geçirebilirsiniz.`;
   drawTextWithBold(doc, faDesc, 22, curY + 15.5, 166, 5.0);
 
@@ -551,7 +539,7 @@ export const downloadCosmicMatrixPDF = async (
 
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(14.5);
-    doc.setTextColor(...gold);
+    doc.setTextColor(...primaryDark);
     doc.text(wData.title, 15, curY);
 
     curY += 3;
@@ -601,7 +589,7 @@ export const downloadCosmicMatrixPDF = async (
       if (planet.botanical) {
         doc.setFont('LiberationSans', 'normal');
         doc.setFontSize(11);
-        doc.setTextColor(160, 240, 200);
+        doc.setTextColor(4, 120, 87);
         curY = drawTextWithBold(
           doc,
           `**Bitkisel Denge & Buhur:** ${planet.botanical.tree} | Buhur/Uçucu Yağ: ${planet.botanical.essentialOil} (${planet.botanical.theme})`,
@@ -616,7 +604,7 @@ export const downloadCosmicMatrixPDF = async (
       if (planet.practicalRemedy) {
         doc.setFont('LiberationSans', 'normal');
         doc.setFontSize(11);
-        doc.setTextColor(255, 230, 160);
+        doc.setTextColor(180, 83, 9);
         curY = drawTextWithBold(doc, `**Pratik Dengeleme Reçetesi:** ${planet.practicalRemedy}`, 17, curY, 176, 6.2);
       }
 

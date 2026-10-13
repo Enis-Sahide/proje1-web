@@ -31,7 +31,7 @@ const drawTextWithBold = (
 ): number => {
   let curX = x;
   let curY = y;
-  const activeColor = (doc as any).getTextColor ? (doc as any).getTextColor() : '#e6e6e6';
+  const activeColor = (doc as any).getTextColor ? (doc as any).getTextColor() : '#1f2937';
 
   if (curY > maxY) {
     doc.addPage();
@@ -143,10 +143,13 @@ const generateSvgString = (chartData: any): string => {
   const R_PLANETS = RADIUS - 15;
   const R_ASPECTS = RADIUS - 40;
 
-  let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CHART_SIZE} ${CHART_SIZE}" width="${CHART_SIZE}" height="${CHART_SIZE}" style="background-color: #141928;">`;
+  let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CHART_SIZE} ${CHART_SIZE}" width="${CHART_SIZE}" height="${CHART_SIZE}" style="background-color: transparent;">`;
   
+  // Outer celestial medallion disc
+  svg += `<circle cx="${CENTER}" cy="${CENTER}" r="${RADIUS + 55}" fill="#141928" stroke="#B8860B" stroke-width="2.5" />`;
+
   // Background circle for aspect lines
-  svg += `<circle cx="${CENTER}" cy="${CENTER}" r="${R_ASPECTS}" stroke="rgba(212,175,55,0.3)" stroke-width="1" fill="rgba(0,0,0,0.4)" />`;
+  svg += `<circle cx="${CENTER}" cy="${CENTER}" r="${R_ASPECTS}" stroke="rgba(212,175,55,0.3)" stroke-width="1" fill="rgba(10,15,30,0.6)" />`;
 
   // Aspect Lines
   chartData.aspects.filter((a: any) => a.type !== 'Kavuşum').forEach((a: any) => {
@@ -285,15 +288,6 @@ export const downloadKabbalahPDF = async (
 ) => {
   const doc = new jsPDF();
 
-  // Override addPage to automatically paint the dark background on all new pages (e.g. from autotable)
-  const originalAddPage = doc.addPage.bind(doc);
-  doc.addPage = function(this: any, ...args: any[]) {
-    const result = originalAddPage(...args);
-    doc.setFillColor(20, 25, 40); // primaryDark
-    doc.rect(0, 0, 210, 297, 'F');
-    return result;
-  };
-
   // Generate chart images in background for each of the 4 worlds (runs in browser context)
   const chartImages: Record<string, string> = {};
   for (const world of ['assiah', 'yetzirah', 'beriyah', 'atzilut'] as const) {
@@ -334,11 +328,12 @@ export const downloadKabbalahPDF = async (
     console.error("Failed to load custom fonts, falling back to standard font:", error);
   }
 
-  const primaryDark: [number, number, number] = [20, 25, 40]; // #141928
-  const secondaryDark: [number, number, number] = [30, 35, 50]; 
-  const gold: [number, number, number] = [212, 175, 55]; // #D4AF37
-  const white: [number, number, number] = [255, 255, 255];
-  const grayText: [number, number, number] = [180, 180, 180];
+  const primaryDark: [number, number, number] = [20, 25, 40]; // #141928 Deep Navy
+  const secondaryDark: [number, number, number] = [248, 250, 252]; // #F8FAFC
+  const gold: [number, number, number] = [184, 134, 11]; // #B8860B Rich Dark Gold
+  const white: [number, number, number] = [31, 41, 55]; // #1F2937 High Contrast Charcoal Body
+  const grayText: [number, number, number] = [100, 116, 139]; // #64748B Slate Muted
+  const borderLight: [number, number, number] = [226, 232, 240]; // #E2E8F0
 
   let currentY = 25;
 
@@ -346,12 +341,9 @@ export const downloadKabbalahPDF = async (
     if (currentY + required > 275) {
       doc.addPage();
       currentY = 25;
+      doc.setTextColor(white[0], white[1], white[2]);
     }
   };
-
-  // --- Title Page ---
-  doc.setFillColor(primaryDark[0], primaryDark[1], primaryDark[2]);
-  doc.rect(0, 0, 210, 297, 'F');
 
   // Decorative Header Gold Line
   doc.setDrawColor(gold[0], gold[1], gold[2]);
@@ -365,7 +357,7 @@ export const downloadKabbalahPDF = async (
 
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(20);
-  doc.setTextColor(white[0], white[1], white[2]);
+  doc.setTextColor(primaryDark[0], primaryDark[1], primaryDark[2]);
   doc.text("KABALİSTİK 4 ALEM HARİTA ANALİZİ", 20, 50);
 
   doc.setFont('LiberationSans', 'normal');
@@ -393,7 +385,10 @@ export const downloadKabbalahPDF = async (
 
   // Background rect for overview
   doc.setFillColor(secondaryDark[0], secondaryDark[1], secondaryDark[2]);
-  doc.rect(20, currentY, 170, 45, 'F');
+  doc.roundedRect(20, currentY, 170, 45, 3, 3, 'F');
+  doc.setDrawColor(...borderLight);
+  doc.setLineWidth(0.4);
+  doc.roundedRect(20, currentY, 170, 45, 3, 3, 'D');
   
   doc.setTextColor(gold[0], gold[1], gold[2]);
   doc.setFontSize(11);
@@ -422,27 +417,27 @@ export const downloadKabbalahPDF = async (
     const boxStartY = currentY;
     const boxHeight = 145;
 
-    // Draw background rectangle (dark blue with cyan border)
-    doc.setFillColor(15, 25, 45);
-    doc.setDrawColor(14, 165, 233);
-    doc.rect(20, boxStartY, 170, boxHeight, 'FD');
+    // Draw background rectangle (light slate with cyan border)
+    doc.setFillColor(248, 250, 252);
+    doc.setDrawColor(2, 132, 199);
+    doc.roundedRect(20, boxStartY, 170, boxHeight, 3, 3, 'FD');
 
     // Title: Güncel Sınav
-    doc.setTextColor(14, 165, 233);
+    doc.setTextColor(2, 132, 199);
     doc.setFontSize(12.5);
     doc.setFont('LiberationSans', 'bold');
     const challengeTitle = ac.currentTheme || ac.title;
     doc.text(`Güncel Sınav: ${challengeTitle}`, 24, boxStartY + 8.5);
 
     // Challenge description
-    doc.setTextColor(240, 240, 240);
+    doc.setTextColor(white[0], white[1], white[2]);
     doc.setFontSize(10.5);
     doc.setFont('LiberationSans', 'normal');
     const challengeDesc = ac.cosmicChallenge || ac.explanation;
     let textY = drawTextWithBold(doc, challengeDesc, 24, boxStartY + 15, 162, 5.2);
 
     // Trigger
-    doc.setTextColor(56, 189, 248);
+    doc.setTextColor(2, 132, 199);
     doc.setFontSize(10.0);
     doc.setFont('LiberationSans', 'normal');
     const triggerSummary = `⚡ Tetikleyici: ${ac.transitSummary || ac.reason}`;
@@ -461,25 +456,25 @@ export const downloadKabbalahPDF = async (
           world: "1. Assiah (Madde)", 
           tag: "Reaktif", 
           desc: ac.spectrum.assiah?.diagnosis, 
-          color: [248, 113, 113] as [number, number, number] 
+          color: [220, 38, 38] as [number, number, number] 
         },
         { 
           world: "2. Yetzirah (Duygu)", 
           tag: "Duygusal Şifa", 
           desc: ac.spectrum.yetzirah?.diagnosis, 
-          color: [56, 189, 248] as [number, number, number] 
+          color: [2, 132, 199] as [number, number, number] 
         },
         { 
           world: "3. Beriyah (Zihin)", 
           tag: "Bilge İrade", 
           desc: ac.spectrum.beriyah?.diagnosis, 
-          color: [251, 191, 36] as [number, number, number] 
+          color: [184, 134, 11] as [number, number, number] 
         },
         { 
           world: "4. Atzilut (Kudret)", 
           tag: "Kozmik Birlik", 
           desc: ac.spectrum.atzilut?.diagnosis, 
-          color: [192, 132, 252] as [number, number, number] 
+          color: [126, 34, 206] as [number, number, number] 
         }
       ];
 
@@ -490,7 +485,7 @@ export const downloadKabbalahPDF = async (
         doc.setFont('LiberationSans', 'bold');
         doc.text(`• ${item.world} [${item.tag}]:`, 24, textY);
         
-        doc.setTextColor(215, 215, 215);
+        doc.setTextColor(white[0], white[1], white[2]);
         doc.setFontSize(10.2);
         doc.setFont('LiberationSans', 'normal');
         textY = drawTextWithBold(doc, item.desc, 27, textY + 4.2, 159, 4.8);
@@ -499,7 +494,7 @@ export const downloadKabbalahPDF = async (
     }
 
     // Footnote
-    doc.setTextColor(140, 140, 140);
+    doc.setTextColor(grayText[0], grayText[1], grayText[2]);
     doc.setFontSize(9.0);
     doc.setFont('LiberationSans', 'normal');
     const footnote = "Ezoterik İlke: Hayat deneyimlerindeki bilinçli farkındalığınız, o an hangi âlemin potansiyelini aktive ettiğinizi belirler. Deneyimlerinizi eylem boyutundan (Assiah) bilgelik, sezgi ve içsel huzura (Beriyah & Atzilut) kolaylıkla dönüştürebilirsiniz.";
@@ -592,16 +587,16 @@ export const downloadKabbalahPDF = async (
       head: [['Gezegen', 'Burç', 'Derece', 'Ev']],
       body: planetsBody,
       theme: 'grid',
-      styles: { font: 'LiberationSans', overflow: 'linebreak', cellPadding: 2.5, valign: 'middle' },
+      styles: { font: 'LiberationSans', overflow: 'linebreak', cellPadding: 2.5, valign: 'middle', lineColor: borderLight, lineWidth: 0.2 },
       columnStyles: {
         0: { cellWidth: 45, fontStyle: 'bold' },
         1: { cellWidth: 40 },
         2: { cellWidth: 45 },
         3: { cellWidth: 40 }
       },
-      headStyles: { fillColor: gold, textColor: primaryDark, fontStyle: 'bold', font: 'LiberationSans' },
-      bodyStyles: { fillColor: [24, 30, 48], textColor: [255, 255, 255], font: 'LiberationSans' },
-      alternateRowStyles: { fillColor: [18, 23, 38] },
+      headStyles: { fillColor: primaryDark, textColor: [255, 255, 255], fontStyle: 'bold', font: 'LiberationSans' },
+      bodyStyles: { fillColor: [255, 255, 255], textColor: white, font: 'LiberationSans' },
+      alternateRowStyles: { fillColor: [248, 250, 252] },
     });
 
     currentY = (doc as any).lastAutoTable.finalY + 15;
@@ -630,7 +625,7 @@ export const downloadKabbalahPDF = async (
 
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(11.2);
-      doc.setTextColor(230, 230, 230);
+      doc.setTextColor(white[0], white[1], white[2]);
 
       currentY = drawTextWithBold(doc, interp.content, 20, currentY, 170, 6.5);
       currentY += 10;
