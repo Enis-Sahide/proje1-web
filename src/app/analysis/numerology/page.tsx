@@ -23,6 +23,7 @@ import {
   BodyCenter
 } from '@/features/numerology/engine/PhoneticChakraEngine';
 import { numerologyInputSchema, birthDataSchema, formatZodError } from '@/lib/validation';
+import AnalysisBackButton from '@/components/ui/AnalysisBackButton';
 
 const isMaster = (num: number) => num === 11 || num === 22 || num === 33;
 
@@ -406,9 +407,7 @@ export default function NumerologyPage() {
   return (
     <div className="min-h-screen pt-24 pb-24 px-4 md:px-6 relative">
       <div className="max-w-4xl mx-auto">
-        <button onClick={() => router.back()} className="mb-8 flex items-center text-mystic-text-muted hover:text-white transition-colors">
-          <ArrowLeft size={20} className="mr-2" /> Geri Dön
-        </button>
+        <AnalysisBackButton hasActiveResult={showResult} />
 
         <div className="flex items-center gap-4 mb-8">
           <div className="w-16 h-16 rounded-full bg-[#AF52DE]/10 border border-[#AF52DE]/30 flex items-center justify-center text-[#AF52DE]">

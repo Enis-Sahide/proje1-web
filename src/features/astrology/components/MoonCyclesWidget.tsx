@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Moon, Calendar, Sparkles, AlertCircle, Globe } from 'lucide-react';
+import Link from 'next/link';
+import { Moon, Calendar, Sparkles, AlertCircle, Globe, ChevronRight } from 'lucide-react';
 import { useContent } from '@/lib/useContent';
 
 interface MoonPhaseEvent {
@@ -24,7 +25,7 @@ export default function MoonCyclesWidget() {
   const MOON_PHASES_2026 = moonData ?? [];
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const nextItemRef = useRef<HTMLDivElement>(null);
+  const nextItemRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -202,12 +203,16 @@ export default function MoonCyclesWidget() {
 
       {/* Quick Summary / Highlight Section */}
       {nextPhase && nextPhaseData && (
-        <div className="mb-4 p-3 bg-mystic-primary/5 rounded-xl border border-mystic-primary/20 flex flex-col gap-1">
+        <Link 
+          href="/analysis/moon-cycles"
+          className="mb-4 p-3 bg-mystic-primary/5 hover:bg-mystic-primary/10 rounded-xl border border-mystic-primary/20 hover:border-mystic-primary/40 flex flex-col gap-1 cursor-pointer transition-all group block"
+          title="Detaylı etkisini görmek için tıklayın"
+        >
           <div className="flex items-center justify-between">
             <span className="text-[10px] uppercase font-bold text-mystic-accent tracking-wider flex items-center gap-1">
               <Sparkles size={10} className="animate-spin" style={{ animationDuration: '4s' }} /> Sıradaki Ay Fazı
             </span>
-            <span className="text-[9px] text-mystic-text-muted">{nextPhaseData.fullDate}</span>
+            <span className="text-[9px] text-mystic-primary font-semibold group-hover:underline">Etkiyi Oku →</span>
           </div>
           <div className="flex justify-between items-center mt-1">
             <div className="flex flex-col">
@@ -222,7 +227,7 @@ export default function MoonCyclesWidget() {
               {nextPhase.signSymbol} {nextPhase.sign} ({nextPhase.degree})
             </span>
           </div>
-        </div>
+        </Link>
       )}
 
       {/* Filter Tabs */}
@@ -256,14 +261,16 @@ export default function MoonCyclesWidget() {
             const isNext = nextPhase && item.utcDate === nextPhase.utcDate;
             const data = getFormattedData(item);
             return (
-              <div
+              <Link
                 key={idx}
                 ref={isNext ? nextItemRef : null}
-                className={`flex items-center justify-between py-1.5 px-2.5 rounded-xl transition-all duration-300 ${
+                href="/analysis/moon-cycles"
+                className={`flex items-center justify-between py-1.5 px-2.5 rounded-xl transition-all duration-300 cursor-pointer ${
                   isNext
-                    ? 'bg-mystic-primary/15 border-2 border-mystic-primary/40 shadow-[0_0_12px_rgba(212,175,55,0.15)]'
-                    : 'hover:bg-mystic-surface-light/40 border border-transparent'
+                    ? 'bg-mystic-primary/15 hover:bg-mystic-primary/25 border-2 border-mystic-primary/40 shadow-[0_0_12px_rgba(212,175,55,0.15)]'
+                    : 'hover:bg-mystic-surface-light/40 border border-transparent hover:border-white/10'
                 }`}
+                title="Detaylı astrolojik etkisini ve tavsiyelerini oku"
               >
                 {/* Left: Date & Time */}
                 <div className="flex flex-col">
@@ -289,7 +296,7 @@ export default function MoonCyclesWidget() {
                     <span className="text-[9px] text-mystic-text-muted leading-none">{item.degree}</span>
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })
         ) : (
@@ -299,6 +306,15 @@ export default function MoonCyclesWidget() {
           </div>
         )}
       </div>
+
+      {/* Direct Link to Dedicated Standalone Page */}
+      <Link
+        href="/analysis/moon-cycles"
+        className="mt-3 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-mystic-primary/10 hover:bg-mystic-primary/20 border border-mystic-primary/30 text-mystic-accent text-xs font-bold transition-all text-center group/btn shadow-sm"
+      >
+        <span>Tüm Ay Döngüleri ve Tutulma Analizleri</span>
+        <ChevronRight size={14} className="group-hover/btn:translate-x-0.5 transition-transform" />
+      </Link>
     </div>
   );
 }

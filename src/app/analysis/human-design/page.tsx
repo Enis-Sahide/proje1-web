@@ -12,6 +12,7 @@ import { useAuth } from '@/context/AuthContext';
 import { downloadHumanDesignPDF } from '@/utils/humanDesignPdfGenerator';
 import AuthPromptModal from '@/components/AuthPromptModal';
 import SafeTimePicker from '@/components/ui/SafeTimePicker';
+import AnalysisBackButton from '@/components/ui/AnalysisBackButton';
 import { synthesizeAstroHumanDesign, AstroHDSynthesisReport } from '@/features/astrology/engine/AstroHumanDesignSynthesis';
 
 const COLORS = {
@@ -663,9 +664,7 @@ export default function HumanDesignPage() {
       
 
       <div className="max-w-6xl mx-auto">
-        <button onClick={() => router.back()} className="mb-8 flex items-center text-mystic-text-muted hover:text-white transition-colors">
-          <ArrowLeft size={20} className="mr-2" /> Geri Dön
-        </button>
+        <AnalysisBackButton hasActiveResult={!!chart} />
 
         <div className="flex flex-col md:flex-row items-center justify-between mb-8">
           <div className="flex items-center gap-4">

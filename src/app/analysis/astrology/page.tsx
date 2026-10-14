@@ -13,6 +13,7 @@ import { useAuth } from '@/context/AuthContext';
 import { downloadChartPDF } from '@/utils/pdfGenerator';
 import AuthPromptModal from '@/components/AuthPromptModal';
 import SafeTimePicker from '@/components/ui/SafeTimePicker';
+import AnalysisBackButton from '@/components/ui/AnalysisBackButton';
 
 const ZODIAC_COLORS: Record<string, string> = {
   'Koç': '#FF453A', 'Aslan': '#FF453A', 'Yay': '#FF453A',
@@ -386,9 +387,7 @@ export default function AstrologyPage() {
     <div className="min-h-screen pt-24 pb-24 px-6 relative">
             
       <div className="max-w-6xl mx-auto">
-        <button onClick={() => router.back()} className="mb-8 flex items-center text-mystic-text-muted hover:text-white transition-colors">
-          <ArrowLeft size={20} className="mr-2" /> Geri Dön
-        </button>
+        <AnalysisBackButton hasActiveResult={!!chartData} />
 
         <div className="flex items-center gap-4 mb-8">
           <div className="w-16 h-16 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 flex items-center justify-center text-[#D4AF37]">

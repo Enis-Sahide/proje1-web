@@ -12,6 +12,7 @@ import { useAuth } from '@/context/AuthContext';
 import { downloadKabbalahPDF } from '@/utils/kabbalahPdfGenerator';
 import AuthPromptModal from '@/components/AuthPromptModal';
 import SafeTimePicker from '@/components/ui/SafeTimePicker';
+import AnalysisBackButton from '@/components/ui/AnalysisBackButton';
 
 const ZODIAC_COLORS: Record<string, string> = {
   'Koç': '#FF453A', 'Aslan': '#FF453A', 'Yay': '#FF453A',
@@ -279,13 +280,7 @@ export default function KabbalahAnalysisPage() {
 
       <div className="max-w-5xl mx-auto px-6 py-6 relative z-10">
         
-        <button 
-          onClick={() => router.back()}
-          className="flex items-center text-mystic-text-muted hover:text-white transition-colors mb-8 group"
-        >
-          <ArrowLeft size={20} className="mr-2 group-hover:-translate-x-1 transition-transform" />
-          Geri Dön
-        </button>
+        <AnalysisBackButton hasActiveResult={!!chartData} />
 
         <div className="mb-12 text-center">
           <div className="flex justify-center mb-4 text-[#D4AF37]">

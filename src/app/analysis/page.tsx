@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Lock, Activity, AlertCircle, Clock, Scroll, TreePine, ChevronRight } from 'lucide-react';
+import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Moon, Lock, Activity, AlertCircle, Clock, Scroll, TreePine, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 interface ToolItem {
@@ -35,6 +35,13 @@ export default function AnalysisPage() {
       icon: <Compass size={22} />,
       color: '#32ADE6',
       link: '/analysis/transits'
+    },
+    {
+      id: 'moon-cycles',
+      title: 'Ay Döngüleri & Tutulmalar',
+      icon: <Moon size={22} />,
+      color: '#E5C158',
+      link: '/analysis/moon-cycles'
     },
     {
       id: 'chakra',
