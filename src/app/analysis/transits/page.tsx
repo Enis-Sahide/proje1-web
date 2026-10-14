@@ -35,6 +35,8 @@ import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { useAuth } from '@/context/AuthContext';
 import TransitTimelineChart from '@/features/astrology/components/TransitTimelineChart';
 import MundaneSkyWheel from '@/features/astrology/components/MundaneSkyWheel';
+import LunationDisplayCard from '@/features/astrology/components/LunationDisplayCard';
+import { getActiveOrNextLunation } from '@/features/astrology/engine/LunationEngine';
 
 const ZODIAC_ORDER = ['Koç', 'Boğa', 'İkizler', 'Yengeç', 'Aslan', 'Başak', 'Terazi', 'Akrep', 'Yay', 'Oğlak', 'Kova', 'Balık'];
 const ZODIAC_COLORS: Record<string, string> = {
@@ -123,6 +125,16 @@ export default function TransitsPage() {
   const [skyTimelineRange, setSkyTimelineRange] = useState<'1m' | '3m' | '6m' | '1y'>('1m');
   const [isSkyTimelineLoading, setIsSkyTimelineLoading] = useState(false);
 
+  // Aktif Ay Fazı & Tutulma Tespiti (Gökyüzü)
+  const currentSkyLunation = useMemo(() => {
+    try {
+      const target = skyDateStr ? new Date(`${skyDateStr}T12:00:00Z`) : new Date();
+      return getActiveOrNextLunation(target);
+    } catch {
+      return getActiveOrNextLunation(new Date());
+    }
+  }, [skyDateStr]);
+
   // Fetch Mundane Sky Chart
   const fetchSkyChart = async (dateStr = skyDateStr, timeStr = skyTimeStr) => {
     setIsSkyLoading(true);
@@ -209,6 +221,24 @@ export default function TransitsPage() {
         transitData.natalChart.houses
       )
     );
+  }, [transitData]);
+
+  // Aktif Ay Fazı & Tutulma Tespiti (Kişisel Transit Tarihi)
+  const personalLunation = useMemo(() => {
+    try {
+      const target = transitDateStr ? new Date(`${transitDateStr}T12:00:00Z`) : new Date();
+      return getActiveOrNextLunation(target);
+    } catch {
+      return getActiveOrNextLunation(new Date());
+    }
+  }, [transitDateStr]);
+
+  const natalHousesList = useMemo(() => {
+    if (!transitData?.natalChart?.houses) return undefined;
+    return transitData.natalChart.houses.map((h, idx) => ({
+      house: idx + 1,
+      sign: h.sign,
+    }));
   }, [transitData]);
 
   const fetchPersonalTimeline = async (rangeToFetch: '1m' | '3m' | '6m' | '1y' = timelineRange) => {
@@ -583,6 +613,14 @@ export default function TransitsPage() {
                 </div>
               ) : skyChartData ? (
                 <div className="space-y-8">
+                  {/* Aktif Kozmik Faz & Tutulma Enerjisi */}
+                  {currentSkyLunation && (
+                    <LunationDisplayCard
+                      event={currentSkyLunation.event}
+                      statusText={currentSkyLunation.statusText}
+                    />
+                  )}
+
                   {/* Wheel & Aspects Split */}
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     
@@ -1264,6 +1302,15 @@ export default function TransitsPage() {
                 {/* Personal Tab 1: Bi-Wheel */}
                 {personalTab === 'BIWHEEL' && (
                   <div className="space-y-10">
+                    {/* Bu Dönemin Ay Fazı & Tutulmasının Doğum Haritanıza Etkisi */}
+                    {personalLunation && (
+                      <LunationDisplayCard
+                        event={personalLunation.event}
+                        natalHouses={natalHousesList}
+                        statusText={personalLunation.statusText}
+                      />
+                    )}
+
                     <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-8 rounded-3xl shadow-2xl flex flex-col items-center w-full max-w-full overflow-hidden">
                       <div className="flex w-full flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-6 mb-8 gap-4">
                          <div>

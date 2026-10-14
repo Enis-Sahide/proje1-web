@@ -1,8 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Moon, Calendar, Sparkles, AlertCircle, Globe } from 'lucide-react';
+import { Moon, Calendar, Sparkles, AlertCircle, Globe, X } from 'lucide-react';
 import { useContent } from '@/lib/useContent';
+import LunationDisplayCard from './LunationDisplayCard';
 
 interface MoonPhaseEvent {
   utcDate: string; // ISO format UTC date
@@ -20,6 +21,7 @@ export default function MoonCyclesWidget() {
   const [filter, setFilter] = useState<'all' | 'new_moon' | 'full_moon' | 'eclipse'>('all');
   const [isTurkeyTime, setIsTurkeyTime] = useState(true);
   const [nextPhase, setNextPhase] = useState<MoonPhaseEvent | null>(null);
+  const [selectedEvent, setSelectedEvent] = useState<MoonPhaseEvent | null>(null);
   const { data: moonData } = useContent<MoonPhaseEvent[]>('/api/content/moon-phases');
   const MOON_PHASES_2026 = moonData ?? [];
 
@@ -202,12 +204,16 @@ export default function MoonCyclesWidget() {
 
       {/* Quick Summary / Highlight Section */}
       {nextPhase && nextPhaseData && (
-        <div className="mb-4 p-3 bg-mystic-primary/5 rounded-xl border border-mystic-primary/20 flex flex-col gap-1">
+        <div 
+          onClick={() => setSelectedEvent(nextPhase)}
+          className="mb-4 p-3 bg-mystic-primary/5 hover:bg-mystic-primary/10 rounded-xl border border-mystic-primary/20 hover:border-mystic-primary/40 flex flex-col gap-1 cursor-pointer transition-all group"
+          title="Detaylı etkisini görmek için tıklayın"
+        >
           <div className="flex items-center justify-between">
             <span className="text-[10px] uppercase font-bold text-mystic-accent tracking-wider flex items-center gap-1">
               <Sparkles size={10} className="animate-spin" style={{ animationDuration: '4s' }} /> Sıradaki Ay Fazı
             </span>
-            <span className="text-[9px] text-mystic-text-muted">{nextPhaseData.fullDate}</span>
+            <span className="text-[9px] text-mystic-primary font-semibold group-hover:underline">Etkiyi Oku →</span>
           </div>
           <div className="flex justify-between items-center mt-1">
             <div className="flex flex-col">
@@ -259,11 +265,13 @@ export default function MoonCyclesWidget() {
               <div
                 key={idx}
                 ref={isNext ? nextItemRef : null}
-                className={`flex items-center justify-between py-1.5 px-2.5 rounded-xl transition-all duration-300 ${
+                onClick={() => setSelectedEvent(item)}
+                className={`flex items-center justify-between py-1.5 px-2.5 rounded-xl transition-all duration-300 cursor-pointer ${
                   isNext
-                    ? 'bg-mystic-primary/15 border-2 border-mystic-primary/40 shadow-[0_0_12px_rgba(212,175,55,0.15)]'
-                    : 'hover:bg-mystic-surface-light/40 border border-transparent'
+                    ? 'bg-mystic-primary/15 hover:bg-mystic-primary/25 border-2 border-mystic-primary/40 shadow-[0_0_12px_rgba(212,175,55,0.15)]'
+                    : 'hover:bg-mystic-surface-light/40 border border-transparent hover:border-white/10'
                 }`}
+                title="Detaylı astrolojik etkisini ve tavsiyelerini oku"
               >
                 {/* Left: Date & Time */}
                 <div className="flex flex-col">
@@ -299,6 +307,30 @@ export default function MoonCyclesWidget() {
           </div>
         )}
       </div>
+
+      {/* Detay Modalı */}
+      {selectedEvent && (
+        <div 
+          onClick={() => setSelectedEvent(null)}
+          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+        >
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="max-w-2xl w-full max-h-[90vh] overflow-y-auto relative animate-in zoom-in-95 duration-200"
+          >
+            <button
+              onClick={() => setSelectedEvent(null)}
+              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+              aria-label="Kapat"
+            >
+              <X size={18} />
+            </button>
+            <LunationDisplayCard 
+              event={selectedEvent} 
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
