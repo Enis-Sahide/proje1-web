@@ -1,9 +1,9 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Moon, Calendar, Sparkles, AlertCircle, Globe, X } from 'lucide-react';
+import Link from 'next/link';
+import { Moon, Calendar, Sparkles, AlertCircle, Globe, ChevronRight } from 'lucide-react';
 import { useContent } from '@/lib/useContent';
-import LunationDisplayCard from './LunationDisplayCard';
 
 interface MoonPhaseEvent {
   utcDate: string; // ISO format UTC date
@@ -21,12 +21,11 @@ export default function MoonCyclesWidget() {
   const [filter, setFilter] = useState<'all' | 'new_moon' | 'full_moon' | 'eclipse'>('all');
   const [isTurkeyTime, setIsTurkeyTime] = useState(true);
   const [nextPhase, setNextPhase] = useState<MoonPhaseEvent | null>(null);
-  const [selectedEvent, setSelectedEvent] = useState<MoonPhaseEvent | null>(null);
   const { data: moonData } = useContent<MoonPhaseEvent[]>('/api/content/moon-phases');
   const MOON_PHASES_2026 = moonData ?? [];
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const nextItemRef = useRef<HTMLDivElement>(null);
+  const nextItemRef = useRef<HTMLAnchorElement>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -204,9 +203,9 @@ export default function MoonCyclesWidget() {
 
       {/* Quick Summary / Highlight Section */}
       {nextPhase && nextPhaseData && (
-        <div 
-          onClick={() => setSelectedEvent(nextPhase)}
-          className="mb-4 p-3 bg-mystic-primary/5 hover:bg-mystic-primary/10 rounded-xl border border-mystic-primary/20 hover:border-mystic-primary/40 flex flex-col gap-1 cursor-pointer transition-all group"
+        <Link 
+          href="/analysis/moon-cycles"
+          className="mb-4 p-3 bg-mystic-primary/5 hover:bg-mystic-primary/10 rounded-xl border border-mystic-primary/20 hover:border-mystic-primary/40 flex flex-col gap-1 cursor-pointer transition-all group block"
           title="Detaylı etkisini görmek için tıklayın"
         >
           <div className="flex items-center justify-between">
@@ -228,7 +227,7 @@ export default function MoonCyclesWidget() {
               {nextPhase.signSymbol} {nextPhase.sign} ({nextPhase.degree})
             </span>
           </div>
-        </div>
+        </Link>
       )}
 
       {/* Filter Tabs */}
@@ -262,10 +261,10 @@ export default function MoonCyclesWidget() {
             const isNext = nextPhase && item.utcDate === nextPhase.utcDate;
             const data = getFormattedData(item);
             return (
-              <div
+              <Link
                 key={idx}
                 ref={isNext ? nextItemRef : null}
-                onClick={() => setSelectedEvent(item)}
+                href="/analysis/moon-cycles"
                 className={`flex items-center justify-between py-1.5 px-2.5 rounded-xl transition-all duration-300 cursor-pointer ${
                   isNext
                     ? 'bg-mystic-primary/15 hover:bg-mystic-primary/25 border-2 border-mystic-primary/40 shadow-[0_0_12px_rgba(212,175,55,0.15)]'
@@ -297,7 +296,7 @@ export default function MoonCyclesWidget() {
                     <span className="text-[9px] text-mystic-text-muted leading-none">{item.degree}</span>
                   </div>
                 </div>
-              </div>
+              </Link>
             );
           })
         ) : (
@@ -308,50 +307,14 @@ export default function MoonCyclesWidget() {
         )}
       </div>
 
-      {/* Detay Modalı (Mobil Uyumlu & Garantili Kapatmalı) */}
-      {selectedEvent && (
-        <div 
-          onClick={() => setSelectedEvent(null)}
-          className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200"
-        >
-          <div 
-            onClick={(e) => e.stopPropagation()}
-            className="max-w-2xl w-full max-h-[85vh] flex flex-col bg-[#121216] border border-[#D4AF37]/40 rounded-3xl shadow-[0_10px_50px_rgba(0,0,0,0.9),0_0_30px_rgba(212,175,55,0.2)] overflow-hidden relative animate-in zoom-in-95 duration-200"
-          >
-            {/* Üst Bar: Her Zaman Sabit ve Görünür Kapatma */}
-            <div className="flex items-center justify-between px-5 py-3 border-b border-white/10 bg-black/60 shrink-0">
-              <span className="text-xs font-bold uppercase tracking-wider text-[#D4AF37] flex items-center gap-1.5">
-                <Sparkles size={14} /> Kozmik Faz & Tutulma Rehberi
-              </span>
-              <button
-                onClick={() => setSelectedEvent(null)}
-                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all cursor-pointer touch-manipulation hover:scale-105"
-                aria-label="Kapat"
-              >
-                <span>Kapat</span>
-                <X size={15} />
-              </button>
-            </div>
-
-            {/* İçerik: Pürüzsüz Kaydırılabilir Alan */}
-            <div className="overflow-y-auto p-4 sm:p-6 flex-1 scrollbar-thin scrollbar-thumb-white/10">
-              <LunationDisplayCard 
-                event={selectedEvent} 
-              />
-            </div>
-
-            {/* Alt Bar: Ek Güvenli Kapat Butonu */}
-            <div className="p-3 bg-black/60 border-t border-white/10 flex justify-center shrink-0">
-              <button
-                onClick={() => setSelectedEvent(null)}
-                className="w-full sm:w-auto px-8 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs sm:text-sm transition-all cursor-pointer touch-manipulation"
-              >
-                Pencereyi Kapat
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Direct Link to Dedicated Standalone Page */}
+      <Link
+        href="/analysis/moon-cycles"
+        className="mt-3 flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl bg-mystic-primary/10 hover:bg-mystic-primary/20 border border-mystic-primary/30 text-mystic-accent text-xs font-bold transition-all text-center group/btn shadow-sm"
+      >
+        <span>Tüm Ay Döngüleri ve Tutulma Analizleri</span>
+        <ChevronRight size={14} className="group-hover/btn:translate-x-0.5 transition-transform" />
+      </Link>
     </div>
   );
 }
