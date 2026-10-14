@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import AuthPromptModal from '@/components/AuthPromptModal';
+import SafeTimePicker from '@/components/ui/SafeTimePicker';
 import { downloadCosmicMatrixPDF } from '@/utils/cosmicMatrixPdfGenerator';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import moment from 'moment-timezone';
@@ -371,7 +372,7 @@ export default function CosmicMatrixPage() {
                     value={dateStr}
                     onChange={(e) => setDateStr(e.target.value)}
                     required
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-400/50"
+                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-base focus:outline-none focus:border-amber-400/50 touch-manipulation"
                   />
                 </div>
 
@@ -379,13 +380,7 @@ export default function CosmicMatrixPage() {
                   <label className="block text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
                     Doğum Saati
                   </label>
-                  <input
-                    type="time"
-                    value={timeStr}
-                    onChange={(e) => setTimeStr(e.target.value)}
-                    required
-                    className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-amber-400/50"
-                  />
+                  <SafeTimePicker value={timeStr} onChange={setTimeStr} required />
                 </div>
 
                 <div>

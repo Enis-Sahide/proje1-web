@@ -9,6 +9,7 @@ import AnimatedBackground from "@/core/ui/AnimatedBackground";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
 import ClarityProvider from "@/components/ClarityProvider";
 import TestBanner from "@/components/TestBanner";
+import InAppBrowserBanner from "@/components/InAppBrowserBanner";
 import Footer from "@/core/ui/Footer";
 
 const inter = Inter({
@@ -90,6 +91,7 @@ export default function RootLayout({
             <RouteGuard>
               <AnalyticsTracker />
               <ClarityProvider />
+              <InAppBrowserBanner />
               <TestBanner />
               <Navigation />
               <main className="flex-grow flex flex-col">

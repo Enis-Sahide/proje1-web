@@ -9,6 +9,7 @@ import Link from 'next/link';
 import { useAuth } from '@/context/AuthContext';
 import BillingProfileForm, { profileSummary, type BillingProfile } from '@/components/billing/BillingProfileForm';
 import { guestCheckoutSchema, formatZodError } from '@/lib/validation';
+import SafeTimePicker from '@/components/ui/SafeTimePicker';
 
 const inputCls =
   'w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#D4AF37] transition-colors';
@@ -322,7 +323,7 @@ function GuestCheckoutForm() {
                     type="date"
                     value={dateStr}
                     onChange={e => setDateStr(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#D4AF37] transition-colors"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-base text-white placeholder-white/30 focus:outline-none focus:border-[#D4AF37] transition-colors touch-manipulation"
                     required
                   />
                 </div>
@@ -330,13 +331,7 @@ function GuestCheckoutForm() {
                   <label className="block text-[11px] font-semibold text-[#D4AF37] uppercase tracking-wider mb-1.5">
                     Doğum Saati
                   </label>
-                  <input 
-                    type="time"
-                    value={timeStr}
-                    onChange={e => setTimeStr(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#D4AF37] transition-colors"
-                    required
-                  />
+                  <SafeTimePicker value={timeStr} onChange={setTimeStr} required />
                 </div>
               </div>
 

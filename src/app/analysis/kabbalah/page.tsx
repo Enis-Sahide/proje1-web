@@ -11,6 +11,7 @@ import { X } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { downloadKabbalahPDF } from '@/utils/kabbalahPdfGenerator';
 import AuthPromptModal from '@/components/AuthPromptModal';
+import SafeTimePicker from '@/components/ui/SafeTimePicker';
 
 const ZODIAC_COLORS: Record<string, string> = {
   'Koç': '#FF453A', 'Aslan': '#FF453A', 'Yay': '#FF453A',
@@ -313,17 +314,13 @@ export default function KabbalahAnalysisPage() {
                     min="1900-01-01"
                     max="2100-12-31"
                     value={dateStr} onChange={e => setDateStr(e.target.value)}
-                    className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
+                    className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-[#D4AF37] transition-colors touch-manipulation"
                   />
                 </div>
                 
                 <div>
                   <label className="block text-sm font-medium text-mystic-text-muted mb-2">Doğum Saati</label>
-                  <input 
-                    type="time" 
-                    value={timeStr} onChange={e => setTimeStr(e.target.value)}
-                    className="w-full bg-black/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors"
-                  />
+                  <SafeTimePicker value={timeStr} onChange={setTimeStr} />
                 </div>
 
                 <div>

@@ -10,7 +10,12 @@ export default function TestBanner() {
   const router = useRouter();
 
   useEffect(() => {
-    if (pathname === '/test' || pathname.startsWith('/admin') || pathname?.startsWith('/checkout/iframe')) {
+    if (
+      pathname === '/test' || 
+      pathname.startsWith('/admin') || 
+      pathname.startsWith('/analysis') || 
+      pathname.startsWith('/checkout')
+    ) {
       setIsVisible(false);
       return;
     }
@@ -19,7 +24,7 @@ export default function TestBanner() {
     if (!dismissed) {
       const timer = setTimeout(() => {
         setIsVisible(true);
-      }, 2000);
+      }, 8000);
       return () => clearTimeout(timer);
     }
   }, [pathname]);

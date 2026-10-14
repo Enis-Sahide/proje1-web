@@ -11,6 +11,7 @@ import { AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 import { useAuth } from '@/context/AuthContext';
 import { downloadHumanDesignPDF } from '@/utils/humanDesignPdfGenerator';
 import AuthPromptModal from '@/components/AuthPromptModal';
+import SafeTimePicker from '@/components/ui/SafeTimePicker';
 import { synthesizeAstroHumanDesign, AstroHDSynthesisReport } from '@/features/astrology/engine/AstroHumanDesignSynthesis';
 
 const COLORS = {
@@ -699,18 +700,12 @@ export default function HumanDesignPage() {
                     max="2100-12-31"
                     value={dateStr}
                     onChange={(e) => setDateStr(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#32D74B] transition-colors" 
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-[#32D74B] transition-colors touch-manipulation" 
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-mystic-text-muted mb-2">Doğum Saati *</label>
-                  <input 
-                    required 
-                    type="time" 
-                    value={timeStr}
-                    onChange={(e) => setTimeStr(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#32D74B] transition-colors" 
-                  />
+                  <SafeTimePicker value={timeStr} onChange={setTimeStr} required />
                 </div>
               </div>
 

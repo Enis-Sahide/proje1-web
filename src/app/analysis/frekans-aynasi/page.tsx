@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, Loader2, Sparkles, Compass, AlertCircle, RefreshCw, MoonStar, ExternalLink } from 'lucide-react';
 import { ASTRO_CITIES, AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
+import SafeTimePicker from '@/components/ui/SafeTimePicker';
 
 export default function FrekansAynasiPage() {
   const router = useRouter();
@@ -102,7 +103,7 @@ export default function FrekansAynasiPage() {
                   type="date"
                   value={dateStr}
                   onChange={(e) => setDateStr(e.target.value)}
-                  className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#0EA5E9] text-sm"
+                  className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#0EA5E9] text-base touch-manipulation"
                 />
               </div>
 
@@ -110,12 +111,7 @@ export default function FrekansAynasiPage() {
                 <label className="block text-xs uppercase tracking-wider text-mystic-text-muted font-bold mb-2">
                   Doğum Saati
                 </label>
-                <input
-                  type="time"
-                  value={timeStr}
-                  onChange={(e) => setTimeStr(e.target.value)}
-                  className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#0EA5E9] text-sm"
-                />
+                <SafeTimePicker value={timeStr} onChange={setTimeStr} />
               </div>
 
               <div>

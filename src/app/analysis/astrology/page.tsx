@@ -12,6 +12,7 @@ import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { useAuth } from '@/context/AuthContext';
 import { downloadChartPDF } from '@/utils/pdfGenerator';
 import AuthPromptModal from '@/components/AuthPromptModal';
+import SafeTimePicker from '@/components/ui/SafeTimePicker';
 
 const ZODIAC_COLORS: Record<string, string> = {
   'Koç': '#FF453A', 'Aslan': '#FF453A', 'Yay': '#FF453A',
@@ -420,11 +421,11 @@ export default function AstrologyPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-mystic-text-muted mb-2">Doğum Tarihi *</label>
-                  <input required type="date" min="1900-01-01" max="2100-12-31" value={dateStr} onChange={e => setDateStr(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors" />
+                  <input required type="date" min="1900-01-01" max="2100-12-31" value={dateStr} onChange={e => setDateStr(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-[#D4AF37] transition-colors touch-manipulation" />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-mystic-text-muted mb-2">Doğum Saati (Tam)</label>
-                  <input required type="time" value={timeStr} onChange={e => setTimeStr(e.target.value)} className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors" />
+                  <SafeTimePicker value={timeStr} onChange={setTimeStr} required />
                 </div>
               </div>
               <div>
