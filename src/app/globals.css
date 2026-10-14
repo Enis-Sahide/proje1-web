@@ -55,6 +55,18 @@
   ::-webkit-scrollbar-thumb:hover {
     background: var(--color-mystic-primary);
   }
+
+  /* Mobil & Instagram In-App Browser Ergonomisi: Otomatik Zoom ve Kilitlenme Engelleme */
+  @media screen and (max-width: 768px) {
+    input, select, textarea {
+      font-size: 16px !important;
+    }
+  }
+
+  button, input, select, textarea, a {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
 @layer utilities {

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { getTransitHouseInterpretation, getTransitAspectInterpretation } from '@/features/astrology/engine/TransitInterpretations';
 import { getSkyPlanetSignInterpretation, getPlanetSignBriefHeadline, getIngressPhase } from '@/features/astrology/engine/SkyAspectInterpretations';
+import SafeTimePicker from '@/components/ui/SafeTimePicker';
 import { 
   generateUnifiedPlanetTransit, 
   UnifiedPlanetTransit, 
@@ -519,20 +520,23 @@ export default function TransitsPage() {
 
               {/* Right: Date Picker & Quick Actions */}
               <div className="flex flex-wrap items-center gap-3">
-                <div className="flex items-center gap-2 bg-black/40 px-3 py-1.5 rounded-xl border border-white/10">
-                  <Clock size={14} className="text-[#0EA5E9]" />
-                  <input 
-                    type="date" 
-                    value={skyDateStr}
-                    onChange={(e) => setSkyDateStr(e.target.value)}
-                    className="bg-transparent text-white text-xs sm:text-sm focus:outline-none"
-                  />
-                  <input 
-                    type="time" 
-                    value={skyTimeStr}
-                    onChange={(e) => setSkyTimeStr(e.target.value)}
-                    className="bg-transparent text-white text-xs sm:text-sm focus:outline-none border-l border-white/10 pl-2"
-                  />
+                <div className="flex flex-wrap items-center gap-2 bg-black/40 px-3 py-1.5 rounded-xl border border-white/10">
+                  <div className="flex items-center gap-2">
+                    <Clock size={14} className="text-[#0EA5E9]" />
+                    <input 
+                      type="date" 
+                      value={skyDateStr}
+                      onChange={(e) => setSkyDateStr(e.target.value)}
+                      className="bg-transparent text-white text-sm focus:outline-none touch-manipulation"
+                    />
+                  </div>
+                  <div className="border-l border-white/10 pl-2">
+                    <SafeTimePicker 
+                      value={skyTimeStr} 
+                      onChange={setSkyTimeStr}
+                      className="text-xs scale-90 origin-left"
+                    />
+                  </div>
                 </div>
 
                 <button
@@ -1169,11 +1173,11 @@ export default function TransitsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-mystic-text-muted mb-2">Doğum Tarihi *</label>
-                        <input required type="date" min="1900-01-01" max="2100-12-31" value={natalDateStr} onChange={e => setNatalDateStr(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors" />
+                        <input required type="date" min="1900-01-01" max="2100-12-31" value={natalDateStr} onChange={e => setNatalDateStr(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-[#D4AF37] transition-colors touch-manipulation" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-mystic-text-muted mb-2">Doğum Saati</label>
-                        <input required type="time" value={natalTimeStr} onChange={e => setNatalTimeStr(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#D4AF37] transition-colors" />
+                        <SafeTimePicker value={natalTimeStr} onChange={setNatalTimeStr} required />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-mystic-text-muted mb-2">Şehir *</label>
@@ -1192,11 +1196,11 @@ export default function TransitsPage() {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-mystic-text-muted mb-2">Transit Tarihi *</label>
-                        <input required type="date" min="1900-01-01" max="2100-12-31" value={transitDateStr} onChange={e => setTransitDateStr(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#0EA5E9] transition-colors" />
+                        <input required type="date" min="1900-01-01" max="2100-12-31" value={transitDateStr} onChange={e => setTransitDateStr(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-[#0EA5E9] transition-colors touch-manipulation" />
                       </div>
                       <div>
                         <label className="block text-sm font-medium text-mystic-text-muted mb-2">Transit Saati</label>
-                        <input required type="time" value={transitTimeStr} onChange={e => setTransitTimeStr(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#0EA5E9] transition-colors" />
+                        <SafeTimePicker value={transitTimeStr} onChange={setTransitTimeStr} required />
                       </div>
                     </div>
                   </div>
