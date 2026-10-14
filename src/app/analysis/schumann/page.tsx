@@ -5,6 +5,7 @@ import { ArrowLeft, Activity, Zap, Compass, BookOpen, AlertCircle, Info, Refresh
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { ROLE_LEVELS } from '@/lib/auth/roles';
+import AnalysisBackButton from '@/components/ui/AnalysisBackButton';
 
 interface KpHistoryItem {
   time: string;
@@ -877,13 +878,7 @@ export default function SchumannPage() {
 
       <div className="max-w-5xl mx-auto px-6 py-12 relative z-30">
         
-        <button 
-          onClick={() => router.back()}
-          className="flex items-center text-mystic-text-muted hover:text-white transition-colors mb-8 group cursor-pointer relative z-50"
-        >
-          <ArrowLeft size={20} className="mr-2 group-hover:-translate-x-1 transition-transform" />
-          Geri Dön
-        </button>
+        <AnalysisBackButton hasActiveResult={false} />
 
         <div className="mb-12 text-center">
           <div className="flex justify-center mb-4 text-[#00E5FF]">

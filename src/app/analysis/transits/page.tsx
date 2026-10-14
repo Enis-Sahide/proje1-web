@@ -37,6 +37,7 @@ import TransitTimelineChart from '@/features/astrology/components/TransitTimelin
 import MundaneSkyWheel from '@/features/astrology/components/MundaneSkyWheel';
 import LunationDisplayCard from '@/features/astrology/components/LunationDisplayCard';
 import { getActiveOrNextLunation } from '@/features/astrology/engine/LunationEngine';
+import AnalysisBackButton from '@/components/ui/AnalysisBackButton';
 
 const ZODIAC_ORDER = ['Koç', 'Boğa', 'İkizler', 'Yengeç', 'Aslan', 'Başak', 'Terazi', 'Akrep', 'Yay', 'Oğlak', 'Kova', 'Balık'];
 const ZODIAC_COLORS: Record<string, string> = {
@@ -423,9 +424,7 @@ export default function TransitsPage() {
   return (
     <div className="min-h-screen pt-24 pb-24 px-4 sm:px-6 relative">
       <div className="max-w-6xl mx-auto">
-        <button onClick={() => router.back()} className="mb-6 flex items-center text-mystic-text-muted hover:text-white transition-colors">
-          <ArrowLeft size={20} className="mr-2" /> Geri Dön
-        </button>
+        <AnalysisBackButton hasActiveResult={!!transitData} />
 
         {/* Main Title Header */}
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
