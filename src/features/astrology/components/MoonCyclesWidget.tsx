@@ -308,26 +308,47 @@ export default function MoonCyclesWidget() {
         )}
       </div>
 
-      {/* Detay Modalı */}
+      {/* Detay Modalı (Mobil Uyumlu & Garantili Kapatmalı) */}
       {selectedEvent && (
         <div 
           onClick={() => setSelectedEvent(null)}
-          className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200"
+          className="fixed inset-0 z-[100] bg-black/85 backdrop-blur-md flex items-center justify-center p-3 sm:p-6 animate-in fade-in duration-200"
         >
           <div 
             onClick={(e) => e.stopPropagation()}
-            className="max-w-2xl w-full max-h-[90vh] overflow-y-auto relative animate-in zoom-in-95 duration-200"
+            className="max-w-2xl w-full max-h-[85vh] flex flex-col bg-[#121216] border border-[#D4AF37]/40 rounded-3xl shadow-[0_10px_50px_rgba(0,0,0,0.9),0_0_30px_rgba(212,175,55,0.2)] overflow-hidden relative animate-in zoom-in-95 duration-200"
           >
-            <button
-              onClick={() => setSelectedEvent(null)}
-              className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
-              aria-label="Kapat"
-            >
-              <X size={18} />
-            </button>
-            <LunationDisplayCard 
-              event={selectedEvent} 
-            />
+            {/* Üst Bar: Her Zaman Sabit ve Görünür Kapatma */}
+            <div className="flex items-center justify-between px-5 py-3 border-b border-white/10 bg-black/60 shrink-0">
+              <span className="text-xs font-bold uppercase tracking-wider text-[#D4AF37] flex items-center gap-1.5">
+                <Sparkles size={14} /> Kozmik Faz & Tutulma Rehberi
+              </span>
+              <button
+                onClick={() => setSelectedEvent(null)}
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-bold transition-all cursor-pointer touch-manipulation hover:scale-105"
+                aria-label="Kapat"
+              >
+                <span>Kapat</span>
+                <X size={15} />
+              </button>
+            </div>
+
+            {/* İçerik: Pürüzsüz Kaydırılabilir Alan */}
+            <div className="overflow-y-auto p-4 sm:p-6 flex-1 scrollbar-thin scrollbar-thumb-white/10">
+              <LunationDisplayCard 
+                event={selectedEvent} 
+              />
+            </div>
+
+            {/* Alt Bar: Ek Güvenli Kapat Butonu */}
+            <div className="p-3 bg-black/60 border-t border-white/10 flex justify-center shrink-0">
+              <button
+                onClick={() => setSelectedEvent(null)}
+                className="w-full sm:w-auto px-8 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs sm:text-sm transition-all cursor-pointer touch-manipulation"
+              >
+                Pencereyi Kapat
+              </button>
+            </div>
           </div>
         </div>
       )}
