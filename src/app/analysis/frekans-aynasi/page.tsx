@@ -2,10 +2,11 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Loader2, Sparkles, Compass, AlertCircle, RefreshCw, MoonStar, ExternalLink } from 'lucide-react';
+import { Loader2, Sparkles, Compass, AlertCircle, RefreshCw, MoonStar, ExternalLink } from 'lucide-react';
 import { ASTRO_CITIES, AstroCity } from '@/features/astrology/engine/AstrologyConstants';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import SafeTimePicker from '@/components/ui/SafeTimePicker';
+import AnalysisBackButton from '@/components/ui/AnalysisBackButton';
 
 export default function FrekansAynasiPage() {
   const router = useRouter();
@@ -63,14 +64,10 @@ export default function FrekansAynasiPage() {
       <div className="absolute bottom-10 left-10 w-[400px] h-[400px] bg-[#6A0DAD] opacity-10 blur-[120px] pointer-events-none rounded-full" />
 
       <div className="max-w-4xl mx-auto relative z-10">
-        {/* Back Button */}
-        <button 
-          onClick={() => router.push('/analysis')}
-          className="inline-flex items-center gap-2 text-mystic-text-muted hover:text-white mb-8 transition-colors text-sm font-medium"
-        >
-          <ArrowLeft size={18} />
-          <span>Analizlere Dön</span>
-        </button>
+        {/* Back Button with safe result guard */}
+        <div className="mb-8">
+          <AnalysisBackButton hasActiveResult={!!activeConsciousness} />
+        </div>
 
         {/* Page Title & Intro */}
         <div className="text-center mb-10">
@@ -193,6 +190,11 @@ export default function FrekansAynasiPage() {
                   <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase">
                     Gelişim Odak Noktası
                   </span>
+                  {activeConsciousness.natalHouse && (
+                    <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 uppercase">
+                      {activeConsciousness.natalHouse}. Ev Sınavı
+                    </span>
+                  )}
                   <h4 className="text-base sm:text-lg font-bold text-[#0EA5E9]">
                     {activeConsciousness.currentTheme || activeConsciousness.title}
                   </h4>
