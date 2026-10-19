@@ -20,7 +20,7 @@ async function main() {
     slug: 'kelt-druid-agaclari-ve-ogham-rehberi',
     content: content,
     imageUrl: '/druid-tree-blog-cover.jpg',
-    category: 'Kadim Bilgelik',
+    category: 'Ezoterik',
     published: true,
   };
 
