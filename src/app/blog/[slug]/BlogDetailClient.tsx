@@ -89,6 +89,29 @@ const renderContent = (content: string) => {
       continue;
     }
 
+    // Markdown Image handling (![alt](url))
+    const imgMatch = trimmed.match(/^!\[(.*?)\]\((.*?)\)$/);
+    if (imgMatch) {
+      const altText = imgMatch[1];
+      const imgUrl = imgMatch[2];
+      elements.push(
+        <div key={`img-${i}`} className="my-8 rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black/40 group">
+          <img 
+            src={imgUrl} 
+            alt={altText || '7Layers Blog Görseli'} 
+            className="w-full h-auto max-h-[480px] object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+            loading="lazy"
+          />
+          {altText && (
+            <p className="text-center text-xs text-mystic-text-muted py-2.5 px-4 bg-black/60 border-t border-white/5 italic">
+              {altText}
+            </p>
+          )}
+        </div>
+      );
+      continue;
+    }
+
     // Markdown Table handling (| ... |)
     if (trimmed.startsWith('|') && trimmed.includes('|')) {
       const tableLines: string[] = [];

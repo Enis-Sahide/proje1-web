@@ -39,6 +39,8 @@ Kendinle konuştuğunda tüm orkestraya *"Harika çalın"* dersin. Ancak yıllar
 
 ---
 
+![Hücresel Şifa ve Organlarla Bilinçli Diyalog](/cellular_body_healing.jpg)
+
 ### Organların Duygusal Hafızası: Hangi Organ Neyi Taşır?
 
 Nörobiyolog Dr. Candace Pert’ün *"Molecules of Emotion"* (Duygu Molekülleri) adlı çığır açan çalışmasında kanıtladığı gibi: **Zihin sadece kafatasının içinde değildir.** Zihnimiz, tüm organlarımıza ve hücrelerimize sinir uçları ve neuropeptidler aracılığıyla yayılmış durumdadır. Yaşadığınız her bastırılmış duygu, kimyasal bir tortu olarak belirli organların dokusuna kodlanır.
