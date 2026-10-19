@@ -617,6 +617,7 @@ export default function TransitsPage() {
                     <LunationDisplayCard
                       event={currentSkyLunation.event}
                       statusText={currentSkyLunation.statusText}
+                      activeSolarEclipse={currentSkyLunation.activeSolarEclipse}
                     />
                   )}
 
@@ -1307,6 +1308,7 @@ export default function TransitsPage() {
                         event={personalLunation.event}
                         natalHouses={natalHousesList}
                         statusText={personalLunation.statusText}
+                        activeSolarEclipse={personalLunation.activeSolarEclipse}
                       />
                     )}
 
