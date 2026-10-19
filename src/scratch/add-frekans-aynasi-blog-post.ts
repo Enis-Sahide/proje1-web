@@ -64,7 +64,7 @@ Kendi kullanım kılavuzuna sahip olmadan bir hayat yaşamak, fırtınalı deniz
 
 Şimdi web sitemizden veya mobil uygulamamızdan **Frekans Aynası** analizine girerek doğum bilgilerinizi yazın; gökyüzünün şu an haritanıza uyguladığı sınavı ve içinizdeki 4 âlemin yansımasını **ücretsiz keşfedin!**`,
     imageUrl: '/knowing_oneself_mirror.jpg',
-    category: 'Farkındalık & Astroloji',
+    category: 'Astroloji',
     published: true,
   };
 

@@ -6,7 +6,7 @@ import { BookOpen, Search, Calendar, ArrowRight, Sparkles, HelpCircle } from 'lu
 import { useContent } from '@/lib/useContent';
 import { getCleanExcerpt } from '@/lib/blogUtils';
 
-const CATEGORIES = ['Tümü', 'Farkındalık & Şifa', 'Ezoterik', 'Astroloji', 'Nefes', 'Ritüeller', 'Kişisel Gelişim', 'Ruhsal Gelişim', 'Çakra Dengeleme'];
+const CATEGORIES = ['Tümü', 'Astroloji', 'Ezoterik', 'Kişisel Gelişim', 'Ruhsal Gelişim', 'Çakra Dengeleme', 'Nefes', 'Ritüeller'];
 
 export default function BlogListPage() {
   const router = useRouter();

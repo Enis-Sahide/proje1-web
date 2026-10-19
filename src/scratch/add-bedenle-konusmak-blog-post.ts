@@ -112,7 +112,7 @@ Bunu birkaç hafta boyunca düzenli yaptığında; kronik yorgunluklarının aza
 
 Bugün bir organına sarıl ve ona teşekkür et. Çünkü o, doğduğun günden beri seni bir saniye bile terk etmedi.`,
     imageUrl: '/cellular_body_healing.jpg',
-    category: 'Farkındalık & Şifa',
+    category: 'Ruhsal Gelişim',
     published: true,
   };
 
