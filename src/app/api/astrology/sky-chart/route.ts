@@ -32,11 +32,35 @@ export async function POST(req: NextRequest) {
     // Generate Chart for the sky moment
     const skyChart = await generateAstrologyChart(dateObj, city, false);
 
-    // Enrich aspects with rich interpretations
-    const enrichedAspects = skyChart.aspects.map(asp => {
+    // Mundane / Anlık Gökyüzü için katı orb filtresi:
+    // Ay hızlı hareket ettiği için maks 4.5°, diğer gezegenler için maks 3.5°, Görmeyen için maks 2.0°
+    const mundaneAspects = (skyChart.aspects || []).filter(asp => {
+      const hasMoon = asp.planet1 === 'Ay' || asp.planet2 === 'Ay';
+      if (asp.type === 'Görmeyen') return asp.orb <= 2.0;
+      const maxOrb = hasMoon ? 4.5 : 3.5;
+      return asp.orb <= maxOrb;
+    });
+
+    // Kesinlik önceliğine göre küçükten büyüğe sırala (0.0° tam kesin pik yapanlar en başta)
+    mundaneAspects.sort((a, b) => a.orb - b.orb);
+
+    // Enrich aspects with rich interpretations and orb intensity badges
+    const enrichedAspects = mundaneAspects.map(asp => {
       const interp = getSkyAspectInterpretation(asp.planet1, asp.planet2, asp.type);
+      let orbLevel: 'exact' | 'strong' | 'moderate' = 'moderate';
+      let orbLabel = 'Gelişen / Ayrılan (Hafif)';
+      if (asp.orb <= 1.0) {
+        orbLevel = 'exact';
+        orbLabel = 'Tam Kesin / Zirve (Pik)';
+      } else if (asp.orb <= 2.5) {
+        orbLevel = 'strong';
+        orbLabel = 'Aktif & Yoğun';
+      }
+
       return {
         ...asp,
+        orbLevel,
+        orbLabel,
         interpretation: interp
       };
     });

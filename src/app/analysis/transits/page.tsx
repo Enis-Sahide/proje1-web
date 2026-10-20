@@ -308,14 +308,21 @@ export default function TransitsPage() {
     }
   };
 
-  // Filtered Mundane Aspects
-  const filteredSkyAspects = (skyChartData?.aspects || []).filter(asp => {
-    if (skyAspectFilter === 'ALL') return true;
-    if (skyAspectFilter === 'HARMONIOUS') return asp.type === 'Üçgen' || asp.type === 'Sekstil';
-    if (skyAspectFilter === 'CHALLENGING') return asp.type === 'Kare' || asp.type === 'Karşıt';
-    if (skyAspectFilter === 'CONJUNCTION') return asp.type === 'Kavuşum';
-    return true;
-  });
+  // Filtered Mundane Aspects (Strict Proximity Sorting)
+  const filteredSkyAspects = (skyChartData?.aspects || [])
+    .filter(asp => {
+      const hasMoon = asp.planet1 === 'Ay' || asp.planet2 === 'Ay';
+      if (asp.type === 'Görmeyen') return asp.orb <= 2.0;
+      const maxOrb = hasMoon ? 4.5 : 3.5;
+      if (asp.orb > maxOrb) return false;
+
+      if (skyAspectFilter === 'ALL') return true;
+      if (skyAspectFilter === 'HARMONIOUS') return asp.type === 'Üçgen' || asp.type === 'Sekstil';
+      if (skyAspectFilter === 'CHALLENGING') return asp.type === 'Kare' || asp.type === 'Karşıt';
+      if (skyAspectFilter === 'CONJUNCTION') return asp.type === 'Kavuşum';
+      return true;
+    })
+    .sort((a, b) => a.orb - b.orb);
 
   const renderBiWheel = () => {
     if (!transitData) return null;
@@ -831,9 +838,20 @@ export default function TransitsPage() {
                                                   </span>
                                                 )}
                                               </div>
-                                              <span className="text-[10px] text-mystic-text-muted">
-                                                Orb: {asp.orb.toFixed(1)}°
-                                              </span>
+                                              <div className="flex items-center gap-1.5 shrink-0">
+                                                <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold ${
+                                                  asp.orb <= 1.0 
+                                                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' 
+                                                    : asp.orb <= 2.5 
+                                                    ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/25' 
+                                                    : 'bg-white/5 text-stone-400 border border-white/10'
+                                                }`}>
+                                                  {asp.orb <= 1.0 ? 'Pik (Exact)' : asp.orb <= 2.5 ? 'Aktif' : 'Hafif'}
+                                                </span>
+                                                <span className="text-[10px] text-mystic-text-muted font-mono">
+                                                  Orb: {asp.orb.toFixed(1)}°
+                                                </span>
+                                              </div>
                                             </div>
                                           ))}
                                         </div>
@@ -923,8 +941,14 @@ export default function TransitsPage() {
                                             <span className="text-xs font-bold" style={{ color: ASPECT_COLORS[asp.type] }}>
                                               {asp.type}
                                             </span>
-                                            <span className="text-[10px] text-gray-400">
-                                              ({asp.orb.toFixed(1)}°)
+                                            <span className={`text-[10px] font-bold px-1 rounded ${
+                                              asp.orb <= 1.0 
+                                                ? 'bg-emerald-500/20 text-emerald-300' 
+                                                : asp.orb <= 2.5 
+                                                ? 'bg-cyan-500/20 text-cyan-300' 
+                                                : 'text-gray-400'
+                                            }`}>
+                                              {asp.orb <= 1.0 ? 'Pik ' : ''}({asp.orb.toFixed(1)}°)
                                             </span>
                                           </div>
 
