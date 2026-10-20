@@ -45,6 +45,7 @@ export interface UnifiedSkyPlanet {
   dailyAdvice: string;
   chakraLayer: string;
   detailedAnalysis: string;
+  minOrb?: number;
 }
 
 export interface UnifiedAspectInfo {
@@ -586,6 +587,8 @@ export function generateUnifiedSkyPlanet(
     detailedAnalysis += `【Retro (Rx) İçe Dönüş】\n${pName} gökyüzünde geri harekette seyrediyor. Bu dönemde dışsal fevri atılımlar yerine, içsel değerlendirmeler yapmak, eksikleri onarmak ve stratejileri sağlamlaştırmak kolektif olarak çok daha verimlidir.\n\n`;
   }
 
+  const minOrb = aspectInfos.length > 0 ? Math.min(...aspectInfos.map(a => a.orb)) : undefined;
+
   return {
     planetName: pName,
     sign,
@@ -602,13 +605,15 @@ export function generateUnifiedSkyPlanet(
     collectiveTheme,
     dailyAdvice,
     chakraLayer,
-    detailedAnalysis
+    detailedAnalysis,
+    minOrb
   };
 }
 
 export function generateUnifiedSkyPlanets(
   allSkyPlanets: AstroPoint[],
-  allSkyAspects: any[]
+  allSkyAspects: any[],
+  sortBy: 'orb' | 'classic' = 'orb'
 ): UnifiedSkyPlanet[] {
   if (!allSkyPlanets || allSkyPlanets.length === 0) return [];
 
@@ -618,8 +623,22 @@ export function generateUnifiedSkyPlanets(
     'Kiron', 'Kuzey Ay Düğümü', 'Lilith'
   ];
 
-  const sortedPlanets = [...allSkyPlanets].filter(p => PRIORITY_ORDER.includes(p.name))
-    .sort((a, b) => PRIORITY_ORDER.indexOf(a.name) - PRIORITY_ORDER.indexOf(b.name));
+  const filteredPlanets = [...allSkyPlanets].filter(p => PRIORITY_ORDER.includes(p.name));
+  const unifiedList = filteredPlanets.map(p => generateUnifiedSkyPlanet(p, allSkyAspects, allSkyPlanets));
 
-  return sortedPlanets.map(p => generateUnifiedSkyPlanet(p, allSkyAspects, allSkyPlanets));
+  if (sortBy === 'classic') {
+    return unifiedList.sort((a, b) => PRIORITY_ORDER.indexOf(a.planetName) - PRIORITY_ORDER.indexOf(b.planetName));
+  }
+
+  // Varsayılan: ORB ÖNCELİKLİ (0.0°'ye en yakın, en kesin pik yapan açısı olan gezegenler en üstte!)
+  return unifiedList.sort((a, b) => {
+    const aOrb = a.minOrb !== undefined ? a.minOrb : 999;
+    const bOrb = b.minOrb !== undefined ? b.minOrb : 999;
+
+    if (aOrb !== bOrb) {
+      return aOrb - bOrb;
+    }
+    // Eşitlik durumunda klasik sıraya göre
+    return PRIORITY_ORDER.indexOf(a.planetName) - PRIORITY_ORDER.indexOf(b.planetName);
+  });
 }
