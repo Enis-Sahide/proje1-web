@@ -119,6 +119,7 @@ export default function TransitsPage() {
   const [skyAspectFilter, setSkyAspectFilter] = useState<'ALL' | 'HARMONIOUS' | 'CHALLENGING' | 'CONJUNCTION'>('ALL');
   const [skyRightTab, setSkyRightTab] = useState<'ASPECTS' | 'SIGN_PLACEMENTS'>('ASPECTS');
   const [skyViewMode, setSkyViewMode] = useState<'SYNTHESIS' | 'LIST'>('SYNTHESIS');
+  const [skySortMode, setSkySortMode] = useState<'ORB' | 'CLASSIC'>('ORB');
   const [signFilter, setSignFilter] = useState<'ALL' | 'NEW_INGRESS' | 'PERSONAL' | 'OUTER'>('ALL');
 
   // Mundane Timeline states
@@ -192,8 +193,12 @@ export default function TransitsPage() {
 
   const unifiedSkyPlanets = useMemo(() => {
     if (!skyChartData?.planets || !skyChartData?.aspects) return [];
-    return generateUnifiedSkyPlanets(skyChartData.planets, skyChartData.aspects);
-  }, [skyChartData]);
+    return generateUnifiedSkyPlanets(
+      skyChartData.planets, 
+      skyChartData.aspects, 
+      skySortMode === 'ORB' ? 'orb' : 'classic'
+    );
+  }, [skyChartData, skySortMode]);
 
   // -------------------------------------------------------------
   // 2. PERSONAL (Natal Bi-Wheel) States
@@ -308,14 +313,21 @@ export default function TransitsPage() {
     }
   };
 
-  // Filtered Mundane Aspects
-  const filteredSkyAspects = (skyChartData?.aspects || []).filter(asp => {
-    if (skyAspectFilter === 'ALL') return true;
-    if (skyAspectFilter === 'HARMONIOUS') return asp.type === 'Üçgen' || asp.type === 'Sekstil';
-    if (skyAspectFilter === 'CHALLENGING') return asp.type === 'Kare' || asp.type === 'Karşıt';
-    if (skyAspectFilter === 'CONJUNCTION') return asp.type === 'Kavuşum';
-    return true;
-  });
+  // Filtered Mundane Aspects (Strict Proximity Sorting)
+  const filteredSkyAspects = (skyChartData?.aspects || [])
+    .filter(asp => {
+      const hasMoon = asp.planet1 === 'Ay' || asp.planet2 === 'Ay';
+      if (asp.type === 'Görmeyen') return asp.orb <= 2.0;
+      const maxOrb = hasMoon ? 4.5 : 3.5;
+      if (asp.orb > maxOrb) return false;
+
+      if (skyAspectFilter === 'ALL') return true;
+      if (skyAspectFilter === 'HARMONIOUS') return asp.type === 'Üçgen' || asp.type === 'Sekstil';
+      if (skyAspectFilter === 'CHALLENGING') return asp.type === 'Kare' || asp.type === 'Karşıt';
+      if (skyAspectFilter === 'CONJUNCTION') return asp.type === 'Kavuşum';
+      return true;
+    })
+    .sort((a, b) => a.orb - b.orb);
 
   const renderBiWheel = () => {
     if (!transitData) return null;
@@ -738,6 +750,35 @@ export default function TransitsPage() {
                           {skyViewMode === 'SYNTHESIS' ? (
                             /* Mode 1: Bütünleşik Gezegen Kartları (Sentez) */
                             <div className="space-y-4 max-h-[560px] overflow-y-auto custom-scrollbar pr-1">
+                              {/* Sort Order Selector */}
+                              <div className="flex items-center justify-between gap-2 px-3 py-2 bg-black/40 rounded-2xl border border-white/5">
+                                <span className="text-[11px] text-stone-400 font-medium">Kart Sıralaması:</span>
+                                <div className="inline-flex p-0.5 rounded-xl bg-white/5 border border-white/10">
+                                  <button
+                                    type="button"
+                                    onClick={() => setSkySortMode('ORB')}
+                                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                                      skySortMode === 'ORB'
+                                        ? 'bg-gradient-to-r from-emerald-500/25 to-cyan-500/25 text-emerald-300 border border-emerald-500/35 shadow-sm'
+                                        : 'text-stone-400 hover:text-white'
+                                    }`}
+                                  >
+                                    ⚡ En Kesin Açılar (Orb Öncelikli)
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => setSkySortMode('CLASSIC')}
+                                    className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all ${
+                                      skySortMode === 'CLASSIC'
+                                        ? 'bg-white/20 text-white border border-white/30 shadow-sm'
+                                        : 'text-stone-400 hover:text-white'
+                                    }`}
+                                  >
+                                    ☉ Gezegen Sırası (Klasik)
+                                  </button>
+                                </div>
+                              </div>
+
                               {unifiedSkyPlanets.length === 0 ? (
                                 <div className="text-center py-12 text-mystic-text-muted text-xs">
                                   Aktif gökyüzü gezegen sentezi hesaplanamadı.
@@ -769,6 +810,21 @@ export default function TransitsPage() {
                                               {sp.hdGateInfo && (
                                                 <span className="text-xs text-emerald-300 font-medium bg-emerald-500/10 px-2.5 py-0.5 rounded-lg border border-emerald-500/25">
                                                   🧬 Kapı {sp.hdGateInfo.gate}: {sp.hdGateInfo.title}
+                                                </span>
+                                              )}
+                                              {sp.minOrb !== undefined ? (
+                                                <span className={`text-[10px] px-2 py-0.5 rounded-lg border font-bold flex items-center gap-1 ${
+                                                  sp.minOrb <= 1.0 
+                                                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40' 
+                                                    : sp.minOrb <= 2.5 
+                                                    ? 'bg-cyan-500/15 text-cyan-300 border-cyan-500/30' 
+                                                    : 'bg-white/5 text-stone-400 border-white/10'
+                                                }`}>
+                                                  <span>★ Zirve Orb:</span> {sp.minOrb.toFixed(1)}° {sp.minOrb <= 1.0 ? '(Pik)' : ''}
+                                                </span>
+                                              ) : (
+                                                <span className="text-[10px] px-2 py-0.5 rounded-lg border font-medium bg-white/5 text-stone-500 border-white/10">
+                                                  Majör Açı Yok
                                                 </span>
                                               )}
                                               {sp.isRetrograde && (
@@ -831,9 +887,20 @@ export default function TransitsPage() {
                                                   </span>
                                                 )}
                                               </div>
-                                              <span className="text-[10px] text-mystic-text-muted">
-                                                Orb: {asp.orb.toFixed(1)}°
-                                              </span>
+                                              <div className="flex items-center gap-1.5 shrink-0">
+                                                <span className={`text-[10px] px-1.5 py-0.5 rounded font-mono font-bold ${
+                                                  asp.orb <= 1.0 
+                                                    ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30' 
+                                                    : asp.orb <= 2.5 
+                                                    ? 'bg-cyan-500/15 text-cyan-300 border border-cyan-500/25' 
+                                                    : 'bg-white/5 text-stone-400 border border-white/10'
+                                                }`}>
+                                                  {asp.orb <= 1.0 ? 'Pik (Exact)' : asp.orb <= 2.5 ? 'Aktif' : 'Hafif'}
+                                                </span>
+                                                <span className="text-[10px] text-mystic-text-muted font-mono">
+                                                  Orb: {asp.orb.toFixed(1)}°
+                                                </span>
+                                              </div>
                                             </div>
                                           ))}
                                         </div>
@@ -923,8 +990,14 @@ export default function TransitsPage() {
                                             <span className="text-xs font-bold" style={{ color: ASPECT_COLORS[asp.type] }}>
                                               {asp.type}
                                             </span>
-                                            <span className="text-[10px] text-gray-400">
-                                              ({asp.orb.toFixed(1)}°)
+                                            <span className={`text-[10px] font-bold px-1 rounded ${
+                                              asp.orb <= 1.0 
+                                                ? 'bg-emerald-500/20 text-emerald-300' 
+                                                : asp.orb <= 2.5 
+                                                ? 'bg-cyan-500/20 text-cyan-300' 
+                                                : 'text-gray-400'
+                                            }`}>
+                                              {asp.orb <= 1.0 ? 'Pik ' : ''}({asp.orb.toFixed(1)}°)
                                             </span>
                                           </div>
 

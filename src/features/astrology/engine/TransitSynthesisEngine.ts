@@ -16,6 +16,7 @@ export interface UnifiedSkyAspectInfo {
   targetDegree?: number;
   aspectType: 'Kavuşum' | 'Sekstil' | 'Kare' | 'Üçgen' | 'Karşıt' | 'Görmeyen' | string;
   orb: number;
+  orbStrength?: string;
   isHarmonious: boolean;
   summary: string;
   energyType: string;
@@ -44,6 +45,7 @@ export interface UnifiedSkyPlanet {
   dailyAdvice: string;
   chakraLayer: string;
   detailedAnalysis: string;
+  minOrb?: number;
 }
 
 export interface UnifiedAspectInfo {
@@ -209,8 +211,14 @@ export function generateUnifiedPlanetTransit(
   const houseTitle = HOUSE_TITLES[house] || `${house}. Ev`;
   const houseTheme = HOUSE_SHORT_THEMES[house] || 'bu yaşam alanınız';
 
-  // Find all active aspects made by this transit planet to natal planets
-  const matchingAspects = allTransitAspects.filter(a => a.transitPlanet === pName);
+  // Find all active aspects made by this transit planet to natal planets with strict orb filter
+  const matchingAspects = allTransitAspects.filter(a => {
+    if (a.transitPlanet !== pName) return false;
+    const hasMoon = a.transitPlanet === 'Ay' || a.natalPlanet === 'Ay';
+    if (a.type === 'Görmeyen') return a.orb <= 2.0;
+    const maxOrb = hasMoon ? 4.5 : 3.5;
+    return a.orb <= maxOrb;
+  }).sort((a, b) => a.orb - b.orb);
 
   const aspectInfos: UnifiedAspectInfo[] = matchingAspects.map(asp => {
     const nPlanet = natalPlanets.find(p => p.name === asp.natalPlanet);
@@ -462,8 +470,18 @@ export function generateUnifiedSkyPlanet(
   const signInterp = getSkyPlanetSignInterpretation(pName, sign, skyPlanet.degreeInSign, skyPlanet.minutes, skyPlanet.isRetrograde);
   const briefHeadline = getPlanetSignBriefHeadline(pName, sign);
 
-  // Matching Aspects for this planet in the sky
-  const matchingAspects = (allSkyAspects || []).filter(a => a.planet1 === pName || a.planet2 === pName);
+  // Matching Aspects for this planet in the sky with STRICT MUNDANE ORB FILTER
+  // Anlık gökyüzü transitlerinde orbu 3.5° (Ay için 4.5°, Görmeyen için 2.0°) üzerindeki alakasız açılar elenir.
+  const matchingAspects = (allSkyAspects || []).filter(a => {
+    if (a.planet1 !== pName && a.planet2 !== pName) return false;
+    const hasMoon = a.planet1 === 'Ay' || a.planet2 === 'Ay';
+    if (a.type === 'Görmeyen') return a.orb <= 2.0;
+    const maxOrb = hasMoon ? 4.5 : 3.5;
+    return a.orb <= maxOrb;
+  });
+
+  // Kesinlik (Proximity) önceliği: 0.0°'ye en yakın olan zirve açı daima en başa gelir!
+  matchingAspects.sort((a, b) => a.orb - b.orb);
 
   const aspectInfos: UnifiedSkyAspectInfo[] = matchingAspects.map(asp => {
     const targetName = asp.planet1 === pName ? asp.planet2 : asp.planet1;
@@ -471,12 +489,19 @@ export function generateUnifiedSkyPlanet(
     const isHarmonious = asp.type === 'Üçgen' || asp.type === 'Sekstil' || (asp.type === 'Kavuşum' && !['Satürn', 'Mars', 'Plüton'].includes(targetName));
     const interp = asp.interpretation || getSkyAspectInterpretation(asp.planet1, asp.planet2, asp.type);
 
+    const orbStrength = asp.orb <= 1.0 
+      ? 'Tam Kesin (Pik)' 
+      : asp.orb <= 2.5 
+      ? 'Aktif & Yoğun' 
+      : 'Gelişen / Hafif';
+
     return {
       targetPlanet: targetName,
       targetSign: targetPlanet?.sign,
       targetDegree: targetPlanet?.degreeInSign,
       aspectType: asp.type,
       orb: asp.orb,
+      orbStrength,
       isHarmonious,
       summary: interp?.summary || `${targetName} ile ${asp.type} açısı.`,
       energyType: interp?.energyType || (isHarmonious ? 'Destekleyici' : 'Zorlayıcı / Sınav')
@@ -555,12 +580,14 @@ export function generateUnifiedSkyPlanet(
 
   if (aspectInfos.length > 0) {
     detailedAnalysis += `【Eşzamanlı Aktif Gökyüzü Açıları】\n` +
-      aspectInfos.map(a => `• ${a.aspectType} ${a.targetPlanet}${a.targetSign ? ` (${a.targetSign} ${a.targetDegree || 0}°)` : ''} [Orb: ${a.orb.toFixed(1)}°]: ${a.summary}`).join('\n') + '\n\n';
+      aspectInfos.map(a => `• ${a.aspectType} ${a.targetPlanet}${a.targetSign ? ` (${a.targetSign} ${a.targetDegree || 0}°)` : ''} [Orb: ${a.orb.toFixed(1)}° • ${a.orbStrength}]: ${a.summary}`).join('\n') + '\n\n';
   }
 
   if (skyPlanet.isRetrograde) {
     detailedAnalysis += `【Retro (Rx) İçe Dönüş】\n${pName} gökyüzünde geri harekette seyrediyor. Bu dönemde dışsal fevri atılımlar yerine, içsel değerlendirmeler yapmak, eksikleri onarmak ve stratejileri sağlamlaştırmak kolektif olarak çok daha verimlidir.\n\n`;
   }
+
+  const minOrb = aspectInfos.length > 0 ? Math.min(...aspectInfos.map(a => a.orb)) : undefined;
 
   return {
     planetName: pName,
@@ -578,13 +605,15 @@ export function generateUnifiedSkyPlanet(
     collectiveTheme,
     dailyAdvice,
     chakraLayer,
-    detailedAnalysis
+    detailedAnalysis,
+    minOrb
   };
 }
 
 export function generateUnifiedSkyPlanets(
   allSkyPlanets: AstroPoint[],
-  allSkyAspects: any[]
+  allSkyAspects: any[],
+  sortBy: 'orb' | 'classic' = 'orb'
 ): UnifiedSkyPlanet[] {
   if (!allSkyPlanets || allSkyPlanets.length === 0) return [];
 
@@ -594,8 +623,22 @@ export function generateUnifiedSkyPlanets(
     'Kiron', 'Kuzey Ay Düğümü', 'Lilith'
   ];
 
-  const sortedPlanets = [...allSkyPlanets].filter(p => PRIORITY_ORDER.includes(p.name))
-    .sort((a, b) => PRIORITY_ORDER.indexOf(a.name) - PRIORITY_ORDER.indexOf(b.name));
+  const filteredPlanets = [...allSkyPlanets].filter(p => PRIORITY_ORDER.includes(p.name));
+  const unifiedList = filteredPlanets.map(p => generateUnifiedSkyPlanet(p, allSkyAspects, allSkyPlanets));
 
-  return sortedPlanets.map(p => generateUnifiedSkyPlanet(p, allSkyAspects, allSkyPlanets));
+  if (sortBy === 'classic') {
+    return unifiedList.sort((a, b) => PRIORITY_ORDER.indexOf(a.planetName) - PRIORITY_ORDER.indexOf(b.planetName));
+  }
+
+  // Varsayılan: ORB ÖNCELİKLİ (0.0°'ye en yakın, en kesin pik yapan açısı olan gezegenler en üstte!)
+  return unifiedList.sort((a, b) => {
+    const aOrb = a.minOrb !== undefined ? a.minOrb : 999;
+    const bOrb = b.minOrb !== undefined ? b.minOrb : 999;
+
+    if (aOrb !== bOrb) {
+      return aOrb - bOrb;
+    }
+    // Eşitlik durumunda klasik sıraya göre
+    return PRIORITY_ORDER.indexOf(a.planetName) - PRIORITY_ORDER.indexOf(b.planetName);
+  });
 }

@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { ArrowLeft, CheckCircle2, Loader2, Zap, Search, X, Download, AlertCircle, Lock, Sparkles, Compass, ShieldAlert, Award, Layers } from 'lucide-react';
 import moment from 'moment-timezone';
-import { generateChart, HumanDesignChart, CenterCode, PLANET_SYMBOLS, CHANNELS } from '@/utils/HumanDesignEngine';
+import { generateChart, HumanDesignChart, CenterCode, PLANET_SYMBOLS, CHANNELS, PlanetCode } from '@/utils/HumanDesignEngine';
 import { useContent } from '@/lib/useContent';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { AstroCity } from '@/features/astrology/engine/AstrologyConstants';
@@ -14,6 +14,116 @@ import AuthPromptModal from '@/components/AuthPromptModal';
 import SafeTimePicker from '@/components/ui/SafeTimePicker';
 import AnalysisBackButton from '@/components/ui/AnalysisBackButton';
 import { synthesizeAstroHumanDesign, AstroHDSynthesisReport } from '@/features/astrology/engine/AstroHumanDesignSynthesis';
+
+interface ActiveActivationInfo {
+  side: 'design' | 'personality';
+  planet: PlanetCode;
+  gate: number;
+  line: number;
+  fixation: 'exalted' | 'detriment' | 'none';
+  isRetrograde?: boolean;
+}
+
+const PLANET_METADATA: Record<PlanetCode, { name: string; role: string; desc: string }> = {
+  Sun: {
+    name: 'Güneş (Sun)',
+    role: 'Bilinç Işığı & Hayat Amacı',
+    desc: 'Haritanızın %70’ini oluşturan ana enerjidir. Bu dünyada parladığınız, kimliğinizi ve varoluş amacınızı ortaya koyduğunuz temel ışıltı kaynağıdır.'
+  },
+  Earth: {
+    name: 'Dünya (Earth)',
+    role: 'Topraklanma & Denge',
+    desc: 'Güneş enerjisini maddeye ve beden formuna demirleyen topraklanma noktasıdır. Fiziksel dünyada ayaklarınızın yere basmasını sağlar.'
+  },
+  NorthNode: {
+    name: 'Kuzey Ay Düğümü',
+    role: 'Evrimsel Yön & Gelecek Çevre',
+    desc: 'Ruhunuzun olgunlaşmak üzere yöneldiği yaşam teması, geleceğiniz ve bu enkarnasyonda sizi çevreleyen insan/olay koşullarıdır.'
+  },
+  SouthNode: {
+    name: 'Güney Ay Düğümü',
+    role: 'Doğal Aşinalık & Geçmiş Deneyim',
+    desc: 'Bu dünyaya gelirken zaten usta olduğunuz, konfor alanınızı oluşturan ve geride bırakıp aşmanız gereken geçmiş yaşam hafızasıdır.'
+  },
+  Moon: {
+    name: 'Ay (Moon)',
+    role: 'İçsel İtici Motor & Duygusal Güç',
+    desc: 'Sizi eyleme geçiren derin duygusal yakıtınızdır. İç dünyanızda sizi neyin motive ettiğini ve harekete geçirdiğini belirler.'
+  },
+  Mercury: {
+    name: 'Merkür (Mercury)',
+    role: 'İletişim & Hakikat Mesajı',
+    desc: 'Zihinsel ifadeniz, düşünce biçiminiz ve bu dünyaya aktarmakla yükümlü olduğunuz temel mesajınızdır.'
+  },
+  Venus: {
+    name: 'Venüs (Venus)',
+    role: 'Değerler & Ahlaki Standartlar',
+    desc: 'Neyi değerli bulduğunuzu, ahlaki pusulanızı, estetik algınızı ve ilişkilerdeki derin bağ dinamiğinizi temsil eder.'
+  },
+  Mars: {
+    name: 'Mars (Mars)',
+    role: 'Mücadele Gücü & Ham Eylem',
+    desc: 'Dış dünyada sınır çizme, harekete geçme, arzu duyma ve tutkuyla mücadele etme potansiyelinizdir.'
+  },
+  Jupiter: {
+    name: 'Jüpiter (Jupiter)',
+    role: 'Yüksek Yasa & Kişisel Genişleme',
+    desc: 'Kişisel felsefeniz, bolluk ve bereket kapınızdır. Evrensel yasalara uygun davrandığınızda hayatın sunduğu koruma kalkanıdır.'
+  },
+  Saturn: {
+    name: 'Satürn (Saturn)',
+    role: 'Disiplin, Sınırlar & Karmik Bedel',
+    desc: 'Yaşamın size koyduğu sınırlar, sorumluluklar ve öğrenmeniz gereken en ağır olgunlaşma sınavlarıdır.'
+  },
+  Uranus: {
+    name: 'Uranüs (Uranus)',
+    role: 'Bireysellik & Özgün Uyanış',
+    desc: 'Alışılagelmiş kalıpları yıkan sıradışı tarafınız, özgürleşme arzunuz ve aniden tetiklenen devrimci içgörülerdir.'
+  },
+  Neptune: {
+    name: 'Neptün (Neptune)',
+    role: 'Mistik Teslimiyet & Sezgi',
+    desc: 'Ruhsal teslimiyet, ilahi ilham, derin sezgiler ve yanılsamalardan uyanarak evrensel birliğe ulaşma kapınızdır.'
+  },
+  Pluto: {
+    name: 'Plüton (Pluto)',
+    role: 'Ruhsal Dönüşüm & Gölge Arınması',
+    desc: 'En derin korkularınız, bilinçaltı güç mücadeleleriniz ve eski kimliğinizi yakıp küllerinizden yeniden doğma alanınızdır.'
+  },
+};
+
+const LINE_DETAILS: Record<number, { name: string; keyword: string; explanation: string }> = {
+  1: {
+    name: '1. Çizgi: Araştırmacı (The Investigator)',
+    keyword: 'Temel Kurma & Güvenlik Arayışı',
+    explanation: 'Bu kapının enerjisini sağlam bir temel oluşturarak deneyimlersiniz. Güvende hissetmek için derinlemesine araştırma yapma, konunun kaynağına inme ve sağlam zemin inşa etme ihtiyacı duyarsınız.'
+  },
+  2: {
+    name: '2. Çizgi: Münzevi (The Hermit)',
+    keyword: 'Doğal Yetenek & Doğru Çağrı',
+    explanation: 'Bu kapının frekansı sizde son derece doğal, çabasız ve doğuştan gelir. Kendi başınıza kalıp üretmeyi seversiniz; dışarıdan doğru bir çağrı veya talep geldiğinde potansiyeliniz aniden parlar.'
+  },
+  3: {
+    name: '3. Çizgi: Deneyimci / Adaptör (The Martyr)',
+    keyword: 'Deneme-Yanılma & Mutasyon',
+    explanation: 'Bu enerjiyi hayatın içinde bizzat deneyerek öğrenirsiniz. Neyin çalışıp neyin çalışmadığını pratikle keşfedersiniz. Yapılan "hatalar" aslında sistemi dönüştüren ve adaptasyon sağlayan en büyük keşiflerinizdir.'
+  },
+  4: {
+    name: '4. Çizgi: Fırsatçı (The Opportunist)',
+    keyword: 'Dostluk, Güven & Sosyal Ağlar',
+    explanation: 'Bu kapının etkisi en güçlü şekilde yakın çevreniz, güvendiğiniz dostluklar ve kurduğunuz sosyal bağlar üzerinden açığa çıkar. Fırsatlar yabancılardan değil, kalp bağı kurduğunuz kişilerden gelir.'
+  },
+  5: {
+    name: '5. Çizgi: Kafir / Pratik Rehber (The Heretic)',
+    keyword: 'Evrensel Çözüm & Projeksiyon',
+    explanation: 'İnsanlar bu kapı enerjisinde sizden pratik, kriz çözücü ve kurtarıcı çözümler bekler. Geniş kitlelere hitap eden, ezber bozan ve doğrudan sonuca götüren evrensel bir pratiklik taşır.'
+  },
+  6: {
+    name: '6. Çizgi: Rol Modeli (The Role Model)',
+    keyword: 'Bilgelik & Yaşayan Örnek',
+    explanation: 'Üç aşamalı bir tekamül sürecidir: İlk 30 yıl deneyimci (3. çizgi gibi), 30-50 yaş arası çatıya çekilip tarafsız gözlemci, 50 yaştan sonra ise kendi hakikatini yaşayan bilge bir ilham kaynağına dönüşme.'
+  }
+};
 
 const COLORS = {
   background: '#0F172A',
@@ -421,6 +531,7 @@ export default function HumanDesignPage() {
   
   const [city, setCity] = useState<AstroCity | null>(null);
   const [activeGateId, setActiveGateId] = useState<number | null>(null);
+  const [activeActivation, setActiveActivation] = useState<ActiveActivationInfo | null>(null);
   const [activeDetail, setActiveDetail] = useState<{ title: string; subtitle?: string; badge?: string; description: string } | null>(null);
 
   const { data: gatesData } = useContent<any[]>('/api/content/hd-gates');
@@ -648,6 +759,7 @@ export default function HumanDesignPage() {
           className="cursor-pointer hover:opacity-80 transition-opacity"
           onClick={() => {
             setActiveDetail(null);
+            setActiveActivation(null);
             setActiveGateId(gNum);
           }}
         >
@@ -833,6 +945,14 @@ export default function HumanDesignPage() {
                           onClick={() => {
                             setActiveDetail(null);
                             setActiveGateId(p.gate);
+                            setActiveActivation({
+                              side: 'design',
+                              planet: p.planet,
+                              gate: p.gate,
+                              line: p.line,
+                              fixation: p.fixation,
+                              isRetrograde: p.isRetrograde
+                            });
                           }}
                         >
                           <div className="flex items-center gap-1.5">
@@ -875,6 +995,14 @@ export default function HumanDesignPage() {
                           onClick={() => {
                             setActiveDetail(null);
                             setActiveGateId(p.gate);
+                            setActiveActivation({
+                              side: 'personality',
+                              planet: p.planet,
+                              gate: p.gate,
+                              line: p.line,
+                              fixation: p.fixation,
+                              isRetrograde: p.isRetrograde
+                            });
                           }}
                         >
                           <div className="flex items-center gap-1.5">
@@ -1335,6 +1463,7 @@ export default function HumanDesignPage() {
                     setShowResult(false);
                     setActiveDetail(null);
                     setActiveGateId(null);
+                    setActiveActivation(null);
                     setSynthesisReport(null);
                     setActiveTab('bodygraph');
                   }} 
@@ -1350,16 +1479,45 @@ export default function HumanDesignPage() {
 
       {/* SIDEBAR for Details */}
       <div 
-        className={`fixed inset-y-0 right-0 w-full md:w-[400px] bg-[#0F172A]/95 backdrop-blur-xl border-l border-white/10 shadow-2xl z-50 transform transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${(activeGateId || activeDetail) ? 'translate-x-0' : 'translate-x-full'}`}
+        className={`fixed inset-y-0 right-0 w-full md:w-[420px] bg-[#0F172A]/95 backdrop-blur-xl border-l border-white/10 shadow-2xl z-50 transform transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] ${(activeGateId || activeDetail) ? 'translate-x-0' : 'translate-x-full'}`}
       >
         {activeGateId && (
           <div className="h-full flex flex-col p-6 overflow-y-auto custom-scrollbar">
-            <div className="flex justify-between items-center mb-8">
-              <div className="w-12 h-12 rounded-full bg-[#32D74B]/20 flex items-center justify-center border border-[#32D74B]/30">
-                <span className="text-[#32D74B] font-bold text-xl">{activeGateId}</span>
+            <div className="flex justify-between items-center mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-12 h-12 rounded-2xl bg-[#32D74B]/20 flex items-center justify-center border border-[#32D74B]/30 shrink-0">
+                  <span className="text-[#32D74B] font-bold text-lg font-mono">
+                    {activeActivation ? `${activeActivation.gate}.${activeActivation.line}` : activeGateId}
+                  </span>
+                </div>
+                {activeActivation ? (
+                  <div>
+                    <span className="text-[11px] uppercase tracking-wider text-stone-400 font-semibold block">
+                      Kişisel Aktivasyon Detayı
+                    </span>
+                    <h3 className="text-base font-bold text-white flex items-center gap-1.5 leading-tight">
+                      <span className={activeActivation.side === 'design' ? 'text-[#E63946]' : 'text-white'}>
+                        {PLANET_SYMBOLS[activeActivation.planet]}
+                      </span>
+                      {PLANET_METADATA[activeActivation.planet]?.name || activeActivation.planet}
+                    </h3>
+                  </div>
+                ) : (
+                  <div>
+                    <span className="text-[11px] uppercase tracking-wider text-stone-400 font-semibold block">
+                      Human Design Kapısı
+                    </span>
+                    <h3 className="text-base font-bold text-white">
+                      Kapı {activeGateId}
+                    </h3>
+                  </div>
+                )}
               </div>
               <button 
-                onClick={() => setActiveGateId(null)}
+                onClick={() => {
+                  setActiveGateId(null);
+                  setActiveActivation(null);
+                }}
                 className="p-2 bg-white/5 hover:bg-white/10 rounded-full text-white/60 hover:text-white transition-colors"
               >
                 <X size={20} />
@@ -1368,38 +1526,186 @@ export default function HumanDesignPage() {
             
             {activeGateData ? (
               <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 delay-150 fill-mode-both text-left">
-                <h2 className="text-2xl font-serif font-bold text-white leading-tight">
-                  {activeGateData.title}
-                </h2>
-                
-                <div className="bg-black/30 rounded-2xl p-5 border border-white/5 space-y-4">
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-start gap-3">
-                      <span className="text-xs font-bold uppercase tracking-widest text-[#32D74B] w-20 shrink-0 pt-0.5">I Ching</span>
-                      <span className="text-sm text-gray-300 font-medium">{activeGateData.iching}</span>
-                    </div>
-                    <span className="text-[10px] text-gray-500 italic pl-[92px] -mt-1 leading-normal">Bu kapının felsefi sembol ismi ve arketipi</span>
-                  </div>
-                  <div className="w-full h-px bg-white/5" />
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-start gap-3">
-                      <span className="text-xs font-bold uppercase tracking-widest text-[#E63946] w-20 shrink-0 pt-0.5">Astroloji</span>
-                      <span className="text-sm text-gray-300 font-medium">{activeGateData.astrology}</span>
-                    </div>
-                    <span className="text-[10px] text-gray-500 italic pl-[92px] -mt-1 leading-normal">Bu kapının gökyüzündeki burç koordinatı</span>
-                  </div>
-                  <div className="w-full h-px bg-white/5" />
-                  <div className="flex flex-col gap-1">
-                    <div className="flex items-start gap-3">
-                      <span className="text-xs font-bold uppercase tracking-widest text-[#F4D03F] w-20 shrink-0 pt-0.5">Biyoloji</span>
-                      <span className="text-sm text-gray-300 font-medium">{activeGateData.biology}</span>
-                    </div>
-                    <span className="text-[10px] text-gray-500 italic pl-[92px] -mt-1 leading-normal">Bu kapının vücutta etkilediği organ veya salgı bezi</span>
-                  </div>
-                </div>
+                {/* 1. ÖZEL GEZEGEN & ÇİZGİ AKTİVASYON BÖLÜMÜ (Eğer sütundan tıklandıysa) */}
+                {activeActivation && (
+                  <div className="space-y-4">
+                    {/* Kart 1: Gezegen & Çizgi Başlığı + Rozetler */}
+                    <div className="bg-gradient-to-br from-white/10 via-black/40 to-white/5 rounded-2xl p-4 border border-white/10">
+                      <div className="flex flex-wrap items-center gap-1.5 mb-3">
+                        {/* Sütun Rozeti */}
+                        <span className={`text-[11px] font-bold px-2.5 py-0.5 rounded-full border ${activeActivation.side === 'design' ? 'bg-[#E63946]/15 text-[#E63946] border-[#E63946]/30' : 'bg-white/10 text-stone-200 border-white/20'}`}>
+                          {activeActivation.side === 'design' ? '🔴 Tasarım (Design) • Bilinçdışı Beden' : '⚪ Kişilik (Personality) • Bilinçli Zihin'}
+                        </span>
 
-                <div className="prose prose-invert prose-p:text-gray-300 prose-p:leading-relaxed prose-p:text-[15px]">
-                  <p>{activeGateData.description}</p>
+                        {/* Fiksasyon Rozeti */}
+                        {activeActivation.fixation === 'exalted' && (
+                          <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                            <span>▲</span> Yücelim (Exaltation)
+                          </span>
+                        )}
+                        {activeActivation.fixation === 'detriment' && (
+                          <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/30 flex items-center gap-1">
+                            <span>▼</span> Düşüş (Detriment)
+                          </span>
+                        )}
+                        {activeActivation.fixation === 'none' && (
+                          <span className="text-[11px] font-medium px-2 py-0.5 rounded-full bg-white/5 text-stone-400 border border-white/10">
+                            Dengeli / Nötr Akış
+                          </span>
+                        )}
+
+                        {/* Retrograd Rozeti */}
+                        {activeActivation.isRetrograde && (
+                          <span className="text-[11px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1">
+                            <span>⟲ R</span> Retrograd (Geri)
+                          </span>
+                        )}
+                      </div>
+
+                      <p className="text-xs text-stone-300 leading-relaxed">
+                        Bu aktivasyon, doğum haritanızda <strong className="text-white">{PLANET_METADATA[activeActivation.planet]?.name}</strong> enerjisinin <strong className="text-white">{activeActivation.gate}. Kapı</strong> ve <strong className="text-white">{activeActivation.line}. Çizgi</strong> üzerinden tezahür ettiğini gösterir.
+                      </p>
+                    </div>
+
+                    {/* Bilinç Katmanı (Tasarım vs Kişilik Derin Yorumu) */}
+                    <div className={`p-4 rounded-xl border ${activeActivation.side === 'design' ? 'bg-[#E63946]/10 border-[#E63946]/20' : 'bg-white/5 border-white/10'}`}>
+                      <h4 className="text-xs font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5 text-stone-200">
+                        <span>✦</span> {activeActivation.side === 'design' ? 'Bilinçdışı Beden Düzlemi (Tasarım / Kırmızı)' : 'Bilinçli Zihin Düzlemi (Kişilik / Siyah)'}
+                      </h4>
+                      <p className="text-xs text-stone-300 leading-relaxed">
+                        {activeActivation.side === 'design'
+                          ? 'Bu frekans doğumunuzdan yaklaşık 88 gün önce kodlanmış genetik ve hücresel beden hafızanızdır. Zihninizin kontrolünde değildir; bedeniniz bu potansiyeli otomatik bir refleks olarak yaşar. Çevrenizdekiler bu enerjinizi sizden daha net ve doğrudan hisseder.'
+                          : 'Bu frekans doğum anınızdaki nötrino akışıyla mühürlenmiş bilinçli zihninizdir. "Ben böyleyim" diyerek tanımladığınız, farkındalık alanınızda doğrudan algıladığınız ve kimliğinize ait hissettiğiniz potansiyeldir.'}
+                      </p>
+                    </div>
+
+                    {/* Gezegen Misyonu */}
+                    <div className="bg-black/30 rounded-xl p-4 border border-white/5">
+                      <div className="flex items-center justify-between mb-1">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+                          <span>{PLANET_SYMBOLS[activeActivation.planet]}</span> {PLANET_METADATA[activeActivation.planet]?.name}
+                        </h4>
+                        <span className="text-[10px] text-stone-400 italic">
+                          {PLANET_METADATA[activeActivation.planet]?.role}
+                        </span>
+                      </div>
+                      <p className="text-xs text-stone-300 leading-relaxed">
+                        {PLANET_METADATA[activeActivation.planet]?.desc}
+                      </p>
+                    </div>
+
+                    {/* Çizgi Arketipi */}
+                    {LINE_DETAILS[activeActivation.line] && (
+                      <div className="bg-black/30 rounded-xl p-4 border border-white/5">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <h4 className="text-xs font-bold uppercase tracking-wider text-[#32D74B] flex items-center gap-1.5">
+                            <span>●</span> {LINE_DETAILS[activeActivation.line].name}
+                          </h4>
+                          <span className="text-[10px] text-stone-400 bg-white/5 px-2 py-0.5 rounded border border-white/5">
+                            {LINE_DETAILS[activeActivation.line].keyword}
+                          </span>
+                        </div>
+                        <p className="text-xs text-stone-300 leading-relaxed">
+                          {LINE_DETAILS[activeActivation.line].explanation}
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Fiksasyon Mekaniği Yorumu */}
+                    <div className={`p-4 rounded-xl border ${
+                      activeActivation.fixation === 'exalted'
+                        ? 'bg-emerald-500/10 border-emerald-500/25'
+                        : activeActivation.fixation === 'detriment'
+                        ? 'bg-rose-500/10 border-rose-500/25'
+                        : 'bg-white/5 border-white/10'
+                    }`}>
+                      <h4 className="text-xs font-bold uppercase tracking-wider mb-1 flex items-center gap-1.5">
+                        {activeActivation.fixation === 'exalted' && (
+                          <span className="text-emerald-400">▲ Yücelim (Exaltation) Mekaniği</span>
+                        )}
+                        {activeActivation.fixation === 'detriment' && (
+                          <span className="text-rose-400">▼ Düşüş (Detriment) Tekamül Sınavı</span>
+                        )}
+                        {activeActivation.fixation === 'none' && (
+                          <span className="text-stone-300">Dengeli / Nötr Çizgi Akışı</span>
+                        )}
+                      </h4>
+                      <p className="text-xs text-stone-300 leading-relaxed">
+                        {activeActivation.fixation === 'exalted' && (
+                          <>
+                            <strong className="text-white">{PLANET_METADATA[activeActivation.planet]?.name}</strong>, bu kapının {activeActivation.line}. çizgisinde Yücelimdedir. Gezegen nötrino akışı, bu çizginin en yapıcı, saf ve yüksek titreşimli potansiyelini zahmetsizce açığa çıkarır.
+                          </>
+                        )}
+                        {activeActivation.fixation === 'detriment' && (
+                          <>
+                            <strong className="text-white">{PLANET_METADATA[activeActivation.planet]?.name}</strong>, bu kapının {activeActivation.line}. çizgisinde Düşüştetir. Gezegen enerjisi bu çizgide içsel bir sürtünme veya gölge deneyimi yaratır. Bu durum bir eksiklik veya ceza değildir; ruhun bu yaşamda bizzat tecrübe ederek dönüştürmesi gereken kilit olgunlaşma sahasıdır.
+                          </>
+                        )}
+                        {activeActivation.fixation === 'none' && (
+                          <>
+                            Bu gezegen söz konusu çizgide belirli bir kutba kilitlenmemiştir; çizginin temel potansiyeli nötr, dengeli ve esnek bir şekilde akar.
+                          </>
+                        )}
+                      </p>
+                    </div>
+
+                    {/* Retrograd Yorumu (Eğer varsa) */}
+                    {activeActivation.isRetrograde && (
+                      <div className="bg-amber-500/10 border border-amber-500/25 p-4 rounded-xl">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-amber-300 mb-1 flex items-center gap-1.5">
+                          <span>⟲</span> Retrograd (R) İçe Dönük & Karmik Etki
+                        </h4>
+                        <p className="text-xs text-stone-300 leading-relaxed">
+                          Gezegen doğum anınızda gökyüzünde geri hareketteydi. Bu durum kapının enerjisinin dış dünyada pervasızca fırlatılması yerine, içsel bir sindirme, geçmiş deneyimleri gözden geçirme ve derin muhakeme sağlama gücü verir.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Ayraç */}
+                    <div className="relative py-2">
+                      <div className="w-full h-px bg-white/10" />
+                      <span className="absolute left-1/2 -translate-x-1/2 top-0 bg-[#0F172A] px-2 text-[10px] uppercase tracking-widest text-stone-400 font-semibold">
+                        Kapı {activeGateId} Temel Arketipi
+                      </span>
+                    </div>
+                  </div>
+                )}
+
+                {/* 2. GENEL KAPI BİLGİSİ */}
+                <div>
+                  <h2 className="text-2xl font-serif font-bold text-white leading-tight mb-4">
+                    {activeGateData.title}
+                  </h2>
+                  
+                  <div className="bg-black/30 rounded-2xl p-5 border border-white/5 space-y-4 mb-5">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-start gap-3">
+                        <span className="text-xs font-bold uppercase tracking-widest text-[#32D74B] w-20 shrink-0 pt-0.5">I Ching</span>
+                        <span className="text-sm text-gray-300 font-medium">{activeGateData.iching}</span>
+                      </div>
+                      <span className="text-[10px] text-gray-500 italic pl-[92px] -mt-1 leading-normal">Bu kapının felsefi sembol ismi ve arketipi</span>
+                    </div>
+                    <div className="w-full h-px bg-white/5" />
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-start gap-3">
+                        <span className="text-xs font-bold uppercase tracking-widest text-[#E63946] w-20 shrink-0 pt-0.5">Astroloji</span>
+                        <span className="text-sm text-gray-300 font-medium">{activeGateData.astrology}</span>
+                      </div>
+                      <span className="text-[10px] text-gray-500 italic pl-[92px] -mt-1 leading-normal">Bu kapının gökyüzündeki burç koordinatı</span>
+                    </div>
+                    <div className="w-full h-px bg-white/5" />
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-start gap-3">
+                        <span className="text-xs font-bold uppercase tracking-widest text-[#F4D03F] w-20 shrink-0 pt-0.5">Biyoloji</span>
+                        <span className="text-sm text-gray-300 font-medium">{activeGateData.biology}</span>
+                      </div>
+                      <span className="text-[10px] text-gray-500 italic pl-[92px] -mt-1 leading-normal">Bu kapının vücutta etkilediği organ veya salgı bezi</span>
+                    </div>
+                  </div>
+
+                  <div className="prose prose-invert prose-p:text-gray-300 prose-p:leading-relaxed prose-p:text-[15px]">
+                    <p>{activeGateData.description}</p>
+                  </div>
                 </div>
               </div>
             ) : (
