@@ -804,11 +804,18 @@ export default function IncarnationAnalysisPage() {
                         <span className="text-xs uppercase tracking-wider text-indigo-300 font-bold flex items-center gap-1.5">
                           <span>🛰️</span> Harita Katmanlarınızdaki Galaktik Sabit Yıldız & Kraliyet Temasları
                         </span>
-                        {resultData.cosmicOrigin.royalStarsActive && resultData.cosmicOrigin.royalStarsActive.length > 0 && (
-                          <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-sm">
-                            👑 {resultData.cosmicOrigin.royalStarsActive.length} Kraliyet Yıldızı Kalkanı Aktif
-                          </span>
-                        )}
+                        {resultData.cosmicOrigin.royalStarsActive && resultData.cosmicOrigin.royalStarsActive.length > 0 && (() => {
+                          const uniqueStars = Array.from(new Set(resultData.cosmicOrigin.royalStarsActive.map(r => r.starName)));
+                          const totalContacts = resultData.cosmicOrigin.royalStarsActive.length;
+                          return (
+                            <span 
+                              className="px-3 py-1 rounded-full text-xs font-extrabold bg-amber-500/20 text-amber-300 border border-amber-500/30 shadow-sm"
+                              title={`${uniqueStars.join(', ')} (${totalContacts} Katman Teması)`}
+                            >
+                              👑 {uniqueStars.length} Kraliyet Yıldızı ({totalContacts} Katman Teması) Aktif
+                            </span>
+                          );
+                        })()}
                       </div>
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
