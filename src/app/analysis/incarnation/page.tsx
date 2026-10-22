@@ -773,7 +773,13 @@ export default function IncarnationAnalysisPage() {
                         {resultData.cosmicOrigin.allAlignments.map((align, idx) => (
                           <div 
                             key={idx} 
-                            onClick={() => setSelectedStarAlignment(align)}
+                            onClick={() => {
+                              if (!isMasterOrAdmin) {
+                                setShowLockModal(true);
+                              } else {
+                                setSelectedStarAlignment(align);
+                              }
+                            }}
                             className={`p-3.5 rounded-xl border text-xs flex flex-col justify-between gap-2.5 transition-all cursor-pointer group hover:scale-[1.02] hover:shadow-lg ${
                               align.isRoyalStar 
                                 ? 'bg-amber-950/25 border-amber-500/40 hover:border-amber-400 text-amber-200 shadow-md' 
@@ -826,9 +832,13 @@ export default function IncarnationAnalysisPage() {
                             <div className="text-[11px] text-white/70">
                               {align.connectedPoint}
                             </div>
-                            <div className="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10px] font-bold text-indigo-300 group-hover:text-amber-300 transition-colors">
-                              <span>Ezoterik Anlamı İncele</span>
-                              <span>➜</span>
+                            <div className="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10px] font-bold transition-colors">
+                              <span className={isMasterOrAdmin ? 'text-indigo-300 group-hover:text-amber-300' : 'text-amber-400/90 group-hover:text-amber-300'}>
+                                {isMasterOrAdmin ? 'Ezoterik Anlamı İncele' : '🔒 Detaylar Kilitli (Usta & Rapor)'}
+                              </span>
+                              <span className={isMasterOrAdmin ? 'text-indigo-300 group-hover:text-amber-300' : 'text-amber-400'}>
+                                {isMasterOrAdmin ? '➜' : '🔒'}
+                              </span>
                             </div>
                           </div>
                         ))}
@@ -1586,8 +1596,26 @@ export default function IncarnationAnalysisPage() {
             </div>
 
             {selectedStarAlignment.interpretation ? (
-              <div className="space-y-4 text-xs sm:text-sm">
-                <div className="p-4 rounded-2xl bg-black/40 border border-indigo-500/20 space-y-1.5 shadow-sm">
+              <div className="space-y-4 text-xs sm:text-sm relative">
+                {!isMasterOrAdmin && (
+                  <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-6 bg-black/75 backdrop-blur-md rounded-2xl text-center border border-amber-500/30 shadow-2xl">
+                    <div className="text-[#D4AF37] mb-3"><Lock size={36} /></div>
+                    <div className="text-white font-bold text-base mb-1.5">Sabit Yıldız & Kraliyet Açılımı Kilitli</div>
+                    <p className="text-white/80 text-xs max-w-sm mb-5 leading-relaxed">
+                      Bu sabit yıldız hizalanmasının derin ezoterik açılımı, kadersel sınavları ve ruhsal misyonu Usta Seviyesi üyelere ve 5 sayfalık Enkarnasyon PDF Raporuna özeldir.
+                    </p>
+                    <button
+                      onClick={() => {
+                        setSelectedStarAlignment(null);
+                        handlePurchaseReport();
+                      }}
+                      className="bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-2.5 px-6 rounded-xl text-xs transition-all cursor-pointer shadow-lg shadow-[#D4AF37]/25"
+                    >
+                      Raporu İndir (888 TL)
+                    </button>
+                  </div>
+                )}
+                <div className={`p-4 rounded-2xl bg-black/40 border border-indigo-500/20 space-y-1.5 shadow-sm ${!isMasterOrAdmin ? 'blur-sm select-none opacity-30' : ''}`}>
                   <div className="flex items-center gap-2 font-bold text-indigo-300 text-xs uppercase tracking-wider">
                     <span>🔮</span> Ezoterik Anlam & Kozmik Portal
                   </div>
@@ -1596,7 +1624,7 @@ export default function IncarnationAnalysisPage() {
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-black/40 border border-cyan-500/20 space-y-1.5 shadow-sm">
+                <div className={`p-4 rounded-2xl bg-black/40 border border-cyan-500/20 space-y-1.5 shadow-sm ${!isMasterOrAdmin ? 'blur-sm select-none opacity-30' : ''}`}>
                   <div className="flex items-center gap-2 font-bold text-cyan-300 text-xs uppercase tracking-wider">
                     <span>🌍</span> Hayattaki Tezahürü & Karakteristik Etkisi
                   </div>
@@ -1605,7 +1633,7 @@ export default function IncarnationAnalysisPage() {
                   </p>
                 </div>
 
-                <div className="p-4 rounded-2xl bg-black/40 border border-amber-500/20 space-y-1.5 shadow-sm">
+                <div className={`p-4 rounded-2xl bg-black/40 border border-amber-500/20 space-y-1.5 shadow-sm ${!isMasterOrAdmin ? 'blur-sm select-none opacity-30' : ''}`}>
                   <div className="flex items-center gap-2 font-bold text-[#FFD700] text-xs uppercase tracking-wider">
                     <span>🧭</span> Ruhsal Görev & Kozmik Sınav
                   </div>
@@ -1651,7 +1679,7 @@ export default function IncarnationAnalysisPage() {
             <div className="text-[#D4AF37] mx-auto mb-4 flex justify-center"><Lock size={48} /></div>
             <h3 className="text-xl font-bold text-white mb-2">Detaylı Karmik Analiz Kilitli</h3>
             <p className="text-mystic-text-muted text-sm mb-6 leading-relaxed">
-              Geçmiş yaşam nedenleri, karmik borçlar ve dharma reçeteleri Usta Seviyesi (Master) üyelere özeldir. Usta üyeliğe geçebilir veya tüm detayları içeren 5 sayfalık PDF Raporunu indirebilirsiniz.
+              Geçmiş yaşam nedenleri, karmik borçlar, sabit yıldız ve kraliyet ezoterik açılımları Usta Seviyesi (Master) üyelere özeldir. Usta üyeliğe geçebilir veya tüm detayları içeren 5 sayfalık PDF Raporunu indirebilirsiniz.
             </p>
             <div className="flex flex-col gap-3">
               <button 

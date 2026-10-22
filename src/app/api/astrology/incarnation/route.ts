@@ -85,6 +85,30 @@ export async function POST(req: NextRequest) {
         progressedEvolution: incarnationData.progressedEvolution ? {
           ...incarnationData.progressedEvolution,
           evolutionSummary: MASKED
+        } : undefined,
+        cosmicOrigin: incarnationData.cosmicOrigin ? {
+          ...incarnationData.cosmicOrigin,
+          soulMission: MASKED,
+          cosmicGift: MASKED,
+          earthlyChallenge: MASKED,
+          allAlignments: incarnationData.cosmicOrigin.allAlignments ? incarnationData.cosmicOrigin.allAlignments.map(a => ({
+            ...a,
+            interpretation: a.interpretation ? {
+              ...a.interpretation,
+              esotericMeaning: MASKED,
+              lifeManifestation: MASKED,
+              spiritualMission: MASKED
+            } : undefined
+          })) : undefined,
+          secondaryStars: incarnationData.cosmicOrigin.secondaryStars ? incarnationData.cosmicOrigin.secondaryStars.map(a => ({
+            ...a,
+            interpretation: a.interpretation ? {
+              ...a.interpretation,
+              esotericMeaning: MASKED,
+              lifeManifestation: MASKED,
+              spiritualMission: MASKED
+            } : undefined
+          })) : undefined
         } : undefined
       };
     }
