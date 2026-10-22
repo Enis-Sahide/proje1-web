@@ -13,6 +13,7 @@ interface ToolItem {
   color: string;
   link: string;
   isLocked?: boolean;
+  isMasterPreview?: boolean;
 }
 
 export default function AnalysisPage() {
@@ -105,7 +106,7 @@ export default function AnalysisPage() {
       icon: <Compass size={22} />,
       color: '#F59E0B',
       link: '/analysis/cosmic-matrix',
-      isLocked: true
+      isMasterPreview: true
     },
     {
       id: 'incarnation',
@@ -113,7 +114,7 @@ export default function AnalysisPage() {
       icon: <Scroll size={22} />,
       color: '#FFD700',
       link: '/analysis/incarnation',
-      isLocked: true
+      isMasterPreview: true
     }
   ];
 
@@ -138,12 +139,7 @@ export default function AnalysisPage() {
           {tools.map((tool) => (
             <div 
               key={tool.id}
-              onClick={(e) => {
-                if (tool.isLocked && !isMasterOrAdmin) {
-                  e.preventDefault();
-                  setShowLockModal(true);
-                  return;
-                }
+              onClick={() => {
                 router.push(tool.link);
               }}
               className="p-4 rounded-2xl bg-white/[0.03] hover:bg-white/[0.08] border border-white/10 hover:border-[#D4AF37]/50 transition-all duration-200 group cursor-pointer flex items-center justify-between gap-3 relative overflow-hidden backdrop-blur-md shadow-sm hover:shadow-[0_0_25px_rgba(212,175,55,0.15)]"
@@ -161,10 +157,10 @@ export default function AnalysisPage() {
                       {tool.title}
                     </h3>
                   </div>
-                  {tool.isLocked && !isMasterOrAdmin && (
+                  {tool.isMasterPreview && !isMasterOrAdmin && (
                     <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-400/90 bg-amber-400/10 border border-amber-400/20 px-1.5 py-0.5 rounded-md mt-0.5">
-                      <Lock size={10} />
-                      Usta Seviyesi
+                      <Sparkles size={10} />
+                      Usta & Rapor
                     </span>
                   )}
                 </div>

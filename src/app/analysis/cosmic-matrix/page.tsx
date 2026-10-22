@@ -243,6 +243,30 @@ export default function CosmicMatrixPage() {
           },
           hdChart
         );
+        if (!isMasterOrAdmin) {
+          const MASKED = "Bu derin kozmik teşhis ve şifa reçetesi Usta Seviyesine ve PDF Raporuna özeldir.";
+          const worldKeys = ['assiah', 'yetzirah', 'beriyah', 'atzilut'] as const;
+          worldKeys.forEach((wKey) => {
+            const w = fullMulti.worlds[wKey];
+            if (w) {
+              w.planetaryDynamics = w.planetaryDynamics.map((p: any) => ({
+                ...p,
+                coreLesson: MASKED,
+                practicalRemedy: MASKED,
+                kabbalahLesson: MASKED,
+                balancingRune: {
+                  ...p.balancingRune,
+                  balancingAction: MASKED
+                },
+                botanical: {
+                  ...p.botanical,
+                  essentialOil: "Gizli Reçete (PDF Raporunda)",
+                  theme: MASKED
+                }
+              }));
+            }
+          });
+        }
         setMultiReport(fullMulti);
         const cur = fullMulti.worlds[selectedWorld];
         setReport(cur);
@@ -250,11 +274,29 @@ export default function CosmicMatrixPage() {
           setSelectedPlanet(cur.planetaryDynamics[0]);
         }
       } else {
-        const singleReport = synthesizeCosmicMatrix(
+        let singleReport = synthesizeCosmicMatrix(
           astroJson.data.planets,
           astroJson.data.aspects,
           hdChart
         );
+        if (!isMasterOrAdmin) {
+          const MASKED = "Bu derin kozmik teşhis ve şifa reçetesi Usta Seviyesine ve PDF Raporuna özeldir.";
+          singleReport.planetaryDynamics = singleReport.planetaryDynamics.map((p: any) => ({
+            ...p,
+            coreLesson: MASKED,
+            practicalRemedy: MASKED,
+            kabbalahLesson: MASKED,
+            balancingRune: {
+              ...p.balancingRune,
+              balancingAction: MASKED
+            },
+            botanical: {
+              ...p.botanical,
+              essentialOil: "Gizli Reçete (PDF Raporunda)",
+              theme: MASKED
+            }
+          }));
+        }
         setReport(singleReport);
         if (singleReport.planetaryDynamics.length > 0) {
           setSelectedPlanet(singleReport.planetaryDynamics[0]);
@@ -299,39 +341,6 @@ export default function CosmicMatrixPage() {
           </div>
         </div>
 
-        {/* Usta Seviyesi Kapısı */}
-        {!isMasterOrAdmin ? (
-          <div className="max-w-2xl mx-auto text-center py-20">
-            <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-amber-500/10 border border-amber-500/30 mb-6">
-              <Lock size={36} className="text-amber-400" />
-            </div>
-            <h2 className="text-3xl font-bold text-white mb-3">Usta Seviyesi Gerektiriyor</h2>
-            <p className="text-mystic-text-muted text-base leading-relaxed mb-8 max-w-lg mx-auto">
-              7Layers Kozmik Matris Analizi; Astroloji, Kabalistik 4 Âlem, Human Design ve Kadim Futhark Runelerini
-              tek bir sentezde birleştiren ileri düzey bir araçtır. Bu analiz yalnızca <strong className="text-amber-300">Usta (Master)</strong> ve üstü seviyelere açıktır.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <button
-                onClick={() => router.push('/profile')}
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-amber-500 to-yellow-600 hover:brightness-110 text-black font-bold py-3.5 px-8 rounded-2xl transition-all shadow-lg shadow-amber-500/25 text-sm cursor-pointer"
-              >
-                <Sparkles size={18} />
-                Seviyeni Yükselt
-              </button>
-              <button
-                onClick={handlePurchaseReport}
-                className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/15 text-white font-bold py-3.5 px-6 rounded-2xl border border-white/20 transition-all text-sm cursor-pointer shadow-lg hover:border-amber-500/40"
-              >
-                <Lock size={16} className="text-amber-400" />
-                <span>PDF Raporunu Satın Al (1.111 TL)</span>
-              </button>
-            </div>
-            <p className="text-xs text-mystic-text-muted mt-5">
-              Mevcut seviyeniz: <span className="text-amber-400 font-semibold capitalize">{role || 'Üye'}</span>
-            </p>
-          </div>
-        ) : (
-          <>
         {/* Giriş & Form Alanı */}
         {!report ? (
           <div className="max-w-3xl mx-auto text-center space-y-8 py-10">
@@ -435,18 +444,28 @@ export default function CosmicMatrixPage() {
                 </div>
 
                 <div className="flex items-center gap-2.5">
-                  <button
-                    onClick={handleDownloadPdf}
-                    disabled={isPdfLoading}
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 hover:brightness-110 text-black font-bold text-xs transition-all shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50"
-                  >
-                    {isPdfLoading ? (
-                      <Loader2 size={14} className="animate-spin" />
-                    ) : (
-                      <Download size={14} />
-                    )}
-                    <span>{isPdfLoading ? 'PDF Hazırlanıyor...' : 'PDF Raporu İndir'}</span>
-                  </button>
+                  {isMasterOrAdmin ? (
+                    <button
+                      onClick={handleDownloadPdf}
+                      disabled={isPdfLoading}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 hover:brightness-110 text-black font-bold text-xs transition-all shadow-lg shadow-amber-500/20 cursor-pointer disabled:opacity-50"
+                    >
+                      {isPdfLoading ? (
+                        <Loader2 size={14} className="animate-spin" />
+                      ) : (
+                        <Download size={14} />
+                      )}
+                      <span>{isPdfLoading ? 'PDF Hazırlanıyor...' : 'PDF Raporu İndir'}</span>
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handlePurchaseReport}
+                      className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 hover:brightness-110 text-black font-bold text-xs transition-all shadow-lg shadow-amber-500/20 cursor-pointer"
+                    >
+                      <Lock size={14} />
+                      <span>Kozmik Matris Raporunu İndir (1.111 TL)</span>
+                    </button>
+                  )}
 
                   <button
                     onClick={() => setReport(null)}
@@ -664,6 +683,38 @@ export default function CosmicMatrixPage() {
                 </div>
               </div>
             </div>
+
+            {/* Kilitli Bölüm Uyarısı & Rapor Satın Alma Kartı (Usta Olmayanlar İçin) */}
+            {!isMasterOrAdmin && (
+              <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-r from-amber-500/15 via-[#D4AF37]/10 to-transparent border border-amber-500/30 flex flex-col md:flex-row items-center justify-between gap-6 shadow-2xl">
+                <div className="flex items-center gap-4 text-center md:text-left">
+                  <div className="p-3.5 rounded-2xl bg-amber-500/20 text-amber-300 shrink-0 border border-amber-500/30">
+                    <Lock size={28} />
+                  </div>
+                  <div>
+                    <h4 className="text-lg font-bold text-white">13 Gezegen & 5 Katman Sentezi Usta Seviyesine Özeldir</h4>
+                    <p className="text-xs sm:text-sm text-gray-300 mt-1 max-w-xl leading-relaxed">
+                      Tüm gezegenlerinizin 4 âlemdeki (Assiah, Yetzirah, Beriyah, Atzilut) içe/dışa akış teşhislerini, Kadim Futhark Rune şifa mühürlerini ve bitkisel buhur reçetelerini görmek için Usta Seviyesine yükselin veya tüm detayları içeren PDF Raporunuzu indirin.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
+                  <button
+                    onClick={() => router.push('/membership')}
+                    className="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs sm:text-sm border border-white/20 transition-all cursor-pointer whitespace-nowrap"
+                  >
+                    Usta Seviyesine Yüksel
+                  </button>
+                  <button
+                    onClick={handlePurchaseReport}
+                    className="px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-600 hover:brightness-110 text-black font-bold text-xs sm:text-sm transition-all shadow-lg shadow-amber-500/25 cursor-pointer flex items-center gap-2 whitespace-nowrap"
+                  >
+                    <Lock size={15} />
+                    <span>PDF Raporunu Satın Al (1.111 TL)</span>
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* 4 Âlem Bilinç Katmanı Seçicisi */}
             <div className="bg-gradient-to-r from-amber-950/20 via-black/50 to-purple-950/20 border border-amber-500/25 rounded-3xl p-6 sm:p-8 space-y-6 backdrop-blur-md shadow-2xl">
@@ -884,7 +935,7 @@ export default function CosmicMatrixPage() {
                             </span>
                             <span className="text-[10px] text-gray-400">{dyn.balancingRune.stone}</span>
                           </div>
-                          <p className="text-xs text-gray-300 leading-relaxed">
+                          <p className={`text-xs text-gray-300 leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                             {dyn.balancingRune.balancingAction}
                           </p>
                         </div>
@@ -893,7 +944,7 @@ export default function CosmicMatrixPage() {
                           <span className="text-[11px] font-bold uppercase tracking-wider text-purple-300 block">
                             Kabala: {dyn.kabbalahSephira} ({dyn.kabbalahWorld})
                           </span>
-                          <p className="text-xs text-gray-300 leading-relaxed">
+                          <p className={`text-xs text-gray-300 leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                             {dyn.kabbalahLesson}
                           </p>
                         </div>
@@ -906,7 +957,7 @@ export default function CosmicMatrixPage() {
                           <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-400 block mb-0.5">
                             Pratik Dengeleme Reçetesi
                           </span>
-                          <p className="text-xs text-emerald-100/90 leading-relaxed">
+                          <p className={`text-xs text-emerald-100/90 leading-relaxed ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                             {dyn.practicalRemedy}
                           </p>
                         </div>
@@ -928,10 +979,10 @@ export default function CosmicMatrixPage() {
                           </div>
                           <div className="bg-black/30 p-2 rounded-xl border border-white/5">
                             <span className="text-[10px] text-gray-400 block font-semibold">🌸 Ortam Uçucu Yağı (Buhurdanlık):</span>
-                            <span className="text-white font-medium">{dyn.botanical.essentialOil}</span>
+                            <span className={`text-white font-medium ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>{dyn.botanical.essentialOil}</span>
                           </div>
                         </div>
-                        <p className="text-[11px] text-gray-400 leading-snug">
+                        <p className={`text-[11px] text-gray-400 leading-snug ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40' : ''}`}>
                           {dyn.botanical.theme}
                         </p>
                       </div>
@@ -989,7 +1040,7 @@ export default function CosmicMatrixPage() {
                 </div>
               </div>
               
-              <div className="overflow-x-auto bg-white/[0.02] border border-white/10 rounded-3xl shadow-2xl">
+              <div className={`overflow-x-auto bg-white/[0.02] border border-white/10 rounded-3xl shadow-2xl relative ${!isMasterOrAdmin ? 'blur-sm select-none opacity-40 pointer-events-none' : ''}`}>
                 <table className="w-full min-w-[640px] text-left text-xs text-gray-300">
                   <thead className="bg-white/5 uppercase tracking-wider text-gray-400 font-bold border-b border-white/10">
                     <tr>
@@ -1037,6 +1088,23 @@ export default function CosmicMatrixPage() {
                 </table>
               </div>
 
+              {!isMasterOrAdmin && (
+                <div className="p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 text-center sm:text-left">
+                    <Lock size={20} className="text-amber-400 shrink-0" />
+                    <p className="text-xs text-gray-300">
+                      5 Katman Bütünleşik Matris Tablosunun ve tüm reçetelerin tamamı <strong className="text-amber-300">PDF Raporu</strong> ve <strong className="text-amber-300">Usta Üyelikte</strong> açılır.
+                    </p>
+                  </div>
+                  <button
+                    onClick={handlePurchaseReport}
+                    className="px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-600 hover:brightness-110 text-black font-bold text-xs transition-all shadow-md shrink-0 cursor-pointer whitespace-nowrap"
+                  >
+                    Raporu Satın Al (1.111 TL)
+                  </button>
+                </div>
+              )}
+
               {/* Güvenlik & Tıbbi Sorumluluk Uyarısı */}
               <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 flex items-start gap-3 text-xs text-gray-400">
                 <Shield size={16} className="text-amber-400 shrink-0 mt-0.5" />
@@ -1046,8 +1114,6 @@ export default function CosmicMatrixPage() {
               </div>
             </div>
           </div>
-        )}
-          </>
         )}
       </div>
 
