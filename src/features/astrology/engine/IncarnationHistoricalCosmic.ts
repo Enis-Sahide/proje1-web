@@ -716,8 +716,12 @@ export function calculateCosmicOrigin(
       frequencyBadge = `${topRoyal.family} (Kraliyet Bekçisi)`;
     }
 
-    // Tüm bireysel sabit yıldız temaslarını müstakil olarak koru ve her birine özel ezoterik anlam ata
-    const allAlignmentsList: StarAlignment[] = allMatches.slice(0, 12).map(m => {
+    // Tüm bireysel sabit yıldız temaslarını müstakil olarak koru ve orb yakınlığına göre sırala
+    // 12 kart sınırı kaldırıldı: Orb kriterini sağlayan tüm gerçek kadersel temaslar eksiksiz listelenir.
+    // Sıralama ilkesi: En dar orb (0.00°'ye en yakın) = en güçlü etki = en başta!
+    const sortedAlignments = [...allMatches].sort((a, b) => a.orb - b.orb);
+
+    const allAlignmentsList: StarAlignment[] = sortedAlignments.map(m => {
       const cleanConnectedPoint = `${m.point.name} ile ${m.orb}° orb`;
       const interpretation = generateStarPointInterpretation(m.star.name, m.point.name, m.point.layer, m.orb);
       return {
