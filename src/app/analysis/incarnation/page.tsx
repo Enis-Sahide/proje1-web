@@ -154,7 +154,7 @@ export default function IncarnationAnalysisPage() {
         <div>
           <h4 className="text-base font-bold text-white">Detaylı Analizler Usta Seviyesine Özeldir</h4>
           <p className="text-xs sm:text-sm text-mystic-text-muted mt-1 max-w-xl">
-            Bu bölümdeki derin karmik nedenleri, dharma reçetelerini ve ezoterik ruh haritanızı görmek için Usta Seviyesi üye olabilir veya tüm detayları içeren 5 sayfalık PDF Raporunu indirebilirsiniz.
+            Bu bölümdeki derin karmik nedenleri, dharma reçetelerini ve ezoterik ruh haritanızı görmek için Usta Seviyesi üye olabilir veya tüm detayları içeren Kapsamlı Enkarnasyon & Ruh Dosyasını (Özel PDF) indirebilirsiniz.
           </p>
         </div>
       </div>
@@ -1602,7 +1602,7 @@ export default function IncarnationAnalysisPage() {
                     <div className="text-[#D4AF37] mb-3"><Lock size={36} /></div>
                     <div className="text-white font-bold text-base mb-1.5">Sabit Yıldız & Kraliyet Açılımı Kilitli</div>
                     <p className="text-white/80 text-xs max-w-sm mb-5 leading-relaxed">
-                      Bu sabit yıldız hizalanmasının derin ezoterik açılımı, kadersel sınavları ve ruhsal misyonu Usta Seviyesi üyelere ve 5 sayfalık Enkarnasyon PDF Raporuna özeldir.
+                      Bu sabit yıldız hizalanmasının derin ezoterik açılımı, kadersel sınavları ve ruhsal misyonu Usta Seviyesi üyelere ve Kapsamlı Enkarnasyon & Ruh Dosyasına (Özel PDF) özeldir.
                     </p>
                     <button
                       onClick={() => {
@@ -1679,7 +1679,7 @@ export default function IncarnationAnalysisPage() {
             <div className="text-[#D4AF37] mx-auto mb-4 flex justify-center"><Lock size={48} /></div>
             <h3 className="text-xl font-bold text-white mb-2">Detaylı Karmik Analiz Kilitli</h3>
             <p className="text-mystic-text-muted text-sm mb-6 leading-relaxed">
-              Geçmiş yaşam nedenleri, karmik borçlar, sabit yıldız ve kraliyet ezoterik açılımları Usta Seviyesi (Master) üyelere özeldir. Usta üyeliğe geçebilir veya tüm detayları içeren 5 sayfalık PDF Raporunu indirebilirsiniz.
+              Geçmiş yaşam nedenleri, karmik borçlar, sabit yıldız ve kraliyet ezoterik açılımları Usta Seviyesi (Master) üyelere özeldir. Usta üyeliğe geçebilir veya tüm detayları içeren Kapsamlı Enkarnasyon & Ruh Dosyasını (Özel PDF) indirebilirsiniz.
             </p>
             <div className="flex flex-col gap-3">
               <button 

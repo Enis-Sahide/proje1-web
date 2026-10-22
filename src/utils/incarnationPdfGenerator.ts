@@ -402,7 +402,23 @@ export const downloadIncarnationPDF = async (
     doc.setLineWidth(0.6);
     doc.line(15, curY, 195, curY);
 
-    curY += 10;
+    // 2.0 KADİM SABİT YILDIZLAR & KRALİYET MUHAFIZLARI REHBERİ
+    curY += 8;
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(...gold);
+    doc.text('Kadim Sabit Yıldızlar, Sirius & Kraliyet Muhafızları Rehberi:', 15, curY);
+    curY += 5;
+
+    doc.setFont('LiberationSans', 'normal');
+    doc.setFontSize(10.5);
+    doc.setTextColor(...white);
+    const wisdomGuide = 'Ezoterik astrolojide sabit yıldızlar, sıradan gezegen döngülerinin ötesinde ruhun evrensel hafızasını taşıyan "Kozmik Boyut Kapıları"dır. Kuran-ı Kerim\'de adı açıkça geçen tek yıldız olan Sirius (Şi\'ra - Necm 49), ilahi inisiyasyon ve yüksek şifa kaynağıdır. Pers ve Babil geleneğinde göğün dört ana yönünü bekleyen 4 Kraliyet Yıldızı (Regulus, Aldebaran, Antares, Fomalhaut) ise Dört Büyük Başmeleğin göksel muhafız kalkanını simgeler. Haritanızdaki bu temaslar, ruhunuzun bu enkarnasyona hangi kozmik yetki, ilahi koruma ve kadersel sınavlarla mühürlendiğini gösterir.';
+    curY = renderText(wisdomGuide, 15, curY, 180, 5.4);
+    curY += 6;
+
+    // 2.1 BİRİNCİL KOZMİK RUH KÖKENİ
+    ensureSpace(45);
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(15);
     doc.setTextColor(30, 58, 138); // Deep Celestial Blue
@@ -427,75 +443,142 @@ export const downloadIncarnationPDF = async (
     curY = renderText(`**Kozmik Deha & Hediye:** ${data.cosmicOrigin.cosmicGift}`, 15, curY, 180, 6.0);
     curY += 3;
     curY = renderText(`**Hücresel Yabancılık & Sınav:** ${data.cosmicOrigin.earthlyChallenge}`, 15, curY, 180, 6.0);
+    curY += 5;
 
-    if (data.cosmicOrigin.secondaryStars && data.cosmicOrigin.secondaryStars.length > 0) {
-      curY += 3;
-      const secAlignmentsText = data.cosmicOrigin.secondaryStars
-        .map(s => `${s.starName.split(' ')[0]} (${s.layer.includes('Bilinçdışı') ? 'Bilinçdışı Tasarım' : s.layer.includes('Drakonik') ? 'Drakonik' : s.layer.includes('Beriyah') ? '3. Harita' : 'Natal'}, ${s.orb}° orb)`)
-        .join(' • ');
-      curY = renderText(`**Katmanlar Arası Hizalanan Yıldızlar:** ${secAlignmentsText}`, 15, curY, 180, 5.8);
-    }
-
+    // 2.2 ÖZEL BÖLÜM: 4 KRALİYET YILDIZI & BAŞMELEK KALKANLARI
     if (data.cosmicOrigin.royalStarsActive && data.cosmicOrigin.royalStarsActive.length > 0) {
-      curY += 3;
-      const royalText = data.cosmicOrigin.royalStarsActive
-        .map(r => `${r.starName} (${r.layer.includes('Beriyah') ? '3. Harita' : r.layer.includes('Drakonik') ? 'Drakonik' : 'Natal'}, ${r.pointName}, ${r.orb}° orb)`)
-        .join(' • ');
+      ensureSpace(50);
+      curY += 4;
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(15);
       doc.setTextColor(...gold);
-      curY = renderText(`**Aktif Kraliyet Yıldızları (4 Melek Kalkanı):** ${royalText}`, 15, curY, 180, 5.8);
+      doc.text('👑 4 Kraliyet Yıldızı (Başmelek Muhafızları) Kalkanı', 15, curY);
+      curY += 6;
+
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(10.5);
       doc.setTextColor(...white);
+      const royalIntro = 'Haritanızda ilahi nizamın 4 büyük göksel muhafızından en az birinin mührü aktiftir. Bu yıldızlar ruhunuza muazzam bir kadersel yetki ve koruma verir; ancak her biri çok ağır ve tavizsiz bir ahlaki sınavla korunur:';
+      curY = renderText(royalIntro, 15, curY, 180, 5.4);
+      curY += 5;
+
+      data.cosmicOrigin.royalStarsActive.forEach((royal) => {
+        ensureSpace(45);
+        const isRegulus = royal.starName.includes('Regulus');
+        const isAldebaran = royal.starName.includes('Aldebaran');
+        const isAntares = royal.starName.includes('Antares');
+        const isFomalhaut = royal.starName.includes('Fomalhaut');
+
+        let archangel = 'Kozmik Başmelek Kalkanı';
+        let direction = 'Kraliyet Kapısı';
+        let mandate = 'Yüksek kadersel sorumluluk ve ruhsal rehberlik yetkisi.';
+        let testWarning = 'Gücü kötüye kullanmaktan, kibirden ve bencillikten mutlak arınma gereklidir.';
+
+        if (isRegulus) {
+          archangel = 'Başmelek Raphaël (Kuzey Gözcüsü - Şifa, Onur & Hakkaniyet)';
+          direction = 'Kuzey Kraliyet Yıldızı (Aslan Kalbi)';
+          mandate = 'Kitleleri arkasından sürükleyen doğal karizma, soylu duruş, liderlik kudreti ve ruhsal şifa elçiliği.';
+          testWarning = 'İNTİKAM VE KİBİR TUZAĞI: Haklı bile olsanız asla intikam peşinde koşmamalı, güç zehirlenmesine kapılmamalısınız. İntikam arandığı anda kadersel tahttan düşüş kaçınılmazdır.';
+        } else if (isAldebaran) {
+          archangel = 'Başmelek Mikâil (Doğu Gözcüsü - Hakikat & Adalet Kılıcı)';
+          direction = 'Doğu Kraliyet Yıldızı (Boğa Gözü)';
+          mandate = 'Sarsılmaz söz kudreti, dürüstlük, hakikati en saf haliyle savunma ve ilahi adaleti yeryüzüne mühürleme yetisi.';
+          testWarning = 'DÜRÜSTLÜK SINAVI: En ufak bir yalan, riya veya hileye başvurulduğunda ilahi sistem kişiyi derhal çok ağır kadersel sınavlara çeker.';
+        } else if (isAntares) {
+          archangel = 'Başmelek Uriel (Batı Gözcüsü - Dönüşüm Ateşi & Okült Simya)';
+          direction = 'Batı Kraliyet Yıldızı (Akrep Kalbi)';
+          mandate = 'Karanlığı ışığa dönüştürme, en derin krizleri ve yıkımları ilahi güce çevirme, ölüm ve yeniden doğum simyacılığı.';
+          testWarning = 'TUTKU VE KİN SINAVI: Yıkıcı hırslardan, kıskançlıktan, insanları manipüle etmekten ve kindar takıntılardan mutlak arınma.';
+        } else if (isFomalhaut) {
+          archangel = 'Başmelek Cebrail (Güney Gözcüsü - Vahiy & Mistik İlham)';
+          direction = 'Güney Kraliyet Yıldızı (Güney Balığı)';
+          mandate = 'Mistik vizyonlar, durugörü, şiirsel/sanatsal deha ve manevi alemlerle dünya arasında ilahi bir köprü olma kabiliyeti.';
+          testWarning = 'SAF NİYET SINAVI: Manevi hediyeleri dünyevi hırslar, büyü/okült manipülasyonlar veya bencilce çıkarlar için kullanmaktan mutlak sakınma.';
+        }
+
+        doc.setFont('LiberationSans', 'bold');
+        doc.setFontSize(12);
+        doc.setTextColor(...gold);
+        doc.text(`👑 ${royal.starName} — ${direction}`, 15, curY);
+        curY += 5;
+
+        doc.setFont('LiberationSans', 'normal');
+        doc.setFontSize(9.5);
+        doc.setTextColor(...muted);
+        doc.text(`Başmelek: ${archangel}  |  Katman: ${royal.layer}  |  Nokta: ${royal.pointName} (${royal.orb}° orb)`, 15, curY);
+        curY += 4.5;
+
+        doc.setFont('LiberationSans', 'normal');
+        doc.setFontSize(11);
+        doc.setTextColor(...white);
+        curY = renderText(`**Kozmik Yetki & Ruhsal Görev:** ${mandate}`, 15, curY, 180, 5.8);
+        curY += 2;
+        curY = renderText(`**Kadersel İmtihan & İlahi Uyarı:** ${testWarning}`, 15, curY, 180, 5.8);
+        curY += 4;
+
+        doc.setDrawColor(...gold);
+        doc.setLineWidth(0.3);
+        doc.line(15, curY, 195, curY);
+        curY += 5;
+      });
     }
 
-    // Öne çıkan sabit yıldız temaslarının ezoterik tezahürleri
-    if (data.cosmicOrigin.allAlignments && data.cosmicOrigin.allAlignments.length > 0) {
-      const topInterpreted = data.cosmicOrigin.allAlignments
-        .filter(a => !!a.interpretation)
-        .slice(0, 3);
-      if (topInterpreted.length > 0) {
-        curY += 5;
+    // 2.3 TÜM AKTİF SABİT YILDIZ HİZALANMALARI (SINIRLAMA OLMAKSIZIN EKSİKSİZ)
+    const starAlignments = (data.cosmicOrigin.allAlignments && data.cosmicOrigin.allAlignments.length > 0)
+      ? data.cosmicOrigin.allAlignments.filter(a => !!a.interpretation)
+      : (data.cosmicOrigin.secondaryStars || []).filter(a => !!a.interpretation);
+
+    if (starAlignments.length > 0) {
+      ensureSpace(50);
+      curY += 4;
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(15);
+      doc.setTextColor(...gold);
+      doc.text('Katmanlar Arası Aktif Galaktik Sabit Yıldız Hizalanmaları', 15, curY);
+      curY += 6;
+
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(10.5);
+      doc.setTextColor(...white);
+      const alignIntro = 'Doğum haritanızın 4 boyutunda (Fiziksel Natal, Drakonik Ruh Haritası, Human Design Bilinçdışı Tasarımı ve 9. Harmonik Beriyah Zihni) aktif olan sabit yıldız temaslarının kadersel açılımları:';
+      curY = renderText(alignIntro, 15, curY, 180, 5.4);
+      curY += 5;
+
+      starAlignments.forEach((align) => {
+        if (!align.interpretation) return;
+        ensureSpace(48);
+
+        const isRoyal = !!align.isRoyalStar;
+        const isSirius = align.starName.includes('Sirius');
+        const icon = isRoyal ? '👑' : isSirius ? '✨' : '★';
+
         doc.setFont('LiberationSans', 'bold');
-        doc.setFontSize(13);
+        doc.setFontSize(12);
         doc.setTextColor(...gold);
-        doc.text('Öne Çıkan Sabit Yıldız İnisiyasyonları & Kadersel Tezahürü:', 15, curY);
-        curY += 7;
+        doc.text(`${icon} ${align.interpretation.title}`, 15, curY);
+        curY += 5;
 
-        topInterpreted.forEach(align => {
-          if (!align.interpretation) return;
+        doc.setFont('LiberationSans', 'normal');
+        doc.setFontSize(9.5);
+        doc.setTextColor(...muted);
+        doc.text(`Takımyıldız: ${align.constellation}  |  Katman: ${align.layer}  |  Nokta: ${align.connectedPoint} (${align.orb}° orb)`, 15, curY);
+        curY += 4.5;
 
-          doc.setFont('LiberationSans', 'bold');
-          doc.setFontSize(11.5);
-          const starTitleLines = doc.splitTextToSize(`★ ${align.interpretation.title} (${align.orb}° orb - ${align.connectedPoint})`, 168);
+        doc.setFont('LiberationSans', 'normal');
+        doc.setFontSize(11);
+        doc.setTextColor(...white);
+        curY = renderText(`**🔮 Ezoterik Anlam & Kozmik Portal:** ${align.interpretation.esotericMeaning}`, 15, curY, 180, 5.8);
+        curY += 2;
+        curY = renderText(`**🌍 Hayattaki Tezahürü & Karakteristik Etkisi:** ${align.interpretation.lifeManifestation}`, 15, curY, 180, 5.8);
+        curY += 2;
+        curY = renderText(`**🧭 Ruhsal Görev & Kozmik Sınav:** ${align.interpretation.spiritualMission}`, 15, curY, 180, 5.8);
+        curY += 4;
 
-          doc.setFont('LiberationSans', 'normal');
-          doc.setFontSize(10.5);
-          const meaningLines = doc.splitTextToSize(align.interpretation.esotericMeaning, 168);
-
-          const lineHeight = 5.2;
-          const cardHeight = 10 + (starTitleLines.length * 5.6) + (meaningLines.length * lineHeight) + 6;
-
-          ensureSpace(cardHeight + 6);
-
-          doc.setFillColor(...cardDark);
-          doc.roundedRect(15, curY, 180, cardHeight, 3, 3, 'F');
-          doc.setDrawColor(90, 110, 180);
-          doc.setLineWidth(0.4);
-          doc.roundedRect(15, curY, 180, cardHeight, 3, 3, 'D');
-
-          let textY = curY + 6.5;
-          doc.setFont('LiberationSans', 'bold');
-          doc.setFontSize(11.5);
-          doc.setTextColor(...gold);
-          doc.text(starTitleLines, 20, textY);
-          textY += (starTitleLines.length * 5.6) + 2;
-
-          doc.setFont('LiberationSans', 'normal');
-          doc.setFontSize(10.5);
-          doc.setTextColor(...white);
-          doc.text(meaningLines, 20, textY);
-
-          curY += cardHeight + 6;
-        });
-      }
+        doc.setDrawColor(220, 225, 235);
+        doc.setLineWidth(0.3);
+        doc.line(15, curY, 195, curY);
+        curY += 5;
+      });
     }
   }
 
