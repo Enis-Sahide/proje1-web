@@ -54,6 +54,8 @@ Kadim Mısır'da Sirius (Sothis), Tanrıça İsis ile özdeşleştirilirdi. Siri
 
 Ezoterik açıdan Sirius; dünyevi bir taht, mal veya askeri fetih dağıtmaz. O bir **Kozmik İnisiyasyon Portalidır**. İnsanoğlunun yüksek benliğiyle, evrensel bilinçle ve ilahi rehberlikle kurduğu doğrudan köprüdür.
 
+![Kozmik Matrisin 4 Muhafızı ve Merkezdeki Ruhsal Güneş: Sirius İnisiyasyonu](/sirius_royal_guardians_portal.jpg)
+
 ---
 
 ## 3. Mukayese Tablosu: İki Ayrık Kozmik Düzlem
