@@ -19,7 +19,7 @@ async function main() {
     title: 'Göğün 4 Muhafızı ve Kozmik Portal: 4 Kraliyet Yıldızı ile Sirius (Şi\'ra) Arasındaki Ezoterik Ayrım',
     slug: 'dort-kraliyet-yildizi-ve-sirius-arasindaki-fark',
     content: content,
-    imageUrl: '/royal_stars_sirius.jpg',
+    imageUrl: '/sirius_royal_guardians_portal.jpg',
     category: 'Ezoterik Astroloji',
     published: true,
   };
