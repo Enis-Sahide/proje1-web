@@ -14,23 +14,14 @@ Görseldeki tasvirde olduğu gibi; bireyin etrafını saran, onu uyuşturan ve a
 
 Halk arasında bu tür varlıklar genellikle **"demon" (iblis/cin)** veya **"karabasan"** gibi genel teolojik kavramlarla adlandırılsa da, ezoterik ve metafizik literatürde hiyerarşi ve fonksiyonlar çok daha spesifiktir.
 
-```
-                    ┌──────────────────────────────────────────────┐
-                    │      GÖRÜNMEYEN ASALAKLARIN SINIFLANDIRILMASI │
-                    └──────────────────────┬───────────────────────┘
-                                           │
-         ┌─────────────────────────────────┼─────────────────────────────────┐
-         ▼                                 ▼                                 ▼
-┌──────────────────┐             ┌──────────────────┐             ┌──────────────────┐
-│ Astral / Eterik  │             │ Düşünce Formları │             │ Teolojik Demonlar│
-│   Parazitler     │             │(Larvalar/Tulpalar│             │   ve Arkonlar    │
-├──────────────────┤             ├──────────────────┤             ├──────────────────┤
-│• Basit organizma │             │• İnsanın kendi   │             │• Yüksek zeka ve  │
-│• İçgüdüsel açlık │             │  zihninden doğar │             │  stratejik yapı  │
-│• Aurik yırtığa   │             │• Saplantılı duygu│             │• Toplu bilinç ve │
-│  tutunur         │             │  ve korku besler │             │  kolektif manipülasyon│
-└──────────────────┘             └──────────────────┘             └──────────────────┘
-```
+### Görünmeyen Asalakların Karşılaştırmalı Sınıflandırması
+
+| Kategori | Varlık Türü | Kökeni & Doğası | Beslenme & Etki Alanı |
+| :--- | :--- | :--- | :--- |
+| **1. Eterik / Astral Parazitler** | Süptil asalaklar, astral sülükler | Basit ve içgüdüsel açlık. Yüksek zekası yoktur. | Auradaki çatlaklara tutunur; korku, panik, şehvet ve uyuşuklukla beslenir. |
+| **2. Zihinsel Düşünce Formları** | Tulpalar, larvalar, kişisel egregorlar | Kişinin kendi takıntılı, kronik olumsuz düşüncelerinden doğar. | Kişinin kendi yaşam gücünü sömürür; zihinde obsesif düşünce döngüleri üretir. |
+| **3. Teolojik Varlıklar & Arkonlar** | Demonlar, iblisler, arkonik yapılar | Yüksek zeka, kolektif illüzyon ve irade gaspı stratejisi. | Bireyi ve kitleleri çaresizlik, korku ve suçluluk frekansında hapseder. |
+
 
 ### 1. Astral ve Eterik Parazitler (Astral Larvae / Energy Parasites)
 Tıpkı biyolojik bedenimizin keneler, sülükler ve bakteriler gibi fiziksel parazitlere ev sahipliği yapabilmesi gibi; **eterik (enerji) ve astral (duygu) bedenimiz** de süptil parazitlerin hedefi olabilir. 
