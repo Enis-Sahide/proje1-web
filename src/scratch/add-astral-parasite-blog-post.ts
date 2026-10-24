@@ -19,7 +19,7 @@ async function main() {
     title: 'Görünmeyen Asalaklar: Astral Parazitler, Zihinsel Demonlar ve Yaşam Enerjisinin Tüketilişi',
     slug: 'gorunmeyen-parazitler-astral-varliklar-ve-enerji-tuketimi',
     content: content,
-    imageUrl: '/astral_parasite_shield.jpg',
+    imageUrl: '/astral_parasite_shield_v2.jpg',
     category: 'Ezoterik',
     published: true,
   };
