@@ -305,7 +305,8 @@ export async function generateAstrologyChart(dateObj: Date, cityInput: string | 
     });
   }
 
-  const aspects = calculateAspects(planets);
+  const aspectPoints = [...planets, ascendant, midheaven].filter(Boolean) as AstroPoint[];
+  const aspects = calculateAspects(aspectPoints);
 
   // --- Esoteric Calculations ---
   const currentYear = new Date().getFullYear();
@@ -376,7 +377,7 @@ export function calculateDraconicChart(baseChart: NatalChartData): NatalChartDat
   const ascendant = shiftPoint(baseChart.ascendant);
   const midheaven = shiftPoint(baseChart.midheaven);
   const houses = baseChart.houses.map(shiftPoint);
-  const aspects = calculateAspects(planets);
+  const aspects = calculateAspects([...planets, ascendant, midheaven].filter(Boolean) as AstroPoint[]);
 
   const interceptedSigns: ZodiacSign[] = [];
   const houseSigns = new Set(houses.map(h => h.sign));

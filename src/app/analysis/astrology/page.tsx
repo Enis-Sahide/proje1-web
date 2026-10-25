@@ -10,7 +10,7 @@ import download from 'downloadjs';
 import { PrintableChart } from '@/components/PrintableChart';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import { useAuth } from '@/context/AuthContext';
-import { downloadChartPDF } from '@/utils/pdfGenerator';
+import { downloadChartPDF, generateSvgString, convertSvgToPng } from '@/utils/pdfGenerator';
 import AuthPromptModal from '@/components/AuthPromptModal';
 import SafeTimePicker from '@/components/ui/SafeTimePicker';
 import AnalysisBackButton from '@/components/ui/AnalysisBackButton';
@@ -79,6 +79,7 @@ export default function AstrologyPage() {
   const printRef = useRef<HTMLDivElement>(null);
   const [isDownloading, setIsDownloading] = useState(false);
   const [renderPrintable, setRenderPrintable] = useState(false);
+  const [printableWheelUrl, setPrintableWheelUrl] = useState<string | null>(null);
 
   // Trigger download after PrintableChart is mounted in DOM
   React.useEffect(() => {
@@ -124,15 +125,27 @@ export default function AstrologyPage() {
       } finally {
         setIsDownloading(false);
         setRenderPrintable(false);
+        setPrintableWheelUrl(null);
       }
     };
 
     downloadChart();
   }, [renderPrintable]);
 
-  const handleDownloadImage = () => {
+  const handleDownloadImage = async () => {
+    if (!chartData) return;
     alert("Bilgilendirme: İndirilen görselde sadece astrolojik tablo verileri yer almaktadır. Butonlara tıklayıp açtığınız detaylı uzun yorum metinleri dökümana dahil değildir.");
-    setRenderPrintable(true);
+    try {
+      setIsDownloading(true);
+      const svgStr = generateSvgString(chartData);
+      const wheelPng = await convertSvgToPng(svgStr);
+      setPrintableWheelUrl(wheelPng);
+      setRenderPrintable(true);
+    } catch (err) {
+      console.error(err);
+      alert('Görsel hazırlanırken bir hata oluştu.');
+      setIsDownloading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -253,7 +266,7 @@ export default function AstrologyPage() {
             return (
               <g key={`zodiac-${i}`}>
                 <line x1={getX(signLon, R_ZODIAC_OUTER)} y1={getY(signLon, R_ZODIAC_OUTER)} x2={getX(signLon, R_ZODIAC_INNER)} y2={getY(signLon, R_ZODIAC_INNER)} stroke="rgba(212,175,55,0.3)" strokeWidth="1" />
-                <text x={getX(midLon, RADIUS + 22)} y={getY(midLon, RADIUS + 22) + 6} fontSize="18" fill={ZODIAC_COLORS[signName]} textAnchor="middle" fontWeight="bold">
+                <text x={getX(midLon, RADIUS + 22)} y={getY(midLon, RADIUS + 22) + 6} fontFamily="Arial, Helvetica, sans-serif" fontSize="18" fill={ZODIAC_COLORS[signName]} textAnchor="middle" fontWeight="bold">
                   {ZODIAC_SYMBOLS[signName]}
                 </text>
               </g>
@@ -273,18 +286,18 @@ export default function AstrologyPage() {
                   strokeDasharray={isAngle ? "" : "4, 4"} 
                 />
                 <line x1={getX(h.longitude, R_TICKS_OUTER)} y1={getY(h.longitude, R_TICKS_OUTER)} x2={getX(h.longitude, R_TICKS_OUTER + 5)} y2={getY(h.longitude, R_TICKS_OUTER + 5)} stroke={isAngle ? "#D4AF37" : "rgba(212,175,55,0.3)"} strokeWidth={isAngle ? "2" : "1"} />
-                <text x={getX(h.longitude, R_CUSP_NUM + (isAngle ? 5 : 0))} y={getY(h.longitude, R_CUSP_NUM + (isAngle ? 5 : 0)) + 4} fontSize={isAngle ? "14" : "12"} fill={isAngle ? "#D4AF37" : "#9CA3AF"} textAnchor="middle" fontWeight={isAngle ? "bold" : "normal"}>
+                <text x={getX(h.longitude, R_CUSP_NUM + (isAngle ? 5 : 0))} y={getY(h.longitude, R_CUSP_NUM + (isAngle ? 5 : 0)) + 4} fontFamily="Arial, Helvetica, sans-serif" fontSize={isAngle ? "14" : "12"} fill={isAngle ? "#D4AF37" : "#9CA3AF"} textAnchor="middle" fontWeight={isAngle ? "bold" : "normal"}>
                   {`${String(h.degreeInSign).padStart(2, '0')}° ${h.house}. ${String(h.minutes).padStart(2, '0')}'`}
                 </text>
               </g>
             );
           })}
 
-          {/* Planets (Removed click modal handlers to prevent lag and accidental mobile clicks) */}
-          {chartData.planets.map((p, i) => {
+          {/* Planets (including ASC and MC) */}
+          {[...chartData.planets, chartData.ascendant, chartData.midheaven].filter(Boolean).map((p, i, arr) => {
             let rOffset = 0;
             for(let j=0; j<i; j++) {
-               if (Math.abs(p.longitude - chartData.planets[j].longitude) < 5) rOffset += 18;
+               if (Math.abs(p.longitude - arr[j].longitude) < 5) rOffset += 18;
             }
             const px = getX(p.longitude, R_PLANETS - rOffset);
             const py = getY(p.longitude, R_PLANETS - rOffset);
@@ -293,14 +306,14 @@ export default function AstrologyPage() {
               <g key={`planet-${i}`}>
                 <line x1={getX(p.longitude, R_ZODIAC_INNER)} y1={getY(p.longitude, R_ZODIAC_INNER)} x2={px} y2={py} stroke="rgba(212,175,55,0.3)" strokeWidth="0.5" strokeDasharray="1, 2" />
                 <circle cx={px} cy={py} r="12" fill="#0F172A" stroke="#D4AF37" strokeWidth="1" />
-                <text x={px} y={py + 5} fontSize="14" fill="#D4AF37" textAnchor="middle" fontWeight="bold">
-                  {PLANET_SYMBOLS[p.name]}
+                <text x={px} y={py + 5} fontFamily="Arial, Helvetica, sans-serif" fontSize="14" fill="#D4AF37" textAnchor="middle" fontWeight="bold">
+                  {PLANET_SYMBOLS[p.name] || p.name[0]}
                 </text>
-                <text x={px + 16} y={py - 5} fontSize="10" fill="#9CA3AF" textAnchor="start">
+                <text x={px + 16} y={py - 5} fontFamily="Arial, Helvetica, sans-serif" fontSize="10" fill="#9CA3AF" textAnchor="start">
                   {`${p.degreeInSign}°${String(p.minutes).padStart(2,'0')}'`}
                 </text>
                 {p.isRetrograde && (
-                  <text x={px + 16} y={py + 6} fontSize="10" fill="#FF453A" textAnchor="start" fontWeight="bold">Rx</text>
+                  <text x={px + 16} y={py + 6} fontFamily="Arial, Helvetica, sans-serif" fontSize="10" fill="#FF453A" textAnchor="start" fontWeight="bold">Rx</text>
                 )}
               </g>
             );
@@ -737,7 +750,17 @@ export default function AstrologyPage() {
               chartData={chartData} 
               locationStr={cityKey ? cityKey.name : ''} 
               dateStr={`${dateStr.split('-').reverse().join('.')} ${timeStr}`} 
-              svgWheel={renderSvgWheel(true)}
+              svgWheel={
+                printableWheelUrl ? (
+                  <img 
+                    src={printableWheelUrl} 
+                    alt="Doğum Haritası Çarkı" 
+                    className="w-[440px] h-[440px] object-contain block" 
+                  />
+                ) : (
+                  renderSvgWheel(true)
+                )
+              }
               aspectGrid={renderAspectGrid(true)}
             />
           )}
