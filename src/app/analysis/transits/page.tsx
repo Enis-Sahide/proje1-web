@@ -17,7 +17,11 @@ import {
   Orbit,
   Layers,
   ChevronRight,
-  Info
+  Info,
+  CheckCircle2,
+  AlertTriangle,
+  Activity,
+  Zap
 } from 'lucide-react';
 import { getTransitHouseInterpretation, getTransitAspectInterpretation } from '@/features/astrology/engine/TransitInterpretations';
 import { getSkyPlanetSignInterpretation, getPlanetSignBriefHeadline, getIngressPhase } from '@/features/astrology/engine/SkyAspectInterpretations';
@@ -28,7 +32,11 @@ import {
   UnifiedAspectInfo, 
   parseInterpretationSections,
   generateUnifiedSkyPlanets,
-  UnifiedSkyPlanet
+  UnifiedSkyPlanet,
+  generateCurrentSkyOverview,
+  CurrentSkyOverview,
+  generatePersonalTransitOverview,
+  PersonalTransitOverview
 } from '@/features/astrology/engine/TransitSynthesisEngine';
 import { AstroCity, TransitChartData, AstroPoint, AstroAspect } from '@/features/astrology/engine/AstrologyConstants';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
@@ -118,7 +126,7 @@ export default function TransitsPage() {
   } | null>(null);
   const [skyAspectFilter, setSkyAspectFilter] = useState<'ALL' | 'HARMONIOUS' | 'CHALLENGING' | 'CONJUNCTION'>('ALL');
   const [skyRightTab, setSkyRightTab] = useState<'ASPECTS' | 'SIGN_PLACEMENTS'>('ASPECTS');
-  const [skyViewMode, setSkyViewMode] = useState<'SYNTHESIS' | 'LIST'>('SYNTHESIS');
+  const [skyViewMode, setSkyViewMode] = useState<'OVERVIEW' | 'SYNTHESIS' | 'LIST'>('OVERVIEW');
   const [skySortMode, setSkySortMode] = useState<'ORB' | 'CLASSIC'>('ORB');
   const [signFilter, setSignFilter] = useState<'ALL' | 'NEW_INGRESS' | 'PERSONAL' | 'OUTER'>('ALL');
 
@@ -191,6 +199,11 @@ export default function TransitsPage() {
     }
   }, []);
 
+  const currentSkyOverview = useMemo(() => {
+    if (!skyChartData?.planets || !skyChartData?.aspects) return null;
+    return generateCurrentSkyOverview(skyChartData.planets, skyChartData.aspects);
+  }, [skyChartData]);
+
   const unifiedSkyPlanets = useMemo(() => {
     if (!skyChartData?.planets || !skyChartData?.aspects) return [];
     return generateUnifiedSkyPlanets(
@@ -212,7 +225,7 @@ export default function TransitsPage() {
   const [transitTimeStr, setTransitTimeStr] = useState(defaultTTime);
 
   const [personalTab, setPersonalTab] = useState<'BIWHEEL' | 'TIMELINE'>('BIWHEEL');
-  const [personalViewMode, setPersonalViewMode] = useState<'SYNTHESIS' | 'TABLES'>('SYNTHESIS');
+  const [personalViewMode, setPersonalViewMode] = useState<'OVERVIEW' | 'SYNTHESIS' | 'TABLES'>('OVERVIEW');
   const [timelineData, setTimelineData] = useState<any>(null);
   const [timelineRange, setTimelineRange] = useState<'1m' | '3m' | '6m' | '1y'>('1m');
   const [isTimelineLoading, setIsTimelineLoading] = useState(false);
@@ -226,6 +239,16 @@ export default function TransitsPage() {
         transitData.natalChart.planets,
         transitData.natalChart.houses
       )
+    );
+  }, [transitData]);
+
+  const personalOverview = useMemo(() => {
+    if (!transitData) return null;
+    return generatePersonalTransitOverview(
+      transitData.transitPlanets,
+      transitData.transitAspects,
+      transitData.natalChart.planets,
+      transitData.natalChart.houses
     );
   }, [transitData]);
 
@@ -485,32 +508,6 @@ export default function TransitsPage() {
           </div>
         </div>
 
-        {/* Frekans Aynası Mini Banner */}
-        <div className="max-w-4xl mx-auto mb-8 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#0EA5E9]/15 via-[#6A0DAD]/15 to-[#D4AF37]/15 border border-[#0EA5E9]/30 backdrop-blur-md flex flex-col sm:flex-row items-center justify-between gap-3 shadow-lg">
-          <div className="flex items-center gap-3 text-center sm:text-left">
-            <div className="p-2 rounded-xl bg-[#0EA5E9]/20 text-[#0EA5E9] shrink-0 hidden sm:block">
-              <Sparkles size={18} />
-            </div>
-            <div>
-              <div className="flex items-center justify-center sm:justify-start gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#0EA5E9]/20 text-[#0EA5E9]">Frekans Aynası</span>
-                <span className="text-xs text-white/70">Bugün Hangi Haritanızı Çalıştırıyorsunuz?</span>
-              </div>
-              <p className="text-xs sm:text-sm font-semibold text-white mt-0.5">
-                Canlı gökyüzü transitlerinin haritanızı hangi temada sınadığını ve 4 alemdeki tutumunuzu teşhis edin.
-              </p>
-            </div>
-          </div>
-          <button
-            type="button"
-            onClick={() => router.push('/analysis/frekans-aynasi')}
-            className="shrink-0 flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8] hover:from-[#38BDF8] hover:to-[#0EA5E9] text-black font-bold text-xs rounded-xl transition-all shadow-md cursor-pointer"
-          >
-            <span>Frekansınızı Teşhis Edin</span>
-            <ChevronRight size={14} />
-          </button>
-        </div>
-
         {error && (
           <div className="bg-red-500/10 border border-red-500/50 text-red-200 p-4 rounded-xl mb-6 flex items-center gap-3">
             <AlertCircle size={20} />
@@ -712,9 +709,21 @@ export default function TransitsPage() {
 
                       {skyRightTab === 'ASPECTS' ? (
                         <>
-                          {/* Sub-View Switcher: Synthesis vs List */}
+                          {/* Sub-View Switcher: Overview vs Synthesis vs List */}
                           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5 mb-4 bg-black/50 p-2 rounded-2xl border border-white/10">
-                            <div className="flex items-center gap-1.5 bg-black/60 p-1 rounded-xl border border-white/10">
+                            <div className="flex flex-wrap items-center gap-1.5 bg-black/60 p-1 rounded-xl border border-white/10">
+                              <button
+                                type="button"
+                                onClick={() => setSkyViewMode('OVERVIEW')}
+                                className={`px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                                  skyViewMode === 'OVERVIEW'
+                                    ? 'bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] text-black shadow-md'
+                                    : 'text-mystic-text-muted hover:text-white'
+                                }`}
+                              >
+                                <Sparkles size={13} />
+                                <span>Günün Kozmik Özeti (Sade)</span>
+                              </button>
                               <button
                                 type="button"
                                 onClick={() => setSkyViewMode('SYNTHESIS')}
@@ -724,8 +733,8 @@ export default function TransitsPage() {
                                     : 'text-mystic-text-muted hover:text-white'
                                 }`}
                               >
-                                <Sparkles size={13} />
-                                <span>Bütünleşik Gezegen Kartları (Sentez)</span>
+                                <Layers size={13} />
+                                <span>13 Gezegen Detayı</span>
                               </button>
                               <button
                                 type="button"
@@ -736,19 +745,163 @@ export default function TransitsPage() {
                                     : 'text-mystic-text-muted hover:text-white'
                                 }`}
                               >
-                                <Layers size={13} />
+                                <Orbit size={13} />
                                 <span>Ayrık Tablolar</span>
                               </button>
                             </div>
                             <span className="text-[10px] text-mystic-text-muted px-2">
-                              {skyViewMode === 'SYNTHESIS' 
-                                ? 'Gezegen + Burç + HD Kapı + Açılar' 
+                              {skyViewMode === 'OVERVIEW'
+                                ? 'Hap Bilgi & Kozmik Barometre'
+                                : skyViewMode === 'SYNTHESIS' 
+                                ? 'Gezegen + Burç + HD Kapı' 
                                 : `${filteredSkyAspects.length} aktif açı`}
                             </span>
                           </div>
 
-                          {skyViewMode === 'SYNTHESIS' ? (
-                            /* Mode 1: Bütünleşik Gezegen Kartları (Sentez) */
+                          {skyViewMode === 'OVERVIEW' ? (
+                            /* Mode 1: Günün Kozmik Hava Durumu (Sade & Öz Tek Kart) */
+                            !currentSkyOverview ? (
+                              <div className="text-center py-12 text-mystic-text-muted text-xs">
+                                Kozmik hava durumu hesaplanamadı.
+                              </div>
+                            ) : (
+                              <div className="bg-gradient-to-br from-black/80 via-black/60 to-[#11052C]/60 backdrop-blur-xl border border-[#D4AF37]/30 rounded-3xl p-5 sm:p-6 shadow-2xl space-y-5">
+                                {/* Header / Vibe */}
+                                <div className="border-b border-white/10 pb-4">
+                                  <div className="flex flex-wrap items-center justify-between gap-2 mb-2">
+                                    <span className="px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-widest bg-gradient-to-r from-[#D4AF37]/20 to-[#0EA5E9]/20 text-[#D4AF37] border border-[#D4AF37]/30 flex items-center gap-1.5 shadow-sm">
+                                      <Sparkles size={12} className="text-[#0EA5E9]" /> Günün Kozmik Hava Durumu
+                                    </span>
+                                    <span className="text-xs font-semibold text-stone-400">
+                                      {currentSkyOverview.subHeadline}
+                                    </span>
+                                  </div>
+                                  <h3 className="text-lg sm:text-xl font-black text-white leading-snug">
+                                    {currentSkyOverview.headline}
+                                  </h3>
+                                  <p className="text-xs sm:text-sm text-gray-200 mt-2.5 leading-relaxed">
+                                    {currentSkyOverview.vibeNarrative}
+                                  </p>
+                                </div>
+
+                                {/* Kozmik Barometre */}
+                                <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-4">
+                                  <span className="text-[10px] uppercase tracking-wider font-extrabold text-[#0EA5E9] block mb-3 flex items-center gap-1.5">
+                                    <Activity size={12} /> Kozmik Frekans Barometresi
+                                  </span>
+                                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    {/* Mental */}
+                                    <div className="space-y-1.5 bg-black/40 p-3 rounded-xl border border-white/5">
+                                      <div className="flex justify-between items-center text-xs">
+                                        <span className="text-stone-300 font-medium">🧠 Zihinsel Odak</span>
+                                        <span className="font-extrabold text-cyan-300">{currentSkyOverview.barometer.mental.label}</span>
+                                      </div>
+                                      <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
+                                        <div className="bg-gradient-to-r from-cyan-500 to-blue-500 h-1.5 rounded-full" style={{ width: `${currentSkyOverview.barometer.mental.score}%` }} />
+                                      </div>
+                                      <span className="text-[10px] text-stone-400 block">{currentSkyOverview.barometer.mental.tone}</span>
+                                    </div>
+
+                                    {/* Emotional */}
+                                    <div className="space-y-1.5 bg-black/40 p-3 rounded-xl border border-white/5">
+                                      <div className="flex justify-between items-center text-xs">
+                                        <span className="text-stone-300 font-medium">🌊 Duygusal Akış</span>
+                                        <span className="font-extrabold text-purple-300">{currentSkyOverview.barometer.emotional.label}</span>
+                                      </div>
+                                      <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
+                                        <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-1.5 rounded-full" style={{ width: `${currentSkyOverview.barometer.emotional.score}%` }} />
+                                      </div>
+                                      <span className="text-[10px] text-stone-400 block">{currentSkyOverview.barometer.emotional.tone}</span>
+                                    </div>
+
+                                    {/* Action */}
+                                    <div className="space-y-1.5 bg-black/40 p-3 rounded-xl border border-white/5">
+                                      <div className="flex justify-between items-center text-xs">
+                                        <span className="text-stone-300 font-medium">⚡ Eylem & Atılım</span>
+                                        <span className="font-extrabold text-[#D4AF37]">{currentSkyOverview.barometer.action.label}</span>
+                                      </div>
+                                      <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
+                                        <div className="bg-gradient-to-r from-amber-500 to-[#D4AF37] h-1.5 rounded-full" style={{ width: `${currentSkyOverview.barometer.action.score}%` }} />
+                                      </div>
+                                      <span className="text-[10px] text-stone-400 block">{currentSkyOverview.barometer.action.tone}</span>
+                                    </div>
+                                  </div>
+                                </div>
+
+                                {/* Fırsatlar & Tuzaklar (Do / Don't) */}
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                  {/* Fırsatlar */}
+                                  <div className="bg-emerald-950/20 border border-emerald-500/20 rounded-2xl p-4 space-y-2">
+                                    <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5 uppercase tracking-wider">
+                                      <CheckCircle2 size={14} /> Bugünün Fırsatları
+                                    </span>
+                                    <ul className="space-y-1.5 text-xs text-stone-200">
+                                      {currentSkyOverview.opportunities.map((item, idx) => (
+                                        <li key={idx} className="flex items-start gap-1.5">
+                                          <span className="text-emerald-400 shrink-0 mt-0.5">✦</span>
+                                          <span>{item}</span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+
+                                  {/* Tuzaklar / Dikkat */}
+                                  <div className="bg-amber-950/20 border border-amber-500/20 rounded-2xl p-4 space-y-2">
+                                    <span className="text-xs font-bold text-amber-400 flex items-center gap-1.5 uppercase tracking-wider">
+                                      <AlertTriangle size={14} /> Neden Kaçınmalı?
+                                    </span>
+                                    <ul className="space-y-1.5 text-xs text-stone-200">
+                                      {currentSkyOverview.cautions.map((item, idx) => (
+                                        <li key={idx} className="flex items-start gap-1.5">
+                                          <span className="text-amber-400 shrink-0 mt-0.5">✦</span>
+                                          <span>{item}</span>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  </div>
+                                </div>
+
+                                {/* Pik Açı Rozetleri */}
+                                {currentSkyOverview.topAspects.length > 0 && (
+                                  <div className="pt-2 border-t border-white/5">
+                                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-stone-400 block mb-2">
+                                      Şu An Gökyüzünde Pik Yapan Kilit Açılar:
+                                    </span>
+                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                                      {currentSkyOverview.topAspects.map((asp, idx) => (
+                                        <div key={idx} className="bg-white/[0.02] border border-white/10 rounded-xl p-2.5 space-y-1">
+                                          <div className="flex items-center justify-between text-xs font-bold">
+                                            <span className={asp.isHarmonious ? 'text-emerald-300' : 'text-amber-300'}>
+                                              {asp.p1} {asp.aspectType} {asp.p2}
+                                            </span>
+                                            <span className="text-[10px] text-stone-400 bg-white/5 px-1.5 py-0.5 rounded">
+                                              {asp.badge}
+                                            </span>
+                                          </div>
+                                          <p className="text-[11px] text-stone-300 leading-snug line-clamp-2">
+                                            {asp.summary}
+                                          </p>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  </div>
+                                )}
+
+                                {/* Detay Açıcı Buton */}
+                                <div className="pt-3 border-t border-white/10 flex justify-center">
+                                  <button
+                                    type="button"
+                                    onClick={() => setSkyViewMode('SYNTHESIS')}
+                                    className="px-4 py-2 rounded-xl text-xs font-bold text-stone-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-2 transition-all cursor-pointer shadow-sm"
+                                  >
+                                    <span>Tüm Gezegenlerin (13 Cismin) Detaylı Kartlarını Gör</span>
+                                    <ChevronRight size={14} className="text-[#0EA5E9]" />
+                                  </button>
+                                </div>
+                              </div>
+                            )
+                          ) : skyViewMode === 'SYNTHESIS' ? (
+                            /* Mode 2: Bütünleşik Gezegen Kartları (Sentez) */
                             <div className="space-y-4 max-h-[560px] overflow-y-auto custom-scrollbar pr-1">
                               {/* Sort Order Selector */}
                               <div className="flex items-center justify-between gap-2 px-3 py-2 bg-black/40 rounded-2xl border border-white/5">
@@ -777,6 +930,19 @@ export default function TransitsPage() {
                                     ☉ Gezegen Sırası (Klasik)
                                   </button>
                                 </div>
+                              </div>
+
+                              {/* Back to Overview Quick Banner */}
+                              <div className="flex items-center justify-between gap-2 px-3.5 py-2.5 bg-gradient-to-r from-[#D4AF37]/10 to-transparent rounded-2xl border border-[#D4AF37]/20">
+                                <span className="text-xs text-stone-300 font-medium">13 Gezegenin Bütünleşik Konumları</span>
+                                <button
+                                  type="button"
+                                  onClick={() => setSkyViewMode('OVERVIEW')}
+                                  className="text-xs text-[#D4AF37] hover:text-white font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                                >
+                                  <ArrowLeft size={13} />
+                                  <span>Sade Özete Dön</span>
+                                </button>
                               </div>
 
                               {unifiedSkyPlanets.length === 0 ? (
@@ -931,6 +1097,18 @@ export default function TransitsPage() {
                                   </div>
                                 ))
                               )}
+
+                              {/* Bottom Return Button */}
+                              <div className="pt-3 pb-1 flex justify-center">
+                                <button
+                                  type="button"
+                                  onClick={() => setSkyViewMode('OVERVIEW')}
+                                  className="px-4 py-2 rounded-xl text-xs font-bold text-stone-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-1.5 transition-all cursor-pointer shadow-sm"
+                                >
+                                  <ArrowLeft size={13} />
+                                  <span>Günün Sade Özetine Dön</span>
+                                </button>
+                              </div>
                             </div>
                           ) : (
                             /* Mode 2: Ayrık Açı Listesi (Existing Filter & List) */
@@ -1420,9 +1598,21 @@ export default function TransitsPage() {
                       </div>
                     </div>
 
-                    {/* Personal View Switcher (Synthesis vs Separate Tables) */}
+                    {/* Personal View Switcher */}
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-black/50 p-3 rounded-2xl border border-white/10 mb-6">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setPersonalViewMode('OVERVIEW')}
+                          className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center gap-2 transition-all cursor-pointer ${
+                            personalViewMode === 'OVERVIEW'
+                              ? 'bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] text-black shadow-lg shadow-cyan-500/20'
+                              : 'text-mystic-text-muted hover:text-white'
+                          }`}
+                        >
+                          <Sparkles size={15} />
+                          <span>Tek Bütünleşik Analiz (Özet)</span>
+                        </button>
                         <button
                           type="button"
                           onClick={() => setPersonalViewMode('SYNTHESIS')}
@@ -1432,8 +1622,8 @@ export default function TransitsPage() {
                               : 'text-mystic-text-muted hover:text-white'
                           }`}
                         >
-                          <Sparkles size={15} />
-                          <span>Bütünleşik Gezegen Kartları (Sentez)</span>
+                          <Layers size={15} />
+                          <span>Ayrıntılı Gezegen Kartları</span>
                         </button>
                         <button
                           type="button"
@@ -1444,19 +1634,212 @@ export default function TransitsPage() {
                               : 'text-mystic-text-muted hover:text-white'
                           }`}
                         >
-                          <Layers size={15} />
+                          <Compass size={15} />
                           <span>Ayrık Tablolar</span>
                         </button>
                       </div>
                       <span className="text-[11px] text-mystic-text-muted hidden md:inline">
-                        {personalViewMode === 'SYNTHESIS' 
-                          ? 'Gezegen + Burç + Ev + Açı tek bir derlenmiş kartta sunulur' 
-                          : 'Ayrı ev ve açı tabloları'}
+                        {personalViewMode === 'OVERVIEW'
+                          ? 'Tüm kişisel etkiler tek bir sade özet kartta sunulur'
+                          : personalViewMode === 'SYNTHESIS' 
+                            ? '10 gezegenin tek tek detaylı analiz kartları' 
+                            : 'Ayrı ev ve açı tabloları'}
                       </span>
                     </div>
 
-                    {/* Mode A: Bütünleşik Kişisel Transit Sentezi */}
-                    {personalViewMode === 'SYNTHESIS' ? (
+                    {/* Mode 1: Tek Bütünleşik Kişisel Transit Özeti */}
+                    {personalViewMode === 'OVERVIEW' && personalOverview && (
+                      <div className="bg-gradient-to-br from-black/80 via-black/60 to-cyan-950/20 backdrop-blur-xl border border-white/10 hover:border-cyan-500/30 rounded-3xl p-6 sm:p-8 transition-all shadow-2xl space-y-6">
+                        {/* Üst Başlık & Kozmik İklim */}
+                        <div className="border-b border-white/10 pb-5">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <span className="text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full bg-[#0EA5E9]/15 text-[#0EA5E9] border border-[#0EA5E9]/30 flex items-center gap-1.5">
+                              <Sparkles size={12} /> Bütünleşik Kişisel Transit Analizi
+                            </span>
+                            <span className="text-xs text-[#D4AF37] font-semibold bg-[#D4AF37]/10 px-2.5 py-0.5 rounded-lg border border-[#D4AF37]/20">
+                              {personalOverview.subHeadline}
+                            </span>
+                          </div>
+                          <h3 className="text-xl sm:text-2xl font-black text-white leading-tight">
+                            {personalOverview.headline}
+                          </h3>
+                          <p className="text-xs sm:text-sm text-gray-300 mt-3 leading-relaxed">
+                            {personalOverview.themeDescription}
+                          </p>
+                        </div>
+
+                        {/* Odak Yaşam Alanları & Enerji Barometresi */}
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                          {/* Sol: Odak Yaşam Alanları (5 cols) */}
+                          <div className="lg:col-span-5 bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3">
+                            <span className="text-[11px] font-extrabold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+                              <Compass size={13} /> Bugünün Odak Yaşam Alanları
+                            </span>
+                            <div className="space-y-2.5">
+                              {personalOverview.focusHouses.map((fh, idx) => (
+                                <div key={`fh-${idx}`} className="bg-black/40 border border-white/5 rounded-xl p-3">
+                                  <div className="flex items-center justify-between gap-2 mb-1">
+                                    <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                                      <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"></span>
+                                      {fh.title}
+                                    </span>
+                                    <span className="text-[10px] text-amber-300/80 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
+                                      {fh.planetNames.join(', ')}
+                                    </span>
+                                  </div>
+                                  <p className="text-[11px] text-gray-400 capitalize">
+                                    {fh.description}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          {/* Sağ: 3 Boyutlu Enerji & Akış Barometresi (7 cols) */}
+                          <div className="lg:col-span-7 bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3">
+                            <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#D4AF37] flex items-center gap-1.5">
+                              <Activity size={13} /> Kişisel Enerji & Akış Barometresi
+                            </span>
+                            <div className="space-y-3 pt-1">
+                              {/* Zihinsel */}
+                              <div>
+                                <div className="flex justify-between items-center text-xs mb-1">
+                                  <span className="text-gray-300 font-medium">Zihinsel Netlik & Karar Gücü</span>
+                                  <span className="text-sky-400 font-bold">{personalOverview.barometer.mental.label} • {personalOverview.barometer.mental.tone}</span>
+                                </div>
+                                <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+                                  <div 
+                                    className="bg-gradient-to-r from-sky-500 to-cyan-400 h-full rounded-full transition-all duration-700" 
+                                    style={{ width: `${personalOverview.barometer.mental.score}%` }} 
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Duygusal */}
+                              <div>
+                                <div className="flex justify-between items-center text-xs mb-1">
+                                  <span className="text-gray-300 font-medium">Duygusal Denge & İç Huzur</span>
+                                  <span className="text-emerald-400 font-bold">{personalOverview.barometer.emotional.label} • {personalOverview.barometer.emotional.tone}</span>
+                                </div>
+                                <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+                                  <div 
+                                    className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-700" 
+                                    style={{ width: `${personalOverview.barometer.emotional.score}%` }} 
+                                  />
+                                </div>
+                              </div>
+
+                              {/* Eylem */}
+                              <div>
+                                <div className="flex justify-between items-center text-xs mb-1">
+                                  <span className="text-gray-300 font-medium">Eylem & İlerleme Enerjisi</span>
+                                  <span className="text-amber-400 font-bold">{personalOverview.barometer.action.label} • {personalOverview.barometer.action.tone}</span>
+                                </div>
+                                <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+                                  <div 
+                                    className="bg-gradient-to-r from-amber-500 to-yellow-400 h-full rounded-full transition-all duration-700" 
+                                    style={{ width: `${personalOverview.barometer.action.score}%` }} 
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Fırsatlar ve Sınavlar */}
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                          {/* Fırsat Kapıları */}
+                          <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 sm:p-5 space-y-2.5">
+                            <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                              <Sparkles size={14} /> 🌟 Bugün Sizin İçin Fırsatlar & Destekler
+                            </span>
+                            <ul className="space-y-2">
+                              {personalOverview.opportunities.map((opp, idx) => (
+                                <li key={`opp-${idx}`} className="text-xs text-gray-200 leading-relaxed flex items-start gap-2">
+                                  <span className="text-emerald-400 shrink-0 mt-0.5">✓</span>
+                                  <span>{opp}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+
+                          {/* Dikkat ve Sınırlar */}
+                          <div className="bg-rose-500/5 border border-rose-500/20 rounded-2xl p-4 sm:p-5 space-y-2.5">
+                            <span className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+                              <AlertCircle size={14} /> ⚠️ Dikkat Edilmesi Gereken Sınavlar
+                            </span>
+                            <ul className="space-y-2">
+                              {personalOverview.cautions.map((cau, idx) => (
+                                <li key={`cau-${idx}`} className="text-xs text-gray-200 leading-relaxed flex items-start gap-2">
+                                  <span className="text-rose-400 shrink-0 mt-0.5">!</span>
+                                  <span>{cau}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        </div>
+
+                        {/* En Güçlü Kişisel Tetikleyiciler (Pik Transitler & Kesin Dereceler) */}
+                        {personalOverview.topAspects.length > 0 && (
+                          <div className="space-y-2.5">
+                            <span className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
+                              <Zap size={14} className="text-[#0EA5E9]" /> En Etkin Kişisel Tetikleyiciler (Pik Transitler)
+                            </span>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                              {personalOverview.topAspects.map((asp, idx) => (
+                                <div 
+                                  key={`pa-${idx}`}
+                                  className="bg-black/50 border border-white/10 hover:border-cyan-500/30 rounded-2xl p-3.5 space-y-2 text-xs"
+                                >
+                                  <div className="flex items-center justify-between gap-1">
+                                    <span className="font-bold text-white flex items-center gap-1">
+                                      <span className="text-[#0EA5E9]">{PLANET_SYMBOLS[asp.transitPlanet] || '★'}</span>
+                                      <span>{asp.transitPlanet}</span>
+                                      <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${asp.isHarmonious ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
+                                        {asp.aspectType}
+                                      </span>
+                                      <span className="text-[#D4AF37]">{PLANET_SYMBOLS[asp.natalPlanet] || '★'}</span>
+                                      <span>{asp.natalPlanet}</span>
+                                    </span>
+                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/25 shrink-0">
+                                      {asp.badge}
+                                    </span>
+                                  </div>
+                                  <div className="text-[10px] text-gray-400 flex items-center justify-between border-t border-white/5 pt-1.5">
+                                    <span>T: {asp.transitSign} {asp.transitDegree}°</span>
+                                    <span>➔</span>
+                                    <span>N: {asp.natalSign} {asp.natalDegree}° ({asp.natalHouse}. Ev)</span>
+                                  </div>
+                                  <p className="text-[11px] text-gray-300 leading-snug">
+                                    {asp.summary}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Alt Reçete / Bilgelik Notu */}
+                        <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+                          <div className="flex items-center gap-3">
+                            <Sparkles size={18} className="text-[#D4AF37] shrink-0" />
+                            <span className="text-gray-200">
+                              <strong className="text-[#D4AF37]">Günün Yaşam Reçetesi:</strong> {personalOverview.lifeAdvice}
+                            </span>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => setPersonalViewMode('SYNTHESIS')}
+                            className="text-[11px] text-cyan-400 hover:text-cyan-300 font-bold whitespace-nowrap underline shrink-0 cursor-pointer"
+                          >
+                            Gezegen Kartlarını Gör →
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Mode B: Bütünleşik Kişisel Transit Gezegen Kartları */}
+                    {personalViewMode === 'SYNTHESIS' && (
                       <div className="space-y-6">
                         {unifiedTransits.map((ut: UnifiedPlanetTransit, idx: number) => (
                           <div 
@@ -1579,8 +1962,10 @@ export default function TransitsPage() {
                           </div>
                         ))}
                       </div>
-                    ) : (
-                      /* Mode B: Klasik Ayrık Tablolar */
+                    )}
+
+                    {/* Mode C: Klasik Ayrık Tablolar */}
+                    {personalViewMode === 'TABLES' && (
                       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Transitlerin Düştüğü Evler */}
                         <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-8 rounded-3xl shadow-2xl">
