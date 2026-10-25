@@ -143,7 +143,7 @@ export const generateSvgString = (chartData: any): string => {
   let svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${CHART_SIZE} ${CHART_SIZE}" width="${CHART_SIZE}" height="${CHART_SIZE}" style="background-color: transparent;">`;
   
   // Outer celestial medallion disc (creates a stunning dark celestial medallion circle on white paper)
-  svg += `<circle cx="${CENTER}" cy="${CENTER}" r="${RADIUS + 55}" fill="#141928" stroke="#B8860B" stroke-width="2.5" />`;
+  svg += `<circle cx="${CENTER}" cy="${CENTER}" r="${RADIUS + 80}" fill="#141928" stroke="#B8860B" stroke-width="2.5" />`;
 
   // Background circle for aspect lines
   svg += `<circle cx="${CENTER}" cy="${CENTER}" r="${R_ASPECTS}" stroke="rgba(212,175,55,0.3)" stroke-width="1" fill="rgba(10,15,30,0.6)" />`;
@@ -197,19 +197,36 @@ export const generateSvgString = (chartData: any): string => {
     svg += `<text x="${getX(midLon, RADIUS + 22)}" y="${getY(midLon, RADIUS + 22) + 6}" font-family="Arial, Helvetica, sans-serif" font-size="18" fill="${ZODIAC_COLORS[signName]}" text-anchor="middle" font-weight="bold">${ZODIAC_SYMBOLS[signName]}</text>`;
   }
 
-  // House Lines
+  // House Lines & Cardinal Angles (ASC, MC, IC, DSC)
   chartData.houses.forEach((h: any) => {
-    const isAngle = h.house === 1 || h.house === 4 || h.house === 7 || h.house === 10;
+    const isAsc = h.house === 1;
+    const isMc = h.house === 10;
+    const isIc = h.house === 4;
+    const isDsc = h.house === 7;
+    const isAngle = isAsc || isMc || isIc || isDsc;
+    const angleLabel = isAsc ? 'ASC' : isMc ? 'MC' : isIc ? 'IC' : isDsc ? 'DSC' : '';
     const color = isAngle ? "#D4AF37" : "rgba(212,175,55,0.3)";
-    const width = isAngle ? "2" : "1";
+    const width = isAngle ? "2.5" : "1";
     const dash = isAngle ? "" : "stroke-dasharray=\"4, 4\"";
+
     svg += `<line x1="${getX(h.longitude, R_ASPECTS)}" y1="${getY(h.longitude, R_ASPECTS)}" x2="${getX(h.longitude, R_ZODIAC_INNER)}" y2="${getY(h.longitude, R_ZODIAC_INNER)}" stroke="${color}" stroke-width="${width}" ${dash} />`;
-    svg += `<line x1="${getX(h.longitude, R_TICKS_OUTER)}" y1="${getY(h.longitude, R_TICKS_OUTER)}" x2="${getX(h.longitude, R_TICKS_OUTER + 5)}" y2="${getY(h.longitude, R_TICKS_OUTER + 5)}" stroke="${color}" stroke-width="${width}" />`;
-    svg += `<text x="${getX(h.longitude, R_CUSP_NUM + (isAngle ? 5 : 0))}" y="${getY(h.longitude, R_CUSP_NUM + (isAngle ? 5 : 0)) + 4}" font-family="Arial, Helvetica, sans-serif" font-size="${isAngle ? "14" : "12"}" fill="${isAngle ? "#D4AF37" : "#9CA3AF"}" text-anchor="middle" font-weight="${isAngle ? "bold" : "normal"}">${h.degreeInSign}° ${h.house}. ${h.minutes}'</text>`;
+    
+    const extLength = isAngle ? 12 : 5;
+    svg += `<line x1="${getX(h.longitude, R_TICKS_OUTER)}" y1="${getY(h.longitude, R_TICKS_OUTER)}" x2="${getX(h.longitude, R_TICKS_OUTER + extLength)}" y2="${getY(h.longitude, R_TICKS_OUTER + extLength)}" stroke="${color}" stroke-width="${width}" />`;
+
+    if (isAngle) {
+      const bx = getX(h.longitude, R_CUSP_NUM + 8);
+      const by = getY(h.longitude, R_CUSP_NUM + 8);
+      svg += `<rect x="${(bx - 17).toFixed(1)}" y="${(by - 9).toFixed(1)}" width="34" height="18" rx="5" fill="#D4AF37" stroke="#141928" stroke-width="1.5" />`;
+      svg += `<text x="${bx.toFixed(1)}" y="${(by + 4).toFixed(1)}" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#000000" text-anchor="middle" font-weight="bold">${angleLabel}</text>`;
+      svg += `<text x="${getX(h.longitude, R_CUSP_NUM + 24).toFixed(1)}" y="${(getY(h.longitude, R_CUSP_NUM + 24) + 4).toFixed(1)}" font-family="Arial, Helvetica, sans-serif" font-size="9" fill="#D4AF37" text-anchor="middle" font-weight="bold">${h.degreeInSign}°${String(h.minutes).padStart(2, '0')}'</text>`;
+    } else {
+      svg += `<text x="${getX(h.longitude, R_CUSP_NUM).toFixed(1)}" y="${(getY(h.longitude, R_CUSP_NUM) + 4).toFixed(1)}" font-family="Arial, Helvetica, sans-serif" font-size="10" fill="#9CA3AF" text-anchor="middle">${h.degreeInSign}° ${h.house}. ${String(h.minutes).padStart(2, '0')}'</text>`;
+    }
   });
 
-  // Planets
-  const planetsList = [...chartData.planets, chartData.ascendant, chartData.midheaven];
+  // Planets (excluding redundant angle cusps already drawn as cardinal badges)
+  const planetsList = chartData.planets.filter((p: any) => !p.name.includes('ASC') && !p.name.includes('MC'));
   planetsList.forEach((p: any, i: number) => {
     let rOffset = 0;
     for(let j=0; j<i; j++) {

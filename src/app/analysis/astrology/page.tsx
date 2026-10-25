@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, MoonStar, Star, CheckCircle2, Loader2, AlertCircle, X, ChevronUp, ChevronDown, Download, Lock } from 'lucide-react';
 import { getFullPlanetInterpretation, getAspectInterpretation, getHouseCuspInterpretation } from '@/features/astrology/engine/AstrologyInterpretations';
 import { AstroPoint, AstroAspect, NatalChartData, ZodiacSign, Planet, AstroCity } from '@/features/astrology/engine/AstrologyConstants';
+import { calculateAspects } from '@/features/astrology/engine/AstrologyEngine';
 import * as htmlToImage from 'html-to-image';
 import download from 'downloadjs';
 import { PrintableChart } from '@/components/PrintableChart';
@@ -137,6 +138,8 @@ export default function AstrologyPage() {
     alert("Bilgilendirme: İndirilen görselde sadece astrolojik tablo verileri yer almaktadır. Butonlara tıklayıp açtığınız detaylı uzun yorum metinleri dökümana dahil değildir.");
     try {
       setIsDownloading(true);
+      const allPoints = [...(chartData.planets || []), chartData.ascendant, chartData.midheaven].filter(Boolean);
+      chartData.aspects = calculateAspects(allPoints);
       const svgStr = generateSvgString(chartData);
       const wheelPng = await convertSvgToPng(svgStr);
       setPrintableWheelUrl(wheelPng);
@@ -174,6 +177,8 @@ export default function AstrologyPage() {
         throw new Error(data.error || 'Harita hesaplanırken bir hata oluştu.');
       }
 
+      const allPoints = [...(data.data.planets || []), data.data.ascendant, data.data.midheaven].filter(Boolean);
+      data.data.aspects = calculateAspects(allPoints);
       setChartData(data.data);
     } catch (err: any) {
       setError(err.message);
@@ -273,28 +278,53 @@ export default function AstrologyPage() {
             );
           })}
 
-          {/* House Lines */}
+          {/* House Lines & Cardinal Angles (ASC, MC, IC, DSC) */}
           {chartData.houses.map((h, i) => {
-            const isAngle = h.house === 1 || h.house === 4 || h.house === 7 || h.house === 10;
+            const isAsc = h.house === 1;
+            const isMc = h.house === 10;
+            const isIc = h.house === 4;
+            const isDsc = h.house === 7;
+            const isAngle = isAsc || isMc || isIc || isDsc;
+            const angleLabel = isAsc ? 'ASC' : isMc ? 'MC' : isIc ? 'IC' : isDsc ? 'DSC' : '';
+            const color = isAngle ? "#D4AF37" : "rgba(212,175,55,0.3)";
+            const width = isAngle ? "2.5" : "1";
+            const dash = isAngle ? "" : "stroke-dasharray=\"4, 4\"";
+
+            const extLength = isAngle ? 12 : 5;
+            const bx = getX(h.longitude, R_CUSP_NUM + 8);
+            const by = getY(h.longitude, R_CUSP_NUM + 8);
+
             return (
               <g key={`house-${i}`}>
                 <line 
                   x1={getX(h.longitude, R_ASPECTS)} y1={getY(h.longitude, R_ASPECTS)} 
                   x2={getX(h.longitude, R_ZODIAC_INNER)} y2={getY(h.longitude, R_ZODIAC_INNER)} 
-                  stroke={isAngle ? "#D4AF37" : "rgba(212,175,55,0.3)"} 
-                  strokeWidth={isAngle ? "2" : "1"} 
-                  strokeDasharray={isAngle ? "" : "4, 4"} 
+                  stroke={color} 
+                  strokeWidth={width} 
+                  strokeDasharray={dash} 
                 />
-                <line x1={getX(h.longitude, R_TICKS_OUTER)} y1={getY(h.longitude, R_TICKS_OUTER)} x2={getX(h.longitude, R_TICKS_OUTER + 5)} y2={getY(h.longitude, R_TICKS_OUTER + 5)} stroke={isAngle ? "#D4AF37" : "rgba(212,175,55,0.3)"} strokeWidth={isAngle ? "2" : "1"} />
-                <text x={getX(h.longitude, R_CUSP_NUM + (isAngle ? 5 : 0))} y={getY(h.longitude, R_CUSP_NUM + (isAngle ? 5 : 0)) + 4} fontFamily="Arial, Helvetica, sans-serif" fontSize={isAngle ? "14" : "12"} fill={isAngle ? "#D4AF37" : "#9CA3AF"} textAnchor="middle" fontWeight={isAngle ? "bold" : "normal"}>
-                  {`${String(h.degreeInSign).padStart(2, '0')}° ${h.house}. ${String(h.minutes).padStart(2, '0')}'`}
-                </text>
+                <line x1={getX(h.longitude, R_TICKS_OUTER)} y1={getY(h.longitude, R_TICKS_OUTER)} x2={getX(h.longitude, R_TICKS_OUTER + extLength)} y2={getY(h.longitude, R_TICKS_OUTER + extLength)} stroke={color} strokeWidth={width} />
+                {isAngle ? (
+                  <>
+                    <rect x={bx - 17} y={by - 9} width={34} height={18} rx={5} fill="#D4AF37" stroke="#141928" strokeWidth={1.5} />
+                    <text x={bx} y={by + 4} fontFamily="Arial, Helvetica, sans-serif" fontSize="10" fill="#000000" textAnchor="middle" fontWeight="bold">
+                      {angleLabel}
+                    </text>
+                    <text x={getX(h.longitude, R_CUSP_NUM + 24)} y={getY(h.longitude, R_CUSP_NUM + 24) + 4} fontFamily="Arial, Helvetica, sans-serif" fontSize="9" fill="#D4AF37" textAnchor="middle" fontWeight="bold">
+                      {`${h.degreeInSign}°${String(h.minutes).padStart(2, '0')}'`}
+                    </text>
+                  </>
+                ) : (
+                  <text x={getX(h.longitude, R_CUSP_NUM)} y={getY(h.longitude, R_CUSP_NUM) + 4} fontFamily="Arial, Helvetica, sans-serif" fontSize="10" fill="#9CA3AF" textAnchor="middle">
+                    {`${String(h.degreeInSign).padStart(2, '0')}° ${h.house}. ${String(h.minutes).padStart(2, '0')}'`}
+                  </text>
+                )}
               </g>
             );
           })}
 
-          {/* Planets (including ASC and MC) */}
-          {[...chartData.planets, chartData.ascendant, chartData.midheaven].filter(Boolean).map((p, i, arr) => {
+          {/* Planets (excluding redundant angle cusps already drawn as cardinal badges) */}
+          {chartData.planets.filter((p: any) => !p.name.includes('ASC') && !p.name.includes('MC')).map((p, i, arr) => {
             let rOffset = 0;
             for(let j=0; j<i; j++) {
                if (Math.abs(p.longitude - arr[j].longitude) < 5) rOffset += 18;
@@ -358,10 +388,37 @@ export default function AstrologyPage() {
                 {PLANET_SYMBOLS[body.name] || body.name}
               </div>
               {bodies.slice(0, row).map((colBody, col) => {
-                const aspect = chartData.aspects.find(a => 
-                  (a.planet1 === body.name && a.planet2 === colBody.name) || 
-                  (a.planet2 === body.name && a.planet1 === colBody.name)
-                );
+                const getAspect = (p1: AstroPoint, p2: AstroPoint) => {
+                  const norm = (s: string) => (s || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+                  const n1 = norm(p1.name);
+                  const n2 = norm(p2.name);
+                  const found = (chartData.aspects || []).find((a: any) => {
+                    const an1 = norm(a.planet1);
+                    const an2 = norm(a.planet2);
+                    return (
+                      (an1 === n1 && an2 === n2) ||
+                      (an1 === n2 && an2 === n1) ||
+                      ((n1.includes('asc') || n1.includes('yukselen')) && (an1.includes('asc') || an2.includes('asc')) && (an1.includes(n2) || an2.includes(n2))) ||
+                      ((n2.includes('asc') || n2.includes('yukselen')) && (an1.includes('asc') || an2.includes('asc')) && (an1.includes(n1) || an2.includes(n1))) ||
+                      ((n1.includes('mc') || n1.includes('tepe')) && (an1.includes('mc') || an2.includes('mc')) && (an1.includes(n2) || an2.includes(n2))) ||
+                      ((n2.includes('mc') || n2.includes('tepe')) && (an1.includes('mc') || an2.includes('mc')) && (an1.includes(n1) || an2.includes(n1)))
+                    );
+                  });
+                  if (found) return found;
+
+                  // Direct geometric aspect calculation as guaranteed fallback
+                  let diff = Math.abs(p1.longitude - p2.longitude);
+                  if (diff > 180) diff = 360 - diff;
+                  if (diff <= 10) return { type: 'Kavuşum', orb: diff };
+                  if (Math.abs(diff - 180) <= 10) return { type: 'Karşıt', orb: Math.abs(diff - 180) };
+                  if (Math.abs(diff - 120) <= 8) return { type: 'Üçgen', orb: Math.abs(diff - 120) };
+                  if (Math.abs(diff - 90) <= 8) return { type: 'Kare', orb: Math.abs(diff - 90) };
+                  if (Math.abs(diff - 60) <= 6) return { type: 'Sekstil', orb: Math.abs(diff - 60) };
+                  if (Math.abs(diff - 150) <= 4) return { type: 'Görmeyen', orb: Math.abs(diff - 150) };
+                  return null;
+                };
+
+                const aspect = getAspect(body, colBody);
                 return (
                   <div key={`cell-${row}-${col}`} className="w-7 h-7 sm:w-8 sm:h-8 border border-white/10 flex items-center justify-center bg-black/20 hover:bg-[#D4AF37]/10 transition-colors">
                     {aspect ? (
