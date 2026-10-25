@@ -642,3 +642,173 @@ export function generateUnifiedSkyPlanets(
     return PRIORITY_ORDER.indexOf(a.planetName) - PRIORITY_ORDER.indexOf(b.planetName);
   });
 }
+
+export interface CurrentSkyOverview {
+  headline: string;
+  subHeadline: string;
+  vibeNarrative: string;
+  moonSign: string;
+  moonDegree: number;
+  moonMood: string;
+  sunSign: string;
+  sunDegree: number;
+  barometer: {
+    mental: { score: number; label: string; tone: string };
+    emotional: { score: number; label: string; tone: string };
+    action: { score: number; label: string; tone: string };
+  };
+  opportunities: string[];
+  cautions: string[];
+  topAspects: {
+    p1: string;
+    p2: string;
+    aspectType: string;
+    orb: number;
+    badge: string;
+    isHarmonious: boolean;
+    summary: string;
+  }[];
+}
+
+const MOON_MOODS: Record<string, { mood: string; energy: string; doAction: string; dontAction: string }> = {
+  'Koç': { mood: 'Atılgan, sabırsız ve cesur', energy: 'Yüksek', doAction: 'Yeni adımlar atın ve fiziksel enerjinizi eyleme dökün.', dontAction: 'Düşünmeden fevri kararlar almaktan ve sert çıkışlardan kaçının.' },
+  'Boğa': { mood: 'Dingin, kararlı ve güven arayan', energy: 'Sakin & Kalıcı', doAction: 'Finansal konuları düzenleyin, bedeninizi dinlendirin ve somut işlere odaklanın.', dontAction: 'Aşırı inatçılıktan ve değişime direnç göstermekten kaçının.' },
+  'İkizler': { mood: 'Meraklı, konuşkan ve hareketli', energy: 'Zihinsel & Hızlı', doAction: 'İletişim kurun, araştırın, yarım kalan görüşmeleri ve yazışmaları tamamlayın.', dontAction: 'Aynı anda çok şeye bölünüp zihninizi dağıtmaktan kaçının.' },
+  'Yengeç': { mood: 'Hassas, koruyucu ve sezgisel', energy: 'İçe Dönük & Derin', doAction: 'Sevdiklerinize ve evinize vakit ayırın, iç sesinize ve rüyalarınıza güvenin.', dontAction: 'Aşırı alınganlık yapmaktan ve geçmiş kırgınlıklara saplanmaktan kaçının.' },
+  'Aslan': { mood: 'Özgüvenli, cömert ve sahne odaklı', energy: 'Sıcak & Yaratıcı', doAction: 'Yaratıcı projelerinizi sergileyin, cesaretinizi ortaya koyun ve takdir edin.', dontAction: 'Ego savaşlarına girmekten ve aşırı gururdan kaçının.' },
+  'Başak': { mood: 'Analitik, titiz ve düzenleyici', energy: 'Pratik & Odaklı', doAction: 'Dağınıklıkları toparlayın, detay gerektiren işleri bitirin ve sağlığınıza özen gösterin.', dontAction: 'Aşırı özeleştiri yapmaktan ve kusur arayarak kaygılanmaktan kaçının.' },
+  'Terazi': { mood: 'Uyumlu, diplomatik ve estetik', energy: 'Dengeli & Sosyal', doAction: 'İlişkilerde uzlaşma sağlayın, adaleti gözetin ve estetik dokunuşlar yapın.', dontAction: 'Kararsızlıkta kilitlenmekten ve ' + 'herkesi memnun etmek için kendinizi unutmaktan kaçının.' },
+  'Akrep': { mood: 'Derin, sezgisel ve dönüştürücü', energy: 'Yoğun & Manyetik', doAction: 'Gizli kalmış meseleleri çözün, stratejik planlar yapın ve arınmaya odaklanın.', dontAction: 'Kuşkuculuğa kapılmaktan ve gizli güç savaşlarına girmekten kaçının.' },
+  'Yay': { mood: 'İyimser, vizyoner ve özgür', energy: 'Genişlemeci & Neşeli', doAction: 'Gelecek vizyonunuzu genişletin, yeni şeyler öğrenin ve umudunuzu tazeleyin.', dontAction: 'Gerçekleşmesi zor büyük vaatler vermekten ve detayları ihmal etmekten kaçının.' },
+  'Oğlak': { mood: 'Disiplinli, sorumluluk sahibi ve gerçekçi', energy: 'Ciddi & Hedef Odaklı', doAction: 'Kariyer hedeflerinize odaklanın, somut ve kalıcı planlar yapın.', dontAction: 'Aşırı karamsarlığa kapılmaktan ve kendinize katı kurallar koymaktan kaçının.' },
+  'Kova': { mood: 'Yenilikçi, özgür ve vizyoner', energy: 'Sıradışı & Kolektif', doAction: 'Özgün fikirlerinizi paylaşın, toplumsal faydaya ve teknolojiye alan açın.', dontAction: 'Duygulardan tamamen kopuk davranmaktan ve anlamsız asilik yapmaktan kaçının.' },
+  'Balık': { mood: 'Şefkatli, ilham dolu ve akışta', energy: 'Süptil & Manevi', doAction: 'Meditasyon, sanat ve şifa çalışmalarına yönelin, sezgilerinize kulak verin.', dontAction: 'Sorumluluklardan kaçmaktan ve kurban psikolojisine bürünmekten kaçının.' },
+};
+
+export function generateCurrentSkyOverview(
+  allSkyPlanets: AstroPoint[],
+  allSkyAspects: any[]
+): CurrentSkyOverview | null {
+  if (!allSkyPlanets || allSkyPlanets.length === 0) return null;
+
+  const sun = allSkyPlanets.find(p => p.name === 'Güneş');
+  const moon = allSkyPlanets.find(p => p.name === 'Ay');
+  const mercury = allSkyPlanets.find(p => p.name === 'Merkür');
+  const mars = allSkyPlanets.find(p => p.name === 'Mars');
+
+  const moonSign = moon?.sign || 'Koç';
+  const moonDeg = moon?.degreeInSign ?? 0;
+  const sunSign = sun?.sign || 'Terazi';
+  const sunDeg = sun?.degreeInSign ?? 0;
+
+  const moonData = MOON_MOODS[moonSign] || MOON_MOODS['Koç'];
+
+  // Açıları dar orb'a göre filtrele ve sırala
+  const validAspects = (allSkyAspects || []).filter(a => a.orb <= 3.2);
+  validAspects.sort((a, b) => a.orb - b.orb);
+
+  const topAspects = validAspects.slice(0, 3).map(asp => {
+    const isHarmonious = asp.type === 'Üçgen' || asp.type === 'Sekstil' || (asp.type === 'Kavuşum' && !['Satürn', 'Mars', 'Plüton'].includes(asp.planet2));
+    const interp = asp.interpretation || getSkyAspectInterpretation(asp.planet1, asp.planet2, asp.type);
+    return {
+      p1: asp.planet1,
+      p2: asp.planet2,
+      aspectType: asp.type,
+      orb: asp.orb,
+      isHarmonious,
+      summary: interp?.summary || `${asp.planet1} - ${asp.planet2} ${asp.type} açısı.`,
+      badge: asp.orb <= 1.0 ? 'Pik Etki (Kesin)' : `${asp.orb.toFixed(1)}° Orb`
+    };
+  });
+
+  // Barometre Puanları Hesaplama
+  let mentalScore = 72;
+  let emotionalScore = 70;
+  let actionScore = 68;
+
+  // Ay burcu elementi
+  if (['Yengeç', 'Akrep', 'Balık'].includes(moonSign)) {
+    emotionalScore += 16;
+  } else if (['İkizler', 'Terazi', 'Kova'].includes(moonSign)) {
+    mentalScore += 14;
+  } else if (['Koç', 'Aslan', 'Yay'].includes(moonSign)) {
+    actionScore += 18;
+  } else if (['Boğa', 'Başak', 'Oğlak'].includes(moonSign)) {
+    mentalScore += 8;
+    actionScore += 8;
+  }
+
+  // Açıların etkisi
+  topAspects.forEach(asp => {
+    if (asp.isHarmonious) {
+      mentalScore += 4;
+      actionScore += 4;
+    } else {
+      emotionalScore += 6;
+      actionScore += 2;
+    }
+  });
+
+  mentalScore = Math.min(95, Math.max(45, mentalScore));
+  emotionalScore = Math.min(96, Math.max(50, emotionalScore));
+  actionScore = Math.min(94, Math.max(48, actionScore));
+
+  const mentalTone = mentalScore >= 80 ? 'Yüksek & Berrak' : mentalScore >= 65 ? 'Stratejik & Dengeli' : 'Dağınık / Dikkat İstiyor';
+  const emotionalTone = emotionalScore >= 80 ? 'Yoğun & Sezgisel' : emotionalScore >= 65 ? 'Dengeli & Sakin' : 'Hassas / Dinlenme Gerek';
+  const actionTone = actionScore >= 80 ? 'Dinamik & Kararlı' : actionScore >= 65 ? 'Ölçülü & İstikrarlı' : 'Ağır / Bekle-Gör';
+
+  // Başlık Kurgusu
+  const peakAspect = topAspects[0];
+  let headline = `Kozmik Rüzgar: Ay ${moonSign}'da — ${moonData.mood}`;
+  if (peakAspect) {
+    if (peakAspect.isHarmonious) {
+      headline = `Akıcı ve Destekleyici Enerjiler: Ay ${moonSign}'da (${peakAspect.p1}-${peakAspect.p2} ${peakAspect.aspectType})`;
+    } else {
+      headline = `Farkındalık ve Denge Zamanı: Ay ${moonSign}'da (${peakAspect.p1}-${peakAspect.p2} ${peakAspect.aspectType})`;
+    }
+  }
+
+  const subHeadline = `☉ Güneş ${sunSign} (${sunDeg}°) • ☽ Ay ${moonSign} (${moonDeg}°)`;
+
+  // Vurucu 2-3 Cümlelik Genel Anlatı
+  let vibeNarrative = `Şu anda kolektif bilinçaltı Ay'ın ${moonSign} seyrinde şekilleniyor; genel atmosfer ${moonData.mood.toLowerCase()} bir frekansta akıyor. `;
+  if (peakAspect) {
+    vibeNarrative += `Gökyüzünde pik yapan ${peakAspect.p1} ile ${peakAspect.p2} arasındaki ${peakAspect.aspectType} açısı (${peakAspect.orb.toFixed(1)}°), ${peakAspect.summary.replace(/^.*?;\s*/, '')} `;
+  }
+  vibeNarrative += `Günün anahtarı: Duygusal dalgalanmalar karşısında merkezinizde kalarak, ${moonData.doAction.toLowerCase()}`;
+
+  // Fırsatlar ve Tuzaklar
+  const opportunities = [
+    moonData.doAction,
+    peakAspect?.isHarmonious
+      ? `${peakAspect.p1} ve ${peakAspect.p2} temasının getirdiği ilhamı somut projelere dönüştürün.`
+      : 'Zorlayıcı görünen durumları olgunlukla karşılayıp içsel sınırlarınızı netleştirin.'
+  ];
+
+  const cautions = [
+    moonData.dontAction,
+    peakAspect && !peakAspect.isHarmonious
+      ? `${peakAspect.p1} ve ${peakAspect.p2} geriliminde aceleci kararlar almaktan ve restleşmelerden uzak durun.`
+      : 'Günün getirdiği rahatlığa fazla kapılıp önemli sorumlulukları ertelemeyin.'
+  ];
+
+  return {
+    headline,
+    subHeadline,
+    vibeNarrative,
+    moonSign,
+    moonDegree: moonDeg,
+    moonMood: moonData.mood,
+    sunSign,
+    sunDegree: sunDeg,
+    barometer: {
+      mental: { score: mentalScore, label: `${mentalScore}%`, tone: mentalTone },
+      emotional: { score: emotionalScore, label: `${emotionalScore}%`, tone: emotionalTone },
+      action: { score: actionScore, label: `${actionScore}%`, tone: actionTone }
+    },
+    opportunities,
+    cautions,
+    topAspects
+  };
+}
+
