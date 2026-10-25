@@ -37,7 +37,7 @@ export const PrintableChart = React.forwardRef<HTMLDivElement, PrintableChartPro
     <div 
       ref={ref}
       // Fixed width/height for exactly A4 portrait at ~150 DPI (1240x1754)
-      className="w-[1240px] h-[1754px] bg-[#141928] text-white p-8 flex flex-col font-sans relative overflow-hidden"
+      className="w-[1240px] min-w-[1240px] h-[1754px] min-h-[1754px] bg-[#141928] text-white p-8 flex flex-col font-sans relative overflow-hidden"
       style={{
         backgroundImage: `radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.05) 0%, transparent 60%), radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 40%)`,
         backgroundSize: '100% 100%'
@@ -59,14 +59,14 @@ export const PrintableChart = React.forwardRef<HTMLDivElement, PrintableChartPro
       </div>
 
       {/* SVG Wheel & Aspect Grid Side by Side */}
-      <div className="flex gap-6 items-start justify-center h-[450px] shrink-0">
-        <div className="flex-1 bg-black/40 border border-[#D4AF37]/20 rounded-2xl flex justify-center items-center h-full relative overflow-hidden">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[640px] h-[640px] flex items-center justify-center scale-[0.75]">
+      <div className="flex gap-6 items-center justify-center h-[460px] shrink-0">
+        <div className="flex-1 bg-black/40 border border-[#D4AF37]/20 rounded-2xl flex justify-center items-center h-full p-2">
+          <div className="w-[440px] h-[440px] flex items-center justify-center">
             {svgWheel}
           </div>
         </div>
-        <div className="flex-1 bg-black/40 border border-[#D4AF37]/20 rounded-2xl flex justify-center items-center h-full relative overflow-hidden">
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center justify-center scale-[0.90]">
+        <div className="flex-1 bg-black/40 border border-[#D4AF37]/20 rounded-2xl flex justify-center items-center h-full p-2">
+          <div className="flex items-center justify-center">
             {aspectGrid}
           </div>
         </div>

@@ -85,8 +85,8 @@ export default function AstrologyPage() {
     if (!renderPrintable) return;
 
     const downloadChart = async () => {
-      // Small timeout to guarantee DOM mounting and render completion
-      await new Promise(resolve => setTimeout(resolve, 400));
+      // Small timeout to guarantee DOM mounting, font loading and SVG layout calculation
+      await new Promise(resolve => setTimeout(resolve, 600));
       
       if (!printRef.current) {
         alert("Görsel oluşturulamadı. Lütfen tekrar deneyin.");
@@ -97,28 +97,25 @@ export default function AstrologyPage() {
       setIsDownloading(true);
       try {
         const node = printRef.current;
-        node.style.position = 'relative';
-        node.style.left = '0';
-        node.style.top = '0';
-        node.style.opacity = '1';
-        node.style.zIndex = '9999';
 
         const dataUrl = await htmlToImage.toPng(node, { 
           backgroundColor: '#141928',
           pixelRatio: 2,
+          width: 1240,
+          height: 1754,
+          canvasWidth: 2480,
+          canvasHeight: 3508,
           style: {
-            position: 'relative',
-            left: '0',
-            top: '0'
+            width: '1240px',
+            minWidth: '1240px',
+            height: '1754px',
+            minHeight: '1754px',
+            position: 'static',
+            left: 'auto',
+            top: 'auto',
+            opacity: '1'
           }
         });
-        
-        // Restore original styles
-        node.style.position = 'absolute';
-        node.style.left = '-9999px';
-        node.style.top = '-9999px';
-        node.style.opacity = '0';
-        node.style.zIndex = '-9999';
 
         download(dataUrl, 'Dogum_Haritasi.png');
       } catch (err) {
@@ -189,7 +186,9 @@ export default function AstrologyPage() {
     const svgContent = (
       <svg 
         viewBox={`0 0 ${CHART_SIZE} ${CHART_SIZE}`} 
-        className={isPrintMode ? "max-w-full h-auto" : "w-full h-full absolute inset-0"}
+        width="100%"
+        height="100%"
+        className={isPrintMode ? "w-full h-full block" : "w-full h-full absolute inset-0"}
       >
           {/* Aspect Lines */}
           <circle cx={CENTER} cy={CENTER} r={R_ASPECTS} stroke="rgba(212,175,55,0.3)" strokeWidth="1" fill="rgba(0,0,0,0.4)" />
@@ -730,8 +729,8 @@ export default function AstrologyPage() {
         </div>
       )}
 
-        {/* Printable Chart (Hidden in a 0x0 container to prevent GPU layer composition glitches on mobile browser engines) */}
-        <div style={{ width: 0, height: 0, overflow: 'hidden', position: 'fixed', left: -9999, top: -9999, pointerEvents: 'none', opacity: 0 }}>
+        {/* Printable Chart Container (fixed 1240x1754 dimensions for pixel-perfect offscreen rendering on all devices) */}
+        <div style={{ width: '1240px', minWidth: '1240px', height: '1754px', minHeight: '1754px', overflow: 'hidden', position: 'fixed', left: -9999, top: 0, pointerEvents: 'none', opacity: 0, zIndex: -9999 }}>
           {chartData && renderPrintable && (
             <PrintableChart 
               ref={printRef}
