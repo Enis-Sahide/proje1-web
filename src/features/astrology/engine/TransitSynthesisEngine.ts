@@ -812,3 +812,237 @@ export function generateCurrentSkyOverview(
   };
 }
 
+export interface PersonalTransitOverview {
+  headline: string;
+  subHeadline: string;
+  themeDescription: string;
+  focusHouses: {
+    house: number;
+    title: string;
+    description: string;
+    planetNames: string[];
+  }[];
+  barometer: {
+    mental: { score: number; label: string; tone: string };
+    emotional: { score: number; label: string; tone: string };
+    action: { score: number; label: string; tone: string };
+  };
+  opportunities: string[];
+  cautions: string[];
+  topAspects: {
+    transitPlanet: string;
+    transitSign: string;
+    transitDegree: number;
+    natalPlanet: string;
+    natalSign: string;
+    natalDegree: number;
+    natalHouse: number;
+    aspectType: string;
+    orb: number;
+    badge: string;
+    isHarmonious: boolean;
+    summary: string;
+  }[];
+  lifeAdvice: string;
+}
+
+export function generatePersonalTransitOverview(
+  transitPlanets: AstroPoint[],
+  allTransitAspect: TransitAspect[],
+  natalPlanets: AstroPoint[],
+  natalHouses: AstroPoint[]
+): PersonalTransitOverview | null {
+  if (!transitPlanets || transitPlanets.length === 0 || !natalPlanets || natalPlanets.length === 0) {
+    return null;
+  }
+
+  // Açıları dar orb'a göre sırala (0.0° en başta)
+  const validAspects = (allTransitAspect || []).filter(a => a.orb <= 3.5);
+  validAspects.sort((a, b) => a.orb - b.orb);
+
+  const topAspects = validAspects.slice(0, 3).map(asp => {
+    const tPlanet = transitPlanets.find(p => p.name === asp.transitPlanet);
+    const nPlanet = natalPlanets.find(p => p.name === asp.natalPlanet);
+    const nHouse = nPlanet ? (nPlanet.house || getHouseFromLongitude(nPlanet.longitude, natalHouses)) : 1;
+    const isHarmonious = asp.type === 'Üçgen' || asp.type === 'Sekstil' || (asp.type === 'Kavuşum' && !['Satürn', 'Mars', 'Plüton'].includes(asp.transitPlanet));
+
+    const tSign = tPlanet?.sign || '';
+    const tDeg = tPlanet?.degreeInSign ?? 0;
+    const nSign = nPlanet?.sign || '';
+    const nDeg = nPlanet?.degreeInSign ?? 0;
+
+    let summary = '';
+    const nArea = HOUSE_SHORT_THEMES[nHouse] || `${nHouse}. evinizi`;
+    switch (asp.type) {
+      case 'Kavuşum':
+        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), ${nHouse}. evinizdeki Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile tam kavuşumda. ${nArea} alanında taze ve yoğun bir başlangıç enerjisi açıyor.`;
+        break;
+      case 'Üçgen':
+        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), ${nHouse}. evinizdeki Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile uyumlu üçgen açıda. Bu alanda çabasız ve destekleyici bir akış sunuyor.`;
+        break;
+      case 'Sekstil':
+        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), ${nHouse}. evinizdeki Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile sekstil açıda. Somut fırsatları fark edip değerlendirmeniz için kapı açıyor.`;
+        break;
+      case 'Kare':
+        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), ${nHouse}. evinizdeki Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile kare açıda. ${nArea} konusunda sizi harekete geçiren yapıcı bir gerilim ve eşik yaratıyor.`;
+        break;
+      case 'Karşıt':
+        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), ${nHouse}. evinizdeki Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile karşıt açıda. İkili dengelerde ve sınırlarınızda farkındalık sınavı veriyor.`;
+        break;
+      default:
+        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile ${asp.type} açısında.`;
+    }
+
+    const badge = asp.orb <= 0.8 ? `★ Tam Pik (${asp.orb.toFixed(1)}°)` : `${asp.orb.toFixed(1)}° Orb`;
+
+    return {
+      transitPlanet: asp.transitPlanet,
+      transitSign: tSign,
+      transitDegree: tDeg,
+      natalPlanet: asp.natalPlanet,
+      natalSign: nSign,
+      natalDegree: nDeg,
+      natalHouse: nHouse,
+      aspectType: asp.type,
+      orb: asp.orb,
+      badge,
+      isHarmonious,
+      summary
+    };
+  });
+
+  // Odak Yaşam Alanları (En çok transit gezegen alan evler)
+  const houseCounts: Record<number, string[]> = {};
+  for (const tp of transitPlanets) {
+    const h = tp.house || getHouseFromLongitude(tp.longitude, natalHouses);
+    if (!houseCounts[h]) houseCounts[h] = [];
+    houseCounts[h].push(tp.name);
+  }
+
+  const sortedHouses = Object.entries(houseCounts)
+    .map(([hStr, pNames]) => ({
+      house: parseInt(hStr, 10),
+      planetNames: pNames,
+      count: pNames.length
+    }))
+    .sort((a, b) => b.count - a.count);
+
+  const focusHouses = sortedHouses.slice(0, 2).map(item => ({
+    house: item.house,
+    title: HOUSE_TITLES[item.house] || `${item.house}. Ev`,
+    description: HOUSE_SHORT_THEMES[item.house] || 'bu yaşam alanınız',
+    planetNames: item.planetNames
+  }));
+
+  // Barometre Puanları Hesaplama
+  let mentalScore = 74;
+  let emotionalScore = 70;
+  let actionScore = 72;
+
+  const tMoon = transitPlanets.find(p => p.name === 'Ay');
+  const tMoonHouse = tMoon ? (tMoon.house || getHouseFromLongitude(tMoon.longitude, natalHouses)) : 1;
+
+  if ([1, 5, 9].includes(tMoonHouse)) {
+    actionScore += 12;
+    mentalScore += 6;
+  } else if ([4, 8, 12].includes(tMoonHouse)) {
+    emotionalScore += 16;
+    actionScore -= 4;
+  } else if ([3, 6, 10].includes(tMoonHouse)) {
+    mentalScore += 14;
+    actionScore += 8;
+  } else if ([2, 7, 11].includes(tMoonHouse)) {
+    mentalScore += 8;
+    emotionalScore += 8;
+  }
+
+  topAspects.forEach(asp => {
+    if (asp.isHarmonious) {
+      mentalScore += 5;
+      actionScore += 4;
+    } else {
+      emotionalScore += 6;
+      actionScore += 2;
+    }
+  });
+
+  mentalScore = Math.min(95, Math.max(45, mentalScore));
+  emotionalScore = Math.min(96, Math.max(48, emotionalScore));
+  actionScore = Math.min(95, Math.max(46, actionScore));
+
+  const mentalTone = mentalScore >= 80 ? 'Yüksek & Berrak' : mentalScore >= 65 ? 'Stratejik & Dengeli' : 'Dağınık / Dinlenme İhtiyacı';
+  const emotionalTone = emotionalScore >= 80 ? 'Yoğun & Sezgisel' : emotionalScore >= 65 ? 'Dengeli & Dingin' : 'Hassas / Sınır Koruma';
+  const actionTone = actionScore >= 80 ? 'Kararlı & Cesur' : actionScore >= 65 ? 'Ölçülü & İstikrarlı' : 'Temkinli / Gözlemde Kal';
+
+  const peak = topAspects[0];
+  let headline = 'Doğum Haritanızda Dengeli Kozmik Akış';
+  let subHeadline = focusHouses.length > 0 
+    ? `Ana Odak: ${focusHouses.map(h => `${h.house}. Ev (${h.description})`).join(' ve ')}`
+    : 'Bütünsel Dönüşüm Süreci';
+
+  if (peak) {
+    if (peak.isHarmonious) {
+      headline = `Destekleyici & Akıcı İlerleme: ${peak.transitPlanet} ➔ Natal ${peak.natalPlanet} (${peak.aspectType})`;
+    } else {
+      headline = `Farkındalık & Yapılanma Zamanı: ${peak.transitPlanet} ➔ Natal ${peak.natalPlanet} (${peak.aspectType})`;
+    }
+  }
+
+  let themeDescription = '';
+  if (focusHouses.length > 0) {
+    themeDescription = `Bugün haritanızda en yoğun kozmik hareketlilik doğrudan ${focusHouses.map(h => `${h.house}. evinizde (${h.description})`).join(' ve ')} üzerinde toplanıyor. `;
+  } else {
+    themeDescription = `Bugün gezegen geçişleri doğum haritanızın kilit noktalarını hassas açılarla aydınlatıyor. `;
+  }
+
+  if (peak) {
+    themeDescription += `Özellikle ${peak.transitPlanet} (${peak.transitSign} ${peak.transitDegree}°) ile ${peak.natalHouse}. evinizdeki Natal ${peak.natalPlanet} (${peak.natalSign} ${peak.natalDegree}°) arasındaki ${peak.aspectType} açısı (${peak.orb.toFixed(1)}° tolerans), günün belirleyici dinamiğini çiziyor. `;
+  }
+
+  themeDescription += `Dış dünyadaki gelişmelere fevri tepkiler vermek yerine, kendi içsel merkezinizi koruyarak adımlarınızı bilinçli atmanız sürecin hediyelerini açığa çıkaracaktır.`;
+
+  const opportunities: string[] = [];
+  const cautions: string[] = [];
+
+  const harmoniousAspects = topAspects.filter(a => a.isHarmonious);
+  const challengingAspects = topAspects.filter(a => !a.isHarmonious);
+
+  if (harmoniousAspects.length > 0) {
+    harmoniousAspects.forEach(asp => {
+      opportunities.push(`Transit ${asp.transitPlanet} (${asp.transitSign} ${asp.transitDegree}°) ➔ Natal ${asp.natalPlanet} (${asp.natalSign} ${asp.natalDegree}°): ${asp.natalHouse}. evinizdeki potansiyellerinizi rahatlıkla açığa çıkarabilir, önünüze çıkan fırsatları değerlendirebilirsiniz.`);
+    });
+  } else {
+    opportunities.push('Günün sakin enerjisi altında geçmiş planlarınızı gözden geçirmek ve içsel dinginliği güçlendirmek için elverişli bir zemin var.');
+  }
+
+  if (challengingAspects.length > 0) {
+    challengingAspects.forEach(asp => {
+      cautions.push(`Transit ${asp.transitPlanet} (${asp.transitSign} ${asp.transitDegree}°) ➔ Natal ${asp.natalPlanet} (${asp.natalSign} ${asp.natalDegree}°): ${asp.natalHouse}. ev konularında fevri restleşmelerden ve acele kararlardan kaçının; sınırlarınızı koruyarak ilerleyin.`);
+    });
+  } else {
+    cautions.push('Aşırı rahatlığa kapılıp tamamlanması gereken sorumluluklarınızı ertelemekten kaçının.');
+  }
+
+  const lifeAdvice = peak
+    ? (peak.isHarmonious 
+        ? `${peak.natalHouse}. evinizin sunduğu bereketli akışı cesaret ve şükranla karşılayın; ertelediğiniz adımları hayata geçirin.`
+        : `${peak.natalHouse}. evinizde beliren sürtüşmeleri bir kriz değil, sizi daha sağlam ve olgun kılan bir basamak olarak görün.`)
+    : 'Haritanızdaki sakin akışı içsel dinlenme ve hedeflerinizi sadeleştirme fırsatı olarak değerlendirin.';
+
+  return {
+    headline,
+    subHeadline,
+    themeDescription,
+    focusHouses,
+    barometer: {
+      mental: { score: mentalScore, label: `${mentalScore}%`, tone: mentalTone },
+      emotional: { score: emotionalScore, label: `${emotionalScore}%`, tone: emotionalTone },
+      action: { score: actionScore, label: `${actionScore}%`, tone: actionTone }
+    },
+    opportunities: opportunities.slice(0, 3),
+    cautions: cautions.slice(0, 3),
+    topAspects,
+    lifeAdvice
+  };
+}
+
