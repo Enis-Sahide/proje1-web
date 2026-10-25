@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { ArrowLeft, MoonStar, Star, CheckCircle2, Loader2, AlertCircle, X, ChevronUp, ChevronDown, Download, Lock } from 'lucide-react';
 import { getFullPlanetInterpretation, getAspectInterpretation, getHouseCuspInterpretation } from '@/features/astrology/engine/AstrologyInterpretations';
 import { AstroPoint, AstroAspect, NatalChartData, ZodiacSign, Planet, AstroCity } from '@/features/astrology/engine/AstrologyConstants';
-import { calculateAspects } from '@/features/astrology/engine/AstrologyEngine';
+import { calculateAspects } from '@/features/astrology/engine/aspectUtils';
 import * as htmlToImage from 'html-to-image';
 import download from 'downloadjs';
 import { PrintableChart } from '@/components/PrintableChart';
