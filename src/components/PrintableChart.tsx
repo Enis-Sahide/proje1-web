@@ -50,7 +50,7 @@ export const PrintableChart = React.forwardRef<HTMLDivElement, PrintableChartPro
         </div>
         <div>
           <h1 className="text-3xl font-bold text-[#D4AF37] mb-1 flex items-center gap-3">
-            Ezoterik Doğum Haritası
+            Doğum Haritası
           </h1>
           <p className="text-lg text-gray-400">
             {locationStr} • {dateStr}
