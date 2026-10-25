@@ -124,7 +124,7 @@ const ASPECT_COLORS: Record<string, string> = {
   'Kavuşum': '#D4AF37', 'Sekstil': '#0A84FF', 'Kare': '#FF453A', 'Üçgen': '#32D74B', 'Karşıt': '#FF453A', 'Görmeyen': '#0A84FF'
 };
 
-const generateSvgString = (chartData: any): string => {
+export const generateSvgString = (chartData: any): string => {
   const CHART_SIZE = 640;
   const CENTER = CHART_SIZE / 2;
   const RADIUS = CENTER - 85;
@@ -231,7 +231,7 @@ const generateSvgString = (chartData: any): string => {
   return svg;
 };
 
-const convertSvgToPng = (svgString: string): Promise<string> => {
+export const convertSvgToPng = (svgString: string): Promise<string> => {
   return new Promise((resolve, reject) => {
     try {
       const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
