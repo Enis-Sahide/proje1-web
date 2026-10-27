@@ -159,6 +159,63 @@ const HOUSE2_INTERPRETATIONS: Record<string, string> = {
   'Balık': 'Sanatsal yaratımlar, şifa ve psikoloji, manevi rehberlik, sezgisel öngörüler ve insanlara umut veren vizyoner projelerle kazanırsınız.'
 };
 
+// 10. Ev MC Burcuna Özel Eylem ve Zirve Taktikleri
+const MC_ACTION_GUIDANCE: Record<string, string> = {
+  'Koç': '10. Eviniz Koç: Bürokrasi veya başkalarının onayını beklemeyin. Fikrinizi ilk pilot proje olarak hızla sahaya sürün; inisiyatif alıp sonuç ürettiğinizde doğal lider olarak otoriteyi devralırsınız.',
+  'Boğa': '10. Eviniz Boğa: Hızlı zenginleşme vadeden spekülatif heveslerden kaçının. Elle tutulur ürünler, gayrimenkul veya nakit akışı düzenli sağlam temellere odaklanarak sarsılmaz bir saygınlık inşa edin.',
+  'İkizler': '10. Eviniz İkizler: Fikirlerinizi tek bir kanala hapsetmeyin. Dijital ağları, çoklu medya kanallarını ve köprü kuruculuğunuzu kullanarak bilgiyi dolaşıma sokun; sektörün sözcüsü konumuna gelin.',
+  'Yengeç': '10. Eviniz Yengeç: Soğuk kurumsal formaliteler yerine güven ve aidiyet ekosistemi yaratın. Müşterileriniz ve ekibinizle kuracağınız koruyucu sadakat bağı en büyük rekabet avantajınızdır.',
+  'Aslan': '10. Eviniz Aslan: Perde arkasında kalarak ışığınızı söndürmeyin. Projelerinizin vitrininde yer alın, sahne konuşmaları yapın ve markanızın bizzat ilham veren vizyoner yüzü olun.',
+  'Başak': '10. Eviniz Başak: Kaotik iş süreçlerini saat gibi çalıştıran metodolojiler ve kalite standartları geliştirin. Kimsenin göremediği detayları kusursuzlaştırarak vazgeçilmez bir uzmanlık tescilleyin.',
+  'Terazi': '10. Eviniz Terazi: Tek başınıza yük taşımak yerine stratejik ittifaklar kurun. Müzakere masasında iki tarafı da kazandıran diplomatik zarafetinizle en zorlu sözleşmeleri bağlayın.',
+  'Akrep': '10. Eviniz Akrep: Yüzeysel işlerle vakit kaybetmeyin. Kriz yönetimi, radikal şirket dönüşümleri, siber güvenlik veya derin araştırma gerektiren kilit düğümleri çözerek vazgeçilmez bir güç odağı olun.',
+  'Yay': '10. Eviniz Yay: Yerel sınırları hızla aşın. Uluslararası ticaret, yabancı dil vizyonu, küresel yayıncılık ve büyük resmi gösteren felsefi mentorluk projeleriyle kariyerinizi dünya ölçeğine taşıyın.',
+  'Oğlak': '10. Eviniz Oğlak: Kısa vadeli alkışlar yerine 5-10 yıllık stratejik bir zirve planı yapın. Sarsılmaz disiplininiz ve hiyerarşik liderliğinizle zamanın silemeyeceği kalıcı bir miras bırakın.',
+  'Kova': '10. Eviniz Kova: Geleneksel mesai ve kalıpları yıkmaktan çekinmeyin. Yapay zeka, yeni nesil dijital topluluklar ve kolektife çağ atlatacak inovatif çözümlerle sektörünüzde devrim başlatın.',
+  'Balık': '10. Eviniz Balık: Salt mantığın sınırlarını aşın. Sanat, sinema, psikoloji ve manevi rehberlik kanallarında insanların kalbine dokunan vizyoner projelerle toplumsal ilham kaynağı olun.'
+};
+
+// 2. Ev Burcuna Özel Finansal Bereket Modeli
+const HOUSE2_ACTION_GUIDANCE: Record<string, string> = {
+  'Koç': '2. Eviniz Koç: Hızlı karar alma cesaretiniz ve pazara ilk giren olma cüretiniz en büyük para kaynağınızdır. Tereddüt ettiğinizde kazanç enerjiniz durur; ilk adımı atın.',
+  'Boğa': '2. Eviniz Boğa: Somut mülk edinme, bileşik getiri, gayrimenkul ve lüks tasarım varlıkları refah kapınızdır. Parayı harcamak yerine üretken varlıklarda tutarak büyütün.',
+  'İkizler': '2. Eviniz İkizler: Bilgi ticareti, danışmanlık, dijital telifler, aracılık ve eğitim içerikleri üzerinden birden fazla dinamik gelir akışı yaratın.',
+  'Yengeç': '2. Eviniz Yengeç: Barınma, gayrimenkul, gıda ve insanların duygusal güvenliğini sağlayan butik hizmetlerle para kazanırsınız. Kazancınızı aileniz ve güvenceniz için değerlendirin.',
+  'Aslan': '2. Eviniz Aslan: Kişisel markanız, lüks segment ürünler, yaratıcı eserleriniz ve sahne görünürlüğünüz para çeker. Hizmetinizi asla düşük fiyatlandırmayın.',
+  'Başak': '2. Eviniz Başak: Yüksek uzmanlık gerektiren analitik zanaat, süreç denetimi, sağlık ve optimizasyon danışmanlığı ile sürdürülebilir yüksek gelir elde edersiniz.',
+  'Terazi': '2. Eviniz Terazi: Başarılı ortaklıklar, estetik/tasarım danışmanlığı, hukuk ve aracılık sözleşmeleri zenginlik kapınızdır. Kazancınız denge ve adalete bağlıdır.',
+  'Akrep': '2. Eviniz Akrep: Fon yönetimi, krizdeki varlıkları ucuza alıp katlayarak satma, stratejik yatırımlar ve ortak sermaye yönetimi ile büyük paraları yönetirsiniz.',
+  'Yay': '2. Eviniz Yay: Yabancı para birimleri, uluslararası e-ticaret, küresel eğitimler ve turizm/yayıncılık bereketi getirir. Vizyonunuzu küresel tutun.',
+  'Oğlak': '2. Eviniz Oğlak: Kalıcı yapılar, kurumsal hisseler, uzun vadeli gayrimenkuller ve tepe yönetici primleri ile zamana yenilmeyen bir servet inşa edersiniz.',
+  'Kova': '2. Eviniz Kova: Dijital platformlar, yapay zeka araçları, kitle fonlaması ve yenilikçi patentlerle beklenmedik büyük finansal sıçramalar yaparsınız.',
+  'Balık': '2. Eviniz Balık: Sezgisel yatırımlar, sanatsal telif hakları, holistik şifa ve insan ruhunu iyileştiren vizyoner projelerle bolluğu hayatınıza çekersiniz.'
+};
+
+// Human Design Tipine Göre Karar & İş Stratejisi
+const HD_ACTION_GUIDANCE: Record<string, string> = {
+  'Jeneratör': 'Human Design Jeneratör: Zihninizin "para için yapmalıyım" baskısına teslim olmayın. Sakral merkezinizin (karnınızın) içtenlikle "evet" dediği işlere odaklanın; sevdiğiniz işte yorulmadan devleşirsiniz.',
+  'Manifesting Jeneratör': 'Human Design Manifesting Jeneratör: Aynı anda birkaç kulvarda koşma hakkınız var. Ancak bir adımdan diğerine geçerken ekibinizi ve müşterilerinizi mutlaka "bilgilendirin"; böylece sürtünmeyi yok edersiniz.',
+  'Projektör': 'Human Design Projektör: Saatlerce amele gibi beden gücüyle çalışmak doğanıza aykırıdır. Yeteneğinizin tanındığı ve fikrinize resmi "davet" geldiği yönetici, mentor veya sistem danışmanı rollerini seçin.',
+  'Manifestor': 'Human Design Manifestor: Kimseden izin veya icazet beklemeyin; siz yeni çağları başlatan öncüsünüz. Sadece aksiyona geçmeden önce etrafınızdakileri "bilgilendirerek" engelleri baştan savın.',
+  'Reflektör': 'Human Design Reflektör: Kariyer kararlarını ve ortaklıkları bir gecede vermeyin. Ay’ın 28 günlük döngüsü boyunca farklı insanlarla ve ortamlarda gözlem yaparak tarafsız bilgeliğinizle yön çizin.'
+};
+
+// Kader Sayısına Göre Aksiyon
+const DESTINY_ACTION_GUIDANCE: Record<number, string> = {
+  1: 'Kader Sayınız 1: Takipçi değil kural koyucu olun. Başkalarının çizdiği şablonları uygulamak yerine özgün vizyonunuzla bağımsız projelerin liderliğini üstlenin.',
+  2: 'Kader Sayınız 2: Diplomasi ve ortaklık gücünüzü devreye sokun. Çatışmalı ortamlarda arabulucu ve şifacı rolü üstlenerek her iki taraftan da değer üretin.',
+  3: 'Kader Sayınız 3: Sahne, söz ve yaratıcı ifade sizin gücünüzdür. Fikirlerinizi mizah, görsel tasarım veya etkileyici bir hitabetle sunarak kitleleri peşinizden sürükleyin.',
+  4: 'Kader Sayınız 4: Disiplin ve sağlam yapı kuruculuğunuzu gösterin. Karmaşık süreçleri sistemleştirip denetlenebilir hale getirerek vazgeçilmez bir operasyonel temel olun.',
+  5: 'Kader Sayınız 5: Esnek ve uyum sağlayıcı olun. Değişen piyasa koşullarını en hızlı siz koklarsınız; kriz anlarında yeni fırsat kapılarına hızla yönelin.',
+  6: 'Kader Sayınız 6: Hizmet kalitesi ve topluluk sorumluluğuna odaklanın. Danışanlarınıza veya müşterilerinize güven veren koruyucu standartlar geliştirin.',
+  7: 'Kader Sayınız 7: Derin uzmanlık ve analitik felsefe inşa edin. Yüzeysel piyasa trendlerine kapılmak yerine konunuzun en derin üstadı olarak saygı görün.',
+  8: 'Kader Sayınız 8: Büyük bütçeleri, güç dengelerini ve organizasyonel yapıları etik bir şekilde yönetin. Maddi dünyayı manevi sorumlulukla dengeleyin.',
+  9: 'Kader Sayınız 9: Kolektife ilham veren küresel misyonlar üstlenin. Sadece kişisel çıkar için değil, dünyada kalıcı bir dönüşüm bırakacak projeleri seçin.',
+  11: 'Kader Sayınız 11 (Üstat Sezgi): Yüksek sezgisel vizyonunuzu profesyonel hayata entegre edin; insanlara yol gösteren kadersel bir ilham meşalesi olun.',
+  22: 'Kader Sayınız 22 (Üstat Mimar): Büyük idealleri somut dünya gerçekliğine indirin; uluslararası ölçekte kalıcı kurumlar ve yapılar inşa edin.',
+  33: 'Kader Sayınız 33 (Üstat Şifacı): Yüksek fedakarlık ve şefkatle insanlığın acılarını dindiren, etik standartları en tepeye koyan projelerde liderlik edin.'
+};
+
 export class CareerEngine {
   public static async analyze(
     fullName: string,
@@ -167,10 +224,6 @@ export class CareerEngine {
     birthCity: AstroCity
   ): Promise<CareerAnalysisResult> {
     // 1. Astroloji Haritası Hesapla
-    const [year, month, day] = birthDate.split('-').map(Number);
-    const [hours, minutes] = (birthTime || '12:00').split(':').map(Number);
-    
-    // Doğum anı UTC Date objesi
     const m = moment.tz(`${birthDate} ${birthTime || '12:00'}`, birthCity.tz || 'Europe/Istanbul');
     const dateObj = m.toDate();
 
@@ -215,17 +268,17 @@ export class CareerEngine {
       hdChart = null;
     }
 
-    const hdType = hdChart ? hdChart.type : 'Generator';
+    const hdType = hdChart ? hdChart.type : 'Jeneratör';
     const hdProfile = hdChart ? hdChart.profile : '1/3';
     const hdStrategy = hdChart ? hdChart.strategy : 'Yanıt Vermek';
     const hdAuthority = hdChart ? hdChart.authority : 'Sakral Otorite';
 
     let hdCareerDynamic = '';
-    if (hdType === 'Generator' || hdType === 'Manifesting Generator') {
+    if (hdType === 'Jeneratör' || hdType === 'Manifesting Jeneratör') {
       hdCareerDynamic = 'Tükenmeden ve tutkuyla çalışabileceğiniz, sevdiğiniz işlerde sürdürülebilir enerji üreten bir ustasınız. Projelere sadece zihninizle değil, sakral içsel heyecanınızla "evet" dediğinizde başarı kaçınılmazdır.';
-    } else if (hdType === 'Projector') {
+    } else if (hdType === 'Projektör') {
       hdCareerDynamic = 'Siz saatlerce amele gibi çalışmak için değil; sistemleri, insanları ve enerjiyi yüksekten yönetmek, danışmanlık vermek ve vizyon göstermek için buradasınız. Davet edildiğiniz ve değerinizin bilindiği ortamlarda parlayacaksınız.';
-    } else if (hdType === 'Manifestor') {
+    } else if (hdType === 'Manifestör') {
       hdCareerDynamic = 'Siz başlatıcısınız. Yeni sektörler açmak, kimsenin cesaret edemediği projeleri tetiklemek ve emir almadan özerk liderlik yapmak sizin doğal yapınızdır. İlerlemeden önce ekibi bilgilendirmeniz dirençleri kırar.';
     } else {
       hdCareerDynamic = 'Siz kolektif sistemlerin aynası ve denetçisisiniz. Bir şirketin veya ekibin nereye gittiğini en tarafsız şekilde hisseder, uzun vadeli vizyon değerlendirmelerinde eşsiz bir danışman rolü üstlenirsiniz.';
@@ -261,7 +314,7 @@ export class CareerEngine {
     let idealModelExp = '';
     let idealPercent = 90;
 
-    if (['Koç', 'Yay', 'Kova'].includes(mcSign) || hdType === 'Manifestor' || destinyNum === 1) {
+    if (['Koç', 'Yay', 'Kova'].includes(mcSign) || hdType === 'Manifestör' || destinyNum === 1) {
       idealModelType = 'Girişimci & Bağımsız Kurucu';
       idealModelExp = 'Kendi kurallarınızı koyabileceğiniz, hiyerarşik baskının olmadığı bağımsız projeler ve şirket kuruculuğu sizin ruhsal doyum kaynağınızdır.';
       idealPercent = 94;
@@ -269,7 +322,7 @@ export class CareerEngine {
       idealModelType = 'Kurumsal Lider & Yönetici';
       idealModelExp = 'Büyük bütçeleri, insan kaynaklarını ve sağlam yapıları yönetebilecek kurumsal liderlik ve otorite kapasiteniz çok yüksektir.';
       idealPercent = 92;
-    } else if (hdType === 'Projector' || ['Terazi', 'İkizler', 'Balık'].includes(mcSign) || destinyNum === 2 || destinyNum === 7) {
+    } else if (hdType === 'Projektör' || ['Terazi', 'İkizler', 'Balık'].includes(mcSign) || destinyNum === 2 || destinyNum === 7) {
       idealModelType = 'Stratejik Rehber & Danışman';
       idealModelExp = 'Operasyonel angaryalardan uzak, uzmanlığınızı ve bilgeliğinizi kurumlara ya da bireylere aktardığınız üst düzey danışmanlık modeli size en çok yakışandır.';
       idealPercent = 89;
@@ -279,14 +332,23 @@ export class CareerEngine {
       idealPercent = 86;
     }
 
-    const superPower = `${mcSign} MC Tepe Noktanızın vizyoner gücü ile ${destinyNum} Kader Sayınızın birleşimi: Kendi alanınızda özgün bir otorite kurma ve kaotik durumlarda doğru stratejik yönü belirleme yeteneği.`;
-    const shadowPitfalls = `Kariyerinizde dikkat etmeniz gereken en büyük gölge: ${destinyInfo.negativePotentials || 'Aşırı mükemmeliyetçilik veya sabırsızlık yüzünden erken vazgeçmek.'} Ayrıca ${saturn.sign} Satürn sınavınız gereği, kısa vadeli kolay kazançlar yerine uzun vadeli itibar inşa etmeye odaklanmalısınız.`;
+    // Kişiye Özel Dinamik Süper Güç
+    const superPower = generateDynamicSuperPower(mcSign, destinyNum, hdType);
+
+    // Kişiye Özel Dinamik Gölge Tuzaklar
+    const shadowPitfalls = generateDynamicShadowPitfall(mcSign, destinyNum, saturn.sign, hdType);
+
+    // Tamamen Dinamik 4 Kadersel Tavsiye (Şablon tekrarlarından arındırılmış)
+    const mcAdvice = MC_ACTION_GUIDANCE[mcSign] || MC_ACTION_GUIDANCE['Oğlak'];
+    const hdAdvice = HD_ACTION_GUIDANCE[hdType] || HD_ACTION_GUIDANCE['Jeneratör'];
+    const destinyAdvice = DESTINY_ACTION_GUIDANCE[destinyNum] || (destinyInfo.constructivePotentials ? `Kader Sayınız (${destinyNum}): ${destinyInfo.constructivePotentials}` : 'Kader sayınız gereği etik gücünüzü ve vizyonunuzu ortaya koyun.');
+    const house2Advice = HOUSE2_ACTION_GUIDANCE[house2Sign] || HOUSE2_ACTION_GUIDANCE['Boğa'];
 
     const actionableGuidance = [
-      `10. Eviniz (${mcSign}) doğrultusunda toplum önünde görünürlüğünüzü artırın; uzmanlığınızı gizli tutmak yerine kişisel markanızı veya şirket unvanınızı öne çıkarın.`,
-      `Human Design ${hdType} stratejiniz gereği: ${hdStrategy} ilkesini iş anlaşmalarında mutlaka uygulayın; aceleci dürtüsel kararlardan kaçının.`,
-      `Kader Sayınız (${destinyNum}) uyarınca: ${destinyInfo.constructivePotentials || 'Organizasyonel yeteneklerinizi'} ekip çalışmalarında ana kozunuz yapın.`,
-      `2. Eviniz (${house2Sign}) kazanç modeline uygun olarak birden fazla gelir akışı oluşturun ve yeteneklerinizi değerinin altında fiyatlandırmayın.`
+      mcAdvice,
+      hdAdvice,
+      destinyAdvice,
+      house2Advice
     ];
 
     return {
@@ -339,6 +401,64 @@ export class CareerEngine {
       }
     };
   }
+}
+
+function generateDynamicSuperPower(mcSign: string, destinyNum: number, hdType: string): string {
+  const mcPowers: Record<string, string> = {
+    'Koç': 'krizlerde ilk adımı atıp öncülük etme cesareti',
+    'Boğa': 'sarsılmaz güvenilirlik ve kalıcı somut değer inşa etme dehası',
+    'İkizler': 'hızlı bilgi sentezi, çoklu ağlar kurma ve ikna kabiliyeti',
+    'Yengeç': 'derin duygusal sezgi, sadakat yaratma ve koruyucu liderlik',
+    'Aslan': 'doğal karizma, sahne ışıltısı ve kitlelere ilham verme gücü',
+    'Başak': 'kusursuz detay hakimiyeti, analitik zeka ve süreç optimizasyonu',
+    'Terazi': 'çatışan tarafları uzlaştıran diplomatik zarafet ve estetik vizyon',
+    'Akrep': 'krizleri fırsata çeviren stratejik derinlik ve dönüşüm gücü',
+    'Yay': 'sınır tanımayan küresel vizyon ve büyük resmi felsefi kavrayış',
+    'Oğlak': 'çelik gibi disiplin, sabırlı strateji ve kalıcı otorite kurma yeteneği',
+    'Kova': 'kalıpların ötesine geçen devrimci inovasyon ve geleceği okuma sezgisi',
+    'Balık': 'mantık sınırlarını aşan yaratıcı ilham ve empatik şifa vizyonu'
+  };
+
+  const destinyPowers: Record<number, string> = {
+    1: 'kendi bağımsız yolunu açan öncü irade',
+    2: 'kusursuz diplomatik uyum ve sezgisel denge',
+    3: 'insanları peşinden sürükleyen ifade ve sanatsal çekim',
+    4: 'sağlam temeller atan metodik inşa gücü',
+    5: 'hızlı adapte olan dinamik dönüşüm zekası',
+    6: 'yüksek sorumluluk ve güven veren koruyuculuk',
+    7: 'derin bilgiye ve hakikate ulaşan analitik bilgelik',
+    8: 'maddi ve kurumsal gücü yöneten stratejik liderlik',
+    9: 'kolektif dönüşüm yaratan evrensel vizyon',
+    11: 'karanlıkta yol gösteren yüksek sezgisel ışık',
+    22: 'büyük hayalleri dünya maddesine indiren usta mimarlık',
+    33: 'toplumu yücelten evrensel şefkat ve adanmışlık'
+  };
+
+  const power1 = mcPowers[mcSign] || 'stratejik liderlik';
+  const power2 = destinyPowers[destinyNum] || 'özgün yetenek';
+
+  return `10. Evinizdeki ${mcSign} Tepe Noktasının getirdiği "${power1}" ile ${destinyNum} Kader Sayınızın sağladığı "${power2}" birleşiyor. Human Design ${hdType} doğanızla birleştiğinde en kaotik iş ortamlarında bile doğru rotayı çizip ekibinizi zirveye taşıma kabiliyetine sahipsiniz.`;
+}
+
+function generateDynamicShadowPitfall(mcSign: string, destinyNum: number, saturnSign: string, hdType: string): string {
+  const mcShadows: Record<string, string> = {
+    'Koç': 'sabırsızlık ve fevri çıkışlarla köprüleri erken yakmak',
+    'Boğa': 'değişime ve inovasyona aşırı direnç gösterip konfor tuzağına saplanmak',
+    'İkizler': 'aşırı bölünerek projeleri yarım bırakmak ve yüzeyselleşmek',
+    'Yengeç': 'iş ilişkilerini aşırı kişiselleştirip alınganlık ve küskünlük geliştirmek',
+    'Aslan': 'eleştiriye tahammülsüzlük ve egonun takdir edilme bağımlılığı',
+    'Başak': 'aşırı detayda boğulup büyük resmi kaçırmak ve aşırı eleştirellik',
+    'Terazi': 'kararsızlık yüzünden fırsatları kaçırmak ve sınır çizememek',
+    'Akrep': 'aşırı şüphecilik, paranoya ve gücü elde tutmak için gizli manipülasyon',
+    'Yay': 'aşırı iyimserlikle riskleri hafife almak ve detayları küçümsemek',
+    'Oğlak': 'aşırı katılık, duyguları tamamen bastırıp işkoliklik batağına düşmek',
+    'Kova': 'kibirli bir fildişi kuleye çekilip ekiple duygusal teması koparmak',
+    'Balık': 'sınır koyamamak, kurban rolüne bürünmek ve gerçeklerden kaçmak'
+  };
+
+  const shadow = mcShadows[mcSign] || 'erken vazgeçmek';
+
+  return `Kariyerinizdeki en büyük gölge tuzak: 10. Ev ${mcSign} temelli "${shadow}". Ayrıca haritanızdaki ${saturnSign} Satürn sınavı gereği, kısa vadeli kolay kazançlara kapılmamalı; itibarınızı zedeleyecek aceleci hamlelerden uzak durmalısınız. ${hdType} stratejinizden koptuğunuzda tükenmişlik (burnout) riski tetiklenir.`;
 }
 
 function getCategoryForSign(sign: string): CareerSectorMatch['category'] {
