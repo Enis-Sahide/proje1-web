@@ -199,13 +199,10 @@ export default function NumerologyPage() {
   const renderAnalysisCard = (
     title: string, 
     num: number, 
-    dataKey: 'lifePathDetails' | 'destinyDetails' | 'soulUrgeDetails' | 'personalityDetails' | 'description',
-    options?: { showCareer?: boolean }
+    dataKey: 'lifePathDetails' | 'destinyDetails' | 'soulUrgeDetails' | 'personalityDetails' | 'description'
   ) => {
     const data = numerologyData[num] || numerologyData[reduceNumber(num)];
     if (!data) return null;
-
-    const shouldShowCareer = dataKey === 'description' || options?.showCareer;
 
     return (
       <div key={title} className="bg-black/40 border border-white/10 rounded-3xl p-6 md:p-8 relative overflow-hidden group hover:border-[#AF52DE]/40 transition-colors">
@@ -233,18 +230,6 @@ export default function NumerologyPage() {
                 {dataKey === 'description' ? data.description : data[dataKey]}
               </p>
             </div>
-
-            {/* Mesleki Yatkınlık & Kariyer Alanı */}
-            {shouldShowCareer && data.career && (
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-[#D4AF37]/15 via-black/40 to-[#AF52DE]/10 border border-[#D4AF37]/35 shadow-lg shadow-[#D4AF37]/5">
-                <h4 className="text-sm font-bold text-[#D4AF37] mb-1.5 flex items-center gap-2">
-                  <Briefcase size={16} className="text-[#D4AF37]" /> Mesleki Yatkınlık & İdeal Kariyer Alanları:
-                </h4>
-                <p className="text-amber-100/90 leading-relaxed text-xs sm:text-sm font-medium">
-                  {data.career}
-                </p>
-              </div>
-            )}
 
             {dataKey === 'description' && (
               <div className="space-y-3 pt-2 border-t border-white/5">
@@ -1085,9 +1070,9 @@ export default function NumerologyPage() {
                 {/* Detaylı Analizler */}
                 <div className="space-y-6 pt-4">
                   <h3 className="text-xl font-bold text-white tracking-wide border-b border-white/5 pb-2">Detaylı Analiz Raporları</h3>
-                  {renderAnalysisCard("Hayat Kulvarı (Yaşam Yolu)", nameResults.lifePath, "lifePathDetails", { showCareer: true })}
+                  {renderAnalysisCard("Hayat Kulvarı (Yaşam Yolu)", nameResults.lifePath, "lifePathDetails")}
                   {renderAnalysisCard("En Ön Plandaki Kişilik", nameResults.personality, "personalityDetails")}
-                  {renderAnalysisCard("İsim Numaranız (Kader & Mesleki Yatkınlık)", nameResults.destiny, "description", { showCareer: true })}
+                  {renderAnalysisCard("İsim Numaranız (Kader Sayısı)", nameResults.destiny, "description")}
                   {renderAnalysisCard("Ruhunuzu Tanımlama (Ruh Güdüsü)", nameResults.soulUrge, "soulUrgeDetails")}
                 </div>
 
@@ -1455,18 +1440,6 @@ export default function NumerologyPage() {
                           {lpData?.weakness}
                         </p>
                       </div>
-
-                      {/* Yaşam Yolu Mesleki Yatkınlık */}
-                      {numerologyData[lifePath?.number || 0]?.career && (
-                        <div className="p-4 rounded-2xl bg-gradient-to-r from-[#D4AF37]/15 via-black/40 to-[#AF52DE]/10 border border-[#D4AF37]/35 shadow-lg shadow-[#D4AF37]/5 mt-3">
-                          <h4 className="text-sm font-bold text-[#D4AF37] mb-1.5 flex items-center gap-2">
-                            <Briefcase size={16} className="text-[#D4AF37]" /> Mesleki Yatkınlık & İdeal Kariyer Alanları:
-                          </h4>
-                          <p className="text-amber-100/90 leading-relaxed text-xs sm:text-sm font-medium">
-                            {numerologyData[lifePath?.number || 0]?.career}
-                          </p>
-                        </div>
-                      )}
                     </div>
                   </div>
                 </div>
