@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Moon, Lock, Activity, AlertCircle, Clock, Scroll, TreePine, ChevronRight } from 'lucide-react';
+import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Moon, Lock, Activity, AlertCircle, Clock, Scroll, TreePine, ChevronRight, Briefcase } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 
 interface ToolItem {
@@ -71,6 +71,13 @@ export default function AnalysisPage() {
       icon: <Hexagon size={22} />,
       color: '#AF52DE',
       link: '/analysis/numerology'
+    },
+    {
+      id: 'career',
+      title: 'Mesleki Yatkınlık & Kariyer',
+      icon: <Briefcase size={22} />,
+      color: '#EAB308',
+      link: '/analysis/career'
     },
     {
       id: 'kabbalah',
