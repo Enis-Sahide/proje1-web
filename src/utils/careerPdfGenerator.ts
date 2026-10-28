@@ -311,11 +311,11 @@ export const downloadCareerPDF = async (
   // 3 Ana Sektör Kartları
   data.topSectors.forEach((sec, idx) => {
     const titleText = `${idx + 1}. ${sec.title} • Uyum: %${sec.fitScore}`;
-    const descLines = doc.splitTextToSize(sec.description, 168);
+    const descLines = doc.splitTextToSize(sec.description, 162);
     const roleText = `Öne Çıkan Roller: ${sec.recommendedRoles.join(', ')}`;
-    const roleLines = doc.splitTextToSize(roleText, 168);
+    const roleLines = doc.splitTextToSize(roleText, 162);
     
-    const cardH = 14 + (descLines.length * 4.2) + (roleLines.length * 3.8);
+    const cardH = 16 + (descLines.length * 4.3) + (roleLines.length * 3.9);
     ensureSpace(cardH + 6);
 
     doc.setFillColor(250, 250, 252);
@@ -331,10 +331,10 @@ export const downloadCareerPDF = async (
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(...charcoal);
-    let lineY = curY + 13;
+    let lineY = curY + 12.5;
     descLines.forEach((dl: string) => {
       doc.text(dl, 20, lineY);
-      lineY += 4.2;
+      lineY += 4.3;
     });
 
     doc.setFont('LiberationSans', 'bold');
@@ -343,7 +343,7 @@ export const downloadCareerPDF = async (
     lineY += 1.5;
     roleLines.forEach((rl: string) => {
       doc.text(rl, 20, lineY);
-      lineY += 3.8;
+      lineY += 3.9;
     });
 
     curY += cardH + 5;
@@ -459,14 +459,14 @@ export const downloadCareerPDF = async (
     if (activeM) {
       doc.setFont('LiberationSans', 'bold');
       doc.setFontSize(9.5);
-      const titleText = `ŞU ANKİ AKTİF EVRENİZ: ${activeM.title} (${activeM.ageRange} • ${activeM.planetCycle})`;
-      const titleLines = doc.splitTextToSize(titleText, 168);
+      const titleText = `ŞU ANKİ AKTİF EVRENİZ: ${activeM.title} [ ${activeM.ageRange} • ${activeM.planetCycle} ]`;
+      const titleLines = doc.splitTextToSize(titleText, 162);
 
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(8.5);
-      const activeDescLines = doc.splitTextToSize(activeM.description, 168);
-      const actionLines = doc.splitTextToSize(`Bu Evrenin Altın Kuralı: ${activeM.actionGuidance}`, 168);
-      const activeBoxH = 14 + (titleLines.length * 4.6) + (activeDescLines.length * 4.0) + (actionLines.length * 3.8);
+      const activeDescLines = doc.splitTextToSize(activeM.description, 162);
+      const actionLines = doc.splitTextToSize(`Bu Evrenin Altın Kuralı: ${activeM.actionGuidance}`, 162);
+      const activeBoxH = 18 + (titleLines.length * 4.6) + (activeDescLines.length * 4.0) + (actionLines.length * 4.0);
 
       doc.setFillColor(254, 252, 232); // Light Amber
       doc.setDrawColor(...gold);
@@ -481,7 +481,7 @@ export const downloadCareerPDF = async (
         doc.text(tl, 20, aY);
         aY += 4.6;
       });
-      aY += 1.5;
+      aY += 2;
 
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(8.5);
@@ -494,10 +494,10 @@ export const downloadCareerPDF = async (
       doc.setFont('LiberationSans', 'bold');
       doc.setFontSize(8.5);
       doc.setTextColor(...primaryDark);
-      aY += 1;
+      aY += 2;
       actionLines.forEach((al: string) => {
         doc.text(al, 20, aY);
-        aY += 3.8;
+        aY += 4.0;
       });
 
       curY += activeBoxH + 8;
