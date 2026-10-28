@@ -161,7 +161,28 @@ export async function POST(req: NextRequest) {
           ...result.vocationalReputation,
           howIndustryRemembersYou: MASKED,
           authorityTrigger: MASKED
-        } : result.vocationalReputation
+        } : result.vocationalReputation,
+
+        // Süper Güç, Tuzaklar & Eylem Planı
+        superPower: MASKED,
+        shadowPitfalls: MASKED,
+        actionableGuidance: [
+          '🔒 1. Stratejik Eylem Kuralı Kapsamlı Kariyer Raporuna özeldir.',
+          '🔒 2. Stratejik Eylem Kuralı Kapsamlı Kariyer Raporuna özeldir.',
+          '🔒 3. Stratejik Eylem Kuralı Kapsamlı Kariyer Raporuna özeldir.',
+          '🔒 4. Stratejik Eylem Kuralı Kapsamlı Kariyer Raporuna özeldir.'
+        ],
+
+        // Sektörlerin Derin Açıklamaları & Rolleri
+        topSectors: result.topSectors.map(s => ({
+          ...s,
+          description: MASKED,
+          recommendedRoles: [MASKED, MASKED, MASKED]
+        })),
+        secondarySectors: result.secondarySectors.map(s => ({
+          ...s,
+          recommendedRoles: [MASKED, MASKED]
+        }))
       };
     } else {
       result = {

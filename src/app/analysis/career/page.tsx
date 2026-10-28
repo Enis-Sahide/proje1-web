@@ -162,6 +162,66 @@ export default function CareerAnalysisPage() {
     </div>
   );
 
+  const renderBigLockedShowcase = (layer: 'material' | 'soul') => (
+    <div className="mt-6 rounded-3xl bg-gradient-to-b from-[#D4AF37]/20 via-black/90 to-black border-2 border-[#D4AF37]/40 p-6 sm:p-10 text-center shadow-2xl relative overflow-hidden space-y-6">
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-32 bg-[#D4AF37]/20 rounded-full blur-3xl pointer-events-none -z-10" />
+      
+      <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-3xl bg-gradient-to-br from-[#D4AF37]/30 to-[#B8860B]/10 border border-[#D4AF37]/50 flex items-center justify-center text-[#D4AF37] shadow-[0_0_30px_rgba(212,175,55,0.3)]">
+        <Lock size={36} className="sm:w-10 sm:h-10 animate-pulse" />
+      </div>
+
+      <div className="max-w-2xl mx-auto space-y-2">
+        <span className="text-[11px] sm:text-xs uppercase tracking-widest text-[#D4AF37] font-extrabold block">
+          🔒 {layer === 'material' ? 'Kapsamlı Kariyer Raporunun Kalan %85\'i Kilitlidir' : 'Drakonik Ruh Haritası ve Kadersel Çağrı Kilitlidir'}
+        </span>
+        <h3 className="text-xl sm:text-3xl font-black text-white">
+          {layer === 'material' 
+            ? 'Tüm Gezegenlerinizi, Sektörel Analizinizi ve Kadersel Rızık Haritanızı Açın' 
+            : 'Ruhsal Tepe Noktanızı, Enkarnasyon Özünüzü ve İlahi Misyonunuzu Keşfedin'}
+        </h3>
+        <p className="text-xs sm:text-sm text-gray-300 leading-relaxed pt-1">
+          {layer === 'material'
+            ? '7 Sektörün Yüzdelik Dağılımı, İkincil İlerletim Saati, Kadersel Zaman Çizelgesi, 10 Gezegenin Mesleki Deşifresi, Müzik/Zanaat Malzemesi, Pars Fortuna Rızık Kapısı, Biyoritm Saatleri ve İndirilebilir 6 Sayfalık Özel PDF Raporu için hemen kilidi açın.'
+            : 'Ruhsal MC (Tepe Noktası), Ruhun 3\'lü Enkarnasyon Doğası, Ruhu Besleyen Kadersel Sektörler ve Ruh-Madde Bütünsel Sentez Köprüsü Kapsamlı Kariyer Dosyasına dahildir.'}
+        </p>
+      </div>
+
+      {/* Avantaj Rozetleri */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 max-w-2xl mx-auto text-left">
+        <div className="bg-white/5 border border-white/10 p-3 rounded-2xl">
+          <span className="text-[10px] text-[#D4AF37] font-bold block mb-0.5">✦ 7 SEKTÖR ANALİZİ</span>
+          <span className="text-[11px] text-gray-300">Yüzdelik tekil uyum skoru</span>
+        </div>
+        <div className="bg-white/5 border border-white/10 p-3 rounded-2xl">
+          <span className="text-[10px] text-[#D4AF37] font-bold block mb-0.5">✦ İLERLETİM DÖNGÜSÜ</span>
+          <span className="text-[11px] text-gray-300">İlerletilmiş Güneş & Ay saati</span>
+        </div>
+        <div className="bg-white/5 border border-white/10 p-3 rounded-2xl">
+          <span className="text-[10px] text-[#D4AF37] font-bold block mb-0.5">✦ 6 KADİM MODÜL</span>
+          <span className="text-[11px] text-gray-300">Enstrüman, rızık & biyoritm</span>
+        </div>
+        <div className="bg-white/5 border border-white/10 p-3 rounded-2xl">
+          <span className="text-[10px] text-[#D4AF37] font-bold block mb-0.5">✦ 6 SAYFA ÖZEL PDF</span>
+          <span className="text-[11px] text-gray-300">İndirilebilir ömürlük dosya</span>
+        </div>
+      </div>
+
+      <div className="pt-2">
+        <button
+          onClick={handlePurchaseReport}
+          className="inline-flex items-center justify-center gap-3 bg-gradient-to-r from-[#D4AF37] via-[#E5C158] to-[#B8860B] hover:opacity-95 text-black font-black py-4 px-8 rounded-2xl transition-all shadow-xl shadow-[#D4AF37]/30 text-sm sm:text-base cursor-pointer hover:scale-[1.02] active:scale-[0.98]"
+        >
+          <Lock size={18} />
+          <span>Tüm Kilitleri Aç & Özel PDF'i Al (444 TL)</span>
+          <ArrowRight size={18} />
+        </button>
+        <span className="block text-[11px] text-gray-400 mt-2">
+          Tek seferlik ödeme • Anında tam erişim • Profilinize ve e-postanıza kayıt
+        </span>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen pt-24 sm:pt-28 pb-20 px-3.5 sm:px-6 relative overflow-x-hidden text-white bg-[#0a0a0f]">
       {/* Background Glows */}
@@ -431,8 +491,14 @@ export default function CareerAnalysisPage() {
               </p>
             </div>
 
-            {/* 2. KRİTİK KARİYER DÖNÜM YAŞLARI & KADERSEL ZAMAN ÇİZELGESİ */}
-            {result.careerTimeline && (
+            {/* KİLİTLİ DURUM: KAPSAMLI KARİYER RAPORU KİLİT VİTRİNİ */}
+            {!result.isUnlocked && renderBigLockedShowcase('material')}
+
+            {/* AÇIK / SATIN ALINMIŞ DURUM: TÜM DERİN MESLEKİ BÖLÜMLER */}
+            {result.isUnlocked && (
+              <>
+                {/* 2. KRİTİK KARİYER DÖNÜM YAŞLARI & KADERSEL ZAMAN ÇİZELGESİ */}
+                {result.careerTimeline && (
               <div className="bg-black/60 border border-amber-500/30 p-5 sm:p-7 rounded-3xl relative overflow-hidden shadow-xl space-y-5">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
                   <div className="flex items-center gap-3">
@@ -1433,6 +1499,8 @@ export default function CareerAnalysisPage() {
                 ))}
               </div>
             </div>
+              </>
+            )}
           </div>
         )}
 
@@ -1467,7 +1535,13 @@ export default function CareerAnalysisPage() {
               </div>
             </div>
 
-            {/* 1. RUHSAL TEPE NOKTASI (DRAKONİK MC) & KADERSEL ÇAĞRI */}
+            {/* KİLİTLİ DURUM: DRAKONİK RUH HARİTASI KİLİT VİTRİNİ */}
+            {!result.isUnlocked && renderBigLockedShowcase('soul')}
+
+            {/* AÇIK / SATIN ALINMIŞ DURUM: TÜM RUHSAL VE ENKARNASYON ANALİZİ */}
+            {result.isUnlocked && (
+              <>
+                {/* 1. RUHSAL TEPE NOKTASI (DRAKONİK MC) & KADERSEL ÇAĞRI */}
             <div className="bg-gradient-to-br from-purple-900/30 via-black/80 to-pink-900/20 border border-purple-500/40 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-purple-500/20 pb-4">
                 <div className="flex items-center gap-3">
@@ -1689,6 +1763,8 @@ export default function CareerAnalysisPage() {
                   <strong>Koruma Kalkanı:</strong> {result.burnoutShield.protectionFormula}
                 </div>
               </div>
+            )}
+              </>
             )}
           </div>
         )}
