@@ -637,8 +637,18 @@ export default function CareerAnalysisPage() {
                       </p>
                     </div>
 
+                    <div className="p-3.5 sm:p-4 bg-green-500/5 border border-green-500/20 rounded-2xl">
+                      <h5 className="text-xs font-bold text-green-300 mb-1 flex items-center gap-1.5">
+                        <Award size={14} /> Doğal İş Hayatı Rolünüz ({result.humanDesign.profile} Profili):
+                      </h5>
+                      <p className="text-xs text-gray-300 leading-relaxed">
+                        {result.humanDesign.profileWorkRole}
+                      </p>
+                    </div>
+
                     <div className="p-3.5 sm:p-4 bg-white/5 border border-white/10 rounded-2xl text-xs text-gray-300 leading-relaxed">
-                      <strong className="text-white">Doğru Karar Otoritesi ({result.humanDesign.decisionAuthority}):</strong> İş tekliflerini, sözleşmeleri ve kariyer sıçramalarını zihninizin mantıksal baskısıyla değil, bu otorite mekanizmasıyla onaylamalısınız.
+                      <strong className="text-white block mb-1">Doğru Karar Otoritesi Taktikleri ({result.humanDesign.decisionAuthority}):</strong>
+                      {result.humanDesign.authorityTactic}
                     </div>
                   </div>
                 </div>
