@@ -360,21 +360,33 @@ export const downloadCareerPDF = async (
     curY += 6;
 
     data.secondarySectors.forEach((sSec) => {
-      ensureSpace(16);
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(8);
+      const roleText = `Destekleyici Roller: ${sSec.recommendedRoles.join(', ')}`;
+      const roleLines = doc.splitTextToSize(roleText, 168);
+      const sBoxH = 10 + (roleLines.length * 3.8);
+
+      ensureSpace(sBoxH + 4);
       doc.setFillColor(248, 250, 252);
-      doc.roundedRect(15, curY, 180, 14, 2, 2, 'F');
+      doc.setDrawColor(229, 231, 235);
+      doc.setLineWidth(0.4);
+      doc.roundedRect(15, curY, 180, sBoxH, 2, 2, 'FD');
 
       doc.setFont('LiberationSans', 'bold');
       doc.setFontSize(9);
       doc.setTextColor(...primaryDark);
       doc.text(`${sSec.title} (%${sSec.percentage} Uyum)`, 20, curY + 6);
 
+      let rY = curY + 10.5;
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(8);
       doc.setTextColor(...muted);
-      doc.text(`Destekleyici Roller: ${sSec.recommendedRoles.join(', ')}`, 20, curY + 11);
+      roleLines.forEach((rl: string) => {
+        doc.text(rl, 20, rY);
+        rY += 3.8;
+      });
 
-      curY += 16;
+      curY += sBoxH + 3.5;
     });
   }
 
@@ -611,7 +623,7 @@ export const downloadCareerPDF = async (
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(7.5);
       const expLines = doc.splitTextToSize(pi.explanation, 168);
-      const visibleExpLines = expLines.slice(0, 2); // En fazla 2 satır açıklama
+      const visibleExpLines = expLines; // Açıklamanın tamamı eksiksiz basılır
 
       doc.setFont('LiberationSans', 'bold');
       doc.setFontSize(7);
@@ -729,7 +741,7 @@ export const downloadCareerPDF = async (
     doc.setFontSize(8.5);
     const mcCallLines = doc.splitTextToSize(data.soulCareer.soulMidheaven.calling, 168);
     const mcImpactLines = doc.splitTextToSize(`Kolektife Bırakılacak Manevi Etki: ${data.soulCareer.soulMidheaven.impact}`, 168);
-    const mcBoxH = 14 + (mcCallLines.slice(0, 2).length * 4.2) + (mcImpactLines.length * 4);
+    const mcBoxH = 14 + (mcCallLines.length * 4.2) + (mcImpactLines.length * 4.0);
 
     ensureSpace(mcBoxH + 5);
 
@@ -747,7 +759,7 @@ export const downloadCareerPDF = async (
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(...charcoal);
-    mcCallLines.slice(0, 2).forEach((ml: string) => {
+    mcCallLines.forEach((ml: string) => {
       doc.text(ml, 20, mcY);
       mcY += 4.2;
     });
@@ -808,27 +820,41 @@ export const downloadCareerPDF = async (
       curY += 5;
 
       data.soulCareer.soulTopSectors.slice(0, 2).forEach((sSec, sIdx) => {
-        ensureSpace(24);
+        doc.setFont('LiberationSans', 'normal');
+        doc.setFontSize(7.5);
+        const sDesc = doc.splitTextToSize(sSec.description, 168);
+        const roleText = `Ruhsal Ustalık Dalları: ${sSec.recommendedRoles.join(', ')}`;
+        const roleLines = doc.splitTextToSize(roleText, 168);
+        const sSecBoxH = 12 + (sDesc.length * 3.8) + (roleLines.length * 3.6);
+
+        ensureSpace(sSecBoxH + 4);
         doc.setFillColor(248, 250, 252);
-        doc.roundedRect(15, curY, 180, 20, 2, 2, 'F');
+        doc.roundedRect(15, curY, 180, sSecBoxH, 2, 2, 'F');
 
         doc.setFont('LiberationSans', 'bold');
         doc.setFontSize(9);
         doc.setTextColor(...purple);
         doc.text(`${sIdx + 1}. ${sSec.title} (%${sSec.percentage} Ruhsal Çağrı)`, 20, curY + 6);
 
+        let secY = curY + 10.5;
         doc.setFont('LiberationSans', 'normal');
         doc.setFontSize(7.5);
         doc.setTextColor(...charcoal);
-        const sDesc = doc.splitTextToSize(sSec.description, 168);
-        doc.text(sDesc[0] || '', 20, curY + 11);
+        sDesc.forEach((dl: string) => {
+          doc.text(dl, 20, secY);
+          secY += 3.8;
+        });
 
         doc.setFont('LiberationSans', 'bold');
         doc.setFontSize(7.5);
         doc.setTextColor(...gold);
-        doc.text(`Ruhsal Ustalık Dalları: ${sSec.recommendedRoles.join(', ')}`, 20, curY + 16);
+        secY += 0.5;
+        roleLines.forEach((rl: string) => {
+          doc.text(rl, 20, secY);
+          secY += 3.6;
+        });
 
-        curY += 23;
+        curY += sSecBoxH + 4;
       });
     }
 
@@ -1059,22 +1085,32 @@ export const downloadCareerPDF = async (
     curY += 6;
 
     data.actionableGuidance.forEach((step, sIdx) => {
-      ensureSpace(14);
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(8);
+      const sLines = doc.splitTextToSize(step, 162);
+      const boxH = Math.max(12, 6 + sLines.length * 3.8);
+
+      ensureSpace(boxH + 4);
       doc.setFillColor(248, 250, 252);
-      doc.roundedRect(15, curY, 180, 11, 2, 2, 'F');
+      doc.setDrawColor(226, 232, 240);
+      doc.setLineWidth(0.4);
+      doc.roundedRect(15, curY, 180, boxH, 2, 2, 'FD');
 
       doc.setFont('LiberationSans', 'bold');
-      doc.setFontSize(8);
+      doc.setFontSize(8.5);
       doc.setTextColor(...gold);
-      doc.text(`${sIdx + 1}`, 19, curY + 7);
+      doc.text(`${sIdx + 1}`, 19, curY + 6);
 
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(8);
       doc.setTextColor(...charcoal);
-      const sLines = doc.splitTextToSize(step, 160);
-      doc.text(sLines[0] || '', 25, curY + 7);
+      let textY = curY + 5.5;
+      sLines.forEach((line: string) => {
+        doc.text(line, 25, textY);
+        textY += 3.8;
+      });
 
-      curY += 13;
+      curY += boxH + 3;
     });
   }
 
