@@ -457,27 +457,38 @@ export const downloadCareerPDF = async (
     // Aktif Kadersel Evre Parlayan Kutu (activeMilestone)
     const activeM = data.careerTimeline.activeMilestone;
     if (activeM) {
-      const activeDescLines = doc.splitTextToSize(activeM.description, 170);
-      const actionLines = doc.splitTextToSize(`Bu Evrenin Altın Kuralı: ${activeM.actionGuidance}`, 170);
-      const activeBoxH = 18 + (activeDescLines.length * 4.2) + (actionLines.length * 4.0);
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(9.5);
+      const titleText = `ŞU ANKİ AKTİF EVRENİZ: ${activeM.title} (${activeM.ageRange} • ${activeM.planetCycle})`;
+      const titleLines = doc.splitTextToSize(titleText, 168);
+
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(8.5);
+      const activeDescLines = doc.splitTextToSize(activeM.description, 168);
+      const actionLines = doc.splitTextToSize(`Bu Evrenin Altın Kuralı: ${activeM.actionGuidance}`, 168);
+      const activeBoxH = 14 + (titleLines.length * 4.6) + (activeDescLines.length * 4.0) + (actionLines.length * 3.8);
 
       doc.setFillColor(254, 252, 232); // Light Amber
       doc.setDrawColor(...gold);
       doc.setLineWidth(0.8);
       doc.roundedRect(15, curY, 180, activeBoxH, 2, 2, 'FD');
 
+      let aY = curY + 6.5;
       doc.setFont('LiberationSans', 'bold');
-      doc.setFontSize(11);
+      doc.setFontSize(9.5);
       doc.setTextColor(...gold);
-      doc.text(`ŞU ANKİ AKTİF EVRENİZ: ${activeM.title} (${activeM.ageRange} - ${activeM.planetCycle})`, 20, curY + 8);
+      titleLines.forEach((tl: string) => {
+        doc.text(tl, 20, aY);
+        aY += 4.6;
+      });
+      aY += 1.5;
 
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(8.5);
       doc.setTextColor(...charcoal);
-      let aY = curY + 14;
       activeDescLines.forEach((adl: string) => {
         doc.text(adl, 20, aY);
-        aY += 4.2;
+        aY += 4.0;
       });
 
       doc.setFont('LiberationSans', 'bold');
@@ -486,7 +497,7 @@ export const downloadCareerPDF = async (
       aY += 1;
       actionLines.forEach((al: string) => {
         doc.text(al, 20, aY);
-        aY += 4.0;
+        aY += 3.8;
       });
 
       curY += activeBoxH + 8;
