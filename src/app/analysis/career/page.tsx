@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { 
   Briefcase, Sparkles, Target, Award, ShieldAlert, 
   ArrowRight, RefreshCw, Layers, Compass, CheckCircle2,
-  Zap, DollarSign, Flame, Lightbulb, Navigation, ChevronRight
+  Zap, DollarSign, Flame, Lightbulb, Navigation, Clock, Calendar
 } from 'lucide-react';
 import AnalysisBackButton from '@/components/ui/AnalysisBackButton';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
@@ -209,7 +209,7 @@ export default function CareerAnalysisPage() {
                     {result.personalInfo.fullName}
                   </h2>
                   <p className="text-[11px] sm:text-xs text-gray-400 mt-0.5 truncate">
-                    {result.personalInfo.birthDate} • {result.personalInfo.cityName}
+                    {result.personalInfo.birthDate} • {result.personalInfo.cityName} (Yaş: {result.careerTimeline?.currentAge || ''})
                   </p>
                 </div>
               </div>
@@ -277,7 +277,94 @@ export default function CareerAnalysisPage() {
               </p>
             </div>
 
-            {/* 2. KARİYER ODAK STRATEJİSİ (Tek Alanda Derinleşme mi, Çok Kanallı Polimat mı?) */}
+            {/* 2. KRİTİK KARİYER DÖNÜM YAŞLARI & KADERSEL ZAMAN ÇİZELGESİ */}
+            {result.careerTimeline && (
+              <div className="bg-black/60 border border-amber-500/30 p-5 sm:p-7 rounded-3xl relative overflow-hidden shadow-xl space-y-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                      <Clock size={22} />
+                    </div>
+                    <div>
+                      <span className="text-[10px] sm:text-xs uppercase tracking-widest text-amber-400 font-bold block">
+                        Kadersel Zamanlama & Kariyer Döngüleri
+                      </span>
+                      <h3 className="text-lg sm:text-xl font-bold text-white">
+                        Şu Anki Kadersel Evreniz ({result.careerTimeline.currentAge} Yaşındasınız)
+                      </h3>
+                    </div>
+                  </div>
+                  <span className="text-xs px-3 py-1 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/30 self-start sm:self-auto font-semibold">
+                    {result.careerTimeline.activeMilestone.ageRange}
+                  </span>
+                </div>
+
+                {/* Aktif Evre Parlayan Kutu */}
+                <div className="bg-gradient-to-br from-amber-500/15 via-black/50 to-black/80 border border-amber-500/40 p-4 sm:p-5 rounded-2xl space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-base sm:text-lg font-bold text-amber-400 flex items-center gap-2">
+                      <span>⚡ {result.careerTimeline.activeMilestone.title}</span>
+                    </h4>
+                    <span className="text-[11px] text-gray-400 italic">
+                      {result.careerTimeline.activeMilestone.planetCycle}
+                    </span>
+                  </div>
+                  <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
+                    {result.careerTimeline.activeMilestone.description}
+                  </p>
+                  <div className="bg-white/5 border border-white/10 p-3 rounded-xl text-xs text-amber-200 flex items-start gap-2">
+                    <Lightbulb size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                    <span><strong>Bu Evrenin Altın Kuralı:</strong> {result.careerTimeline.activeMilestone.actionGuidance}</span>
+                  </div>
+                </div>
+
+                {/* 5 Aşamalı Yaş Yol Haritası (Timeline) */}
+                <div className="space-y-2 pt-2">
+                  <span className="text-xs font-semibold text-gray-400 block mb-2">
+                    Hayat Boyu Kadersel Kariyer Yol Haritanız:
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2.5">
+                    {result.careerTimeline.milestones.map((m, mIdx) => {
+                      const isActive = m.status === 'active';
+                      const isCompleted = m.status === 'completed';
+
+                      return (
+                        <div
+                          key={mIdx}
+                          className={`p-3 rounded-2xl border transition-all text-xs flex flex-col justify-between gap-1.5 ${
+                            isActive
+                              ? 'bg-amber-500/15 border-amber-500/60 shadow-[0_0_15px_rgba(234,179,8,0.2)]'
+                              : isCompleted
+                              ? 'bg-white/5 border-green-500/30 text-gray-300'
+                              : 'bg-white/[0.02] border-white/5 text-gray-400'
+                          }`}
+                        >
+                          <div className="flex items-center justify-between gap-1">
+                            <span className="font-extrabold text-white text-[11px]">
+                              {m.ageRange}
+                            </span>
+                            {isActive ? (
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500 text-black">
+                                AKTİF
+                              </span>
+                            ) : isCompleted ? (
+                              <span className="text-[10px] text-green-400 font-bold">✓ Geçildi</span>
+                            ) : (
+                              <span className="text-[10px] text-gray-500">Gelecek</span>
+                            )}
+                          </div>
+                          <span className={`font-semibold leading-tight text-[11px] ${isActive ? 'text-amber-300' : 'text-gray-300'}`}>
+                            {m.title}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 3. KARİYER ODAK STRATEJİSİ (Tek Alanda Derinleşme mi, Çok Kanallı Polimat mı?) */}
             {result.focusStrategy && (
               <div className="bg-black/60 border border-blue-500/30 p-5 sm:p-7 rounded-3xl relative overflow-hidden shadow-xl">
                 <div className="flex items-center gap-3 mb-3">
@@ -286,7 +373,7 @@ export default function CareerAnalysisPage() {
                   </div>
                   <div>
                     <span className="text-[10px] sm:text-xs uppercase tracking-widest text-blue-400 font-bold block">
-                      Ezoterik Odak Analizi
+                      Kariyer Odak & Uzmanlaşma Stratejisi
                     </span>
                     <h3 className="text-lg sm:text-xl font-bold text-white">
                       {result.focusStrategy.type}
@@ -306,7 +393,7 @@ export default function CareerAnalysisPage() {
               </div>
             )}
 
-            {/* 3. TÜM SEKTÖRLER VE %100 ENERJİ SPEKTRUMU */}
+            {/* 4. TÜM SEKTÖRLER VE %100 ENERJİ SPEKTRUMU */}
             <div className="space-y-4">
               <div className="flex items-center gap-2.5 px-1">
                 <div className="p-2 rounded-xl bg-[#EAB308]/10 text-[#EAB308] border border-[#EAB308]/20">
@@ -409,7 +496,7 @@ export default function CareerAnalysisPage() {
                 ))}
               </div>
 
-              {/* Kalan 4 İkincil Sektör (Eksiksiz Listeleme) */}
+              {/* Kalan 4 İkincil Sektör */}
               {result.secondarySectors && result.secondarySectors.length > 0 && (
                 <div className="bg-black/50 border border-white/10 p-4 sm:p-6 rounded-3xl space-y-4">
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-white/5 pb-3">
@@ -456,7 +543,7 @@ export default function CareerAnalysisPage() {
               )}
             </div>
 
-            {/* 4. KADERSEL EVRİLME (DHARMA - KUZEY DÜĞÜMÜ ROTASI) */}
+            {/* 5. KADERSEL EVRİLME (DHARMA - KUZEY DÜĞÜMÜ ROTASI) */}
             {result.dharmaPath && (
               <div className="bg-gradient-to-br from-purple-500/10 via-black/60 to-black/80 border border-purple-500/30 p-5 sm:p-7 rounded-3xl relative overflow-hidden shadow-xl">
                 <div className="flex items-center gap-3 mb-4">
@@ -499,7 +586,7 @@ export default function CareerAnalysisPage() {
               </div>
             )}
 
-            {/* 5. PARA & SERVET ÇEKME MODELİ VE TÜKENMİŞLİK KALKANI */}
+            {/* 6. PARA & SERVET ÇEKME MODELİ VE TÜKENMİŞLİK KALKANI */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
               {/* Para Çekme Modeli */}
               {result.wealthMagnet && (
@@ -547,7 +634,7 @@ export default function CareerAnalysisPage() {
               )}
             </div>
 
-            {/* 6. SÜPER GÜÇ VE GÖLGE TUZAKLAR */}
+            {/* 7. SÜPER GÜÇ VE GÖLGE TUZAKLAR */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
               {/* Süper Güç */}
               <div className="bg-black/40 border border-green-500/30 p-5 sm:p-6 rounded-3xl relative overflow-hidden group hover:border-green-500/50 transition-colors">
@@ -576,7 +663,7 @@ export default function CareerAnalysisPage() {
               </div>
             </div>
 
-            {/* 7. 4 STRATEJİK EYLEM ADIMI */}
+            {/* 8. 4 STRATEJİK EYLEM ADIMI */}
             <div className="bg-black/60 border border-white/10 p-5 sm:p-8 rounded-3xl space-y-5">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 rounded-xl bg-[#EAB308]/10 text-[#EAB308] border border-[#EAB308]/20">

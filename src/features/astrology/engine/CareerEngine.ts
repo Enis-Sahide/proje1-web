@@ -60,6 +60,24 @@ export interface BurnoutShieldData {
   protectionFormula: string;
 }
 
+export interface CareerMilestone {
+  id: string;
+  ageRange: string;
+  minAge: number;
+  maxAge: number;
+  title: string;
+  planetCycle: string;
+  status: 'completed' | 'active' | 'upcoming';
+  description: string;
+  actionGuidance: string;
+}
+
+export interface CareerTimelineData {
+  currentAge: number;
+  activeMilestone: CareerMilestone;
+  milestones: CareerMilestone[];
+}
+
 export interface CareerAnalysisResult {
   personalInfo: {
     fullName: string;
@@ -78,6 +96,7 @@ export interface CareerAnalysisResult {
     percentage: number;
     explanation: string;
   };
+  careerTimeline: CareerTimelineData;
   focusStrategy: FocusStrategyData;
   dharmaPath: DharmaPathData;
   wealthMagnet: WealthMagnetData;
@@ -239,21 +258,20 @@ export class CareerEngine {
     const house6Sign = chart.houses[5] ? chart.houses[5].sign : 'Başak';
 
     // A) MERKÜR & MARS BİLİŞSEL VE MEKANİK ETKİLEŞİMİ (Kodlama & Algoritma Dehası)
-    // Ezoterik kural: Merkür (kod/dil) + Mars (mekanik/alet/eylem) = Doğal Yazılımcı / Hacker / Mühendis
     chart.aspects.forEach(asp => {
       const pair = `${asp.planet1}-${asp.planet2}`;
 
       if (pair.includes('Merkür') && pair.includes('Mars')) {
-        scores.technology += 36; // Bilişsel mekanik hız & kodlama
+        scores.technology += 36;
         scores.systems += 22;
         scores.leadership += 14;
       }
       if (pair.includes('Merkür') && pair.includes('Uranüs')) {
-        scores.technology += 34; // Dijital zeka, yapay zeka & derin teknoloji
+        scores.technology += 34;
         scores.systems += 16;
       }
       if (pair.includes('Merkür') && pair.includes('Satürn')) {
-        scores.systems += 30; // Derin veritabanı, mimari ve sabırlı kodlama
+        scores.systems += 30;
         scores.technology += 24;
       }
       if (pair.includes('Mars') && pair.includes('Uranüs')) {
@@ -278,7 +296,7 @@ export class CareerEngine {
       scores.systems += 14;
     }
     if ([mercury.house, mars.house, uranus.house, saturn.house].includes(3)) {
-      scores.technology += 24; // Çocukluktan beri bilgisayara ve koda çekilme
+      scores.technology += 24;
       scores.systems += 16;
     }
 
@@ -378,7 +396,6 @@ export class CareerEngine {
     }
 
     // G) NUMEROLOJİ (Yaşam Yolu, Doğum Günü Sayısı & İsim)
-    // Yaşam Yolu 7 (Analist, Kodlayıcı, Hacker) veya 4 (Sistem Mimarı)
     if (lifePathNum === 7) {
       scores.technology += 32;
       scores.systems += 22;
@@ -392,13 +409,11 @@ export class CareerEngine {
       scores.leadership += 20;
     }
 
-    // Doğum Günü Sayısı (4, 7, 13, 22, 25, 31 teknik zekadır)
     if ([4, 7, 13, 22, 25, 31].includes(birthDayNum)) {
       scores.technology += 20;
       scores.systems += 18;
     }
 
-    // İsim Kader Sayısı
     if (destinyNum === 7) scores.technology += 22;
     else if (destinyNum === 4) scores.systems += 24;
     else if (destinyNum === 8 || destinyNum === 22) scores.finance += 24;
@@ -518,25 +533,21 @@ export class CareerEngine {
       idealPercent = 89;
     }
 
-    // 8. YENİ EZOTERİK DERİNLİKLER:
-    // A) KARİYER ODAK STRATEJİSİ (Tek Alanda Derinleşme mi, Çok Kanallı Polimat mı?)
+    // 8. KRİTİK KARİYER DÖNÜM YAŞLARI (Kadersel Zaman Çizelgesi)
+    const careerTimeline = calculateCareerTimeline(birthDate);
+
+    // 9. DİĞER EZOTERİK DERİNLİKLER:
     const focusStrategy = calculateFocusStrategy(chart, saturn, hdType, mcSign);
-
-    // B) KADERSEL EVRİLME (DHARMA) - Kuzey Ay Düğümü Yolu
     const dharmaPath = calculateDharmaPath(northNode);
-
-    // C) PARA & SERVET ÇEKME MODELİ (Şans Noktası & 2. Ev)
     const wealthMagnet = calculateWealthMagnet(house2Sign, topSectors[0].id);
-
-    // D) TÜKENMİŞLİK KALKANI (Burnout Kalkanı)
     const burnoutShield = calculateBurnoutShield(hdType, topSectors[0].category);
 
-    // 9. SÜPER GÜÇ VE GÖLGE TUZAKLAR
+    // 10. SÜPER GÜÇ VE GÖLGE TUZAKLAR
     const dominantCategory = topSectors[0].category;
     const superPower = generateCleanMultiPlanetSuperPower(dominantCategory, mercury.sign, uranus.house, destinyNum);
     const shadowPitfalls = generateCleanMultiPlanetShadowPitfall(dominantCategory, saturn.sign);
 
-    // 10. 4 STRATEJİK EYLEM ADIMI
+    // 11. 4 STRATEJİK EYLEM ADIMI
     const actionableGuidance = generateActionableGuidance(dominantCategory, hdType, destinyNum, house2Sign);
 
     return {
@@ -557,6 +568,7 @@ export class CareerEngine {
         percentage: idealPercent,
         explanation: idealModelExp
       },
+      careerTimeline,
       focusStrategy,
       dharmaPath,
       wealthMagnet,
@@ -574,6 +586,87 @@ export class CareerEngine {
 }
 
 // YARDIMCI EZOTERİK MOTOR HESAPLAMALARI:
+
+function calculateCareerTimeline(birthDate: string): CareerTimelineData {
+  const currentAge = moment().diff(moment(birthDate), 'years');
+
+  const baseMilestones = [
+    {
+      id: 'discovery',
+      ageRange: '18 - 26 Yaş',
+      minAge: 18,
+      maxAge: 26,
+      title: 'Keşif, Deneme & Temel Yetenek İnşası',
+      planetCycle: 'Mars & Jüpiter Gençlik Döngüsü',
+      description: 'Piyasayı tanıma, çıraklık, farklı sektörleri deneyimleme ve temel teknik yetenekleri cebe koyma evresidir. Bu dönemde yapılan yön değişiklikleri ve arayışlar son derece doğaldır.',
+      actionGuidance: 'Mükemmeliyetçilik aramak yerine farklı projelerde pişin ve teknik araç setinizi genişletin.'
+    },
+    {
+      id: 'saturn_return',
+      ageRange: '28 - 31 Yaş',
+      minAge: 27,
+      maxAge: 32,
+      title: 'Profesyonel Rüştünü İspat & Temel Kurma',
+      planetCycle: '1. Satürn Döngüsü (Saturn Return)',
+      description: 'Çıraklığın resmi olarak bittiği, genç yetenek sıfatından çıkıp ilk büyük unvanı, kurumsal sorumluluğu veya ilk şirketi kurduğunuz kadersel olgunlaşma sınavıdır.',
+      actionGuidance: 'Dağınıklığı ve gevşekliği bırakın; uzmanlığınızı resmi unvana veya tescilli bir iş modeline dökün.'
+    },
+    {
+      id: 'nodal_shift',
+      ageRange: '36 - 39 Yaş',
+      minAge: 35,
+      maxAge: 39,
+      title: 'Kadersel Uyanış & Özgür Yolunu Çizme',
+      planetCycle: 'Kader Düğümleri Döngüsü (Nodal Shift)',
+      description: 'Başkaları için çalışmaktan veya başkalarının kurallarıyla yaşamaktan bıkıp kendi özgün vizyonunuzu ilan ettiğiniz, radikal sektör/iş modeli değişikliği çağıdır.',
+      actionGuidance: 'Konfor alanına saplanıp kalmayın; uzun süredir ertelediğiniz bağımsız projelerin liderliğini üstlenin.'
+    },
+    {
+      id: 'uranus_renaissance',
+      ageRange: '41 - 45 Yaş',
+      minAge: 40,
+      maxAge: 46,
+      title: 'Kariyer Rönesansı & Büyük İnovasyon Patlaması',
+      planetCycle: 'Uranüs Karşıtlığı (Uranus Opposition)',
+      description: 'İkinci bahar ve en yüksek özerklik çağıdır. Kimseye kendinizi ispatlama kaygınız kalmaz; sektöre çağ atlatacak inovatif projeler, derin teknoloji veya büyük fon/sistem kuruculuğu zirve yapar.',
+      actionGuidance: 'Geleneksel kalıpları yıkın; sektörünüzde devrim yaratacak bağımsız ve teknolojik ürünlerinize tam gaz verin.'
+    },
+    {
+      id: 'legacy_authority',
+      ageRange: '48 - 55+ Yaş',
+      minAge: 47,
+      maxAge: 99,
+      title: 'Akil Liderlik, Kurumsal Miras & Mentorluk',
+      planetCycle: 'Kiron & 2. Satürn Bilgelik Döngüsü',
+      description: 'Günlük operasyonel koşuşturmadan çekilip; yönetim kurullarında akil insanlık yapma, genç liderleri fonlama ve zamanın silemeyeceği kurumsal bir anıt bırakma evresidir.',
+      actionGuidance: 'Operasyonu yeni nesil yeteneklere devredin; stratejik vizyon ve kalıcı miras kuruculuğuna odaklanın.'
+    }
+  ];
+
+  // Aktif aşamayı tespit et
+  let activeIndex = baseMilestones.findIndex(m => currentAge >= m.minAge && currentAge <= m.maxAge);
+  if (activeIndex === -1) {
+    if (currentAge < 18) activeIndex = 0;
+    else activeIndex = baseMilestones.length - 1;
+  }
+
+  const milestones: CareerMilestone[] = baseMilestones.map((m, idx) => {
+    let status: 'completed' | 'active' | 'upcoming' = 'upcoming';
+    if (idx < activeIndex) status = 'completed';
+    else if (idx === activeIndex) status = 'active';
+
+    return {
+      ...m,
+      status
+    };
+  });
+
+  return {
+    currentAge,
+    activeMilestone: milestones[activeIndex],
+    milestones
+  };
+}
 
 function calculateFocusStrategy(chart: NatalChartData, saturn: AstroPoint, hdType: string, mcSign: string): FocusStrategyData {
   const isSaturnDominant = saturn.house === 10 || saturn.house === 1 || saturn.house === 6;
