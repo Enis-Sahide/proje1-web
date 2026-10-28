@@ -888,10 +888,15 @@ export const downloadCareerPDF = async (
     );
   }
 
-  // ================= SAYFA 7: STRATEJİK GÜÇLER, SERVET, KORUMA & EYLEM PLANI =================
-  doc.addPage();
-  drawHeader();
-  curY = 30;
+  // ================= STRATEJİK GÜÇLER, SERVET, KORUMA & EYLEM PLANI =================
+  if (curY > 175) {
+    doc.addPage();
+    drawHeader();
+    curY = 30;
+  } else {
+    ensureSpace(40);
+    curY += 8;
+  }
 
   // 1. Kadersel Evrilme (Dharma)
   if (data.dharmaPath) {
