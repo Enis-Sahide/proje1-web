@@ -208,14 +208,17 @@ export const downloadCareerPDF = async (
 
   curY += 50;
 
-  // 4 Core Badges
+  // 4 Core Badges (2x2 Grid for generous width and multi-line safety)
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(12);
   doc.setTextColor(...gold);
   doc.text('TEMEL MESLEKİ MİZAÇ ROZETLERİ', 15, curY);
   curY += 5;
 
-  const badgeW = 42;
+  const badgeW = 88;
+  const badgeH = 19;
+  const gapX = 4;
+  const gapY = 4;
   const badges = [
     { title: 'Liderlik Tarzı', val: data.summaryBadges.leadershipStyle },
     { title: 'Çalışma Dinamiği', val: data.summaryBadges.workDynamic },
@@ -224,20 +227,29 @@ export const downloadCareerPDF = async (
   ];
 
   badges.forEach((b, idx) => {
-    const bx = 15 + idx * 46;
+    const col = idx % 2;
+    const row = Math.floor(idx / 2);
+    const bx = 15 + col * (badgeW + gapX);
+    const by = curY + row * (badgeH + gapY);
+
     doc.setFillColor(243, 244, 246);
-    doc.roundedRect(bx, curY, badgeW, 20, 2, 2, 'F');
+    doc.roundedRect(bx, by, badgeW, badgeH, 2, 2, 'F');
+
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(...muted);
-    doc.text(b.title, bx + badgeW / 2, curY + 6, { align: 'center' });
+    doc.text(b.title.toUpperCase(), bx + 6, by + 6);
+
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(8);
+    doc.setFontSize(8.5);
     doc.setTextColor(...charcoal);
-    doc.text(doc.splitTextToSize(b.val, badgeW - 4)[0] || '', bx + badgeW / 2, curY + 14, { align: 'center' });
+    const valLines = doc.splitTextToSize(b.val, badgeW - 12);
+    valLines.slice(0, 2).forEach((vl: string, vlIdx: number) => {
+      doc.text(vl, bx + 6, by + 12 + vlIdx * 4.2);
+    });
   });
 
-  curY += 28;
+  curY += 2 * badgeH + gapY + 7;
 
   // İdeal Çalışma Modeli Açıklaması
   doc.setFont('LiberationSans', 'bold');
@@ -271,31 +283,49 @@ export const downloadCareerPDF = async (
   doc.text('SEKTÖREL POTANSİYEL & ENERJİ SPEKTRUMU (%100)', 15, curY);
   curY += 8;
 
-  // Top Sectors List
+  // Top Sectors List (Dynamic Height & Multi-line Wrapped Roles)
   data.topSectors.forEach((sec, idx) => {
-    ensureSpace(40);
+    const titleText = `${idx + 1}. ${sec.title} • Uyum: %${sec.fitScore}`;
+    const descLines = doc.splitTextToSize(sec.description, 168);
+    const roleText = `Öne Çıkan Roller: ${sec.recommendedRoles.join(', ')}`;
+    const roleLines = doc.splitTextToSize(roleText, 168);
+    
+    // Total card height with generous padding
+    const cardH = 14 + (descLines.length * 4.2) + (roleLines.length * 4.0);
+    ensureSpace(cardH + 6);
+
     doc.setFillColor(250, 250, 252);
     doc.setDrawColor(220, 225, 235);
     doc.setLineWidth(0.5);
-    doc.roundedRect(15, curY, 180, 36, 2, 2, 'FD');
+    doc.roundedRect(15, curY, 180, cardH, 2, 2, 'FD');
 
+    // Title
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(11);
+    doc.setFontSize(10.5);
     doc.setTextColor(...primaryDark);
-    doc.text(`${idx + 1}. ${sec.title} • Uyum: %${sec.fitScore}`, 20, curY + 8);
+    doc.text(titleText, 20, curY + 7);
 
+    // Description lines
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(...charcoal);
-    const descLines = doc.splitTextToSize(sec.description, 170);
-    doc.text(descLines.slice(0, 2), 20, curY + 15);
+    let lineY = curY + 13;
+    descLines.forEach((dl: string) => {
+      doc.text(dl, 20, lineY);
+      lineY += 4.2;
+    });
 
+    // Roles lines
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(8);
     doc.setTextColor(...gold);
-    doc.text(`Öne Çıkan Roller: ${sec.recommendedRoles.join(', ')}`, 20, curY + 29);
+    lineY += 1.5;
+    roleLines.forEach((rl: string) => {
+      doc.text(rl, 20, lineY);
+      lineY += 3.8;
+    });
 
-    curY += 41;
+    curY += cardH + 5;
   });
 
   curY += 5;
