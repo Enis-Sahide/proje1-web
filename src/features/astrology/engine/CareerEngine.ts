@@ -712,7 +712,7 @@ export class CareerEngine {
     const actionableGuidance = generateActionableGuidance(dominantCategory, hdType, destinyNum, house2Sign);
 
     // 15. KADİM VE EZOTERİK DERİN MESLEKİ MODÜLLER (6 YENİ BOYUT)
-    const musicalAffinity = calculateMusicalAffinity(chart, mercury, venus, neptune, mars, house2Sign);
+    const musicalAffinity = calculateMusicalAffinity(chart, ascSign, sun, moon, mercury, venus, neptune, mars, house2Sign, mcSign);
     const craftsmanshipMaterial = calculateCraftsmanshipMaterial(chart, mars, saturn, venus, sun, ascSign);
     const parsFortunaWealth = calculateParsFortunaWealth(chart);
     const partnershipDna = calculatePartnershipDna(chart, sun, mars, venus);
@@ -1683,78 +1683,224 @@ function calculateSecondaryProgressions(natalChart: NatalChartData, birthDate: s
 // ---------------------------------------------------------
 
 /**
- * 1. MÜZİKAL ENSTRÜMAN VE SES YATKINLIĞI
- * Element dağılımı, parmak/el koordinasyonu (Merkür), armoni (Venüs),
- * ruhani frekans/tını (Neptün), vokal ve boğaz çakrası (2. Ev) sentezi.
+ * 1. MÜZİKAL ENSTRÜMAN VE SES YATKINLIĞI (UZMAN ASTRO-ENSTRÜMAN MOTORU)
+ * Fiziksel icra anatomisi (Yükselen parmak/el kontrolü), ruhsal ritim ve nefes (Ay ve MC),
+ * zihinsel koordinasyon (Merkür), armoni ve tel rezonansı (Venüs & Balık/Boğa/Terazi),
+ * mistik derinlik (Neptün), vokal rezonansı (2. Ev).
  */
 function calculateMusicalAffinity(
   chart: NatalChartData,
+  ascSign: string,
+  sun: AstroPoint,
+  moon: AstroPoint,
   mercury: AstroPoint,
   venus: AstroPoint,
   neptune: AstroPoint,
   mars: AstroPoint,
-  house2Sign: string
+  house2Sign: string,
+  mcSign: string
 ): MusicalAffinityData {
-  // Element ağırlıklarını analiz et
-  let earth = 0, air = 0, water = 0, fire = 0;
-  chart.planets.forEach(p => {
-    if (['Koç', 'Aslan', 'Yay'].includes(p.sign)) fire += 2;
-    else if (['Boğa', 'Başak', 'Oğlak'].includes(p.sign)) earth += 2;
-    else if (['İkizler', 'Terazi', 'Kova'].includes(p.sign)) air += 2;
-    else if (['Yengeç', 'Akrep', 'Balık'].includes(p.sign)) water += 2;
-  });
+  // 6 Temel Müzikal Kulvar Puanlaması
+  const scores = {
+    strings: 0,   // Klasik/Akustik Gitar, Telli Armoni (Venüs, Balık stelyumu, Boğa/Terazi tel dokunuşu)
+    winds: 0,     // Yan Flüt, Klarnet, Saksafon, Ney (Ay/MC Terazi/İkizler/Kova nefes ve diyafram)
+    keys: 0,      // Piyano, Akustik Klavye, Tuşlular (Yükselen Başak/İkizler parmak koordinasyonu & Merkür)
+    bowed: 0,     // Keman, Çello, Kontrbas, Yaylı Ud (Su stelyumu, Neptün perdesiz derinlik)
+    rhythm: 0,    // Bateri, Perküsyon, Elektro Gitar (Mars, Ateş yükselen, yüksek nabız ve sahne itkisi)
+    meditative: 0 // Handpan, Kalimba, Ses Çanakları (Neptün/12. Ev 432Hz meditatif şifa)
+  };
 
-  // Venüs & Neptün & Merkür bonusları
-  if (['Boğa', 'Başak', 'Oğlak'].includes(venus.sign)) earth += 3;
-  if (['İkizler', 'Terazi', 'Kova'].includes(venus.sign)) air += 3;
-  if (['Yengeç', 'Akrep', 'Balık'].includes(venus.sign)) water += 3;
-  if (['Koç', 'Aslan', 'Yay'].includes(venus.sign)) fire += 3;
+  const instrumentReasons: Record<string, string[]> = {
+    strings: [],
+    winds: [],
+    keys: [],
+    bowed: [],
+    rhythm: [],
+    meditative: []
+  };
 
-  let primaryCategory = 'Tuşlu & Akustik Ahşap Rezonatörleri';
-  let primaryInstruments = ['Piyano & Akustik Piyano', 'Klasik / Akustik Gitar', 'Çello', 'Akustik Bas'];
-  let primaryElement = 'Toprak & Ahşap Frekansı (Titreşim ve Yapısal İntizam)';
-  let primaryEssence = 'Dokunsal hafıza, sağlam armoni, tuş hassasiyeti ve ritmik matematiksel denge. Ahşabın rezonansını vücudunuzda hissederek çalma liyakati.';
-
-  if (water >= earth && water >= air && water >= fire) {
-    primaryCategory = 'Perdesiz / Yaylı & Mikro-Ton Frekans Ailesi';
-    primaryInstruments = ['Keman & Viyola', 'Klasik Ud & Kanun', 'Çello & Kontrbas', 'Akustik Arp'];
-    primaryElement = 'Su & Akışkan Eter (Ruhani Derinlik & Hüzün)';
-    primaryEssence = 'Ses perdeleri arasındaki sonsuz duygusal geçişleri parmak uçlarıyla hissetme dehası. Kalbin hüznünü ve trans halini titreşimle aktarma.';
-  } else if (air >= earth && air >= water && air >= fire) {
-    primaryCategory = 'Nefesli Çalgılar & Elektronik Ses Tasarımı';
-    primaryInstruments = ['Saksafon & Yan Flüt', 'Klarnet & Ney', 'Synthesizer & Analog Modüler Sistemler', 'DAW Dijital Müzik Prodüksiyonu'];
-    primaryElement = 'Hava & Zihinsel Akım (Melodik Rüzgar & Modern Dalga)';
-    primaryEssence = 'Nefes kontrolü, melodik çeviklik ve ses dalgalarını zihinsel mimariyle şekillendirme. Akor geçişlerindeki entelektüel zarafet.';
-  } else if (fire >= earth && fire >= air && fire >= water) {
-    primaryCategory = 'Dinamik Ritim, Vurmalı Çalgılar & Sahne Telleri';
-    primaryInstruments = ['Bateri & Akustik Davul Seti', 'Perküsyon, Bendir & Asma Davul', 'Elektro Gitar & Solo Lead', 'Bas Gitar'];
-    primaryElement = 'Ateş & Nabız (Yüksek İtki, Vuruş & Sahne Alevi)';
-    primaryEssence = 'Nabız gibi atan poliritmik zeka, bedenle birleşen vuruş senkronu ve izleyiciyi harekete geçiren yüksek frekanslı sahne karizması.';
+  // A) TUŞLULAR & PİYANO (PARMAK & EL ANATOMİSİ, POLİFONİK ARMONİ):
+  if (ascSign === 'Başak') {
+    scores.keys += 48;
+    instrumentReasons.keys.push('Yükselen Başak el-parmak mikro-koordinasyonu ve bağımsız el ritmi (Piyano)');
+  } else if (ascSign === 'İkizler') {
+    scores.keys += 38;
+    instrumentReasons.keys.push('Yükselen İkizler parmak çevikliği ve hızlı nota geçişleri');
+  } else if (['Terazi', 'Boğa'].includes(ascSign)) {
+    scores.keys += 38;
+    instrumentReasons.keys.push(`Yükselen ${ascSign} polifonik akor kulağı, tuş hassasiyeti ve armonik piyano yetisi (Piyano)`);
+  } else if (['Oğlak'].includes(ascSign)) {
+    scores.keys += 26;
+    instrumentReasons.keys.push('Toprak yükselenin metronomik nota intizamı ve tuş ağırlığı');
   }
 
-  // İkincil Stil
-  let secCategory = 'Elektronik & Minimalist Ambiyans';
-  let secInstruments = ['Lo-Fi / Ambient Tuşluları', 'El Panı (Handpan / Hang Drum)', 'Akustik Kalimba'];
-  let secEssence = 'Zihni meditatif bir sükunete kavuşturan, tekrarlı ve büyüleyici tınılar.';
-
-  if (['Balık', 'Akrep', 'Yengeç'].includes(neptune.sign) || [8, 12].includes(neptune.house)) {
-    secCategory = 'Mistik & Meditatif Trans Çalgıları';
-    secInstruments = ['Ney & Dilsiz Kaval', 'Tibet Ses Çanakları & Gong', 'Hang Drum (Handpan)'];
-    secEssence = 'Bilinçaltını arındıran, şifa frekansları (432Hz/528Hz) yayan mistik titreşimler.';
-  } else if (['Kova', 'İkizler', 'Yay'].includes(mercury.sign)) {
-    secCategory = 'Hızlı Doğaçlama & Caz / Füzyon İcrası';
-    secInstruments = ['Solo Elektro Gitar', 'Caz Trompet & Trombon', 'Groove Bas'];
-    secEssence = 'Kurallara meydan okuyan, serbest çağrışımlı melodik doğaçlama gücü.';
+  if (['Başak', 'İkizler'].includes(mercury.sign)) {
+    scores.keys += 30;
+    instrumentReasons.keys.push(`Merkür ${mercury.sign} nörolojik parmak refleksleri`);
+  } else if (['Balık', 'Terazi'].includes(mercury.sign)) {
+    scores.keys += 25;
+    instrumentReasons.keys.push(`Merkür ${mercury.sign} tuşlardaki duygusal nüans ve nüfuz kabiliyeti`);
   }
+  if ([1, 3, 6, 10].includes(mercury.house)) {
+    scores.keys += 18;
+  }
+  if (['Boğa', 'Başak', 'Oğlak'].includes(moon.sign)) {
+    scores.keys += 16;
+  }
+
+  // B) TELLİ & AKUSTİK GİTAR (AKOR, ARMONİ & MELODİ):
+  const piscesCount = chart.planets.filter(p => p.sign === 'Balık').length;
+  if (['Balık', 'Terazi', 'Boğa'].includes(sun.sign)) {
+    scores.strings += 38;
+    instrumentReasons.strings.push(`${sun.sign} Güneşinin tellere dokunma arzusu ve melodik hassasiyeti (Gitar)`);
+  }
+  if (['Terazi', 'Balık', 'Boğa'].includes(moon.sign)) {
+    scores.strings += 36;
+    instrumentReasons.strings.push(`Ay ${moon.sign} armonik tel titreşimi ve akor duyarlılığı`);
+  }
+  if (['Balık', 'Boğa', 'Terazi'].includes(venus.sign)) {
+    scores.strings += 32;
+    instrumentReasons.strings.push(`Venüs ${venus.sign} estetik tını ve akor geçişleri`);
+  }
+  if (piscesCount >= 2) {
+    scores.strings += 28;
+    instrumentReasons.strings.push('Balık stelyumunun kalbi melodiye ve tellere dökme ihtiyacı');
+  }
+
+  // C) NEFESLİ ÇALGILAR & FLÜT (DİYAFRAM, NEFES & HAVA):
+  if (['Terazi', 'İkizler', 'Kova'].includes(moon.sign)) {
+    scores.winds += 46;
+    instrumentReasons.winds.push(`Ay ${moon.sign} nefes-diyafram akışı ve melodik hava zarafeti (Flüt)`);
+  }
+  if (['İkizler', 'Terazi', 'Kova'].includes(mcSign)) {
+    scores.winds += 36;
+    instrumentReasons.winds.push(`Tepe Noktası (MC) ${mcSign} nefesli çalgılarda ifade dehası`);
+  }
+  if (['İkizler', 'Terazi'].includes(ascSign)) {
+    scores.winds += 26;
+    instrumentReasons.winds.push(`Yükselen ${ascSign} solunum ritmi ve nefes kontrolü`);
+  }
+  const airCount = chart.planets.filter(p => ['İkizler', 'Terazi', 'Kova'].includes(p.sign)).length;
+  if (airCount >= 3) {
+    scores.winds += 22;
+  }
+
+  // D) YAYLILAR & MİKRO-TON FREKANSI (KEMAN, ÇELLO, UD):
+  if (piscesCount >= 3 || chart.planets.filter(p => ['Yengeç', 'Akrep', 'Balık'].includes(p.sign)).length >= 4) {
+    scores.bowed += 36;
+    instrumentReasons.bowed.push('Derin Su elementi yoğunluğunun perdesiz yaylılarda hüzün ve şifa bulması');
+  }
+  if ([8, 12].includes(neptune.house) || ['Balık', 'Akrep'].includes(neptune.sign)) {
+    scores.bowed += 25;
+    instrumentReasons.bowed.push('Neptünyen mikro-tonal perdeler ve trans frekansı');
+  }
+  if (['Yengeç', 'Akrep'].includes(moon.sign)) {
+    scores.bowed += 20;
+  }
+
+  // E) RİTİM, VURMALI & SAHNE TELLERİ (BATERİ, PERKÜSYON, ELEKTRO GİTAR):
+  if (['Koç', 'Aslan', 'Yay'].includes(ascSign)) {
+    scores.rhythm += 46;
+    instrumentReasons.rhythm.push(`Yükselen ${ascSign} yüksek sahne voltajı ve poliritmik beden nabzı (Bateri)`);
+  }
+  if ([1, 10].includes(mars.house) || ['Koç', 'Akrep', 'Oğlak'].includes(mars.sign)) {
+    scores.rhythm += 36;
+    instrumentReasons.rhythm.push(`Mars ${mars.sign} güçlü ataklar, vuruş kararlılığı ve sahne alevi`);
+  }
+  if (['Koç', 'Aslan', 'Yay'].includes(sun.sign) || ['Koç', 'Yay'].includes(moon.sign)) {
+    scores.rhythm += 26;
+  }
+
+  // F) MEDİTATİF ŞİFA (HANDPAN, KALİMBA):
+  if (neptune.house === 1 || neptune.house === 12 || ['Kova', 'Balık'].includes(moon.sign)) {
+    scores.meditative += 32;
+    instrumentReasons.meditative.push('Bilinçaltını arındıran 432Hz meditatif rezonans');
+  }
+
+  // Kulvarları Puanlarına Göre Sırala
+  const sortedTracks = (Object.keys(scores) as Array<keyof typeof scores>)
+    .sort((a, b) => scores[b] - scores[a]);
+
+  const topTrack = sortedTracks[0];
+  const secondTrack = sortedTracks[1];
+  const thirdTrack = sortedTracks[2];
+
+  // Enstrüman Eşleşmeleri
+  const trackInstruments: Record<string, { title: string; main: string; items: string[]; element: string }> = {
+    strings: {
+      title: 'Klasik & Akustik Telli Armoni',
+      main: 'Klasik / Akustik Gitar',
+      items: ['Klasik & Akustik Gitar', 'Akustik Bas', 'Klasik Ud & Arp'],
+      element: 'Venüs & Balık (Akor Rezonansı & Tel Dokunuşu)'
+    },
+    winds: {
+      title: 'Nefesli Çalgılar & Hava Frekansı',
+      main: 'Yan Flüt & Nefesliler',
+      items: ['Yan Flüt', 'Klarnet & Ney', 'Saksafon'],
+      element: 'Hava & Ay (Diyafram Kontrolü & Lirik Akış)'
+    },
+    keys: {
+      title: 'Piyano & Akustik Tuşlu Sistemler',
+      main: 'Piyano & Akustik Piyano',
+      items: ['Akustik Piyano & Kuyruklu Piyano', 'Vintage Elektrikli Piyano (Rhodes)', 'Synthesizer Klavye'],
+      element: 'Toprak & Merkür (Matematiksel Akor & Parmak İntizamı)'
+    },
+    bowed: {
+      title: 'Perdesiz Yaylılar & Mikro-Ton Ailesi',
+      main: 'Keman & Çello',
+      items: ['Keman & Viyola', 'Çello & Kontrbas', 'Klasik Yaylı Ud'],
+      element: 'Su & Eter (Mikro-Ton Geçişleri & Ruhani Derinlik)'
+    },
+    rhythm: {
+      title: 'Dinamik Ritim & Sahne Telleri',
+      main: 'Bateri & Elektro Gitar',
+      items: ['Akustik Bateri & Davul Seti', 'Solo Elektro Gitar', 'Perküsyon & Bendir'],
+      element: 'Ateş & Mars (Nabız, Yüksek İtki & Sahne Alevi)'
+    },
+    meditative: {
+      title: 'Mistik & Meditatif Frekans Çalgıları',
+      main: 'El Panı (Handpan / Hang Drum)',
+      items: ['Handpan (Hang Drum)', 'Akustik Kalimba', 'Tibet Ses Çanakları'],
+      element: 'Eter & 432Hz Şifa Rezonansı'
+    }
+  };
+
+  // Kişiye özel en yüksek 3 enstrümanı seç ve birincil vitrini oluştur
+  const primaryInstrumentsList = [
+    trackInstruments[topTrack].main,
+    trackInstruments[secondTrack].main,
+    trackInstruments[thirdTrack].main
+  ];
+
+  // Birleşik kategori başlığı ve element
+  const primaryCategory = `${trackInstruments[topTrack].title} & ${trackInstruments[secondTrack].title}`;
+  const primaryElement = `${trackInstruments[topTrack].element} + ${trackInstruments[secondTrack].element}`;
+
+  // Kişiye özel harita gerekçesi sentezi
+  const topReasons = [
+    ...(instrumentReasons[topTrack] || []),
+    ...(instrumentReasons[secondTrack] || []),
+    ...(instrumentReasons[thirdTrack] || [])
+  ].slice(0, 3);
+
+  const primaryEssence = topReasons.length > 0
+    ? `Doğum haritanızdaki ${topReasons.join('; ')} bileşimi; bu enstrümanları parmaklarınızda, nefesinizde ve ruhunuzda en zahmetsizce rezonansa sokan ana kaynaktır.`
+    : 'Doğum haritanızdaki el-parmak koordinasyonu, nefes dengesi ve melodi arayışı bu enstrümanlarda en yüksek uyumu sağlar.';
+
+  // İkincil Stil (2. ve 3. sıradaki enstrümanların alternatif setleri)
+  const secCategory = trackInstruments[secondTrack].title;
+  const secInstruments = trackInstruments[secondTrack].items;
+  const secEssence = `${trackInstruments[secondTrack].main} tınıları ve nefes/akor akışı, zihinsel korteks gerginliğinizi topraklayarak iş hayatındaki odaklanmanızı zirveye taşır.`;
 
   // Vokal / Şan Yatkınlığı (2. Ev ve Boğa / Terazi / Aslan tınısı)
   const isVocalFriendly = ['Boğa', 'Terazi', 'Aslan', 'İkizler', 'Balık', 'Yengeç'].includes(house2Sign) ||
     ['Boğa', 'Terazi', 'Aslan'].includes(venus.sign) ||
+    ['Boğa', 'Terazi'].includes(moon.sign) ||
     venus.house === 2 || venus.house === 1;
 
-  const vocalStyle = ['Boğa', 'Terazi'].includes(house2Sign) || ['Boğa', 'Terazi'].includes(venus.sign)
+  const vocalStyle = ['Boğa', 'Terazi'].includes(house2Sign) || ['Boğa', 'Terazi'].includes(venus.sign) || ['Terazi'].includes(moon.sign)
     ? 'Lirik, Buğulu & Sıcak Bariton / Mezzo Tınısı (Ruh Okşayan Kadife Rezonans)'
-    : ['Aslan', 'Koç'].includes(house2Sign)
+    : ['Aslan', 'Koç'].includes(house2Sign) || ['Aslan', 'Koç'].includes(ascSign)
       ? 'Dramatik, Güçlü & Yüksek Desibelli Sahne Vokali (Belting & Karizmatik Vurgu)'
       : 'Ruhani, İçsel & Şiirsel Melodik Vokal (Akustik & Tasavvufi Mırıldanma)';
 
@@ -1765,7 +1911,7 @@ function calculateMusicalAffinity(
   return {
     primaryInstrument: {
       category: primaryCategory,
-      instruments: primaryInstruments,
+      instruments: primaryInstrumentsList,
       element: primaryElement,
       essence: primaryEssence
     },
@@ -1780,7 +1926,7 @@ function calculateMusicalAffinity(
       chakraResonance
     },
     musicalExpressionAdvice:
-      'Günde en az 20 dakika enstrüman teline dokunmak veya ritim tutmak, doğum haritanızdaki zihinsel korteks gerginliğini sıfırlar ve iş hayatınızdaki karar alma berraklığınızı %40 artırır.'
+      `Günde en az 20 dakika ${primaryInstrumentsList[0]}, ${primaryInstrumentsList[1]} veya ${primaryInstrumentsList[2]} tellerine/tuşlarına/nefesine odaklanmak, doğum haritanızdaki zihinsel korteks gerginliğini sıfırlar ve iş hayatınızdaki karar alma berraklığınızı %40 artırır.`
   };
 }
 
