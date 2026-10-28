@@ -120,7 +120,48 @@ export async function POST(req: NextRequest) {
         planetaryInsights: result.planetaryInsights.map(p => ({
           ...p,
           explanation: MASKED
-        }))
+        })),
+
+        // Kadim ve Ezoterik 6 Yeni Modülün Maskelenmesi
+        musicalAffinity: result.musicalAffinity ? {
+          ...result.musicalAffinity,
+          musicalExpressionAdvice: MASKED,
+          vocalAptitude: {
+            ...result.musicalAffinity.vocalAptitude,
+            chakraResonance: MASKED
+          }
+        } : result.musicalAffinity,
+
+        craftsmanshipMaterial: result.craftsmanshipMaterial ? {
+          ...result.craftsmanshipMaterial,
+          healingPower: MASKED,
+          commercialApplications: [MASKED, MASKED]
+        } : result.craftsmanshipMaterial,
+
+        parsFortunaWealth: result.parsFortunaWealth ? {
+          ...result.parsFortunaWealth,
+          karmicBlessingArea: MASKED,
+          practicalMonetizationGuidance: MASKED
+        } : result.parsFortunaWealth,
+
+        partnershipDna: result.partnershipDna ? {
+          ...result.partnershipDna,
+          synergyCondition: MASKED,
+          toxicPartnershipRisk: MASKED,
+          idealTeamStructure: MASKED
+        } : result.partnershipDna,
+
+        planetaryProductivityHours: result.planetaryProductivityHours ? {
+          ...result.planetaryProductivityHours,
+          dailyRoutineAdvice: MASKED,
+          rechargeAndBurnoutPreventionWindow: MASKED
+        } : result.planetaryProductivityHours,
+
+        vocationalReputation: result.vocationalReputation ? {
+          ...result.vocationalReputation,
+          howIndustryRemembersYou: MASKED,
+          authorityTrigger: MASKED
+        } : result.vocationalReputation
       };
     } else {
       result = {

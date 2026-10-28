@@ -156,6 +156,66 @@ export interface ProgressedCareerData {
   };
 }
 
+export interface MusicalAffinityData {
+  primaryInstrument: {
+    category: string;
+    instruments: string[];
+    element: string;
+    essence: string;
+  };
+  secondaryStyle: {
+    category: string;
+    instruments: string[];
+    essence: string;
+  };
+  vocalAptitude: {
+    hasAptitude: boolean;
+    style: string;
+    chakraResonance: string;
+  };
+  musicalExpressionAdvice: string;
+}
+
+export interface CraftsmanshipMaterialData {
+  primaryMaterial: string;
+  craftsmanshipTitle: string;
+  toolsAndTechniques: string[];
+  healingPower: string;
+  commercialApplications: string[];
+}
+
+export interface ParsFortunaWealthData {
+  sign: string;
+  degreeInSign: number;
+  house: number;
+  wealthPortalTitle: string;
+  karmicBlessingArea: string;
+  practicalMonetizationGuidance: string;
+}
+
+export interface PartnershipDnaData {
+  archetype: 'Yalnız Kurt (Solo Kurucu & Özerk Usta)' | 'İkili İttifak (Stratejik Ortaklık İnsanı)' | 'Kolektif Orkestra Şefi (Ağ & Komünite Lideri)';
+  motto: string;
+  synergyCondition: string;
+  toxicPartnershipRisk: string;
+  idealTeamStructure: string;
+}
+
+export interface PlanetaryProductivityHoursData {
+  rulingPlanet: string;
+  peakMentalFocusWindow: string;
+  goldenNegotiationWindow: string;
+  rechargeAndBurnoutPreventionWindow: string;
+  dailyRoutineAdvice: string;
+}
+
+export interface VocationalReputationData {
+  reputationTitle: string;
+  publicImageArchetype: string;
+  howIndustryRemembersYou: string;
+  authorityTrigger: string;
+}
+
 export interface CareerAnalysisResult {
   personalInfo: {
     fullName: string;
@@ -186,6 +246,12 @@ export interface CareerAnalysisResult {
   secondarySectors: SecondarySectorMatch[];
   planetaryInsights: PlanetaryPlacementCareerInsight[];
   soulCareer: SoulCareerData;
+  musicalAffinity: MusicalAffinityData;
+  craftsmanshipMaterial: CraftsmanshipMaterialData;
+  parsFortunaWealth: ParsFortunaWealthData;
+  partnershipDna: PartnershipDnaData;
+  planetaryProductivityHours: PlanetaryProductivityHoursData;
+  vocationalReputation: VocationalReputationData;
   energyDistribution: {
     segments: CareerEnergySegment[];
   };
@@ -645,6 +711,14 @@ export class CareerEngine {
     // 14. 4 STRATEJİK EYLEM ADIMI
     const actionableGuidance = generateActionableGuidance(dominantCategory, hdType, destinyNum, house2Sign);
 
+    // 15. KADİM VE EZOTERİK DERİN MESLEKİ MODÜLLER (6 YENİ BOYUT)
+    const musicalAffinity = calculateMusicalAffinity(chart, mercury, venus, neptune, mars, house2Sign);
+    const craftsmanshipMaterial = calculateCraftsmanshipMaterial(chart, mars, saturn, venus, sun, ascSign);
+    const parsFortunaWealth = calculateParsFortunaWealth(chart);
+    const partnershipDna = calculatePartnershipDna(chart, sun, mars, venus);
+    const planetaryProductivityHours = calculatePlanetaryProductivityHours(chart, sun, mercury, mars);
+    const vocationalReputation = calculateVocationalReputation(chart, mcSign, saturn, sun);
+
     return {
       personalInfo: {
         fullName,
@@ -671,6 +745,12 @@ export class CareerEngine {
       secondarySectors,
       planetaryInsights,
       soulCareer,
+      musicalAffinity,
+      craftsmanshipMaterial,
+      parsFortunaWealth,
+      partnershipDna,
+      planetaryProductivityHours,
+      vocationalReputation,
       energyDistribution: {
         segments
       },
@@ -1597,3 +1677,437 @@ function calculateSecondaryProgressions(natalChart: NatalChartData, birthDate: s
     }
   };
 }
+
+// ---------------------------------------------------------
+// 15. KADİM VE EZOTERİK YENİ DERİN MESLEKİ MODÜLLER:
+// ---------------------------------------------------------
+
+/**
+ * 1. MÜZİKAL ENSTRÜMAN VE SES YATKINLIĞI
+ * Element dağılımı, parmak/el koordinasyonu (Merkür), armoni (Venüs),
+ * ruhani frekans/tını (Neptün), vokal ve boğaz çakrası (2. Ev) sentezi.
+ */
+function calculateMusicalAffinity(
+  chart: NatalChartData,
+  mercury: AstroPoint,
+  venus: AstroPoint,
+  neptune: AstroPoint,
+  mars: AstroPoint,
+  house2Sign: string
+): MusicalAffinityData {
+  // Element ağırlıklarını analiz et
+  let earth = 0, air = 0, water = 0, fire = 0;
+  chart.planets.forEach(p => {
+    if (['Koç', 'Aslan', 'Yay'].includes(p.sign)) fire += 2;
+    else if (['Boğa', 'Başak', 'Oğlak'].includes(p.sign)) earth += 2;
+    else if (['İkizler', 'Terazi', 'Kova'].includes(p.sign)) air += 2;
+    else if (['Yengeç', 'Akrep', 'Balık'].includes(p.sign)) water += 2;
+  });
+
+  // Venüs & Neptün & Merkür bonusları
+  if (['Boğa', 'Başak', 'Oğlak'].includes(venus.sign)) earth += 3;
+  if (['İkizler', 'Terazi', 'Kova'].includes(venus.sign)) air += 3;
+  if (['Yengeç', 'Akrep', 'Balık'].includes(venus.sign)) water += 3;
+  if (['Koç', 'Aslan', 'Yay'].includes(venus.sign)) fire += 3;
+
+  let primaryCategory = 'Tuşlu & Akustik Ahşap Rezonatörleri';
+  let primaryInstruments = ['Piyano & Akustik Piyano', 'Klasik / Akustik Gitar', 'Çello', 'Akustik Bas'];
+  let primaryElement = 'Toprak & Ahşap Frekansı (Titreşim ve Yapısal İntizam)';
+  let primaryEssence = 'Dokunsal hafıza, sağlam armoni, tuş hassasiyeti ve ritmik matematiksel denge. Ahşabın rezonansını vücudunuzda hissederek çalma liyakati.';
+
+  if (water >= earth && water >= air && water >= fire) {
+    primaryCategory = 'Perdesiz / Yaylı & Mikro-Ton Frekans Ailesi';
+    primaryInstruments = ['Keman & Viyola', 'Klasik Ud & Kanun', 'Çello & Kontrbas', 'Akustik Arp'];
+    primaryElement = 'Su & Akışkan Eter (Ruhani Derinlik & Hüzün)';
+    primaryEssence = 'Ses perdeleri arasındaki sonsuz duygusal geçişleri parmak uçlarıyla hissetme dehası. Kalbin hüznünü ve trans halini titreşimle aktarma.';
+  } else if (air >= earth && air >= water && air >= fire) {
+    primaryCategory = 'Nefesli Çalgılar & Elektronik Ses Tasarımı';
+    primaryInstruments = ['Saksafon & Yan Flüt', 'Klarnet & Ney', 'Synthesizer & Analog Modüler Sistemler', 'DAW Dijital Müzik Prodüksiyonu'];
+    primaryElement = 'Hava & Zihinsel Akım (Melodik Rüzgar & Modern Dalga)';
+    primaryEssence = 'Nefes kontrolü, melodik çeviklik ve ses dalgalarını zihinsel mimariyle şekillendirme. Akor geçişlerindeki entelektüel zarafet.';
+  } else if (fire >= earth && fire >= air && fire >= water) {
+    primaryCategory = 'Dinamik Ritim, Vurmalı Çalgılar & Sahne Telleri';
+    primaryInstruments = ['Bateri & Akustik Davul Seti', 'Perküsyon, Bendir & Asma Davul', 'Elektro Gitar & Solo Lead', 'Bas Gitar'];
+    primaryElement = 'Ateş & Nabız (Yüksek İtki, Vuruş & Sahne Alevi)';
+    primaryEssence = 'Nabız gibi atan poliritmik zeka, bedenle birleşen vuruş senkronu ve izleyiciyi harekete geçiren yüksek frekanslı sahne karizması.';
+  }
+
+  // İkincil Stil
+  let secCategory = 'Elektronik & Minimalist Ambiyans';
+  let secInstruments = ['Lo-Fi / Ambient Tuşluları', 'El Panı (Handpan / Hang Drum)', 'Akustik Kalimba'];
+  let secEssence = 'Zihni meditatif bir sükunete kavuşturan, tekrarlı ve büyüleyici tınılar.';
+
+  if (['Balık', 'Akrep', 'Yengeç'].includes(neptune.sign) || [8, 12].includes(neptune.house)) {
+    secCategory = 'Mistik & Meditatif Trans Çalgıları';
+    secInstruments = ['Ney & Dilsiz Kaval', 'Tibet Ses Çanakları & Gong', 'Hang Drum (Handpan)'];
+    secEssence = 'Bilinçaltını arındıran, şifa frekansları (432Hz/528Hz) yayan mistik titreşimler.';
+  } else if (['Kova', 'İkizler', 'Yay'].includes(mercury.sign)) {
+    secCategory = 'Hızlı Doğaçlama & Caz / Füzyon İcrası';
+    secInstruments = ['Solo Elektro Gitar', 'Caz Trompet & Trombon', 'Groove Bas'];
+    secEssence = 'Kurallara meydan okuyan, serbest çağrışımlı melodik doğaçlama gücü.';
+  }
+
+  // Vokal / Şan Yatkınlığı (2. Ev ve Boğa / Terazi / Aslan tınısı)
+  const isVocalFriendly = ['Boğa', 'Terazi', 'Aslan', 'İkizler', 'Balık', 'Yengeç'].includes(house2Sign) ||
+    ['Boğa', 'Terazi', 'Aslan'].includes(venus.sign) ||
+    venus.house === 2 || venus.house === 1;
+
+  const vocalStyle = ['Boğa', 'Terazi'].includes(house2Sign) || ['Boğa', 'Terazi'].includes(venus.sign)
+    ? 'Lirik, Buğulu & Sıcak Bariton / Mezzo Tınısı (Ruh Okşayan Kadife Rezonans)'
+    : ['Aslan', 'Koç'].includes(house2Sign)
+      ? 'Dramatik, Güçlü & Yüksek Desibelli Sahne Vokali (Belting & Karizmatik Vurgu)'
+      : 'Ruhani, İçsel & Şiirsel Melodik Vokal (Akustik & Tasavvufi Mırıldanma)';
+
+  const chakraResonance = isVocalFriendly
+    ? 'Vishuddha (5. Boğaz Çakrası) Rezonansı Açık: Ses telleriniz sadece konuşma değil, kelimeleri ve melodileri ruha şifa olarak aktarma frekansına sahip.'
+    : 'Muladhara & Anahata Dengeleyici: Vokaliniz doğrudan kalp merkezli; teknik tizlerden ziyade samimi ve derin tınılarla rezonans yaratır.';
+
+  return {
+    primaryInstrument: {
+      category: primaryCategory,
+      instruments: primaryInstruments,
+      element: primaryElement,
+      essence: primaryEssence
+    },
+    secondaryStyle: {
+      category: secCategory,
+      instruments: secInstruments,
+      essence: secEssence
+    },
+    vocalAptitude: {
+      hasAptitude: isVocalFriendly,
+      style: vocalStyle,
+      chakraResonance
+    },
+    musicalExpressionAdvice:
+      'Günde en az 20 dakika enstrüman teline dokunmak veya ritim tutmak, doğum haritanızdaki zihinsel korteks gerginliğini sıfırlar ve iş hayatınızdaki karar alma berraklığınızı %40 artırır.'
+  };
+}
+
+/**
+ * 2. EL BECERİSİ & ZANAAT MALZEMESİ ANATOMİSİ
+ * Parmakların ve zihnin hangi hammaddeyle temas ettiğinde ustalaştığı ve şifa bulduğu.
+ */
+function calculateCraftsmanshipMaterial(
+  chart: NatalChartData,
+  mars: AstroPoint,
+  saturn: AstroPoint,
+  venus: AstroPoint,
+  sun: AstroPoint,
+  ascSign: string
+): CraftsmanshipMaterialData {
+  let material = 'Masif Ahşap, Marangozluk & Organik Lifler';
+  let title = 'Ahşap & Organik Doku Ustası (Köklenme ve Biçimlendirme)';
+  let tools = ['Iskarpela & Rende', 'Doğal Ahşap Yağları & Mumlar', 'Ahşap Torna Tezgahı', 'Japon Çekme Testeresi'];
+  let healing = 'Ağacın damarlarıyla temas etmek, aşırı zihinsel yorgunluğu ve kaygıyı toprağa aktararak sinir sisteminizi doğrudan sakinleştirir.';
+  let commercial = ['Özel Tasarım Masif Mobilya & Masalar', 'Akustik Ahşap Hoparlör & Sanat Objeleri', 'Geleneksel Kündekari & Ahşap Oymacılık Atölyesi'];
+
+  // Mars Koç/Akrep veya 1. / 10. Evde ise -> Demir / Çelik / Metal
+  if (['Koç', 'Akrep', 'Oğlak'].includes(mars.sign) || [1, 10, 8].includes(mars.house)) {
+    material = 'Dövme Çelik, Demir, Bakır & Metalurji Zanaatı';
+    title = 'Ateş & Metal Simyacısı (Sertliği İradeyle Yoğurma)';
+    tools = ['Örs & Çekiç', 'Gazlı Ocak & Tavlama Fırını', 'TIG / Gazaltı Kaynak Makinesi', 'Metal Polisaj & Asit Gravür'];
+    healing = 'Metali dövmek ve ateşi kontrol etmek, içinizdeki bastırılmış öfke ve stres enerjisini somut bir sanat eserine ve kuvvete dönüştürür.';
+    commercial = ['Koleksiyonluk Özel El Yapımı Şef Bıçakları', 'Özel Ferforje & Metal Mimari Detaylar', 'Endüstriyel Heykel & Metal Tasarım'];
+  }
+  // Venüs Boğa/Terazi veya Terazi/Boğa Yükselen -> Deri, Tekstil & Kumaş
+  else if (['Boğa', 'Terazi'].includes(venus.sign) || ['Boğa', 'Terazi'].includes(ascSign)) {
+    material = 'Doğal Deri, Saf İpek, Yün & Terzilik Kumaşları';
+    title = 'Doku, Deri & Moda Zanaatkarı (Zarafet ve Mukavemet)';
+    tools = ['Deri Delme Zımbaları & Mumlu İp', 'Geleneksel Saraç İğneleri', 'Döner Bıçak & Kalıp Masası', 'Bitkisel Tabaklama Yağları'];
+    healing = 'Deriye dikiş atmak ve kumaşın dokusunu parmaklarla hissetmek, zihni derin bir transa ve estetik sükunete sokar.';
+    commercial = ['Lüks El Yapımı Deri Çanta & Cüzdan Atölyesi', 'Kişiye Özel Terzilik & Kumaş Tasarımı', 'Deri Döşeme & Özel Aksesuar Üretimi'];
+  }
+  // Su burçları / 4. Ev vurgusu -> Kil, Seramik & Cam
+  else if (['Yengeç', 'Balık', 'Akrep'].includes(sun.sign) || [4, 12].includes(sun.house)) {
+    material = 'Doğal Kil, Seramik, Çamur & Cam Füzyon';
+    title = 'Toprak & Su Şekillendiricisi (Akışkan Form Ustalığı)';
+    tools = ['Çömlekçi Çarkı', 'Kil Şekillendirme Ebeşuarları', 'Yüksek Isı Sır Fırını', 'Cam Kesme & Füzyon Pürmüzü'];
+    healing = 'Balçığa ve suya dokunmak, bilinçdışındaki duygusal düğümleri çözer ve sezgisel yaratıcılığı serbest bırakır.';
+    commercial = ['Artizan Seramik Kahve & Sofra Takımları', 'Mimari Seramik Karo & Duvar Panoları', 'Özel Tasarım Cam Heykel & Aydınlatma'];
+  }
+  // Merkür Başak/İkizler/Kova -> Mikro-Mekanik & Kuyumculuk
+  else if (['Başak', 'İkizler', 'Kova'].includes(chart.planets.find(p => p.name === 'Merkür')?.sign || '')) {
+    material = 'Değerli Madenler (Gümüş/Altın), Değerli Taşlar & Mikro-Mekanik';
+    title = 'Hassas Mikro-Mekanik & Kuyumculuk Ustası (Milimetrik Deha)';
+    tools = ['Kuyumcu Kaynak Şalümosu', 'Büyüteçli Mikroskop & Kumpas', 'Hassas Saatçi Tornavidaları', 'Kıl Testere & Mıhlama Kalemleri'];
+    healing = 'Göz ve elin mikron seviyesindeki mutlak uyumu, dağınık düşünceleri tek bir lazer odağında toplar.';
+    commercial = ['Kişiye Özel Tasarım Gümüş & Altın Takı Atölyesi', 'Mekanik Saat Restorasyonu & Bakımı', 'Antika & Hassas Mekanizma Tamirciliği'];
+  }
+
+  return {
+    primaryMaterial: material,
+    craftsmanshipTitle: title,
+    toolsAndTechniques: tools,
+    healingPower: healing,
+    commercialApplications: commercial
+  };
+}
+
+/**
+ * 3. KADERSEL ŞANS NOKTASI & RIZIK KAPISI (PARS FORTUNA / LOT OF FORTUNE)
+ * Haritada zahmetsiz rızkın aktığı kadersel mesleki kapı.
+ */
+function calculateParsFortunaWealth(chart: NatalChartData): ParsFortunaWealthData {
+  const pof = chart.planets.find(p => p.name.includes('Şans') || p.name.includes('POF')) || {
+    name: 'Şans Noktası (POF)',
+    sign: chart.ascendant?.sign || 'Koç',
+    degreeInSign: 15,
+    house: 2
+  };
+
+  const houseThemes: Record<number, { title: string; blessing: string; guidance: string }> = {
+    1: {
+      title: 'Bireysel Marka, Beden & Bağımsız Girişim Rızkı',
+      blessing: 'Başkalarının emri altında değil; kendi adınızı, yüzünüzü ve şahsi markanızı ortaya koyduğunuzda kadersel bereket kapıları ardına kadar açılır.',
+      guidance: 'Kendi firmanızı veya şahıs markanızı tescilleyin. Kendi tarzınızla liderlik ettiğiniz her iş doğrudan servet üretir.'
+    },
+    2: {
+      title: 'Kendi Ürettiğin Somut Değer & Maddi Mülk Rızkı',
+      blessing: 'En klasik ve güçlü zenginlik konumu. Elinizin emeği, nakit akışı kontrolü ve gayrimenkul/varlık biriktirme konusunda ilahi bir rızık akışına sahipsiniz.',
+      guidance: 'Ürettiğiniz ürün veya hizmetin fiyatını hak ettiği seviyede tutun; asla bedelsiz veya ucuz hizmet vermeyin. Toprak ve güvenli varlıklara yatırım yapın.'
+    },
+    3: {
+      title: 'Yerel Ticaret, Dijital Bilgi, Yazarlık & İletişim Ağı Rızkı',
+      blessing: 'Diliniz, kaleminiz, yerel ticaret kabiliyetiniz ve networkünüz sizin en büyük darphanenizdir. Al-sat, komisyon, dijital içerik ve aracılıkla rızık gelir.',
+      guidance: 'İletişim ağınızı diri tutun. Sosyal medya bültenleri, e-ticaret, yerel acentecilik veya eğitim içerikleriyle çoklu gelir akışları kurun.'
+    },
+    4: {
+      title: 'Toprak, Gayrimenkul, Aile İşi & Atölye Rızkı',
+      blessing: 'Köklerden, topraktan, gayrimenkul alım-satımından, mimariden ve kendi evinizde/atölyenizde kurduğunuz huzurlu üretimden bereket fışkırır.',
+      guidance: 'Kira geliri getiren mülkler edinin. Aile mirasını veya geleneksel zanaatları modern dokunuşla ticarileştirin.'
+    },
+    5: {
+      title: 'Yaratıcı Eserler, Sahne, Oyun & Spekülatif Kazanç Rızkı',
+      blessing: 'Zevk aldığınız, içinizdeki çocuğu coşturan, sahneye taşıdığınız sanat, eğlence veya lüks tüketim projelerinden zahmetsiz para kazanırsınız.',
+      guidance: 'Hobilerinizi asla kenara atmayın; onları premium birer markaya dönüştürün. Sanat, oyun veya yaratıcı tasarım üzerinden gelir yaratın.'
+    },
+    6: {
+      title: 'Zanaat Ustalığı, Sağlık, Evcil Hayvanlar & Günlük Hizmet Rızkı',
+      blessing: 'Göz nuru dökülen titiz işçilik, teknik problem çözücülük, sağlık sektörü, diyet/şifa veya evcil hayvan bakımında benzersiz bir müşteri sadakatiyle rızkınız büyür.',
+      guidance: 'İşinizi kusursuz bir operasyonel standartla yapın. Müşterilerinizin hayatındaki karmaşayı çözen sistemler kurarak sürekli gelir elde edin.'
+    },
+    7: {
+      title: 'Stratejik İttifaklar, Danışmanlık & Sözleşme Rızkı',
+      blessing: 'Yalnızken değil; doğru ortakla birleştiğinizde, evlilik yoluyla veya kurduğunuz yüksek bütçeli ikili danışmanlık kontratlarıyla servetiniz katlanır.',
+      guidance: 'Tek başınıza tüm yükü sırtlanmayın; operasyon veya satış tarafını güçlü bir ortağa devredip kâr paylaşımı anlaşmaları yapın.'
+    },
+    8: {
+      title: 'Başkalarının Sermayesi, Fonlar, Yatırım & Kriz Çözme Rızkı',
+      blessing: 'Büyük paraları, şirket birleşmelerini, fonları, kredileri ve krizdeki işletmeleri rehabilite etme kabiliyetiniz sayesinde büyük komisyon ve hisseler kazanırsınız.',
+      guidance: 'Yatırım fonları, ortak sermaye havuzları ve risk sermayesi yönetimi üzerine uzmanlaşın. Krizleri ucuza kapatıp değere dönüştürün.'
+    },
+    9: {
+      title: 'Uluslararası Ticaret, Dış Pazarlar, Yabancı Para & Akademi Rızkı',
+      blessing: 'Doğduğunuz şehirde değil; sınırların ötesinde, yabancı döviz cinsinden, dış ticaret, turizm, yayıncılık veya küresel eğitimle gelen büyük servet kapısıdır.',
+      guidance: 'İşinizi mutlaka küresel pazara açın. İhracat yapın, yabancı dilde danışmanlık verin veya yurt dışı bağlantılı projeleri kovalayın.'
+    },
+    10: {
+      title: 'Kamu Otoritesi, Kurumsal İtibar & Sektörel Liderlik Rızkı',
+      blessing: 'En yüksek görünürlük derecesi. Devlet ihaleleri, üst düzey kurumsal yöneticilik, tescilli lisanslar ve sektörün en tepesindeki unvanınızla gelen bereket.',
+      guidance: 'Sektörünüzde lisanslı, resmi ve en saygın isim olun. Kurumsal ihaleler ve kamu/birlik projelerine teklif vererek en üst segmentle çalışın.'
+    },
+    11: {
+      title: 'Büyük Topluluklar, Platformlar, Dernekler & Gelecek Teknolojisi Rızkı',
+      blessing: 'Bireylerden değil; yüzbinlerce kişilik komünitelerden, kooperatiflerden, kitlesel fonlamadan ve SaaS/dijital platform aboneliklerinden gelen pasif servet.',
+      guidance: 'Geniş bir kitleyi veya derneği arkanıza alın. Üyelik bazlı platformlar, ekosistemler veya sektörel birlikler kurarak ölçeklenin.'
+    },
+    12: {
+      title: 'Gizli Danışmanlık, Arka Plan Stratejisi, Hastane & Spiritüel Rızık',
+      blessing: 'Vitrin önünde değil; kulis arkasında, gizli danışmanlıkta, laboratuvar/hastane veya kapalı fonlarda fısıldayan stratejist olarak kazanılan kadersel rızık.',
+      guidance: 'Görünür olmak için debelenmeyin; perde arkasında güçlü aktörlere akıl hocalığı yapın veya kapalı devre VIP hizmetler sunun.'
+    }
+  };
+
+  const houseInfo = houseThemes[pof.house] || houseThemes[2];
+
+  return {
+    sign: pof.sign,
+    degreeInSign: pof.degreeInSign,
+    house: pof.house,
+    wealthPortalTitle: `${pof.sign} Burcunda ${pof.house}. Ev Şans Noktası: ${houseInfo.title}`,
+    karmicBlessingArea: houseInfo.blessing,
+    practicalMonetizationGuidance: houseInfo.guidance
+  };
+}
+
+/**
+ * 4. ORTAKLIK & ÇALIŞMA DNA'SI
+ * 1. Ev (Solo Bağımsızlık) vs 7. Ev (İkili İttifak) vs 11. Ev (Kolektif Ağ) analizi.
+ */
+function calculatePartnershipDna(
+  chart: NatalChartData,
+  sun: AstroPoint,
+  mars: AstroPoint,
+  venus: AstroPoint
+): PartnershipDnaData {
+  let soloScore = 0;
+  let partnershipScore = 0;
+  let collectiveScore = 0;
+
+  // Gezegen evleri analizi
+  chart.planets.forEach(p => {
+    if ([1, 10].includes(p.house)) soloScore += 3;
+    if ([7, 8].includes(p.house)) partnershipScore += 3;
+    if ([11, 3, 9].includes(p.house)) collectiveScore += 3;
+  });
+
+  if (['Koç', 'Aslan', 'Oğlak'].includes(sun.sign)) soloScore += 4;
+  if (['Terazi', 'Boğa', 'İkizler'].includes(sun.sign)) partnershipScore += 4;
+  if (['Kova', 'Yay', 'Balık'].includes(sun.sign)) collectiveScore += 4;
+
+  if (soloScore >= partnershipScore && soloScore >= collectiveScore) {
+    return {
+      archetype: 'Yalnız Kurt (Solo Kurucu & Özerk Usta)',
+      motto: 'Hızlı karar al, bürokrasiyi sıfırla, mutlak sorumluluk üstlen.',
+      synergyCondition: 'Sizin için ortaklık, hızınızı kesen bir onay mekanizmasıdır. Ortak yerine özerk taşeronlar veya doğrudan size bağlı uzmanlarla çalışmalısınız.',
+      toxicPartnershipRisk: 'Eşit hisseli (%50-%50) ortaklıklarda yetki çatışması yaşanır; karar veremeyen pasif ortaklar sizin enerjinizi tüketir.',
+      idealTeamStructure: 'Tek kurucu (CEO) + dışarıdan hizmet alınan uzman serbest çalışanlar (freelancer ağı).'
+    };
+  } else if (partnershipScore >= soloScore && partnershipScore >= collectiveScore) {
+    return {
+      archetype: 'İkili İttifak (Stratejik Ortaklık İnsanı)',
+      motto: '1 + 1 = 3 Sinerjisi; Vizyon ve Operasyonun Kusursuz İkiliği.',
+      synergyCondition: 'Tek başınıza kaldığınızda vizyonunuz yarım kalır; yanınızda güvenilir, sözleşmeyle bağlanmış ve yetki alanları net ayrılmış bir tamamlayıcı ortak olmalıdır.',
+      toxicPartnershipRisk: 'Sınırları net çizilmemiş, yazılı protokolsüz ve duygusal temele dayalı ahbap-çavuş ortaklıkları en büyük iflas riskinizdir.',
+      idealTeamStructure: 'İki kurucu ortak (Biri Ürün/Operasyon, Diğeri Satış/Vizyon) + çekirdek sadık operasyon kadrosu.'
+    };
+  } else {
+    return {
+      archetype: 'Kolektif Orkestra Şefi (Ağ & Komünite Lideri)',
+      motto: 'Birlikten kuvvet doğar; dağıtık güç, kooperatif ruhu ve ekosistem liderliği.',
+      synergyCondition: 'Hiyerarşik katı şirketler yerine dernekler, birlikler, kooperatifler veya açık kaynaklı ağlar kurarak kitleleri bir vizyon etrafında kenetlersiniz.',
+      toxicPartnershipRisk: 'Aşırı merkeziyetçi ve dikte eden otoriter yapılar sizin vizyonunuzu boğar; çok sesliliği yönetememek kaosa yol açabilir.',
+      idealTeamStructure: 'Yatay hiyerarşi, komite bazlı yönetim ve paydaşların söz sahibi olduğu modern kooperatif / platform mimarisi.'
+    };
+  }
+}
+
+/**
+ * 5. GÜNÜN EN VERİMLİ BİYORİTM & İMZA SAATLERİ
+ * Haritanın gündüz/gece dengesi, Merkür ve Mars saatlerine göre odak, imza ve şarj pencereleri.
+ */
+function calculatePlanetaryProductivityHours(
+  chart: NatalChartData,
+  sun: AstroPoint,
+  mercury: AstroPoint,
+  mars: AstroPoint
+): PlanetaryProductivityHoursData {
+  const isDayChart = (sun.house >= 7 && sun.house <= 12);
+  const rulingPlanet = isDayChart ? 'Güneş & Merkür (Gündüz Zihni)' : 'Ay & Mars (Gece Odaklı Derin Strateji)';
+
+  let mentalWindow = '08:30 - 11:45 (Sabah Zihinsel Berraklık Zirvesi)';
+  let negotiationWindow = '13:30 - 15:45 (Merkür & Jüpiter Müzakere ve Sözleşme Penceresi)';
+  let rechargeWindow = '18:00 - 20:00 (Venüs & Ay Topraklanma ve Zihinsel Detoks)';
+
+  if (!isDayChart) {
+    mentalWindow = '15:30 - 18:30 ve 21:30 - 00:30 (Sessizlikte Gelen Derin Analiz ve Kodlama/Üretim)';
+    negotiationWindow = '11:00 - 13:30 (Öğle Güneşi Görünürlük ve Resmi Görüşmeler)';
+    rechargeWindow = '18:30 - 20:30 (Fiziksel Spor, Yürüyüş ve Zihni Kapatma)';
+  }
+
+  return {
+    rulingPlanet,
+    peakMentalFocusWindow: mentalWindow,
+    goldenNegotiationWindow: negotiationWindow,
+    rechargeAndBurnoutPreventionWindow: rechargeWindow,
+    dailyRoutineAdvice:
+      'Kritik sözleşmeleri ve finansal imzaları asla yorgun olduğunuz akşam saatlerine bırakmayın; altın müzakere pencerenizde tamamlayın.'
+  };
+}
+
+/**
+ * 6. TOPLUMSAL İTİBAR & SEKTÖREL ŞÖHRET İMZASI (VOCATIONAL REPUTATION)
+ * Tepe Noktası (MC) burcuna göre iş dünyasında ve kamuoyu nezdinde bırakılan silinmez iz.
+ */
+function calculateVocationalReputation(
+  chart: NatalChartData,
+  mcSign: string,
+  saturn: AstroPoint,
+  sun: AstroPoint
+): VocationalReputationData {
+  const mcThemes: Record<string, { title: string; archetype: string; memory: string; trigger: string }> = {
+    'Koç': {
+      title: 'Yolu Açan Öncü & Cesur Reformcu',
+      archetype: 'İlk Adımı Atan Korkusuz Savaşçı',
+      memory: 'Sektörün tıkandığı kriz anlarında kimsenin cesaret edemediği radikal kararları alıp piyasayı açan öncü olarak hatırlanır.',
+      trigger: 'Hızlı inisiyatif alma, rekabetten korkmama ve bürokratik engelleri ezip geçme kudreti.'
+    },
+    'Boğa': {
+      title: 'Yıkılmaz Güven Abidesi & Kalıcı Değer Mimarı',
+      archetype: 'Sağlam Temeller Kuran Usta',
+      memory: 'Asla batmayan, sözünün eri, piyasa fırtınalarında bile müşterisine ve işine sadık kalan en güvenilir kale olarak anılır.',
+      trigger: 'Maddi güvence sağlama, sabırlı büyüme ve ürün/hizmet kalitesinde tavizsiz istikrar.'
+    },
+    'İkizler': {
+      title: 'Piyasanın Bilgi Mimarı & Hızlı Ağ Kurucu',
+      archetype: 'Entelektüel Arabulucu & İletişim Dehası',
+      memory: 'Hangi kapının nasıl açılacağını bilen, bilgiyi ışık hızında pazarlayan ve sektörü birbirine bağlayan parlak zeka.',
+      trigger: 'Hızlı adaptasyon, keskin hitabet ve karmaşık sektör verilerini herkesin anlayacağı dile çevirme ustalığı.'
+    },
+    'Yengeç': {
+      title: 'Sektörün Koruyucu Hamisi & Duygusal Vizyoner',
+      archetype: 'Güvenli Liman İnşa Eden Hami Lider',
+      memory: 'Çalışanlarını ve müşterilerini bir aile gibi koruyan, insan odaklı ve samimi iş kültürüyle sevgiyle anılan lider.',
+      trigger: 'Yüksek empati, kurumsal aidiyet hissi yaratma ve kriz anlarında sığınılan bilge liman olma.'
+    },
+    'Aslan': {
+      title: 'Vitrin Lideri & İlham Veren Karizmatik Marka',
+      archetype: 'Işıltılı Hükümdar & Cömert Vizyoner',
+      memory: 'İsmi duyulduğunda saygı uyandıran, girdiği her sektöre lüks, vizyon ve yüksek standart getiren efsanevi yüz.',
+      trigger: 'Doğal sahne aurası, yüksek özgüven ve personeline cömertçe ilham vererek onları yüceltme.'
+    },
+    'Başak': {
+      title: 'Kusursuz İntizam & Çözüm Mühendisi',
+      archetype: 'Metodik Usta & Sistem Denetçisi',
+      memory: 'En ince kusuru bile gözden kaçırmayan, saat gibi işleyen mekanizmalar kuran ve israfı sıfırlayan mükemmeliyetçi.',
+      trigger: 'Tavizsiz kalite kontrolü, analitik problem çözme ve operasyonel verimliliği zirveye çıkarma.'
+    },
+    'Terazi': {
+      title: 'Müzakere Dehası & Estetik Diplomat',
+      archetype: 'Denge Kuran Hakem & Zarafet Temsilcisi',
+      memory: 'En zorlu hukuki ve ticari çatışmaları bile uzlaşmayla çözen, piyasaya adalet ve şıklık getiren zarif profesyonel.',
+      trigger: 'Kusursuz diplomatik dil, adil paylaşım hissi ve estetik/tasarım kalitesiyle büyüleme.'
+    },
+    'Akrep': {
+      title: 'Gölge Stratejist & Krizlerin Yenilmez Fatihi',
+      archetype: 'Küllerinden Doğan Dönüşüm Simyacısı',
+      memory: 'Herkesin battığı yerde sıfırdan servet inşa eden, sektörün arka planını en derinlemesine yöneten sarsılmaz güç.',
+      trigger: 'Korkusuz kriz yönetimi, perde arkası stratejik zeka ve mutlak ketumluk.'
+    },
+    'Yay': {
+      title: 'Ufukları Aşan Vizyoner & Küresel Kaşif',
+      archetype: 'Büyük Resmi Gören Bilge Filozof',
+      memory: 'Yerel sınırları kırıp sektörü dünyaya açan, vizyoner fikirleriyle çağının ötesinde işler başaran cesur gezgin.',
+      trigger: 'Geniş felsefi vizyon, uluslararası bağlantılar ve cesur büyük hedefler koyma kabiliyeti.'
+    },
+    'Oğlak': {
+      title: 'Kalıcı İmparatorluklar Kuran Otorite',
+      archetype: 'Disiplinli Mimar & Zirvenin Hakimi',
+      memory: 'Genç yaşta temellerini attığı işi nesiller boyu ayakta kalan kurumsal bir anıta dönüştüren çelik disiplinli lider.',
+      trigger: 'Tavizsiz iş ahlakı, uzun vadeli stratejik sabır ve kurumsal hiyerarşiyi yönetme kudreti.'
+    },
+    'Kova': {
+      title: 'Geleceği Bugüne Getiren Radikal İnovatör',
+      archetype: 'Ezber Bozan Deha & Toplumcu Reformcu',
+      memory: 'Geleneksel köhnemiş sistemleri yıkarak teknoloji ve özgürlük temelli yeni nesil iş modelleri kuran devrimci.',
+      trigger: 'Özgün inovasyon, teknolojik vizyon ve kitleleri eşitlikçi bir geleceğe taşıma dehası.'
+    },
+    'Balık': {
+      title: 'Ruh Katan Sanatkar & Şifa Rehberi',
+      archetype: 'Sezgisel İlham Kaynağı & Derin Şifacı',
+      memory: 'Sadece cüzdana değil insanların ruhuna hitap eden, işine maneviyat ve sanatsal derinlik katan unutulmaz usta.',
+      trigger: 'Görünmeyeni sezen kuvvetli altıncı his, sanatsal incelik ve karşılıksız hizmet aşkı.'
+    }
+  };
+
+  const theme = mcThemes[mcSign] || mcThemes['Oğlak'];
+
+  return {
+    reputationTitle: theme.title,
+    publicImageArchetype: theme.archetype,
+    howIndustryRemembersYou: theme.memory,
+    authorityTrigger: theme.trigger
+  };
+}
+

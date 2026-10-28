@@ -793,6 +793,128 @@ export const downloadCareerPDF = async (
     curY += 6;
   }
 
+  // ==========================================
+  // KADİM VE EZOTERİK 6 YENİ MESLEKİ MODÜL
+  // ==========================================
+
+  // Modül 1: Müzikal Enstrüman & Ses Yatkınlığı
+  if (data.musicalAffinity) {
+    ensureSpace(32);
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(219, 39, 119); // Pink
+    doc.text('MÜZİKAL ENSTRÜMAN, RİTİM & SES FREKANSI YATKINLIĞI', 15, curY);
+    curY += 5;
+
+    curY = renderText(
+      `**Baskın Enstrüman Ailesi:** ${data.musicalAffinity.primaryInstrument.category} (${data.musicalAffinity.primaryInstrument.element})\n` +
+      `**Rezonans & Nitelik:** ${data.musicalAffinity.primaryInstrument.essence}\n` +
+      `**Uyumlu Sazlar:** ${data.musicalAffinity.primaryInstrument.instruments.join(', ')}\n` +
+      `**İkincil / Meditatif Frekans:** ${data.musicalAffinity.secondaryStyle.category} (${data.musicalAffinity.secondaryStyle.instruments.join(', ')})\n` +
+      `**Vokal & Boğaz Çakrası:** ${data.musicalAffinity.vocalAptitude.style} — ${data.musicalAffinity.vocalAptitude.chakraResonance}\n` +
+      `**Zihinsel Sıfırlanma Reçetesi:** ${data.musicalAffinity.musicalExpressionAdvice}`,
+      15, curY, 180, 5.8
+    );
+    curY += 6;
+  }
+
+  // Modül 2: El Becerisi & Zanaat Malzemesi Anatomisi
+  if (data.craftsmanshipMaterial) {
+    ensureSpace(32);
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(217, 119, 6); // Amber
+    doc.text('EL BECERİSİ & ZANAAT MALZEMESİ ANATOMİSİ', 15, curY);
+    curY += 5;
+
+    curY = renderText(
+      `**Ustalık Unvanı:** ${data.craftsmanshipMaterial.craftsmanshipTitle}\n` +
+      `**Baskın Madde:** ${data.craftsmanshipMaterial.primaryMaterial}\n` +
+      `**Geleneksel El Aletleri:** ${data.craftsmanshipMaterial.toolsAndTechniques.join(', ')}\n` +
+      `**Psikosomatik Şifa Gücü:** ${data.craftsmanshipMaterial.healingPower}\n` +
+      `**Ticari Atölye Uygulamaları:** ${data.craftsmanshipMaterial.commercialApplications.join(' • ')}`,
+      15, curY, 180, 5.8
+    );
+    curY += 6;
+  }
+
+  // Modül 3: Kadersel Şans Noktası & Rızık Kapısı
+  if (data.parsFortunaWealth) {
+    ensureSpace(30);
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(16, 185, 129); // Emerald
+    doc.text('KADERSEL ŞANS NOKTASI & RIZIK KAPISI (PARS FORTUNA)', 15, curY);
+    curY += 5;
+
+    curY = renderText(
+      `**Konum & Kapı:** ${data.parsFortunaWealth.wealthPortalTitle}\n` +
+      `**Kadersel Bereket Alanı:** ${data.parsFortunaWealth.karmicBlessingArea}\n` +
+      `**Zahmetsiz Rızık Formülü:** ${data.parsFortunaWealth.practicalMonetizationGuidance}`,
+      15, curY, 180, 5.8
+    );
+    curY += 6;
+  }
+
+  // Modül 4: Ortaklık & Çalışma DNA'sı
+  if (data.partnershipDna) {
+    ensureSpace(30);
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(37, 99, 235); // Blue
+    doc.text('İŞ BİRLİĞİ & ORTAKLIK DNA’SI', 15, curY);
+    curY += 5;
+
+    curY = renderText(
+      `**Çalışma Arketipi:** ${data.partnershipDna.archetype}\n` +
+      `**İş Mottosu:** "${data.partnershipDna.motto}"\n` +
+      `**Sinerji Şartı:** ${data.partnershipDna.synergyCondition}\n` +
+      `**Toksik Ortaklık Riski:** ${data.partnershipDna.toxicPartnershipRisk}\n` +
+      `**İdeal Takım Mimarisi:** ${data.partnershipDna.idealTeamStructure}`,
+      15, curY, 180, 5.8
+    );
+    curY += 6;
+  }
+
+  // Modül 5: Günün En Verimli Biyoritm & İmza Saatleri
+  if (data.planetaryProductivityHours) {
+    ensureSpace(30);
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(202, 138, 4); // Yellow/Gold
+    doc.text('GEZEGEN SAATLERİ & GÜNLÜK VERİMLİLİK BİYORİTMİ', 15, curY);
+    curY += 5;
+
+    curY = renderText(
+      `**Yönetici Güç:** ${data.planetaryProductivityHours.rulingPlanet}\n` +
+      `**🎯 Zihinsel Derin Odak Penceresi:** ${data.planetaryProductivityHours.peakMentalFocusWindow}\n` +
+      `**✍️ Altın Müzakere & İmza Penceresi:** ${data.planetaryProductivityHours.goldenNegotiationWindow}\n` +
+      `**🔋 Şarj & Arınma Penceresi:** ${data.planetaryProductivityHours.rechargeAndBurnoutPreventionWindow}\n` +
+      `**⚡ Günlük Rutin Kuralı:** ${data.planetaryProductivityHours.dailyRoutineAdvice}`,
+      15, curY, 180, 5.8
+    );
+    curY += 6;
+  }
+
+  // Modül 6: Toplumsal İtibar & Sektörel Şöhret İmzası
+  if (data.vocationalReputation) {
+    ensureSpace(30);
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(79, 70, 229); // Indigo
+    doc.text('TEPE NOKTASI (MC) & SEKTÖREL İTİBAR İMZASI', 15, curY);
+    curY += 5;
+
+    curY = renderText(
+      `**İtibar Unvanı:** ${data.vocationalReputation.reputationTitle}\n` +
+      `**Kamusal Arketip:** ${data.vocationalReputation.publicImageArchetype}\n` +
+      `**Piyasanın Hatırlayacağı Saygın İz:** ${data.vocationalReputation.howIndustryRemembersYou}\n` +
+      `**👑 Otorite Tetiği:** ${data.vocationalReputation.authorityTrigger}`,
+      15, curY, 180, 5.8
+    );
+    curY += 6;
+  }
+
   // 5. Dünyevi Kariyer Eylem Planı (4 Somut Kural)
   if (data.actionableGuidance && data.actionableGuidance.length > 0) {
     ensureSpace(40);

@@ -7,7 +7,8 @@ import {
   ArrowRight, RefreshCw, Layers, Compass, CheckCircle2,
   Zap, DollarSign, Flame, Lightbulb, Navigation, Clock, Calendar,
   Palette, Building2, FileText, Hammer, Music, HeartHandshake, Globe, Feather,
-  Sun, Moon, TrendingUp, Hourglass, Lock, Download, Loader2
+  Sun, Moon, TrendingUp, Hourglass, Lock, Download, Loader2,
+  Coins, Users, Mic, Radio
 } from 'lucide-react';
 import AnalysisBackButton from '@/components/ui/AnalysisBackButton';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
@@ -991,6 +992,337 @@ export default function CareerAnalysisPage() {
                 </p>
               </div>
             )}
+
+            {/* KADİM & EZOTERİK DERİN MESLEKİ MODÜLLER (6 YENİ BOYUT) */}
+
+            {/* MODÜL 1: MÜZİKAL ENSTRÜMAN & SES YATKINLIĞI */}
+            {result.musicalAffinity && (
+              <div className="bg-gradient-to-br from-pink-900/20 via-black/70 to-purple-900/20 border border-pink-500/30 p-5 sm:p-7 rounded-3xl relative overflow-hidden shadow-xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2.5 rounded-xl bg-pink-500/15 text-pink-400 border border-pink-500/30">
+                    <Music size={22} />
+                  </div>
+                  <div>
+                    <span className="text-[10px] sm:text-xs uppercase tracking-widest text-pink-400 font-bold block">
+                      Ezoterik Titreşim & Frekans Anatomisi
+                    </span>
+                    <h3 className="text-lg sm:text-xl font-bold text-white">
+                      Müzikal Enstrüman, Ritim & Ses Yatkınlığı
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  {/* Birincil Enstrüman Ailesi */}
+                  <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-pink-500/20 text-pink-300 uppercase">
+                          Baskın Enstrüman Ailesi
+                        </span>
+                        <span className="text-[11px] text-pink-300 font-medium">
+                          {result.musicalAffinity.primaryInstrument.element}
+                        </span>
+                      </div>
+                      <h4 className="text-base font-bold text-white mb-2">
+                        {result.musicalAffinity.primaryInstrument.category}
+                      </h4>
+                      <p className="text-xs text-gray-300 leading-relaxed mb-3">
+                        {result.musicalAffinity.primaryInstrument.essence}
+                      </p>
+                    </div>
+                    <div className="pt-2 border-t border-white/5">
+                      <span className="text-[10px] text-gray-400 block mb-1.5 uppercase font-semibold">Tavsiye Edilen Sazlar:</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {result.musicalAffinity.primaryInstrument.instruments.map((inst, idx) => (
+                          <span key={idx} className="text-[11px] bg-pink-500/10 border border-pink-500/20 px-2.5 py-1 rounded-lg text-pink-200">
+                            🎵 {inst}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* İkincil Stil & Frekans */}
+                  <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 uppercase">
+                          İkincil / Meditatif Frekans
+                        </span>
+                      </div>
+                      <h4 className="text-base font-bold text-white mb-2">
+                        {result.musicalAffinity.secondaryStyle.category}
+                      </h4>
+                      <p className="text-xs text-gray-300 leading-relaxed mb-3">
+                        {result.musicalAffinity.secondaryStyle.essence}
+                      </p>
+                    </div>
+                    <div className="pt-2 border-t border-white/5">
+                      <span className="text-[10px] text-gray-400 block mb-1.5 uppercase font-semibold">Uyumlu Ses Aletleri:</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {result.musicalAffinity.secondaryStyle.instruments.map((inst, idx) => (
+                          <span key={idx} className="text-[11px] bg-purple-500/10 border border-purple-500/20 px-2.5 py-1 rounded-lg text-purple-200">
+                            ✨ {inst}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Vokal & Boğaz Çakrası */}
+                <div className="bg-black/50 border border-pink-500/20 p-4 rounded-2xl mb-3">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Mic size={16} className="text-pink-400" />
+                    <span className="text-xs font-bold text-white">
+                      Ses / Vokal & Hitabet Kapasitesi: {result.musicalAffinity.vocalAptitude.style}
+                    </span>
+                  </div>
+                  <p className={`text-xs text-gray-300 leading-relaxed ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                    {result.musicalAffinity.vocalAptitude.chakraResonance}
+                  </p>
+                </div>
+
+                {/* Zihinsel Rahatlama & Tavsiye */}
+                <p className={`text-xs text-pink-200/90 bg-pink-500/15 p-3 rounded-xl border border-pink-500/20 ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                  🎼 <strong>Zihinsel Sıfırlanma Reçetesi:</strong> {result.musicalAffinity.musicalExpressionAdvice}
+                </p>
+              </div>
+            )}
+
+            {/* MODÜL 2: EL BECERİSİ & ZANAAT MALZEMESİ ANATOMİSİ */}
+            {result.craftsmanshipMaterial && (
+              <div className="bg-gradient-to-br from-amber-900/20 via-black/70 to-orange-900/20 border border-amber-500/30 p-5 sm:p-7 rounded-3xl relative overflow-hidden shadow-xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-400 border border-amber-500/30">
+                    <Hammer size={22} />
+                  </div>
+                  <div>
+                    <span className="text-[10px] sm:text-xs uppercase tracking-widest text-amber-400 font-bold block">
+                      Dokunsal Ustalık & Maddeyle Temas
+                    </span>
+                    <h3 className="text-lg sm:text-xl font-bold text-white">
+                      {result.craftsmanshipMaterial.craftsmanshipTitle}
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
+                    <span className="text-[10px] uppercase font-bold text-amber-400 block tracking-wider mb-1.5">
+                      Baskın Ustalık Hammaddesi
+                    </span>
+                    <p className="text-sm font-semibold text-white mb-2">
+                      {result.craftsmanshipMaterial.primaryMaterial}
+                    </p>
+                    <span className="text-[10px] text-gray-400 block mb-1.5 uppercase font-semibold">Geleneksel El Aletleri & Teknikler:</span>
+                    <div className="flex flex-wrap gap-1.5">
+                      {result.craftsmanshipMaterial.toolsAndTechniques.map((t, idx) => (
+                        <span key={idx} className="text-[11px] bg-amber-500/10 border border-amber-500/20 px-2.5 py-1 rounded-lg text-amber-200">
+                          🛠️ {t}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex flex-col justify-between">
+                    <div>
+                      <span className="text-[10px] uppercase font-bold text-orange-400 block tracking-wider mb-1.5">
+                        Ticari Atölye & Ürün Fikirleri
+                      </span>
+                      <div className="space-y-1.5">
+                        {result.craftsmanshipMaterial.commercialApplications.map((app, idx) => (
+                          <div key={idx} className={`text-xs text-gray-300 flex items-center gap-2 ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                            <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
+                            <span>{app}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="pt-2 border-t border-white/5 mt-3">
+                      <span className="text-[10px] text-gray-400 uppercase font-semibold block mb-1">Psikosomatik Şifa:</span>
+                      <p className={`text-xs text-amber-200/90 ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                        {result.craftsmanshipMaterial.healingPower}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* MODÜL 3 & 4: ŞANS NOKTASI (RIZIK KAPISI) & ORTAKLIK DNA'SI (2'li Grid) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+              {/* MODÜL 3: KADERSEL ŞANS NOKTASI & RIZIK KAPISI */}
+              {result.parsFortunaWealth && (
+                <div className="bg-gradient-to-br from-emerald-900/25 via-black/70 to-emerald-950/30 border border-emerald-500/30 p-5 sm:p-6 rounded-3xl relative overflow-hidden flex flex-col justify-between shadow-xl">
+                  <div>
+                    <div className="flex items-center gap-3 mb-3.5">
+                      <div className="p-2 sm:p-2.5 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                        <Coins size={20} />
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase text-emerald-400 font-bold block">
+                          Pars Fortuna (Kadersel Rızık Kapısı)
+                        </span>
+                        <h4 className="text-base sm:text-lg font-bold text-white">
+                          {result.parsFortunaWealth.wealthPortalTitle}
+                        </h4>
+                      </div>
+                    </div>
+
+                    <p className={`text-xs sm:text-sm text-gray-300 leading-relaxed mb-3 ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                      {result.parsFortunaWealth.karmicBlessingArea}
+                    </p>
+                  </div>
+
+                  <div className={`bg-emerald-500/10 border border-emerald-500/20 p-3.5 rounded-2xl text-xs text-emerald-200 mt-2 ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                    <strong>💰 Zahmetsiz Rızık Formülü:</strong> {result.parsFortunaWealth.practicalMonetizationGuidance}
+                  </div>
+                </div>
+              )}
+
+              {/* MODÜL 4: ORTAKLIK & ÇALIŞMA DNA'SI */}
+              {result.partnershipDna && (
+                <div className="bg-gradient-to-br from-blue-900/25 via-black/70 to-indigo-950/30 border border-blue-500/30 p-5 sm:p-6 rounded-3xl relative overflow-hidden flex flex-col justify-between shadow-xl">
+                  <div>
+                    <div className="flex items-center gap-3 mb-3.5">
+                      <div className="p-2 sm:p-2.5 rounded-xl bg-blue-500/15 text-blue-400 border border-blue-500/30">
+                        <Users size={20} />
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase text-blue-400 font-bold block">
+                          İş Birliği & Ortaklık DNA'sı
+                        </span>
+                        <h4 className="text-base sm:text-lg font-bold text-white">
+                          {result.partnershipDna.archetype}
+                        </h4>
+                      </div>
+                    </div>
+
+                    <p className="text-xs text-blue-300/90 font-medium italic mb-2.5">
+                      "{result.partnershipDna.motto}"
+                    </p>
+
+                    <p className={`text-xs sm:text-sm text-gray-300 leading-relaxed mb-3 ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                      {result.partnershipDna.synergyCondition}
+                    </p>
+                  </div>
+
+                  <div className="space-y-2 mt-2">
+                    <div className={`bg-rose-500/10 border border-rose-500/20 p-2.5 rounded-xl text-xs text-rose-200 ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                      ⚠️ <strong>Toksik Ortaklık Tuzağı:</strong> {result.partnershipDna.toxicPartnershipRisk}
+                    </div>
+                    <div className="bg-blue-500/10 border border-blue-500/20 p-2.5 rounded-xl text-xs text-blue-200">
+                      👥 <strong>İdeal Takım Mimarisi:</strong> {result.partnershipDna.idealTeamStructure}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* MODÜL 5 & 6: BİYORİTM ÇALIŞMA SAATLERİ & SEKTÖREL İTİBAR İMZASI (2'li Grid) */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
+              {/* MODÜL 5: GÜNÜN EN VERİMLİ BİYORİTM & İMZA SAATLERİ */}
+              {result.planetaryProductivityHours && (
+                <div className="bg-gradient-to-br from-yellow-900/20 via-black/70 to-amber-950/30 border border-yellow-500/30 p-5 sm:p-6 rounded-3xl relative overflow-hidden flex flex-col justify-between shadow-xl">
+                  <div>
+                    <div className="flex items-center gap-3 mb-3.5">
+                      <div className="p-2 sm:p-2.5 rounded-xl bg-yellow-500/15 text-yellow-400 border border-yellow-500/30">
+                        <Clock size={20} />
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase text-yellow-400 font-bold block">
+                          Gezegen Saatleri & Verimlilik
+                        </span>
+                        <h4 className="text-base sm:text-lg font-bold text-white">
+                          Biyoritm & İmza Pencereleri ({result.planetaryProductivityHours.rulingPlanet})
+                        </h4>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2.5 mb-3">
+                      <div className="bg-white/5 border border-white/10 p-3 rounded-2xl">
+                        <span className="text-[10px] font-bold text-amber-300 uppercase tracking-wider block mb-0.5">
+                          🎯 Zihinsel Derin Odak & Kodlama/Üretim Penceresi
+                        </span>
+                        <p className="text-xs sm:text-sm font-semibold text-white">
+                          {result.planetaryProductivityHours.peakMentalFocusWindow}
+                        </p>
+                      </div>
+
+                      <div className="bg-white/5 border border-white/10 p-3 rounded-2xl">
+                        <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider block mb-0.5">
+                          ✍️ Altın Müzakere, Satış & İmza Penceresi
+                        </span>
+                        <p className="text-xs sm:text-sm font-semibold text-white">
+                          {result.planetaryProductivityHours.goldenNegotiationWindow}
+                        </p>
+                      </div>
+
+                      <div className="bg-white/5 border border-white/10 p-3 rounded-2xl">
+                        <span className="text-[10px] font-bold text-purple-300 uppercase tracking-wider block mb-0.5">
+                          🔋 Şarj & Zihinsel Arınma Penceresi
+                        </span>
+                        <p className={`text-xs sm:text-sm font-semibold text-white ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                          {result.planetaryProductivityHours.rechargeAndBurnoutPreventionWindow}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <p className={`text-xs text-yellow-200/90 bg-yellow-500/15 p-3 rounded-xl border border-yellow-500/20 ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                    ⚡ <strong>Biyoritm Stratejisi:</strong> {result.planetaryProductivityHours.dailyRoutineAdvice}
+                  </p>
+                </div>
+              )}
+
+              {/* MODÜL 6: TOPLUMSAL İTİBAR & SEKTÖREL ŞÖHRET İMZASI */}
+              {result.vocationalReputation && (
+                <div className="bg-gradient-to-br from-indigo-900/20 via-black/70 to-purple-950/30 border border-indigo-500/30 p-5 sm:p-6 rounded-3xl relative overflow-hidden flex flex-col justify-between shadow-xl">
+                  <div>
+                    <div className="flex items-center gap-3 mb-3.5">
+                      <div className="p-2 sm:p-2.5 rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
+                        <Award size={20} />
+                      </div>
+                      <div>
+                        <span className="text-[10px] uppercase text-indigo-400 font-bold block">
+                          Tepe Noktası (MC) & Sektörel İtibar
+                        </span>
+                        <h4 className="text-base sm:text-lg font-bold text-white">
+                          {result.vocationalReputation.reputationTitle}
+                        </h4>
+                      </div>
+                    </div>
+
+                    <div className="bg-white/5 border border-white/10 p-3.5 rounded-2xl mb-3">
+                      <span className="text-[10px] font-bold text-indigo-300 uppercase tracking-wider block mb-1">
+                        İş Dünyasındaki Kamusal Arketipiniz
+                      </span>
+                      <p className="text-xs sm:text-sm font-semibold text-white">
+                        {result.vocationalReputation.publicImageArchetype}
+                      </p>
+                    </div>
+
+                    <div className="space-y-2 mb-3">
+                      <span className="text-[10px] text-gray-400 uppercase font-semibold block">
+                        Piyasanın Sizi Hatırlayacağı Saygın İmza:
+                      </span>
+                      <p className={`text-xs sm:text-sm text-gray-300 leading-relaxed ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                        {result.vocationalReputation.howIndustryRemembersYou}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className={`bg-indigo-500/10 border border-indigo-500/20 p-3.5 rounded-2xl text-xs text-indigo-200 ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                    👑 <strong>Otorite Tetiği:</strong> {result.vocationalReputation.authorityTrigger}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Kilit Bilgilendirmesi (Eğer kilitliyse) */}
+            {!result.isUnlocked && renderLockedSectionNotice("Müzikal Frekans, Zanaat Hammaddesi, Kadersel Rızık ve Biyoritm Modülleri Kilitlidir")}
 
             {/* 6. PARA & SERVET ÇEKME MODELİ VE TÜKENMİŞLİK KALKANI */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
