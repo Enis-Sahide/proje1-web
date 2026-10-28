@@ -19,7 +19,7 @@ const drawTextWithBold = (
   x: number,
   y: number,
   maxWidth: number,
-  lineHeight: number = 7.0,
+  lineHeight: number = 6.5,
   maxY: number = 265,
   startY: number = 30,
   onPageBreak?: () => void
@@ -153,7 +153,7 @@ export const downloadCareerPDF = async (
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(9);
     doc.setTextColor(...muted);
-    doc.text('Özel Mesleki Dosya', 195, 11, { align: 'right' });
+    doc.text('Kapsamlı Mesleki & Ezoterik Dosya', 195, 11, { align: 'right' });
   };
 
   let curY = 0;
@@ -171,19 +171,19 @@ export const downloadCareerPDF = async (
     x: number,
     y: number,
     maxWidth: number = 180,
-    lineHeight: number = 6.5
+    lineHeight: number = 6.2
   ): number => {
     return drawTextWithBold(doc, text, x, y, maxWidth, lineHeight, 265, 30, drawHeader);
   };
 
-  // ================= SAYFA 1: KAPAK & GENEL BAKIŞ =================
+  // ================= SAYFA 1: KAPAK & GENEL MİZAÇ BAKIŞI =================
   drawHeader();
   curY = 30;
 
-  // Title Box
+  // Title Card
   doc.setFillColor(...cardDark);
   doc.setDrawColor(...gold);
-  doc.setLineWidth(0.5);
+  doc.setLineWidth(0.6);
   doc.roundedRect(15, curY, 180, 42, 3, 3, 'FD');
 
   doc.setFont('LiberationSans', 'bold');
@@ -192,7 +192,7 @@ export const downloadCareerPDF = async (
   doc.text(birthInfo.fullName || data.personalInfo.fullName, 22, curY + 12);
 
   doc.setFont('LiberationSans', 'normal');
-  doc.setFontSize(10);
+  doc.setFontSize(9.5);
   doc.setTextColor(...muted);
   const formattedDate = birthInfo.birthDate ? birthInfo.birthDate.split('T')[0].split('-').reverse().join('.') : '';
   doc.text(`Doğum: ${formattedDate} ${birthInfo.birthTime || '12:00'} • ${birthInfo.cityName} (Yaş: ${data.careerTimeline?.currentAge || ''})`, 22, curY + 20);
@@ -206,9 +206,9 @@ export const downloadCareerPDF = async (
   doc.setTextColor(...charcoal);
   doc.text(`Karar İlkesi: "${data.summaryBadges.decisionMotto}"`, 22, curY + 37);
 
-  curY += 50;
+  curY += 49;
 
-  // 4 Core Badges (2x2 Grid for generous width and multi-line safety)
+  // 4 Core Badges (2x2 Grid)
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(12);
   doc.setTextColor(...gold);
@@ -258,7 +258,7 @@ export const downloadCareerPDF = async (
   doc.text('BÜYÜK SENTEZ: İDEAL ÇALIŞMA MODELİNİZ', 15, curY);
   curY += 6;
 
-  curY = renderText(data.idealWorkModel.explanation, 15, curY, 180, 6.5);
+  curY = renderText(data.idealWorkModel.explanation, 15, curY, 180, 6.2);
   curY += 6;
 
   // Kariyer Odak Stratejisi
@@ -269,10 +269,13 @@ export const downloadCareerPDF = async (
     doc.text(`UZMANLAŞMA STRATEJİSİ: ${data.focusStrategy.type}`, 15, curY);
     curY += 6;
 
-    curY = renderText(`**Motto:** ${data.focusStrategy.motto}\n\n${data.focusStrategy.explanation}\n\n**Stratejik Eylem:** ${data.focusStrategy.actionAdvice}`, 15, curY, 180, 6.5);
+    curY = renderText(
+      `**Motto:** ${data.focusStrategy.motto}\n\n${data.focusStrategy.explanation}\n\n**Stratejik Eylem:** ${data.focusStrategy.actionAdvice}`,
+      15, curY, 180, 6.2
+    );
   }
 
-  // ================= SAYFA 2: SEKTÖRLER & ENERJİ DAĞILIMI =================
+  // ================= SAYFA 2: SEKTÖREL POTANSİYEL & ENERJİ SPEKTRUMU =================
   doc.addPage();
   drawHeader();
   curY = 30;
@@ -281,17 +284,38 @@ export const downloadCareerPDF = async (
   doc.setFontSize(14);
   doc.setTextColor(...gold);
   doc.text('SEKTÖREL POTANSİYEL & ENERJİ SPEKTRUMU (%100)', 15, curY);
-  curY += 8;
+  curY += 7;
 
-  // Top Sectors List (Dynamic Height & Multi-line Wrapped Roles)
+  // Enerji Dağılımı Özeti (%100)
+  if (data.energyDistribution && data.energyDistribution.segments.length > 0) {
+    doc.setFillColor(243, 244, 246);
+    doc.roundedRect(15, curY, 180, 16, 2, 2, 'F');
+
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...primaryDark);
+    doc.text('Kişisel Potansiyel Dağılımı: ', 18, curY + 6);
+
+    const segText = data.energyDistribution.segments
+      .map(s => `${s.title}: %${s.percentage}`)
+      .join('  •  ');
+    doc.setFont('LiberationSans', 'normal');
+    doc.setFontSize(8);
+    doc.setTextColor(...charcoal);
+    const segLines = doc.splitTextToSize(segText, 172);
+    doc.text(segLines.slice(0, 2), 18, curY + 11);
+
+    curY += 21;
+  }
+
+  // 3 Ana Sektör Kartları
   data.topSectors.forEach((sec, idx) => {
     const titleText = `${idx + 1}. ${sec.title} • Uyum: %${sec.fitScore}`;
     const descLines = doc.splitTextToSize(sec.description, 168);
     const roleText = `Öne Çıkan Roller: ${sec.recommendedRoles.join(', ')}`;
     const roleLines = doc.splitTextToSize(roleText, 168);
     
-    // Total card height with generous padding
-    const cardH = 14 + (descLines.length * 4.2) + (roleLines.length * 4.0);
+    const cardH = 14 + (descLines.length * 4.2) + (roleLines.length * 3.8);
     ensureSpace(cardH + 6);
 
     doc.setFillColor(250, 250, 252);
@@ -299,13 +323,11 @@ export const downloadCareerPDF = async (
     doc.setLineWidth(0.5);
     doc.roundedRect(15, curY, 180, cardH, 2, 2, 'FD');
 
-    // Title
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(10.5);
     doc.setTextColor(...primaryDark);
     doc.text(titleText, 20, curY + 7);
 
-    // Description lines
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(...charcoal);
@@ -315,7 +337,6 @@ export const downloadCareerPDF = async (
       lineY += 4.2;
     });
 
-    // Roles lines
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(8);
     doc.setTextColor(...gold);
@@ -328,28 +349,88 @@ export const downloadCareerPDF = async (
     curY += cardH + 5;
   });
 
+  // Tamamlayıcı İkincil Sektörler
+  if (data.secondarySectors && data.secondarySectors.length > 0) {
+    ensureSpace(35);
+    curY += 4;
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(...gold);
+    doc.text('TAMAMLAYICI & İKİNCİL SEKTÖR POTANSİYELLERİ', 15, curY);
+    curY += 6;
+
+    data.secondarySectors.forEach((sSec) => {
+      ensureSpace(16);
+      doc.setFillColor(248, 250, 252);
+      doc.roundedRect(15, curY, 180, 14, 2, 2, 'F');
+
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(...primaryDark);
+      doc.text(`${sSec.title} (%${sSec.percentage} Uyum)`, 20, curY + 6);
+
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(...muted);
+      doc.text(`Destekleyici Roller: ${sSec.recommendedRoles.join(', ')}`, 20, curY + 11);
+
+      curY += 16;
+    });
+  }
+
+  // ================= SAYFA 3: GEZEGENLERİN MESLEKİ DEŞİFRELERİ (TAM LİSTE) =================
+  doc.addPage();
+  drawHeader();
+  curY = 30;
+
+  doc.setFont('LiberationSans', 'bold');
+  doc.setFontSize(14);
+  doc.setTextColor(...gold);
+  doc.text('GEZEGENLERİN MESLEKİ DEŞİFRELERİ & ZANAAT DALLARI', 15, curY);
   curY += 5;
 
-  // Gezegensel Mesleki Göstergeler
-  doc.setFont('LiberationSans', 'bold');
-  doc.setFontSize(13);
-  doc.setTextColor(...gold);
-  doc.text('GEZEGENLERİN MESLEKİ DEŞİFRELERİ', 15, curY);
-  curY += 8;
+  doc.setFont('LiberationSans', 'normal');
+  doc.setFontSize(8.5);
+  doc.setTextColor(...muted);
+  doc.text('Doğum haritanızdaki göksel yerleşimlerin çalışma tarzınıza, meslek yeteneklerinize ve zanaat dallarına yansıması:', 15, curY);
+  curY += 7;
 
-  data.planetaryInsights.slice(0, 4).forEach((ins) => {
-    ensureSpace(28);
+  // All planetary insights rendered completely
+  data.planetaryInsights.forEach((ins) => {
+    const pTitle = `• ${ins.planet} (${ins.sign} - ${ins.house}. Ev): ${ins.title} [${ins.domain}]`;
+    const expLines = doc.splitTextToSize(ins.explanation, 170);
+    const profText = `Yatkın Meslekler & Zanaat Dalları: ${ins.suitableProfessions.join(', ')}`;
+    const profLines = doc.splitTextToSize(profText, 170);
+
+    const blockH = 10 + (expLines.length * 4.0) + (profLines.length * 3.8);
+    ensureSpace(blockH + 4);
+
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(9.5);
     doc.setTextColor(...primaryDark);
-    doc.text(`• ${ins.planet} (${ins.sign} - ${ins.house}. Ev): ${ins.title}`, 18, curY);
+    doc.text(pTitle, 18, curY);
     curY += 5;
 
-    curY = renderText(ins.explanation, 22, curY, 172, 5.5);
-    curY += 3;
+    doc.setFont('LiberationSans', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...charcoal);
+    expLines.forEach((el: string) => {
+      doc.text(el, 22, curY);
+      curY += 4.0;
+    });
+
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(...purple);
+    profLines.forEach((pl: string) => {
+      doc.text(pl, 22, curY);
+      curY += 3.8;
+    });
+
+    curY += 4;
   });
 
-  // ================= SAYFA 3: KADERSEL ZAMAN ÇİZELGESİ =================
+  // ================= SAYFA 4: KADERSEL ZAMAN ÇİZELGESİ & AKTİF EVRE =================
   if (data.careerTimeline) {
     doc.addPage();
     drawHeader();
@@ -358,45 +439,87 @@ export const downloadCareerPDF = async (
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(14);
     doc.setTextColor(...gold);
-    doc.text('KADERSEL KARİYER DÖNÜM YAŞLARI & ZAMAN ÇİZELGESİ', 15, curY);
-    curY += 8;
+    doc.text('KADERSEL KARİYER ZAMAN ÇİZELGESİ & AKTİF EVRENİZ', 15, curY);
+    curY += 7;
 
-    doc.setFont('LiberationSans', 'normal');
-    doc.setFontSize(9);
-    doc.setTextColor(...charcoal);
-    curY = renderText(
-      'Gezegen döngüleri (Satürn döngüsü, Nodal aks kayması, Uranüs karşıtlığı ve Kiron şifalanması) mesleki hayatınızdaki kırılma, yükselme ve olgunlaşma aşamalarını belirler.',
-      15, curY, 180, 6.0
-    );
-    curY += 5;
+    // Aktif Kadersel Evre Parlayan Kutu (activeMilestone)
+    const activeM = data.careerTimeline.activeMilestone;
+    if (activeM) {
+      const activeDescLines = doc.splitTextToSize(activeM.description, 170);
+      const actionLines = doc.splitTextToSize(`Bu Evrenin Altın Kuralı: ${activeM.actionGuidance}`, 170);
+      const activeBoxH = 18 + (activeDescLines.length * 4.2) + (actionLines.length * 4.0);
 
-    data.careerTimeline.milestones.forEach((ms) => {
-      ensureSpace(34);
-      doc.setFillColor(248, 250, 252);
-      doc.setDrawColor(220, 225, 235);
-      doc.roundedRect(15, curY, 180, 28, 2, 2, 'FD');
+      doc.setFillColor(254, 252, 232); // Light Amber
+      doc.setDrawColor(...gold);
+      doc.setLineWidth(0.8);
+      doc.roundedRect(15, curY, 180, activeBoxH, 2, 2, 'FD');
 
       doc.setFont('LiberationSans', 'bold');
-      doc.setFontSize(10);
+      doc.setFontSize(11);
       doc.setTextColor(...gold);
-      doc.text(`${ms.ageRange} YAŞ: ${ms.planetCycle.toUpperCase()}`, 20, curY + 7);
+      doc.text(`ŞU ANKİ AKTİF EVRENİZ: ${activeM.title} (${activeM.ageRange} - ${activeM.planetCycle})`, 20, curY + 8);
+
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(...charcoal);
+      let aY = curY + 14;
+      activeDescLines.forEach((adl: string) => {
+        doc.text(adl, 20, aY);
+        aY += 4.2;
+      });
+
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(...primaryDark);
+      aY += 1;
+      actionLines.forEach((al: string) => {
+        doc.text(al, 20, aY);
+        aY += 4.0;
+      });
+
+      curY += activeBoxH + 8;
+    }
+
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(...primaryDark);
+    doc.text('HAYAT BOYU KADERSEL KARİYER YOL HARİTASI (TÜM DÖNÜM YAŞLARI)', 15, curY);
+    curY += 6;
+
+    data.careerTimeline.milestones.forEach((ms) => {
+      const gLines = doc.splitTextToSize(`${ms.description} - ${ms.actionGuidance}`, 168);
+      const msH = 14 + (gLines.length * 4.0);
+      ensureSpace(msH + 4);
+
+      doc.setFillColor(248, 250, 252);
+      doc.setDrawColor(220, 225, 235);
+      doc.setLineWidth(0.5);
+      doc.roundedRect(15, curY, 180, msH, 2, 2, 'FD');
+
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(9.5);
+      doc.setTextColor(...gold);
+      doc.text(`${ms.ageRange} YAŞ: ${ms.planetCycle.toUpperCase()} [${ms.status === 'active' ? 'AKTİF EVRE' : ms.status === 'completed' ? 'TAMAMLANDI' : 'GELECEK EVRE'}]`, 20, curY + 6);
 
       doc.setFont('LiberationSans', 'bold');
       doc.setFontSize(9);
       doc.setTextColor(...primaryDark);
-      doc.text(ms.title, 20, curY + 14);
+      doc.text(ms.title, 20, curY + 12);
 
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(8);
       doc.setTextColor(...charcoal);
-      const gLines = doc.splitTextToSize(`${ms.description} - ${ms.actionGuidance}`, 170);
-      doc.text(gLines.slice(0, 2), 20, curY + 21);
+      let mY = curY + 17;
+      gLines.forEach((gl: string) => {
+        doc.text(gl, 20, mY);
+        mY += 4.0;
+      });
 
-      curY += 32;
+      curY += msH + 4;
     });
   }
 
-  // ================= SAYFA 4: İKİNCİL İLERLETİM (SECONDARY PROGRESSIONS) =================
+  // ================= SAYFA 5: İKİNCİL İLERLETİM (SECONDARY PROGRESSIONS) =================
   if (data.progressedCareer) {
     doc.addPage();
     drawHeader();
@@ -406,12 +529,12 @@ export const downloadCareerPDF = async (
     doc.setFontSize(14);
     doc.setTextColor(...purple);
     doc.text('İKİNCİL İLERLETİM: İÇSEL KARİYER SAATİNİZ', 15, curY);
-    curY += 6;
+    curY += 5;
 
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(...muted);
-    doc.text('Astro-Seek Standardı • 1 Gün = 1 Yıl İlerletim Formülü', 15, curY);
+    doc.text(`Astro-Seek Standardı • 1 Gün = 1 Yıl İlerletim Formülü (${data.progressedCareer.currentAge} Yaş İlerletimi)`, 15, curY);
     curY += 8;
 
     // 1. İlerletilmiş Güneş
@@ -423,13 +546,13 @@ export const downloadCareerPDF = async (
 
     const sun = data.progressedCareer.progressedSun;
     curY = renderText(
-      `**Mevcut İlerletilmiş Konum:** ${sun.progressedSign} ${sun.degreeInSign}°${sun.minutes}' (Doğum: ${sun.natalSign} ${sun.natalDegree}°)\n` +
+      `**Mevcut İlerletilmiş Konum:** ${sun.progressedSign} ${sun.degreeInSign}°${sun.minutes}' (Doğum Güneşi: ${sun.natalSign} ${sun.natalDegree}°)\n` +
       `**Dönüşüm Teması:** ${sun.identityShiftTheme}\n` +
       `**Geçiş Yaşı:** ${sun.shiftAge} yaş • Sonraki Burç: ${sun.nextShiftAge} yaş\n\n` +
       `${sun.explanation}`,
       15, curY, 180, 6.0
     );
-    curY += 8;
+    curY += 7;
 
     // 2. İlerletilmiş Ay
     doc.setFont('LiberationSans', 'bold');
@@ -446,7 +569,7 @@ export const downloadCareerPDF = async (
       `${moon.houseImpact}`,
       15, curY, 180, 6.0
     );
-    curY += 8;
+    curY += 7;
 
     // 3. İlerletilmiş Ay Fazı (30 Yıllık Döngü)
     doc.setFont('LiberationSans', 'bold');
@@ -457,7 +580,7 @@ export const downloadCareerPDF = async (
 
     const phase = data.progressedCareer.progressedMoonPhase;
     curY = renderText(
-      `**Döngü Mottosu:** "${phase.phaseMotto}" (Faz ${phase.phaseNumber}/8 • ${phase.elongationDegree}°)\n\n` +
+      `**Döngü Mottosu:** "${phase.phaseMotto}" (Faz ${phase.phaseNumber}/8 • ${phase.elongationDegree}° Açı)\n\n` +
       `**Aşama Durumu:** ${phase.stageDescription}\n\n` +
       `**Kariyer Hasat Rehberi:** ${phase.careerHarvestGuidance}\n\n` +
       `🏛️ **${data.progressedCareer.progressedMidheaven.careerEvolutionTitle}**`,
@@ -465,7 +588,7 @@ export const downloadCareerPDF = async (
     );
   }
 
-  // ================= SAYFA 5: RUH HARİTASI (DRAKONİK KATMAN) =================
+  // ================= SAYFA 6: RUH HARİTASI (DRAKONİK KATMAN & RUHSAL ÇAĞRI) =================
   if (data.soulCareer) {
     doc.addPage();
     drawHeader();
@@ -475,15 +598,15 @@ export const downloadCareerPDF = async (
     doc.setFontSize(14);
     doc.setTextColor(...purple);
     doc.text('2. RUH HARİTASI: DRAKONİK ÇAĞRI & RUHSAL KARİYER', 15, curY);
-    curY += 8;
+    curY += 6;
 
     curY = renderText(
-      'Kuzey Ay Düğümü 0° Koç burcuna referanslanarak çıkarılan Drakonik haritanız, dünyevi hedeflerin ötesinde ruhunuzun bu yaşamda deneyimlemeye can attığı mesleki misyonu açıklar.',
+      'Kuzey Ay Düğümü 0° Koç referans alınarak çıkarılan Drakonik haritanız, dünyevi kariyer unvanlarının ötesinde ruhunuzun bu yaşamda deneyimlemek istediği ilahi mesleki misyonu açıklar.',
       15, curY, 180, 6.0
     );
     curY += 6;
 
-    // Soul MC and Planets
+    // Drakonik MC Kartı
     doc.setFillColor(250, 245, 255);
     doc.setDrawColor(216, 180, 254);
     doc.roundedRect(15, curY, 180, 36, 2, 2, 'FD');
@@ -491,21 +614,96 @@ export const downloadCareerPDF = async (
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(10.5);
     doc.setTextColor(...purple);
-    doc.text(`Drakonik MC (Ruhsal Tepe Noktası): ${data.soulCareer.soulMidheaven.sign} - ${data.soulCareer.soulMidheaven.title}`, 20, curY + 8);
+    doc.text(`Drakonik MC (Ruhsal Tepe Noktası): ${data.soulCareer.soulMidheaven.sign} - ${data.soulCareer.soulMidheaven.title}`, 20, curY + 7);
 
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(...charcoal);
-    const mcLines = doc.splitTextToSize(data.soulCareer.soulMidheaven.calling, 170);
-    doc.text(mcLines.slice(0, 3), 20, curY + 16);
+    const mcCallLines = doc.splitTextToSize(data.soulCareer.soulMidheaven.calling, 170);
+    doc.text(mcCallLines.slice(0, 2), 20, curY + 14);
 
-    curY += 42;
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(...gold);
+    doc.text(`Kolektife Bırakılacak Manevi Etki: ${data.soulCareer.soulMidheaven.impact}`, 20, curY + 28);
+
+    curY += 41;
+
+    // Ruhun 3'lü Enkarnasyon Özü (Yükselen, Güneş, Ay)
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(11);
+    doc.setTextColor(...primaryDark);
+    doc.text('RUHUN 3\'LÜ ENKARNASYON DOĞASI', 15, curY);
+    curY += 5;
+
+    const soulBoxW = 58;
+    const soulBoxH = 26;
+    const sCards = [
+      { label: `Yükselen: ${data.soulCareer.soulAscendant.sign}`, text: data.soulCareer.soulAscendant.essence, color: purple },
+      { label: `Güneş: ${data.soulCareer.soulSun.sign}`, text: data.soulCareer.soulSun.mission, color: gold },
+      { label: `Ay: ${data.soulCareer.soulMoon.sign}`, text: data.soulCareer.soulMoon.emotionalNourishment, color: primaryDark }
+    ];
+
+    sCards.forEach((sc, scIdx) => {
+      const scX = 15 + scIdx * 61;
+      doc.setFillColor(248, 250, 252);
+      doc.roundedRect(scX, curY, soulBoxW, soulBoxH, 2, 2, 'F');
+
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(...sc.color);
+      doc.text(sc.label, scX + 4, curY + 6);
+
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(...charcoal);
+      const scLines = doc.splitTextToSize(sc.text, soulBoxW - 8);
+      scLines.slice(0, 3).forEach((scl: string, lIdx: number) => {
+        doc.text(scl, scX + 4, curY + 12 + lIdx * 3.8);
+      });
+    });
+
+    curY += soulBoxH + 7;
+
+    // Ruhu Besleyen Kadersel Sektörler
+    if (data.soulCareer.soulTopSectors && data.soulCareer.soulTopSectors.length > 0) {
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(...purple);
+      doc.text('RUHU BESLEYEN KADERSEL SEKTÖRLER', 15, curY);
+      curY += 5;
+
+      data.soulCareer.soulTopSectors.slice(0, 2).forEach((sSec, sIdx) => {
+        ensureSpace(24);
+        doc.setFillColor(248, 250, 252);
+        doc.roundedRect(15, curY, 180, 20, 2, 2, 'F');
+
+        doc.setFont('LiberationSans', 'bold');
+        doc.setFontSize(9);
+        doc.setTextColor(...purple);
+        doc.text(`${sIdx + 1}. ${sSec.title} (%${sSec.percentage} Ruhsal Çağrı)`, 20, curY + 6);
+
+        doc.setFont('LiberationSans', 'normal');
+        doc.setFontSize(7.5);
+        doc.setTextColor(...charcoal);
+        const sDesc = doc.splitTextToSize(sSec.description, 168);
+        doc.text(sDesc[0] || '', 20, curY + 11);
+
+        doc.setFont('LiberationSans', 'bold');
+        doc.setFontSize(7.5);
+        doc.setTextColor(...gold);
+        doc.text(`Ruhsal Ustalık Dalları: ${sSec.recommendedRoles.join(', ')}`, 20, curY + 16);
+
+        curY += 23;
+      });
+    }
 
     // Ruh-Madde Sentez Köprüsü
+    ensureSpace(45);
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(12);
     doc.setTextColor(...primaryDark);
-    doc.text('RUH - MADDE SENTEZ KÖPRÜSÜ', 15, curY);
+    doc.text('RUH - MADDE BÜTÜNSEL SENTEZ KÖPRÜSÜ', 15, curY);
     curY += 6;
 
     const bridge = data.soulCareer.soulMaterialBridge;
@@ -514,61 +712,128 @@ export const downloadCareerPDF = async (
       `**Ruhsal Çağrı:** ${bridge.soulCalling}\n\n` +
       `**Sentez Tavsiyesi:** ${bridge.synthesisAdvice}\n\n` +
       `⚠️ **Tatminsizlik Uyarısı:** ${bridge.unfulfillmentWarning}\n\n` +
-      `🌿 **Kutsal Rutin (Günlük Uygulama):** ${bridge.dailySpiritualPractice}`,
+      `🌿 **Kutsal Rutin (Günlük Ruhsal Uygulama):** ${bridge.dailySpiritualPractice}`,
       15, curY, 180, 6.0
     );
   }
 
-  // ================= SAYFA 6: SERVET & TÜKENMİŞLİK KALKANI =================
+  // ================= SAYFA 7: STRATEJİK GÜÇLER, SERVET, KORUMA & EYLEM PLANI =================
   doc.addPage();
   drawHeader();
   curY = 30;
 
-  // Servet Mıknatısı
-  if (data.wealthMagnet) {
+  // 1. Kadersel Evrilme (Dharma)
+  if (data.dharmaPath) {
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(13);
-    doc.setTextColor(...gold);
-    doc.text('SERVET MIKNATISI & FİNANSAL KALDIRAÇ STRATEJİNİZ', 15, curY);
+    doc.setTextColor(...purple);
+    doc.text('KADERSEL EVRİLME ROTASI (DHARMA - KUZEY DÜĞÜMÜ)', 15, curY);
     curY += 6;
 
     curY = renderText(
-      `**Servet Kapısı:** ${data.wealthMagnet.channelTitle}\n\n` +
-      `**İşleyiş Mekanizması:** ${data.wealthMagnet.mechanism}\n\n` +
-      `**Uygulanabilir Formül:** ${data.wealthMagnet.practicalFormula}`,
-      15, curY, 180, 6.0
+      `**Dharma Başlığı:** ${data.dharmaPath.title}\n\n` +
+      `**Aşılması Gereken Konfor Alanı (Güney Düğüm Alışkanlıkları):** ${data.dharmaPath.fromComfortZone}\n\n` +
+      `**Kadersel Büyüme Misyonu:** ${data.dharmaPath.toGrowthMission}\n\n` +
+      `✨ **Kariyer Sıçraması:** ${data.dharmaPath.careerImpact}`,
+      15, curY, 180, 5.8
     );
-    curY += 8;
+    curY += 6;
   }
 
-  // Tükenmişlik Kalkanı
-  if (data.burnoutShield) {
+  // 2. Mesleki Süper Güç & Gölge Tuzaklar
+  if (data.superPower || data.shadowPitfalls) {
+    ensureSpace(35);
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(13);
-    doc.setTextColor(220, 38, 38); // Crimson
-    doc.text('TÜKENMİŞLİK KALKANI & MESLEKİ KORUMA REÇETESİ', 15, curY);
+    doc.setFontSize(12);
+    doc.setTextColor(...gold);
+    doc.text('MESLEKİ SÜPER GÜÇ VE GÖLGE TUZAKLAR (KÖR NOKTALAR)', 15, curY);
     curY += 6;
 
     curY = renderText(
-      `**Temel Enerji Riski:** ${data.burnoutShield.coreRisk}\n\n` +
-      `**Kaçınılması Gereken Toksik Ortamlar:** ${data.burnoutShield.toxicEnvironments}\n\n` +
-      `**Koruma Formülü:** ${data.burnoutShield.protectionFormula}`,
-      15, curY, 180, 6.0
+      `⚡ **Mesleki Süper Gücünüz:** ${data.superPower}\n\n` +
+      `⚠️ **Gölge Tuzaklar & Kör Noktalar:** ${data.shadowPitfalls}`,
+      15, curY, 180, 5.8
     );
-    curY += 8;
+    curY += 6;
+  }
+
+  // 3. Servet Mıknatısı
+  if (data.wealthMagnet) {
+    ensureSpace(28);
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(...gold);
+    doc.text('SERVET MIKNATISI & FİNANSAL KALDIRAÇ STRATEJİNİZ', 15, curY);
+    curY += 5;
+
+    curY = renderText(
+      `**Servet Kapısı:** ${data.wealthMagnet.channelTitle}\n` +
+      `**İşleyiş Mekanizması:** ${data.wealthMagnet.mechanism}\n` +
+      `**Uygulanabilir Formül:** ${data.wealthMagnet.practicalFormula}`,
+      15, curY, 180, 5.8
+    );
+    curY += 6;
+  }
+
+  // 4. Tükenmişlik Kalkanı
+  if (data.burnoutShield) {
+    ensureSpace(28);
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(220, 38, 38);
+    doc.text('TÜKENMİŞLİK KALKANI & MESLEKİ KORUMA REÇETESİ', 15, curY);
+    curY += 5;
+
+    curY = renderText(
+      `**Temel Enerji Riski:** ${data.burnoutShield.coreRisk}\n` +
+      `**Kaçınılması Gereken Toksik Ortamlar:** ${data.burnoutShield.toxicEnvironments}\n` +
+      `**Koruma Formülü:** ${data.burnoutShield.protectionFormula}`,
+      15, curY, 180, 5.8
+    );
+    curY += 6;
+  }
+
+  // 5. Dünyevi Kariyer Eylem Planı (4 Somut Kural)
+  if (data.actionableGuidance && data.actionableGuidance.length > 0) {
+    ensureSpace(40);
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(12);
+    doc.setTextColor(...primaryDark);
+    doc.text('DÜNYEVİ KARİYER EYLEM PLANINIZ (4 STRATEJİK KURAL)', 15, curY);
+    curY += 6;
+
+    data.actionableGuidance.forEach((step, sIdx) => {
+      ensureSpace(14);
+      doc.setFillColor(248, 250, 252);
+      doc.roundedRect(15, curY, 180, 11, 2, 2, 'F');
+
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(8);
+      doc.setTextColor(...gold);
+      doc.text(`${sIdx + 1}`, 19, curY + 7);
+
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(8);
+      doc.setTextColor(...charcoal);
+      const sLines = doc.splitTextToSize(step, 160);
+      doc.text(sLines[0] || '', 25, curY + 7);
+
+      curY += 13;
+    });
   }
 
   // Footer Note
-  ensureSpace(25);
+  ensureSpace(20);
+  curY += 4;
   doc.setFillColor(243, 244, 246);
-  doc.roundedRect(15, curY, 180, 20, 2, 2, 'F');
+  doc.roundedRect(15, curY, 180, 16, 2, 2, 'F');
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(8);
   doc.setTextColor(...muted);
   doc.text(
     'Bu analiz 7Layers Ezoterik & Kozmik Astroloji Motoru ile üretilmiştir. © 7Layers. Bütün hakları saklıdır.',
     105,
-    curY + 11,
+    curY + 9,
     { align: 'center' }
   );
 
