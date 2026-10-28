@@ -580,9 +580,9 @@ function calculateCareerTimeline(birthDate: string): CareerTimelineData {
   const baseMilestones = [
     {
       id: 'discovery',
-      ageRange: '18 - 26 Yaş',
-      minAge: 18,
-      maxAge: 26,
+      ageRange: '18 - 27 Yaş',
+      minAge: 0,
+      maxAge: 27,
       title: 'Keşif, Deneme & Temel Yetenek İnşası',
       planetCycle: 'Mars & Jüpiter Gençlik Döngüsü',
       description: 'Piyasayı tanıma, çıraklık, farklı sektörleri deneyimleme ve temel teknik yetenekleri cebe koyma evresidir. Bu dönemde yapılan yön değişiklikleri ve arayışlar son derece doğaldır.',
@@ -590,39 +590,39 @@ function calculateCareerTimeline(birthDate: string): CareerTimelineData {
     },
     {
       id: 'saturn_return',
-      ageRange: '28 - 31 Yaş',
-      minAge: 27,
-      maxAge: 32,
-      title: 'Profesyonel Rüştünü İspat & Temel Kurma',
-      planetCycle: '1. Satürn Döngüsü (Saturn Return)',
+      ageRange: '28 - 34 Yaş',
+      minAge: 28,
+      maxAge: 34,
+      title: 'Profesyonel Rüştünü İspat & Ustalığa Geçiş',
+      planetCycle: '1. Satürn Döngüsü & Hermetik Ustalık (33 Yaş)',
       description: 'Çıraklığın resmi olarak bittiği, genç yetenek sıfatından çıkıp ilk büyük unvanı, kurumsal sorumluluğu veya ilk şirketi kurduğunuz kadersel olgunlaşma sınavıdır.',
       actionGuidance: 'Dağınıklığı ve gevşekliği bırakın; uzmanlığınızı resmi unvana veya tescilli bir iş modeline dökün.'
     },
     {
       id: 'nodal_shift',
-      ageRange: '36 - 39 Yaş',
+      ageRange: '35 - 41 Yaş',
       minAge: 35,
-      maxAge: 39,
+      maxAge: 41,
       title: 'Kadersel Uyanış & Özgür Yolunu Çizme',
-      planetCycle: 'Kader Düğümleri Döngüsü (Nodal Shift)',
+      planetCycle: '2. Kader Düğümleri & Jüpiter Döngüsü',
       description: 'Başkaları için çalışmaktan veya başkalarının kurallarıyla yaşamaktan bıkıp kendi özgün vizyonunuzu ilan ettiğiniz, radikal sektör/iş modeli değişikliği çağıdır.',
       actionGuidance: 'Konfor alanına saplanıp kalmayın; uzun süredir ertelediğiniz bağımsız projelerin liderliğini üstlenin.'
     },
     {
       id: 'uranus_renaissance',
-      ageRange: '41 - 45 Yaş',
-      minAge: 40,
-      maxAge: 46,
+      ageRange: '42 - 48 Yaş',
+      minAge: 42,
+      maxAge: 48,
       title: 'Kariyer Rönesansı & Büyük İnovasyon Patlaması',
-      planetCycle: 'Uranüs Karşıtlığı (Uranus Opposition)',
+      planetCycle: 'Uranüs Karşıtlığı (Ruhun 2. Doğumu)',
       description: 'İkinci bahar ve en yüksek özerklik çağıdır. Kimseye kendinizi ispatlama kaygınız kalmaz; sektöre çağ atlatacak inovatif projeler, derin teknoloji veya büyük fon/sistem kuruculuğu zirve yapar.',
       actionGuidance: 'Geleneksel kalıpları yıkın; sektörünüzde devrim yaratacak bağımsız ve teknolojik ürünlerinize tam gaz verin.'
     },
     {
       id: 'legacy_authority',
-      ageRange: '48 - 55+ Yaş',
-      minAge: 47,
-      maxAge: 99,
+      ageRange: '49+ Yaş',
+      minAge: 49,
+      maxAge: 120,
       title: 'Akil Liderlik, Kurumsal Miras & Mentorluk',
       planetCycle: 'Kiron & 2. Satürn Bilgelik Döngüsü',
       description: 'Günlük operasyonel koşuşturmadan çekilip; yönetim kurullarında akil insanlık yapma, genç liderleri fonlama ve zamanın silemeyeceği kurumsal bir anıt bırakma evresidir.',
@@ -630,10 +630,10 @@ function calculateCareerTimeline(birthDate: string): CareerTimelineData {
     }
   ];
 
-  // Aktif aşamayı tespit et
+  // Aktif aşamayı tespit et (kesintisiz tam aralık)
   let activeIndex = baseMilestones.findIndex(m => currentAge >= m.minAge && currentAge <= m.maxAge);
   if (activeIndex === -1) {
-    if (currentAge < 18) activeIndex = 0;
+    if (currentAge < 28) activeIndex = 0;
     else activeIndex = baseMilestones.length - 1;
   }
 

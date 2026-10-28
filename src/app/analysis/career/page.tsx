@@ -209,7 +209,7 @@ export default function CareerAnalysisPage() {
                     {result.personalInfo.fullName}
                   </h2>
                   <p className="text-[11px] sm:text-xs text-gray-400 mt-0.5 truncate">
-                    {result.personalInfo.birthDate} • {result.personalInfo.cityName} (Yaş: {result.careerTimeline?.currentAge || ''})
+                    {result.personalInfo.birthDate ? result.personalInfo.birthDate.split('T')[0].split('-').reverse().join('.') : ''} • {result.personalInfo.cityName} (Yaş: {result.careerTimeline?.currentAge || ''})
                   </p>
                 </div>
               </div>
