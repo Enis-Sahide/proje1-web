@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { 
   Briefcase, Sparkles, Target, Award, ShieldAlert, 
   ArrowRight, RefreshCw, Layers, Compass, CheckCircle2,
-  Zap, DollarSign, Flame, Lightbulb, Navigation, Clock, Calendar
+  Zap, DollarSign, Flame, Lightbulb, Navigation, Clock, Calendar,
+  Palette, Building2, FileText, Hammer, Music, HeartHandshake
 } from 'lucide-react';
 import AnalysisBackButton from '@/components/ui/AnalysisBackButton';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
@@ -542,6 +543,100 @@ export default function CareerAnalysisPage() {
                 </div>
               )}
             </div>
+
+            {/* 5. GEZEGEN YERLEŞİMLERİNE GÖRE MESLEKİ, ZANAAT & SANAT HARİTASI */}
+            {result.planetaryInsights && result.planetaryInsights.length > 0 && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2.5 px-1">
+                  <div className="p-2 rounded-xl bg-pink-500/10 text-pink-400 border border-pink-500/20">
+                    <Palette size={18} />
+                  </div>
+                  <div>
+                    <h3 className="text-lg sm:text-xl font-bold text-white">
+                      Gezegen Yerleşimlerinize Göre Mesleki & Zanaat Göstergeleri
+                    </h3>
+                    <span className="text-[11px] sm:text-xs text-gray-400 block">
+                      Doğum haritanızdaki gezegenlerin kamu memurluğu, tekstil, müzik, zanaat ve sahadaki doğrudan karşılıkları
+                    </span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {result.planetaryInsights.map((insight, pIdx) => {
+                    const getIcon = (iconName: string) => {
+                      switch (iconName) {
+                        case 'Palette': return <Palette size={18} className="text-pink-400" />;
+                        case 'Building2': return <Building2 size={18} className="text-blue-400" />;
+                        case 'FileText': return <FileText size={18} className="text-amber-400" />;
+                        case 'Hammer': return <Hammer size={18} className="text-red-400" />;
+                        case 'Music': return <Music size={18} className="text-purple-400" />;
+                        case 'HeartHandshake': return <HeartHandshake size={18} className="text-emerald-400" />;
+                        default: return <Briefcase size={18} className="text-gray-400" />;
+                      }
+                    };
+
+                    const getDomainColor = (iconName: string) => {
+                      switch (iconName) {
+                        case 'Palette': return 'border-pink-500/30 bg-pink-500/10 text-pink-300';
+                        case 'Building2': return 'border-blue-500/30 bg-blue-500/10 text-blue-300';
+                        case 'FileText': return 'border-amber-500/30 bg-amber-500/10 text-amber-300';
+                        case 'Hammer': return 'border-red-500/30 bg-red-500/10 text-red-300';
+                        case 'Music': return 'border-purple-500/30 bg-purple-500/10 text-purple-300';
+                        case 'HeartHandshake': return 'border-emerald-500/30 bg-emerald-500/10 text-emerald-300';
+                        default: return 'border-white/10 bg-white/5 text-gray-300';
+                      }
+                    };
+
+                    return (
+                      <div
+                        key={pIdx}
+                        className="bg-black/50 border border-white/10 hover:border-white/20 p-4 sm:p-5 rounded-2xl flex flex-col justify-between transition-all"
+                      >
+                        <div>
+                          <div className="flex items-center justify-between gap-2 mb-2.5">
+                            <div className="flex items-center gap-2">
+                              <div className="p-2 rounded-xl bg-white/5 border border-white/10">
+                                {getIcon(insight.iconName)}
+                              </div>
+                              <span className="text-xs font-bold text-white">
+                                {insight.planet} ({insight.sign} • {insight.house}. Ev)
+                              </span>
+                            </div>
+                            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${getDomainColor(insight.iconName)}`}>
+                              {insight.domain}
+                            </span>
+                          </div>
+
+                          <h4 className="text-xs sm:text-sm font-semibold text-gray-200 mb-2 leading-snug">
+                            {insight.title}
+                          </h4>
+
+                          <p className="text-xs text-gray-400 leading-relaxed mb-3">
+                            {insight.explanation}
+                          </p>
+                        </div>
+
+                        <div className="pt-2 border-t border-white/5">
+                          <span className="text-[10px] text-gray-400 uppercase tracking-wider block mb-1.5 font-medium">
+                            Yatkın Meslekler & Zanaat Dalları:
+                          </span>
+                          <div className="flex flex-wrap gap-1">
+                            {insight.suitableProfessions.map((prof, profIdx) => (
+                              <span
+                                key={profIdx}
+                                className="text-[10px] bg-white/5 border border-white/10 text-gray-300 px-2 py-0.5 rounded-md"
+                              >
+                                {prof}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* 5. KADERSEL EVRİLME (DHARMA - KUZEY DÜĞÜMÜ ROTASI) */}
             {result.dharmaPath && (

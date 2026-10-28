@@ -78,6 +78,17 @@ export interface CareerTimelineData {
   milestones: CareerMilestone[];
 }
 
+export interface PlanetaryPlacementCareerInsight {
+  planet: string;
+  sign: string;
+  house: number;
+  domain: string;
+  iconName: string;
+  title: string;
+  explanation: string;
+  suitableProfessions: string[];
+}
+
 export interface CareerAnalysisResult {
   personalInfo: {
     fullName: string;
@@ -105,6 +116,7 @@ export interface CareerAnalysisResult {
   shadowPitfalls: string;
   topSectors: CareerSectorMatch[];
   secondarySectors: SecondarySectorMatch[];
+  planetaryInsights: PlanetaryPlacementCareerInsight[];
   energyDistribution: {
     segments: CareerEnergySegment[];
   };
@@ -124,66 +136,66 @@ interface SectorDefinition {
 const SECTOR_DEFINITIONS: Record<string, SectorDefinition> = {
   technology: {
     id: 'technology',
-    title: 'Yazılım Mimarisi, Yapay Zeka & Derin Teknoloji',
-    shortTitle: 'Yazılım & Teknoloji',
+    title: 'Bilişim, Yazılım, Donanım & Teknik Mühendislik',
+    shortTitle: 'Yazılım & Bilişim',
     category: 'Teknoloji & İnovasyon',
     color: '#8B5CF6',
-    description: 'Bilişim sistemleri, algoritmik yazılım mimarisi, yapay zeka entegrasyonları ve ölçeklenebilir dijital platformlar inşa etme konusunda doğuştan gelen yüksek analitik problem çözme dehanızı temsil eder.',
-    roles: ['Yazılım Mimarı & Full-Stack Mühendis', 'Yapay Zeka & Algoritma Geliştirici', 'Teknoloji Kurucusu (CTO / Founder)', 'Bulut & Sistem Altyapı Direktörü', 'Siber Güvenlik & Veri Analisti']
+    description: 'Bilişim altyapıları, yazılım mimarisi, donanım ve ağ sistemleri, veri analizi ve teknik problem çözme konusunda analitik yeteneklerinizi temsil eder.',
+    roles: ['Yazılım Geliştirici & Mühendis', 'Bilişim & Ağ Teknisyeni', 'Veri Analisti & Yapay Zeka Uzmanı', 'Teknik Çözüm & Donanım Danışmanı', 'Bilgi İşlem Sorumlusu']
   },
   finance: {
     id: 'finance',
-    title: 'Büyük Sermaye, Yatırım Stratejisi & Varlık Yönetimi',
-    shortTitle: 'Finans & Sermaye',
+    title: 'Maliye, Bankacılık, Muhasebe & Esnaf Ticareti',
+    shortTitle: 'Finans, Maliye & Ticaret',
     category: 'Finans & Strateji',
     color: '#10B981',
-    description: 'Maddi kaynakları vizyoner hedefler doğrultusunda büyütme, portföy ve fon yönetimi, şirket satın almaları ve stratejik sermaye kurgularında söz sahibi olma gücünüzü simgeler.',
-    roles: ['Yatırım Bankacısı & Portföy Yöneticisi', 'Özel Sermaye (PE) & Fon Direktörü', 'Finansal Stratejist & CFO', 'Gayrimenkul Geliştirme Yatırımcısı', 'Kriz Arbitrajı & Varlık Değerleme Uzmanı']
+    description: 'Maddi kaynakları bereketle yönetme, bankacılık ve kamu maliyesi, vergi dairesi memuriyeti, esnaflık, işletme muhasebesi ve sermaye değerlendirme liyakatinizdir.',
+    roles: ['Maliye / Vergi Dairesi Memuru', 'Banka Uzmanı & Veznedar', 'Mali Müşavir & Muhasebe Sorumlusu', 'Esnaf & Ticari İşletmeci', 'Gayrimenkul & Yatırım Danışmanı']
   },
   leadership: {
     id: 'leadership',
-    title: 'Bağımsız Girişimcilik, Start-up & İcra Kurulu Liderliği',
-    shortTitle: 'Girişim & Liderlik',
+    title: 'İdari Yönetim, Kamu Şefliği & Bağımsız İşletmecilik',
+    shortTitle: 'Yönetim & Girişim',
     category: 'Liderlik & Girişim',
     color: '#EAB308',
-    description: 'Piyasada ilk adımı atma cesareti, start-up projelerini hızla ölçekleme, kriz anlarında inisiyatif alarak ekiplere ve şirketlere kararlı bir şekilde yön verme kudretinizi açığa çıkarır.',
-    roles: ['Şirket Kurucusu & CEO', 'Start-up Büyüme Direktörü (Scale-up)', 'Kriz & Dönüşüm Yöneticisi', 'Girişim Sermayesi (VC) Ortağı', 'Operasyonel İcra Lideri']
+    description: 'İster kamu kurumlarında idari şeflik ve daire müdürlüğü, ister özel sektör yöneticiliği, isterse kendi atölyesini ve dükkanını kurma cesareti; insanlara ve işlere yön verme kudretinizdir.',
+    roles: ['Kamu Kurum Yöneticisi & Daire Amiri', 'Bağımsız Atölye / Dükkan İşletmecisi', 'Şirket Müdürü & Operasyon Şefi', 'Kooperatif & Saha Yöneticisi', 'Kriz & Dönüşüm Lideri']
   },
   systems: {
     id: 'systems',
-    title: 'Sistem Mimarisi, Mühendislik & Süreç Optimizasyonu',
-    shortTitle: 'Sistem & Mühendislik',
+    title: 'Kamu Memuriyeti, Bürokrasi, Zanaat & Süreç Düzeni',
+    shortTitle: 'Kamu Memuriyeti & Zanaat',
     category: 'Organizasyon & Sistem',
     color: '#3B82F6',
-    description: 'Karmaşık operasyonel süreçlerden saat gibi işleyen kusursuz düzenler çıkarma, kalite güvence, endüstriyel altyapı ve sürdürülebilir organizasyonel standartlar inşa etme dehanızdır.',
-    roles: ['Operasyon Direktörü (COO)', 'Endüstriyel & Sistem Mühendisi', 'Süreç Optimizasyon Danışmanı', 'Kurumsal Denetim & Kalite Başkanı', 'Büyük Ölçekli Proje Yöneticisi']
+    description: 'Devlet kurumlarında intizamlı kamu memurluğu, adliye ve bürokrasi, arşiv ve evrak yönetimi, tekstil/imalat kalite kontrolü ve saat gibi işleyen düzenler kurma erdeminizdir.',
+    roles: ['Devlet Memuru / Büro Amiri', 'Adliye & Evrak Kayıt Memuru', 'Tekstil & İmalat Kalite Kontrolörü', 'Maliye & Denetim Memuru', 'Sistem & Operasyon Mühendisi']
   },
   creative: {
     id: 'creative',
-    title: 'Dijital Ürün Tasarımı, Medya & Kreatif İletişim',
-    shortTitle: 'Tasarım & Medya',
+    title: 'Tekstil & Moda Tasarımı, Müzik, Sahne & Görsel Sanatlar',
+    shortTitle: 'Tekstil, Sanat & Müzik',
     category: 'Sanat & İletişim',
     color: '#EC4899',
-    description: 'Kullanıcı deneyimi (UI/UX), marka kimliği, yaratıcı içerik üretimi, görsel sanatlar ve kitleleri derinden etkileyen çok kanallı iletişim ağları kurma yeteneğinizi yansıtır.',
-    roles: ['Kreatif Direktör', 'Dijital Ürün (UI/UX) Tasarımcısı', 'Medya & Yayıncılık Yöneticisi', 'Marka Kimliği Stratejisti', 'Görsel Yapımcı & Sanat Yönetmeni']
+    description: 'Kumaş, dokuma ve tekstil tasarımı, müzikal enstrüman ve beste icrası, sahne sanatları, görsel estetik, dekorasyon ve ruhu besleyen eserler üretme dehanızı yansıtır.',
+    roles: ['Tekstil, Kumaş & Moda Tasarımcısı', 'Müzisyen, Besteci & Ses Sanatçısı', 'Sahne Sanatçısı & Tiyatrocu', 'Görsel Sanatlar & Ressam/Zanaatkar', 'Dekorasyon & El Sanatları Ustası']
   },
   global: {
     id: 'global',
-    title: 'Global Vizyon, Uluslararası Ticaret & Yüksek Akademi',
-    shortTitle: 'Global Vizyon & Akademi',
+    title: 'Dış Ticaret, Lojistik, Gümrük, Turizm & Yüksek Akademi',
+    shortTitle: 'Dış Ticaret & Akademi',
     category: 'Global Vizyon & Akademi',
     color: '#F97316',
-    description: 'Yerel sınırları aşarak çok uluslu ticaret, küresel stratejik ortaklıklar, yüksek akademik araştırmalar ve kitlelere yön veren felsefi danışmanlıkta kadersel söz sahibi olduğunuzu gösterir.',
-    roles: ['Uluslararası Ticaret Direktörü', 'Akademisyen & Enstitü Başkanı', 'Küresel İş Geliştirme Danışmanı', 'Uluslararası Hukuk Müşaviri', 'Kurumsal Filozof & Stratejist']
+    description: 'Uluslararası ticaret, gümrük ve lojistik sevkiyat, turizm acenteciliği, yabancı dil ve tercümanlık ile yüksek akademik araştırmalarda sınırları aşan vizyonunuzdur.',
+    roles: ['Dış Ticaret & Gümrük Memuru', 'Lojistik & Sevkiyat Koordinatörü', 'Turizm & Otelcilik Yöneticisi', 'Tercüman & Dil Uzmanı', 'Akademisyen & Kültür Araştırmacısı']
   },
   human: {
     id: 'human',
-    title: 'İnsan Kaynakları, Psikoloji & Büyüme Danışmanlığı',
-    shortTitle: 'İnsan & Danışmanlık',
+    title: 'Öğretmenlik, Sağlık, Kamu Hizmeti & Sosyal Şifa',
+    shortTitle: 'Eğitim, Sağlık & Hizmet',
     category: 'Şifa & Danışmanlık',
     color: '#14B8A6',
-    description: 'İnsan psikolojisinin derin dinamiklerini anlama, kurumlarda sadakat ve aidiyet ortamı yaratma, üst düzey yetenekleri keşfetme ve dönüştürücü koçluk verme kabiliyetinizi anlatır.',
-    roles: ['İnsan Kaynakları Direktörü (CHRO)', 'Üst Düzey Yönetici Koçu & Mentor', 'Klinik Psikolog & Başdanışman', 'Kurumsal Kültür Mimarı', 'Sosyal Gelişim & Sağlık Lideri']
+    description: 'Öğretmenlik ve gençleri yetiştirme, kamu sağlığı ve hemşirelik, sosyal hizmet memurluğu, psikolojik rehberlik ve insanlara şefkatle hizmet etme yüksek vicdanınızı simgeler.',
+    roles: ['Öğretmen & Eğitimci', 'Hemşire & Sağlık Personeli', 'Kamu Sosyal Hizmet Görevlisi', 'Rehberlik & Psikolojik Danışman', 'İnsan Kaynakları & Yetenek Sorumlusu']
   }
 };
 
@@ -533,12 +545,27 @@ export class CareerEngine {
     const wealthMagnet = calculateWealthMagnet(house2Sign, topSectors[0].id);
     const burnoutShield = calculateBurnoutShield(hdType, topSectors[0].category);
 
-    // 10. SÜPER GÜÇ VE GÖLGE TUZAKLAR
+    // 10. GEZEGEN YERLEŞİMLERİNE GÖRE BİREBİR MESLEKİ & ZANAAT DÖKÜMÜ
+    const planetaryInsights = calculatePlanetaryCareerInsights(
+      chart,
+      sun,
+      moon,
+      mercury,
+      venus,
+      mars,
+      jupiter,
+      saturn,
+      neptune,
+      uranus,
+      pluto
+    );
+
+    // 11. SÜPER GÜÇ VE GÖLGE TUZAKLAR
     const dominantCategory = topSectors[0].category;
     const superPower = generateCleanMultiPlanetSuperPower(dominantCategory, mercury.sign, uranus.house, destinyNum);
     const shadowPitfalls = generateCleanMultiPlanetShadowPitfall(dominantCategory, saturn.sign);
 
-    // 11. 4 STRATEJİK EYLEM ADIMI
+    // 12. 4 STRATEJİK EYLEM ADIMI
     const actionableGuidance = generateActionableGuidance(dominantCategory, hdType, destinyNum, house2Sign);
 
     return {
@@ -564,6 +591,7 @@ export class CareerEngine {
       shadowPitfalls,
       topSectors,
       secondarySectors,
+      planetaryInsights,
       energyDistribution: {
         segments
       },
@@ -595,8 +623,8 @@ function calculateCareerTimeline(birthDate: string): CareerTimelineData {
       maxAge: 34,
       title: 'Profesyonel Rüştünü İspat & Ustalığa Geçiş',
       planetCycle: '1. Satürn Döngüsü & Hermetik Ustalık (33 Yaş)',
-      description: 'Çıraklığın resmi olarak bittiği, genç yetenek sıfatından çıkıp ilk büyük unvanı, kurumsal sorumluluğu veya ilk şirketi kurduğunuz kadersel olgunlaşma sınavıdır.',
-      actionGuidance: 'Dağınıklığı ve gevşekliği bırakın; uzmanlığınızı resmi unvana veya tescilli bir iş modeline dökün.'
+      description: 'Çıraklığın resmi olarak bittiği, genç yetenek sıfatından çıkıp ilk büyük unvanı, kamu derecesini, mesleki ustalığı veya kendi iş yerini/atölyesini kurduğunuz kadersel olgunlaşma sınavıdır.',
+      actionGuidance: 'Dağınıklığı bırakın; uzmanlığınızı resmi unvana, memuriyet kademesine, ustalık belgesine veya tescilli bir iş modeline dökün.'
     },
     {
       id: 'nodal_shift',
@@ -605,8 +633,8 @@ function calculateCareerTimeline(birthDate: string): CareerTimelineData {
       maxAge: 41,
       title: 'Kadersel Uyanış & Özgür Yolunu Çizme',
       planetCycle: '2. Kader Düğümleri & Jüpiter Döngüsü',
-      description: 'Başkaları için çalışmaktan veya başkalarının kurallarıyla yaşamaktan bıkıp kendi özgün vizyonunuzu ilan ettiğiniz, radikal sektör/iş modeli değişikliği çağıdır.',
-      actionGuidance: 'Konfor alanına saplanıp kalmayın; uzun süredir ertelediğiniz bağımsız projelerin liderliğini üstlenin.'
+      description: 'Başkalarının dar kalıplarıyla yaşamaktan bıkıp kendi özgün vizyonunuzu ilan ettiğiniz, mesleğinizde kendi imzanızı attığınız veya kendi atölyenizi/işinizi kurduğunuz uyanış çağıdır.',
+      actionGuidance: 'Konfor alanına saplanıp kalmayın; uzun süredir ertelediğiniz bağımsız projelerin veya mesleki atılımların sorumluluğunu üstlenin.'
     },
     {
       id: 'uranus_renaissance',
@@ -615,8 +643,8 @@ function calculateCareerTimeline(birthDate: string): CareerTimelineData {
       maxAge: 48,
       title: 'Kariyer Rönesansı & Büyük İnovasyon Patlaması',
       planetCycle: 'Uranüs Karşıtlığı (Ruhun 2. Doğumu)',
-      description: 'İkinci bahar ve en yüksek özerklik çağıdır. Kimseye kendinizi ispatlama kaygınız kalmaz; sektöre çağ atlatacak inovatif projeler, derin teknoloji veya büyük fon/sistem kuruculuğu zirve yapar.',
-      actionGuidance: 'Geleneksel kalıpları yıkın; sektörünüzde devrim yaratacak bağımsız ve teknolojik ürünlerinize tam gaz verin.'
+      description: 'İkinci bahar ve en yüksek özerklik çağıdır. Kimseye kendinizi ispatlama kaygınız kalmaz; sektörünüzde, zanaatinizde veya sanatınızda çağ atlatacak özgün eserler, sistemler ve bağımsız projeler zirve yapar.',
+      actionGuidance: 'Geleneksel kalıpları yıkın; mesleğinizde veya sanatınızda devrim yaratacak bağımsız çalışmalarınıza tam gaz verin.'
     },
     {
       id: 'legacy_authority',
@@ -625,8 +653,8 @@ function calculateCareerTimeline(birthDate: string): CareerTimelineData {
       maxAge: 120,
       title: 'Akil Liderlik, Kurumsal Miras & Mentorluk',
       planetCycle: 'Kiron & 2. Satürn Bilgelik Döngüsü',
-      description: 'Günlük operasyonel koşuşturmadan çekilip; yönetim kurullarında akil insanlık yapma, genç liderleri fonlama ve zamanın silemeyeceği kurumsal bir anıt bırakma evresidir.',
-      actionGuidance: 'Operasyonu yeni nesil yeteneklere devredin; stratejik vizyon ve kalıcı miras kuruculuğuna odaklanın.'
+      description: 'Günlük operasyonel koşturmadan çekilip; birikmiş tecrübeyi yeni nesillere aktarma, usta-çırak ilişkisiyle zanaatinizi/bilginizi yaşatma, kurumsal miras bırakma ve akil insanlık yapma evresidir.',
+      actionGuidance: 'Operasyonu yeni nesil yeteneklere devredin; stratejik vizyon, usta öğreticilik ve kalıcı eserler bırakmaya odaklanın.'
     }
   ];
 
@@ -950,7 +978,7 @@ function calculateIdealWorkModel(
     return {
       type: 'Kurumsal Lider & Üst Yönetici',
       percentage: calculatedPercentage,
-      explanation: 'Büyük bütçeleri, insan kaynaklarını ve sağlam kurumsal mekanizmaları yönetebilecek doğal bir otorite ve organizasyonel güç taşırsınız. Kurumların icra kurullarında, genel müdürlük koltuğunda veya holding zirvelerinde kalıcı bir miras inşa edersiniz.'
+      explanation: 'Gerek devlet kademelerinde ve kamu kurumlarında intizamlı idari yönetim, gerekse kurumsal yapılarda, şube müdürlüklerinde veya icra mercilerinde kalıcı ve güven veren bir nizam inşa edersiniz. Büyük bütçeleri, insan kaynaklarını ve sağlam mekanizmaları yönetebilecek doğal bir otorite ve organizasyonel ciddiyet taşırsınız.'
     };
   }
 
@@ -958,7 +986,7 @@ function calculateIdealWorkModel(
     return {
       type: 'Stratejik Rehber & Danışman',
       percentage: calculatedPercentage,
-      explanation: 'Operasyonel angaryalardan ve günlük amelelikten uzaklaşıp; üst düzey liderlere, şirketlere veya bireylere stratejik yol haritası çizdiğiniz uzman başdanışmanlık ve mimarlık modeli size en yüksek saygınlığı ve finansal akışı sağlar.'
+      explanation: 'Operasyonel angaryalardan ve rutin amelelikten uzaklaşıp; kurumlara, liderlere veya bireylere stratejik yol haritası çizdiğiniz uzman rehberlik, hukuki/mali danışmanlık veya başdanışmanlık modeli size en yüksek saygınlığı ve finansal bereketi sağlar.'
     };
   }
 
@@ -966,13 +994,194 @@ function calculateIdealWorkModel(
     return {
       type: 'Özerk Uzman & Zanaatkar',
       percentage: calculatedPercentage,
-      explanation: 'Kendi alanında en derin bilgiye sahip, teknik ustalığıyla vazgeçilmez olan ve kalite standartlarını kendisi belirleyen özerk bir çalışma biçimi sizin için idealdir. Şirket bürokrasisiyle boğuşmak yerine en üst düzey uzmanlığı icra etmek sizi zirveye taşır.'
+      explanation: 'Kendi alanında en derin bilgiye ve el ustalığına sahip; ister kendi atölyesinde üretim yapan usta bir tekstilci/zanaatkar, ister bağımsız bir müzisyen/sanatçı, ister teknik sistem uzmanı olsun; kalitesini tavizsiz konuşturduğu özerk bir çalışma biçimi sizin için idealdir. Bürokrasiye boğulmak yerine zanaatinizi ve uzmanlığınızı bizzat icra etmek sizi zirveye taşır.'
     };
   }
 
   return {
     type: 'Girişimci & Bağımsız Kurucu',
     percentage: calculatedPercentage,
-    explanation: 'Başkalarının katı bürokrasisi altında çalışmak yaratıcı potansiyelinizi ve bağımsız karar alma gücünüzü sınırlar. Kendi kurallarınızı koyduğunuz bağımsız girişimler, şirket kuruculuğu veya serbest start-up modelleri sizin en yüksek verim ve kadersel doyum alanınızdır.'
+    explanation: 'Başkalarının katı direktifleri altında çalışmak yaratıcı enerjinizi ve bağımsız karar alma gücünüzü kısıtlar. Kendi işini, dükkanını, atölyesini veya bağımsız girişimini kurarak kendi kurallarıyla ilerleyen bağımsız modeller sizin en yüksek doyum ve bereket alanınızdır.'
   };
+}
+
+function calculatePlanetaryCareerInsights(
+  chart: NatalChartData,
+  sun: AstroPoint,
+  moon: AstroPoint,
+  mercury: AstroPoint,
+  venus: AstroPoint,
+  mars: AstroPoint,
+  jupiter: AstroPoint,
+  saturn: AstroPoint,
+  neptune: AstroPoint,
+  uranus: AstroPoint,
+  pluto: AstroPoint
+): PlanetaryPlacementCareerInsight[] {
+  const insights: PlanetaryPlacementCareerInsight[] = [];
+
+  // 1. VENÜS: Tekstil, Kumaş, Sanat, Müzik & Zanaat
+  const venusArtsSigns = ['Boğa', 'Terazi', 'Balık', 'Yengeç'];
+  const venusCraftSigns = ['Başak', 'Oğlak'];
+  if (venusArtsSigns.includes(venus.sign) || [2, 5, 7, 12].includes(venus.house)) {
+    insights.push({
+      planet: 'Venüs',
+      sign: venus.sign,
+      house: venus.house,
+      domain: 'Tekstil, Sanat & Müzik',
+      iconName: 'Palette',
+      title: `Venüs ${venus.sign} (${venus.house}. Ev) • Tekstil, Moda, Kumaş & Müzikal Yetenek`,
+      explanation: `Venüs'ünüzün ${venus.sign} burcundaki ve ${venus.house}. evdeki yerleşimi; kumaş dokusu, tekstil tasarımı, renk ve desen ahengi ile el zanaatlerinde doğuştan gelen rafine bir estetik zevk bahşeder. Aynı zamanda müzik kulağı, enstrüman icrası, ses estetiği veya dekorasyon/görsel sanatlarda ruhu doyuran eserler çıkarma potansiyelinizi açığa çıkarır.`,
+      suitableProfessions: [
+        'Tekstil & Kumaş Tasarımcısı',
+        'Müzisyen, Besteci & Ses Sanatçısı',
+        'Moda & Stilist',
+        'Görsel Sanatlar & Ressam',
+        'Ev Tekstili & Dekorasyon Ustası'
+      ]
+    });
+  } else if (venusCraftSigns.includes(venus.sign) || [6, 10].includes(venus.house)) {
+    insights.push({
+      planet: 'Venüs',
+      sign: venus.sign,
+      house: venus.house,
+      domain: 'Tekstil, Sanat & Müzik',
+      iconName: 'Palette',
+      title: `Venüs ${venus.sign} (${venus.house}. Ev) • Tekstil Kalıp Ustalığı & İnce Zanaat`,
+      explanation: `Venüs'ün bu yerleşimi, estetik yeteneği disiplin ve teknik milimetrik hassasiyetle birleştirir. Tekstil kalıpçılığı, titiz terzilik, takı/mücevher zanaatı, restorasyon ve üretimde sıfır hata ile çalışan usta el becerisi sunar.`,
+      suitableProfessions: [
+        'Tekstil Modelisti & Kalıp Ustası',
+        'Mücevher & Kuyumculuk Zanaatkarı',
+        'Tekstil Kalite Güvence Uzmanı',
+        'El İşçiliği & Terzilik'
+      ]
+    });
+  } else {
+    insights.push({
+      planet: 'Venüs',
+      sign: venus.sign,
+      house: venus.house,
+      domain: 'Tekstil, Sanat & Müzik',
+      iconName: 'Palette',
+      title: `Venüs ${venus.sign} (${venus.house}. Ev) • Estetik İletişim, Sahne & Tasarım`,
+      explanation: `Venüs'ünüzün ${venus.sign} yerleşimi; stil danışmanlığı, sahne tasarımı, tekstil ürünlerinin vitrin sunumu ve görsel albenisi yüksek tasarımlar hazırlama kabiliyetinizi destekler.`,
+      suitableProfessions: [
+        'Stil Danışmanı & Tasarımcı',
+        'Sahne & Vitrin Tasarımcısı',
+        'Görsel İletişim Uzmanı',
+        'Tekstil Pazarlama & Temsil'
+      ]
+    });
+  }
+
+  // 2. SATÜRN: Kamu Memuriyeti, Devlet Nizamı, Bürokrasi & Liyakat
+  const saturnGovSigns = ['Oğlak', 'Başak', 'Boğa', 'Yengeç'];
+  if (saturnGovSigns.includes(saturn.sign) || [6, 10, 4, 1].includes(saturn.house)) {
+    insights.push({
+      planet: 'Satürn',
+      sign: saturn.sign,
+      house: saturn.house,
+      domain: 'Kamu Memuriyeti & İdari Düzen',
+      iconName: 'Building2',
+      title: `Satürn ${saturn.sign} (${saturn.house}. Ev) • Devlet Memuriyeti & Kamu Nizamı`,
+      explanation: `Satürn'ün ${saturn.sign} burcunda ve ${saturn.house}. evdeki sağlam konumu; devlet kademelerinde kamu memurluğu, kurumsal bürokrasi, evrak ve arşiv nizamı, adliye/vergi dairesi intizamı ve kanunlara sadakatle yükselmeyi destekler. Riskli maceralar yerine güvenceli, intizamlı ve kademeli kamu görevinde sarsılmaz bir liyakat sunar.`,
+      suitableProfessions: [
+        'Devlet Memuru & Büro Şefi',
+        'Adliye & Evrak Kayıt Görevlisi',
+        'Maliye / Vergi Dairesi Memuru',
+        'Kamu İdare Personeli',
+        'Mevzuat & Kalite Denetmeni'
+      ]
+    });
+  } else {
+    insights.push({
+      planet: 'Satürn',
+      sign: saturn.sign,
+      house: saturn.house,
+      domain: 'Kamu Memuriyeti & İdari Düzen',
+      iconName: 'Building2',
+      title: `Satürn ${saturn.sign} (${saturn.house}. Ev) • Kurumsal Denetim, Muhasebe & Zanaat Disiplini`,
+      explanation: `Satürn'ün bu yerleşimi; mali denetim, muhasebe hesaplarının intizamı, usta-çırak disipliniyle zanaatte kök salma ve kurumsal yapıların omurgasını koruma ciddiyeti verir.`,
+      suitableProfessions: [
+        'Mali Müşavir & Muhasebe Sorumlusu',
+        'Kurumsal Denetçi',
+        'Arşiv & Büro Şefi',
+        'Zanaat Atölye Şefi'
+      ]
+    });
+  }
+
+  // 3. MERKÜR: Büro Yönetimi, Esnaflık, Ticaret, Yazışma & El Zanaatı / Kodlama
+  insights.push({
+    planet: 'Merkür',
+    sign: mercury.sign,
+    house: mercury.house,
+    domain: 'Büro, Ticaret & Zanaat',
+    iconName: 'FileText',
+    title: `Merkür ${mercury.sign} (${mercury.house}. Ev) • Büro İdaresi, Resmi Yazışma, Ticaret & Zanaat`,
+    explanation: `Merkür'ün ${mercury.sign} yerleşimi; büro idaresi, resmi daire yazışmaları, kâtiplik, evrak tasnifi, esnaflık ve perakende ticaret zekasını güçlendirir. Aynı zamanda parmak ve el koordinasyonu gerektiren hassas zanaatlarda (terzilik, saatçilik, enstrüman tuşları veya klavye kodlaması) seri bir pratiklik kazandırır.`,
+    suitableProfessions: [
+      'Büro Yönetimi & İdari Memur',
+      'Ticari İşletmeci & Esnaf',
+      'Muhasebe & Evrak Raportörü',
+      'Yazılım & Bilişim Uzmanı',
+      'Editör & Yazışma Sorumlusu'
+    ]
+  });
+
+  // 4. MARS: Saha Ustalığı, İmalat Sanayii, Güvenlik & Teknik Zanaat
+  insights.push({
+    planet: 'Mars',
+    sign: mars.sign,
+    house: mars.house,
+    domain: 'Saha, İmalat & Güvenlik',
+    iconName: 'Hammer',
+    title: `Mars ${mars.sign} (${mars.house}. Ev) • Saha Ustalığı, İmalat Sanayii & Güvenlik`,
+    explanation: `Mars'ın ${mars.sign} konumu; fabrikada imalat tezgâhı, sanayi atölyesi, mekanik tamirat, inşaat ve metalurji gibi bizzat sahada ter dökülen alanlarda yüksek dayanıklılık verir. Ayrıca polislik, askeriye, özel güvenlik, cerrahi tıp veya acil müdahale ekiplerinde soğukkanlı bir cesaret sağlar.`,
+    suitableProfessions: [
+      'Sanayi & Makine Teknisyeni',
+      'Kolluk Kuvveti / Güvenlik Görevlisi',
+      'Mekanik Tesisat & Bakım Ustası',
+      'Cerrahi/Acil Sağlık Personeli',
+      'Saha Operasyon Şefi'
+    ]
+  });
+
+  // 5. NEPTÜN: Müzikal İlham, Sahne & Sanatsal Ruh
+  insights.push({
+    planet: 'Neptün',
+    sign: neptune.sign,
+    house: neptune.house,
+    domain: 'İlham, Sahne & Sanat',
+    iconName: 'Music',
+    title: `Neptün ${neptune.sign} (${neptune.house}. Ev) • Müzikal İlham, Sahne & Sanatsal Ruh`,
+    explanation: `Neptün'ün bu mistik yerleşimi; görünmeyen melodileri duyma, beste yapma, enstrümana duygu yükleme, sinema, tiyatro, şiir ve mistik sanatlar kanalını açar. Mantığın bittiği yerde ilhamla üreten, ruhları dinlendiren ve dinleyicileri büyüleyen bir sanat frekansıdır.`,
+    suitableProfessions: [
+      'Besteci, Aranjör & Müzisyen',
+      'Sinema & Tiyatro Sanatçısı',
+      'Fotoğraf & Görsel Yönetmeni',
+      'Şair & Edebi Yazar',
+      'Doğal Terapi & Şifa Uzmanı'
+    ]
+  });
+
+  // 6. AY: Gıda, Beslenme, Konfeksiyon, Eğitim & Şefkat Hizmeti
+  insights.push({
+    planet: 'Ay',
+    sign: moon.sign,
+    house: moon.house,
+    domain: 'Eğitim, Sağlık & Hizmet',
+    iconName: 'HeartHandshake',
+    title: `Ay ${moon.sign} (${moon.house}. Ev) • Gıda, Konfeksiyon, Eğitim & Şefkat Hizmeti`,
+    explanation: `Ay'ınızın besleyici konumu; aşçılık, gıda işletmeciliği, ev tekstili/konfeksiyon, anaokulu/kreş eğitmenliği, hemşirelik ve kamuya şefkatle hizmet sunulan destek rollerinde derin bir iç huzur ve bereket sağlar.`,
+    suitableProfessions: [
+      'Gıda İşletmecisi & Aşçı',
+      'Ev Tekstili & Konfeksiyon Ustası',
+      'Hemşire & Bakım Uzmanı',
+      'Anaokulu / Çocuk Gelişimcisi',
+      'Kamu Sosyal Hizmet Görevlisi'
+    ]
+  });
+
+  return insights;
 }
