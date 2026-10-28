@@ -225,7 +225,16 @@ export const downloadCareerPDF = async (
     curY = renderText(`**${b.title}:** ${b.val}`, 15, curY, 180, 5.6);
     curY += 2;
   });
-  curY += 5;
+
+  if (data.summaryBadges.decisionExplanation) {
+    ensureSpace(22);
+    curY = renderText(
+      `**Stratejik Karar Kılavuzu:** ${data.summaryBadges.decisionExplanation.replace(/\n\n/g, ' ')}`,
+      15, curY, 180, 5.5
+    );
+    curY += 3;
+  }
+  curY += 4;
 
   // İdeal Çalışma Modeli Açıklaması
   doc.setFont('LiberationSans', 'bold');

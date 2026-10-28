@@ -229,6 +229,7 @@ export interface CareerAnalysisResult {
     workDynamic: string;
     coreAsset: string;
     decisionMotto: string;
+    decisionExplanation: string;
   };
   idealWorkModel: {
     type: 'Girişimci & Bağımsız Kurucu' | 'Kurumsal Lider & Üst Yönetici' | 'Stratejik Rehber & Danışman' | 'Özerk Uzman & Zanaatkar';
@@ -657,7 +658,50 @@ export class CareerEngine {
     else if (hdType === 'Reflektör') workDynamic = 'Yüksek Vizyon & Tarafsız Denetim';
 
     const coreAsset = topSectors[0].title;
-    const decisionMotto = `${hdStrategy} & ${hdAuthority.replace('Otorite', '').trim()} Karar Modeli`;
+    
+    // Anlaşılır ve Somut Karar Mekanizması & Stratejik Rehber
+    const getDecisionMechanismProfile = (strategy: string, authority: string) => {
+      let strategyPlain = 'Piyasa Talebine Yanıt Verme';
+      let strategyDesc = 'kendi kendinize boşlukta iş uydurup başlatmak enerjinizi tüketir; piyasadan, müşterilerden veya iş ortaklarından somut bir talep ya da soru geldiğinde harekete geçmelisiniz';
+      
+      if (strategy.toLowerCase().includes('davet')) {
+        strategyPlain = 'Liyakat Görünürlüğü & Davetle Başlama';
+        strategyDesc = 'kendinizi zorla kabul ettirmeye çalışmak yerine uzmanlığınızı sergileyip yetkili mercilerden veya müşterilerden resmi teklif ve davet beklemelisiniz';
+      } else if (strategy.toLowerCase().includes('bilgi')) {
+        strategyPlain = 'Öncü Başlatıcılık & Bilgilendirme';
+        strategyDesc = 'izin istemek yerine doğrudan inisiyatif almalı, ancak direnç görmemek için atacağınız adımlardan etkilenecek paydaşları önceden bilgilendirmelisiniz';
+      } else if (strategy.toLowerCase().includes('ay')) {
+        strategyPlain = 'Döngüsel Gözlem & Sabırlı Karar';
+        strategyDesc = 'büyük kariyer kararlarını aceleye getirmemeli, fikrinizi bir ay boyunca farklı koşullarda tartarak netleştirmelisiniz';
+      }
+
+      let authPlain = 'Sindirerek Karar Alma';
+      let authDesc = 'Büyük teklif, ortaklık ve imza kararlarında asla ilk anın heyecanıyla veya baskısıyla anında "Evet" demeyin. Duygusal dalganızın yatışması için kararın üstüne en az 24 saat uyuyun. Sizin için en karlı ve isabetli netlik, acele edilmediğinde zamanda olgunlaşır.';
+
+      if (authority.toLowerCase().includes('sakral')) {
+        authPlain = 'İçgüdüsel Beden Tepkisi';
+        authDesc = 'Bir iş teklifi veya proje geldiğinde karın ve beden enerjinizin o işe anlık olarak içten bir "Evet" mi yoksa isteksiz bir "Hayır" mı dediğini dinleyin. Zihinsel mantık kurgulamak yerine, bedensel çalışma hevesinizin olup olmadığını rehber alın.';
+      } else if (authority.toLowerCase().includes('dalak') || authority.toLowerCase().includes('spleen')) {
+        authPlain = 'Anlık Sezgi & İçsel Radar';
+        authDesc = 'Karar anında ilk saniyede içinize doğan sessiz hissi dinleyin. Kararı uzatıp mantık yürüttükçe doğru his kaybolur. İçsel güvenlik radarınız ilk anda uyardıysa o işten uzak durun.';
+      } else if (authority.toLowerCase().includes('ego') || authority.toLowerCase().includes('kalp')) {
+        authPlain = 'Kişisel İrade & Taahhüt Gücü';
+        authDesc = '"Bu iş gerçekten benim kalbimin istediği ve bana değer katacak bir hedef mi?" sorusunu sorun. İradenizin ve gururunuzun tam arkasında duramayacağı hiçbir sözleşmeye imza atmayın.';
+      } else if (authority.toLowerCase().includes('kendilik') || authority.toLowerCase().includes('çevre') || authority.toLowerCase().includes('mental')) {
+        authPlain = 'Sesli Düşünme & Ortam Uyumu';
+        authDesc = 'Kararınızı güvendiğiniz birine sesli olarak anlatırken kendi ağzınızdan çıkan sözleri dinleyin. Doğru karar, doğru çalışma ortamında sesinizin rahat ve ferah çıktığını hissettiğiniz an netleşir.';
+      }
+
+      const title = `${strategyPlain} & ${authPlain}`;
+      const motto = `${title} (${strategy} • ${authority.replace('Otorite', '').trim()})`;
+      const explanation = `Kariyerinizde ${strategyDesc}.\n\nKarar Anında: ${authDesc}`;
+
+      return { motto, explanation };
+    };
+
+    const decisionProfile = getDecisionMechanismProfile(hdStrategy, hdAuthority);
+    const decisionMotto = decisionProfile.motto;
+    const decisionExplanation = decisionProfile.explanation;
 
     // 7. İDEAL ÇALIŞMA MODELİ (4 Boyutlu Matematiksel Puanlama Matrisi)
     const idealWorkModel = calculateIdealWorkModel(
@@ -731,7 +775,8 @@ export class CareerEngine {
         leadershipStyle,
         workDynamic,
         coreAsset,
-        decisionMotto
+        decisionMotto,
+        decisionExplanation
       },
       idealWorkModel,
       careerTimeline,

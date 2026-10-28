@@ -405,6 +405,23 @@ export default function CareerAnalysisPage() {
               </div>
             </div>
 
+            {/* STRATEJİK KARAR MEKANİZMASI REHBERİ */}
+            {result.summaryBadges.decisionExplanation && (
+              <div className="bg-black/40 border border-emerald-500/30 p-4 sm:p-5 rounded-2xl backdrop-blur-md">
+                <div className="flex flex-wrap items-center gap-2 mb-2">
+                  <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                    🧭 Stratejik Karar Alma Kılavuzunuz
+                  </span>
+                  <span className="text-[11px] text-gray-400">
+                    ({result.summaryBadges.decisionMotto})
+                  </span>
+                </div>
+                <p className="text-xs sm:text-sm text-gray-200 leading-relaxed whitespace-pre-line">
+                  {result.summaryBadges.decisionExplanation}
+                </p>
+              </div>
+            )}
+
             {/* 2 KATMANLI EZOTERİK MİMARİ SEÇİCİ (Madde Dünyası vs Ruh Haritası) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-1.5 bg-black/60 border border-white/15 rounded-3xl backdrop-blur-md">
               <button
