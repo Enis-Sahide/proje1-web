@@ -607,33 +607,63 @@ export const downloadCareerPDF = async (
     curY += 8;
 
     data.planetaryInsights.forEach((pi) => {
-      ensureSpace(27);
-      doc.setFillColor(248, 250, 252);
-      doc.setDrawColor(229, 231, 235);
-      doc.roundedRect(15, curY, 180, 23, 2, 2, 'FD');
-
-      doc.setFont('LiberationSans', 'bold');
-      doc.setFontSize(9);
-      doc.setTextColor(...gold);
-      doc.text(`${pi.planet.toUpperCase()} (${pi.sign} - ${pi.house}. Ev) • ${pi.domain.toUpperCase()}`, 20, curY + 6);
-
-      doc.setFont('LiberationSans', 'bold');
-      doc.setFontSize(8.5);
-      doc.setTextColor(...primaryDark);
-      doc.text(pi.title, 20, curY + 11);
-
+      // Metinleri ve satırları kutu genişliğine (168mm) göre hesapla
       doc.setFont('LiberationSans', 'normal');
       doc.setFontSize(7.5);
-      doc.setTextColor(...charcoal);
-      const expLines = doc.splitTextToSize(pi.explanation, 170);
-      doc.text(expLines.slice(0, 1), 20, curY + 16);
+      const expLines = doc.splitTextToSize(pi.explanation, 168);
+      const visibleExpLines = expLines.slice(0, 2); // En fazla 2 satır açıklama
 
       doc.setFont('LiberationSans', 'bold');
       doc.setFontSize(7);
-      doc.setTextColor(...purple);
-      doc.text(`Tavsiye Edilen Meslek Dalları: ${pi.suitableProfessions.join(' • ')}`, 20, curY + 20.5);
+      const profText = `Tavsiye Edilen Meslek Dalları: ${pi.suitableProfessions.join(' • ')}`;
+      const profLines = doc.splitTextToSize(profText, 168); // Asla sağdan taşmayacak şekilde satırlara böl
 
-      curY += 26;
+      // Dinamik Yükseklik: Üst padding (5) + Başlık (4.5) + Alt Başlık (4.5) + Açıklama + Meslekler + Alt padding (4)
+      const boxH = 14 + (visibleExpLines.length * 3.8) + (profLines.length * 3.5);
+
+      ensureSpace(boxH + 5);
+
+      // Kutu Çizimi
+      doc.setFillColor(248, 250, 252);
+      doc.setDrawColor(229, 231, 235);
+      doc.roundedRect(15, curY, 180, boxH, 2, 2, 'FD');
+
+      let innerY = curY + 5.5;
+
+      // 1. Gezegen & Alan Başlığı
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(...gold);
+      doc.text(`${pi.planet.toUpperCase()} (${pi.sign} - ${pi.house}. Ev) • ${pi.domain.toUpperCase()}`, 20, innerY);
+      innerY += 4.5;
+
+      // 2. Mesleki Arketip Unvanı
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(...primaryDark);
+      doc.text(pi.title, 20, innerY);
+      innerY += 4.5;
+
+      // 3. Açıklama Satırları
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(...charcoal);
+      visibleExpLines.forEach((el: string) => {
+        doc.text(el, 20, innerY);
+        innerY += 3.8;
+      });
+      innerY += 0.8;
+
+      // 4. Tavsiye Edilen Meslek Dalları (Satır Satır Temiz Yerleşim)
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(7);
+      doc.setTextColor(...purple);
+      profLines.forEach((pl: string) => {
+        doc.text(pl, 20, innerY);
+        innerY += 3.5;
+      });
+
+      curY += boxH + 4;
     });
   }
 
@@ -650,56 +680,88 @@ export const downloadCareerPDF = async (
     curY += 6;
 
     // KADİM EZOTERİK İLKE • ONTOLOJİK UYANIŞ ŞARTI MANİFESTO KUTUSU
-    ensureSpace(45);
+    doc.setFont('LiberationSans', 'normal');
+    doc.setFontSize(7.5);
+    const p1 = 'Kadim Gnostik ve Hermetik öğretilerde insanoğlunun büyük çoğunluğu yaşamını 1. Katman olan Madde Dünyası içerisinde, biyolojik ve toplumsal matrix’in mekanik düzeninde tamamlar. Bu yaratılışın dengesini kuran doğal bir fazdır.';
+    const p1Lines = doc.splitTextToSize(p1, 168);
+
+    const p2 = 'Drakonik (Ruh) Haritası, her insanda zorla çalışan bir mekanizma değil; yalnızca dünyevi statü ve paranın ötesindeki içsel sızıyı duyan, "Ben buraya sadece bu çarkı döndürmek için gelmedim" diyerek içsel kıvılcımını kristalleştiren bilinçler için aktifleşen yüksek oktavlı kadersel bir rehberdir. Uykuda olan bilinçler için bu katman sessiz bir tohum olarak bekler; rezonans duyanlar içinse gerçek hayat amacının kapısını açar.';
+    const p2Lines = doc.splitTextToSize(p2, 168);
+
+    const manifestoBoxH = 17 + (p1Lines.length * 3.8) + 2.5 + (p2Lines.length * 3.8);
+    ensureSpace(manifestoBoxH + 5);
+
     doc.setFillColor(250, 245, 255);
     doc.setDrawColor(192, 132, 252);
-    doc.roundedRect(15, curY, 180, 42, 2, 2, 'FD');
+    doc.roundedRect(15, curY, 180, manifestoBoxH, 2, 2, 'FD');
 
+    let mY = curY + 6.5;
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(9.5);
     doc.setTextColor(...purple);
-    doc.text('KADİM EZOTERİK İLKE • ONTOLOJİK UYANIŞ ŞARTI (Hermetik & Gurdjieff Perspektifi)', 20, curY + 7);
+    doc.text('KADİM EZOTERİK İLKE • ONTOLOJİK UYANIŞ ŞARTI (Hermetik & Gurdjieff Perspektifi)', 20, mY);
+    mY += 5;
 
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(8.5);
     doc.setTextColor(...primaryDark);
-    doc.text('Ruhsal Çağrı Bir Zorunluluk Değil, Bilinçli Bir Uyanış Potansiyelidir', 20, curY + 13);
+    doc.text('Ruhsal Çağrı Bir Zorunluluk Değil, Bilinçli Bir Uyanış Potansiyelidir', 20, mY);
+    mY += 5;
 
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(...charcoal);
-    const p1 = 'Kadim Gnostik ve Hermetik öğretilerde insanoğlunun büyük çoğunluğu yaşamını 1. Katman olan Madde Dünyası içerisinde, biyolojik ve toplumsal matrix’in mekanik düzeninde tamamlar. Bu yaratılışın dengesini kuran doğal bir fazdır.';
-    const p1Lines = doc.splitTextToSize(p1, 170);
-    doc.text(p1Lines, 20, curY + 18.5);
+    p1Lines.forEach((pl: string) => {
+      doc.text(pl, 20, mY);
+      mY += 3.8;
+    });
+    mY += 2;
 
-    const p2 = 'Drakonik (Ruh) Haritası, her insanda zorla çalışan bir mekanizma değil; yalnızca dünyevi statü ve paranın ötesindeki içsel sızıyı duyan, "Ben buraya sadece bu çarkı döndürmek için gelmedim" diyerek içsel kıvılcımını kristalleştiren bilinçler için aktifleşen yüksek oktavlı kadersel bir rehberdir. Uykuda olan bilinçler için bu katman sessiz bir tohum olarak bekler; rezonans duyanlar içinse gerçek hayat amacının kapısını açar.';
-    const p2Lines = doc.splitTextToSize(p2, 170);
-    doc.text(p2Lines, 20, curY + 27.5);
+    p2Lines.forEach((pl: string) => {
+      doc.text(pl, 20, mY);
+      mY += 3.8;
+    });
 
-    curY += 48;
+    curY += manifestoBoxH + 6;
 
-    // Drakonik MC Kartı
+    // Drakonik MC Kartı (Dinamik Yükseklik)
+    doc.setFont('LiberationSans', 'normal');
+    doc.setFontSize(8.5);
+    const mcCallLines = doc.splitTextToSize(data.soulCareer.soulMidheaven.calling, 168);
+    const mcImpactLines = doc.splitTextToSize(`Kolektife Bırakılacak Manevi Etki: ${data.soulCareer.soulMidheaven.impact}`, 168);
+    const mcBoxH = 14 + (mcCallLines.slice(0, 2).length * 4.2) + (mcImpactLines.length * 4);
+
+    ensureSpace(mcBoxH + 5);
+
     doc.setFillColor(250, 245, 255);
     doc.setDrawColor(216, 180, 254);
-    doc.roundedRect(15, curY, 180, 36, 2, 2, 'FD');
+    doc.roundedRect(15, curY, 180, mcBoxH, 2, 2, 'FD');
 
+    let mcY = curY + 6.5;
     doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(10.5);
+    doc.setFontSize(10);
     doc.setTextColor(...purple);
-    doc.text(`Drakonik MC (Ruhsal Tepe Noktası): ${data.soulCareer.soulMidheaven.sign} - ${data.soulCareer.soulMidheaven.title}`, 20, curY + 7);
+    doc.text(`Drakonik MC (Ruhsal Tepe Noktası): ${data.soulCareer.soulMidheaven.sign} - ${data.soulCareer.soulMidheaven.title}`, 20, mcY);
+    mcY += 5;
 
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(...charcoal);
-    const mcCallLines = doc.splitTextToSize(data.soulCareer.soulMidheaven.calling, 170);
-    doc.text(mcCallLines.slice(0, 2), 20, curY + 14);
+    mcCallLines.slice(0, 2).forEach((ml: string) => {
+      doc.text(ml, 20, mcY);
+      mcY += 4.2;
+    });
+    mcY += 1;
 
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(8);
     doc.setTextColor(...gold);
-    doc.text(`Kolektife Bırakılacak Manevi Etki: ${data.soulCareer.soulMidheaven.impact}`, 20, curY + 28);
+    mcImpactLines.forEach((il: string) => {
+      doc.text(il, 20, mcY);
+      mcY += 4;
+    });
 
-    curY += 41;
+    curY += mcBoxH + 6;
 
     // Ruhun 3'lü Enkarnasyon Özü (Yükselen, Güneş, Ay)
     doc.setFont('LiberationSans', 'bold');
