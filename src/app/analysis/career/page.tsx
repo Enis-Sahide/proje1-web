@@ -6,7 +6,7 @@ import {
   Briefcase, Sparkles, Target, Award, ShieldAlert, 
   ArrowRight, RefreshCw, Layers, Compass, CheckCircle2,
   Zap, DollarSign, Flame, Lightbulb, Navigation, Clock, Calendar,
-  Palette, Building2, FileText, Hammer, Music, HeartHandshake
+  Palette, Building2, FileText, Hammer, Music, HeartHandshake, Globe, Feather
 } from 'lucide-react';
 import AnalysisBackButton from '@/components/ui/AnalysisBackButton';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
@@ -27,6 +27,7 @@ export default function CareerAnalysisPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<CareerAnalysisResult | null>(null);
+  const [activeLayer, setActiveLayer] = useState<'material' | 'soul'>('material');
 
   // Load from user profile if exists
   useEffect(() => {
@@ -255,8 +256,72 @@ export default function CareerAnalysisPage() {
               </div>
             </div>
 
-            {/* 1. İDEAL ÇALIŞMA MODELİ */}
-            <div className="bg-gradient-to-br from-[#EAB308]/15 via-black/70 to-black/90 border border-[#EAB308]/40 rounded-3xl p-5 sm:p-8 relative overflow-hidden shadow-2xl">
+            {/* 2 KATMANLI EZOTERİK MİMARİ SEÇİCİ (Madde Dünyası vs Ruh Haritası) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 p-1.5 bg-black/60 border border-white/15 rounded-3xl backdrop-blur-md">
+              <button
+                type="button"
+                onClick={() => setActiveLayer('material')}
+                className={`flex items-center gap-3.5 p-4 rounded-2xl text-left transition-all cursor-pointer ${
+                  activeLayer === 'material'
+                    ? 'bg-gradient-to-r from-amber-500/20 to-blue-500/10 border border-amber-500/40 text-white shadow-xl'
+                    : 'bg-transparent border border-transparent text-gray-400 hover:text-gray-200 hover:bg-white/5'
+                }`}
+              >
+                <div className={`p-3 rounded-xl border shrink-0 ${
+                  activeLayer === 'material'
+                    ? 'bg-amber-500/20 text-[#EAB308] border-amber-500/30'
+                    : 'bg-white/5 text-gray-400 border-white/10'
+                }`}>
+                  <Globe size={22} />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold block truncate">1. Madde Dünyası Haritası</span>
+                    {activeLayer === 'material' && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30">Aktif</span>
+                    )}
+                  </div>
+                  <span className="text-[11px] text-gray-400 block truncate mt-0.5">
+                    Dünyevi Kariyer, Rızık, Kamu, Tekstil, Ticaret & Sosyal Güvence
+                  </span>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveLayer('soul')}
+                className={`flex items-center gap-3.5 p-4 rounded-2xl text-left transition-all cursor-pointer ${
+                  activeLayer === 'soul'
+                    ? 'bg-gradient-to-r from-purple-500/20 to-pink-500/10 border border-purple-500/40 text-white shadow-xl'
+                    : 'bg-transparent border border-transparent text-gray-400 hover:text-gray-200 hover:bg-white/5'
+                }`}
+              >
+                <div className={`p-3 rounded-xl border shrink-0 ${
+                  activeLayer === 'soul'
+                    ? 'bg-purple-500/20 text-purple-400 border-purple-500/30'
+                    : 'bg-white/5 text-gray-400 border-white/10'
+                }`}>
+                  <Sparkles size={22} />
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-bold block truncate">2. Ruh Haritası (Drakonik)</span>
+                    {activeLayer === 'soul' && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-semibold border border-purple-500/30">Aktif</span>
+                    )}
+                  </div>
+                  <span className="text-[11px] text-gray-400 block truncate mt-0.5">
+                    Kadersel Çağrı, Ruhu Besleyen Alanlar & İçsel Doyum
+                  </span>
+                </div>
+              </button>
+            </div>
+
+            {/* ========== KATMAN 1: MADDE DÜNYASI HARİTASI ========== */}
+            {activeLayer === 'material' && (
+              <div className="space-y-6 animate-fadeIn">
+                {/* 1. İDEAL ÇALIŞMA MODELİ */}
+                <div className="bg-gradient-to-br from-[#EAB308]/15 via-black/70 to-black/90 border border-[#EAB308]/40 rounded-3xl p-5 sm:p-8 relative overflow-hidden shadow-2xl">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 border-b border-white/10 pb-5 mb-5">
                 <div>
                   <span className="text-[10px] sm:text-xs uppercase tracking-widest text-[#EAB308] font-bold block mb-1">
@@ -766,7 +831,7 @@ export default function CareerAnalysisPage() {
                 </div>
                 <div>
                   <h3 className="text-lg sm:text-xl font-bold text-white">
-                    Kadersel Kariyer Eylem Planınız
+                    Dünyevi Kariyer Eylem Planınız
                   </h3>
                   <span className="text-[11px] sm:text-xs text-gray-400 block">
                     Zirveye ulaşmak için hemen uygulayabileceğiniz 4 somut stratejik kural
@@ -790,6 +855,235 @@ export default function CareerAnalysisPage() {
                 ))}
               </div>
             </div>
+          </div>
+        )}
+
+        {/* ========== KATMAN 2: RUH HARİTASI (DRAKONİK KATMAN) ========== */}
+        {activeLayer === 'soul' && result.soulCareer && (
+          <div className="space-y-6 animate-fadeIn">
+            {/* 1. RUHSAL TEPE NOKTASI (DRAKONİK MC) & KADERSEL ÇAĞRI */}
+            <div className="bg-gradient-to-br from-purple-900/30 via-black/80 to-pink-900/20 border border-purple-500/40 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-purple-500/20 pb-4">
+                <div className="flex items-center gap-3">
+                  <div className="p-3 rounded-2xl bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-inner">
+                    <Sparkles size={24} />
+                  </div>
+                  <div>
+                    <span className="text-[10px] sm:text-xs uppercase tracking-widest text-purple-400 font-bold block">
+                      Ruhsal Tepe Noktası (Drakonik MC: {result.soulCareer.soulMidheaven.sign})
+                    </span>
+                    <h3 className="text-xl sm:text-2xl font-black text-white">
+                      {result.soulCareer.soulMidheaven.title}
+                    </h3>
+                  </div>
+                </div>
+                <span className="text-xs font-semibold px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 self-start sm:self-auto">
+                  Kadersel Ruh Çağrısı (Vocation)
+                </span>
+              </div>
+
+              <div className="space-y-3 pt-1">
+                <p className="text-xs sm:text-base text-purple-100 leading-relaxed font-medium">
+                  {result.soulCareer.soulMidheaven.calling}
+                </p>
+                <div className="bg-white/5 border border-purple-500/20 p-4 rounded-2xl text-xs sm:text-sm text-gray-300 flex items-start gap-2.5">
+                  <Award size={18} className="text-purple-400 shrink-0 mt-0.5" />
+                  <span><strong>Kolektife Bırakılacak Manevi Etki:</strong> {result.soulCareer.soulMidheaven.impact}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 2. RUHUN ENKARNASYON DOĞASI (3'LÜ KART) */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="bg-black/50 border border-purple-500/20 p-5 rounded-2xl space-y-2">
+                <span className="text-[10px] uppercase font-bold text-purple-400 block tracking-wider">
+                  Ruhun Enkarnasyon Özü (Drakonik Yükselen: {result.soulCareer.soulAscendant.sign})
+                </span>
+                <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
+                  {result.soulCareer.soulAscendant.essence}
+                </p>
+              </div>
+
+              <div className="bg-black/50 border border-pink-500/20 p-5 rounded-2xl space-y-2">
+                <span className="text-[10px] uppercase font-bold text-pink-400 block tracking-wider">
+                  Ruhun İlahi Işığı (Drakonik Güneş: {result.soulCareer.soulSun.sign})
+                </span>
+                <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
+                  {result.soulCareer.soulSun.mission}
+                </p>
+              </div>
+
+              <div className="bg-black/50 border border-blue-500/20 p-5 rounded-2xl space-y-2">
+                <span className="text-[10px] uppercase font-bold text-blue-400 block tracking-wider">
+                  Manevi Beslenme Kaynağı (Drakonik Ay: {result.soulCareer.soulMoon.sign})
+                </span>
+                <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
+                  {result.soulCareer.soulMoon.emotionalNourishment}
+                </p>
+              </div>
+            </div>
+
+            {/* 3. RUHU BESLEYEN KADERSEL SEKTÖRLER */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2.5 px-1">
+                <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                  <Feather size={18} />
+                </div>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-bold text-white">
+                    Ruhu Besleyen Mesleki & Sanatsal Alanlar
+                  </h3>
+                  <span className="text-[11px] sm:text-xs text-gray-400 block">
+                    Maddi kaygılardan bağımsız, ruhunuzun bu dünyada üretirken en derin içsel tatmini duyduğu alanlar
+                  </span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {result.soulCareer.soulTopSectors.map((sector, sIdx) => (
+                  <div
+                    key={sIdx}
+                    className="bg-black/50 border border-purple-500/30 p-5 rounded-3xl flex flex-col justify-between shadow-xl"
+                    style={{ borderTopColor: sector.color, borderTopWidth: '3px' }}
+                  >
+                    <div>
+                      <div className="flex items-center justify-between gap-2 mb-2.5">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 uppercase">
+                          Ruhsal Çağrı #{sIdx + 1}
+                        </span>
+                        <span className="text-lg font-bold" style={{ color: sector.color }}>
+                          %{sector.percentage}
+                        </span>
+                      </div>
+                      <h4 className="text-base font-bold text-white mb-2">{sector.title}</h4>
+                      <p className="text-xs text-gray-300 leading-relaxed mb-4">{sector.description}</p>
+                    </div>
+                    <div className="pt-3 border-t border-white/5 space-y-1.5">
+                      <span className="text-[10px] text-gray-400 font-semibold uppercase block">
+                        Ruhsal Ustalık Dalları:
+                      </span>
+                      <div className="flex flex-wrap gap-1">
+                        {sector.recommendedRoles.map((r, rIdx) => (
+                          <span key={rIdx} className="text-[10px] bg-white/5 border border-white/10 px-2 py-0.5 rounded text-gray-200">
+                            {r}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* 4. RUH & MADDE DENGE KÖPRÜSÜ (BÜTÜNSEL SENTEZ) */}
+            <div className="bg-gradient-to-br from-amber-500/10 via-purple-500/10 to-black/80 border border-amber-500/30 p-5 sm:p-7 rounded-3xl relative overflow-hidden shadow-2xl space-y-4">
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-300 border border-amber-500/30">
+                  <Layers size={22} />
+                </div>
+                <div>
+                  <span className="text-[10px] sm:text-xs uppercase tracking-widest text-amber-300 font-bold block">
+                    Ruh & Madde Bütünsel Entegrasyon Köprüsü
+                  </span>
+                  <h3 className="text-lg sm:text-xl font-bold text-white">
+                    Dünyevi Mesleğiniz ile Ruhsal Çağrınızı Birleştirme Formülü
+                  </h3>
+                </div>
+              </div>
+
+              <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
+                {result.soulCareer.soulMaterialBridge.synthesisAdvice}
+              </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                <div className="bg-rose-500/10 border border-rose-500/25 p-4 rounded-2xl">
+                  <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider block mb-1">
+                    ⚠️ Yalnızca Maddede Kalma Riski:
+                  </span>
+                  <p className="text-xs text-rose-200 leading-relaxed">
+                    {result.soulCareer.soulMaterialBridge.unfulfillmentWarning}
+                  </p>
+                </div>
+
+                <div className="bg-emerald-500/10 border border-emerald-500/25 p-4 rounded-2xl">
+                  <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block mb-1">
+                    🕊️ Ruhsal Doyum İçin Kutsal Rutin:
+                  </span>
+                  <p className="text-xs text-emerald-200 leading-relaxed">
+                    {result.soulCareer.soulMaterialBridge.dailySpiritualPractice}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* 5. KADERSEL EVRİLME (DHARMA - KUZEY DÜĞÜMÜ ROTASI) */}
+            {result.dharmaPath && (
+              <div className="bg-gradient-to-br from-purple-500/10 via-black/60 to-black/80 border border-purple-500/30 p-5 sm:p-7 rounded-3xl relative overflow-hidden shadow-xl">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                    <Navigation size={22} />
+                  </div>
+                  <div>
+                    <span className="text-[10px] sm:text-xs uppercase tracking-widest text-purple-400 font-bold block">
+                      Kadersel Evrilme Rotası (Dharma)
+                    </span>
+                    <h3 className="text-lg sm:text-xl font-bold text-white">
+                      {result.dharmaPath.title}
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
+                  <div className="bg-white/5 border border-white/10 p-3.5 rounded-2xl">
+                    <span className="text-[10px] text-gray-400 uppercase tracking-wider block mb-1">
+                      Aşılması Gereken Konfor Alanı (Geçmiş Alışkanlıklar)
+                    </span>
+                    <p className="text-xs sm:text-sm text-gray-300">
+                      {result.dharmaPath.fromComfortZone}
+                    </p>
+                  </div>
+
+                  <div className="bg-purple-500/10 border border-purple-500/30 p-3.5 rounded-2xl">
+                    <span className="text-[10px] text-purple-300 uppercase tracking-wider block mb-1 font-semibold">
+                      Büyüme ve Kadersel Misyon Kapısı
+                    </span>
+                    <p className="text-xs sm:text-sm text-purple-100 font-medium">
+                      {result.dharmaPath.toGrowthMission}
+                    </p>
+                  </div>
+                </div>
+
+                <p className="text-xs text-purple-200/90 bg-purple-500/15 p-3 rounded-xl border border-purple-500/20">
+                  ✨ <strong>Kadersel Sıçrama:</strong> {result.dharmaPath.careerImpact}
+                </p>
+              </div>
+            )}
+
+            {/* 6. TÜKENMİŞLİK KALKANI */}
+            {result.burnoutShield && (
+              <div className="bg-black/50 border border-rose-500/30 p-5 sm:p-6 rounded-3xl relative overflow-hidden">
+                <div className="flex items-center gap-3 mb-3.5">
+                  <div className="p-2 sm:p-2.5 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                    <Flame size={20} />
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase text-rose-400 font-bold block">Tükenmişlik Kalkanı</span>
+                    <h4 className="text-base sm:text-lg font-bold text-white">Enerji Sızıntısı & Koruma</h4>
+                  </div>
+                </div>
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mb-2">
+                  <strong>Temel Risk:</strong> {result.burnoutShield.coreRisk}
+                </p>
+                <p className="text-xs text-rose-300/80 mb-3">
+                  <strong>Kaçınılması Gereken:</strong> {result.burnoutShield.toxicEnvironments}
+                </p>
+                <div className="bg-rose-500/10 border border-rose-500/20 p-3 rounded-xl text-xs text-rose-200">
+                  <strong>Koruma Kalkanı:</strong> {result.burnoutShield.protectionFormula}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
           </div>
         )}
       </div>

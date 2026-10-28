@@ -1,4 +1,4 @@
-import { generateAstrologyChart } from './AstrologyEngine';
+import { generateAstrologyChart, calculateDraconicChart } from './AstrologyEngine';
 import { AstroCity, NatalChartData, AstroPoint, AstroAspect } from './AstrologyConstants';
 import { calculateNameAnalysis, calculateLifePath } from '@/utils/numerologyCalculator';
 import { generateChart, HumanDesignChart } from '@/utils/HumanDesignEngine';
@@ -89,6 +89,35 @@ export interface PlanetaryPlacementCareerInsight {
   suitableProfessions: string[];
 }
 
+export interface SoulCareerData {
+  soulMidheaven: {
+    sign: string;
+    title: string;
+    calling: string;
+    impact: string;
+  };
+  soulAscendant: {
+    sign: string;
+    essence: string;
+  };
+  soulSun: {
+    sign: string;
+    mission: string;
+  };
+  soulMoon: {
+    sign: string;
+    emotionalNourishment: string;
+  };
+  soulTopSectors: CareerSectorMatch[];
+  soulMaterialBridge: {
+    materialIdentity: string;
+    soulCalling: string;
+    synthesisAdvice: string;
+    unfulfillmentWarning: string;
+    dailySpiritualPractice: string;
+  };
+}
+
 export interface CareerAnalysisResult {
   personalInfo: {
     fullName: string;
@@ -117,6 +146,7 @@ export interface CareerAnalysisResult {
   topSectors: CareerSectorMatch[];
   secondarySectors: SecondarySectorMatch[];
   planetaryInsights: PlanetaryPlacementCareerInsight[];
+  soulCareer: SoulCareerData;
   energyDistribution: {
     segments: CareerEnergySegment[];
   };
@@ -560,12 +590,16 @@ export class CareerEngine {
       pluto
     );
 
-    // 11. SÜPER GÜÇ VE GÖLGE TUZAKLAR
+    // 11. RUH HARİTASI (DRAKONİK KATMAN & KADERSEL ÇAĞRI)
+    const draconicChart = calculateDraconicChart(chart);
+    const soulCareer = calculateSoulCareer(chart, draconicChart, topSectors[0]);
+
+    // 12. SÜPER GÜÇ VE GÖLGE TUZAKLAR
     const dominantCategory = topSectors[0].category;
     const superPower = generateCleanMultiPlanetSuperPower(dominantCategory, mercury.sign, uranus.house, destinyNum);
     const shadowPitfalls = generateCleanMultiPlanetShadowPitfall(dominantCategory, saturn.sign);
 
-    // 12. 4 STRATEJİK EYLEM ADIMI
+    // 13. 4 STRATEJİK EYLEM ADIMI
     const actionableGuidance = generateActionableGuidance(dominantCategory, hdType, destinyNum, house2Sign);
 
     return {
@@ -592,6 +626,7 @@ export class CareerEngine {
       topSectors,
       secondarySectors,
       planetaryInsights,
+      soulCareer,
       energyDistribution: {
         segments
       },
@@ -1184,4 +1219,174 @@ function calculatePlanetaryCareerInsights(
   });
 
   return insights;
+}
+
+function calculateSoulCareer(
+  natalChart: NatalChartData,
+  draconicChart: NatalChartData,
+  primaryMaterialSector: CareerSectorMatch
+): SoulCareerData {
+  const dMc = (draconicChart.midheaven && draconicChart.midheaven.sign) || draconicChart.houses?.[9]?.sign || 'Koç';
+  const dAsc = (draconicChart.ascendant && draconicChart.ascendant.sign) || draconicChart.houses?.[0]?.sign || 'Koç';
+  const dSun = draconicChart.planets.find(p => p.name === 'Güneş')?.sign || 'Koç';
+  const dMoon = draconicChart.planets.find(p => p.name === 'Ay')?.sign || 'Koç';
+  const dVenus = draconicChart.planets.find(p => p.name === 'Venüs')?.sign || 'Koç';
+
+  // 1. Ruhsal Tepe Noktası (Drakonik MC) - Kadersel Çağrı
+  const mcCallings: Record<string, { title: string; calling: string; impact: string }> = {
+    'Koç': {
+      title: 'Öncü Ruh, Ruhsal Cesaret & Ezber Bozan Başlatıcılık',
+      calling: 'Korkusuzca ilk adımı atarak başkalarının cesaret edemediği manevi yolları açmak, bağımsız ruhsal liderlik yapmak.',
+      impact: 'Topluma kendi ayakları üzerinde durmayı ve ruhsal iradeyi aşılar.'
+    },
+    'Boğa': {
+      title: 'Kutsal Madde, Doğal Şifa & Kalıcı Değer Üreticisi',
+      calling: 'Toprakla, bedenle, doğayla ve ruhsal sanatla bağ kurarak dünyaya dinginlik, somut huzur ve şifa aşılamak.',
+      impact: 'Ruhsal değerleri yeryüzünde elle tutulur, kalıcı ve huzurlu zanaat eserlerine dönüştürür.'
+    },
+    'İkizler': {
+      title: 'Kozmik Elçi, Bilgelik Aktarıcısı & Köprü Kurucu',
+      calling: 'Yüksek ruhsal gerçekleri anlaşılır sade dillere tercüme etmek, kelimeler ve yazıyla insanları uyandırmak.',
+      impact: 'Zihinlerdeki tabuları yıkar, bilgi akışını hızlandırarak kolektif bilinci genişletir.'
+    },
+    'Yengeç': {
+      title: 'Kolektif Anne, Ruhsal Şefkat & Sığınak İnşacısı',
+      calling: 'Yaralı ruhlara şefkatle kucak açmak, aidiyet yaratmak, derin duygusal yaraları sevgiyle sarmak.',
+      impact: 'İnsanların duygusal kökleriyle barışmasını ve kalpten beslenmesini sağlar.'
+    },
+    'Aslan': {
+      title: 'İlahi Işık, Kalp Rehberi & Yaratıcı İlham Kaynağı',
+      calling: 'Kendi içsel ışığını korkmadan parlatıp sahneye koymak, insanlara yaşama sevinci ve kalpten üretme ilhamı vermek.',
+      impact: 'Karanlıkta kalan ruhlara umut, asalet ve yaratıcı coşku aşılar.'
+    },
+    'Başak': {
+      title: 'Kutsal Hizmetkâr, Zanaat Üstadı & Simyacı Şifacı',
+      calling: 'Kibri bırakıp bizzat alçakgönüllülükle hizmet etmek; beden, zihin ve ruh dengesini ince ayarla onarmak.',
+      impact: 'Kaosu düzene çevirir, günlük hayatı kutsal bir ibadete ve arınmaya dönüştürür.'
+    },
+    'Terazi': {
+      title: 'Kozmik Ahenk, İlahi Adalet & Güzellik Elçisi',
+      calling: 'İnsanlar arasındaki kutuplaşmaları sevgi ve diplomasiyle eritmek, sanatı ve adaleti ruhsal bir mertebeye taşımak.',
+      impact: 'Çatışmaları barışa, çirkinlikleri ruhu dinlendiren estetik bir armoniye evirir.'
+    },
+    'Akrep': {
+      title: 'Gölge Şifacısı, Ruhsal Simyacı & Kriz Dönüştürücüsü',
+      calling: 'İnsanların yüzleşmeye korktuğu en derin karanlıklara inip oradan elmaslar çıkarmak, tabuları ve travmaları dönüştürmek.',
+      impact: 'Ölüm ve yeniden doğum döngülerinde ruhlara korkusuzca eşlik eder.'
+    },
+    'Yay': {
+      title: 'Manevi Yol Gösterici, Hakikat Yolcusu & Bilge Gezgin',
+      calling: 'Dar inanç kalıplarını yıkıp evrensel hakikati aramak; felsefe, yüksek öğreti ve rehberlikle ufukları genişletmek.',
+      impact: 'Ruhları esaretten kurtarır, evrenin yüce anlamına doğru yolculuğa çıkarır.'
+    },
+    'Oğlak': {
+      title: 'Ruhsal Mimar, Kadim Bilgelik Muhafızı & Akil Üstat',
+      calling: 'Geçici hevesler yerine zamana meydan okuyan ruhsal sistemler kurmak, disiplin ve bilgelikle topluma rehberlik etmek.',
+      impact: 'Manevi değerleri somut ve sarsılmaz bir sütun haline getirir.'
+    },
+    'Kova': {
+      title: 'Kozmik Vizyoner, Kolektif Uyanışçı & Özgür Ruh',
+      calling: 'İnsanlığı eski zincirlerinden kurtaracak devrimci fikirler getirmek, eşitlik ve kolektif kardeşlik ağları kurmak.',
+      impact: 'Geleceğin ışığını bugüne taşır, insanlığı yeni bilinç çağına hazırlar.'
+    },
+    'Balık': {
+      title: 'Evrensel Sevgi Kanalı, Mistisizm & Sanatsal Bütünlük',
+      calling: 'Ego sınırlarını eritip koşulsuz merhamet kanalını açmak; müzik, sanat, dua ve teslimiyetle ruhları iyileştirmek.',
+      impact: 'İlahi birlik hissini uyandırır, dünyevi acıları ilahi aşkla teselli eder.'
+    }
+  };
+
+  const mcData = mcCallings[dMc] || mcCallings['Koç'];
+
+  // 2. Ruhun Enkarnasyon Özü (Drakonik Ascendant)
+  const ascEssences: Record<string, string> = {
+    'Koç': 'Ruhunuz bu enkarnasyona saf yaşam enerjisini, bağımsız cesareti ve korkusuz başlangıçları deneyimlemeye geldi.',
+    'Boğa': 'Ruhunuz yeryüzünün kutsal dengesini, dinginliği, doğal üretkenliği ve maddeyle barışmayı tecrübe etmeye geldi.',
+    'İkizler': 'Ruhunuz zihinsel merakı, yüksek bilginin köprülerini kurmayı ve kelimelerin dönüştürücü gücünü yaymaya geldi.',
+    'Yengeç': 'Ruhunuz kalbin şefkatini, koruyuculuğu ve koşulsuz bir yuva sevgisini dünyaya hediye etmeye geldi.',
+    'Aslan': 'Ruhunuz ilahi yaratıcılığı, asil bir cömertliği ve kendi öz ışığıyla karanlığı aydınlatmayı öğrenmeye geldi.',
+    'Başak': 'Ruhunuz arınmayı, kutsal zanaat ustalığını ve dünyayı sessizce iyileştiren adanmış bir hizmeti sunmaya geldi.',
+    'Terazi': 'Ruhunuz ilahi ahengi, adil dengeleri ve ruhsal yoldaşlıkların kutsallığını inşa etmeye geldi.',
+    'Akrep': 'Ruhunuz en derin gölgelerden geçerek ruhsal simyayı, tutkunun gücünü ve küllerinden doğmayı kavramaya geldi.',
+    'Yay': 'Ruhunuz sonsuz hakikat arayışını, ilahi neşeyi ve evrensel bilgeliği kitlelerle paylaşmaya geldi.',
+    'Oğlak': 'Ruhunuz manevi olgunluğu, zamansız kalitede eserler bırakmayı ve ruhsal bir üstat gibi sorumluluk almayı seçti.',
+    'Kova': 'Ruhunuz toplumsal tabuları yıkarak bireysel özgürlüğü ve evrensel kardeşliği yeryüzüne indirmeyi seçti.',
+    'Balık': 'Ruhunuz koşulsuz teslimiyeti, ilahi merhameti ve sanatsal ilhamla dünyayı arındırmayı seçti.'
+  };
+
+  // 3. Ruhu Besleyen Kadersel Sektörler (Drakonik Gezegen Dağılımı)
+  const soulScores: Record<string, number> = {
+    creative: 25,
+    human: 25,
+    global: 20,
+    systems: 15,
+    technology: 10,
+    finance: 10,
+    leadership: 15
+  };
+
+  if (['Balık', 'Terazi', 'Boğa', 'Aslan'].includes(dVenus) || ['Balık', 'Yengeç', 'Yay'].includes(dMc)) {
+    soulScores.creative += 35;
+    soulScores.human += 25;
+  }
+  if (['Başak', 'Oğlak'].includes(dMc) || ['Başak', 'Yengeç'].includes(dMoon)) {
+    soulScores.human += 30;
+    soulScores.systems += 25;
+  }
+  if (['Yay', 'Kova'].includes(dMc) || ['Yay', 'Kova'].includes(dSun)) {
+    soulScores.global += 35;
+    soulScores.creative += 20;
+  }
+
+  const soulTotal = Object.values(soulScores).reduce((a, b) => a + b, 0);
+  const sortedSoulKeys = Object.keys(soulScores).sort((a, b) => soulScores[b] - soulScores[a]);
+  const soulTopKeys = sortedSoulKeys.slice(0, 3);
+
+  const soulTopSectors: CareerSectorMatch[] = soulTopKeys.map(k => {
+    const def = SECTOR_DEFINITIONS[k];
+    const pct = Math.round((soulScores[k] / soulTotal) * 100);
+    return {
+      id: def.id,
+      title: def.title,
+      shortTitle: def.shortTitle,
+      category: def.category,
+      fitScore: soulScores[k],
+      percentage: pct,
+      color: def.color,
+      recommendedRoles: def.roles.slice(0, 3),
+      description: def.description
+    };
+  });
+
+  // 4. Ruh & Madde Denge Köprüsü:
+  const soulMaterialBridge = {
+    materialIdentity: `${primaryMaterialSector.shortTitle} alanındaki dünyevi mesleğiniz (Sosyal Güvence & Rızık)`,
+    soulCalling: `Drakonik ${dMc} MC: ${mcData.title}`,
+    synthesisAdvice: `Dünyevi alanda (${primaryMaterialSector.shortTitle}) çalışırken rızkınızı ve dünyevi intizamınızı sağlarsınız; ancak ruhunuzun doyması için Drakonik ${dMc} kadersel çağrınızı (${mcData.calling.substring(0, 75)}...) hayatınızın merkezine almalısınız. Dünyevi mesleğinizi bir nihai amaç değil; ruhsal sanatınızı, zanaatinizi, şifanızı ve yaratıcılığınızı besleyen güvenli bir zemin olarak konumlandırın.`,
+    unfulfillmentWarning: `Eğer sadece maddi kazanç, maaş veya unvan peşinde koşup ruhunuzun bu kadersel çağrısını ihmal ederseniz; hayatınızda ne kadar para kazanırsanız kazanın içsel bir boşluk, anlamsızlık ve 'Ben neden buradayım?' buhranı baş gösterir.`,
+    dailySpiritualPractice: `Haftada en az 4-5 saat dünyevi iş kaygılarından tamamen sıyrılarak; müzik, el zanaati, manevi tefekkür veya insanlara karşılıksız şifa/yardım sunacağınız ruhsal bir alanı kutsal bir ritüel olarak yaşatın.`
+  };
+
+  return {
+    soulMidheaven: {
+      sign: dMc,
+      title: mcData.title,
+      calling: mcData.calling,
+      impact: mcData.impact
+    },
+    soulAscendant: {
+      sign: dAsc,
+      essence: ascEssences[dAsc] || ascEssences['Koç']
+    },
+    soulSun: {
+      sign: dSun,
+      mission: `Ruhunuz ${dSun} enerjisini yayarak parıldamayı ve dünyayı aydınlatmayı kadersel görev edinmiştir.`
+    },
+    soulMoon: {
+      sign: dMoon,
+      emotionalNourishment: `Ruhunuz ${dMoon} doğasında beslenir; dinginlik, duygusal derinlik ve samimiyet onun en büyük yakıtıdır.`
+    },
+    soulTopSectors,
+    soulMaterialBridge
+  };
 }
