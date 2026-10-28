@@ -308,10 +308,15 @@ export const downloadCareerPDF = async (
     });
   }
 
-  // ================= SAYFA 3: GEZEGENLERİN MESLEKİ DEŞİFRELERİ (TAM LİSTE) =================
-  doc.addPage();
-  drawHeader();
-  curY = 30;
+  // ================= GEZEGENLERİN MESLEKİ DEŞİFRELERİ (TAM LİSTE) =================
+  if (curY > 175) {
+    doc.addPage();
+    drawHeader();
+    curY = 30;
+  } else {
+    ensureSpace(40);
+    curY += 8;
+  }
 
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(13);
@@ -328,25 +333,25 @@ export const downloadCareerPDF = async (
   // All planetary insights rendered completely
   data.planetaryInsights.forEach((ins) => {
     ensureSpace(24);
-    doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(9.5);
-    doc.setTextColor(...primaryDark);
-    doc.text(`• ${ins.planet} (${ins.sign} - ${ins.house}. Ev): ${ins.title} [${ins.domain}]`, 15, curY);
-    curY += 5;
-
     curY = renderText(
+      `**• ${ins.planet} (${ins.sign} - ${ins.house}. Ev): ${ins.title} [${ins.domain}]**\n` +
       `${ins.explanation}\n` +
       `**Yatkın Meslekler & Zanaat Dalları:** ${ins.suitableProfessions.join(', ')}`,
       15, curY, 180, 5.5
     );
-    curY += 5;
+    curY += 4;
   });
 
-  // ================= SAYFA 4: KADERSEL ZAMAN ÇİZELGESİ & AKTİF EVRE =================
+  // ================= KADERSEL ZAMAN ÇİZELGESİ & AKTİF EVRE =================
   if (data.careerTimeline) {
-    doc.addPage();
-    drawHeader();
-    curY = 30;
+    if (curY > 175) {
+      doc.addPage();
+      drawHeader();
+      curY = 30;
+    } else {
+      ensureSpace(40);
+      curY += 8;
+    }
 
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(13);
@@ -354,22 +359,18 @@ export const downloadCareerPDF = async (
     doc.text('KADERSEL KARİYER ZAMAN ÇİZELGESİ & AKTİF EVRENİZ', 15, curY);
     curY += 7;
 
-    // Aktif Kadersel Evre
+    // Aktif Kadersel Evre (renderText ile satır sarma)
     const activeM = data.careerTimeline.activeMilestone;
     if (activeM) {
       ensureSpace(28);
-      doc.setFont('LiberationSans', 'bold');
-      doc.setFontSize(10.5);
-      doc.setTextColor(...primaryDark);
-      doc.text(`ŞU ANKİ AKTİF EVRENİZ: ${activeM.title} [ ${activeM.ageRange} • ${activeM.planetCycle} ]`, 15, curY);
-      curY += 5.5;
-
+      const cleanAge = activeM.ageRange.replace(/yaş/gi, '').trim();
       curY = renderText(
+        `**ŞU ANKİ AKTİF EVRENİZ: ${activeM.title} [ ${cleanAge} Yaş • ${activeM.planetCycle} ]**\n` +
         `${activeM.description}\n` +
         `**Bu Evrenin Altın Kuralı:** ${activeM.actionGuidance}`,
         15, curY, 180, 5.8
       );
-      curY += 7;
+      curY += 6;
     }
 
     doc.setFont('LiberationSans', 'bold');
@@ -380,13 +381,10 @@ export const downloadCareerPDF = async (
 
     data.careerTimeline.milestones.forEach((ms) => {
       ensureSpace(18);
-      doc.setFont('LiberationSans', 'bold');
-      doc.setFontSize(9.5);
-      doc.setTextColor(...primaryDark);
-      doc.text(`• ${ms.ageRange} YAŞ: ${ms.planetCycle.toUpperCase()} [${ms.status === 'active' ? 'AKTİF EVRE' : ms.status === 'completed' ? 'TAMAMLANDI' : 'GELECEK EVRE'}] — ${ms.title}`, 15, curY);
-      curY += 4.5;
-
+      const cleanAge = ms.ageRange.replace(/yaş/gi, '').trim();
+      const statusLabel = ms.status === 'active' ? 'AKTİF EVRE' : ms.status === 'completed' ? 'TAMAMLANDI' : 'GELECEK EVRE';
       curY = renderText(
+        `**• ${cleanAge} Yaş: ${ms.planetCycle.toUpperCase()} [${statusLabel}] — ${ms.title}**\n` +
         `${ms.description} - ${ms.actionGuidance}`,
         15, curY, 180, 5.5
       );
@@ -394,11 +392,16 @@ export const downloadCareerPDF = async (
     });
   }
 
-  // ================= SAYFA 5: İKİNCİL İLERLETİM (SECONDARY PROGRESSIONS) =================
+  // ================= İKİNCİL İLERLETİM (SECONDARY PROGRESSIONS) =================
   if (data.progressedCareer) {
-    doc.addPage();
-    drawHeader();
-    curY = 30;
+    if (curY > 175) {
+      doc.addPage();
+      drawHeader();
+      curY = 30;
+    } else {
+      ensureSpace(40);
+      curY += 8;
+    }
 
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(13);
@@ -413,66 +416,49 @@ export const downloadCareerPDF = async (
     curY += 8;
 
     // 1. İlerletilmiş Güneş
-    doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(10.5);
-    doc.setTextColor(...primaryDark);
-    doc.text('1. İlerletilmiş Güneş (Mesleki Kimlik & Ego Evrimi)', 15, curY);
-    curY += 5;
-
+    ensureSpace(24);
     const sun = data.progressedCareer.progressedSun;
     curY = renderText(
+      `**1. İlerletilmiş Güneş (Mesleki Kimlik & Ego Evrimi)**\n` +
       `**Mevcut İlerletilmiş Konum:** ${sun.progressedSign} ${sun.degreeInSign}°${sun.minutes}' (Doğum Güneşi: ${sun.natalSign} ${sun.natalDegree}°)\n` +
       `**Dönüşüm Teması:** ${sun.identityShiftTheme}\n` +
       `**Geçiş Yaşı:** ${sun.shiftAge} yaş • Sonraki Burç: ${sun.nextShiftAge} yaş\n\n` +
       `${sun.explanation}`,
       15, curY, 180, 5.8
     );
-    curY += 7;
+    curY += 6;
 
     // 2. İlerletilmiş Ay
-    doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(10.5);
-    doc.setTextColor(...primaryDark);
-    doc.text('2. İlerletilmiş Ay (2.5 Yıllık Mesleki Mevsim & Odak Evi)', 15, curY);
-    curY += 5;
-
+    ensureSpace(24);
     const moon = data.progressedCareer.progressedMoon;
     curY = renderText(
+      `**2. İlerletilmiş Ay (2.5 Yıllık Mesleki Mevsim & Odak Evi)**\n` +
       `**Mevcut Konum:** ${moon.sign} ${moon.degreeInSign}°${moon.minutes}' • **Odak Alanı:** ${moon.natalHouse}. Ev\n` +
       `**Döngü Teması:** ${moon.cycleTheme}\n` +
       `**Tahmini Kalan Süre:** ~${moon.estimatedMonthsLeft} Ay\n\n` +
       `${moon.houseImpact}`,
       15, curY, 180, 5.8
     );
-    curY += 7;
+    curY += 6;
 
     // 3. İlerletilmiş Ay Fazı (30 Yıllık Döngü)
-    doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(10.5);
-    doc.setTextColor(...primaryDark);
-    doc.text(`3. 30 Yıllık Kariyer Döngüsü: ${data.progressedCareer.progressedMoonPhase.name}`, 15, curY);
-    curY += 5;
-
+    ensureSpace(24);
     const phase = data.progressedCareer.progressedMoonPhase;
     curY = renderText(
+      `**3. 30 Yıllık Kariyer Döngüsü: ${phase.name}**\n` +
       `**Döngü Mottosu:** "${phase.phaseMotto}" (Faz ${phase.phaseNumber}/8 • ${phase.elongationDegree}° Açı)\n\n` +
       `**Aşama Durumu:** ${phase.stageDescription}\n\n` +
       `**Kariyer Hasat Rehberi:** ${phase.careerHarvestGuidance}`,
       15, curY, 180, 5.8
     );
-    curY += 7;
+    curY += 6;
 
     // 4. İlerletilmiş Tepe Noktası (Solar Arc MC)
     if (data.progressedCareer.progressedMidheaven) {
       const mc = data.progressedCareer.progressedMidheaven;
       ensureSpace(24);
-      doc.setFont('LiberationSans', 'bold');
-      doc.setFontSize(10.5);
-      doc.setTextColor(...primaryDark);
-      doc.text(`4. Toplumsal Statü & Unvan Evrimi (İlerletilmiş MC - ${mc.careerEvolutionTitle})`, 15, curY);
-      curY += 5;
-
       curY = renderText(
+        `**4. Toplumsal Statü & Unvan Evrimi (İlerletilmiş MC - ${mc.careerEvolutionTitle})**\n` +
         `${mc.explanation || 'Kariyerinizde yeni bir statü ve toplumsal görünürlük evresine geçiş.'}`,
         15, curY, 180, 5.8
       );
@@ -482,9 +468,14 @@ export const downloadCareerPDF = async (
 
   // ================= 10 GEZEGENİN MESLEKİ & ZANAAT GÖSTERGELERİ =================
   if (data.planetaryInsights && data.planetaryInsights.length > 0) {
-    doc.addPage();
-    drawHeader();
-    curY = 30;
+    if (curY > 175) {
+      doc.addPage();
+      drawHeader();
+      curY = 30;
+    } else {
+      ensureSpace(40);
+      curY += 8;
+    }
 
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(13);
@@ -500,27 +491,26 @@ export const downloadCareerPDF = async (
 
     data.planetaryInsights.forEach((pi) => {
       ensureSpace(24);
-      doc.setFont('LiberationSans', 'bold');
-      doc.setFontSize(9.5);
-      doc.setTextColor(...primaryDark);
-      doc.text(`• ${pi.planet.toUpperCase()} (${pi.sign} - ${pi.house}. Ev) • ${pi.domain.toUpperCase()}`, 15, curY);
-      curY += 4.5;
-
       curY = renderText(
-        `**${pi.title}**\n` +
+        `**• ${pi.planet.toUpperCase()} (${pi.sign} - ${pi.house}. Ev) • ${pi.domain.toUpperCase()}: ${pi.title}**\n` +
         `${pi.explanation}\n` +
         `**Tavsiye Edilen Meslek Dalları:** ${pi.suitableProfessions.join(' • ')}`,
         15, curY, 180, 5.5
       );
-      curY += 5;
+      curY += 4;
     });
   }
 
   // ================= RUH HARİTASI (DRAKONİK KATMAN & RUHSAL ÇAĞRI) =================
   if (data.soulCareer) {
-    doc.addPage();
-    drawHeader();
-    curY = 30;
+    if (curY > 175) {
+      doc.addPage();
+      drawHeader();
+      curY = 30;
+    } else {
+      ensureSpace(45);
+      curY += 8;
+    }
 
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(13);
@@ -545,13 +535,8 @@ export const downloadCareerPDF = async (
 
     // Drakonik MC
     ensureSpace(24);
-    doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(10.5);
-    doc.setTextColor(...primaryDark);
-    doc.text(`Drakonik MC (Ruhsal Tepe Noktası): ${data.soulCareer.soulMidheaven.sign} - ${data.soulCareer.soulMidheaven.title}`, 15, curY);
-    curY += 5;
-
     curY = renderText(
+      `**Drakonik MC (Ruhsal Tepe Noktası): ${data.soulCareer.soulMidheaven.sign} - ${data.soulCareer.soulMidheaven.title}**\n` +
       `${data.soulCareer.soulMidheaven.calling}\n` +
       `**Kolektife Bırakılacak Manevi Etki:** ${data.soulCareer.soulMidheaven.impact}`,
       15, curY, 180, 5.8
