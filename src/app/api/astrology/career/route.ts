@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { CareerEngine } from '@/features/astrology/engine/CareerEngine';
 import { AstroCity, ASTRO_CITIES } from '@/features/astrology/engine/AstrologyConstants';
 import { getAuthPayload } from '@/lib/auth/session';
+import { verifyAccessToken } from '@/lib/auth/jwt';
+import { getAccount } from '@/lib/auth/account';
 import { db } from '@/db/client';
 import { guestOrders } from '@/db/schema';
 import { eq, and, or } from 'drizzle-orm';
@@ -30,18 +32,46 @@ export async function POST(req: NextRequest) {
     );
 
     // Oturum ve Yetki Doğrulama (Master, Admin veya Satın Almış kullanıcı)
-    const payload = await getAuthPayload(req);
-    const isMasterOrAdmin = payload && (payload.role === 'master' || payload.role === 'admin');
+    let payload = await getAuthPayload(req);
+    if (!payload) {
+      const cookieToken = req.cookies.get('access_token')?.value;
+      if (cookieToken) {
+        payload = await verifyAccessToken(cookieToken);
+      }
+    }
+
+    let isMasterOrAdmin = false;
+    let userEmail = payload?.email || '';
+
+    if (payload?.sub) {
+      try {
+        const account = await getAccount(payload.sub);
+        if (account) {
+          if (account.role === 'master' || account.role === 'admin') {
+            isMasterOrAdmin = true;
+          }
+          if (account.email) {
+            userEmail = account.email;
+          }
+        }
+      } catch (accErr) {
+        console.error('Error fetching account for career auth:', accErr);
+      }
+    }
+
+    if (!isMasterOrAdmin && payload && (payload.role === 'master' || payload.role === 'admin')) {
+      isMasterOrAdmin = true;
+    }
     
     let hasPurchased = false;
-    if (payload?.email) {
+    if (userEmail) {
       try {
         const [order] = await db
           .select({ id: guestOrders.id })
           .from(guestOrders)
           .where(
             and(
-              eq(guestOrders.email, payload.email.toLowerCase()),
+              eq(guestOrders.email, userEmail.toLowerCase()),
               eq(guestOrders.paymentStatus, 'success'),
               or(
                 eq(guestOrders.analysisType, 'career'),

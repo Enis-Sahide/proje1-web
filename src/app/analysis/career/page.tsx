@@ -583,7 +583,7 @@ export default function CareerAnalysisPage() {
                   </div>
                 </div>
 
-                {!result.isUnlocked && renderLockedSectionNotice("Kadersel Zaman Çizelgesi Detayları Kilitlidir")}
+                {!isEffectiveUnlocked && renderLockedSectionNotice("Kadersel Zaman Çizelgesi Detayları Kilitlidir")}
               </div>
             )}
 
@@ -603,7 +603,7 @@ export default function CareerAnalysisPage() {
                         <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">
                           {result.progressedCareer.currentAge} Yaş İlerletimi
                         </span>
-                        {!result.isUnlocked && (
+                        {!isEffectiveUnlocked && (
                           <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30 flex items-center gap-1">
                             <Lock size={10} /> Kilitli
                           </span>
@@ -646,7 +646,7 @@ export default function CareerAnalysisPage() {
                       🎯 {result.progressedCareer.progressedSun.identityShiftTheme}
                     </div>
 
-                    <p className={`text-xs text-gray-300 leading-relaxed ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                    <p className={`text-xs text-gray-300 leading-relaxed ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                       {result.progressedCareer.progressedSun.explanation}
                     </p>
 
@@ -685,7 +685,7 @@ export default function CareerAnalysisPage() {
                       🌊 {result.progressedCareer.progressedMoon.cycleTheme}
                     </div>
 
-                    <p className={`text-xs text-gray-300 leading-relaxed ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                    <p className={`text-xs text-gray-300 leading-relaxed ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                       {result.progressedCareer.progressedMoon.houseImpact}
                     </p>
 
@@ -718,7 +718,7 @@ export default function CareerAnalysisPage() {
                       <p className="text-xs sm:text-sm text-gray-200 font-medium leading-snug">
                         &quot;{result.progressedCareer.progressedMoonPhase.phaseMotto}&quot;
                       </p>
-                      <p className={`text-xs text-gray-400 leading-relaxed ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                      <p className={`text-xs text-gray-400 leading-relaxed ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                         {result.progressedCareer.progressedMoonPhase.stageDescription}
                       </p>
                     </div>
@@ -728,7 +728,7 @@ export default function CareerAnalysisPage() {
                         <Lightbulb size={14} className="text-purple-400" />
                         Bu Fazda Uygulanacak Kariyer Stratejisi
                       </span>
-                      <p className={`text-xs text-gray-200 leading-relaxed ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                      <p className={`text-xs text-gray-200 leading-relaxed ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                         {result.progressedCareer.progressedMoonPhase.careerHarvestGuidance}
                       </p>
                       {result.progressedCareer.progressedMidheaven && (
@@ -740,7 +740,7 @@ export default function CareerAnalysisPage() {
                   </div>
                 </div>
 
-                {!result.isUnlocked && renderLockedSectionNotice("İçsel Kariyer Saati ve İlerletim Detayları Kilitlidir")}
+                {!isEffectiveUnlocked && renderLockedSectionNotice("İçsel Kariyer Saati ve İlerletim Detayları Kilitlidir")}
               </div>
             )}
 
@@ -1146,13 +1146,13 @@ export default function CareerAnalysisPage() {
                       Ses / Vokal & Hitabet Kapasitesi: {result.musicalAffinity.vocalAptitude.style}
                     </span>
                   </div>
-                  <p className={`text-xs text-gray-300 leading-relaxed ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                  <p className={`text-xs text-gray-300 leading-relaxed ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                     {result.musicalAffinity.vocalAptitude.chakraResonance}
                   </p>
                 </div>
 
                 {/* Zihinsel Rahatlama & Tavsiye */}
-                <p className={`text-xs text-pink-200/90 bg-pink-500/15 p-3 rounded-xl border border-pink-500/20 ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                <p className={`text-xs text-pink-200/90 bg-pink-500/15 p-3 rounded-xl border border-pink-500/20 ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                   🎼 <strong>Zihinsel Sıfırlanma Reçetesi:</strong> {result.musicalAffinity.musicalExpressionAdvice}
                 </p>
               </div>
@@ -1200,7 +1200,7 @@ export default function CareerAnalysisPage() {
                       </span>
                       <div className="space-y-1.5">
                         {result.craftsmanshipMaterial.commercialApplications.map((app, idx) => (
-                          <div key={idx} className={`text-xs text-gray-300 flex items-center gap-2 ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                          <div key={idx} className={`text-xs text-gray-300 flex items-center gap-2 ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
                             <span>{app}</span>
                           </div>
@@ -1209,7 +1209,7 @@ export default function CareerAnalysisPage() {
                     </div>
                     <div className="pt-2 border-t border-white/5 mt-3">
                       <span className="text-[10px] text-gray-400 uppercase font-semibold block mb-1">Psikosomatik Şifa:</span>
-                      <p className={`text-xs text-amber-200/90 ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                      <p className={`text-xs text-amber-200/90 ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                         {result.craftsmanshipMaterial.healingPower}
                       </p>
                     </div>
@@ -1238,12 +1238,12 @@ export default function CareerAnalysisPage() {
                       </div>
                     </div>
 
-                    <p className={`text-xs sm:text-sm text-gray-300 leading-relaxed mb-3 ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                    <p className={`text-xs sm:text-sm text-gray-300 leading-relaxed mb-3 ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                       {result.parsFortunaWealth.karmicBlessingArea}
                     </p>
                   </div>
 
-                  <div className={`bg-emerald-500/10 border border-emerald-500/20 p-3.5 rounded-2xl text-xs text-emerald-200 mt-2 ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                  <div className={`bg-emerald-500/10 border border-emerald-500/20 p-3.5 rounded-2xl text-xs text-emerald-200 mt-2 ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                     <strong>💰 Zahmetsiz Rızık Formülü:</strong> {result.parsFortunaWealth.practicalMonetizationGuidance}
                   </div>
                 </div>
@@ -1271,13 +1271,13 @@ export default function CareerAnalysisPage() {
                       "{result.partnershipDna.motto}"
                     </p>
 
-                    <p className={`text-xs sm:text-sm text-gray-300 leading-relaxed mb-3 ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                    <p className={`text-xs sm:text-sm text-gray-300 leading-relaxed mb-3 ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                       {result.partnershipDna.synergyCondition}
                     </p>
                   </div>
 
                   <div className="space-y-2 mt-2">
-                    <div className={`bg-rose-500/10 border border-rose-500/20 p-2.5 rounded-xl text-xs text-rose-200 ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                    <div className={`bg-rose-500/10 border border-rose-500/20 p-2.5 rounded-xl text-xs text-rose-200 ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                       ⚠️ <strong>Toksik Ortaklık Tuzağı:</strong> {result.partnershipDna.toxicPartnershipRisk}
                     </div>
                     <div className="bg-blue-500/10 border border-blue-500/20 p-2.5 rounded-xl text-xs text-blue-200">
@@ -1331,14 +1331,14 @@ export default function CareerAnalysisPage() {
                         <span className="text-[10px] font-bold text-purple-300 uppercase tracking-wider block mb-0.5">
                           🔋 Şarj & Zihinsel Arınma Penceresi
                         </span>
-                        <p className={`text-xs sm:text-sm font-semibold text-white ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                        <p className={`text-xs sm:text-sm font-semibold text-white ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                           {result.planetaryProductivityHours.rechargeAndBurnoutPreventionWindow}
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <p className={`text-xs text-yellow-200/90 bg-yellow-500/15 p-3 rounded-xl border border-yellow-500/20 ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                  <p className={`text-xs text-yellow-200/90 bg-yellow-500/15 p-3 rounded-xl border border-yellow-500/20 ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                     ⚡ <strong>Biyoritm Stratejisi:</strong> {result.planetaryProductivityHours.dailyRoutineAdvice}
                   </p>
                 </div>
@@ -1375,13 +1375,13 @@ export default function CareerAnalysisPage() {
                       <span className="text-[10px] text-gray-400 uppercase font-semibold block">
                         Piyasanın Sizi Hatırlayacağı Saygın İmza:
                       </span>
-                      <p className={`text-xs sm:text-sm text-gray-300 leading-relaxed ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                      <p className={`text-xs sm:text-sm text-gray-300 leading-relaxed ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                         {result.vocationalReputation.howIndustryRemembersYou}
                       </p>
                     </div>
                   </div>
 
-                  <div className={`bg-indigo-500/10 border border-indigo-500/20 p-3.5 rounded-2xl text-xs text-indigo-200 ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                  <div className={`bg-indigo-500/10 border border-indigo-500/20 p-3.5 rounded-2xl text-xs text-indigo-200 ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                     👑 <strong>Otorite Tetiği:</strong> {result.vocationalReputation.authorityTrigger}
                   </div>
                 </div>
@@ -1389,7 +1389,7 @@ export default function CareerAnalysisPage() {
             </div>
 
             {/* Kilit Bilgilendirmesi (Eğer kilitliyse) */}
-            {!result.isUnlocked && renderLockedSectionNotice("Müzikal Frekans, Zanaat Hammaddesi, Kadersel Rızık ve Biyoritm Modülleri Kilitlidir")}
+            {!isEffectiveUnlocked && renderLockedSectionNotice("Müzikal Frekans, Zanaat Hammaddesi, Kadersel Rızık ve Biyoritm Modülleri Kilitlidir")}
 
             {/* 6. PARA & SERVET ÇEKME MODELİ VE TÜKENMİŞLİK KALKANI */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
@@ -1672,7 +1672,7 @@ export default function CareerAnalysisPage() {
                 </div>
               </div>
 
-              <p className={`text-xs sm:text-sm text-gray-200 leading-relaxed ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+              <p className={`text-xs sm:text-sm text-gray-200 leading-relaxed ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                 {result.soulCareer.soulMaterialBridge.synthesisAdvice}
               </p>
 
@@ -1681,7 +1681,7 @@ export default function CareerAnalysisPage() {
                   <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider block mb-1">
                     ⚠️ Yalnızca Maddede Kalma Riski:
                   </span>
-                  <p className={`text-xs text-rose-200 leading-relaxed ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                  <p className={`text-xs text-rose-200 leading-relaxed ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                     {result.soulCareer.soulMaterialBridge.unfulfillmentWarning}
                   </p>
                 </div>
@@ -1690,13 +1690,13 @@ export default function CareerAnalysisPage() {
                   <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block mb-1">
                     🕊️ Ruhsal Doyum İçin Kutsal Rutin:
                   </span>
-                  <p className={`text-xs text-emerald-200 leading-relaxed ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                  <p className={`text-xs text-emerald-200 leading-relaxed ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                     {result.soulCareer.soulMaterialBridge.dailySpiritualPractice}
                   </p>
                 </div>
               </div>
 
-              {!result.isUnlocked && renderLockedSectionNotice("Drakonik Ruh Haritası ve Sentez Köprüsü Kilitlidir")}
+              {!isEffectiveUnlocked && renderLockedSectionNotice("Drakonik Ruh Haritası ve Sentez Köprüsü Kilitlidir")}
             </div>
 
             {/* 5. KADERSEL EVRİLME (DHARMA - KUZEY DÜĞÜMÜ ROTASI) */}
