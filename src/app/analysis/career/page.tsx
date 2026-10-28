@@ -1439,6 +1439,34 @@ export default function CareerAnalysisPage() {
         {/* ========== KATMAN 2: RUH HARİTASI (DRAKONİK KATMAN) ========== */}
         {activeLayer === 'soul' && result.soulCareer && (
           <div className="space-y-6 animate-fadeIn">
+            {/* KADİM EZOTERİK İLKE & UYANIŞ ŞARTI (ONTOLOJİK BİLDİRİGELİK) */}
+            <div className="bg-gradient-to-r from-purple-950/40 via-indigo-950/30 to-black/70 border border-purple-500/35 p-5 sm:p-6 rounded-3xl relative overflow-hidden shadow-2xl">
+              <div className="flex items-start gap-3.5">
+                <div className="p-2.5 rounded-2xl bg-purple-500/20 text-purple-300 border border-purple-500/40 shrink-0 mt-0.5">
+                  <Compass size={22} />
+                </div>
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] sm:text-xs uppercase tracking-widest text-purple-400 font-bold">
+                      Kadim Ezoterik İlke • Ontolojik Uyanış Şartı
+                    </span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 font-semibold border border-purple-500/30">
+                      Hermetik & Gurdjieff Perspektifi
+                    </span>
+                  </div>
+                  <h4 className="text-sm sm:text-base font-bold text-white">
+                    Ruhsal Çağrı Bir Zorunluluk Değil, Bilinçli Bir Uyanış Potansiyelidir
+                  </h4>
+                  <p className="text-xs sm:text-[13px] text-gray-300 leading-relaxed">
+                    Kadim Gnostik ve Hermetik öğretilerde insanoğlunun büyük çoğunluğu yaşamını <strong>1. Katman olan Madde Dünyası</strong> içerisinde, biyolojik ve toplumsal matrix’in mekanik düzeninde tamamlar. Bu yaratılışın dengesini kuran doğal bir fazdır.
+                  </p>
+                  <p className="text-xs sm:text-[13px] text-purple-200/90 leading-relaxed pt-1">
+                    Aşağıda okuyacağınız <strong>Drakonik (Ruh) Haritası</strong>, her insanda zorla çalışan bir mekanizma değil; yalnızca dünyevi statü ve paranın ötesindeki içsel sızıyı duyan, <em>"Ben buraya sadece bu çarkı döndürmek için gelmedim"</em> diyerek içsel kıvılcımını kristalleştiren bilinçler için aktifleşen <strong>yüksek oktavlı kadersel bir rehberdir</strong>. Uykuda olan bilinçler için bu katman sessiz bir tohum olarak bekler; rezonans duyanlar içinse gerçek hayat amacının kapısını açar.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* 1. RUHSAL TEPE NOKTASI (DRAKONİK MC) & KADERSEL ÇAĞRI */}
             <div className="bg-gradient-to-br from-purple-900/30 via-black/80 to-pink-900/20 border border-purple-500/40 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-purple-500/20 pb-4">

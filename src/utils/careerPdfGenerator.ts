@@ -601,8 +601,8 @@ export const downloadCareerPDF = async (
     curY += 6;
 
     curY = renderText(
-      'Kuzey Ay Düğümü 0° Koç referans alınarak çıkarılan Drakonik haritanız, dünyevi kariyer unvanlarının ötesinde ruhunuzun bu yaşamda deneyimlemek istediği ilahi mesleki misyonu açıklar.',
-      15, curY, 180, 6.0
+      '**Kadim Ezoterik İlke (Uyanış Şartı):** Hermetik ve Gurdjieff öğretilerine göre; insan yaşamının büyük bölümünü 1. Katman olan Madde Dünyası\'nın mekanik düzeninde tamamlayabilir. Drakonik harita zoraki bir dayatma değil; dünyevi matrix\'in ötesindeki içsel sızıyı duyan ve bilinci uyanan varlıklar için aktifleşen yüksek frekanslı bir ruh pusulasıdır. Uykuda olanlar için sessiz bir tohum olarak bekler.',
+      15, curY, 180, 5.5
     );
     curY += 6;
 
