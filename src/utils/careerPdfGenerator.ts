@@ -588,7 +588,56 @@ export const downloadCareerPDF = async (
     );
   }
 
-  // ================= SAYFA 6: RUH HARİTASI (DRAKONİK KATMAN & RUHSAL ÇAĞRI) =================
+  // ================= 10 GEZEGENİN MESLEKİ & ZANAAT GÖSTERGELERİ =================
+  if (data.planetaryInsights && data.planetaryInsights.length > 0) {
+    doc.addPage();
+    drawHeader();
+    curY = 30;
+
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(14);
+    doc.setTextColor(...primaryDark);
+    doc.text('GEZEGEN YERLEŞİMLERİNE GÖRE MESLEKİ & ZANAAT GÖSTERGELERİ', 15, curY);
+    curY += 5;
+
+    doc.setFont('LiberationSans', 'normal');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...muted);
+    doc.text('Doğum haritanızdaki 10 temel kozmik gücün kamu memurluğu, zanaat, müzik, ticaret ve sahadaki yansımaları', 15, curY);
+    curY += 8;
+
+    data.planetaryInsights.forEach((pi) => {
+      ensureSpace(27);
+      doc.setFillColor(248, 250, 252);
+      doc.setDrawColor(229, 231, 235);
+      doc.roundedRect(15, curY, 180, 23, 2, 2, 'FD');
+
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(9);
+      doc.setTextColor(...gold);
+      doc.text(`${pi.planet.toUpperCase()} (${pi.sign} - ${pi.house}. Ev) • ${pi.domain.toUpperCase()}`, 20, curY + 6);
+
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(8.5);
+      doc.setTextColor(...primaryDark);
+      doc.text(pi.title, 20, curY + 11);
+
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(7.5);
+      doc.setTextColor(...charcoal);
+      const expLines = doc.splitTextToSize(pi.explanation, 170);
+      doc.text(expLines.slice(0, 1), 20, curY + 16);
+
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(7);
+      doc.setTextColor(...purple);
+      doc.text(`Tavsiye Edilen Meslek Dalları: ${pi.suitableProfessions.join(' • ')}`, 20, curY + 20.5);
+
+      curY += 26;
+    });
+  }
+
+  // ================= RUH HARİTASI (DRAKONİK KATMAN & RUHSAL ÇAĞRI) =================
   if (data.soulCareer) {
     doc.addPage();
     drawHeader();
@@ -600,11 +649,34 @@ export const downloadCareerPDF = async (
     doc.text('2. RUH HARİTASI: DRAKONİK ÇAĞRI & RUHSAL KARİYER', 15, curY);
     curY += 6;
 
-    curY = renderText(
-      '**Kadim Ezoterik İlke (Uyanış Şartı):** Hermetik ve Gurdjieff öğretilerine göre; insan yaşamının büyük bölümünü 1. Katman olan Madde Dünyası\'nın mekanik düzeninde tamamlayabilir. Drakonik harita zoraki bir dayatma değil; dünyevi matrix\'in ötesindeki içsel sızıyı duyan ve bilinci uyanan varlıklar için aktifleşen yüksek frekanslı bir ruh pusulasıdır. Uykuda olanlar için sessiz bir tohum olarak bekler.',
-      15, curY, 180, 5.5
-    );
-    curY += 6;
+    // KADİM EZOTERİK İLKE • ONTOLOJİK UYANIŞ ŞARTI MANİFESTO KUTUSU
+    ensureSpace(45);
+    doc.setFillColor(250, 245, 255);
+    doc.setDrawColor(192, 132, 252);
+    doc.roundedRect(15, curY, 180, 42, 2, 2, 'FD');
+
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(9.5);
+    doc.setTextColor(...purple);
+    doc.text('KADİM EZOTERİK İLKE • ONTOLOJİK UYANIŞ ŞARTI (Hermetik & Gurdjieff Perspektifi)', 20, curY + 7);
+
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(8.5);
+    doc.setTextColor(...primaryDark);
+    doc.text('Ruhsal Çağrı Bir Zorunluluk Değil, Bilinçli Bir Uyanış Potansiyelidir', 20, curY + 13);
+
+    doc.setFont('LiberationSans', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(...charcoal);
+    const p1 = 'Kadim Gnostik ve Hermetik öğretilerde insanoğlunun büyük çoğunluğu yaşamını 1. Katman olan Madde Dünyası içerisinde, biyolojik ve toplumsal matrix’in mekanik düzeninde tamamlar. Bu yaratılışın dengesini kuran doğal bir fazdır.';
+    const p1Lines = doc.splitTextToSize(p1, 170);
+    doc.text(p1Lines, 20, curY + 18.5);
+
+    const p2 = 'Drakonik (Ruh) Haritası, her insanda zorla çalışan bir mekanizma değil; yalnızca dünyevi statü ve paranın ötesindeki içsel sızıyı duyan, "Ben buraya sadece bu çarkı döndürmek için gelmedim" diyerek içsel kıvılcımını kristalleştiren bilinçler için aktifleşen yüksek oktavlı kadersel bir rehberdir. Uykuda olan bilinçler için bu katman sessiz bir tohum olarak bekler; rezonans duyanlar içinse gerçek hayat amacının kapısını açar.';
+    const p2Lines = doc.splitTextToSize(p2, 170);
+    doc.text(p2Lines, 20, curY + 27.5);
+
+    curY += 48;
 
     // Drakonik MC Kartı
     doc.setFillColor(250, 245, 255);
