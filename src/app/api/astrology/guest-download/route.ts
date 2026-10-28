@@ -132,6 +132,18 @@ export async function GET(request: Request) {
         cosmicMatrix,
         druidTree
       };
+    } else if (order.analysisType === 'career' || order.analysisType === 'kariyer') {
+      const { CareerEngine } = require('@/features/astrology/engine/CareerEngine');
+      const fullName = (order.birthData as any)?.fullName || (order.birthData as any)?.name || 'Danışan';
+      const careerResult = await CareerEngine.analyze(
+        fullName,
+        localDate,
+        localTime,
+        cityData
+      );
+      resultData = {
+        careerResult
+      };
     } else {
       // Standard Esoteric Astrology Chart
       const assiahChart = await generateAstrologyChart(dateObj, cityData, false);

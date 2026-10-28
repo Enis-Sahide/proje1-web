@@ -61,6 +61,7 @@ export function normalizeProductType(raw: string | null | undefined): string {
   const v = (raw || '').trim().toLowerCase();
   if (v === 'human_design') return 'human-design';
   if (v === 'cosmic_matrix') return 'cosmic-matrix';
+  if (v === 'kariyer') return 'career';
   return v;
 }
 

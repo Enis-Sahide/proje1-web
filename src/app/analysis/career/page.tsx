@@ -7,12 +7,14 @@ import {
   ArrowRight, RefreshCw, Layers, Compass, CheckCircle2,
   Zap, DollarSign, Flame, Lightbulb, Navigation, Clock, Calendar,
   Palette, Building2, FileText, Hammer, Music, HeartHandshake, Globe, Feather,
-  Sun, Moon, TrendingUp, Hourglass
+  Sun, Moon, TrendingUp, Hourglass, Lock, Download, Loader2
 } from 'lucide-react';
 import AnalysisBackButton from '@/components/ui/AnalysisBackButton';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
+import AuthPromptModal from '@/components/AuthPromptModal';
 import { AstroCity, ASTRO_CITIES } from '@/features/astrology/engine/AstrologyConstants';
 import type { CareerAnalysisResult } from '@/features/astrology/engine/CareerEngine';
+import { downloadCareerPDF } from '@/utils/careerPdfGenerator';
 import { useAuth } from '@/context/AuthContext';
 
 export default function CareerAnalysisPage() {
@@ -26,6 +28,8 @@ export default function CareerAnalysisPage() {
   const [birthCity, setBirthCity] = useState<AstroCity | null>(null);
 
   const [isLoading, setIsLoading] = useState(false);
+  const [isPdfLoading, setIsPdfLoading] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<CareerAnalysisResult | null>(null);
   const [activeLayer, setActiveLayer] = useState<'material' | 'soul'>('material');
@@ -95,6 +99,67 @@ export default function CareerAnalysisPage() {
     setResult(null);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const handlePurchaseReport = () => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    const query = new URLSearchParams({
+      type: 'career',
+      fullName: fullName.trim() || result?.personalInfo.fullName || '',
+      date: birthDate || result?.personalInfo.birthDate || '',
+      time: birthTime || result?.personalInfo.birthTime || '12:00',
+      city: birthCity?.name || result?.personalInfo.cityName || '',
+      lat: (birthCity?.lat || '').toString(),
+      lon: (birthCity?.lon || '').toString(),
+      tz: birthCity?.tz || '',
+      email: user?.email || ''
+    }).toString();
+    router.push(`/checkout/guest?${query}`);
+  };
+
+  const handleDownloadPdf = async () => {
+    if (!result) return;
+    try {
+      setIsPdfLoading(true);
+      await downloadCareerPDF(result, {
+        fullName: fullName.trim() || result.personalInfo.fullName,
+        birthDate: birthDate || result.personalInfo.birthDate,
+        birthTime: birthTime || result.personalInfo.birthTime,
+        cityName: birthCity?.name || result.personalInfo.cityName,
+        country: birthCity?.country || 'Türkiye'
+      });
+    } catch (err) {
+      console.error('Kariyer PDF oluşturma hatası:', err);
+      alert('PDF oluşturulurken bir hata meydana geldi.');
+    } finally {
+      setIsPdfLoading(false);
+    }
+  };
+
+  const renderLockedSectionNotice = (titleText = "Bu Bölüm Kapsamlı Kariyer Raporuna Özeldir") => (
+    <div className="mt-5 p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-amber-500/10 via-[#D4AF37]/10 to-transparent border border-[#D4AF37]/30 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+      <div className="flex items-center gap-4">
+        <div className="p-3 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] shrink-0">
+          <Lock size={24} />
+        </div>
+        <div>
+          <h4 className="text-sm sm:text-base font-bold text-white">{titleText}</h4>
+          <p className="text-xs text-gray-400 mt-1 max-w-xl">
+            İkincil İlerletim saatini, kadersel zaman çizelgesini, Drakonik ruhsal çağrıyı ve servet kaldıraç stratejinizi içeren 6 sayfalık Kapsamlı Kariyer Dosyasını (Özel PDF) hemen edinebilirsiniz.
+          </p>
+        </div>
+      </div>
+      <button
+        onClick={handlePurchaseReport}
+        className="shrink-0 flex items-center justify-center gap-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-extrabold py-3 px-5 rounded-xl transition-all shadow-lg shadow-[#D4AF37]/20 text-xs sm:text-sm cursor-pointer whitespace-nowrap active:scale-[0.98]"
+      >
+        <Lock size={15} />
+        <span>Raporu İndir (444 TL)</span>
+      </button>
+    </div>
+  );
 
   return (
     <div className="min-h-screen pt-24 sm:pt-28 pb-20 px-3.5 sm:px-6 relative overflow-x-hidden text-white bg-[#0a0a0f]">
@@ -217,13 +282,34 @@ export default function CareerAnalysisPage() {
                 </div>
               </div>
 
-              <button
-                onClick={handleReset}
-                className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-gray-300 flex items-center justify-center gap-2 transition-all cursor-pointer"
-              >
-                <RefreshCw size={14} />
-                <span>Yeni Analiz Yap</span>
-              </button>
+              <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full md:w-auto">
+                {result.isUnlocked ? (
+                  <button
+                    onClick={handleDownloadPdf}
+                    disabled={isPdfLoading}
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#EAB308] via-[#D4AF37] to-[#EAB308] hover:opacity-95 text-black font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-amber-500/20 cursor-pointer active:scale-[0.98]"
+                  >
+                    {isPdfLoading ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+                    <span>Kariyer Raporunu İndir (PDF)</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={handlePurchaseReport}
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-extrabold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-amber-500/20 cursor-pointer whitespace-nowrap active:scale-[0.98]"
+                  >
+                    <Lock size={15} />
+                    <span>Tüm Kilitleri Aç (444 TL)</span>
+                  </button>
+                )}
+
+                <button
+                  onClick={handleReset}
+                  className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-semibold text-gray-300 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                >
+                  <RefreshCw size={14} />
+                  <span>Yeni Analiz</span>
+                </button>
+              </div>
             </div>
 
             {/* 4 Core Summary Badges */}
@@ -428,6 +514,8 @@ export default function CareerAnalysisPage() {
                     })}
                   </div>
                 </div>
+
+                {!result.isUnlocked && renderLockedSectionNotice("Kadersel Zaman Çizelgesi Detayları Kilitlidir")}
               </div>
             )}
 
@@ -447,6 +535,11 @@ export default function CareerAnalysisPage() {
                         <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">
                           {result.progressedCareer.currentAge} Yaş İlerletimi
                         </span>
+                        {!result.isUnlocked && (
+                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30 flex items-center gap-1">
+                            <Lock size={10} /> Kilitli
+                          </span>
+                        )}
                       </div>
                       <h3 className="text-lg sm:text-2xl font-bold text-white">
                         İkincil İlerletim: Mesleki Evrim ve Mevcut Sezonunuz
@@ -485,7 +578,7 @@ export default function CareerAnalysisPage() {
                       🎯 {result.progressedCareer.progressedSun.identityShiftTheme}
                     </div>
 
-                    <p className="text-xs text-gray-300 leading-relaxed">
+                    <p className={`text-xs text-gray-300 leading-relaxed ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                       {result.progressedCareer.progressedSun.explanation}
                     </p>
 
@@ -524,7 +617,7 @@ export default function CareerAnalysisPage() {
                       🌊 {result.progressedCareer.progressedMoon.cycleTheme}
                     </div>
 
-                    <p className="text-xs text-gray-300 leading-relaxed">
+                    <p className={`text-xs text-gray-300 leading-relaxed ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                       {result.progressedCareer.progressedMoon.houseImpact}
                     </p>
 
@@ -557,7 +650,7 @@ export default function CareerAnalysisPage() {
                       <p className="text-xs sm:text-sm text-gray-200 font-medium leading-snug">
                         &quot;{result.progressedCareer.progressedMoonPhase.phaseMotto}&quot;
                       </p>
-                      <p className="text-xs text-gray-400 leading-relaxed">
+                      <p className={`text-xs text-gray-400 leading-relaxed ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                         {result.progressedCareer.progressedMoonPhase.stageDescription}
                       </p>
                     </div>
@@ -567,7 +660,7 @@ export default function CareerAnalysisPage() {
                         <Lightbulb size={14} className="text-purple-400" />
                         Bu Fazda Uygulanacak Kariyer Stratejisi
                       </span>
-                      <p className="text-xs text-gray-200 leading-relaxed">
+                      <p className={`text-xs text-gray-200 leading-relaxed ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                         {result.progressedCareer.progressedMoonPhase.careerHarvestGuidance}
                       </p>
                       {result.progressedCareer.progressedMidheaven && (
@@ -578,6 +671,8 @@ export default function CareerAnalysisPage() {
                     </div>
                   </div>
                 </div>
+
+                {!result.isUnlocked && renderLockedSectionNotice("İçsel Kariyer Saati ve İlerletim Detayları Kilitlidir")}
               </div>
             )}
 
@@ -1142,7 +1237,7 @@ export default function CareerAnalysisPage() {
                 </div>
               </div>
 
-              <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
+              <p className={`text-xs sm:text-sm text-gray-200 leading-relaxed ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                 {result.soulCareer.soulMaterialBridge.synthesisAdvice}
               </p>
 
@@ -1151,7 +1246,7 @@ export default function CareerAnalysisPage() {
                   <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider block mb-1">
                     ⚠️ Yalnızca Maddede Kalma Riski:
                   </span>
-                  <p className="text-xs text-rose-200 leading-relaxed">
+                  <p className={`text-xs text-rose-200 leading-relaxed ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                     {result.soulCareer.soulMaterialBridge.unfulfillmentWarning}
                   </p>
                 </div>
@@ -1160,11 +1255,13 @@ export default function CareerAnalysisPage() {
                   <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block mb-1">
                     🕊️ Ruhsal Doyum İçin Kutsal Rutin:
                   </span>
-                  <p className="text-xs text-emerald-200 leading-relaxed">
+                  <p className={`text-xs text-emerald-200 leading-relaxed ${!result.isUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
                     {result.soulCareer.soulMaterialBridge.dailySpiritualPractice}
                   </p>
                 </div>
               </div>
+
+              {!result.isUnlocked && renderLockedSectionNotice("Drakonik Ruh Haritası ve Sentez Köprüsü Kilitlidir")}
             </div>
 
             {/* 5. KADERSEL EVRİLME (DHARMA - KUZEY DÜĞÜMÜ ROTASI) */}
@@ -1238,6 +1335,13 @@ export default function CareerAnalysisPage() {
           </div>
         )}
       </div>
+
+      <AuthPromptModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        title="Kariyer Analizi Üyeliği"
+        description="Raporunuzun güvenle e-postanıza iletilmesi ve dilediğiniz zaman profilinizden indirebilmeniz için lütfen giriş yapın veya ücretsiz hesap oluşturun."
+      />
     </div>
   );
 }

@@ -19,7 +19,7 @@ function GuestCheckoutForm() {
   const searchParams = useSearchParams();
   const { user } = useAuth();
   
-  // Default type: kabbalah (999 TL), human-design (555 TL), incarnation (888 TL), cosmic-matrix (1111 TL), or astrology (444 TL)
+  // Default type: kabbalah (999 TL), human-design (555 TL), incarnation (888 TL), cosmic-matrix (1111 TL), career (444 TL), or astrology (444 TL)
   const rawType = searchParams.get('type') || 'kabbalah';
   const analysisType = (rawType === 'astrology') 
     ? 'astrology' 
@@ -29,6 +29,8 @@ function GuestCheckoutForm() {
     ? 'incarnation' 
     : (rawType === 'cosmic-matrix' || rawType === 'cosmic_matrix')
     ? 'cosmic-matrix'
+    : (rawType === 'career' || rawType === 'kariyer')
+    ? 'career'
     : 'kabbalah';
 
   const title = analysisType === 'kabbalah'
@@ -39,6 +41,8 @@ function GuestCheckoutForm() {
     ? 'Karmik & Enkarnasyon Analizi Raporu'
     : analysisType === 'cosmic-matrix'
     ? '7Layers Kozmik Matris Sentez Raporu'
+    : analysisType === 'career'
+    ? 'Kariyer & Mesleki Yatkınlık Raporu'
     : 'Doğum Haritası Analizi Raporu';
 
   // Step state: 'info' -> 'payment' (Treps'e yönlendirme anı)

@@ -8,6 +8,7 @@ import { downloadChartPDF } from '@/utils/pdfGenerator';
 import { downloadHumanDesignPDF } from '@/utils/humanDesignPdfGenerator';
 import { downloadIncarnationPDF } from '@/utils/incarnationPdfGenerator';
 import { downloadCosmicMatrixPDF } from '@/utils/cosmicMatrixPdfGenerator';
+import { downloadCareerPDF } from '@/utils/careerPdfGenerator';
 
 function CheckoutSuccessContent() {
   const router = useRouter();
@@ -90,6 +91,17 @@ function CheckoutSuccessContent() {
           {
             localDate,
             localTime,
+            cityName: cityData.name,
+            country: cityData.country || 'Türkiye'
+          }
+        );
+      } else if (analysisType === 'career' || analysisType === 'kariyer') {
+        await downloadCareerPDF(
+          result.careerResult,
+          {
+            fullName: orderData.name || orderData.birthData?.fullName || '',
+            birthDate: localDate,
+            birthTime: localTime,
             cityName: cityData.name,
             country: cityData.country || 'Türkiye'
           }

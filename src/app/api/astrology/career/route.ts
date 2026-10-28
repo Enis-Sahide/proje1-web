@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { CareerEngine } from '@/features/astrology/engine/CareerEngine';
 import { AstroCity, ASTRO_CITIES } from '@/features/astrology/engine/AstrologyConstants';
+import { getAuthPayload } from '@/lib/auth/session';
+import { db } from '@/db/client';
+import { guestOrders } from '@/db/schema';
+import { eq, and, or } from 'drizzle-orm';
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,12 +22,112 @@ export async function POST(req: NextRequest) {
       ? ASTRO_CITIES.find(c => c.name.toLowerCase() === birthCity.toLowerCase()) || ASTRO_CITIES[0]
       : birthCity;
 
-    const result = await CareerEngine.analyze(
+    let result = await CareerEngine.analyze(
       fullName.trim(),
       birthDate,
       birthTime || '12:00',
       cityData
     );
+
+    // Oturum ve Yetki Doğrulama (Master, Admin veya Satın Almış kullanıcı)
+    const payload = await getAuthPayload(req);
+    const isMasterOrAdmin = payload && (payload.role === 'master' || payload.role === 'admin');
+    
+    let hasPurchased = false;
+    if (payload?.email) {
+      try {
+        const [order] = await db
+          .select({ id: guestOrders.id })
+          .from(guestOrders)
+          .where(
+            and(
+              eq(guestOrders.email, payload.email.toLowerCase()),
+              eq(guestOrders.paymentStatus, 'success'),
+              or(
+                eq(guestOrders.analysisType, 'career'),
+                eq(guestOrders.analysisType, 'kariyer')
+              )
+            )
+          )
+          .limit(1);
+        if (order) hasPurchased = true;
+      } catch (dbErr) {
+        console.error('Error checking user career purchases:', dbErr);
+      }
+    }
+
+    const isUnlocked = Boolean(isMasterOrAdmin || hasPurchased);
+
+    // Kilitli / Ücretsiz Ziyaretçi: Derin kısımları sunucu tarafında maskele (Crack-geçirmez koruma)
+    if (!isUnlocked) {
+      const MASKED = '🔒 Bu detaylı analiz Kapsamlı Kariyer Raporuna özeldir.';
+      
+      result = {
+        ...result,
+        isUnlocked: false,
+        // İkincil İlerletim Derin Metinleri
+        progressedCareer: result.progressedCareer ? {
+          ...result.progressedCareer,
+          progressedSun: {
+            ...result.progressedCareer.progressedSun,
+            explanation: MASKED
+          },
+          progressedMoon: {
+            ...result.progressedCareer.progressedMoon,
+            houseImpact: MASKED
+          },
+          progressedMoonPhase: {
+            ...result.progressedCareer.progressedMoonPhase,
+            careerHarvestGuidance: MASKED,
+            stageDescription: MASKED
+          }
+        } : result.progressedCareer,
+
+        // Kadersel Zaman Çizelgesi
+        careerTimeline: result.careerTimeline ? {
+          ...result.careerTimeline,
+          milestones: result.careerTimeline.milestones.map(m => ({
+            ...m,
+            description: MASKED,
+            actionGuidance: MASKED
+          }))
+        } : result.careerTimeline,
+
+        // Ruh Haritası (Drakonik Katman)
+        soulCareer: result.soulCareer ? {
+          ...result.soulCareer,
+          soulMaterialBridge: {
+            ...result.soulCareer.soulMaterialBridge,
+            synthesisAdvice: MASKED,
+            unfulfillmentWarning: MASKED,
+            dailySpiritualPractice: MASKED
+          }
+        } : result.soulCareer,
+
+        // Servet Mıknatısı & Tükenmişlik Kalkanı
+        wealthMagnet: result.wealthMagnet ? {
+          ...result.wealthMagnet,
+          mechanism: MASKED,
+          practicalFormula: MASKED
+        } : result.wealthMagnet,
+
+        burnoutShield: result.burnoutShield ? {
+          ...result.burnoutShield,
+          protectionFormula: MASKED
+        } : result.burnoutShield,
+
+        // Gezegen Mesleki Deşifreleri
+        planetaryInsights: result.planetaryInsights.map(p => ({
+          ...p,
+          explanation: MASKED
+        }))
+      };
+    } else {
+      result = {
+        ...result,
+        isUnlocked: true
+      };
+    }
 
     return NextResponse.json(result);
   } catch (error: any) {
