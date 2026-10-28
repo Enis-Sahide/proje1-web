@@ -510,28 +510,19 @@ export class CareerEngine {
     const coreAsset = topSectors[0].title;
     const decisionMotto = `${hdStrategy} & ${hdAuthority.replace('Otorite', '').trim()} Karar Modeli`;
 
-    // 7. İDEAL ÇALIŞMA MODELİ
-    let idealModelType: 'Girişimci & Bağımsız Kurucu' | 'Kurumsal Lider & Üst Yönetici' | 'Stratejik Rehber & Danışman' | 'Özerk Uzman & Zanaatkar' = 'Girişimci & Bağımsız Kurucu';
-    let idealModelExp = '';
-    let idealPercent = 92;
-
-    if (topSectors[0].category === 'Teknoloji & İnovasyon' || ['Koç', 'Yay', 'Kova'].includes(mcSign) || hdType === 'Manifestör' || destinyNum === 1) {
-      idealModelType = 'Girişimci & Bağımsız Kurucu';
-      idealModelExp = 'Başkalarının katı bürokrasisi altında çalışmak yaratıcı ve teknolojik üretim kapasitenizi sınırlar. Kendi kurallarınızı koyduğunuz bağımsız projeler, teknoloji kuruculuğu veya serbest start-up modelleri sizin en yüksek verim ve kadersel doyum alanınızdır.';
-      idealPercent = 96;
-    } else if (['Oğlak', 'Aslan', 'Boğa'].includes(mcSign) || destinyNum === 8 || destinyNum === 4 || destinyNum === 22) {
-      idealModelType = 'Kurumsal Lider & Üst Yönetici';
-      idealModelExp = 'Büyük bütçeleri, organizasyonları ve sağlam kurumsal mekanizmaları yönetebilecek doğal bir otorite ve organizasyonel güç taşırsınız. Kurumların icra kurullarında veya holding zirvelerinde kalıcı bir miras inşa edersiniz.';
-      idealPercent = 94;
-    } else if (hdType === 'Projektör' || destinyNum === 2 || destinyNum === 7 || destinyNum === 11) {
-      idealModelType = 'Stratejik Rehber & Danışman';
-      idealModelExp = 'Operasyonel angaryalardan uzaklaşıp üst düzey liderlere veya kurumlara stratejik mimari çizdiğiniz başdanışmanlık modeli size en yüksek saygınlığı ve finansal akışı sağlar.';
-      idealPercent = 91;
-    } else {
-      idealModelType = 'Özerk Uzman & Zanaatkar';
-      idealModelExp = 'Kendi alanında en derin bilgiye sahip, teknik ustalığıyla aranılan ve kalite standartlarını kendisi belirleyen özerk bir çalışma biçimi sizin için idealdir.';
-      idealPercent = 89;
-    }
+    // 7. İDEAL ÇALIŞMA MODELİ (4 Boyutlu Matematiksel Puanlama Matrisi)
+    const idealWorkModel = calculateIdealWorkModel(
+      chart,
+      saturn,
+      mars,
+      mercury,
+      sun,
+      jupiter,
+      hdType,
+      mcSign,
+      destinyNum,
+      house6Sign
+    );
 
     // 8. KRİTİK KARİYER DÖNÜM YAŞLARI (Kadersel Zaman Çizelgesi)
     const careerTimeline = calculateCareerTimeline(birthDate);
@@ -563,11 +554,7 @@ export class CareerEngine {
         coreAsset,
         decisionMotto
       },
-      idealWorkModel: {
-        type: idealModelType,
-        percentage: idealPercent,
-        explanation: idealModelExp
-      },
+      idealWorkModel,
       careerTimeline,
       focusStrategy,
       dharmaPath,
@@ -886,4 +873,106 @@ function generateActionableGuidance(category: string, hdType: string, destinyNum
     : 'Kalıcı gayrimenkul mülkleri, şirket hisseleri ve üretken varlıklar üzerinden sermayenizi büyüterek zamana meydan okuyan bir finansal koruma kalkanı oluşturun.';
 
   return [step1, step2, step3, step4];
+}
+
+interface IdealWorkModelResult {
+  type: 'Girişimci & Bağımsız Kurucu' | 'Kurumsal Lider & Üst Yönetici' | 'Stratejik Rehber & Danışman' | 'Özerk Uzman & Zanaatkar';
+  percentage: number;
+  explanation: string;
+}
+
+function calculateIdealWorkModel(
+  chart: NatalChartData,
+  saturn: AstroPoint,
+  mars: AstroPoint,
+  mercury: AstroPoint,
+  sun: AstroPoint,
+  jupiter: AstroPoint,
+  hdType: string,
+  mcSign: string,
+  destinyNum: number,
+  house6Sign: string
+): IdealWorkModelResult {
+  const modelScores = {
+    corporate: 10,
+    consultant: 10,
+    specialist: 10,
+    entrepreneur: 10
+  };
+
+  // 1. KURUMSAL LİDER & ÜST YÖNETİCİ PUANLARI
+  if (saturn.house === 10) modelScores.corporate += 35;
+  if (['Oğlak', 'Aslan', 'Boğa'].includes(mcSign)) modelScores.corporate += 30;
+  if (sun.house === 10) modelScores.corporate += 25;
+  if ([8, 4, 22].includes(destinyNum)) modelScores.corporate += 30;
+  if (['Oğlak', 'Boğa'].includes(saturn.sign)) modelScores.corporate += 15;
+
+  // 2. STRATEJİK REHBER & DANIŞMAN PUANLARI
+  if (hdType === 'Projektör') modelScores.consultant += 42;
+  if (jupiter.house === 9 || jupiter.house === 10) modelScores.consultant += 28;
+  if (['Terazi', 'İkizler', 'Balık', 'Kova'].includes(mercury.sign)) modelScores.consultant += 22;
+  if ([7, 2, 11, 33].includes(destinyNum)) modelScores.consultant += 30;
+  if (['Terazi', 'Balık'].includes(mcSign)) modelScores.consultant += 24;
+
+  // 3. ÖZERK UZMAN & ZANAATKAR PUANLARI
+  if (mercury.sign === 'Başak') modelScores.specialist += 36;
+  if (saturn.house === 6 || mercury.house === 6 || mars.house === 6) modelScores.specialist += 32;
+  if (['Başak', 'Boğa', 'Akrep'].includes(house6Sign)) modelScores.specialist += 24;
+  if (mcSign === 'Başak' || mcSign === 'Akrep') modelScores.specialist += 22;
+  if (hdType === 'Jeneratör') modelScores.specialist += 22;
+  if (destinyNum === 4 || destinyNum === 6) modelScores.specialist += 18;
+
+  // 4. GİRİŞİMCİ & BAĞIMSIZ KURUCU PUANLARI
+  if (mars.house === 1 || mars.house === 10) modelScores.entrepreneur += 32;
+  if (['Koç', 'Aslan'].includes(mcSign)) modelScores.entrepreneur += 28;
+  if (hdType === 'Manifestör') modelScores.entrepreneur += 36;
+  else if (hdType === 'Manifesting Jeneratör') modelScores.entrepreneur += 22;
+  if (destinyNum === 1 || destinyNum === 5) modelScores.entrepreneur += 32;
+
+  chart.aspects.forEach(asp => {
+    const pair = `${asp.planet1}-${asp.planet2}`;
+    if (pair.includes('Güneş') && pair.includes('Mars')) modelScores.entrepreneur += 18;
+    if (pair.includes('Mars') && pair.includes('Uranüs')) modelScores.entrepreneur += 18;
+    if (pair.includes('Merkür') && pair.includes('Satürn')) modelScores.specialist += 18;
+    if (pair.includes('Satürn') && pair.includes('Jüpiter')) modelScores.corporate += 18;
+  });
+
+  const sorted = (Object.keys(modelScores) as Array<keyof typeof modelScores>).sort(
+    (a, b) => modelScores[b] - modelScores[a]
+  );
+  const winner = sorted[0];
+  const maxScore = modelScores[winner];
+
+  // Dinamik yüzde: %83 - %95 arası
+  const calculatedPercentage = Math.min(95, Math.max(83, Math.round(75 + (maxScore / 130) * 18)));
+
+  if (winner === 'corporate') {
+    return {
+      type: 'Kurumsal Lider & Üst Yönetici',
+      percentage: calculatedPercentage,
+      explanation: 'Büyük bütçeleri, insan kaynaklarını ve sağlam kurumsal mekanizmaları yönetebilecek doğal bir otorite ve organizasyonel güç taşırsınız. Kurumların icra kurullarında, genel müdürlük koltuğunda veya holding zirvelerinde kalıcı bir miras inşa edersiniz.'
+    };
+  }
+
+  if (winner === 'consultant') {
+    return {
+      type: 'Stratejik Rehber & Danışman',
+      percentage: calculatedPercentage,
+      explanation: 'Operasyonel angaryalardan ve günlük amelelikten uzaklaşıp; üst düzey liderlere, şirketlere veya bireylere stratejik yol haritası çizdiğiniz uzman başdanışmanlık ve mimarlık modeli size en yüksek saygınlığı ve finansal akışı sağlar.'
+    };
+  }
+
+  if (winner === 'specialist') {
+    return {
+      type: 'Özerk Uzman & Zanaatkar',
+      percentage: calculatedPercentage,
+      explanation: 'Kendi alanında en derin bilgiye sahip, teknik ustalığıyla vazgeçilmez olan ve kalite standartlarını kendisi belirleyen özerk bir çalışma biçimi sizin için idealdir. Şirket bürokrasisiyle boğuşmak yerine en üst düzey uzmanlığı icra etmek sizi zirveye taşır.'
+    };
+  }
+
+  return {
+    type: 'Girişimci & Bağımsız Kurucu',
+    percentage: calculatedPercentage,
+    explanation: 'Başkalarının katı bürokrasisi altında çalışmak yaratıcı potansiyelinizi ve bağımsız karar alma gücünüzü sınırlar. Kendi kurallarınızı koyduğunuz bağımsız girişimler, şirket kuruculuğu veya serbest start-up modelleri sizin en yüksek verim ve kadersel doyum alanınızdır.'
+  };
 }
