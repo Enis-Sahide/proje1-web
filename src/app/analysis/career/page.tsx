@@ -410,12 +410,45 @@ export default function CareerAnalysisPage() {
                 ))}
               </div>
 
-              {/* İkincil Alanlar ve Diğer Sektörler Özeti (Mobil Uyumlu) */}
-              {result.energyDistribution?.othersSummary && (
-                <div className="bg-black/40 border border-white/10 p-4 rounded-2xl flex items-start sm:items-center gap-3 text-xs text-gray-400">
-                  <div className="w-2.5 h-2.5 rounded-full bg-slate-400 shrink-0 mt-0.5 sm:mt-0" />
-                  <p className="leading-relaxed">
-                    {result.energyDistribution.othersSummary}
+              {/* İkincil / Destekleyici Potansiyeller (Tekil Yüzdelerle Mobil Uyumlu) */}
+              {result.secondarySectors && result.secondarySectors.length > 0 && (
+                <div className="bg-black/50 border border-white/10 p-4 sm:p-5 rounded-3xl space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                    <span className="text-xs font-bold text-gray-200">
+                      İkincil & Destekleyici Kariyer Potansiyelleriniz
+                    </span>
+                    <span className="text-[11px] text-gray-400">
+                      Kariyerinizi güçlendiren tamamlayıcı yan yetkinlikler
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                    {result.secondarySectors.map((sec, sIdx) => (
+                      <div
+                        key={sIdx}
+                        className="bg-white/5 border border-white/10 p-2.5 sm:p-3 rounded-xl flex items-center justify-between gap-2"
+                      >
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span
+                            className="w-2.5 h-2.5 rounded-full shrink-0"
+                            style={{ backgroundColor: sec.color }}
+                          />
+                          <span className="text-[11px] sm:text-xs font-medium text-gray-200 truncate">
+                            {sec.shortTitle}
+                          </span>
+                        </div>
+                        <span
+                          className="text-xs sm:text-sm font-bold shrink-0"
+                          style={{ color: sec.color }}
+                        >
+                          %{sec.percentage}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <p className="text-[11px] text-gray-400 pt-1 leading-relaxed">
+                    Kariyer odağınız ilk 3 ana alanda yoğunlaşırken; bu ikincil alanlar kriz anlarında veya çok kanallı projelerde size esneklik ve rekabet avantajı sağlar.
                   </p>
                 </div>
               )}

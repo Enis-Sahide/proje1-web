@@ -7,12 +7,22 @@ import moment from 'moment-timezone';
 export interface CareerSectorMatch {
   id: string;
   title: string;
+  shortTitle: string;
   category: 'Liderlik & Girişim' | 'Teknoloji & İnovasyon' | 'Sanat & İletişim' | 'Şifa & Danışmanlık' | 'Finans & Strateji' | 'Global Vizyon & Akademi' | 'Organizasyon & Sistem';
-  fitScore: number; // Yüzdelik potansiyel payı (ör. %44)
+  fitScore: number;
   percentage: number;
   color: string;
   recommendedRoles: string[];
   description: string;
+}
+
+export interface SecondarySectorMatch {
+  id: string;
+  title: string;
+  shortTitle: string;
+  category: string;
+  percentage: number;
+  color: string;
 }
 
 export interface CareerEnergySegment {
@@ -44,10 +54,9 @@ export interface CareerAnalysisResult {
   superPower: string;
   shadowPitfalls: string;
   topSectors: CareerSectorMatch[];
+  secondarySectors: SecondarySectorMatch[];
   energyDistribution: {
     segments: CareerEnergySegment[];
-    othersPercentage: number;
-    othersSummary: string;
   };
   actionableGuidance: string[];
 }
@@ -381,36 +390,32 @@ export class CareerEngine {
       scores.leadership += 14;
     }
 
-    // 5. MATEMATİKSEL %100 DAĞILIM HESAPLAMASI
+    // 5. TÜM 7 SEKTÖRÜN BİREBİR TEKİL %100 DAĞILIMI
     const totalScore = Object.values(scores).reduce((acc, curr) => acc + curr, 0);
     const sortedSectorKeys = Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
 
-    // Ham yüzdeleri hesapla
-    const rawPercentages: Record<string, number> = {};
+    // Her sektörün tekil yüzdesi (yuvarlama)
+    const percentages: Record<string, number> = {};
+    let sumPercentages = 0;
     sortedSectorKeys.forEach(k => {
-      rawPercentages[k] = Math.round((scores[k] / totalScore) * 100);
+      const pct = Math.max(3, Math.round((scores[k] / totalScore) * 100));
+      percentages[k] = pct;
+      sumPercentages += pct;
     });
 
-    // İlk 3 sektörün yüzdeleri
-    const p1 = rawPercentages[sortedSectorKeys[0]] || 0;
-    const p2 = rawPercentages[sortedSectorKeys[1]] || 0;
-    const p3 = rawPercentages[sortedSectorKeys[2]] || 0;
+    // Toplam 100'e tam denk gelsin diye son farkı en yüksek sektörde dengele
+    const diff = 100 - sumPercentages;
+    percentages[sortedSectorKeys[0]] += diff;
 
-    // Geriye kalanlar (Diğer Sektörler): toplam 100'e tamamlanır
-    const othersPercentage = Math.max(4, 100 - (p1 + p2 + p3));
-
-    // Kalan diğer sektörlerin isimleri
-    const remainingSectorNames = sortedSectorKeys.slice(3).map(k => SECTOR_DEFINITIONS[k].shortTitle);
-    const othersSummary = `Geriye kalan %${othersPercentage}'lik ikincil potansiyeliniz ${remainingSectorNames.slice(0, 3).join(', ')} alanlarına dengeli olarak dağılmaktadır.`;
-
-    // İlk 3 Sektör Listesi
-    const topSectors: CareerSectorMatch[] = sortedSectorKeys.slice(0, 3).map((key, idx) => {
+    // İlk 3 Zirve Sektör (Detaylı Rol ve Açıklamalarla)
+    const topSectors: CareerSectorMatch[] = sortedSectorKeys.slice(0, 3).map(key => {
       const def = SECTOR_DEFINITIONS[key];
-      const pct = idx === 0 ? p1 : idx === 1 ? p2 : p3;
+      const pct = percentages[key];
 
       return {
         id: def.id,
         title: def.title,
+        shortTitle: def.shortTitle,
         category: def.category,
         fitScore: pct,
         percentage: pct,
@@ -420,23 +425,30 @@ export class CareerEngine {
       };
     });
 
-    // Enerji Dağılım Segmentleri (Mobil Spektrum Çubuğu İçin)
-    const segments: CareerEnergySegment[] = [
-      ...topSectors.map(s => ({
-        id: s.id,
-        title: SECTOR_DEFINITIONS[s.id].shortTitle,
-        category: s.category,
-        percentage: s.percentage,
-        color: s.color
-      })),
-      {
-        id: 'others',
-        title: 'Diğer Alanlar',
-        category: 'İkincil Potansiyel',
-        percentage: othersPercentage,
-        color: '#64748B' // Arduvaz Gri
-      }
-    ];
+    // Kalan 4 İkincil Sektör (Kendi tekil yüzdeleriyle)
+    const secondarySectors: SecondarySectorMatch[] = sortedSectorKeys.slice(3).map(key => {
+      const def = SECTOR_DEFINITIONS[key];
+      return {
+        id: def.id,
+        title: def.title,
+        shortTitle: def.shortTitle,
+        category: def.category,
+        percentage: percentages[key],
+        color: def.color
+      };
+    });
+
+    // Spektrum Çubuğu için 7 Sektörün Tamamı (Büyükten küçüğe tekil)
+    const segments: CareerEnergySegment[] = sortedSectorKeys.map(key => {
+      const def = SECTOR_DEFINITIONS[key];
+      return {
+        id: def.id,
+        title: def.shortTitle,
+        category: def.category,
+        percentage: percentages[key],
+        color: def.color
+      };
+    });
 
     // 6. ÖZET ROZETLER
     let leadershipStyle = 'Stratejik, Vizyoner & İnovatif';
@@ -509,10 +521,9 @@ export class CareerEngine {
       superPower,
       shadowPitfalls,
       topSectors,
+      secondarySectors,
       energyDistribution: {
-        segments,
-        othersPercentage,
-        othersSummary
+        segments
       },
       actionableGuidance
     };
