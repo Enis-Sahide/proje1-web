@@ -1099,7 +1099,7 @@ export default function CareerAnalysisPage() {
                       </p>
                     </div>
                     <div className="pt-2 border-t border-white/5">
-                      <span className="text-[10px] text-gray-400 block mb-1.5 uppercase font-semibold">Tavsiye Edilen Sazlar:</span>
+                      <span className="text-[10px] text-gray-400 block mb-1.5 uppercase font-semibold">Tavsiye Edilen Enstrümanlar:</span>
                       <div className="flex flex-wrap gap-1.5">
                         {result.musicalAffinity.primaryInstrument.instruments.map((inst, idx) => (
                           <span key={idx} className="text-[11px] bg-pink-500/10 border border-pink-500/20 px-2.5 py-1 rounded-lg text-pink-200">

@@ -943,7 +943,7 @@ export const downloadCareerPDF = async (
     curY = renderText(
       `**Baskın Enstrüman Ailesi:** ${data.musicalAffinity.primaryInstrument.category} (${data.musicalAffinity.primaryInstrument.element})\n` +
       `**Rezonans & Nitelik:** ${data.musicalAffinity.primaryInstrument.essence}\n` +
-      `**Uyumlu Sazlar:** ${data.musicalAffinity.primaryInstrument.instruments.join(', ')}\n` +
+      `**Uyumlu Enstrümanlar:** ${data.musicalAffinity.primaryInstrument.instruments.join(', ')}\n` +
       `**İkincil / Meditatif Frekans:** ${data.musicalAffinity.secondaryStyle.category} (${data.musicalAffinity.secondaryStyle.instruments.join(', ')})\n` +
       `**Vokal & Boğaz Çakrası:** ${data.musicalAffinity.vocalAptitude.style} — ${data.musicalAffinity.vocalAptitude.chakraResonance}\n` +
       `**Zihinsel Sıfırlanma Reçetesi:** ${data.musicalAffinity.musicalExpressionAdvice}`,
