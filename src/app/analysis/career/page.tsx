@@ -734,6 +734,11 @@ export default function CareerAnalysisPage() {
                       {result.progressedCareer.progressedMidheaven && (
                         <div className="pt-2 border-t border-purple-500/20 text-[11px] text-purple-200">
                           🏛️ <strong>Toplumsal Unvan Evrimi:</strong> {result.progressedCareer.progressedMidheaven.careerEvolutionTitle}
+                          {result.progressedCareer.progressedMidheaven.explanation && (
+                            <p className="text-xs text-gray-300 mt-1 leading-relaxed">
+                              {result.progressedCareer.progressedMidheaven.explanation}
+                            </p>
+                          )}
                         </div>
                       )}
                     </div>

@@ -605,10 +605,41 @@ export const downloadCareerPDF = async (
     curY = renderText(
       `**Döngü Mottosu:** "${phase.phaseMotto}" (Faz ${phase.phaseNumber}/8 • ${phase.elongationDegree}° Açı)\n\n` +
       `**Aşama Durumu:** ${phase.stageDescription}\n\n` +
-      `**Kariyer Hasat Rehberi:** ${phase.careerHarvestGuidance}\n\n` +
-      `🏛️ **${data.progressedCareer.progressedMidheaven.careerEvolutionTitle}**`,
+      `**Kariyer Hasat Rehberi:** ${phase.careerHarvestGuidance}`,
       15, curY, 180, 6.0
     );
+    curY += 7;
+
+    // 4. İlerletilmiş Tepe Noktası (Solar Arc MC - Toplumsal Unvan Evrimi Kartı)
+    if (data.progressedCareer.progressedMidheaven) {
+      const mc = data.progressedCareer.progressedMidheaven;
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(8.5);
+      const mcExpLines = doc.splitTextToSize(mc.explanation || 'Kariyerinizde yeni bir statü ve toplumsal görünürlük evresine geçiş.', 162);
+      const mcBoxH = 16 + (mcExpLines.length * 4.2);
+
+      ensureSpace(mcBoxH + 6);
+      doc.setFillColor(250, 245, 255); // Hafif lavanta zemin
+      doc.setDrawColor(216, 180, 254);
+      doc.setLineWidth(0.6);
+      doc.roundedRect(15, curY, 180, mcBoxH, 2, 2, 'FD');
+
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(9.5);
+      doc.setTextColor(...purple);
+      doc.text(`🏛️ ${mc.careerEvolutionTitle} • TOPLUMSAL STATÜ & UNVAN EVRİMİ`, 20, curY + 7);
+
+      doc.setFont('LiberationSans', 'normal');
+      doc.setFontSize(8.5);
+      doc.setTextColor(...charcoal);
+      let mcTextY = curY + 13;
+      mcExpLines.forEach((mcl: string) => {
+        doc.text(mcl, 20, mcTextY);
+        mcTextY += 4.2;
+      });
+
+      curY += mcBoxH + 6;
+    }
   }
 
   // ================= 10 GEZEGENİN MESLEKİ & ZANAAT GÖSTERGELERİ =================

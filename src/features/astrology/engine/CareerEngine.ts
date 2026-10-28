@@ -153,6 +153,7 @@ export interface ProgressedCareerData {
     sign: string;
     degreeInSign: number;
     careerEvolutionTitle: string;
+    explanation: string;
   };
 }
 
@@ -1639,6 +1640,23 @@ function calculateSecondaryProgressions(natalChart: NatalChartData, birthDate: s
   const progMcLon = ((natalMc.longitude || 0) + exactAgeYears * SUN_PROG_RATE) % 360;
   const progMcData = getSignAndDegree(progMcLon);
 
+  const mcExplanations: Record<string, string> = {
+    'Koç': 'Mesleki hayatınızda bağımsızlık, yeni bir sektöre öncülük etme ve başkalarının cesaret edemediği projeleri kendi inisiyatifinizle başlatma çağı.',
+    'Boğa': 'Kariyerinizde somut finansal güvence, kalıcı üretken varlıklar inşa etme ve piyasada güven veren sağlam bir marka yaratma evresi.',
+    'İkizler': 'Mesleki ağları (network) genişletme, ticaret, dijital medya, iletişim ve çok kanallı projelerle toplumsal görünürlük kazanma dönemi.',
+    'Yengeç': 'Kendi şirketinizi/ekibinizi bir aile gibi koruma, aidiyet yaratma, gayrimenkul veya topluma hizmet odaklı saygın bir kariyer olgunlaşması.',
+    'Aslan': 'Kariyerinizde sahneye çıkma, liderliği ve otoriteyi tam olarak üstlenme, kendi markanızı parlatma ve sektörde parmakla gösterilme çağı.',
+    'Başak': 'Ustalık, teknik mükemmellik, hizmet kalitesini tescilleme ve operasyonel sistemleri kusursuz bir nizamla yönetme evresi.',
+    'Terazi': 'Stratejik kurumsal ortaklıklar, prestijli iş birlikleri, halkla ilişkiler, diplomasi ve estetik standart belirleyiciliği dönemi.',
+    'Akrep': 'Krizleri fırsata çevirme, büyük sermaye ve finansal dönüşüm yönetimi, stratejik hamleler ve derin sektörel otorite inşası.',
+    'Yay': 'Uluslararası pazarlar, yüksek vizyon, akademi, yayıncılık ve sınırları aşan felsefi bir sektör liderliği çağı.',
+    'Oğlak': 'Mesleki zirve, en üst unvanlar, devlet veya kurumsal kademelerde sarsılmaz bir nizam ve kalıcı bir miras bırakma evresi.',
+    'Kova': 'Sektörde ezber bozan inovasyon, teknolojik devrim, bağımsız çalışma modelleri ve kitleleri peşinden sürükleyen vizyonerlik dönemi.',
+    'Balık': 'Manevi doyum, sanatsal ilham, sezgisel rehberlik ve topluma şifa/ilham dağıtan yaratıcı bir mesleki olgunluk çağı.'
+  };
+
+  const mcExp = mcExplanations[progMcData.sign] || 'Kariyerinizde yeni bir statü ve toplumsal görünürlük evresine geçiş.';
+
   return {
     currentAge,
     progressedSun: {
@@ -1673,7 +1691,8 @@ function calculateSecondaryProgressions(natalChart: NatalChartData, birthDate: s
     progressedMidheaven: {
       sign: progMcData.sign,
       degreeInSign: progMcData.degreeInSign,
-      careerEvolutionTitle: `İlerletilmiş Tepe Noktanız ${progMcData.sign} (${progMcData.degreeInSign}°)`
+      careerEvolutionTitle: `İlerletilmiş Tepe Noktanız ${progMcData.sign} (${progMcData.degreeInSign}°)`,
+      explanation: mcExp
     }
   };
 }
