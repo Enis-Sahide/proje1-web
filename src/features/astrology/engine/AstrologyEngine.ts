@@ -175,7 +175,8 @@ export async function generateAstrologyChart(dateObj: Date, cityInput: string | 
     { name: 'Uranüs', id: Constants.SE_URANUS },
     { name: 'Neptün', id: Constants.SE_NEPTUNE },
     { name: 'Plüton', id: Constants.SE_PLUTO },
-    { name: 'Kiron', id: Constants.SE_CHIRON }
+    { name: 'Kiron', id: Constants.SE_CHIRON },
+    { name: 'Kuzey Ay Düğümü', id: Constants.SE_TRUE_NODE }
   ];
 
   const planets: AstroPoint[] = [];
