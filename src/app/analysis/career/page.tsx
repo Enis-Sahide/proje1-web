@@ -6,7 +6,8 @@ import {
   Briefcase, Sparkles, Target, Award, ShieldAlert, 
   ArrowRight, RefreshCw, Layers, Compass, CheckCircle2,
   Zap, DollarSign, Flame, Lightbulb, Navigation, Clock, Calendar,
-  Palette, Building2, FileText, Hammer, Music, HeartHandshake, Globe, Feather
+  Palette, Building2, FileText, Hammer, Music, HeartHandshake, Globe, Feather,
+  Sun, Moon, TrendingUp, Hourglass
 } from 'lucide-react';
 import AnalysisBackButton from '@/components/ui/AnalysisBackButton';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
@@ -430,7 +431,157 @@ export default function CareerAnalysisPage() {
               </div>
             )}
 
-            {/* 3. KARİYER ODAK STRATEJİSİ (Tek Alanda Derinleşme mi, Çok Kanallı Polimat mı?) */}
+            {/* 3. İKİNCİL İLERLETİM (SECONDARY PROGRESSIONS • ASTRO-SEEK STANDARDI) */}
+            {result.progressedCareer && (
+              <div className="bg-gradient-to-br from-indigo-950/40 via-black/80 to-purple-950/30 border border-indigo-500/30 p-5 sm:p-7 rounded-3xl relative overflow-hidden shadow-2xl space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
+                      <Hourglass size={22} />
+                    </div>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] sm:text-xs uppercase tracking-widest text-indigo-400 font-bold block">
+                          İçsel Kariyer Saati • Astro-Seek Standardı
+                        </span>
+                        <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">
+                          {result.progressedCareer.currentAge} Yaş İlerletimi
+                        </span>
+                      </div>
+                      <h3 className="text-lg sm:text-2xl font-bold text-white">
+                        İkincil İlerletim: Mesleki Evrim ve Mevcut Sezonunuz
+                      </h3>
+                    </div>
+                  </div>
+                  <div className="text-[11px] text-gray-400 bg-white/5 px-3 py-1.5 rounded-xl border border-white/10 shrink-0">
+                    1 Gün = 1 Yıl Formülü (Secondary Progressions)
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                  {/* İlerletilmiş Güneş (Mesleki Kimlik & Ego Evrimi) */}
+                  <div className="bg-black/50 border border-amber-500/20 rounded-2xl p-5 space-y-3 relative overflow-hidden">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5 text-amber-400 font-bold text-sm">
+                        <Sun size={18} />
+                        <span>İlerletilmiş Güneş (Kimlik Evrimi)</span>
+                      </div>
+                      <span className="text-xs px-2.5 py-1 rounded-lg bg-amber-500/10 text-amber-300 border border-amber-500/20 font-semibold">
+                        {result.progressedCareer.progressedSun.progressedSign} {result.progressedCareer.progressedSun.degreeInSign}°{result.progressedCareer.progressedSun.minutes}&apos;
+                      </span>
+                    </div>
+
+                    <div className="bg-white/5 p-3 rounded-xl border border-white/5 flex items-center justify-between text-xs">
+                      <div className="text-gray-400">
+                        Doğum: <strong className="text-gray-200">{result.progressedCareer.progressedSun.natalSign} ({result.progressedCareer.progressedSun.natalDegree}°)</strong>
+                      </div>
+                      <ArrowRight size={14} className="text-amber-400" />
+                      <div className="text-gray-400">
+                        Şu An: <strong className="text-amber-300">{result.progressedCareer.progressedSun.progressedSign} ({result.progressedCareer.progressedSun.degreeInSign}°)</strong>
+                      </div>
+                    </div>
+
+                    <div className="text-xs text-amber-200 font-semibold bg-amber-500/10 p-2.5 rounded-lg border border-amber-500/20">
+                      🎯 {result.progressedCareer.progressedSun.identityShiftTheme}
+                    </div>
+
+                    <p className="text-xs text-gray-300 leading-relaxed">
+                      {result.progressedCareer.progressedSun.explanation}
+                    </p>
+
+                    <div className="text-[11px] text-gray-400 pt-2 border-t border-white/5 flex items-center justify-between">
+                      <span>Geçiş Yaşı: <strong className="text-white">{result.progressedCareer.progressedSun.shiftAge} yaş</strong></span>
+                      {result.progressedCareer.progressedSun.nextShiftAge && (
+                        <span>Sonraki Burç: <strong className="text-amber-300">{result.progressedCareer.progressedSun.nextShiftAge} yaş</strong></span>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* İlerletilmiş Ay (2.5 Yıllık Mesleki Mevsim & Odak Evi) */}
+                  <div className="bg-black/50 border border-blue-500/20 rounded-2xl p-5 space-y-3 relative overflow-hidden">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5 text-blue-400 font-bold text-sm">
+                        <Moon size={18} />
+                        <span>İlerletilmiş Ay (2.5 Yıllık Mevsim)</span>
+                      </div>
+                      <span className="text-xs px-2.5 py-1 rounded-lg bg-blue-500/10 text-blue-300 border border-blue-500/20 font-semibold">
+                        {result.progressedCareer.progressedMoon.sign} {result.progressedCareer.progressedMoon.degreeInSign}°{result.progressedCareer.progressedMoon.minutes}&apos;
+                      </span>
+                    </div>
+
+                    <div className="bg-white/5 p-3 rounded-xl border border-white/5 flex items-center justify-between text-xs">
+                      <div>
+                        <span className="text-gray-400 block text-[10px] uppercase">Natal Ev Etkisi</span>
+                        <strong className="text-blue-300">{result.progressedCareer.progressedMoon.natalHouse}. Ev Odak Alanı</strong>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-gray-400 block text-[10px] uppercase">Tahmini Kalan Süre</span>
+                        <strong className="text-white">~{result.progressedCareer.progressedMoon.estimatedMonthsLeft} Ay</strong>
+                      </div>
+                    </div>
+
+                    <div className="text-xs text-blue-200 font-semibold bg-blue-500/10 p-2.5 rounded-lg border border-blue-500/20">
+                      🌊 {result.progressedCareer.progressedMoon.cycleTheme}
+                    </div>
+
+                    <p className="text-xs text-gray-300 leading-relaxed">
+                      {result.progressedCareer.progressedMoon.houseImpact}
+                    </p>
+
+                    <div className="text-[11px] text-gray-400 pt-2 border-t border-white/5 flex items-center justify-between">
+                      <span>Döngü Süresi: <strong className="text-white">Her burçta ~2.5 yıl</strong></span>
+                      <span>Odak: <strong className="text-blue-300">İçsel Motivasyon & Ritim</strong></span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 30 Yıllık Kariyer Döngüsü: İlerletilmiş Ay Fazı (Elongation) */}
+                <div className="bg-black/60 border border-purple-500/30 rounded-2xl p-5 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
+                    <div className="flex items-center gap-2">
+                      <TrendingUp size={18} className="text-purple-400" />
+                      <h4 className="text-sm sm:text-base font-bold text-white">
+                        30 Yıllık Mesleki Yaşam Döngüsü: {result.progressedCareer.progressedMoonPhase.name}
+                      </h4>
+                    </div>
+                    <span className="text-xs px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30 font-semibold self-start sm:self-auto">
+                      Faz {result.progressedCareer.progressedMoonPhase.phaseNumber} / 8 • {result.progressedCareer.progressedMoonPhase.elongationDegree}° Açı
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <span className="text-[11px] text-purple-400 uppercase font-bold tracking-wider block">
+                        Döngü Niteliği & Mevcut Durum
+                      </span>
+                      <p className="text-xs sm:text-sm text-gray-200 font-medium leading-snug">
+                        &quot;{result.progressedCareer.progressedMoonPhase.phaseMotto}&quot;
+                      </p>
+                      <p className="text-xs text-gray-400 leading-relaxed">
+                        {result.progressedCareer.progressedMoonPhase.stageDescription}
+                      </p>
+                    </div>
+
+                    <div className="bg-purple-950/30 border border-purple-500/20 p-4 rounded-xl space-y-2">
+                      <span className="text-[11px] text-purple-300 uppercase font-bold tracking-wider block flex items-center gap-1.5">
+                        <Lightbulb size={14} className="text-purple-400" />
+                        Bu Fazda Uygulanacak Kariyer Stratejisi
+                      </span>
+                      <p className="text-xs text-gray-200 leading-relaxed">
+                        {result.progressedCareer.progressedMoonPhase.careerHarvestGuidance}
+                      </p>
+                      {result.progressedCareer.progressedMidheaven && (
+                        <div className="pt-2 border-t border-purple-500/20 text-[11px] text-purple-200">
+                          🏛️ <strong>Toplumsal Unvan Evrimi:</strong> {result.progressedCareer.progressedMidheaven.careerEvolutionTitle}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* 4. KARİYER ODAK STRATEJİSİ (Tek Alanda Derinleşme mi, Çok Kanallı Polimat mı?) */}
             {result.focusStrategy && (
               <div className="bg-black/60 border border-blue-500/30 p-5 sm:p-7 rounded-3xl relative overflow-hidden shadow-xl">
                 <div className="flex items-center gap-3 mb-3">

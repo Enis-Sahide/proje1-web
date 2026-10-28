@@ -1,4 +1,4 @@
-import { generateAstrologyChart, calculateDraconicChart } from './AstrologyEngine';
+import { generateAstrologyChart, calculateDraconicChart, getSignAndDegree } from './AstrologyEngine';
 import { AstroCity, NatalChartData, AstroPoint, AstroAspect } from './AstrologyConstants';
 import { calculateNameAnalysis, calculateLifePath } from '@/utils/numerologyCalculator';
 import { generateChart, HumanDesignChart } from '@/utils/HumanDesignEngine';
@@ -118,6 +118,44 @@ export interface SoulCareerData {
   };
 }
 
+export interface ProgressedCareerData {
+  currentAge: number;
+  progressedSun: {
+    natalSign: string;
+    natalDegree: number;
+    progressedSign: string;
+    degreeInSign: number;
+    minutes: number;
+    hasShifted: boolean;
+    shiftAge: number;
+    nextShiftAge: number;
+    identityShiftTheme: string;
+    explanation: string;
+  };
+  progressedMoon: {
+    sign: string;
+    degreeInSign: number;
+    minutes: number;
+    natalHouse: number;
+    cycleTheme: string;
+    houseImpact: string;
+    estimatedMonthsLeft: number;
+  };
+  progressedMoonPhase: {
+    name: string;
+    phaseNumber: number;
+    phaseMotto: string;
+    elongationDegree: number;
+    stageDescription: string;
+    careerHarvestGuidance: string;
+  };
+  progressedMidheaven: {
+    sign: string;
+    degreeInSign: number;
+    careerEvolutionTitle: string;
+  };
+}
+
 export interface CareerAnalysisResult {
   personalInfo: {
     fullName: string;
@@ -137,6 +175,7 @@ export interface CareerAnalysisResult {
     explanation: string;
   };
   careerTimeline: CareerTimelineData;
+  progressedCareer: ProgressedCareerData;
   focusStrategy: FocusStrategyData;
   dharmaPath: DharmaPathData;
   wealthMagnet: WealthMagnetData;
@@ -594,12 +633,15 @@ export class CareerEngine {
     const draconicChart = calculateDraconicChart(chart);
     const soulCareer = calculateSoulCareer(chart, draconicChart, topSectors[0]);
 
-    // 12. SÜPER GÜÇ VE GÖLGE TUZAKLAR
+    // 12. İKİNCİL İLERLETİM (SECONDARY PROGRESSIONS - ASTRO-SEEK STANDARDI)
+    const progressedCareer = calculateSecondaryProgressions(chart, birthDate);
+
+    // 13. SÜPER GÜÇ VE GÖLGE TUZAKLAR
     const dominantCategory = topSectors[0].category;
     const superPower = generateCleanMultiPlanetSuperPower(dominantCategory, mercury.sign, uranus.house, destinyNum);
     const shadowPitfalls = generateCleanMultiPlanetShadowPitfall(dominantCategory, saturn.sign);
 
-    // 13. 4 STRATEJİK EYLEM ADIMI
+    // 14. 4 STRATEJİK EYLEM ADIMI
     const actionableGuidance = generateActionableGuidance(dominantCategory, hdType, destinyNum, house2Sign);
 
     return {
@@ -617,6 +659,7 @@ export class CareerEngine {
       },
       idealWorkModel,
       careerTimeline,
+      progressedCareer,
       focusStrategy,
       dharmaPath,
       wealthMagnet,
@@ -1388,5 +1431,168 @@ function calculateSoulCareer(
     },
     soulTopSectors,
     soulMaterialBridge
+  };
+}
+
+function calculateSecondaryProgressions(natalChart: NatalChartData, birthDate: string): ProgressedCareerData {
+  const currentAge = moment().diff(moment(birthDate), 'years');
+  const exactAgeYears = moment().diff(moment(birthDate), 'days') / 365.2422;
+
+  const natalSun = natalChart.planets.find(p => p.name === 'Güneş') || { longitude: 0, sign: 'Koç', degreeInSign: 0, minutes: 0 };
+  const natalMoon = natalChart.planets.find(p => p.name === 'Ay') || { longitude: 0, sign: 'Boğa', degreeInSign: 0, minutes: 0 };
+  const natalMc = natalChart.midheaven || { longitude: 0, sign: 'Oğlak', degreeInSign: 0, minutes: 0 };
+
+  // 1. İlerletilmiş Güneş (Günde 0.9856473322 derece = Yılda 0.9856473322 derece)
+  const SUN_PROG_RATE = 0.9856473322;
+  const progSunLon = (natalSun.longitude + exactAgeYears * SUN_PROG_RATE) % 360;
+  const progSunData = getSignAndDegree(progSunLon);
+
+  const remainingToFirstShift = 30 - (natalSun.degreeInSign + natalSun.minutes / 60);
+  const shiftAge = Math.round((remainingToFirstShift / SUN_PROG_RATE) * 10) / 10;
+  const hasShifted = exactAgeYears >= shiftAge;
+
+  const remainingInCurrentProgSun = 30 - (progSunData.degreeInSign + progSunData.minutes / 60);
+  const nextShiftAge = Math.round((exactAgeYears + remainingInCurrentProgSun / SUN_PROG_RATE) * 10) / 10;
+
+  const identityShiftTheme = `${natalSun.sign} Doğumu → ${progSunData.sign} Bilincine Evrilme`;
+  let explanation = '';
+  if (hasShifted) {
+    explanation = `Doğum anınızdaki ${natalSun.sign} mizanız, yaklaşık ${shiftAge} yaşında kabuk değiştirerek ${progSunData.sign} enerjisine evrilmiştir. Gençlikteki öncelikleriniz yerini ${progSunData.sign} burcunun getirdiği mesleki olgunluğa bırakmıştır. Bir sonraki büyük kadersel mizaç dönüşümünüz yaklaşık ${nextShiftAge} yaşında gerçekleşecektir.`;
+  } else {
+    explanation = `Güneşiniz henüz doğum anınızdaki ${natalSun.sign} burcunda olgunlaşmaktadır. Yaklaşık ${shiftAge} yaşına geldiğinizde Güneşiniz ${progSunData.sign} burcuna geçecek ve kariyerinizde köklü bir zihniyet ve hedef değişimi tetiklenecektir.`;
+  }
+
+  // 2. İlerletilmiş Ay (Günde ~13.176358 derece = Yılda ~13.176358 derece)
+  const MOON_PROG_RATE = 13.176358;
+  const progMoonLon = (natalMoon.longitude + exactAgeYears * MOON_PROG_RATE) % 360;
+  const progMoonData = getSignAndDegree(progMoonLon);
+
+  const degsLeftInMoonSign = 30 - (progMoonData.degreeInSign + progMoonData.minutes / 60);
+  const estimatedMonthsLeft = Math.max(1, Math.round((degsLeftInMoonSign / MOON_PROG_RATE) * 12));
+
+  // Natal hangi evde olduğunu bul
+  let natalHouse = 1;
+  if (natalChart.houses && natalChart.houses.length === 12) {
+    for (let i = 0; i < 12; i++) {
+      const currentCusp = natalChart.houses[i].longitude;
+      const nextCusp = natalChart.houses[(i + 1) % 12].longitude;
+      const distance = (nextCusp - currentCusp + 360) % 360;
+      const pointDist = (progMoonLon - currentCusp + 360) % 360;
+      if (pointDist < distance) {
+        natalHouse = natalChart.houses[i].house || (i + 1);
+        break;
+      }
+    }
+  }
+
+  const houseThemes: Record<number, { title: string; impact: string }> = {
+    1: { title: 'Yeni Başlangıçlar & Bireysel Kimlik İnşası', impact: '28 yıllık yepyeni bir kariyer döngüsünün başındasınız. Kendi vizyonunuzu, adınızı ve bireysel projelerinizi öne çıkarma zamanı.' },
+    2: { title: 'Kendi Gelirini Artırma & Finansal Güvence', impact: 'Maaşınızı artırma, fiyatınızı yükseltme, birikim yapma ve yeteneklerinizi doğrudan nakit paraya dönüştürme dönemindesiniz.' },
+    3: { title: 'Yeni Beceriler, Ticaret & İletişim Ağı', impact: 'Eğitim alma, yeni araç ve yazılımları öğrenme, yerel ticaret, resmi yazışmalar ve network kurma dönemindesiniz.' },
+    4: { title: 'Köklenme, Temel Kurma & İç Düzen', impact: 'Kendi iş yerinizi, dükkanınızı veya atölyenizi kurma, ailevi/maddi güvenceyi sağlama ve sağlam temeller atma çağı.' },
+    5: { title: 'Yaratıcı İfade, Sahne & Özgün Projeler', impact: 'Zevk alarak üretme, sahneye çıkma, risk alma, sanatsal veya inovatif projelerinizi parlatma zamanı.' },
+    6: { title: 'Çok Çalışma, Zanaat, Hizmet & Ustalık', impact: 'Çıraklık, işe ve üretime adanma, detayları mükemmelleştirme, memuriyet veya zanaat disipliniyle pişme dönemi.' },
+    7: { title: 'Stratejik Ortaklıklar & Müşteri Bağları', impact: 'Tek başına değil; doğru ortaklar bulma, sözleşmeler imzalama, danışmanlık verme ve kilit ittifaklar kurma zamanı.' },
+    8: { title: 'Kriz Yönetimi, Yatırım & Derin Dönüşüm', impact: 'Kredi, fon, ortak sermaye yönetimi, eski mesleki alışkanlıkları geride bırakıp yenilenme çağı.' },
+    9: { title: 'Vizyon Genişletme, Yüksek Eğitim & Dış Pazarlar', impact: 'Akademi, dış ticaret, yabancı diller, yayıncılık veya felsefi danışmanlıkta ufukları aşma zamanı.' },
+    10: { title: 'Kariyer Zirvesi, Unvan, Terfi & Görünürlük', impact: 'En yüksek kariyer görünürlüğü dönemi! Emeklerinizin karşılığını alma, unvan tescilleme ve toplum önünde takdir görme çağı.' },
+    11: { title: 'Kolektif Projeler, Birlik & Gelecek Vizyonu', impact: 'Meslek odaları, dernekler, kooperatifler, geniş kitlelere hitap eden projeler ve ekip liderliği zamanı.' },
+    12: { title: 'Arınma, Defterleri Kapatma & Kuluçka Dönemi', impact: 'Eski 28 yıllık döngünün son faslı. Zorlamadan dinlenme, içsel hazırlık yapma ve yeni büyük döngüye zemin hazırlama zamanı.' }
+  };
+
+  const houseData = houseThemes[natalHouse] || houseThemes[10];
+
+  // 3. İlerletilmiş Ay Fazı (Elongasyon Açısı: Moon - Sun)
+  const phaseAngle = (progMoonLon - progSunLon + 360) % 360;
+  let phaseNumber = 1;
+  let phaseName = 'Yeniay Fazı (0° - 45°)';
+  let phaseMotto = '30 Yıllık Yeni Kariyer Tohumunu Ekiş';
+  let stageDescription = 'Önünüzdeki 30 yıllık hayat ve kariyerinizin tohumlarını ektiğiniz taptaze bir başlangıç evresindesiniz.';
+  let careerHarvestGuidance = 'Hemen devasa meyveler beklemeyin; sabırla temelleri atın, yeni becerileri öğrenin ve yönünüzü belirleyin.';
+
+  if (phaseAngle >= 45 && phaseAngle < 90) {
+    phaseNumber = 2;
+    phaseName = 'Hilal Fazı (45° - 90°)';
+    phaseMotto = 'İlk Filizlenme & Cesur Mücadele';
+    stageDescription = 'Ektiğiniz tohumların ilk filizlerini verdiği, dirençlerle karşılaştığınız ve kararlılıkla mücadele ettiğiniz evredir.';
+    careerHarvestGuidance = 'Şüpheye düşmeyin; projelerinize tutunarak piyasadaki ilk engelleri inançla aşın.';
+  } else if (phaseAngle >= 90 && phaseAngle < 135) {
+    phaseNumber = 3;
+    phaseName = 'İlk Dördün Fazı (90° - 135°)';
+    phaseMotto = 'Kriz Yönetimi, Karar & Yön Tayini';
+    stageDescription = 'Geri dönüşün olmadığı, kariyer rotanızdaki en kritik virajı döndüğünüz eylem ve karar aşamasıdır.';
+    careerHarvestGuidance = 'Eskiye tutunmayı bırakın; cesur kararlar alarak profesyonel yolunuzu kesinleştirin.';
+  } else if (phaseAngle >= 135 && phaseAngle < 180) {
+    phaseNumber = 4;
+    phaseName = 'Büyüyen Ay Fazı (135° - 180°)';
+    phaseMotto = 'Ustalığı İnce Ayarla Mükemmelleştirme';
+    stageDescription = 'Büyük hasattan hemen önceki evre. Hataları düzeltme, uzmanlığı cilalama ve kalite standartlarını zirveye çıkarma zamanıdır.';
+    careerHarvestGuidance = 'Ayrıntılara odaklanın; ürününüzü veya zanaatinizi kusursuzlaştırarak büyük vitrine hazırlanın.';
+  } else if (phaseAngle >= 180 && phaseAngle < 225) {
+    phaseNumber = 5;
+    phaseName = 'Dolunay Fazı (180° - 225°)';
+    phaseMotto = 'Kariyer Zirvesi, Büyük Hasat & Görünürlük';
+    stageDescription = '30 yıllık döngünün en aydınlık zirvesi! 15 yıldır verdiğiniz tüm emeklerin meyvelerini topladığınız hasat çağıdır.';
+    careerHarvestGuidance = 'Mütevazılıkla geri çekilmeyin; hakkınız olan unvanı, geliri ve saygınlığı özgüvenle kabul edin.';
+  } else if (phaseAngle >= 225 && phaseAngle < 270) {
+    phaseNumber = 6;
+    phaseName = 'Küçülen / Hasat Fazı (225° - 270°)';
+    phaseMotto = 'Meyveleri Dağıtma & Bilgelik Aktarımı';
+    stageDescription = 'Elde ettiğiniz başarıyı ve tecrübeyi başkalarıyla paylaştığınız, mentorluk ve akil liderlik yaptığınız evredir.';
+    careerHarvestGuidance = 'Bilgiyi saklamayın; ekibinizi eğitin, zanaatinizi öğretin ve sektörel itibarınızı kökleştirin.';
+  } else if (phaseAngle >= 270 && phaseAngle < 315) {
+    phaseNumber = 7;
+    phaseName = 'Son Dördün Fazı (270° - 315°)';
+    phaseMotto = 'Yeniden Yapılanma & Fazlalıkları Eleme';
+    stageDescription = 'Size artık hizmet etmeyen işleri, ortaklıkları ve yükleri elediğiniz, sadeleşme ve revizyon çağıdır.';
+    careerHarvestGuidance = 'Yorulmuş sistemleri tasfiye edin; sadeleşerek operasyonel yüklerinizi hafifletin.';
+  } else if (phaseAngle >= 315) {
+    phaseNumber = 8;
+    phaseName = 'Balsamik / Karanlık Ay Fazı (315° - 360°)';
+    phaseMotto = 'Eski Döngüyü Kapatma, Arınma & Dinlenme';
+    stageDescription = '30 yıllık koca bir kariyer perdesinin kapanış evresidir. Kuluçka zamanıdır; yeni büyük döngü için içsel hazırlık yapılır.';
+    careerHarvestGuidance = 'Zorla yeni büyük hamleler yapmaya çalışmayın; dinlenin, arının ve yakında doğacak yeni döneme hazırlanarak güç toplayın.';
+  }
+
+  // 4. İlerletilmiş MC (Solar Arc)
+  const progMcLon = ((natalMc.longitude || 0) + exactAgeYears * SUN_PROG_RATE) % 360;
+  const progMcData = getSignAndDegree(progMcLon);
+
+  return {
+    currentAge,
+    progressedSun: {
+      natalSign: natalSun.sign,
+      natalDegree: natalSun.degreeInSign,
+      progressedSign: progSunData.sign,
+      degreeInSign: progSunData.degreeInSign,
+      minutes: progSunData.minutes,
+      hasShifted,
+      shiftAge,
+      nextShiftAge,
+      identityShiftTheme,
+      explanation
+    },
+    progressedMoon: {
+      sign: progMoonData.sign,
+      degreeInSign: progMoonData.degreeInSign,
+      minutes: progMoonData.minutes,
+      natalHouse,
+      cycleTheme: houseData.title,
+      houseImpact: houseData.impact,
+      estimatedMonthsLeft
+    },
+    progressedMoonPhase: {
+      name: phaseName,
+      phaseNumber,
+      phaseMotto,
+      elongationDegree: Math.round(phaseAngle * 10) / 10,
+      stageDescription,
+      careerHarvestGuidance
+    },
+    progressedMidheaven: {
+      sign: progMcData.sign,
+      degreeInSign: progMcData.degreeInSign,
+      careerEvolutionTitle: `İlerletilmiş Tepe Noktanız ${progMcData.sign} (${progMcData.degreeInSign}°)`
+    }
   };
 }
