@@ -305,36 +305,89 @@ export default function CareerAnalysisPage() {
               </p>
             </div>
 
-            {/* 2. EN UYGUN SEKTÖRLER VE İDEAL ROLLER */}
+            {/* 2. EN UYGUN SEKTÖRLER VE %100 ENERJİ DAĞILIMI */}
             <div className="space-y-4">
               <div className="flex items-center gap-2.5 px-1">
                 <div className="p-2 rounded-xl bg-[#EAB308]/10 text-[#EAB308] border border-[#EAB308]/20">
                   <Target size={18} />
                 </div>
-                <h3 className="text-lg sm:text-xl font-bold text-white">
-                  En Yüksek Başarı Vadeden 3 Kariyer Alanı
-                </h3>
+                <div>
+                  <h3 className="text-lg sm:text-xl font-bold text-white">
+                    En Yüksek Başarı Vadeden Kariyer Alanlarınız
+                  </h3>
+                  <span className="text-[11px] sm:text-xs text-gray-400 block">
+                    Gezegen yerleşimlerinizin %100 üzerinden hesaplanan matematiksel potansiyel dağılımı
+                  </span>
+                </div>
               </div>
 
+              {/* %100 Kariyer Spektrumu Çubuğu (Mobil Uyumlu) */}
+              {result.energyDistribution && (
+                <div className="bg-black/60 border border-white/10 p-4 sm:p-5 rounded-3xl shadow-lg space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs">
+                    <span className="font-semibold text-gray-200">Kişisel Potansiyel Spektrumu (%100)</span>
+                    <span className="text-[11px] text-gray-400">Tüm haritanın kümülatif enerji dağılımı</span>
+                  </div>
+
+                  {/* Yatay Segmentli Çubuk */}
+                  <div className="w-full h-3.5 sm:h-4 bg-white/5 rounded-full p-0.5 border border-white/10 flex overflow-hidden">
+                    {result.energyDistribution.segments.map((seg, sIdx) => (
+                      <div
+                        key={sIdx}
+                        style={{ width: `${Math.max(4, seg.percentage)}%`, backgroundColor: seg.color }}
+                        className="h-full first:rounded-l-full last:rounded-r-full transition-all duration-500 relative"
+                        title={`${seg.title}: %${seg.percentage}`}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Mobil Dostu Segment Etiketleri (Wrap) */}
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-4 pt-1">
+                    {result.energyDistribution.segments.map((seg, sIdx) => (
+                      <div key={sIdx} className="flex items-center gap-1.5 text-[11px] sm:text-xs bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
+                        <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: seg.color }} />
+                        <span className="text-gray-300 font-medium">{seg.title}</span>
+                        <span className="font-bold text-white">%{seg.percentage}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* 3 Ana Sektör Kartları (Mobilde 1 sütun, masaüstünde 3 sütun) */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
                 {result.topSectors.map((sector, idx) => (
                   <div
                     key={idx}
-                    className="bg-black/50 border border-white/10 hover:border-[#EAB308]/40 p-5 sm:p-6 rounded-3xl transition-all duration-300 flex flex-col justify-between group shadow-xl relative overflow-hidden"
+                    className="bg-black/50 border border-white/10 hover:border-white/30 p-5 sm:p-6 rounded-3xl transition-all duration-300 flex flex-col justify-between group shadow-xl relative overflow-hidden"
+                    style={{ borderTopColor: sector.color, borderTopWidth: '3px' }}
                   >
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#EAB308]/5 rounded-full blur-2xl group-hover:bg-[#EAB308]/10 transition-colors pointer-events-none" />
+                    <div
+                      className="absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl pointer-events-none opacity-20"
+                      style={{ backgroundColor: sector.color }}
+                    />
 
                     <div>
                       <div className="flex items-center justify-between mb-3.5">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#EAB308] bg-[#EAB308]/10 border border-[#EAB308]/20 px-2.5 py-1 rounded-md">
+                        <span
+                          className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md"
+                          style={{
+                            backgroundColor: `${sector.color}20`,
+                            color: sector.color,
+                            border: `1px solid ${sector.color}40`
+                          }}
+                        >
                           {sector.category}
                         </span>
-                        <span className="text-base sm:text-lg font-extrabold text-[#EAB308]">
-                          %{sector.fitScore} Uyum
+                        <span
+                          className="text-sm sm:text-base font-extrabold px-2.5 py-0.5 rounded-lg bg-white/5 border border-white/10"
+                          style={{ color: sector.color }}
+                        >
+                          %{sector.percentage} Pay
                         </span>
                       </div>
 
-                      <h4 className="text-lg sm:text-xl font-bold text-white group-hover:text-[#EAB308] transition-colors mb-2">
+                      <h4 className="text-lg sm:text-xl font-bold text-white mb-2 leading-snug">
                         {sector.title}
                       </h4>
 
@@ -356,6 +409,16 @@ export default function CareerAnalysisPage() {
                   </div>
                 ))}
               </div>
+
+              {/* İkincil Alanlar ve Diğer Sektörler Özeti (Mobil Uyumlu) */}
+              {result.energyDistribution?.othersSummary && (
+                <div className="bg-black/40 border border-white/10 p-4 rounded-2xl flex items-start sm:items-center gap-3 text-xs text-gray-400">
+                  <div className="w-2.5 h-2.5 rounded-full bg-slate-400 shrink-0 mt-0.5 sm:mt-0" />
+                  <p className="leading-relaxed">
+                    {result.energyDistribution.othersSummary}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* 3. SÜPER GÜÇ VE GÖLGE TUZAKLAR */}

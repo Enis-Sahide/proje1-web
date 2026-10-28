@@ -5,11 +5,22 @@ import { generateChart, HumanDesignChart } from '@/utils/HumanDesignEngine';
 import moment from 'moment-timezone';
 
 export interface CareerSectorMatch {
+  id: string;
   title: string;
   category: 'Liderlik & Girişim' | 'Teknoloji & İnovasyon' | 'Sanat & İletişim' | 'Şifa & Danışmanlık' | 'Finans & Strateji' | 'Global Vizyon & Akademi' | 'Organizasyon & Sistem';
-  fitScore: number;
+  fitScore: number; // Yüzdelik potansiyel payı (ör. %44)
+  percentage: number;
+  color: string;
   recommendedRoles: string[];
   description: string;
+}
+
+export interface CareerEnergySegment {
+  id: string;
+  title: string;
+  category: string;
+  percentage: number;
+  color: string;
 }
 
 export interface CareerAnalysisResult {
@@ -33,13 +44,20 @@ export interface CareerAnalysisResult {
   superPower: string;
   shadowPitfalls: string;
   topSectors: CareerSectorMatch[];
+  energyDistribution: {
+    segments: CareerEnergySegment[];
+    othersPercentage: number;
+    othersSummary: string;
+  };
   actionableGuidance: string[];
 }
 
 interface SectorDefinition {
   id: string;
   title: string;
+  shortTitle: string;
   category: CareerSectorMatch['category'];
+  color: string;
   description: string;
   roles: string[];
 }
@@ -48,49 +66,63 @@ const SECTOR_DEFINITIONS: Record<string, SectorDefinition> = {
   technology: {
     id: 'technology',
     title: 'Yazılım Mimarisi, Yapay Zeka & Derin Teknoloji',
+    shortTitle: 'Yazılım & Teknoloji',
     category: 'Teknoloji & İnovasyon',
+    color: '#8B5CF6', // Asil Mor
     description: 'Bilişim sistemleri, algoritmik yazılım mimarisi, yapay zeka entegrasyonları ve ölçeklenebilir dijital platformlar inşa etme konusunda doğuştan gelen yüksek analitik problem çözme dehanızı temsil eder.',
     roles: ['Yazılım Mimarı & Full-Stack Mühendis', 'Yapay Zeka & Algoritma Geliştirici', 'Teknoloji Kurucusu (CTO / Founder)', 'Bulut & Sistem Altyapı Direktörü', 'Siber Güvenlik & Veri Analisti']
   },
   finance: {
     id: 'finance',
     title: 'Büyük Sermaye, Yatırım Stratejisi & Varlık Yönetimi',
+    shortTitle: 'Finans & Sermaye',
     category: 'Finans & Strateji',
+    color: '#10B981', // Zümrüt Yeşili
     description: 'Maddi kaynakları vizyoner hedefler doğrultusunda büyütme, portföy ve fon yönetimi, şirket satın almaları ve stratejik sermaye kurgularında söz sahibi olma gücünüzü simgeler.',
     roles: ['Yatırım Bankacısı & Portföy Yöneticisi', 'Özel Sermaye (PE) & Fon Direktörü', 'Finansal Stratejist & CFO', 'Gayrimenkul Geliştirme Yatırımcısı', 'Kriz Arbitrajı & Varlık Değerleme Uzmanı']
   },
   leadership: {
     id: 'leadership',
     title: 'Bağımsız Girişimcilik, Start-up & İcra Kurulu Liderliği',
+    shortTitle: 'Girişim & Liderlik',
     category: 'Liderlik & Girişim',
+    color: '#EAB308', // Altın Sarısı
     description: 'Piyasada ilk adımı atma cesareti, start-up projelerini hızla ölçekleme, kriz anlarında inisiyatif alarak ekiplere ve şirketlere kararlı bir şekilde yön verme kudretinizi açığa çıkarır.',
     roles: ['Şirket Kurucusu & CEO', 'Start-up Büyüme Direktörü (Scale-up)', 'Kriz & Dönüşüm Yöneticisi', 'Girişim Sermayesi (VC) Ortağı', 'Operasyonel İcra Lideri']
   },
   systems: {
     id: 'systems',
     title: 'Sistem Mimarisi, Mühendislik & Süreç Optimizasyonu',
+    shortTitle: 'Sistem & Mühendislik',
     category: 'Organizasyon & Sistem',
+    color: '#3B82F6', // Safir Mavi
     description: 'Karmaşık operasyonel süreçlerden saat gibi işleyen kusursuz düzenler çıkarma, kalite güvence, endüstriyel altyapı ve sürdürülebilir organizasyonel standartlar inşa etme dehanızdır.',
     roles: ['Operasyon Direktörü (COO)', 'Endüstriyel & Sistem Mühendisi', 'Süreç Optimizasyon Danışmanı', 'Kurumsal Denetim & Kalite Başkanı', 'Büyük Ölçekli Proje Yöneticisi']
   },
   creative: {
     id: 'creative',
     title: 'Dijital Ürün Tasarımı, Medya & Kreatif İletişim',
+    shortTitle: 'Tasarım & Medya',
     category: 'Sanat & İletişim',
+    color: '#EC4899', // Gül Pembe
     description: 'Kullanıcı deneyimi (UI/UX), marka kimliği, yaratıcı içerik üretimi, görsel sanatlar ve kitleleri derinden etkileyen çok kanallı iletişim ağları kurma yeteneğinizi yansıtır.',
     roles: ['Kreatif Direktör', 'Dijital Ürün (UI/UX) Tasarımcısı', 'Medya & Yayıncılık Yöneticisi', 'Marka Kimliği Stratejisti', 'Görsel Yapımcı & Sanat Yönetmeni']
   },
   global: {
     id: 'global',
     title: 'Global Vizyon, Uluslararası Ticaret & Yüksek Akademi',
+    shortTitle: 'Global Vizyon & Akademi',
     category: 'Global Vizyon & Akademi',
+    color: '#F97316', // Mercan Turuncu
     description: 'Yerel sınırları aşarak çok uluslu ticaret, küresel stratejik ortaklıklar, yüksek akademik araştırmalar ve kitlelere yön veren felsefi danışmanlıkta kadersel söz sahibi olduğunuzu gösterir.',
     roles: ['Uluslararası Ticaret Direktörü', 'Akademisyen & Enstitü Başkanı', 'Küresel İş Geliştirme Danışmanı', 'Uluslararası Hukuk Müşaviri', 'Kurumsal Filozof & Stratejist']
   },
   human: {
     id: 'human',
     title: 'İnsan Kaynakları, Psikoloji & Büyüme Danışmanlığı',
+    shortTitle: 'İnsan & Danışmanlık',
     category: 'Şifa & Danışmanlık',
+    color: '#14B8A6', // Turkuaz
     description: 'İnsan psikolojisinin derin dinamiklerini anlama, kurumlarda sadakat ve aidiyet ortamı yaratma, üst düzey yetenekleri keşfetme ve dönüştürücü koçluk verme kabiliyetinizi anlatır.',
     roles: ['İnsan Kaynakları Direktörü (CHRO)', 'Üst Düzey Yönetici Koçu & Mentor', 'Klinik Psikolog & Başdanışman', 'Kurumsal Kültür Mimarı', 'Sosyal Gelişim & Sağlık Lideri']
   }
@@ -125,13 +157,13 @@ export class CareerEngine {
 
     // 4. EVRENSEL GEZEGEN PUANLAMA MOTORU (Multi-Planet Weighted Scoring)
     const scores: Record<string, number> = {
-      technology: 10,
-      finance: 10,
-      leadership: 10,
-      systems: 10,
-      creative: 10,
-      global: 10,
-      human: 10
+      technology: 8,
+      finance: 8,
+      leadership: 8,
+      systems: 8,
+      creative: 8,
+      global: 8,
+      human: 8
     };
 
     // Gezegenleri bul
@@ -159,30 +191,27 @@ export class CareerEngine {
 
     const mcSign = chart.midheaven.sign;
     const house2 = chart.houses[1] ? chart.houses[1].sign : 'Boğa';
-    const house6 = chart.houses[5] ? chart.houses[5].sign : 'Başak';
-    const house10 = chart.houses[9] ? chart.houses[9].sign : mcSign;
 
-    // A) URANÜS DEĞERLENDİRMESİ (Yazılım, Teknoloji, Yapay Zeka, İnovasyon)
+    // A) URANÜS (Yazılım, Teknoloji, Yapay Zeka, İnovasyon)
     if (uranus.house === 10 || uranus.house === 9) {
-      scores.technology += 42; // Kariyer zirvesinde doğrudan bilişim/yazılım
+      scores.technology += 42;
       scores.leadership += 18;
     } else if (uranus.house === 6) {
-      scores.technology += 35; // Günlük teknik uzmanlık
+      scores.technology += 35;
       scores.systems += 15;
     } else if (uranus.house === 1 || uranus.house === 11) {
       scores.technology += 28;
       scores.leadership += 20;
     } else if (uranus.house === 3) {
-      scores.technology += 24; // Kodlama ve dijital diller
+      scores.technology += 24;
       scores.creative += 12;
     }
     if (['Kova', 'Başak', 'İkizler', 'Yay'].includes(uranus.sign)) {
       scores.technology += 18;
     }
 
-    // B) MERKÜR DEĞERLENDİRMESİ (Algoritmik Zeka, Kodlama, Sistem & Veri)
+    // B) MERKÜR (Algoritmik Zeka, Kodlama, Sistem & Veri)
     if (mercury.sign === 'Başak') {
-      // Merkür Başak'ta yücelir ve yönetir: En üst düzey algoritmik mantık, hata ayıklama (debug), veri mimarisi
       scores.technology += 38;
       scores.systems += 30;
     } else if (mercury.sign === 'İkizler' || mercury.sign === 'Kova') {
@@ -197,11 +226,11 @@ export class CareerEngine {
       scores.systems += 18;
     }
 
-    // C) SATÜRN DEĞERLENDİRMESİ (Dayanıklı Altyapı, Sistem Mimarisi, Yönetim & Regülasyon)
+    // C) SATÜRN (Dayanıklı Altyapı, Sistem Mimarisi, Yönetim & Regülasyon)
     if (['Oğlak', 'Akrep', 'Başak'].includes(saturn.sign)) {
       scores.systems += 28;
       scores.finance += 20;
-      scores.technology += 16; // Sağlam backend altyapısı ve veri güvenliği
+      scores.technology += 16;
     }
     if (saturn.house === 10 || saturn.house === 6) {
       scores.systems += 30;
@@ -210,7 +239,7 @@ export class CareerEngine {
       scores.finance += 25;
     }
 
-    // D) MARS DEĞERLENDİRMESİ (Teknik Aksiyon, Mühendislik, Start-up İnisiyatifi)
+    // D) MARS (Teknik Aksiyon, Mühendislik, Start-up İnisiyatifi)
     if (['Akrep', 'Koç', 'Oğlak'].includes(mars.sign)) {
       scores.leadership += 24;
       scores.systems += 20;
@@ -223,7 +252,7 @@ export class CareerEngine {
       scores.technology += 16;
     }
 
-    // E) GÜNEŞ DEĞERLENDİRMESİ (Liderlik, İtibar, Görünürlük & Karizma)
+    // E) GÜNEŞ (Liderlik, İtibar, Görünürlük & Karizma)
     if (['Aslan', 'Koç', 'Yay'].includes(sun.sign)) {
       scores.leadership += 28;
       scores.global += 18;
@@ -238,7 +267,7 @@ export class CareerEngine {
       scores.leadership += 25;
     }
 
-    // F) JÜPİTER DEĞERLENDİRMESİ (Büyük Sermaye, Global Vizyon, Uluslararası Ticaret)
+    // F) JÜPİTER (Büyük Sermaye, Global Vizyon, Uluslararası Ticaret)
     if (['Yay', 'Balık', 'Yengeç', 'Boğa'].includes(jupiter.sign)) {
       scores.global += 26;
       scores.finance += 22;
@@ -250,7 +279,7 @@ export class CareerEngine {
       scores.finance += 26;
     }
 
-    // G) VENÜS & NEPTÜN DEĞERLENDİRMESİ (Tasarım, UI/UX, Sanat, Diplomasi, Şifa)
+    // G) VENÜS & NEPTÜN (Tasarım, UI/UX, Sanat, Diplomasi, Şifa)
     if (['Terazi', 'Boğa', 'Balık'].includes(venus.sign)) {
       scores.creative += 28;
       scores.human += 18;
@@ -263,48 +292,43 @@ export class CareerEngine {
       scores.human += 20;
     }
 
-    // H) PLÜTON & AY DEĞERLENDİRMESİ (Siber Güvenlik, Derin Finans, İnsan Kaynakları)
+    // H) PLÜTON & AY (Siber Güvenlik, Derin Finans, İnsan Kaynakları)
     if (pluto.house === 10 || pluto.house === 8 || pluto.house === 2) {
       scores.finance += 22;
-      scores.technology += 14; // Kriptoloji ve siber güvenlik
+      scores.technology += 14;
       scores.leadership += 16;
     }
     if (['Yengeç', 'Boğa', 'Balık'].includes(moon.sign) || moon.house === 10 || moon.house === 6) {
       scores.human += 26;
     }
 
-    // I) GEZEGEN AÇILARI (ASPECTS)
+    // I) GEZEGEN AÇILARI
     chart.aspects.forEach(asp => {
       const p1 = asp.planet1;
       const p2 = asp.planet2;
       const pair = `${p1}-${p2}`;
 
-      // Merkür - Uranüs: Teknoloji ve Yazılım Dehası
       if (pair.includes('Merkür') && pair.includes('Uranüs')) {
         scores.technology += 25;
       }
-      // Mars - Uranüs: Hızlı Prototipleme & Teknoloji Girişimi
       if (pair.includes('Mars') && pair.includes('Uranüs')) {
         scores.technology += 16;
         scores.leadership += 14;
       }
-      // Merkür - Satürn: Sistem Mimarisi, Kusursuz Mantık
       if (pair.includes('Merkür') && pair.includes('Satürn')) {
         scores.systems += 20;
         scores.technology += 14;
       }
-      // Güneş - Jüpiter veya Mars - Jüpiter: Büyük Ölçekli Liderlik
       if ((pair.includes('Güneş') || pair.includes('Mars')) && pair.includes('Jüpiter')) {
         scores.global += 16;
         scores.leadership += 14;
       }
-      // Venüs - Merkür veya Venüs - Neptün: Kreatif Tasarım ve UI/UX
       if (pair.includes('Venüs') && (pair.includes('Merkür') || pair.includes('Neptün'))) {
         scores.creative += 20;
       }
     });
 
-    // J) 10. EV (MC) BURCU VE KARİYER EKSENİ
+    // J) 10. EV (MC) BURCU
     if (mcSign === 'Kova') {
       scores.technology += 25;
       scores.leadership += 15;
@@ -313,7 +337,6 @@ export class CareerEngine {
       scores.technology += 20;
     } else if (mcSign === 'Yay') {
       scores.global += 25;
-      // Yay aynı zamanda vizyoner teknoloji ve küresel start-up'ları destekler
       scores.technology += 12;
       scores.leadership += 14;
     } else if (mcSign === 'Koç' || mcSign === 'Aslan') {
@@ -327,7 +350,7 @@ export class CareerEngine {
       scores.human += 24;
     }
 
-    // K) NUMEROLOJİ KADER SAYISI KATKISI
+    // K) NUMEROLOJİ KADER SAYISI
     if (destinyNum === 7) {
       scores.technology += 24;
       scores.systems += 18;
@@ -347,7 +370,7 @@ export class CareerEngine {
       scores.global += 22;
     }
 
-    // L) HUMAN DESIGN TİPİ KATKISI
+    // L) HUMAN DESIGN TİPİ
     if (hdType === 'Manifestör') {
       scores.leadership += 18;
     } else if (hdType === 'Projektör') {
@@ -358,29 +381,64 @@ export class CareerEngine {
       scores.leadership += 14;
     }
 
-    // 5. PUANLARI SIRALA VE EN YÜKSEK 3 SEKTÖRÜ SEÇ
+    // 5. MATEMATİKSEL %100 DAĞILIM HESAPLAMASI
+    const totalScore = Object.values(scores).reduce((acc, curr) => acc + curr, 0);
     const sortedSectorKeys = Object.keys(scores).sort((a, b) => scores[b] - scores[a]);
-    const maxScore = scores[sortedSectorKeys[0]] || 100;
 
-    // İlk 3 sektörü formatla
+    // Ham yüzdeleri hesapla
+    const rawPercentages: Record<string, number> = {};
+    sortedSectorKeys.forEach(k => {
+      rawPercentages[k] = Math.round((scores[k] / totalScore) * 100);
+    });
+
+    // İlk 3 sektörün yüzdeleri
+    const p1 = rawPercentages[sortedSectorKeys[0]] || 0;
+    const p2 = rawPercentages[sortedSectorKeys[1]] || 0;
+    const p3 = rawPercentages[sortedSectorKeys[2]] || 0;
+
+    // Geriye kalanlar (Diğer Sektörler): toplam 100'e tamamlanır
+    const othersPercentage = Math.max(4, 100 - (p1 + p2 + p3));
+
+    // Kalan diğer sektörlerin isimleri
+    const remainingSectorNames = sortedSectorKeys.slice(3).map(k => SECTOR_DEFINITIONS[k].shortTitle);
+    const othersSummary = `Geriye kalan %${othersPercentage}'lik ikincil potansiyeliniz ${remainingSectorNames.slice(0, 3).join(', ')} alanlarına dengeli olarak dağılmaktadır.`;
+
+    // İlk 3 Sektör Listesi
     const topSectors: CareerSectorMatch[] = sortedSectorKeys.slice(0, 3).map((key, idx) => {
       const def = SECTOR_DEFINITIONS[key];
-      // Normalize fit score: 1. %94-98, 2. %87-92, 3. %82-86
-      let calculatedFit = Math.round((scores[key] / maxScore) * 96);
-      if (idx === 0) calculatedFit = Math.max(95, Math.min(98, calculatedFit));
-      if (idx === 1) calculatedFit = Math.max(88, Math.min(93, calculatedFit));
-      if (idx === 2) calculatedFit = Math.max(82, Math.min(87, calculatedFit));
+      const pct = idx === 0 ? p1 : idx === 1 ? p2 : p3;
 
       return {
+        id: def.id,
         title: def.title,
         category: def.category,
-        fitScore: calculatedFit,
+        fitScore: pct,
+        percentage: pct,
+        color: def.color,
         recommendedRoles: def.roles,
         description: def.description
       };
     });
 
-    // 6. ÖZET ROZETLER (Jargonsuz)
+    // Enerji Dağılım Segmentleri (Mobil Spektrum Çubuğu İçin)
+    const segments: CareerEnergySegment[] = [
+      ...topSectors.map(s => ({
+        id: s.id,
+        title: SECTOR_DEFINITIONS[s.id].shortTitle,
+        category: s.category,
+        percentage: s.percentage,
+        color: s.color
+      })),
+      {
+        id: 'others',
+        title: 'Diğer Alanlar',
+        category: 'İkincil Potansiyel',
+        percentage: othersPercentage,
+        color: '#64748B' // Arduvaz Gri
+      }
+    ];
+
+    // 6. ÖZET ROZETLER
     let leadershipStyle = 'Stratejik, Vizyoner & İnovatif';
     if (scores.technology > scores.leadership && scores.technology > scores.finance) {
       leadershipStyle = 'Analitik, Sistem Kuran & İnovasyon Odaklı';
@@ -427,7 +485,7 @@ export class CareerEngine {
     const superPower = generateCleanMultiPlanetSuperPower(dominantCategory, mercury.sign, uranus.house, destinyNum);
     const shadowPitfalls = generateCleanMultiPlanetShadowPitfall(dominantCategory, saturn.sign);
 
-    // 9. 4 STRATEJİK EYLEM ADIMI (Jargonsuz)
+    // 9. 4 STRATEJİK EYLEM ADIMI
     const actionableGuidance = generateActionableGuidance(dominantCategory, hdType, destinyNum, house2);
 
     return {
@@ -451,6 +509,11 @@ export class CareerEngine {
       superPower,
       shadowPitfalls,
       topSectors,
+      energyDistribution: {
+        segments,
+        othersPercentage,
+        othersSummary
+      },
       actionableGuidance
     };
   }
