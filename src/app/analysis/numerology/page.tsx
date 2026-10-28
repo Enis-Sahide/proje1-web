@@ -235,19 +235,25 @@ export default function NumerologyPage() {
               <div className="space-y-3 pt-2 border-t border-white/5">
                 {data.constructivePotentials && (
                   <div>
-                    <h4 className="text-sm font-semibold text-green-400 mb-1">Yapıcı Potansiyeller:</h4>
+                    <h4 className="text-sm font-semibold text-green-400 mb-1 flex items-center gap-1.5">
+                      <Sparkles size={14} className="text-green-400" /> Güçlü Potansiyeller & Yetenekler:
+                    </h4>
                     <p className="text-gray-300 leading-relaxed text-xs">{data.constructivePotentials}</p>
                   </div>
                 )}
                 {data.negativePotentials && (
                   <div>
-                    <h4 className="text-sm font-semibold text-red-400 mb-1">Gölge Yönler:</h4>
+                    <h4 className="text-sm font-semibold text-red-400 mb-1 flex items-center gap-1.5">
+                      <AlertCircle size={14} className="text-red-400" /> Gölge Yönler & Dikkat Edilmesi Gerekenler:
+                    </h4>
                     <p className="text-gray-300 leading-relaxed text-xs">{data.negativePotentials}</p>
                   </div>
                 )}
                 {data.relationships && (
                   <div>
-                    <h4 className="text-sm font-semibold text-[#4285F4] mb-1">İlişkiler ve Aşk:</h4>
+                    <h4 className="text-sm font-semibold text-[#4285F4] mb-1 flex items-center gap-1.5">
+                      <Heart size={14} className="text-[#4285F4]" /> İlişkiler ve Aşk Dinamiği:
+                    </h4>
                     <p className="text-gray-300 leading-relaxed text-xs">{data.relationships}</p>
                   </div>
                 )}
@@ -1066,7 +1072,7 @@ export default function NumerologyPage() {
                   <h3 className="text-xl font-bold text-white tracking-wide border-b border-white/5 pb-2">Detaylı Analiz Raporları</h3>
                   {renderAnalysisCard("Hayat Kulvarı (Yaşam Yolu)", nameResults.lifePath, "lifePathDetails")}
                   {renderAnalysisCard("En Ön Plandaki Kişilik", nameResults.personality, "personalityDetails")}
-                  {renderAnalysisCard("İsim Numaranız (Kader)", nameResults.destiny, "description")}
+                  {renderAnalysisCard("İsim Numaranız (Kader Sayısı)", nameResults.destiny, "description")}
                   {renderAnalysisCard("Ruhunuzu Tanımlama (Ruh Güdüsü)", nameResults.soulUrge, "soulUrgeDetails")}
                 </div>
 
