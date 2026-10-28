@@ -148,7 +148,7 @@ export default function CareerAnalysisPage() {
         <div>
           <h4 className="text-sm sm:text-base font-bold text-white">{titleText}</h4>
           <p className="text-xs text-gray-400 mt-1 max-w-xl">
-            İkincil İlerletim saatini, kadersel zaman çizelgesini, Drakonik ruhsal çağrıyı ve servet kaldıraç stratejinizi içeren 6 sayfalık Kapsamlı Kariyer Dosyasını (Özel PDF) hemen edinebilirsiniz.
+            İkincil İlerletim saatini, kadersel zaman çizelgesini, Drakonik ruhsal çağrıyı ve servet kaldıraç stratejinizi içeren Kapsamlı Kariyer Raporunu (Özel PDF) hemen edinebilirsiniz.
           </p>
         </div>
       </div>
@@ -181,7 +181,7 @@ export default function CareerAnalysisPage() {
         </h3>
         <p className="text-xs sm:text-sm text-gray-300 leading-relaxed pt-1">
           {layer === 'material'
-            ? '7 Sektörün Yüzdelik Dağılımı, İkincil İlerletim Saati, Kadersel Zaman Çizelgesi, 10 Gezegenin Mesleki Deşifresi, Müzik/Zanaat Malzemesi, Pars Fortuna Rızık Kapısı, Biyoritm Saatleri ve İndirilebilir 6 Sayfalık Özel PDF Raporu için hemen kilidi açın.'
+            ? '7 Sektörün Yüzdelik Dağılımı, İkincil İlerletim Saati, Kadersel Zaman Çizelgesi, 10 Gezegenin Mesleki Deşifresi, Müzik/Zanaat Malzemesi, Pars Fortuna Rızık Kapısı, Biyoritm Saatleri ve İndirilebilir Özel PDF Raporu için hemen kilidi açın.'
             : 'Ruhsal MC (Tepe Noktası), Ruhun 3\'lü Enkarnasyon Doğası, Ruhu Besleyen Kadersel Sektörler ve Ruh-Madde Bütünsel Sentez Köprüsü Kapsamlı Kariyer Dosyasına dahildir.'}
         </p>
       </div>
@@ -201,8 +201,8 @@ export default function CareerAnalysisPage() {
           <span className="text-[11px] text-gray-300">Enstrüman, rızık & biyoritm</span>
         </div>
         <div className="bg-white/5 border border-white/10 p-3 rounded-2xl">
-          <span className="text-[10px] text-[#D4AF37] font-bold block mb-0.5">✦ 6 SAYFA ÖZEL PDF</span>
-          <span className="text-[11px] text-gray-300">İndirilebilir ömürlük dosya</span>
+          <span className="text-[10px] text-[#D4AF37] font-bold block mb-0.5">✦ ÖZEL PDF RAPORU</span>
+          <span className="text-[11px] text-gray-300">İndirilebilir dijital analiz</span>
         </div>
       </div>
 
@@ -216,7 +216,7 @@ export default function CareerAnalysisPage() {
           <ArrowRight size={18} />
         </button>
         <span className="block text-[11px] text-gray-400 mt-2">
-          Tek seferlik ödeme • Anında tam erişim • Profilinize ve e-postanıza kayıt
+          Tek seferlik ödeme • Derin Analiz • Özel PDF Raporu • Anında İndirme
         </span>
       </div>
     </div>
