@@ -17,10 +17,12 @@ import { AstroCity, ASTRO_CITIES } from '@/features/astrology/engine/AstrologyCo
 import type { CareerAnalysisResult } from '@/features/astrology/engine/CareerEngine';
 import { downloadCareerPDF } from '@/utils/careerPdfGenerator';
 import { useAuth } from '@/context/AuthContext';
+import { apiFetch } from '@/lib/apiClient';
 
 export default function CareerAnalysisPage() {
   const router = useRouter();
-  const { user } = useAuth();
+  const { user, role } = useAuth();
+  const isMasterOrAdmin = role === 'admin' || role === 'master';
 
   // Form State
   const [fullName, setFullName] = useState('');
@@ -34,6 +36,8 @@ export default function CareerAnalysisPage() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<CareerAnalysisResult | null>(null);
   const [activeLayer, setActiveLayer] = useState<'material' | 'soul'>('material');
+
+  const isEffectiveUnlocked = Boolean(result?.isUnlocked || isMasterOrAdmin);
 
   // Load from user profile if exists
   useEffect(() => {
@@ -69,9 +73,8 @@ export default function CareerAnalysisPage() {
     setIsLoading(true);
 
     try {
-      const res = await fetch('/api/astrology/career', {
+      const data = await apiFetch<CareerAnalysisResult>('/api/astrology/career', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           fullName: fullName.trim(),
           birthDate,
@@ -80,10 +83,8 @@ export default function CareerAnalysisPage() {
         })
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.error || 'Hesaplama sırasında sunucu hatası oluştu.');
+      if (isMasterOrAdmin) {
+        data.isUnlocked = true;
       }
 
       setResult(data);
@@ -344,7 +345,7 @@ export default function CareerAnalysisPage() {
               </div>
 
               <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full md:w-auto">
-                {result.isUnlocked ? (
+                {isEffectiveUnlocked ? (
                   <button
                     onClick={handleDownloadPdf}
                     disabled={isPdfLoading}
@@ -492,10 +493,10 @@ export default function CareerAnalysisPage() {
             </div>
 
             {/* KİLİTLİ DURUM: KAPSAMLI KARİYER RAPORU KİLİT VİTRİNİ */}
-            {!result.isUnlocked && renderBigLockedShowcase('material')}
+            {!isEffectiveUnlocked && renderBigLockedShowcase('material')}
 
             {/* AÇIK / SATIN ALINMIŞ DURUM: TÜM DERİN MESLEKİ BÖLÜMLER */}
-            {result.isUnlocked && (
+            {isEffectiveUnlocked && (
               <>
                 {/* 2. KRİTİK KARİYER DÖNÜM YAŞLARI & KADERSEL ZAMAN ÇİZELGESİ */}
                 {result.careerTimeline && (
@@ -1536,10 +1537,10 @@ export default function CareerAnalysisPage() {
             </div>
 
             {/* KİLİTLİ DURUM: DRAKONİK RUH HARİTASI KİLİT VİTRİNİ */}
-            {!result.isUnlocked && renderBigLockedShowcase('soul')}
+            {!isEffectiveUnlocked && renderBigLockedShowcase('soul')}
 
             {/* AÇIK / SATIN ALINMIŞ DURUM: TÜM RUHSAL VE ENKARNASYON ANALİZİ */}
-            {result.isUnlocked && (
+            {isEffectiveUnlocked && (
               <>
                 {/* 1. RUHSAL TEPE NOKTASI (DRAKONİK MC) & KADERSEL ÇAĞRI */}
             <div className="bg-gradient-to-br from-purple-900/30 via-black/80 to-pink-900/20 border border-purple-500/40 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl space-y-4">
