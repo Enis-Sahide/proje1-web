@@ -835,7 +835,7 @@ export const downloadCareerPDF = async (
   curY += 3;
 
   const promoBoxY = curY;
-  const promoBoxHeight = 64;
+  const promoBoxHeight = 66;
 
   // Şık Arka Plan Kartı
   doc.setFillColor(248, 250, 252);
@@ -854,24 +854,24 @@ export const downloadCareerPDF = async (
   doc.setTextColor(...muted);
   doc.text('Kadim ezoterik ilimler ve modern analiz motorumuzla kader haritanızın diğer katmanlarını çözün:', 105, promoBoxY + 11.5, { align: 'center' });
 
-  // 4 Adet Merak Uyandırıcı Analiz Maddesi
+  // 4 Adet Resmi 7Layers Analiz Maddesi
   let itemY = promoBoxY + 17;
   const promoItems = [
     {
-      title: '🔮 Kadersel İlişki & Sinastri Uyumu:',
-      desc: 'Partnerinizle aranızdaki bağ bir tesadüf mü, karmik bir borç mu? Bilinçaltı dinamikler ve ilişki kaderi.'
+      title: '🪐 Doğum Haritası Analizi:',
+      desc: 'Gezegen yerleşimleri, yükselen burç ve evlerinizin kadersel potansiyelleri.'
     },
     {
-      title: '🌳 Kabala Yaşam Ağacı & Ruh Misyonu:',
-      desc: 'Ruhunuz bu enkarnasyona hangi sınavı aşmak için geldi? 10 Sefirot ve 22 Yol ile hayatın asıl manevi amacı.'
+      title: '🧬 Human Design (Tasarımınız):',
+      desc: 'Enerji tipiniz, auranız, profiliniz ve fıtri karar alma otoriteniz.'
     },
     {
-      title: '🧬 Human Design (Bilinç & Enerji Tasarımı):',
-      desc: 'Doğru kararları zihninizle mi alıyorsunuz? Gerçek enerji tipinizi, auranızı ve tükenmeden yaşama stratejinizi öğrenin.'
+      title: '🔢 Numeroloji Analizi:',
+      desc: 'Doğum tarihi ve isminizdeki kozmik titreşimler, yaşam yolu ve zirve döngüleri.'
     },
     {
-      title: '⏳ Kozmik Doğum Saati Tespiti (Rektifikasyon):',
-      desc: 'Doğum saatinizi tam bilmiyorsanız, geçmiş kilit olaylarınızla gerçek doğum dakikanızı matematiksel olarak bulun.'
+      title: '🌲 Kelt Druid Ağacı Analizi:',
+      desc: 'Doğum anınızın kutsal Kelt koruyucu ağaç arketipi ve kadim doğa frekansı.'
     }
   ];
 
@@ -882,10 +882,14 @@ export const downloadCareerPDF = async (
     doc.text(item.title, 19, itemY);
 
     const titleWidth = doc.getTextWidth(item.title);
+    const maxDescWidth = 188 - (19 + titleWidth + 2); // 188mm sınır (kutu 195mm'de biter)
+
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(...muted);
-    doc.text(item.desc, 19 + titleWidth + 1.5, itemY);
+
+    const lines = doc.splitTextToSize(item.desc, maxDescWidth);
+    doc.text(lines[0], 19 + titleWidth + 2, itemY);
 
     itemY += 7.2;
   });
@@ -897,7 +901,7 @@ export const downloadCareerPDF = async (
   doc.setTextColor(255, 255, 255);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(8.5);
-  doc.text('👉 Hemen Ziyaret Edin: www.7layers.tr  •  Kişiye Özel Derin Haritalar & Farkındalık Analizleri', 105, promoBoxY + promoBoxHeight - 6, { align: 'center' });
+  doc.text('👉 Hemen Ziyaret Edin: www.7layers.tr  •  Kişiye Özel Kadim Analizler & Ruhsal Farkındalık', 105, promoBoxY + promoBoxHeight - 6, { align: 'center' });
 
   curY = promoBoxY + promoBoxHeight + 5;
 
