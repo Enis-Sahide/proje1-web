@@ -167,7 +167,7 @@ export default function AnalysisPage() {
                   {tool.isMasterPreview && !isMasterOrAdmin && (
                     <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-400/90 bg-amber-400/10 border border-amber-400/20 px-1.5 py-0.5 rounded-md mt-0.5">
                       <Sparkles size={10} />
-                      Usta & Rapor
+                      Kapsamlı Rapor
                     </span>
                   )}
                 </div>
@@ -189,9 +189,9 @@ export default function AnalysisPage() {
             onClick={e => e.stopPropagation()}
           >
             <div className="text-[#D4AF37] mx-auto mb-4 flex justify-center"><AlertCircle size={48} /></div>
-            <h3 className="text-xl font-bold text-white mb-2">Usta Seviyesi Gerekli</h3>
+            <h3 className="text-xl font-bold text-white mb-2">Kapsamlı Rapor Gereklidir</h3>
             <p className="text-mystic-text-muted text-sm mb-6 leading-relaxed">
-              Bu derin ezoterik analiz Usta Seviyesi (Master) üyelere özeldir. Bu derin analiz seviye sistemine özeldir, yakında açılacaktır.
+              Bu derin ezoterik analiz kapsamlı rapora özeldir. Tek seferlik satın alarak ömür boyu sınırsız erişim sağlayabilirsiniz.
             </p>
             <button 
               onClick={() => setShowLockModal(false)}

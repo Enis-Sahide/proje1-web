@@ -249,7 +249,7 @@ function GuestCheckoutForm() {
           </h1>
           
           <p className="text-mystic-text-muted text-xs md:text-sm leading-relaxed mb-6">
-            Doğum parametrelerinizle anında hesaplanan profesyonel ve derinlikli PDF raporunuza güvenle erişin; raporunuz e-postanıza iletilir ve profilinizde saklanır.
+            Doğum parametrelerinizle anında hesaplanan profesyonel ve derinlikli PDF raporunuza hemen erişin; ödeme sonrası doğrudan ekranınızdan anında indirebilir ve sınırsız kullanabilirsiniz.
           </p>
 
           <div className="space-y-3 pt-6 border-t border-white/10 text-xs">
@@ -259,7 +259,7 @@ function GuestCheckoutForm() {
             </div>
             <div className="flex justify-between items-center">
               <span className="text-mystic-text-muted">Teslimat</span>
-              <span className="text-green-400 font-medium">Anında İndirme + E-Posta</span>
+              <span className="text-green-400 font-medium">Anında Doğrudan İndirme</span>
             </div>
             {cityKey && (
               <div className="flex justify-between items-center">
@@ -312,7 +312,7 @@ function GuestCheckoutForm() {
                   type="email"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  placeholder="PDF indirme linkinin gönderileceği adres"
+                  placeholder="Fatura ve iletişim e-posta adresiniz"
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm text-white placeholder-white/30 focus:outline-none focus:border-[#D4AF37] transition-colors"
                   required
                 />

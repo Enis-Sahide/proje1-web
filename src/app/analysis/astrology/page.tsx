@@ -54,10 +54,13 @@ const CHART_SIZE = 640;
 const CENTER = CHART_SIZE / 2;
 const RADIUS = CENTER - 85;
 
+import { useAnalysisAccess } from '@/hooks/useAnalysisAccess';
+
 export default function AstrologyPage() {
   const router = useRouter();
   const { role, user } = useAuth();
-  const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
+  const { isUnlocked: isPurchasedOrAdmin } = useAnalysisAccess('astrology');
+  const isApprenticeOrAbove = isPurchasedOrAdmin;
   const [showLockModal, setShowLockModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
@@ -785,14 +788,33 @@ export default function AstrologyPage() {
             <div className="text-[#D4AF37] mx-auto mb-4 flex justify-center"><AlertCircle size={48} /></div>
             <h3 className="text-xl font-bold text-white mb-2">Detaylı Analiz Kilitli</h3>
             <p className="text-mystic-text-muted text-sm mb-6 leading-relaxed">
-              Doğum haritasındaki gezegen yerleşimleri, ev ve açı yorumlarının derin detayları Çıraklık Seviyesi (Apprentice) ve üzeri üyelere özeldir. Bu derin analiz seviye sistemine özeldir, yakında açılacaktır.
+              Doğum haritasındaki gezegen yerleşimleri, ev ve açı yorumlarının derin detayları Kapsamlı Doğum Haritası Raporuna özeldir. Tek seferlik satın alarak ömür boyu sınırsız erişebilirsiniz.
             </p>
             <div className="flex flex-col gap-3">
               <button 
-                onClick={() => setShowLockModal(false)}
+                onClick={() => {
+                  setShowLockModal(false);
+                  const query = new URLSearchParams({
+                    type: 'astrology',
+                    date: dateStr,
+                    time: timeStr,
+                    city: cityKey?.name || '',
+                    lat: (cityKey?.lat || '').toString(),
+                    lon: (cityKey?.lon || '').toString(),
+                    tz: cityKey?.tz || '',
+                    email: user?.email || ''
+                  }).toString();
+                  router.push(`/checkout/guest?${query}`);
+                }}
                 className="w-full bg-[#D4AF37] hover:bg-[#E5C158] text-black font-bold py-3 px-4 rounded-xl transition-all cursor-pointer shadow-lg shadow-[#D4AF37]/10"
               >
-                Anladım
+                Raporu Satın Al (Ömür Boyu Erişim)
+              </button>
+              <button 
+                onClick={() => setShowLockModal(false)}
+                className="w-full bg-white/5 hover:bg-white/10 text-white/70 py-2.5 px-4 rounded-xl transition-all text-xs"
+              >
+                Kapat
               </button>
             </div>
           </div>

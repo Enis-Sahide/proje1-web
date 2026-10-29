@@ -72,10 +72,13 @@ const KABBALAH_HD_BRIDGE: Record<string, { title: string; subtitle: string; desc
   }
 };
 
+import { useAnalysisAccess } from '@/hooks/useAnalysisAccess';
+
 export default function KabbalahAnalysisPage() {
   const router = useRouter();
   const { role, user } = useAuth();
-  const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
+  const { isUnlocked: isPurchasedOrAdmin } = useAnalysisAccess('kabbalah');
+  const isApprenticeOrAbove = isPurchasedOrAdmin;
   const [showLockModal, setShowLockModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
 
@@ -805,7 +808,7 @@ export default function KabbalahAnalysisPage() {
                               <Lock size={18} />
                             </div>
                             <span className="text-sm font-bold text-white mb-0.5">Derin Ezoterik Analiz Kilitli</span>
-                            <span className="text-xs text-[#D4AF37]">Çıraklık Seviyesi ve Üzeri Üyelere Özeldir</span>
+                            <span className="text-xs text-[#D4AF37]">Kapsamlı Rapora Özeldir</span>
                           </div>
                         )}
 
@@ -881,16 +884,33 @@ export default function KabbalahAnalysisPage() {
             onClick={e => e.stopPropagation()}
           >
             <div className="text-[#D4AF37] mx-auto mb-4 flex justify-center"><AlertCircle size={48} /></div>
-            <h3 className="text-xl font-bold text-white mb-2">Detaylı Analiz Kilitli</h3>
+            <h3 className="text-xl font-bold text-white mb-2">Kapsamlı Rapor Gereklidir</h3>
             <p className="text-mystic-text-muted text-sm mb-6 leading-relaxed">
-              Kabalistik gezegen yerleşimlerinin derin ezoterik analizleri Usta Seviyesi (Master) üyelere özeldir. Bu derin analiz seviye sistemine özeldir, yakında açılacaktır.
+              Kabalistik gezegen yerleşimlerinin derin ezoterik analizleri Kapsamlı Kabala Raporuna özeldir. Tek seferlik satın alarak bu analize ömür boyu sınırsız erişebilirsiniz.
             </p>
             <div className="flex flex-col gap-3">
               <button 
-                onClick={() => setShowLockModal(false)}
+                onClick={() => {
+                  setShowLockModal(false);
+                  const query = new URLSearchParams({
+                    type: 'kabbalah',
+                    date: dateStr,
+                    time: timeStr,
+                    city: cityKey?.name || '',
+                    lat: (cityKey?.lat || '').toString(),
+                    lon: (cityKey?.lon || '').toString(),
+                    tz: cityKey?.tz || '',
+                    email: user?.email || ''
+                  }).toString();
+                  if (!user) {
+                    setShowAuthModal(true);
+                    return;
+                  }
+                  router.push(`/checkout/guest?${query}`);
+                }}
                 className="w-full bg-[#D4AF37] hover:bg-[#E5C158] text-black font-bold py-3 px-4 rounded-xl transition-all cursor-pointer shadow-lg shadow-[#D4AF37]/10"
               >
-                Anladım
+                Raporu Satın Al (Ömür Boyu Erişim)
               </button>
             </div>
           </div>

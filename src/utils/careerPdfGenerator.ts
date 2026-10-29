@@ -830,16 +830,89 @@ export const downloadCareerPDF = async (
     curY += 4;
   }
 
-  // Footer Note
-  ensureSpace(20);
-  curY += 4;
-  doc.setDrawColor(203, 213, 225);
-  doc.setLineWidth(0.4);
-  doc.line(15, curY, 195, curY);
+  // ================= 7LAYERS DİĞER ANALİZLER & KEŞİF ALANI (KUTUSUZ, AYIRICI ÇİZGİLİ) =================
+  ensureSpace(75);
   curY += 5;
+
+  // Analizden Ayıran Şık İnce Çizgi
+  doc.setDrawColor(203, 213, 225);
+  doc.setLineWidth(0.6);
+  doc.line(15, curY, 195, curY);
+  curY += 7;
+
+  // Başlık
+  doc.setFont('LiberationSans', 'bold');
+  doc.setFontSize(10.5);
+  doc.setTextColor(...primaryDark);
+  doc.text('✨ 7LAYERS İLE YAŞAMINIZIN DİĞER SIRLARINI KEŞFEDİN', 105, curY, { align: 'center' });
+  curY += 4.5;
+
+  // Alt Başlık
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(8);
   doc.setTextColor(...muted);
+  doc.text('Kadim ezoterik ilimler ve modern analiz motorumuzla kader haritanızın diğer katmanlarını çözün:', 105, curY, { align: 'center' });
+  curY += 6.5;
+
+  // 6 Adet Resmi 7Layers Analiz Maddesi (Kutusuz, Ferah Düzende)
+  const promoItems = [
+    {
+      title: '🪐 Doğum Haritası Analizi:',
+      desc: 'Gezegen yerleşimleri, yükselen burç ve evlerinizin kadersel potansiyelleri.'
+    },
+    {
+      title: '🧭 Anlık Gökyüzü Sorgulaması:',
+      desc: 'Canlı gezegen transitleri ve güncel kozmik tesirler.'
+    },
+    {
+      title: '🪞 Frekans Aynası Analizi (Canlı):',
+      desc: 'Anlık enerji rezonansınız ve kişisel frekans dengeniz.'
+    },
+    {
+      title: '🧬 Human Design (Tasarımınız):',
+      desc: 'Enerji tipiniz, auranız, profiliniz ve fıtri karar alma otoriteniz.'
+    },
+    {
+      title: '🔢 Numeroloji Analizi:',
+      desc: 'Doğum tarihi ve isminizdeki kozmik titreşimler, yaşam yolu ve zirve döngüleri.'
+    },
+    {
+      title: '🌲 Kelt Druid Ağacı Analizi:',
+      desc: 'Doğum anınızın kutsal Kelt koruyucu ağaç arketipi ve kadim doğa frekansı.'
+    }
+  ];
+
+  promoItems.forEach((item) => {
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(...primaryDark);
+    doc.text(item.title, 15, curY);
+
+    const titleWidth = doc.getTextWidth(item.title);
+    doc.setFont('LiberationSans', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(...muted);
+    doc.text(item.desc, 15 + titleWidth + 2, curY);
+
+    curY += 5.5;
+  });
+
+  // Call to Action (Ziyaret & Keşif Buton Bandı)
+  curY += 2;
+  doc.setFillColor(15, 23, 42); // Slate 900
+  doc.roundedRect(15, curY, 180, 8.5, 2, 2, 'F');
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('LiberationSans', 'bold');
+  doc.setFontSize(8.5);
+  doc.text('👉 Hemen Ziyaret Edin: www.7layers.tr  •  Kişiye Özel Kadim Analizler & Canlı Kozmik Araçlar', 105, curY + 5.5, { align: 'center' });
+
+  curY += 14;
+
+  // Telif Alt Notu
+  doc.setFont('LiberationSans', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(148, 163, 184);
   doc.text(
     'Bu analiz 7Layers Ezoterik & Kozmik Astroloji Motoru ile üretilmiştir. © 7Layers. Bütün hakları saklıdır.',
     105,

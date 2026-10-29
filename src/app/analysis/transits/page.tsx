@@ -74,10 +74,13 @@ const CHART_SIZE = 640;
 const CENTER = CHART_SIZE / 2;
 const RADIUS = CENTER - 85;
 
+import { useAnalysisAccess } from '@/hooks/useAnalysisAccess';
+
 export default function TransitsPage() {
   const router = useRouter();
-  const { role } = useAuth();
-  const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
+  const { role, user } = useAuth();
+  const { isUnlocked: isPurchasedOrAdmin } = useAnalysisAccess('transits');
+  const isApprenticeOrAbove = role === 'admin' || role === 'master' || isPurchasedOrAdmin;
 
   // Mode Switch: MUNDANE (Kişiselden Bağımsız Gökyüzü) vs PERSONAL (Natal Bi-Wheel)
   const [analysisMode, setAnalysisMode] = useState<'MUNDANE' | 'PERSONAL'>('MUNDANE');
@@ -2163,14 +2166,27 @@ export default function TransitsPage() {
             <div className="text-[#0EA5E9] mx-auto mb-4 flex justify-center"><AlertCircle size={48} /></div>
             <h3 className="text-xl font-bold text-white mb-2">Detaylı Analiz Kilitli</h3>
             <p className="text-mystic-text-muted text-sm mb-6 leading-relaxed">
-              Transit geçişlerinin doğum haritanızdaki evlere ve gezegenlerinize yaptığı kadersel etkilerin detaylı yorumları Çıraklık Seviyesi (Apprentice) ve üzeri üyelere özeldir. Bu derin analiz seviye sistemine özeldir, yakında açılacaktır.
+              Transit geçişlerinin doğum haritanızdaki evlere ve gezegenlerinize yaptığı kadersel etkilerin detaylı yorumları Kapsamlı Gökyüzü & Transit Raporuna özeldir. Tek seferlik satın alarak ömür boyu sınırsız erişebilirsiniz.
             </p>
             <div className="flex flex-col gap-3">
               <button 
-                onClick={() => setShowLockModal(false)}
+                onClick={() => {
+                  setShowLockModal(false);
+                  const query = new URLSearchParams({
+                    type: 'transits',
+                    email: user?.email || ''
+                  }).toString();
+                  router.push(`/checkout/guest?${query}`);
+                }}
                 className="w-full bg-[#0EA5E9] hover:bg-[#38BDF8] text-black font-bold py-3 px-4 rounded-xl transition-all cursor-pointer shadow-lg shadow-[#0EA5E9]/10"
               >
-                Anladım
+                Raporu Satın Al (Ömür Boyu Erişim)
+              </button>
+              <button 
+                onClick={() => setShowLockModal(false)}
+                className="w-full bg-white/5 hover:bg-white/10 text-white/70 py-2.5 px-4 rounded-xl transition-all text-xs"
+              >
+                Kapat
               </button>
             </div>
           </div>

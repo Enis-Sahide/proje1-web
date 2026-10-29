@@ -40,7 +40,7 @@ export default function NumerologyPage() {
   const router = useRouter();
   const { role, user } = useAuth();
   const isLoggedIn = !!user;
-  const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
+  const isApprenticeOrAbove = isLoggedIn;
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
@@ -354,7 +354,28 @@ export default function NumerologyPage() {
       });
     }
 
-    if (!isApprenticeOrAbove) return null;
+    if (!isApprenticeOrAbove) {
+      return (
+        <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/25 rounded-3xl p-6 md:p-8 mt-6 text-center">
+          <div className="w-12 h-12 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] mx-auto mb-3 flex items-center justify-center">
+            <Lock size={22} />
+          </div>
+          <h3 className="text-lg font-bold text-white mb-2">Astro-Numerolojik Kişisel Kodlarınız</h3>
+          <p className="text-xs text-mystic-text-muted mb-5 max-w-md mx-auto leading-relaxed">
+            Kozmik evren giriş kodlarınız, karmik borç kodu ve aura koruma titreşimlerinizi görüntülemek için ücretsiz üye olun veya giriş yapın.
+          </p>
+          <button
+            onClick={() => {
+              router.push('/auth/login?redirect=/analysis/numerology');
+            }}
+            className="bg-[#D4AF37] hover:bg-[#E5C158] text-black font-bold py-2.5 px-6 rounded-xl transition-all text-xs shadow-lg shadow-[#D4AF37]/10 cursor-pointer inline-flex items-center gap-2"
+          >
+            <LogIn size={14} />
+            <span>Giriş Yap / Üye Ol</span>
+          </button>
+        </div>
+      );
+    }
 
     return (
       <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/25 rounded-3xl p-6 md:p-8 mt-6">

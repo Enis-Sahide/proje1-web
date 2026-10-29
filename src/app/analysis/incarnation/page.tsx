@@ -48,10 +48,13 @@ const ZODIAC_COLORS: Record<string, string> = {
   'Yengeç': '#0A84FF', 'Akrep': '#0A84FF', 'Balık': '#0A84FF',
 };
 
+import { useAnalysisAccess } from '@/hooks/useAnalysisAccess';
+
 export default function IncarnationAnalysisPage() {
   const router = useRouter();
   const { role, user } = useAuth();
-  const isMasterOrAdmin = role === 'master' || role === 'admin';
+  const { isUnlocked: isPurchasedOrAdmin } = useAnalysisAccess('incarnation');
+  const isMasterOrAdmin = role === 'master' || role === 'admin' || isPurchasedOrAdmin;
 
   // Form states
   const [dateStr, setDateStr] = useState('');
@@ -152,9 +155,9 @@ export default function IncarnationAnalysisPage() {
           <Lock size={24} />
         </div>
         <div>
-          <h4 className="text-base font-bold text-white">Detaylı Analizler Usta Seviyesine Özeldir</h4>
+          <h4 className="text-base font-bold text-white">Detaylı Analizler Kapsamlı Rapora Özeldir</h4>
           <p className="text-xs sm:text-sm text-mystic-text-muted mt-1 max-w-xl">
-            Bu bölümdeki derin karmik nedenleri, dharma reçetelerini ve ezoterik ruh haritanızı görmek için Usta Seviyesi üye olabilir veya tüm detayları içeren Kapsamlı Enkarnasyon & Ruh Dosyasını (Özel PDF) indirebilirsiniz.
+            Bu bölümdeki derin karmik nedenleri, dharma reçetelerini ve ezoterik ruh haritanızı görmek için Kapsamlı Enkarnasyon & Ruh Dosyasını (Özel PDF) tek seferlik satın alarak ömür boyu sınırsız erişebilirsiniz.
           </p>
         </div>
       </div>
@@ -276,7 +279,7 @@ export default function IncarnationAnalysisPage() {
                     )}
                     {isMasterOrAdmin && (
                       <span className="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                        Usta Seviyesi Aktif
+                        Kapsamlı Rapor Aktif
                       </span>
                     )}
                   </div>
@@ -611,7 +614,7 @@ export default function IncarnationAnalysisPage() {
                     {!isMasterOrAdmin && (
                       <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-mystic-text-muted text-xs font-semibold">
                         <Lock size={12} className="text-[#D4AF37]" />
-                        <span>Usta Seviyesi</span>
+                        <span>Kapsamlı Rapor</span>
                       </div>
                     )}
                   </div>
@@ -834,7 +837,7 @@ export default function IncarnationAnalysisPage() {
                             </div>
                             <div className="pt-1.5 border-t border-white/5 flex items-center justify-between text-[10px] font-bold transition-colors">
                               <span className={isMasterOrAdmin ? 'text-indigo-300 group-hover:text-amber-300' : 'text-amber-400/90 group-hover:text-amber-300'}>
-                                {isMasterOrAdmin ? 'Ezoterik Anlamı İncele' : '🔒 Detaylar Kilitli (Usta & Rapor)'}
+                                {isMasterOrAdmin ? 'Ezoterik Anlamı İncele' : '🔒 Detaylar Kilitli (Kapsamlı Rapor)'}
                               </span>
                               <span className={isMasterOrAdmin ? 'text-indigo-300 group-hover:text-amber-300' : 'text-amber-400'}>
                                 {isMasterOrAdmin ? '➜' : '🔒'}
@@ -951,7 +954,7 @@ export default function IncarnationAnalysisPage() {
                     {!isMasterOrAdmin && (
                       <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-mystic-text-muted text-xs font-semibold">
                         <Lock size={12} className="text-[#D4AF37]" />
-                        <span>Usta Seviyesi</span>
+                        <span>Kapsamlı Rapor</span>
                       </div>
                     )}
                   </div>
@@ -1043,7 +1046,7 @@ export default function IncarnationAnalysisPage() {
                       {!isMasterOrAdmin && (
                         <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-mystic-text-muted text-xs font-semibold">
                           <Lock size={12} className="text-[#D4AF37]" />
-                          <span>Usta Seviyesi</span>
+                          <span>Kapsamlı Rapor</span>
                         </div>
                       )}
                     </div>
@@ -1121,7 +1124,7 @@ export default function IncarnationAnalysisPage() {
                     {!isMasterOrAdmin && (
                       <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-mystic-text-muted text-xs font-semibold">
                         <Lock size={12} className="text-[#D4AF37]" />
-                        <span>Usta Seviyesi</span>
+                        <span>Kapsamlı Rapor</span>
                       </div>
                     )}
                   </div>
@@ -1453,7 +1456,7 @@ export default function IncarnationAnalysisPage() {
                       {!isMasterOrAdmin && (
                         <div className="flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-white/5 border border-white/10 text-mystic-text-muted text-xs font-semibold">
                           <Lock size={12} className="text-[#D4AF37]" />
-                          <span>Usta</span>
+                          <span>Kapsamlı Rapor</span>
                         </div>
                       )}
                     </div>
@@ -1531,7 +1534,7 @@ export default function IncarnationAnalysisPage() {
                     {!isMasterOrAdmin && (
                       <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-mystic-text-muted text-xs font-semibold">
                         <Lock size={12} className="text-[#D4AF37]" />
-                        <span>Usta Seviyesi</span>
+                        <span>Kapsamlı Rapor</span>
                       </div>
                     )}
                   </div>
@@ -1602,7 +1605,7 @@ export default function IncarnationAnalysisPage() {
                     <div className="text-[#D4AF37] mb-3"><Lock size={36} /></div>
                     <div className="text-white font-bold text-base mb-1.5">Sabit Yıldız & Kraliyet Açılımı Kilitli</div>
                     <p className="text-white/80 text-xs max-w-sm mb-5 leading-relaxed">
-                      Bu sabit yıldız hizalanmasının derin ezoterik açılımı, kadersel sınavları ve ruhsal misyonu Usta Seviyesi üyelere ve Kapsamlı Enkarnasyon & Ruh Dosyasına (Özel PDF) özeldir.
+                      Bu sabit yıldız hizalanmasının derin ezoterik açılımı, kadersel sınavları ve ruhsal misyonu Kapsamlı Enkarnasyon & Ruh Dosyasına (Özel PDF) özeldir.
                     </p>
                     <button
                       onClick={() => {
@@ -1665,7 +1668,7 @@ export default function IncarnationAnalysisPage() {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         title="Giriş Yapın veya Kayıt Olun"
-        description="Karmik analiz raporunuzu 888 TL karşılığında satın alıp profilinizde ve e-postanızda güvenle saklayabilmeniz için lütfen giriş yapın."
+        description="Karmik analiz raporunuzu 888 TL karşılığında satın alıp doğrudan ekranınızdan anında indirmek ve sınırsız erişmek için lütfen giriş yapın."
         redirectUrl={`/checkout/guest?type=incarnation&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}`}
       />
 
@@ -1679,7 +1682,7 @@ export default function IncarnationAnalysisPage() {
             <div className="text-[#D4AF37] mx-auto mb-4 flex justify-center"><Lock size={48} /></div>
             <h3 className="text-xl font-bold text-white mb-2">Detaylı Karmik Analiz Kilitli</h3>
             <p className="text-mystic-text-muted text-sm mb-6 leading-relaxed">
-              Geçmiş yaşam nedenleri, karmik borçlar, sabit yıldız ve kraliyet ezoterik açılımları Usta Seviyesi (Master) üyelere özeldir. Usta üyeliğe geçebilir veya tüm detayları içeren Kapsamlı Enkarnasyon & Ruh Dosyasını (Özel PDF) indirebilirsiniz.
+              Geçmiş yaşam nedenleri, karmik borçlar, sabit yıldız ve kraliyet ezoterik açılımları Kapsamlı Enkarnasyon & Ruh Dosyasına (Özel PDF) özeldir. Tek seferlik satın alarak ömür boyu sınırsız erişebilirsiniz.
             </p>
             <div className="flex flex-col gap-3">
               <button 
