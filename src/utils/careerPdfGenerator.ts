@@ -489,19 +489,20 @@ export const downloadCareerPDF = async (
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(13);
     doc.setTextColor(...primaryDark);
-    doc.text('GEZEGEN YERLEŞİMLERİNE GÖRE MESLEKİ & ZANAAT GÖSTERGELERİ', 15, curY);
+    doc.text('MESLEKİ ASTROLOJİNİN 6 TEMEL SÜTUNU & KADERSEL GÖSTERGELER', 15, curY);
     curY += 5;
 
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(...muted);
-    doc.text('Doğum haritanızdaki 10 temel kozmik gücün kamu memurluğu, zanaat, müzik, ticaret ve sahadaki yansımaları', 15, curY);
+    doc.text('Kariyer Zirveniz (10. Ev MC), Rızık Kapınız (2. Ev), Günlük Mesai Zeminimiz (6. Ev), Mesleki İradeniz, İş Vitrininiz ve Bereket Dehanız', 15, curY);
     curY += 8;
 
     data.planetaryInsights.forEach((pi) => {
       ensureSpace(24);
+      const locStr = pi.planet.includes('Ev') || pi.planet.includes('Yükselen') ? pi.sign : `${pi.sign} - ${pi.house}. Ev`;
       curY = renderText(
-        `**• ${pi.planet.toUpperCase()} (${pi.sign} - ${pi.house}. Ev) • ${pi.domain.toUpperCase()}: ${pi.title}**\n` +
+        `**• ${pi.planet.toUpperCase()} (${locStr}) • ${pi.domain.toUpperCase()}: ${pi.title}**\n` +
         `${pi.explanation}\n` +
         `**Tavsiye Edilen Meslek Dalları:** ${pi.suitableProfessions.join(' • ')}`,
         15, curY, 180, 5.5
@@ -542,50 +543,61 @@ export const downloadCareerPDF = async (
     );
     curY += 6;
 
-    // Drakonik MC
-    ensureSpace(24);
-    curY = renderText(
-      `**Drakonik MC (Ruhsal Tepe Noktası): ${data.soulCareer.soulMidheaven.sign} - ${data.soulCareer.soulMidheaven.title}**\n` +
-      `${data.soulCareer.soulMidheaven.calling}\n` +
-      `**Kolektife Bırakılacak Manevi Etki:** ${data.soulCareer.soulMidheaven.impact}`,
-      15, curY, 180, 5.8
-    );
-    curY += 6;
-
-    // Ruhun 3'lü Enkarnasyon Doğası
-    ensureSpace(30);
-    doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(11);
-    doc.setTextColor(...primaryDark);
-    doc.text('RUHUN 3\'LÜ ENKARNASYON DOĞASI', 15, curY);
-    curY += 5;
-
-    curY = renderText(
-      `**Yükselen (${data.soulCareer.soulAscendant.sign}):** ${data.soulCareer.soulAscendant.essence}\n` +
-      `**Güneş (${data.soulCareer.soulSun.sign}):** ${data.soulCareer.soulSun.mission}\n` +
-      `**Ay (${data.soulCareer.soulMoon.sign}):** ${data.soulCareer.soulMoon.emotionalNourishment}`,
-      15, curY, 180, 5.8
-    );
-    curY += 6;
-
-    // Ruhu Besleyen Kadersel Sektörler
-    if (data.soulCareer.soulTopSectors && data.soulCareer.soulTopSectors.length > 0) {
+    // Ruhu Besleyen Kadersel Sektörler (7 Sektör Dağılımı)
+    const soulSectors = data.soulCareer.soulAllSectors || data.soulCareer.soulTopSectors;
+    if (soulSectors && soulSectors.length > 0) {
       ensureSpace(28);
       doc.setFont('LiberationSans', 'bold');
       doc.setFontSize(11);
       doc.setTextColor(...primaryDark);
-      doc.text('RUHU BESLEYEN KADERSEL SEKTÖRLER', 15, curY);
+      doc.text('RUHU BESLEYEN KADERSEL SEKTÖRLER (7 SEKTÖR DAĞILIMI)', 15, curY);
       curY += 5;
 
-      data.soulCareer.soulTopSectors.slice(0, 2).forEach((sSec, sIdx) => {
+      soulSectors.forEach((sSec, sIdx) => {
         ensureSpace(20);
         curY = renderText(
-          `**${sIdx + 1}. ${sSec.title} (%${sSec.percentage} Ruhsal Çağrı):** ${sSec.description}\n` +
-          `**Ruhsal Ustalık Dalları:** ${sSec.recommendedRoles.join(', ')}`,
+          `**${sIdx + 1}. ${sSec.title} (%${sSec.percentage} - ${sSec.category}):** ${sSec.description}\n` +
+          `**İçsel Doyum Veren Roller:** ${sSec.recommendedRoles.join(', ')}`,
           15, curY, 180, 5.8
         );
-        curY += 4;
+        curY += 3;
       });
+    }
+
+    // Ruh Haritası (Drakonik) 6 Temel Sütun Deşifresi
+    if (data.soulCareer.soulPillars && data.soulCareer.soulPillars.length > 0) {
+      ensureSpace(28);
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(...primaryDark);
+      doc.text('RUH HARİTASI (DRAKONİK) 6 TEMEL SÜTUN DEŞİFRESİ', 15, curY);
+      curY += 5;
+
+      data.soulCareer.soulPillars.forEach((pillar) => {
+        ensureSpace(18);
+        curY = renderText(
+          `**${pillar.title} [${pillar.domain}]:** ${pillar.explanation}\n` +
+          `**Ruhsal Ustalık Alanları:** ${pillar.suitableProfessions.join(', ')}`,
+          15, curY, 180, 5.8
+        );
+        curY += 3;
+      });
+    }
+
+    // Drakonik Ay (Ruhun Duygusal & Mesleki Doyum Pusulası)
+    if (data.soulCareer.soulMoon) {
+      ensureSpace(20);
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(...primaryDark);
+      doc.text('DRAKONİK AY - RUHUN DUYGUSAL & MESLEKİ DOYUM PUSULASI', 15, curY);
+      curY += 5;
+
+      curY = renderText(
+        `**Drakonik Ay (${data.soulCareer.soulMoon.sign}):** ${data.soulCareer.soulMoon.emotionalNourishment}`,
+        15, curY, 180, 5.8
+      );
+      curY += 6;
     }
 
     // Ruh-Madde Sentez Köprüsü
@@ -619,6 +631,7 @@ export const downloadCareerPDF = async (
 
   // 1. Kadersel Evrilme (Dharma)
   if (data.dharmaPath) {
+    ensureSpace(45);
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(12);
     doc.setTextColor(...primaryDark);
@@ -626,10 +639,13 @@ export const downloadCareerPDF = async (
     curY += 6;
 
     curY = renderText(
-      `**Dharma Başlığı:** ${data.dharmaPath.title}\n\n` +
-      `**Aşılması Gereken Konfor Alanı (Güney Düğüm Alışkanlıkları):** ${data.dharmaPath.fromComfortZone}\n\n` +
-      `**Kadersel Büyüme Misyonu:** ${data.dharmaPath.toGrowthMission}\n\n` +
-      `✨ **Kariyer Sıçraması:** ${data.dharmaPath.careerImpact}`,
+      `**Dharma Ekseni:** ${data.dharmaPath.title}\n\n` +
+      `**🧭 Bu Rota Ne Anlama Geliyor ve Neden Hayatidir?:** ${data.dharmaPath.purposeAndMeaning}\n\n` +
+      `**Aşılması Gereken Konfor Alanı (Eski Alışkanlıklar):** ${data.dharmaPath.fromComfortZone}\n\n` +
+      `⚠️ **Neden Mesleki Sıkıntı Yaşarsınız? (Tıkanma Uyarısı):** ${data.dharmaPath.comfortZoneRisk}\n\n` +
+      `**Kadersel Büyüme & Yeni Çağ Becerisi:** ${data.dharmaPath.toGrowthMission}\n\n` +
+      `🎯 **Pratik Entegrasyon (Mevcut İşi Bırakmadan Nasıl Geçilir?):** ${data.dharmaPath.integrationStrategy}\n\n` +
+      `✨ **Kadersel Kariyer Sıçraması:** ${data.dharmaPath.careerImpact}`,
       15, curY, 180, 5.8
     );
     curY += 6;
@@ -652,23 +668,6 @@ export const downloadCareerPDF = async (
     curY += 6;
   }
 
-  // 3. Servet Mıknatısı
-  if (data.wealthMagnet) {
-    ensureSpace(28);
-    doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(12);
-    doc.setTextColor(...primaryDark);
-    doc.text('SERVET MIKNATISI & FİNANSAL KALDIRAÇ STRATEJİNİZ', 15, curY);
-    curY += 5;
-
-    curY = renderText(
-      `**Servet Kapısı:** ${data.wealthMagnet.channelTitle}\n` +
-      `**İşleyiş Mekanizması:** ${data.wealthMagnet.mechanism}\n` +
-      `**Uygulanabilir Formül:** ${data.wealthMagnet.practicalFormula}`,
-      15, curY, 180, 5.8
-    );
-    curY += 6;
-  }
 
   // 4. Tükenmişlik Kalkanı
   if (data.burnoutShield) {
@@ -733,23 +732,6 @@ export const downloadCareerPDF = async (
     curY += 6;
   }
 
-  // Modül 3: Kadersel Şans Noktası & Rızık Kapısı
-  if (data.parsFortunaWealth) {
-    ensureSpace(30);
-    doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(12);
-    doc.setTextColor(...primaryDark);
-    doc.text('KADERSEL ŞANS NOKTASI & RIZIK KAPISI (PARS FORTUNA)', 15, curY);
-    curY += 5;
-
-    curY = renderText(
-      `**Konum & Kapı:** ${data.parsFortunaWealth.wealthPortalTitle}\n` +
-      `**Kadersel Bereket Alanı:** ${data.parsFortunaWealth.karmicBlessingArea}\n` +
-      `**Zahmetsiz Rızık Formülü:** ${data.parsFortunaWealth.practicalMonetizationGuidance}`,
-      15, curY, 180, 5.8
-    );
-    curY += 6;
-  }
 
   // Modül 4: Ortaklık & Çalışma DNA'sı
   if (data.partnershipDna) {
@@ -791,24 +773,6 @@ export const downloadCareerPDF = async (
     curY += 6;
   }
 
-  // Modül 6: Toplumsal İtibar & Sektörel Şöhret İmzası
-  if (data.vocationalReputation) {
-    ensureSpace(30);
-    doc.setFont('LiberationSans', 'bold');
-    doc.setFontSize(12);
-    doc.setTextColor(...primaryDark);
-    doc.text('TEPE NOKTASI (MC) & SEKTÖREL İTİBAR İMZASI', 15, curY);
-    curY += 5;
-
-    curY = renderText(
-      `**İtibar Unvanı:** ${data.vocationalReputation.reputationTitle}\n` +
-      `**Kamusal Arketip:** ${data.vocationalReputation.publicImageArchetype}\n` +
-      `**Piyasanın Hatırlayacağı Saygın İz:** ${data.vocationalReputation.howIndustryRemembersYou}\n` +
-      `**👑 Otorite Tetiği:** ${data.vocationalReputation.authorityTrigger}`,
-      15, curY, 180, 5.8
-    );
-    curY += 6;
-  }
 
   // 5. Dünyevi Kariyer Eylem Planı (4 Somut Kural - KUTUSUZ)
   if (data.actionableGuidance && data.actionableGuidance.length > 0) {
