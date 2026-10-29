@@ -1212,38 +1212,9 @@ export default function CareerAnalysisPage() {
               </div>
             )}
 
-            {/* MODÜL 3 & 4: ŞANS NOKTASI (RIZIK KAPISI) & ORTAKLIK DNA'SI (2'li Grid) */}
+            {/* KADİM & EZOTERİK DERİN MESLEKİ MODÜLLER (ORTAKLIK DNA'SI & BİYORİTM) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-              {/* MODÜL 3: KADERSEL ŞANS NOKTASI & RIZIK KAPISI */}
-              {result.parsFortunaWealth && (
-                <div className="bg-gradient-to-br from-emerald-900/25 via-black/70 to-emerald-950/30 border border-emerald-500/30 p-5 sm:p-6 rounded-3xl relative overflow-hidden flex flex-col justify-between shadow-xl">
-                  <div>
-                    <div className="flex items-center gap-3 mb-3.5">
-                      <div className="p-2 sm:p-2.5 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                        <Coins size={20} />
-                      </div>
-                      <div>
-                        <span className="text-[10px] uppercase text-emerald-400 font-bold block">
-                          Pars Fortuna (Kadersel Rızık Kapısı)
-                        </span>
-                        <h4 className="text-base sm:text-lg font-bold text-white">
-                          {result.parsFortunaWealth.wealthPortalTitle}
-                        </h4>
-                      </div>
-                    </div>
-
-                    <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mb-3">
-                      {result.parsFortunaWealth.karmicBlessingArea}
-                    </p>
-                  </div>
-
-                  <div className="bg-emerald-500/10 border border-emerald-500/20 p-3.5 rounded-2xl text-xs text-emerald-200 mt-2">
-                    <strong>💰 Zahmetsiz Rızık Formülü:</strong> {result.parsFortunaWealth.practicalMonetizationGuidance}
-                  </div>
-                </div>
-              )}
-
-              {/* MODÜL 4: ORTAKLIK & ÇALIŞMA DNA'SI */}
+              {/* MODÜL 3: İŞ BİRLİĞİ & ORTAKLIK DNA'SI */}
               {result.partnershipDna && (
                 <div className="bg-gradient-to-br from-blue-900/25 via-black/70 to-indigo-950/30 border border-blue-500/30 p-5 sm:p-6 rounded-3xl relative overflow-hidden flex flex-col justify-between shadow-xl">
                   <div>
@@ -1280,11 +1251,8 @@ export default function CareerAnalysisPage() {
                   </div>
                 </div>
               )}
-            </div>
 
-            {/* MODÜL 5 & 6: BİYORİTM ÇALIŞMA SAATLERİ & SEKTÖREL İTİBAR İMZASI (2'li Grid) */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-              {/* MODÜL 5: GÜNÜN EN VERİMLİ BİYORİTM & İMZA SAATLERİ */}
+              {/* MODÜL 4: GÜNÜN EN VERİMLİ BİYORİTM & İMZA SAATLERİ */}
               {result.planetaryProductivityHours && (
                 <div className="bg-gradient-to-br from-yellow-900/20 via-black/70 to-amber-950/30 border border-yellow-500/30 p-5 sm:p-6 rounded-3xl relative overflow-hidden flex flex-col justify-between shadow-xl">
                   <div>
@@ -1337,98 +1305,35 @@ export default function CareerAnalysisPage() {
                   </p>
                 </div>
               )}
+            </div>
 
-              {/* MODÜL 6: TOPLUMSAL İTİBAR & SEKTÖREL ŞÖHRET İMZASI */}
-              {result.vocationalReputation && (
-                <div className="bg-gradient-to-br from-indigo-900/20 via-black/70 to-purple-950/30 border border-indigo-500/30 p-5 sm:p-6 rounded-3xl relative overflow-hidden flex flex-col justify-between shadow-xl">
+            {/* TÜKENMİŞLİK KALKANI & ENERJETİK KORUMA */}
+            {result.burnoutShield && (
+              <div className="bg-black/50 border border-rose-500/30 p-5 sm:p-6 rounded-3xl relative overflow-hidden shadow-xl">
+                <div className="flex items-center gap-3 mb-3.5">
+                  <div className="p-2 sm:p-2.5 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                    <Flame size={20} />
+                  </div>
                   <div>
-                    <div className="flex items-center gap-3 mb-3.5">
-                      <div className="p-2 sm:p-2.5 rounded-xl bg-indigo-500/15 text-indigo-400 border border-indigo-500/30">
-                        <Award size={20} />
-                      </div>
-                      <div>
-                        <span className="text-[10px] uppercase text-indigo-400 font-bold block">
-                          Tepe Noktası (MC) & Sektörel İtibar
-                        </span>
-                        <h4 className="text-base sm:text-lg font-bold text-white">
-                          {result.vocationalReputation.reputationTitle}
-                        </h4>
-                      </div>
-                    </div>
-
-                    <div className="bg-white/5 border border-white/10 p-3.5 rounded-2xl mb-3">
-                      <span className="text-[10px] font-bold text-indigo-300 uppercase tracking-wider block mb-1">
-                        İş Dünyasındaki Kamusal Arketipiniz
-                      </span>
-                      <p className="text-xs sm:text-sm font-semibold text-white">
-                        {result.vocationalReputation.publicImageArchetype}
-                      </p>
-                    </div>
-
-                    <div className="space-y-2 mb-3">
-                      <span className="text-[10px] text-gray-400 uppercase font-semibold block">
-                        Piyasanın Sizi Hatırlayacağı Saygın İmza:
-                      </span>
-                      <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-                        {result.vocationalReputation.howIndustryRemembersYou}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="bg-indigo-500/10 border border-indigo-500/20 p-3.5 rounded-2xl text-xs text-indigo-200">
-                    👑 <strong>Otorite Tetiği:</strong> {result.vocationalReputation.authorityTrigger}
+                    <span className="text-[10px] uppercase text-rose-400 font-bold block">Tükenmişlik Kalkanı</span>
+                    <h4 className="text-base sm:text-lg font-bold text-white">Enerji Sızıntısı & Mesleki Koruma</h4>
                   </div>
                 </div>
-              )}
-            </div>
-
-            {/* 6. PARA & SERVET ÇEKME MODELİ VE TÜKENMİŞLİK KALKANI */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
-              {/* Para Çekme Modeli */}
-              {result.wealthMagnet && (
-                <div className="bg-black/50 border border-emerald-500/30 p-5 sm:p-6 rounded-3xl relative overflow-hidden">
-                  <div className="flex items-center gap-3 mb-3.5">
-                    <div className="p-2 sm:p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                      <DollarSign size={20} />
-                    </div>
-                    <div>
-                      <span className="text-[10px] uppercase text-emerald-400 font-bold block">Servet Çekme Kapısı</span>
-                      <h4 className="text-base sm:text-lg font-bold text-white">{result.wealthMagnet.channelTitle}</h4>
-                    </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+                  <div className="bg-white/5 border border-white/10 p-3.5 rounded-2xl">
+                    <span className="text-[10px] uppercase font-bold text-gray-400 block mb-1">Temel Risk:</span>
+                    <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">{result.burnoutShield.coreRisk}</p>
                   </div>
-                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mb-3">
-                    {result.wealthMagnet.mechanism}
-                  </p>
-                  <div className="bg-emerald-500/10 border border-emerald-500/20 p-3 rounded-xl text-xs text-emerald-200">
-                    <strong>Uygulanabilir Formül:</strong> {result.wealthMagnet.practicalFormula}
+                  <div className="bg-white/5 border border-white/10 p-3.5 rounded-2xl">
+                    <span className="text-[10px] uppercase font-bold text-rose-400 block mb-1">Kaçınılması Gereken Ortam:</span>
+                    <p className="text-xs sm:text-sm text-rose-200/90 leading-relaxed">{result.burnoutShield.toxicEnvironments}</p>
                   </div>
                 </div>
-              )}
-
-              {/* Tükenmişlik Kalkanı */}
-              {result.burnoutShield && (
-                <div className="bg-black/50 border border-rose-500/30 p-5 sm:p-6 rounded-3xl relative overflow-hidden">
-                  <div className="flex items-center gap-3 mb-3.5">
-                    <div className="p-2 sm:p-2.5 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                      <Flame size={20} />
-                    </div>
-                    <div>
-                      <span className="text-[10px] uppercase text-rose-400 font-bold block">Tükenmişlik Kalkanı</span>
-                      <h4 className="text-base sm:text-lg font-bold text-white">Enerji Sızıntısı & Koruma</h4>
-                    </div>
-                  </div>
-                  <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mb-2">
-                    <strong>Temel Risk:</strong> {result.burnoutShield.coreRisk}
-                  </p>
-                  <p className="text-xs text-rose-300/80 mb-3">
-                    <strong>Kaçınılması Gereken:</strong> {result.burnoutShield.toxicEnvironments}
-                  </p>
-                  <div className="bg-rose-500/10 border border-rose-500/20 p-3 rounded-xl text-xs text-rose-200">
-                    <strong>Koruma Kalkanı:</strong> {result.burnoutShield.protectionFormula}
-                  </div>
+                <div className="bg-rose-500/10 border border-rose-500/20 p-3.5 rounded-2xl text-xs text-rose-200">
+                  🛡️ <strong>Koruma Kalkanı Reçetesi:</strong> {result.burnoutShield.protectionFormula}
                 </div>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* 7. SÜPER GÜÇ VE GÖLGE TUZAKLAR */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
@@ -1533,268 +1438,192 @@ export default function CareerAnalysisPage() {
             {/* AÇIK / SATIN ALINMIŞ DURUM: TÜM RUHSAL VE ENKARNASYON ANALİZİ */}
             {isEffectiveUnlocked && (
               <>
-                {/* 1. RUHSAL TEPE NOKTASI (DRAKONİK MC) & KADERSEL ÇAĞRI */}
-            <div className="bg-gradient-to-br from-purple-900/30 via-black/80 to-pink-900/20 border border-purple-500/40 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-2xl space-y-4">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-purple-500/20 pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-3 rounded-2xl bg-purple-500/20 text-purple-300 border border-purple-500/40 shadow-inner">
-                    <Sparkles size={24} />
-                  </div>
-                  <div>
-                    <span className="text-[10px] sm:text-xs uppercase tracking-widest text-purple-400 font-bold block">
-                      Ruhsal Tepe Noktası (Drakonik MC: {result.soulCareer.soulMidheaven.sign})
-                    </span>
-                    <h3 className="text-xl sm:text-2xl font-black text-white">
-                      {result.soulCareer.soulMidheaven.title}
-                    </h3>
-                  </div>
-                </div>
-                <span className="text-xs font-semibold px-3 py-1 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 self-start sm:self-auto">
-                  Kadersel Ruh Çağrısı (Vocation)
-                </span>
-              </div>
-
-              <div className="space-y-3 pt-1">
-                <p className="text-xs sm:text-base text-purple-100 leading-relaxed font-medium">
-                  {result.soulCareer.soulMidheaven.calling}
-                </p>
-                <div className="bg-white/5 border border-purple-500/20 p-4 rounded-2xl text-xs sm:text-sm text-gray-300 flex items-start gap-2.5">
-                  <Award size={18} className="text-purple-400 shrink-0 mt-0.5" />
-                  <span><strong>Kolektife Bırakılacak Manevi Etki:</strong> {result.soulCareer.soulMidheaven.impact}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* 2. RUHUN ENKARNASYON DOĞASI (3'LÜ KART) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-black/50 border border-purple-500/20 p-5 rounded-2xl space-y-2">
-                <span className="text-[10px] uppercase font-bold text-purple-400 block tracking-wider">
-                  Ruhun Enkarnasyon Özü (Drakonik Yükselen: {result.soulCareer.soulAscendant.sign})
-                </span>
-                <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
-                  {result.soulCareer.soulAscendant.essence}
-                </p>
-              </div>
-
-              <div className="bg-black/50 border border-pink-500/20 p-5 rounded-2xl space-y-2">
-                <span className="text-[10px] uppercase font-bold text-pink-400 block tracking-wider">
-                  Ruhun İlahi Işığı (Drakonik Güneş: {result.soulCareer.soulSun.sign})
-                </span>
-                <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
-                  {result.soulCareer.soulSun.mission}
-                </p>
-              </div>
-
-              <div className="bg-black/50 border border-blue-500/20 p-5 rounded-2xl space-y-2">
-                <span className="text-[10px] uppercase font-bold text-blue-400 block tracking-wider">
-                  Manevi Beslenme Kaynağı (Drakonik Ay: {result.soulCareer.soulMoon.sign})
-                </span>
-                <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
-                  {result.soulCareer.soulMoon.emotionalNourishment}
-                </p>
-              </div>
-            </div>
-
-            {/* 3. RUHU BESLEYEN KADERSEL SEKTÖRLER (7 SEKTÖRÜN TAMAMI) */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2.5 px-1">
-                <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                  <Feather size={18} />
-                </div>
-                <div>
-                  <h3 className="text-lg sm:text-xl font-bold text-white">
-                    Ruhu Besleyen Mesleki & Sanatsal Alanlar (7 Sektör Dağılımı)
-                  </h3>
-                  <span className="text-[11px] sm:text-xs text-gray-400 block">
-                    Maddi kaygılardan bağımsız, ruhunuzun bu dünyada üretirken en derin içsel tatmini duyduğu alanların tam dökümü
-                  </span>
-                </div>
-              </div>
-
-              {/* TÜM RUHSAL SEKTÖRLERİN DAĞILIM ÇUBUĞU */}
-              {result.soulCareer.soulAllSectors && result.soulCareer.soulAllSectors.length > 0 && (
-                <div className="bg-black/50 border border-purple-500/20 p-4 rounded-2xl space-y-2.5">
-                  <div className="flex items-center justify-between text-xs text-gray-400 font-medium">
-                    <span>Ruhsal Çağrı Ağırlık Dağılımı (7 Sektörün Tamamı)</span>
-                    <span className="text-purple-300 font-bold">%100 Toplam Dağılım</span>
-                  </div>
-                  <div className="h-3 w-full rounded-full bg-white/5 overflow-hidden flex shadow-inner">
-                    {result.soulCareer.soulAllSectors.map((sec, idx) => (
-                      <div
-                        key={idx}
-                        style={{ width: `${sec.percentage}%`, backgroundColor: sec.color }}
-                        className="h-full transition-all duration-500 hover:opacity-80"
-                        title={`${sec.shortTitle}: %${sec.percentage}`}
-                      />
-                    ))}
-                  </div>
-                  <div className="flex flex-wrap gap-2 pt-1">
-                    {result.soulCareer.soulAllSectors.map((sec, idx) => (
-                      <div key={idx} className="flex items-center gap-1.5 text-[11px] text-gray-300 bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
-                        <span className="w-2 h-2 rounded-full" style={{ backgroundColor: sec.color }} />
-                        <span className="font-medium">{sec.shortTitle}</span>
-                        <span className="text-purple-300 font-bold">%{sec.percentage}</span>
+                {/* 1. RUH HARİTASI (DRAKONİK) 6 TEMEL MESLEKİ SÜTUNU */}
+                {result.soulCareer.soulPillars && result.soulCareer.soulPillars.length > 0 && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2.5 px-1">
+                      <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                        <Sparkles size={18} />
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* 7 RUHSAL SEKTÖR KARTI */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {(result.soulCareer.soulAllSectors || result.soulCareer.soulTopSectors).map((sector, sIdx) => (
-                  <div
-                    key={sIdx}
-                    className="bg-black/50 border border-purple-500/30 p-5 rounded-3xl flex flex-col justify-between shadow-xl hover:border-purple-500/50 transition-all"
-                    style={{ borderTopColor: sector.color, borderTopWidth: '3px' }}
-                  >
-                    <div>
-                      <div className="flex items-center justify-between gap-2 mb-2.5">
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 uppercase">
-                          Ruhsal Çağrı #{sIdx + 1}
-                        </span>
-                        <span className="text-lg font-bold" style={{ color: sector.color }}>
-                          %{sector.percentage}
+                      <div>
+                        <h3 className="text-lg sm:text-xl font-bold text-white">
+                          Ruh Haritanızın (Drakonik) 6 Temel Mesleki Sütunu
+                        </h3>
+                        <span className="text-[11px] sm:text-xs text-gray-400 block">
+                          Ruhsal MC (10. Ev), 2. Ev Manevi Rızık, 6. Ev Kutsal Hizmet, Drakonik Güneş, Yükselen ve Kadersel Bereket Kapısı
                         </span>
                       </div>
-                      <h4 className="text-base font-bold text-white mb-2">{sector.title}</h4>
-                      <p className="text-xs text-gray-300 leading-relaxed mb-4">{sector.description}</p>
                     </div>
-                    <div className="pt-3 border-t border-white/5 space-y-1.5">
-                      <span className="text-[10px] text-gray-400 font-semibold uppercase block">
-                        Ruhsal Ustalık Dalları:
-                      </span>
-                      <div className="flex flex-wrap gap-1">
-                        {sector.recommendedRoles.map((r, rIdx) => (
-                          <span key={rIdx} className="text-[10px] bg-white/5 border border-white/10 px-2 py-0.5 rounded text-gray-200">
-                            {r}
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {result.soulCareer.soulPillars.map((pillar, pIdx) => {
+                        const getIcon = (iconName: string) => {
+                          switch (iconName) {
+                            case 'Sun': return <Sun size={18} className="text-amber-400" />;
+                            case 'Eye': return <Compass size={18} className="text-blue-400" />;
+                            case 'Sparkles': return <Sparkles size={18} className="text-purple-400" />;
+                            case 'Building2': return <Building2 size={18} className="text-pink-400" />;
+                            case 'Heart': return <HeartHandshake size={18} className="text-rose-400" />;
+                            case 'Music': return <Music size={18} className="text-indigo-400" />;
+                            case 'BookOpen': return <FileText size={18} className="text-cyan-400" />;
+                            case 'Scale': return <Briefcase size={18} className="text-amber-400" />;
+                            case 'Flame': return <Flame size={18} className="text-red-400" />;
+                            case 'CheckCircle': return <CheckCircle2 size={18} className="text-emerald-400" />;
+                            case 'Globe': return <Globe size={18} className="text-teal-400" />;
+                            case 'Shield': return <ShieldAlert size={18} className="text-stone-400" />;
+                            default: return <Sparkles size={18} className="text-purple-400" />;
+                          }
+                        };
+
+                        return (
+                          <div
+                            key={pIdx}
+                            className="bg-black/50 border border-purple-500/20 hover:border-purple-500/40 p-4 sm:p-5 rounded-2xl flex flex-col justify-between transition-all shadow-lg"
+                          >
+                            <div>
+                              <div className="flex items-center justify-between gap-2 mb-2.5">
+                                <div className="flex items-center gap-2">
+                                  <div className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20">
+                                    {getIcon(pillar.iconName)}
+                                  </div>
+                                  <span className="text-xs font-bold text-white">
+                                    {pillar.planet} ({pillar.sign})
+                                  </span>
+                                </div>
+                                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-300">
+                                  {pillar.domain}
+                                </span>
+                              </div>
+
+                              <h4 className="text-xs sm:text-sm font-semibold text-gray-200 mb-2 leading-snug">
+                                {pillar.title}
+                              </h4>
+
+                              <p className="text-xs text-gray-400 leading-relaxed mb-3">
+                                {pillar.explanation}
+                              </p>
+                            </div>
+
+                            <div className="pt-2 border-t border-white/5">
+                              <span className="text-[10px] text-gray-400 uppercase tracking-wider block mb-1.5 font-medium">
+                                Ruhsal Ustalık Alanları:
+                              </span>
+                              <div className="flex flex-wrap gap-1">
+                                {pillar.suitableProfessions.map((prof, profIdx) => (
+                                  <span
+                                    key={profIdx}
+                                    className="text-[10px] bg-purple-500/10 border border-purple-500/20 text-purple-200 px-2 py-0.5 rounded-md"
+                                  >
+                                    {prof}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* MANEVİ BESLENME KAYNAĞI (DRAKONİK AY) */}
+                    {result.soulCareer.soulMoon && (
+                      <div className="bg-black/50 border border-blue-500/25 p-4 sm:p-5 rounded-2xl flex items-start gap-3 shadow-lg">
+                        <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 shrink-0 mt-0.5">
+                          <Moon size={20} />
+                        </div>
+                        <div>
+                          <span className="text-[10px] uppercase font-bold text-blue-400 block tracking-wider mb-1">
+                            Ruhun Manevi Beslenme & Duygusal Doyum Kaynağı (Drakonik Ay: {result.soulCareer.soulMoon.sign})
                           </span>
+                          <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
+                            {result.soulCareer.soulMoon.emotionalNourishment}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* 2. RUHU BESLEYEN KADERSEL SEKTÖRLER (7 SEKTÖRÜN TAMAMI) */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2.5 px-1">
+                    <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                      <Feather size={18} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-bold text-white">
+                        Ruhu Besleyen Mesleki & Sanatsal Alanlar (7 Sektör Dağılımı)
+                      </h3>
+                      <span className="text-[11px] sm:text-xs text-gray-400 block">
+                        Maddi kaygılardan bağımsız, ruhunuzun bu dünyada üretirken en derin içsel tatmini duyduğu alanların tam dökümü
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* TÜM RUHSAL SEKTÖRLERİN DAĞILIM ÇUBUĞU */}
+                  {result.soulCareer.soulAllSectors && result.soulCareer.soulAllSectors.length > 0 && (
+                    <div className="bg-black/50 border border-purple-500/20 p-4 rounded-2xl space-y-2.5">
+                      <div className="flex items-center justify-between text-xs text-gray-400 font-medium">
+                        <span>Ruhsal Çağrı Ağırlık Dağılımı (7 Sektörün Tamamı)</span>
+                        <span className="text-purple-300 font-bold">%100 Toplam Dağılım</span>
+                      </div>
+                      <div className="h-3 w-full rounded-full bg-white/5 overflow-hidden flex shadow-inner">
+                        {result.soulCareer.soulAllSectors.map((sec, idx) => (
+                          <div
+                            key={idx}
+                            style={{ width: `${sec.percentage}%`, backgroundColor: sec.color }}
+                            className="h-full transition-all duration-500 hover:opacity-80"
+                            title={`${sec.shortTitle}: %${sec.percentage}`}
+                          />
+                        ))}
+                      </div>
+                      <div className="flex flex-wrap gap-2 pt-1">
+                        {result.soulCareer.soulAllSectors.map((sec, idx) => (
+                          <div key={idx} className="flex items-center gap-1.5 text-[11px] text-gray-300 bg-white/5 px-2 py-0.5 rounded-md border border-white/5">
+                            <span className="w-2 h-2 rounded-full" style={{ backgroundColor: sec.color }} />
+                            <span className="font-medium">{sec.shortTitle}</span>
+                            <span className="text-purple-300 font-bold">%{sec.percentage}</span>
+                          </div>
                         ))}
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
+                  )}
 
-            {/* RUH HARİTASI (DRAKONİK) 6 TEMEL SÜTUN DEŞİFRESİ */}
-            {result.soulCareer.soulPillars && result.soulCareer.soulPillars.length > 0 && (
-              <div className="space-y-4">
-                <div className="flex items-center gap-2.5 px-1">
-                  <div className="p-2 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                    <Sparkles size={18} />
-                  </div>
-                  <div>
-                    <h3 className="text-lg sm:text-xl font-bold text-white">
-                      Ruh Haritanızın (Drakonik) 6 Temel Mesleki Sütunu
-                    </h3>
-                    <span className="text-[11px] sm:text-xs text-gray-400 block">
-                      Ruhsal MC, 2. Ev Manevi Rızık, 6. Ev Kutsal Hizmet, Drakonik Güneş, Yükselen ve Kadersel Bereket Kapısı
-                    </span>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {result.soulCareer.soulPillars.map((pillar, pIdx) => {
-                    const getIcon = (iconName: string) => {
-                      switch (iconName) {
-                        case 'Sun': return <Sun size={18} className="text-amber-400" />;
-                        case 'Eye': return <Compass size={18} className="text-blue-400" />;
-                        case 'Sparkles': return <Sparkles size={18} className="text-purple-400" />;
-                        case 'Building2': return <Building2 size={18} className="text-pink-400" />;
-                        case 'Heart': return <HeartHandshake size={18} className="text-rose-400" />;
-                        case 'Music': return <Music size={18} className="text-indigo-400" />;
-                        case 'BookOpen': return <FileText size={18} className="text-cyan-400" />;
-                        case 'Scale': return <Briefcase size={18} className="text-amber-400" />;
-                        case 'Flame': return <Flame size={18} className="text-red-400" />;
-                        case 'CheckCircle': return <CheckCircle2 size={18} className="text-emerald-400" />;
-                        case 'Globe': return <Globe size={18} className="text-teal-400" />;
-                        case 'Shield': return <ShieldAlert size={18} className="text-stone-400" />;
-                        default: return <Sparkles size={18} className="text-purple-400" />;
-                      }
-                    };
-
-                    return (
+                  {/* 7 RUHSAL SEKTÖR KARTI */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {(result.soulCareer.soulAllSectors || result.soulCareer.soulTopSectors).map((sector, sIdx) => (
                       <div
-                        key={pIdx}
-                        className="bg-black/50 border border-purple-500/20 hover:border-purple-500/40 p-4 sm:p-5 rounded-2xl flex flex-col justify-between transition-all shadow-lg"
+                        key={sIdx}
+                        className="bg-black/50 border border-purple-500/30 p-5 rounded-3xl flex flex-col justify-between shadow-xl hover:border-purple-500/50 transition-all"
+                        style={{ borderTopColor: sector.color, borderTopWidth: '3px' }}
                       >
                         <div>
                           <div className="flex items-center justify-between gap-2 mb-2.5">
-                            <div className="flex items-center gap-2">
-                              <div className="p-2 rounded-xl bg-purple-500/10 border border-purple-500/20">
-                                {getIcon(pillar.iconName)}
-                              </div>
-                              <span className="text-xs font-bold text-white">
-                                {pillar.planet} ({pillar.sign})
-                              </span>
-                            </div>
-                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full border border-purple-500/30 bg-purple-500/10 text-purple-300">
-                              {pillar.domain}
+                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 uppercase">
+                              Ruhsal Çağrı #{sIdx + 1}
+                            </span>
+                            <span className="text-lg font-bold" style={{ color: sector.color }}>
+                              %{sector.percentage}
                             </span>
                           </div>
-
-                          <h4 className="text-xs sm:text-sm font-semibold text-gray-200 mb-2 leading-snug">
-                            {pillar.title}
-                          </h4>
-
-                          <p className="text-xs text-gray-400 leading-relaxed mb-3">
-                            {pillar.explanation}
-                          </p>
+                          <h4 className="text-base font-bold text-white mb-2">{sector.title}</h4>
+                          <p className="text-xs text-gray-300 leading-relaxed mb-4">{sector.description}</p>
                         </div>
-
-                        <div className="pt-2 border-t border-white/5">
-                          <span className="text-[10px] text-gray-400 uppercase tracking-wider block mb-1.5 font-medium">
-                            Ruhsal Ustalık Alanları:
+                        <div className="pt-3 border-t border-white/5 space-y-1.5">
+                          <span className="text-[10px] text-gray-400 font-semibold uppercase block">
+                            Ruhsal Ustalık Dalları:
                           </span>
                           <div className="flex flex-wrap gap-1">
-                            {pillar.suitableProfessions.map((prof, profIdx) => (
-                              <span
-                                key={profIdx}
-                                className="text-[10px] bg-purple-500/10 border border-purple-500/20 text-purple-200 px-2 py-0.5 rounded-md"
-                              >
-                                {prof}
+                            {sector.recommendedRoles.map((r, rIdx) => (
+                              <span key={rIdx} className="text-[10px] bg-white/5 border border-white/10 px-2 py-0.5 rounded text-gray-200">
+                                {r}
                               </span>
                             ))}
                           </div>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* DRAKONİK KADERSEL ŞANS NOKTASI & MANEVİ RIZIK KAPISI */}
-            {result.soulCareer.soulParsFortuna && (
-              <div className="bg-gradient-to-br from-emerald-950/30 via-black/70 to-purple-950/30 border border-emerald-500/30 p-5 sm:p-7 rounded-3xl relative overflow-hidden shadow-xl">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2.5 rounded-xl bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
-                    <Sparkles size={22} />
-                  </div>
-                  <div>
-                    <span className="text-[10px] sm:text-xs uppercase tracking-widest text-emerald-400 font-bold block">
-                      Ruh Haritası Kadersel Rızık Kapısı (Drakonik Pars Fortuna)
-                    </span>
-                    <h3 className="text-lg sm:text-xl font-bold text-white">
-                      {result.soulCareer.soulParsFortuna.wealthPortalTitle}
-                    </h3>
+                    ))}
                   </div>
                 </div>
-
-                <div className="space-y-3">
-                  <div className="bg-white/5 border border-white/10 p-4 rounded-2xl">
-                    <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
-                      {result.soulCareer.soulParsFortuna.karmicBlessingArea}
-                    </p>
-                  </div>
-
-                  <div className="bg-emerald-500/10 border border-emerald-500/25 p-4 rounded-2xl text-xs sm:text-sm text-emerald-200 leading-relaxed">
-                    <strong>🕊️ Zahmetsiz Manevi Bereket Formülü:</strong> {result.soulCareer.soulParsFortuna.practicalMonetizationGuidance}
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* 4. RUH & MADDE DENGE KÖPRÜSÜ (BÜTÜNSEL SENTEZ) */}
             <div className="bg-gradient-to-br from-amber-500/10 via-purple-500/10 to-black/80 border border-amber-500/30 p-5 sm:p-7 rounded-3xl relative overflow-hidden shadow-2xl space-y-4">
