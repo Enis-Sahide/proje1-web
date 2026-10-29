@@ -417,262 +417,371 @@ export class CareerEngine {
 
       // 1. Işın: İrade & Liderlik (Güneş - Mars / Plüton)
       if ((pair.includes('Güneş') && pair.includes('Mars')) || (pair.includes('Güneş') && pair.includes('Plüton'))) {
-        scores.leadership += 26;
-        scores.finance += 12;
+        scores.leadership += 24;
+        scores.finance += 10;
       }
-      // 7. Işın: Kozmik Kıvılcım & İleri Teknoloji (Uranüs - Merkür / Mars)
+      // 7. Işın: Kozmik Kıvılcım & İleri Teknoloji (Uranüs - Merkür / Mars / Güneş / Satürn)
       if (pair.includes('Merkür') && pair.includes('Uranüs')) {
+        scores.technology += 28;
+        scores.global += 12;
+      }
+      if (pair.includes('Güneş') && pair.includes('Uranüs')) {
+        scores.technology += 26;
+        scores.leadership += 14;
+      }
+      if (pair.includes('Satürn') && pair.includes('Uranüs')) {
         scores.technology += 24;
-        scores.global += 14;
+        scores.systems += 16;
       }
       if (pair.includes('Mars') && pair.includes('Uranüs')) {
+        scores.technology += 22;
+        scores.leadership += 14;
+      }
+      if (pair.includes('Jüpiter') && pair.includes('Uranüs')) {
         scores.technology += 20;
-        scores.leadership += 15;
+        scores.global += 16;
       }
       // Analitik Zeka & Problem Çözümü (Merkür - Mars)
       if (pair.includes('Merkür') && pair.includes('Mars')) {
-        scores.technology += 16;
+        scores.technology += 18;
         scores.systems += 16;
-        scores.leadership += 12;
+        scores.leadership += 10;
       }
       // 3. Işın: Sistem & Mantık Mimarisi (Merkür - Satürn)
       if (pair.includes('Merkür') && pair.includes('Satürn')) {
-        scores.systems += 26;
-        scores.finance += 14;
+        scores.systems += 22;
+        scores.technology += 16;
+        scores.finance += 12;
       }
       // 5. Işın: Yüksek Sanat, Estetik & Uyum (Venüs - Neptün / Ay)
       if (pair.includes('Venüs') && (pair.includes('Neptün') || pair.includes('Ay'))) {
-        scores.creative += 26;
-        scores.human += 16;
+        scores.creative += 24;
+        scores.human += 12;
       }
       // İletişim, Medya & Diplomasi (Venüs - Merkür)
       if (pair.includes('Venüs') && pair.includes('Merkür')) {
-        scores.creative += 22;
+        scores.creative += 20;
         scores.global += 14;
       }
       // 2. Işın: Büyük Servet, Güç & Varlık Yönetimi (Jüpiter - Plüton)
       if (pair.includes('Jüpiter') && pair.includes('Plüton')) {
-        scores.finance += 28;
-        scores.leadership += 16;
+        scores.finance += 24;
+        scores.leadership += 14;
       }
       // Kurumsal Finans & Ekonomi (Jüpiter - Satürn / Venüs - Satürn)
       if ((pair.includes('Jüpiter') && pair.includes('Satürn')) || (pair.includes('Venüs') && pair.includes('Satürn'))) {
-        scores.finance += 22;
-        scores.systems += 20;
+        scores.finance += 20;
+        scores.systems += 18;
       }
       // 2. Işın: Yüksek Bilgelik, Hukuk & Akademi (Jüpiter - Güneş)
       if ((pair.includes('Güneş') || pair.includes('Mars')) && pair.includes('Jüpiter')) {
-        scores.global += 26;
-        scores.leadership += 16;
+        scores.global += 24;
+        scores.leadership += 14;
       }
       // 6. Işın: Şifa, Psikoloji & Merhamet (Ay - Neptün / Plüton)
       if (pair.includes('Ay') && (pair.includes('Neptün') || pair.includes('Plüton'))) {
-        scores.human += 28;
-        scores.creative += 14;
+        scores.human += 22;
+        scores.creative += 12;
       }
       // Şifa & Kiron Rezonansı (Güneş/Merkür - Kiron)
       if (pair.includes('Kiron') && (pair.includes('Güneş') || pair.includes('Merkür') || pair.includes('Ay'))) {
-        scores.human += 26;
+        scores.human += 20;
       }
       // Disiplinli Eylem & İnşaat (Mars - Satürn)
       if (pair.includes('Mars') && pair.includes('Satürn')) {
-        scores.systems += 22;
-        scores.leadership += 16;
+        scores.systems += 20;
+        scores.leadership += 14;
       }
     });
 
-    // B) 2. EV (Finans, Değer Üretimi, Bankacılık & Somut Kaynaklar)
-    if (['Boğa', 'Oğlak', 'Akrep', 'Başak'].includes(house2Sign)) {
-      scores.finance += 22;
+    // B) 2. EV (Finans, Değer Üretimi, Rızık & Somut Kaynaklar)
+    if (['Boğa', 'Oğlak'].includes(house2Sign)) {
+      scores.finance += 24;
+    } else if (['Akrep', 'Başak'].includes(house2Sign)) {
+      scores.finance += 18;
+      scores.systems += 14;
+    } else if (['Kova'].includes(house2Sign)) {
+      scores.technology += 24;
+      scores.finance += 12;
+    } else if (['İkizler'].includes(house2Sign)) {
+      scores.technology += 18;
+      scores.creative += 14;
+      scores.finance += 10;
+    } else if (['Koç', 'Aslan'].includes(house2Sign)) {
+      scores.leadership += 22;
+      scores.finance += 12;
+    } else if (['Yengeç', 'Balık'].includes(house2Sign)) {
+      scores.human += 18;
+      scores.creative += 14;
+    } else if (['Terazi'].includes(house2Sign)) {
+      scores.creative += 20;
+      scores.finance += 14;
     }
     if ([jupiter.house, venus.house, pluto.house, saturn.house].includes(2)) {
-      scores.finance += 26;
+      scores.finance += 24;
+    }
+    if (uranus.house === 2) {
+      scores.technology += 26;
+      scores.finance += 14;
     }
     if (mercury.house === 2) {
       scores.finance += 16;
-      scores.systems += 14;
+      scores.systems += 12;
+      scores.technology += 12;
     }
 
-    // C) 3. EV (Bilişsel Diller, Yazarlık, Medya, Temel Eğitim & İletişim)
-    if (['İkizler', 'Başak', 'Terazi'].includes(house3Sign)) {
+    // C) 3. EV (Bilişsel Diller, Kodlama, Medya & İletişim)
+    if (['İkizler', 'Terazi'].includes(house3Sign)) {
       scores.creative += 18;
-      scores.systems += 14;
+      scores.technology += 14;
+    } else if (['Başak'].includes(house3Sign)) {
+      scores.systems += 16;
+      scores.technology += 16;
     } else if (['Kova', 'Akrep'].includes(house3Sign)) {
-      scores.technology += 18;
+      scores.technology += 20;
       scores.systems += 12;
     }
     if (mercury.house === 3 || moon.house === 3) {
-      scores.creative += 20;
-      scores.systems += 14;
+      scores.creative += 18;
+      scores.technology += 14;
     }
     if (uranus.house === 3) {
-      scores.technology += 20;
+      scores.technology += 22;
     }
 
     // D) 5. EV (Yaratıcı İfade, Sanat, Sahne, Tasarım & Girişim)
     if (['Aslan', 'Terazi', 'Balık', 'İkizler'].includes(house5Sign)) {
-      scores.creative += 22;
+      scores.creative += 20;
     }
     if ([sun.house, venus.house, neptune.house].includes(5)) {
-      scores.creative += 28;
+      scores.creative += 24;
     }
     if (mars.house === 5) {
-      scores.creative += 16;
-      scores.leadership += 16;
+      scores.creative += 14;
+      scores.leadership += 14;
     }
 
-    // E) 6. EV (Sağlık, Tıp, İnce Zanaat, Hizmet & Operasyon)
-    if (['Başak', 'Yengeç', 'Balık', 'Akrep'].includes(house6Sign)) {
-      scores.human += 22;
-      scores.systems += 16;
-    } else if (['Oğlak', 'Boğa', 'Kova'].includes(house6Sign)) {
-      scores.systems += 22;
+    // E) 6. EV (Sağlık, Tıp, İnce Zanaat, Hizmet, Yazılım & Operasyon)
+    if (['Başak'].includes(house6Sign)) {
+      scores.systems += 18;
+      scores.technology += 16;
+      scores.human += 14;
+    } else if (['Yengeç', 'Balık'].includes(house6Sign)) {
+      scores.human += 20;
+      scores.creative += 12;
+    } else if (['Kova'].includes(house6Sign)) {
+      scores.technology += 24;
+      scores.systems += 14;
+    } else if (['İkizler'].includes(house6Sign)) {
+      scores.technology += 18;
+      scores.creative += 12;
+    } else if (['Oğlak', 'Boğa'].includes(house6Sign)) {
+      scores.systems += 20;
+      scores.finance += 12;
     }
     if ([moon.house, neptune.house].includes(6)) {
-      scores.human += 28;
+      scores.human += 22;
     }
     if ([saturn.house, mars.house].includes(6)) {
-      scores.systems += 24;
+      scores.systems += 20;
     }
     if (mercury.house === 6) {
-      scores.systems += 22;
-      scores.human += 14;
+      scores.systems += 18;
+      scores.technology += 16;
     }
     if (uranus.house === 6) {
-      scores.technology += 20;
-      scores.systems += 14;
+      scores.technology += 24;
+      scores.systems += 12;
     }
 
-    // F) 8. EV (Dönüşüm, Büyük Finans, Cerrahi, Psikiyatri & Kriz Yönetimi)
+    // F) 8. EV (Dönüşüm, Büyük Finans, Kriptografi, Cerrahi & Kriz)
     if (['Akrep', 'Boğa', 'Oğlak'].includes(house8Sign)) {
-      scores.finance += 20;
-      scores.human += 18;
+      scores.finance += 18;
+      scores.human += 14;
     }
     if ([pluto.house, mars.house].includes(8)) {
-      scores.human += 24;
-      scores.finance += 22;
+      scores.human += 18;
+      scores.finance += 18;
+      scores.leadership += 12;
     }
     if (jupiter.house === 8) {
-      scores.finance += 26;
+      scores.finance += 22;
     }
 
-    // G) 9. EV (Yüksek Dharma, Hukuk, Akademi, Felsefe & Global Vizyon)
-    if (['Yay', 'Balık', 'Kova', 'Terazi'].includes(house9Sign)) {
-      scores.global += 24;
+    // G) 9. EV (Yüksek Bilim, Hukuk, Akademi & Global İnovasyon)
+    if (['Yay', 'Kova'].includes(house9Sign)) {
+      scores.global += 22;
+      scores.technology += 14;
+    } else if (['Balık', 'Terazi'].includes(house9Sign)) {
+      scores.global += 20;
     }
     if ([jupiter.house, sun.house].includes(9)) {
-      scores.global += 28;
+      scores.global += 24;
     }
     if (mercury.house === 9) {
-      scores.global += 20;
-      scores.creative += 14;
+      scores.global += 18;
+      scores.technology += 14;
     }
     if (uranus.house === 9) {
-      scores.technology += 18;
+      scores.technology += 22;
       scores.global += 18;
     }
 
     // H) 10. EV (MC - Toplumsal Tepe Noktası & Mesleki Makam)
     if (['Koç', 'Aslan'].includes(mcSign)) {
-      scores.leadership += 30;
+      scores.leadership += 28;
     } else if (['Boğa', 'Akrep'].includes(mcSign)) {
-      scores.finance += 28;
-    } else if (['İkizler', 'Terazi'].includes(mcSign)) {
-      scores.creative += 28;
+      scores.finance += 26;
+    } else if (['Terazi'].includes(mcSign)) {
+      scores.creative += 26;
+    } else if (['İkizler'].includes(mcSign)) {
+      scores.technology += 24;
+      scores.creative += 20;
     } else if (['Yengeç', 'Balık'].includes(mcSign)) {
-      scores.human += 30;
+      scores.human += 26;
     } else if (['Başak', 'Oğlak'].includes(mcSign)) {
-      scores.systems += 30;
+      scores.systems += 26;
+      scores.technology += 16;
     } else if (mcSign === 'Yay') {
-      scores.global += 30;
+      scores.global += 28;
     } else if (mcSign === 'Kova') {
-      scores.technology += 28;
-      scores.global += 16;
+      scores.technology += 32;
+      scores.global += 14;
     }
 
-    if (sun.house === 10) scores.leadership += 32;
-    if (saturn.house === 10) { scores.systems += 30; scores.leadership += 18; }
-    if (jupiter.house === 10) { scores.global += 30; scores.finance += 24; }
-    if (venus.house === 10) { scores.creative += 30; scores.finance += 16; }
-    if (mars.house === 10) { scores.leadership += 28; scores.systems += 16; }
-    if (moon.house === 10) { scores.human += 28; scores.creative += 16; }
-    if (uranus.house === 10) { scores.technology += 30; scores.global += 16; }
-    if (neptune.house === 10) { scores.human += 28; scores.creative += 26; }
-    if (pluto.house === 10) { scores.finance += 26; scores.leadership += 24; }
-    if (mercury.house === 10) { scores.systems += 22; scores.creative += 18; scores.technology += 16; }
+    if (sun.house === 10) {
+      if (sun.sign === 'Kova' || sun.sign === 'İkizler') {
+        scores.technology += 32;
+        scores.leadership += 16;
+      } else {
+        scores.leadership += 28;
+      }
+    }
+    if (saturn.house === 10) { scores.systems += 26; scores.leadership += 16; }
+    if (jupiter.house === 10) { scores.global += 26; scores.finance += 20; }
+    if (venus.house === 10) { scores.creative += 28; scores.finance += 14; }
+    if (mars.house === 10) { scores.leadership += 24; scores.systems += 14; }
+    if (moon.house === 10) { scores.human += 24; scores.creative += 14; }
+    if (uranus.house === 10) { scores.technology += 32; scores.global += 14; }
+    if (neptune.house === 10) { scores.human += 22; scores.creative += 22; }
+    if (pluto.house === 10) { scores.finance += 22; scores.leadership += 20; }
+    if (mercury.house === 10) { scores.technology += 24; scores.systems += 18; scores.creative += 14; }
 
-    // I) 12. EV (Kolektif Şifa, Sanat, Hastaneler & Arka Plan Stratejisi)
+    // I) 12. EV (Kolektif Şifa, Sanat & Arka Plan)
     if ([neptune.house, moon.house, jupiter.house].includes(12)) {
-      scores.human += 26;
-      scores.creative += 18;
+      scores.human += 22;
+      scores.creative += 16;
     }
 
     // J) GEZEGEN BURÇ ASİLETLERİ (Dignities)
     if (sun.sign === 'Aslan' || sun.sign === 'Koç') {
       scores.leadership += 26;
     } else if (sun.sign === 'Yay') {
-      scores.leadership += 18;
+      scores.leadership += 16;
       scores.global += 22;
+    } else if (sun.sign === 'Kova') {
+      scores.technology += 32;
+      scores.global += 16;
+    } else if (sun.sign === 'İkizler') {
+      scores.technology += 22;
+      scores.creative += 18;
+    } else if (sun.sign === 'Başak') {
+      scores.systems += 22;
+      scores.technology += 20;
+    } else if (sun.sign === 'Boğa') {
+      scores.finance += 24;
+      scores.creative += 14;
+    } else if (sun.sign === 'Yengeç' || sun.sign === 'Balık') {
+      scores.human += 24;
+      scores.creative += 18;
+    } else if (sun.sign === 'Terazi') {
+      scores.creative += 22;
+      scores.human += 14;
+    } else if (sun.sign === 'Oğlak') {
+      scores.systems += 24;
+      scores.leadership += 16;
+    } else if (sun.sign === 'Akrep') {
+      scores.finance += 20;
+      scores.leadership += 16;
+      scores.technology += 14;
     }
 
     if (moon.sign === 'Yengeç' || moon.sign === 'Balık') {
-      scores.human += 28;
+      scores.human += 24;
     } else if (moon.sign === 'Boğa') {
       scores.finance += 20;
-      scores.creative += 16;
+      scores.creative += 14;
+    } else if (moon.sign === 'Kova') {
+      scores.technology += 20;
+      scores.global += 14;
+    } else if (moon.sign === 'İkizler' || moon.sign === 'Başak') {
+      scores.technology += 16;
+      scores.systems += 16;
     }
 
     if (mercury.sign === 'Başak') {
-      scores.systems += 28;
-      scores.technology += 18;
-    } else if (mercury.sign === 'İkizler') {
-      scores.creative += 24;
-      scores.technology += 16;
-    } else if (mercury.sign === 'Kova') {
+      scores.systems += 24;
       scores.technology += 24;
-      scores.global += 18;
+    } else if (mercury.sign === 'İkizler') {
+      scores.technology += 22;
+      scores.creative += 20;
+    } else if (mercury.sign === 'Kova') {
+      scores.technology += 28;
+      scores.global += 16;
     } else if (mercury.sign === 'Akrep' || mercury.sign === 'Oğlak') {
-      scores.systems += 22;
-      scores.finance += 18;
+      scores.systems += 20;
+      scores.finance += 16;
     }
 
     if (venus.sign === 'Boğa' || venus.sign === 'Terazi') {
-      scores.creative += 28;
-      scores.finance += 16;
-    } else if (venus.sign === 'Balık') {
       scores.creative += 26;
-      scores.human += 24;
+      scores.finance += 14;
+    } else if (venus.sign === 'Balık') {
+      scores.creative += 24;
+      scores.human += 20;
+    } else if (venus.sign === 'Kova') {
+      scores.creative += 18;
+      scores.technology += 16;
     }
 
     if (mars.sign === 'Koç' || mars.sign === 'Akrep' || mars.sign === 'Oğlak') {
-      scores.leadership += 24;
-      scores.systems += 18;
+      scores.leadership += 22;
+      scores.systems += 16;
+    } else if (mars.sign === 'Kova') {
+      scores.technology += 22;
+      scores.leadership += 14;
     }
 
     if (jupiter.sign === 'Yay' || jupiter.sign === 'Balık') {
-      scores.global += 28;
-      scores.human += 18;
+      scores.global += 24;
+      scores.human += 16;
     } else if (jupiter.sign === 'Yengeç' || jupiter.sign === 'Boğa') {
-      scores.finance += 24;
+      scores.finance += 22;
+      scores.global += 16;
+    } else if (jupiter.sign === 'Kova') {
+      scores.technology += 22;
       scores.global += 18;
     }
 
-    if (saturn.sign === 'Oğlak' || saturn.sign === 'Kova' || saturn.sign === 'Terazi') {
-      scores.systems += 28;
-      scores.finance += 18;
+    if (saturn.sign === 'Oğlak' || saturn.sign === 'Terazi') {
+      scores.systems += 24;
+      scores.finance += 16;
+    } else if (saturn.sign === 'Kova') {
+      scores.technology += 24;
+      scores.systems += 20;
     }
 
     if (uranus.sign === 'Kova') {
-      scores.technology += 26;
+      scores.technology += 30;
     }
     if (neptune.sign === 'Balık') {
-      scores.creative += 22;
-      scores.human += 24;
+      scores.creative += 20;
+      scores.human += 20;
     }
     if (pluto.sign === 'Akrep') {
-      scores.finance += 22;
-      scores.human += 18;
-      scores.leadership += 18;
+      scores.finance += 20;
+      scores.human += 14;
+      scores.leadership += 16;
     }
 
     // K) YÜKSELEN BURÇ (ASC - Dış Dünyadaki Eylem Maskesi)
@@ -680,17 +789,21 @@ export class CareerEngine {
       scores.leadership += 22;
     } else if (['Boğa', 'Oğlak'].includes(ascSign)) {
       scores.finance += 20;
-      scores.systems += 20;
-    } else if (['İkizler', 'Terazi'].includes(ascSign)) {
+      scores.systems += 18;
+    } else if (ascSign === 'Terazi') {
       scores.creative += 22;
-    } else if (['Yengeç', 'Balık'].includes(ascSign)) {
-      scores.human += 24;
-    } else if (ascSign === 'Başak') {
-      scores.systems += 24;
-    } else if (ascSign === 'Yay') {
-      scores.global += 24;
-    } else if (ascSign === 'Kova') {
+    } else if (ascSign === 'İkizler') {
       scores.technology += 22;
+      scores.creative += 18;
+    } else if (['Yengeç', 'Balık'].includes(ascSign)) {
+      scores.human += 22;
+    } else if (ascSign === 'Başak') {
+      scores.systems += 20;
+      scores.technology += 18;
+    } else if (ascSign === 'Yay') {
+      scores.global += 22;
+    } else if (ascSign === 'Kova') {
+      scores.technology += 26;
       scores.global += 14;
     }
 
@@ -1394,166 +1507,197 @@ function calculatePlanetaryCareerInsights(
 ): PlanetaryPlacementCareerInsight[] {
   const insights: PlanetaryPlacementCareerInsight[] = [];
 
-  // 1. VENÜS: Tekstil, Kumaş, Sanat, Müzik & Zanaat
-  const venusArtsSigns = ['Boğa', 'Terazi', 'Balık', 'Yengeç'];
-  const venusCraftSigns = ['Başak', 'Oğlak'];
-  if (venusArtsSigns.includes(venus.sign) || [2, 5, 7, 12].includes(venus.house)) {
-    insights.push({
-      planet: 'Venüs',
-      sign: venus.sign,
-      house: venus.house,
-      domain: 'Tekstil, Sanat & Müzik',
-      iconName: 'Palette',
-      title: `Venüs ${venus.sign} (${venus.house}. Ev) • Tekstil, Moda, Kumaş & Müzikal Yetenek`,
-      explanation: `Venüs'ünüzün ${venus.sign} burcundaki ve ${venus.house}. evdeki yerleşimi; kumaş dokusu, tekstil tasarımı, renk ve desen ahengi ile el zanaatlerinde doğuştan gelen rafine bir estetik zevk bahşeder. Aynı zamanda müzik kulağı, enstrüman icrası, ses estetiği veya dekorasyon/görsel sanatlarda ruhu doyuran eserler çıkarma potansiyelinizi açığa çıkarır.`,
-      suitableProfessions: [
-        'Tekstil & Kumaş Tasarımcısı',
-        'Müzisyen, Besteci & Ses Sanatçısı',
-        'Moda & Stilist',
-        'Görsel Sanatlar & Ressam',
-        'Ev Tekstili & Dekorasyon Ustası'
-      ]
-    });
-  } else if (venusCraftSigns.includes(venus.sign) || [6, 10].includes(venus.house)) {
-    insights.push({
-      planet: 'Venüs',
-      sign: venus.sign,
-      house: venus.house,
-      domain: 'Tekstil, Sanat & Müzik',
-      iconName: 'Palette',
-      title: `Venüs ${venus.sign} (${venus.house}. Ev) • Tekstil Kalıp Ustalığı & İnce Zanaat`,
-      explanation: `Venüs'ün bu yerleşimi, estetik yeteneği disiplin ve teknik milimetrik hassasiyetle birleştirir. Tekstil kalıpçılığı, titiz terzilik, takı/mücevher zanaatı, restorasyon ve üretimde sıfır hata ile çalışan usta el becerisi sunar.`,
-      suitableProfessions: [
-        'Tekstil Modelisti & Kalıp Ustası',
-        'Mücevher & Kuyumculuk Zanaatkarı',
-        'Tekstil Kalite Güvence Uzmanı',
-        'El İşçiliği & Terzilik'
-      ]
-    });
-  } else {
-    insights.push({
-      planet: 'Venüs',
-      sign: venus.sign,
-      house: venus.house,
-      domain: 'Tekstil, Sanat & Müzik',
-      iconName: 'Palette',
-      title: `Venüs ${venus.sign} (${venus.house}. Ev) • Estetik İletişim, Sahne & Tasarım`,
-      explanation: `Venüs'ünüzün ${venus.sign} yerleşimi; stil danışmanlığı, sahne tasarımı, tekstil ürünlerinin vitrin sunumu ve görsel albenisi yüksek tasarımlar hazırlama kabiliyetinizi destekler.`,
-      suitableProfessions: [
-        'Stil Danışmanı & Tasarımcı',
-        'Sahne & Vitrin Tasarımcısı',
-        'Görsel İletişim Uzmanı',
-        'Tekstil Pazarlama & Temsil'
-      ]
-    });
-  }
+  const house2Sign = chart.houses[1]?.sign || 'Boğa';
+  const house6Sign = chart.houses[5]?.sign || 'Başak';
+  const mcSign = chart.midheaven?.sign || chart.houses[9]?.sign || 'Oğlak';
 
-  // 2. SATÜRN: Kamu Memuriyeti, Devlet Nizamı, Bürokrasi & Liyakat
-  const saturnGovSigns = ['Oğlak', 'Başak', 'Boğa', 'Yengeç'];
-  if (saturnGovSigns.includes(saturn.sign) || [6, 10, 4, 1].includes(saturn.house)) {
-    insights.push({
-      planet: 'Satürn',
-      sign: saturn.sign,
-      house: saturn.house,
-      domain: 'Kamu Memuriyeti & İdari Düzen',
-      iconName: 'Building2',
-      title: `Satürn ${saturn.sign} (${saturn.house}. Ev) • Devlet Memuriyeti & Kamu Nizamı`,
-      explanation: `Satürn'ün ${saturn.sign} burcunda ve ${saturn.house}. evdeki sağlam konumu; devlet kademelerinde kamu memurluğu, kurumsal bürokrasi, evrak ve arşiv nizamı, adliye/vergi dairesi intizamı ve kanunlara sadakatle yükselmeyi destekler. Riskli maceralar yerine güvenceli, intizamlı ve kademeli kamu görevinde sarsılmaz bir liyakat sunar.`,
-      suitableProfessions: [
-        'Devlet Memuru & Büro Şefi',
-        'Adliye & Evrak Kayıt Görevlisi',
-        'Maliye / Vergi Dairesi Memuru',
-        'Kamu İdare Personeli',
-        'Mevzuat & Kalite Denetmeni'
-      ]
-    });
-  } else {
-    insights.push({
-      planet: 'Satürn',
-      sign: saturn.sign,
-      house: saturn.house,
-      domain: 'Kamu Memuriyeti & İdari Düzen',
-      iconName: 'Building2',
-      title: `Satürn ${saturn.sign} (${saturn.house}. Ev) • Kurumsal Denetim, Muhasebe & Zanaat Disiplini`,
-      explanation: `Satürn'ün bu yerleşimi; mali denetim, muhasebe hesaplarının intizamı, usta-çırak disipliniyle zanaatte kök salma ve kurumsal yapıların omurgasını koruma ciddiyeti verir.`,
-      suitableProfessions: [
-        'Mali Müşavir & Muhasebe Sorumlusu',
-        'Kurumsal Denetçi',
-        'Arşiv & Büro Şefi',
-        'Zanaat Atölye Şefi'
-      ]
-    });
-  }
+  // 1. KART: 2. EV (RIZIK, MADDİ KAZANÇ & PARANIN AKTIĞI ALAN)
+  const getHouse2Insight = (sign: string): { title: string; explanation: string; roles: string[]; iconName: string } => {
+    switch (sign) {
+      case 'Boğa':
+        return {
+          title: `2. Ev ${sign} • Toprak, Zanaat, Gayrimenkul & Somut Değer Üretimi`,
+          explanation: `Para ve rızık evinizin Boğa burcunda olması; kazancınızın elle tutulur somut üretimden, mimarlık ve inşaat, peyzaj, çiçekçilik, gayrimenkul yatırımları, estetik zanaat ve uzun vadeli güvenli ticaretten akacağını gösterir. Maddi bereketi sabır ve kaliteyle inşa edersiniz.`,
+          roles: ['Gayrimenkul & Mülk Danışmanı', 'Peyzaj & Çiçekçilik İşletmecisi', 'İç Mimar & Zanaatkar', 'Sermaye & Fon Değerlendirici', 'Tekstil & Doğal Ürün Ticareti'],
+          iconName: 'Building2'
+        };
+      case 'Kova':
+        return {
+          title: `2. Ev ${sign} • İleri Teknoloji, Yazılım, Dijital Ürünler & Ağ Gelirleri`,
+          explanation: `Rızık kapınızın Kova burcunda yerleşmesi; ana gelirinizin bilgisayar sistemleri, yazılım mimarisi, yapay zeka, internet ağları, dijital ürün satışları, fütüristik girişimler ve bağımsız projeler üzerinden doğacağını belgeler. Geleneksel mesai yerine bilgi ve teknoloji üretmek servet anahtarınızdır.`,
+          roles: ['Yazılım Mimarı & Geliştirici', 'Dijital Ürün & Girişim Sahibi', 'Bilişim & Ağ Güvenlik Danışmanı', 'Yapay Zeka & Veri Uzmanı', 'Teknoloji Proje Yöneticisi'],
+          iconName: 'Palette'
+        };
+      case 'İkizler':
+        return {
+          title: `2. Ev ${sign} • Bilişim, Ticaret, Medya, Yazarlık & Aracılık Gelirleri`,
+          explanation: `Para evinizin İkizler burcunda olması; rızkınızın zihinsel çeviklik, programlama dilleri, ticaret, komisyonculuk, editörlük, sosyal medya, danışmanlık ve bilgi akışını yönetmekten geleceğini simgeler. Tek bir maaş yerine birden çok koldan para akıtma potansiyeliniz yüksektir.`,
+          roles: ['Yazılım & Web Geliştirici', 'Ticari Temsilci & Komisyoncu', 'İçerik Stratejisti & Yazar', 'Bilişim Eğitmeni & Danışman', 'E-Ticaret İşletmecisi'],
+          iconName: 'FileText'
+        };
+      case 'Başak':
+        return {
+          title: `2. Ev ${sign} • Mali Analiz, Muhasebe, Kodlama, Kalite & Zanaat Kazancı`,
+          explanation: `2. Evinizin Başak burcunda olması; gelirin detaylı hesap uzmanlığı, muhasebe ve maliye, yazılımda hata ayıklama (debugging), sağlık/eczacılık sektörü, teknik kalite denetimi ve milimetrik el zanaatlerinden bereketleneceğini gösterir. Kusursuz işçiliğiniz servetinizin teminatıdır.`,
+          roles: ['Mali Müşavir & Denetmen', 'Yazılım Test & Kalite Mühendisi', 'Büro Şefi & Hesap Uzmanı', 'Eczacı & Sağlık İdarecisi', 'İnce Zanaat & Restorasyon Ustası'],
+          iconName: 'FileText'
+        };
+      case 'Yengeç':
+        return {
+          title: `2. Ev ${sign} • Gıda, Eğitim, Aile Şirketi, Konfeksiyon & Barınma`,
+          explanation: `Para evinizin Yengeç burcunda olması; kazancınızın insanları besleyen, koruyan ve eğiten alanlardan geleceğini gösterir. Gıda işletmeciliği, anaokulu/öğretmenlik, otelcilik ve barınma, konfeksiyon ve ev tekstili ile aile işletmeciliği en bereketli rızık kapılarınızdır.`,
+          roles: ['Gıda İşletmecisi & Restoran Sahibi', 'Eğitimci & Kreş Yöneticisi', 'Ev Tekstili İmalatçısı', 'Gayrimenkul & Yaşam Alanı Danışmanı', 'Kamu Sosyal Güvence Uzmanı'],
+          iconName: 'HeartHandshake'
+        };
+      case 'Aslan':
+        return {
+          title: `2. Ev ${sign} • Lüks Sektör, Üst Düzey Yönetim, Sahne & Marka Değeri`,
+          explanation: `2. Evinizin Aslan burcunda olması; yüksek vitrinli sektörlerden, sahne ve sanat dünyasından, şirket kuruculuğundan, lüks tasarım ve değerli madenler/mücevherat alanından büyük ölçekli para kazanma gücü verir. Kendi markanızı parlatmak doğrudan servete dönüşür.`,
+          roles: ['Marka & Girişim Kurucusu', 'Lüks Ürün & Mücevher Danışmanı', 'Kreatif Yönetmen & Tasarımcı', 'Sanat & Sahne İdarecisi', 'Şirket Tepe Yöneticisi'],
+          iconName: 'Palette'
+        };
+      case 'Terazi':
+        return {
+          title: `2. Ev ${sign} • Hukuk, Estetik, İç Mimarlık, Ortaklık & Sanat Ticareti`,
+          explanation: `Para evinizin Terazi burcunda yerleşmesi; rızkınızın ortaklıklar, danışmanlıklar, hukuk ve arabuluculuk, güzellik/estetisyenlik, iç mimari dekorasyon, sanat galerisi ve ikili ticari müzakerelerden doğacağını simgeler. Denge ve estetik kurduğunuz her mecra size para kazandırır.`,
+          roles: ['Hukuk Müşaviri & Arabulucu', 'İç Mimar & Dekorasyon Uzmanı', 'Güzellik & Estetik Danışmanı', 'Sanat Temsilcisi & Galeri Müdürü', 'Kurumsal İkna & Halkla İlişkiler'],
+          iconName: 'HeartHandshake'
+        };
+      case 'Akrep':
+        return {
+          title: `2. Ev ${sign} • Büyük Sermaye, Kriz Yönetimi, Finans, Siber Güvenlik & Dönüşüm`,
+          explanation: `2. Evinizin Akrep burcunda olması; başkalarının krizde olduğu anları paraya çevirme, siber güvenlik, derin araştırma, cerrahi tıp, büyük kurumsal fonlar ve risk sermayesi yönetimi alanlarında devasa bir para çekme manyetizması verir.`,
+          roles: ['Siber Güvenlik & İstihbarat Uzmanı', 'Yatırım Bankacısı & Kriz Yöneticisi', 'Adli Tıp / Cerrahi Sağlıkçı', 'Sigorta & Fon Yöneticisi', 'Stratejik Şirket Danışmanı'],
+          iconName: 'Building2'
+        };
+      case 'Yay':
+        return {
+          title: `2. Ev ${sign} • Dış Ticaret, Uluslararası Lojistik, Yüksek Akademi & Turizm`,
+          explanation: `Para evinizin Yay burcunda olması; rızkınızın ülke sınırlarının ötesinden, gümrük ve ithalat/ihracat operasyonlarından, turizm acenteciliğinden, yabancı dillerden ve akademik yayıncılıktan besleneceğini gösterir. Vizyonunuz ne kadar küreselse kazancınız o kadar büyür.`,
+          roles: ['Dış Ticaret & Gümrük Operatörü', 'Uluslararası Lojistik Müdürü', 'Turizm & Otelcilik Yöneticisi', 'Akademisyen & Kitap Yazarı', 'Yurtdışı Eğitim & Vize Danışmanı'],
+          iconName: 'Building2'
+        };
+      case 'Oğlak':
+        return {
+          title: `2. Ev ${sign} • Kurumsal Bürokrasi, Devlet İhalesi, Kamu Nizamı & Kalıcı Varlık`,
+          explanation: `2. Evinizin Oğlak burcunda olması; sabırla, kademe kademe yükselerek devlet kurumlarında kamu memurluğu, maliye bürokrasisi, kurumsal yönetim, inşaat müteahhitliği ve tapu/arazi mülkiyeti üzerinden sarsılmaz bir servet inşa etme dirayeti bahşeder.`,
+          roles: ['Kamu Maliyesi & Vergi Dairesi Şefi', 'Kurumsal Üst Düzey Müdür', 'İnşaat & Altyapı İşletmecisi', 'Büyük Gayrimenkul Yatırımcısı', 'Devlet İdare & İntizam Personeli'],
+          iconName: 'Building2'
+        };
+      case 'Koç':
+        return {
+          title: `2. Ev ${sign} • Bağımsız Girişimcilik, Saha İcraatı, Mühendislik & Mekanik`,
+          explanation: `2. Evinizin Koç burcunda olması; beklemek yerine ilk adımı atarak kendi işini kurma, sanayi tezgâhı, teknik mühendislik, metal/makine imalatı ve sahada bizzat ter dökerek hızlı ve cesur para kazanma gücünüzü simgeler.`,
+          roles: ['Bağımsız Atölye / Girişim Sahibi', 'Makine & Teknik Donanım Uzmanı', 'Saha Operasyon Şefi', 'Spor & Savunma Eğitmeni', 'Mekanik İmalat Ustası'],
+          iconName: 'Hammer'
+        };
+      default: // Balık
+        return {
+          title: `2. Ev ${sign} • Müzik, Sinema, Psikoloji, Şifa, Denizcilik & Sezgi`,
+          explanation: `2. Evinizin Balık burcunda olması; rızkınızın müzik besteciliği, ses icrası, sinema ve görsel sanatlar, psikolojik danışmanlık, şifa ve doğal terapiler, deniz taşımacılığı ve kamu hizmetinden manevi bir bereketle akacağını simgeler.`,
+          roles: ['Müzisyen & Ses Bestecisi', 'Psikolog & Aile Danışmanı', 'Sinema & Görsel Yönetmen', 'Denizcilik & Su Ürünleri Uzmanı', 'Kamu Sosyal Şifa Görevlisi'],
+          iconName: 'Music'
+        };
+    }
+  };
 
-  // 3. MERKÜR: Büro Yönetimi, Esnaflık, Ticaret, Yazışma & El Zanaatı / Kodlama
+  const h2 = getHouse2Insight(house2Sign);
+  insights.push({
+    planet: '2. Ev (Para Evi)',
+    sign: house2Sign,
+    house: 2,
+    domain: 'Rızık & Para Kapısı',
+    iconName: h2.iconName,
+    title: h2.title,
+    explanation: h2.explanation,
+    suitableProfessions: h2.roles
+  });
+
+  // 2. KART: 10. EV (MC - KARİYER ZİRVESİ & TOPLUMSAL MESLEKİ MAKAMI)
+  insights.push({
+    planet: '10. Ev (MC)',
+    sign: mcSign,
+    house: 10,
+    domain: 'Kariyer Zirvesi & Unvan',
+    iconName: 'Building2',
+    title: `10. Ev ${mcSign} (MC) • Kamusal Kariyer Zirveniz & Mesleki İtibarınız`,
+    explanation: `Kariyer tepe noktanızın (MC) ${mcSign} burcunda olması; toplumun sizi hangi mesleki sıfat ve saygınlıkla hatırlayacağını belirler. Bu burcun doğasındaki sorumlulukları üstlendiğinizde kariyer basamaklarını hızla tırmanır, sektörünüzde otorite ve referans mercii olursunuz.`,
+    suitableProfessions: [
+      `${mcSign} Doğasında Yönetici & Uzman`,
+      'Sektörel Otorite & Liyakat Sahibi',
+      'Kurumsal İtibar Temsilcisi',
+      'Bağımsız Mesleki Lider'
+    ]
+  });
+
+  // 3. KART: 6. EV (GÜNLÜK ÇALIŞMA ORTAMI, RUTİN & SAHA ZEMİNİ)
+  insights.push({
+    planet: '6. Ev (Çalışma Evi)',
+    sign: house6Sign,
+    house: 6,
+    domain: 'Çalışma Ortamı & Rutin',
+    iconName: 'FileText',
+    title: `6. Ev ${house6Sign} • Günlük Mesai Zemininde Verimlilik & Hizmet`,
+    explanation: `Çalışma hayatı evinizin ${house6Sign} burcunda olması; günlük mesainizin geçtiği ortamın niteliğini simgeler. Düzenli masa başı mı, analitik kodlama ve veri ekranları mı, atölye zanaatı mı yoksa sahada hareketli insan ilişkileri mi size en yüksek verimi sağlar; bu yerleşim çalışma ritminizi korur.`,
+    suitableProfessions: [
+      'Operasyon & Süreç Düzenleyicisi',
+      'Kalite & İntizam Sorumlusu',
+      'Hizmet & Destek Koordinatörü',
+      'Teknik Ofis / Saha Çalışanı'
+    ]
+  });
+
+  // 4. KART: MERKÜR (Bilişsel Zeka, Kodlama, Resmi Yazışma & Ticaret)
   insights.push({
     planet: 'Merkür',
     sign: mercury.sign,
     house: mercury.house,
-    domain: 'Büro, Ticaret & Zanaat',
+    domain: 'Zeka, Kodlama & Ticaret',
     iconName: 'FileText',
-    title: `Merkür ${mercury.sign} (${mercury.house}. Ev) • Büro İdaresi, Resmi Yazışma, Ticaret & Zanaat`,
-    explanation: `Merkür'ün ${mercury.sign} yerleşimi; büro idaresi, resmi daire yazışmaları, kâtiplik, evrak tasnifi, esnaflık ve perakende ticaret zekasını güçlendirir. Aynı zamanda parmak ve el koordinasyonu gerektiren hassas zanaatlarda (terzilik, saatçilik, enstrüman tuşları veya klavye kodlaması) seri bir pratiklik kazandırır.`,
+    title: `Merkür ${mercury.sign} (${mercury.house}. Ev) • Bilişsel Mantık, Yazılım & Ticari Zeka`,
+    explanation: `Merkür'ün ${mercury.sign} yerleşimi; büro idaresi, resmi daire yazışmaları, kâtiplik, veri tasnifi, esnaflık ve perakende ticaret zekasını güçlendirir. Aynı zamanda parmak ve el koordinasyonu gerektiren hassas işlerde (yazılım kodlaması, saatçilik, enstrüman tuşları veya teknik çizim) seri bir pratiklik kazandırır.`,
     suitableProfessions: [
+      'Yazılım & Bilişim Geliştiricisi',
       'Büro Yönetimi & İdari Memur',
       'Ticari İşletmeci & Esnaf',
       'Muhasebe & Evrak Raportörü',
-      'Yazılım & Bilişim Uzmanı',
       'Editör & Yazışma Sorumlusu'
     ]
   });
 
-  // 4. MARS: Saha Ustalığı, İmalat Sanayii, Güvenlik & Teknik Zanaat
+  // 5. KART: MARS & SATÜRN (Saha Gücü, İmalat Sanayii & Devlet İntizamı)
   insights.push({
-    planet: 'Mars',
-    sign: mars.sign,
+    planet: 'Mars & Satürn',
+    sign: `${mars.sign} / ${saturn.sign}`,
     house: mars.house,
-    domain: 'Saha, İmalat & Güvenlik',
+    domain: 'Saha, İmalat & Disiplin',
     iconName: 'Hammer',
-    title: `Mars ${mars.sign} (${mars.house}. Ev) • Saha Ustalığı, İmalat Sanayii & Güvenlik`,
-    explanation: `Mars'ın ${mars.sign} konumu; fabrikada imalat tezgâhı, sanayi atölyesi, mekanik tamirat, inşaat ve metalurji gibi bizzat sahada ter dökülen alanlarda yüksek dayanıklılık verir. Ayrıca polislik, askeriye, özel güvenlik, cerrahi tıp veya acil müdahale ekiplerinde soğukkanlı bir cesaret sağlar.`,
+    title: `Mars & Satürn • Saha Dayanıklılığı, İmalat Sanayii & Güvenlik`,
+    explanation: `Mars'ın ${mars.sign} ve Satürn'ün ${saturn.sign} yerleşimleri; sanayi atölyesi, mekanik tamirat, inşaat ve metalurji gibi bizzat sahada ter dökülen alanlarda yüksek dayanıklılık verir. Ayrıca devlet kurumlarında kamu memurluğu, arşiv intizamı, polislik/güvenlik veya cerrahi tıp gibi zorlu görevlerde sarsılmaz bir liyakat sunar.`,
     suitableProfessions: [
+      'Devlet Memuru & Büro Şefi',
       'Sanayi & Makine Teknisyeni',
       'Kolluk Kuvveti / Güvenlik Görevlisi',
       'Mekanik Tesisat & Bakım Ustası',
-      'Cerrahi/Acil Sağlık Personeli',
       'Saha Operasyon Şefi'
     ]
   });
 
-  // 5. NEPTÜN: Müzikal İlham, Sahne & Sanatsal Ruh
+  // 6. KART: VENÜS & NEPTÜN (Tekstil, Müzik, Sanat & Ruhsal İlham)
   insights.push({
-    planet: 'Neptün',
-    sign: neptune.sign,
-    house: neptune.house,
-    domain: 'İlham, Sahne & Sanat',
-    iconName: 'Music',
-    title: `Neptün ${neptune.sign} (${neptune.house}. Ev) • Müzikal İlham, Sahne & Sanatsal Ruh`,
-    explanation: `Neptün'ün bu mistik yerleşimi; görünmeyen melodileri duyma, beste yapma, enstrümana duygu yükleme, sinema, tiyatro, şiir ve mistik sanatlar kanalını açar. Mantığın bittiği yerde ilhamla üreten, ruhları dinlendiren ve dinleyicileri büyüleyen bir sanat frekansıdır.`,
+    planet: 'Venüs & Neptün',
+    sign: `${venus.sign} / ${neptune.sign}`,
+    house: venus.house,
+    domain: 'Sanat, Tekstil & Müzik',
+    iconName: 'Palette',
+    title: `Venüs & Neptün • Tekstil, Moda, Müzikal İlham & Zanaat Estetiği`,
+    explanation: `Venüs'ün ${venus.sign} ve Neptün'ün ${neptune.sign} ahengi; kumaş dokusu, tekstil tasarımı, renk uyumu, müzik kulağı, enstrüman icrası, görsel sanatlar ve dekorasyonda ruhu dinlendiren estetik eserler çıkarma dehanızı simgeler.`,
     suitableProfessions: [
-      'Besteci, Aranjör & Müzisyen',
-      'Sinema & Tiyatro Sanatçısı',
-      'Fotoğraf & Görsel Yönetmeni',
-      'Şair & Edebi Yazar',
-      'Doğal Terapi & Şifa Uzmanı'
-    ]
-  });
-
-  // 6. AY: Gıda, Beslenme, Konfeksiyon, Eğitim & Şefkat Hizmeti
-  insights.push({
-    planet: 'Ay',
-    sign: moon.sign,
-    house: moon.house,
-    domain: 'Eğitim, Sağlık & Hizmet',
-    iconName: 'HeartHandshake',
-    title: `Ay ${moon.sign} (${moon.house}. Ev) • Gıda, Konfeksiyon, Eğitim & Şefkat Hizmeti`,
-    explanation: `Ay'ınızın besleyici konumu; aşçılık, gıda işletmeciliği, ev tekstili/konfeksiyon, anaokulu/kreş eğitmenliği, hemşirelik ve kamuya şefkatle hizmet sunulan destek rollerinde derin bir iç huzur ve bereket sağlar.`,
-    suitableProfessions: [
-      'Gıda İşletmecisi & Aşçı',
-      'Ev Tekstili & Konfeksiyon Ustası',
-      'Hemşire & Bakım Uzmanı',
-      'Anaokulu / Çocuk Gelişimcisi',
-      'Kamu Sosyal Hizmet Görevlisi'
+      'Tekstil & Kumaş Tasarımcısı',
+      'Müzisyen, Besteci & Ses Sanatçısı',
+      'Moda & Stilist',
+      'Görsel Sanatlar & Ressam/Zanaatkar',
+      'Dekorasyon & Sahne Sanatçısı'
     ]
   });
 
