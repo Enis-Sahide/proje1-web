@@ -17,12 +17,14 @@ import { AstroCity, ASTRO_CITIES } from '@/features/astrology/engine/AstrologyCo
 import type { CareerAnalysisResult } from '@/features/astrology/engine/CareerEngine';
 import { downloadCareerPDF } from '@/utils/careerPdfGenerator';
 import { useAuth } from '@/context/AuthContext';
+import { useAnalysisAccess } from '@/hooks/useAnalysisAccess';
 import { apiFetch } from '@/lib/apiClient';
 
 export default function CareerAnalysisPage() {
   const router = useRouter();
   const { user, role } = useAuth();
-  const isMasterOrAdmin = role === 'admin' || role === 'master';
+  const { isUnlocked: isPurchasedOrAdmin } = useAnalysisAccess('career');
+  const isMasterOrAdmin = role === 'admin' || role === 'master' || isPurchasedOrAdmin;
 
   // Form State
   const [fullName, setFullName] = useState('');
@@ -139,29 +141,6 @@ export default function CareerAnalysisPage() {
       setIsPdfLoading(false);
     }
   };
-
-  const renderLockedSectionNotice = (titleText = "Bu Bölüm Kapsamlı Kariyer Raporuna Özeldir") => (
-    <div className="mt-5 p-5 sm:p-6 rounded-2xl bg-gradient-to-r from-amber-500/10 via-[#D4AF37]/10 to-transparent border border-[#D4AF37]/30 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-      <div className="flex items-center gap-4">
-        <div className="p-3 rounded-full bg-[#D4AF37]/20 text-[#D4AF37] shrink-0">
-          <Lock size={24} />
-        </div>
-        <div>
-          <h4 className="text-sm sm:text-base font-bold text-white">{titleText}</h4>
-          <p className="text-xs text-gray-400 mt-1 max-w-xl">
-            İkincil İlerletim saatini, kadersel zaman çizelgesini, Drakonik ruhsal çağrıyı ve servet kaldıraç stratejinizi içeren Kapsamlı Kariyer Raporunu (Özel PDF) hemen edinebilirsiniz.
-          </p>
-        </div>
-      </div>
-      <button
-        onClick={handlePurchaseReport}
-        className="shrink-0 flex items-center justify-center gap-2 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-extrabold py-3 px-5 rounded-xl transition-all shadow-lg shadow-[#D4AF37]/20 text-xs sm:text-sm cursor-pointer whitespace-nowrap active:scale-[0.98]"
-      >
-        <Lock size={15} />
-        <span>Raporu İndir (444 TL)</span>
-      </button>
-    </div>
-  );
 
   const renderBigLockedShowcase = (layer: 'material' | 'soul') => (
     <div className="mt-6 rounded-3xl bg-gradient-to-b from-[#D4AF37]/20 via-black/90 to-black border-2 border-[#D4AF37]/40 p-6 sm:p-10 text-center shadow-2xl relative overflow-hidden space-y-6">
@@ -486,7 +465,157 @@ export default function CareerAnalysisPage() {
             {/* ========== KATMAN 1: MADDE DÜNYASI HARİTASI ========== */}
             {activeLayer === 'material' && (
               <div className="space-y-6 animate-fadeIn">
-                {/* 1. İDEAL ÇALIŞMA MODELİ */}
+                {/* 1. TÜM SEKTÖRLER VE %100 ENERJİ SPEKTRUMU */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2.5 px-1">
+                    <div className="p-2 rounded-xl bg-[#EAB308]/10 text-[#EAB308] border border-[#EAB308]/20">
+                      <Target size={18} />
+                    </div>
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-bold text-white">
+                        Kariyer Potansiyeli ve Sektörel Enerji Dağılımınız
+                      </h3>
+                      <span className="text-[11px] sm:text-xs text-gray-400 block">
+                        Gezegen yerleşimlerinizin %100 üzerinden hesaplanan eksiksiz sektörel dağılımı
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* %100 Spektrum Çubuğu */}
+                  {result.energyDistribution && (
+                    <div className="bg-black/60 border border-white/10 p-4 sm:p-5 rounded-3xl shadow-lg space-y-3">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs">
+                        <span className="font-semibold text-gray-200">Kişisel Potansiyel Spektrumu (%100 Toplam)</span>
+                        <span className="text-[11px] text-gray-400">7 sektörün haritanızdaki kümülatif payı</span>
+                      </div>
+
+                      <div className="w-full h-3.5 sm:h-4 bg-white/5 rounded-full p-0.5 border border-white/10 flex overflow-hidden">
+                        {result.energyDistribution.segments.map((seg, sIdx) => (
+                          <div
+                            key={sIdx}
+                            style={{ width: `${Math.max(3, seg.percentage)}%`, backgroundColor: seg.color }}
+                            className="h-full first:rounded-l-full last:rounded-r-full transition-all duration-500 relative"
+                            title={`${seg.title}: %${seg.percentage}`}
+                          />
+                        ))}
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-1">
+                        {result.energyDistribution.segments.map((seg, sIdx) => (
+                          <div key={sIdx} className="flex items-center gap-1.5 text-[11px] sm:text-xs bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
+                            <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: seg.color }} />
+                            <span className="text-gray-300 font-medium">{seg.title}</span>
+                            <span className="font-bold text-white">%{seg.percentage}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* 3 Ana Sektör Kartları */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
+                    {result.topSectors.map((sector, idx) => (
+                      <div
+                        key={idx}
+                        className="bg-black/50 border border-white/10 hover:border-white/30 p-5 sm:p-6 rounded-3xl transition-all duration-300 flex flex-col justify-between group shadow-xl relative overflow-hidden"
+                        style={{ borderTopColor: sector.color, borderTopWidth: '3px' }}
+                      >
+                        <div
+                          className="absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl pointer-events-none opacity-20"
+                          style={{ backgroundColor: sector.color }}
+                        />
+
+                        <div>
+                          <div className="flex items-center justify-between mb-3.5">
+                            <span
+                              className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md"
+                              style={{
+                                backgroundColor: `${sector.color}20`,
+                                color: sector.color,
+                                border: `1px solid ${sector.color}40`
+                              }}
+                            >
+                              {sector.category}
+                            </span>
+                            <span
+                              className="text-sm sm:text-base font-extrabold px-2.5 py-0.5 rounded-lg bg-white/5 border border-white/10"
+                              style={{ color: sector.color }}
+                            >
+                              %{sector.percentage} Pay
+                            </span>
+                          </div>
+
+                          <h4 className="text-lg sm:text-xl font-bold text-white mb-2 leading-snug">
+                            {sector.title}
+                          </h4>
+
+                          <p className="text-xs text-gray-400 leading-relaxed mb-4">
+                            {sector.description}
+                          </p>
+                        </div>
+
+                        <div className="pt-3.5 border-t border-white/5 space-y-2">
+                          <span className="text-[11px] font-semibold text-gray-300 block">Önerilen İdeal Roller:</span>
+                          <div className="flex flex-wrap gap-1.5">
+                            {sector.recommendedRoles.map((role, rIdx) => (
+                              <span key={rIdx} className="text-[11px] bg-white/5 border border-white/10 text-gray-300 px-2 py-0.5 rounded-lg">
+                                {role}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Kalan 4 İkincil Sektör */}
+                  {result.secondarySectors && result.secondarySectors.length > 0 && (
+                    <div className="bg-black/50 border border-white/10 p-4 sm:p-6 rounded-3xl space-y-4">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-white/5 pb-3">
+                        <div>
+                          <h4 className="text-sm sm:text-base font-bold text-white">
+                            İkincil & Destekleyici Kariyer Potansiyelleriniz
+                          </h4>
+                          <span className="text-[11px] text-gray-400">
+                            Kariyer odağınızı zenginleştiren diğer tamamlayıcı yetkinlik alanlarınız
+                          </span>
+                        </div>
+                        <span className="text-xs text-gray-400">4 Tamamlayıcı Alan</span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        {result.secondarySectors.map((sec, sIdx) => (
+                          <div
+                            key={sIdx}
+                            className="bg-white/5 border border-white/10 p-3.5 rounded-2xl flex flex-col justify-between gap-2"
+                            style={{ borderLeftColor: sec.color, borderLeftWidth: '3px' }}
+                          >
+                            <div className="flex items-center justify-between gap-2">
+                              <span className="text-xs font-bold text-white truncate">
+                                {sec.shortTitle}
+                              </span>
+                              <span
+                                className="text-xs font-extrabold px-2 py-0.5 rounded-md bg-white/5"
+                                style={{ color: sec.color }}
+                              >
+                                %{sec.percentage}
+                              </span>
+                            </div>
+                            <div className="flex flex-wrap gap-1 pt-1">
+                              {sec.recommendedRoles.map((r, rIdx) => (
+                                <span key={rIdx} className="text-[10px] bg-black/40 text-gray-400 px-1.5 py-0.5 rounded">
+                                  {r}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* 2. BÜYÜK SENTEZ: İDEAL ÇALIŞMA MODELİ */}
                 <div className="bg-gradient-to-br from-[#EAB308]/15 via-black/70 to-black/90 border border-[#EAB308]/40 rounded-3xl p-5 sm:p-8 relative overflow-hidden shadow-2xl">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-4 border-b border-white/10 pb-5 mb-5">
                 <div>
@@ -515,7 +644,7 @@ export default function CareerAnalysisPage() {
             {/* AÇIK / SATIN ALINMIŞ DURUM: TÜM DERİN MESLEKİ BÖLÜMLER */}
             {isEffectiveUnlocked && (
               <>
-                {/* 2. KRİTİK KARİYER DÖNÜM YAŞLARI & KADERSEL ZAMAN ÇİZELGESİ */}
+                {/* 3. KRİTİK KARİYER DÖNÜM YAŞLARI & KADERSEL ZAMAN ÇİZELGESİ */}
                 {result.careerTimeline && (
               <div className="bg-black/60 border border-amber-500/30 p-5 sm:p-7 rounded-3xl relative overflow-hidden shadow-xl space-y-5">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
@@ -599,12 +728,10 @@ export default function CareerAnalysisPage() {
                     })}
                   </div>
                 </div>
-
-                {!isEffectiveUnlocked && renderLockedSectionNotice("Kadersel Zaman Çizelgesi Detayları Kilitlidir")}
               </div>
             )}
 
-            {/* 3. İKİNCİL İLERLETİM (SECONDARY PROGRESSIONS • ASTRO-SEEK STANDARDI) */}
+            {/* 4. İKİNCİL İLERLETİM (SECONDARY PROGRESSIONS • ASTRO-SEEK STANDARDI) */}
             {result.progressedCareer && (
               <div className="bg-gradient-to-br from-indigo-950/40 via-black/80 to-purple-950/30 border border-indigo-500/30 p-5 sm:p-7 rounded-3xl relative overflow-hidden shadow-2xl space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
@@ -620,11 +747,6 @@ export default function CareerAnalysisPage() {
                         <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">
                           {result.progressedCareer.currentAge} Yaş İlerletimi
                         </span>
-                        {!isEffectiveUnlocked && (
-                          <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-semibold border border-amber-500/30 flex items-center gap-1">
-                            <Lock size={10} /> Kilitli
-                          </span>
-                        )}
                       </div>
                       <h3 className="text-lg sm:text-2xl font-bold text-white">
                         İkincil İlerletim: Mesleki Evrim ve Mevcut Sezonunuz
@@ -663,7 +785,7 @@ export default function CareerAnalysisPage() {
                       🎯 {result.progressedCareer.progressedSun.identityShiftTheme}
                     </div>
 
-                    <p className={`text-xs text-gray-300 leading-relaxed ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                    <p className="text-xs text-gray-300 leading-relaxed">
                       {result.progressedCareer.progressedSun.explanation}
                     </p>
 
@@ -702,7 +824,7 @@ export default function CareerAnalysisPage() {
                       🌊 {result.progressedCareer.progressedMoon.cycleTheme}
                     </div>
 
-                    <p className={`text-xs text-gray-300 leading-relaxed ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                    <p className="text-xs text-gray-300 leading-relaxed">
                       {result.progressedCareer.progressedMoon.houseImpact}
                     </p>
 
@@ -735,7 +857,7 @@ export default function CareerAnalysisPage() {
                       <p className="text-xs sm:text-sm text-gray-200 font-medium leading-snug">
                         &quot;{result.progressedCareer.progressedMoonPhase.phaseMotto}&quot;
                       </p>
-                      <p className={`text-xs text-gray-400 leading-relaxed ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                      <p className="text-xs text-gray-400 leading-relaxed">
                         {result.progressedCareer.progressedMoonPhase.stageDescription}
                       </p>
                     </div>
@@ -745,7 +867,7 @@ export default function CareerAnalysisPage() {
                         <Lightbulb size={14} className="text-purple-400" />
                         Bu Fazda Uygulanacak Kariyer Stratejisi
                       </span>
-                      <p className={`text-xs text-gray-200 leading-relaxed ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                      <p className="text-xs text-gray-200 leading-relaxed">
                         {result.progressedCareer.progressedMoonPhase.careerHarvestGuidance}
                       </p>
                       {result.progressedCareer.progressedMidheaven && (
@@ -761,8 +883,6 @@ export default function CareerAnalysisPage() {
                     </div>
                   </div>
                 </div>
-
-                {!isEffectiveUnlocked && renderLockedSectionNotice("İçsel Kariyer Saati ve İlerletim Detayları Kilitlidir")}
               </div>
             )}
 
@@ -794,156 +914,6 @@ export default function CareerAnalysisPage() {
                 </div>
               </div>
             )}
-
-            {/* 4. TÜM SEKTÖRLER VE %100 ENERJİ SPEKTRUMU */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2.5 px-1">
-                <div className="p-2 rounded-xl bg-[#EAB308]/10 text-[#EAB308] border border-[#EAB308]/20">
-                  <Target size={18} />
-                </div>
-                <div>
-                  <h3 className="text-lg sm:text-xl font-bold text-white">
-                    Kariyer Potansiyeli ve Sektörel Enerji Dağılımınız
-                  </h3>
-                  <span className="text-[11px] sm:text-xs text-gray-400 block">
-                    Gezegen yerleşimlerinizin %100 üzerinden hesaplanan eksiksiz sektörel dağılımı
-                  </span>
-                </div>
-              </div>
-
-              {/* %100 Spektrum Çubuğu */}
-              {result.energyDistribution && (
-                <div className="bg-black/60 border border-white/10 p-4 sm:p-5 rounded-3xl shadow-lg space-y-3">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs">
-                    <span className="font-semibold text-gray-200">Kişisel Potansiyel Spektrumu (%100 Toplam)</span>
-                    <span className="text-[11px] text-gray-400">7 sektörün haritanızdaki kümülatif payı</span>
-                  </div>
-
-                  <div className="w-full h-3.5 sm:h-4 bg-white/5 rounded-full p-0.5 border border-white/10 flex overflow-hidden">
-                    {result.energyDistribution.segments.map((seg, sIdx) => (
-                      <div
-                        key={sIdx}
-                        style={{ width: `${Math.max(3, seg.percentage)}%`, backgroundColor: seg.color }}
-                        className="h-full first:rounded-l-full last:rounded-r-full transition-all duration-500 relative"
-                        title={`${seg.title}: %${seg.percentage}`}
-                      />
-                    ))}
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-2 sm:gap-3 pt-1">
-                    {result.energyDistribution.segments.map((seg, sIdx) => (
-                      <div key={sIdx} className="flex items-center gap-1.5 text-[11px] sm:text-xs bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
-                        <span className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: seg.color }} />
-                        <span className="text-gray-300 font-medium">{seg.title}</span>
-                        <span className="font-bold text-white">%{seg.percentage}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* 3 Ana Sektör Kartları */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-                {result.topSectors.map((sector, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-black/50 border border-white/10 hover:border-white/30 p-5 sm:p-6 rounded-3xl transition-all duration-300 flex flex-col justify-between group shadow-xl relative overflow-hidden"
-                    style={{ borderTopColor: sector.color, borderTopWidth: '3px' }}
-                  >
-                    <div
-                      className="absolute top-0 right-0 w-32 h-32 rounded-full blur-2xl pointer-events-none opacity-20"
-                      style={{ backgroundColor: sector.color }}
-                    />
-
-                    <div>
-                      <div className="flex items-center justify-between mb-3.5">
-                        <span
-                          className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md"
-                          style={{
-                            backgroundColor: `${sector.color}20`,
-                            color: sector.color,
-                            border: `1px solid ${sector.color}40`
-                          }}
-                        >
-                          {sector.category}
-                        </span>
-                        <span
-                          className="text-sm sm:text-base font-extrabold px-2.5 py-0.5 rounded-lg bg-white/5 border border-white/10"
-                          style={{ color: sector.color }}
-                        >
-                          %{sector.percentage} Pay
-                        </span>
-                      </div>
-
-                      <h4 className="text-lg sm:text-xl font-bold text-white mb-2 leading-snug">
-                        {sector.title}
-                      </h4>
-
-                      <p className="text-xs text-gray-400 leading-relaxed mb-4">
-                        {sector.description}
-                      </p>
-                    </div>
-
-                    <div className="pt-3.5 border-t border-white/5 space-y-2">
-                      <span className="text-[11px] font-semibold text-gray-300 block">Önerilen İdeal Roller:</span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {sector.recommendedRoles.map((role, rIdx) => (
-                          <span key={rIdx} className="text-[11px] bg-white/5 border border-white/10 text-gray-300 px-2 py-0.5 rounded-lg">
-                            {role}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Kalan 4 İkincil Sektör */}
-              {result.secondarySectors && result.secondarySectors.length > 0 && (
-                <div className="bg-black/50 border border-white/10 p-4 sm:p-6 rounded-3xl space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 border-b border-white/5 pb-3">
-                    <div>
-                      <h4 className="text-sm sm:text-base font-bold text-white">
-                        İkincil & Destekleyici Kariyer Potansiyelleriniz
-                      </h4>
-                      <span className="text-[11px] text-gray-400">
-                        Kariyer odağınızı zenginleştiren diğer tamamlayıcı yetkinlik alanlarınız
-                      </span>
-                    </div>
-                    <span className="text-xs text-gray-400">4 Tamamlayıcı Alan</span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                    {result.secondarySectors.map((sec, sIdx) => (
-                      <div
-                        key={sIdx}
-                        className="bg-white/5 border border-white/10 p-3.5 rounded-2xl flex flex-col justify-between gap-2"
-                        style={{ borderLeftColor: sec.color, borderLeftWidth: '3px' }}
-                      >
-                        <div className="flex items-center justify-between gap-2">
-                          <span className="text-xs font-bold text-white truncate">
-                            {sec.shortTitle}
-                          </span>
-                          <span
-                            className="text-xs font-extrabold px-2 py-0.5 rounded-md bg-white/5"
-                            style={{ color: sec.color }}
-                          >
-                            %{sec.percentage}
-                          </span>
-                        </div>
-                        <div className="flex flex-wrap gap-1 pt-1">
-                          {sec.recommendedRoles.map((r, rIdx) => (
-                            <span key={rIdx} className="text-[10px] bg-black/40 text-gray-400 px-1.5 py-0.5 rounded">
-                              {r}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
 
             {/* 5. GEZEGEN YERLEŞİMLERİNE GÖRE MESLEKİ, ZANAAT & SANAT HARİTASI */}
             {result.planetaryInsights && result.planetaryInsights.length > 0 && (
@@ -1168,13 +1138,13 @@ export default function CareerAnalysisPage() {
                       Ses / Vokal & Hitabet Kapasitesi: {result.musicalAffinity.vocalAptitude.style}
                     </span>
                   </div>
-                  <p className={`text-xs text-gray-300 leading-relaxed ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                  <p className="text-xs text-gray-300 leading-relaxed">
                     {result.musicalAffinity.vocalAptitude.chakraResonance}
                   </p>
                 </div>
 
                 {/* Zihinsel Rahatlama & Tavsiye */}
-                <p className={`text-xs text-pink-200/90 bg-pink-500/15 p-3 rounded-xl border border-pink-500/20 ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                <p className="text-xs text-pink-200/90 bg-pink-500/15 p-3 rounded-xl border border-pink-500/20">
                   🎼 <strong>Zihinsel Sıfırlanma Reçetesi:</strong> {result.musicalAffinity.musicalExpressionAdvice}
                 </p>
               </div>
@@ -1222,7 +1192,7 @@ export default function CareerAnalysisPage() {
                       </span>
                       <div className="space-y-1.5">
                         {result.craftsmanshipMaterial.commercialApplications.map((app, idx) => (
-                          <div key={idx} className={`text-xs text-gray-300 flex items-center gap-2 ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                          <div key={idx} className="text-xs text-gray-300 flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-amber-400 shrink-0" />
                             <span>{app}</span>
                           </div>
@@ -1231,7 +1201,7 @@ export default function CareerAnalysisPage() {
                     </div>
                     <div className="pt-2 border-t border-white/5 mt-3">
                       <span className="text-[10px] text-gray-400 uppercase font-semibold block mb-1">Psikosomatik Şifa:</span>
-                      <p className={`text-xs text-amber-200/90 ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                      <p className="text-xs text-amber-200/90">
                         {result.craftsmanshipMaterial.healingPower}
                       </p>
                     </div>
@@ -1260,12 +1230,12 @@ export default function CareerAnalysisPage() {
                       </div>
                     </div>
 
-                    <p className={`text-xs sm:text-sm text-gray-300 leading-relaxed mb-3 ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                    <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mb-3">
                       {result.parsFortunaWealth.karmicBlessingArea}
                     </p>
                   </div>
 
-                  <div className={`bg-emerald-500/10 border border-emerald-500/20 p-3.5 rounded-2xl text-xs text-emerald-200 mt-2 ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                  <div className="bg-emerald-500/10 border border-emerald-500/20 p-3.5 rounded-2xl text-xs text-emerald-200 mt-2">
                     <strong>💰 Zahmetsiz Rızık Formülü:</strong> {result.parsFortunaWealth.practicalMonetizationGuidance}
                   </div>
                 </div>
@@ -1293,13 +1263,13 @@ export default function CareerAnalysisPage() {
                       "{result.partnershipDna.motto}"
                     </p>
 
-                    <p className={`text-xs sm:text-sm text-gray-300 leading-relaxed mb-3 ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                    <p className="text-xs sm:text-sm text-gray-300 leading-relaxed mb-3">
                       {result.partnershipDna.synergyCondition}
                     </p>
                   </div>
 
                   <div className="space-y-2 mt-2">
-                    <div className={`bg-rose-500/10 border border-rose-500/20 p-2.5 rounded-xl text-xs text-rose-200 ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                    <div className="bg-rose-500/10 border border-rose-500/20 p-2.5 rounded-xl text-xs text-rose-200">
                       ⚠️ <strong>Toksik Ortaklık Tuzağı:</strong> {result.partnershipDna.toxicPartnershipRisk}
                     </div>
                     <div className="bg-blue-500/10 border border-blue-500/20 p-2.5 rounded-xl text-xs text-blue-200">
@@ -1353,14 +1323,14 @@ export default function CareerAnalysisPage() {
                         <span className="text-[10px] font-bold text-purple-300 uppercase tracking-wider block mb-0.5">
                           🔋 Şarj & Zihinsel Arınma Penceresi
                         </span>
-                        <p className={`text-xs sm:text-sm font-semibold text-white ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                        <p className="text-xs sm:text-sm font-semibold text-white">
                           {result.planetaryProductivityHours.rechargeAndBurnoutPreventionWindow}
                         </p>
                       </div>
                     </div>
                   </div>
 
-                  <p className={`text-xs text-yellow-200/90 bg-yellow-500/15 p-3 rounded-xl border border-yellow-500/20 ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                  <p className="text-xs text-yellow-200/90 bg-yellow-500/15 p-3 rounded-xl border border-yellow-500/20">
                     ⚡ <strong>Biyoritm Stratejisi:</strong> {result.planetaryProductivityHours.dailyRoutineAdvice}
                   </p>
                 </div>
@@ -1397,21 +1367,18 @@ export default function CareerAnalysisPage() {
                       <span className="text-[10px] text-gray-400 uppercase font-semibold block">
                         Piyasanın Sizi Hatırlayacağı Saygın İmza:
                       </span>
-                      <p className={`text-xs sm:text-sm text-gray-300 leading-relaxed ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                      <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
                         {result.vocationalReputation.howIndustryRemembersYou}
                       </p>
                     </div>
                   </div>
 
-                  <div className={`bg-indigo-500/10 border border-indigo-500/20 p-3.5 rounded-2xl text-xs text-indigo-200 ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                  <div className="bg-indigo-500/10 border border-indigo-500/20 p-3.5 rounded-2xl text-xs text-indigo-200">
                     👑 <strong>Otorite Tetiği:</strong> {result.vocationalReputation.authorityTrigger}
                   </div>
                 </div>
               )}
             </div>
-
-            {/* Kilit Bilgilendirmesi (Eğer kilitliyse) */}
-            {!isEffectiveUnlocked && renderLockedSectionNotice("Müzikal Frekans, Zanaat Hammaddesi, Kadersel Rızık ve Biyoritm Modülleri Kilitlidir")}
 
             {/* 6. PARA & SERVET ÇEKME MODELİ VE TÜKENMİŞLİK KALKANI */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
@@ -1694,7 +1661,7 @@ export default function CareerAnalysisPage() {
                 </div>
               </div>
 
-              <p className={`text-xs sm:text-sm text-gray-200 leading-relaxed ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+              <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
                 {result.soulCareer.soulMaterialBridge.synthesisAdvice}
               </p>
 
@@ -1703,7 +1670,7 @@ export default function CareerAnalysisPage() {
                   <span className="text-[10px] font-bold text-rose-400 uppercase tracking-wider block mb-1">
                     ⚠️ Yalnızca Maddede Kalma Riski:
                   </span>
-                  <p className={`text-xs text-rose-200 leading-relaxed ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                  <p className="text-xs text-rose-200 leading-relaxed">
                     {result.soulCareer.soulMaterialBridge.unfulfillmentWarning}
                   </p>
                 </div>
@@ -1712,13 +1679,11 @@ export default function CareerAnalysisPage() {
                   <span className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider block mb-1">
                     🕊️ Ruhsal Doyum İçin Kutsal Rutin:
                   </span>
-                  <p className={`text-xs text-emerald-200 leading-relaxed ${!isEffectiveUnlocked ? 'blur-sm select-none opacity-60' : ''}`}>
+                  <p className="text-xs text-emerald-200 leading-relaxed">
                     {result.soulCareer.soulMaterialBridge.dailySpiritualPractice}
                   </p>
                 </div>
               </div>
-
-              {!isEffectiveUnlocked && renderLockedSectionNotice("Drakonik Ruh Haritası ve Sentez Köprüsü Kilitlidir")}
             </div>
 
             {/* 5. KADERSEL EVRİLME (DHARMA - KUZEY DÜĞÜMÜ ROTASI) */}
