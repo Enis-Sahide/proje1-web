@@ -919,15 +919,15 @@ export default function CareerAnalysisPage() {
             {result.planetaryInsights && result.planetaryInsights.length > 0 && (
               <div className="space-y-4">
                 <div className="flex items-center gap-2.5 px-1">
-                  <div className="p-2 rounded-xl bg-pink-500/10 text-pink-400 border border-pink-500/20">
-                    <Palette size={18} />
+                  <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                    <Layers size={18} />
                   </div>
                   <div>
                     <h3 className="text-lg sm:text-xl font-bold text-white">
-                      Gezegen Yerleşimlerinize Göre Mesleki & Zanaat Göstergeleri
+                      Mesleki Astrolojinin 6 Temel Sütunu & Kadersel Göstergeler
                     </h3>
                     <span className="text-[11px] sm:text-xs text-gray-400 block">
-                      Doğum haritanızdaki gezegenlerin kamu memurluğu, tekstil, müzik, zanaat ve sahadaki doğrudan karşılıkları
+                      Kariyer Zirveniz (10. Ev MC), Rızık Kapınız (2. Ev), Günlük Mesai Zeminimiz (6. Ev), Mesleki İradeniz, İş Vitrininiz ve Kadersel Bereket Dehanız
                     </span>
                   </div>
                 </div>
@@ -970,7 +970,9 @@ export default function CareerAnalysisPage() {
                                 {getIcon(insight.iconName)}
                               </div>
                               <span className="text-xs font-bold text-white">
-                                {insight.planet} ({insight.sign} • {insight.house}. Ev)
+                                {insight.planet.includes('Ev') || insight.planet.includes('Yükselen')
+                                  ? `${insight.planet} • ${insight.sign}`
+                                  : `${insight.planet} • ${insight.sign} (${insight.house}. Ev)`}
                               </span>
                             </div>
                             <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full border ${getDomainColor(insight.iconName)}`}>

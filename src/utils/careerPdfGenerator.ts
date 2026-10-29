@@ -489,19 +489,20 @@ export const downloadCareerPDF = async (
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(13);
     doc.setTextColor(...primaryDark);
-    doc.text('GEZEGEN YERLEŞİMLERİNE GÖRE MESLEKİ & ZANAAT GÖSTERGELERİ', 15, curY);
+    doc.text('MESLEKİ ASTROLOJİNİN 6 TEMEL SÜTUNU & KADERSEL GÖSTERGELER', 15, curY);
     curY += 5;
 
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(...muted);
-    doc.text('Doğum haritanızdaki 10 temel kozmik gücün kamu memurluğu, zanaat, müzik, ticaret ve sahadaki yansımaları', 15, curY);
+    doc.text('Kariyer Zirveniz (10. Ev MC), Rızık Kapınız (2. Ev), Günlük Mesai Zeminimiz (6. Ev), Mesleki İradeniz, İş Vitrininiz ve Bereket Dehanız', 15, curY);
     curY += 8;
 
     data.planetaryInsights.forEach((pi) => {
       ensureSpace(24);
+      const locStr = pi.planet.includes('Ev') || pi.planet.includes('Yükselen') ? pi.sign : `${pi.sign} - ${pi.house}. Ev`;
       curY = renderText(
-        `**• ${pi.planet.toUpperCase()} (${pi.sign} - ${pi.house}. Ev) • ${pi.domain.toUpperCase()}: ${pi.title}**\n` +
+        `**• ${pi.planet.toUpperCase()} (${locStr}) • ${pi.domain.toUpperCase()}: ${pi.title}**\n` +
         `${pi.explanation}\n` +
         `**Tavsiye Edilen Meslek Dalları:** ${pi.suitableProfessions.join(' • ')}`,
         15, curY, 180, 5.5
