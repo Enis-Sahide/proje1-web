@@ -1527,19 +1527,26 @@ export default function CareerAnalysisPage() {
                       >
                         <div>
                           <div className="flex items-center justify-between gap-2 mb-2.5">
-                            <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 uppercase">
-                              Ruhsal Çağrı #{sIdx + 1}
+                            <span
+                              className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-md"
+                              style={{
+                                backgroundColor: `${sector.color}20`,
+                                color: sector.color,
+                                border: `1px solid ${sector.color}40`
+                              }}
+                            >
+                              #{sIdx + 1} • {sector.category}
                             </span>
-                            <span className="text-lg font-bold" style={{ color: sector.color }}>
+                            <span className="text-base font-extrabold px-2 py-0.5 rounded-lg bg-white/5 border border-white/10" style={{ color: sector.color }}>
                               %{sector.percentage}
                             </span>
                           </div>
-                          <h4 className="text-base font-bold text-white mb-2">{sector.title}</h4>
+                          <h4 className="text-base font-bold text-white mb-2 leading-snug">{sector.title}</h4>
                           <p className="text-xs text-gray-300 leading-relaxed mb-4">{sector.description}</p>
                         </div>
                         <div className="pt-3 border-t border-white/5 space-y-1.5">
                           <span className="text-[10px] text-gray-400 font-semibold uppercase block">
-                            Ruhsal Ustalık Dalları:
+                            İçsel Doyum Veren Roller:
                           </span>
                           <div className="flex flex-wrap gap-1">
                             {sector.recommendedRoles.map((r, rIdx) => (

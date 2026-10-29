@@ -556,8 +556,8 @@ export const downloadCareerPDF = async (
       soulSectors.forEach((sSec, sIdx) => {
         ensureSpace(20);
         curY = renderText(
-          `**${sIdx + 1}. ${sSec.title} (%${sSec.percentage} Ruhsal Çağrı):** ${sSec.description}\n` +
-          `**Ruhsal Ustalık Dalları:** ${sSec.recommendedRoles.join(', ')}`,
+          `**${sIdx + 1}. ${sSec.title} (%${sSec.percentage} - ${sSec.category}):** ${sSec.description}\n` +
+          `**İçsel Doyum Veren Roller:** ${sSec.recommendedRoles.join(', ')}`,
           15, curY, 180, 5.8
         );
         curY += 3;
