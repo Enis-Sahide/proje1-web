@@ -1033,7 +1033,7 @@ export class CareerEngine {
     const draconicChart = calculateDraconicChart(chart);
     const soulCareer = calculateSoulCareer(chart, draconicChart, topSectors[0]);
 
-    // 12. İKİNCİL İLERLETİM (SECONDARY PROGRESSIONS - ASTRO-SEEK STANDARDI)
+    // 12. İKİNCİL İLERLETİM (SECONDARY PROGRESSIONS)
     const progressedCareer = calculateSecondaryProgressions(chart, birthDate);
 
     // 13. SÜPER GÜÇ VE GÖLGE TUZAKLAR

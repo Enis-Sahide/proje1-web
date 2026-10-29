@@ -742,7 +742,7 @@ export default function CareerAnalysisPage() {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="text-[10px] sm:text-xs uppercase tracking-widest text-indigo-400 font-bold block">
-                          İçsel Kariyer Saati • Astro-Seek Standardı
+                          İçsel Kariyer Saati • Kadim Zaman Döngüsü
                         </span>
                         <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/30">
                           {result.progressedCareer.currentAge} Yaş İlerletimi
