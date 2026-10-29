@@ -530,7 +530,8 @@ export default function HumanDesignPage() {
   
   const [name, setName] = useState('');
   const [dateStr, setDateStr] = useState('');
-  const [timeStr, setTimeStr] = useState('');
+  const [timeStr, setTimeStr] = useState('12:00');
+  const [error, setError] = useState<string | null>(null);
   
   const [city, setCity] = useState<AstroCity | null>(null);
   const [activeGateId, setActiveGateId] = useState<number | null>(null);
@@ -547,15 +548,25 @@ export default function HumanDesignPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!dateStr || !timeStr || !city) return;
+    setError(null);
+
+    if (!dateStr) {
+      setError("Lütfen doğum tarihinizi giriniz.");
+      return;
+    }
+    const finalTime = timeStr || '12:00';
+    if (!city) {
+      setError("Lütfen doğum şehrinizi arama kutusuna yazarak açılan listeden tıklayıp seçiniz.");
+      return;
+    }
     setIsAnalyzing(true);
     
     try {
-      const dateTimeString = `${dateStr} ${timeStr}`;
+      const dateTimeString = `${dateStr} ${finalTime}`;
       const m = moment.tz(dateTimeString, "YYYY-MM-DD HH:mm", city.tz);
       
       if (!m.isValid()) {
-        alert("Girilen tarih/saat geçerli değil.");
+        setError("Girilen tarih veya saat geçerli bir zaman dilimi oluşturamadı.");
         setIsAnalyzing(false);
         return;
       }
@@ -570,7 +581,7 @@ export default function HumanDesignPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             localDate: dateStr,
-            localTime: timeStr,
+            localTime: finalTime,
             cityData: city
           })
         });
@@ -588,9 +599,9 @@ export default function HumanDesignPage() {
       }
 
       setShowResult(true);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Hesaplama sırasında bir hata oluştu.");
+      setError(err?.message || "Hesaplama sırasında bir hata oluştu.");
     } finally {
       setIsAnalyzing(false);
     }
@@ -802,6 +813,13 @@ export default function HumanDesignPage() {
               </div>
             )}
             
+            {error && (
+              <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-sm flex items-center gap-3 animate-in fade-in duration-200">
+                <AlertCircle size={20} className="shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+            
             <form onSubmit={handleSubmit} className="space-y-6">
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -813,26 +831,32 @@ export default function HumanDesignPage() {
                     min="1900-01-01"
                     max="2100-12-31"
                     value={dateStr}
-                    onChange={(e) => setDateStr(e.target.value)}
+                    onChange={(e) => {
+                      setDateStr(e.target.value);
+                      setError(null);
+                    }}
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-[#32D74B] transition-colors touch-manipulation" 
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-mystic-text-muted mb-2">Doğum Saati *</label>
-                  <SafeTimePicker value={timeStr} onChange={setTimeStr} required />
+                  <SafeTimePicker value={timeStr} onChange={(val) => { setTimeStr(val); setError(null); }} required />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-mystic-text-muted mb-2">Doğduğunuz Şehir *</label>
                 <LocationAutocomplete
-                  onSelect={(c) => setCity(c)}
+                  onSelect={(c) => {
+                    setCity(c);
+                    setError(null);
+                  }}
                   defaultDisplay={city ? city.name : ''}
                   className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#32D74B] transition-colors"
                 />
               </div>
 
-              <button type="submit" className="w-full bg-[#32D74B] hover:bg-[#16a34a] text-white font-bold text-lg py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(50,215,75,0.3)] mt-4">
+              <button type="submit" className="w-full bg-[#32D74B] hover:bg-[#16a34a] text-white font-bold text-lg py-4 rounded-xl transition-all shadow-[0_0_20px_rgba(50,215,75,0.3)] mt-4 cursor-pointer">
                 Haritayı Hesapla
               </button>
             </form>
