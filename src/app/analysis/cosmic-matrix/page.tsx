@@ -247,7 +247,7 @@ export default function CosmicMatrixPage() {
           hdChart
         );
         if (!isMasterOrAdmin) {
-          const MASKED = "Bu derin kozmik teşhis ve şifa reçetesi Usta Seviyesine ve PDF Raporuna özeldir.";
+          const MASKED = "Bu derin kozmik teşhis ve şifa reçetesi Kapsamlı PDF Raporuna özeldir.";
           const worldKeys = ['assiah', 'yetzirah', 'beriyah', 'atzilut'] as const;
           worldKeys.forEach((wKey) => {
             const w = fullMulti.worlds[wKey];
@@ -283,7 +283,7 @@ export default function CosmicMatrixPage() {
           hdChart
         );
         if (!isMasterOrAdmin) {
-          const MASKED = "Bu derin kozmik teşhis ve şifa reçetesi Usta Seviyesine ve PDF Raporuna özeldir.";
+          const MASKED = "Bu derin kozmik teşhis ve şifa reçetesi Kapsamlı PDF Raporuna özeldir.";
           singleReport.planetaryDynamics = singleReport.planetaryDynamics.map((p: any) => ({
             ...p,
             coreLesson: MASKED,
@@ -695,25 +695,19 @@ export default function CosmicMatrixPage() {
                     <Lock size={28} />
                   </div>
                   <div>
-                    <h4 className="text-lg font-bold text-white">13 Gezegen & 5 Katman Sentezi Usta Seviyesine Özeldir</h4>
+                    <h4 className="text-lg font-bold text-white">13 Gezegen & 5 Katman Sentezi Kapsamlı Rapora Özeldir</h4>
                     <p className="text-xs sm:text-sm text-gray-300 mt-1 max-w-xl leading-relaxed">
-                      Tüm gezegenlerinizin 4 âlemdeki (Assiah, Yetzirah, Beriyah, Atzilut) içe/dışa akış teşhislerini, Kadim Futhark Rune şifa mühürlerini ve bitkisel buhur reçetelerini görmek için Usta Seviyesine yükselin veya tüm detayları içeren PDF Raporunuzu indirin.
+                      Tüm gezegenlerinizin 4 âlemdeki (Assiah, Yetzirah, Beriyah, Atzilut) içe/dışa akış teşhislerini, Kadim Futhark Rune şifa mühürlerini ve bitkisel buhur reçetelerini görmek için Kapsamlı PDF Raporunuzu tek seferlik satın alarak ömür boyu sınırsız erişebilirsiniz.
                     </p>
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
                   <button
-                    onClick={() => router.push('/membership')}
-                    className="px-5 py-3 rounded-2xl bg-white/10 hover:bg-white/15 text-white font-bold text-xs sm:text-sm border border-white/20 transition-all cursor-pointer whitespace-nowrap"
-                  >
-                    Usta Seviyesine Yüksel
-                  </button>
-                  <button
                     onClick={handlePurchaseReport}
                     className="px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-yellow-600 hover:brightness-110 text-black font-bold text-xs sm:text-sm transition-all shadow-lg shadow-amber-500/25 cursor-pointer flex items-center gap-2 whitespace-nowrap"
                   >
                     <Lock size={15} />
-                    <span>PDF Raporunu Satın Al (1.111 TL)</span>
+                    <span>PDF Raporunu Satın Al (Ömür Boyu Erişim - 1.111 TL)</span>
                   </button>
                 </div>
               </div>
@@ -1096,7 +1090,7 @@ export default function CosmicMatrixPage() {
                   <div className="flex items-center gap-3 text-center sm:text-left">
                     <Lock size={20} className="text-amber-400 shrink-0" />
                     <p className="text-xs text-gray-300">
-                      5 Katman Bütünleşik Matris Tablosunun ve tüm reçetelerin tamamı <strong className="text-amber-300">PDF Raporu</strong> ve <strong className="text-amber-300">Usta Üyelikte</strong> açılır.
+                      5 Katman Bütünleşik Matris Tablosunun ve tüm reçetelerin tamamı <strong className="text-amber-300">Kapsamlı PDF Raporunda</strong> açılır.
                     </p>
                   </div>
                   <button

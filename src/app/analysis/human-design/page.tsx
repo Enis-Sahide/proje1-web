@@ -1764,16 +1764,33 @@ export default function HumanDesignPage() {
             onClick={e => e.stopPropagation()}
           >
             <div className="text-[#32D74B] mx-auto mb-4 flex justify-center"><AlertCircle size={48} /></div>
-            <h3 className="text-xl font-bold text-white mb-2">Detaylı Analiz Kilitli</h3>
+            <h3 className="text-xl font-bold text-white mb-2">Kapsamlı Rapor Gereklidir</h3>
             <p className="text-mystic-text-muted text-sm mb-6 leading-relaxed">
-              Human Design haritanızdaki kapılar, enerji merkezleri, tip, otorite ve profil yorumlarının derin detayları Çıraklık Seviyesi (Apprentice) ve üzeri üyelere özeldir. Bu derin analiz seviye sistemine özeldir, yakında açılacaktır.
+              Human Design haritanızdaki kapılar, enerji merkezleri, tip, otorite ve profil yorumlarının derin detayları Kapsamlı Human Design Raporuna özeldir. Tek seferlik satın alarak bu analize ömür boyu sınırsız erişebilirsiniz.
             </p>
             <div className="flex flex-col gap-3">
               <button 
-                onClick={() => setShowLockModal(false)}
+                onClick={() => {
+                  setShowLockModal(false);
+                  const query = new URLSearchParams({
+                    type: 'human-design',
+                    date: dateStr,
+                    time: timeStr,
+                    city: city?.name || '',
+                    lat: (city?.lat || '').toString(),
+                    lon: (city?.lon || '').toString(),
+                    tz: city?.tz || '',
+                    email: user?.email || ''
+                  }).toString();
+                  if (!user) {
+                    setShowAuthModal(true);
+                    return;
+                  }
+                  router.push(`/checkout/guest?${query}`);
+                }}
                 className="w-full bg-[#32D74B] hover:bg-[#28B83E] text-black font-bold py-3 px-4 rounded-xl transition-all cursor-pointer shadow-lg shadow-[#32D74B]/10"
               >
-                Anladım
+                Raporu Satın Al (Ömür Boyu Erişim)
               </button>
             </div>
           </div>

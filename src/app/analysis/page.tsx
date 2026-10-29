@@ -189,9 +189,9 @@ export default function AnalysisPage() {
             onClick={e => e.stopPropagation()}
           >
             <div className="text-[#D4AF37] mx-auto mb-4 flex justify-center"><AlertCircle size={48} /></div>
-            <h3 className="text-xl font-bold text-white mb-2">Usta Seviyesi Gerekli</h3>
+            <h3 className="text-xl font-bold text-white mb-2">Kapsamlı Rapor Gereklidir</h3>
             <p className="text-mystic-text-muted text-sm mb-6 leading-relaxed">
-              Bu derin ezoterik analiz Usta Seviyesi (Master) üyelere özeldir. Bu derin analiz seviye sistemine özeldir, yakında açılacaktır.
+              Bu derin ezoterik analiz kapsamlı rapora özeldir. Tek seferlik satın alarak ömür boyu sınırsız erişim sağlayabilirsiniz.
             </p>
             <button 
               onClick={() => setShowLockModal(false)}

@@ -36,11 +36,14 @@ const reduceNumber = (num: number): number => {
   return sum;
 };
 
+import { useAnalysisAccess } from '@/hooks/useAnalysisAccess';
+
 export default function NumerologyPage() {
   const router = useRouter();
   const { role, user } = useAuth();
   const isLoggedIn = !!user;
-  const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
+  const { isUnlocked: isPurchasedOrAdmin } = useAnalysisAccess('numerology');
+  const isApprenticeOrAbove = role === 'admin' || role === 'master' || isPurchasedOrAdmin;
   const [isAdmin, setIsAdmin] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
 
@@ -354,7 +357,32 @@ export default function NumerologyPage() {
       });
     }
 
-    if (!isApprenticeOrAbove) return null;
+    if (!isApprenticeOrAbove) {
+      return (
+        <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/25 rounded-3xl p-6 md:p-8 mt-6 text-center">
+          <div className="w-12 h-12 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] mx-auto mb-3 flex items-center justify-center">
+            <Lock size={22} />
+          </div>
+          <h3 className="text-lg font-bold text-white mb-2">Astro-Numerolojik Kişisel Kodlar Kilitli</h3>
+          <p className="text-xs text-mystic-text-muted mb-5 max-w-md mx-auto leading-relaxed">
+            Kozmik evren giriş kodlarınız, karmik borç kodu ve aura koruma titreşimleri Kapsamlı Numeroloji Raporuna özeldir. Tek seferlik satın alarak ömür boyu sınırsız erişebilirsiniz.
+          </p>
+          <button
+            onClick={() => {
+              const query = new URLSearchParams({
+                type: 'numerology',
+                email: user?.email || '',
+                name: name || ''
+              }).toString();
+              router.push(`/checkout/guest?${query}`);
+            }}
+            className="bg-[#D4AF37] hover:bg-[#E5C158] text-black font-bold py-2.5 px-6 rounded-xl transition-all text-xs shadow-lg shadow-[#D4AF37]/10 cursor-pointer"
+          >
+            Raporu Satın Al (Ömür Boyu Erişim)
+          </button>
+        </div>
+      );
+    }
 
     return (
       <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/25 rounded-3xl p-6 md:p-8 mt-6">
