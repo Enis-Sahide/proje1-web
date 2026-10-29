@@ -830,36 +830,43 @@ export const downloadCareerPDF = async (
     curY += 4;
   }
 
-  // ================= 7LAYERS DİĞER ANALİZLER & KEŞİF KARTI (VIRAL TANITIM ALANI) =================
-  ensureSpace(72);
-  curY += 3;
+  // ================= 7LAYERS DİĞER ANALİZLER & KEŞİF ALANI (KUTUSUZ, AYIRICI ÇİZGİLİ) =================
+  ensureSpace(75);
+  curY += 5;
 
-  const promoBoxY = curY;
-  const promoBoxHeight = 66;
-
-  // Şık Arka Plan Kartı
-  doc.setFillColor(248, 250, 252);
+  // Analizden Ayıran Şık İnce Çizgi
   doc.setDrawColor(203, 213, 225);
   doc.setLineWidth(0.6);
-  doc.roundedRect(15, promoBoxY, 180, promoBoxHeight, 3, 3, 'FD');
+  doc.line(15, curY, 195, curY);
+  curY += 7;
 
   // Başlık
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(10.5);
   doc.setTextColor(...primaryDark);
-  doc.text('✨ 7LAYERS İLE YAŞAMINIZIN DİĞER SIRLARINI KEŞFEDİN', 105, promoBoxY + 7, { align: 'center' });
+  doc.text('✨ 7LAYERS İLE YAŞAMINIZIN DİĞER SIRLARINI KEŞFEDİN', 105, curY, { align: 'center' });
+  curY += 4.5;
 
+  // Alt Başlık
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(8);
   doc.setTextColor(...muted);
-  doc.text('Kadim ezoterik ilimler ve modern analiz motorumuzla kader haritanızın diğer katmanlarını çözün:', 105, promoBoxY + 11.5, { align: 'center' });
+  doc.text('Kadim ezoterik ilimler ve modern analiz motorumuzla kader haritanızın diğer katmanlarını çözün:', 105, curY, { align: 'center' });
+  curY += 6.5;
 
-  // 4 Adet Resmi 7Layers Analiz Maddesi
-  let itemY = promoBoxY + 17;
+  // 6 Adet Resmi 7Layers Analiz Maddesi (Kutusuz, Ferah Düzende)
   const promoItems = [
     {
       title: '🪐 Doğum Haritası Analizi:',
       desc: 'Gezegen yerleşimleri, yükselen burç ve evlerinizin kadersel potansiyelleri.'
+    },
+    {
+      title: '🧭 Anlık Gökyüzü Sorgulaması:',
+      desc: 'Canlı gezegen transitleri ve güncel kozmik tesirler.'
+    },
+    {
+      title: '🪞 Frekans Aynası Analizi (Canlı):',
+      desc: 'Anlık enerji rezonansınız ve kişisel frekans dengeniz.'
     },
     {
       title: '🧬 Human Design (Tasarımınız):',
@@ -879,31 +886,28 @@ export const downloadCareerPDF = async (
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(8);
     doc.setTextColor(...primaryDark);
-    doc.text(item.title, 19, itemY);
+    doc.text(item.title, 15, curY);
 
     const titleWidth = doc.getTextWidth(item.title);
-    const maxDescWidth = 188 - (19 + titleWidth + 2); // 188mm sınır (kutu 195mm'de biter)
-
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(7.5);
     doc.setTextColor(...muted);
+    doc.text(item.desc, 15 + titleWidth + 2, curY);
 
-    const lines = doc.splitTextToSize(item.desc, maxDescWidth);
-    doc.text(lines[0], 19 + titleWidth + 2, itemY);
-
-    itemY += 7.2;
+    curY += 5.5;
   });
 
   // Call to Action (Ziyaret & Keşif Buton Bandı)
+  curY += 2;
   doc.setFillColor(15, 23, 42); // Slate 900
-  doc.roundedRect(19, promoBoxY + promoBoxHeight - 11, 172, 8, 2, 2, 'F');
+  doc.roundedRect(15, curY, 180, 8.5, 2, 2, 'F');
 
   doc.setTextColor(255, 255, 255);
   doc.setFont('LiberationSans', 'bold');
   doc.setFontSize(8.5);
-  doc.text('👉 Hemen Ziyaret Edin: www.7layers.tr  •  Kişiye Özel Kadim Analizler & Ruhsal Farkındalık', 105, promoBoxY + promoBoxHeight - 6, { align: 'center' });
+  doc.text('👉 Hemen Ziyaret Edin: www.7layers.tr  •  Kişiye Özel Kadim Analizler & Canlı Kozmik Araçlar', 105, curY + 5.5, { align: 'center' });
 
-  curY = promoBoxY + promoBoxHeight + 5;
+  curY += 14;
 
   // Telif Alt Notu
   doc.setFont('LiberationSans', 'normal');
