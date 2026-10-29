@@ -543,6 +543,27 @@ export const downloadCareerPDF = async (
     );
     curY += 6;
 
+    // Ruhu Besleyen Kadersel Sektörler (7 Sektör Dağılımı)
+    const soulSectors = data.soulCareer.soulAllSectors || data.soulCareer.soulTopSectors;
+    if (soulSectors && soulSectors.length > 0) {
+      ensureSpace(28);
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(...primaryDark);
+      doc.text('RUHU BESLEYEN KADERSEL SEKTÖRLER (7 SEKTÖR DAĞILIMI)', 15, curY);
+      curY += 5;
+
+      soulSectors.forEach((sSec, sIdx) => {
+        ensureSpace(20);
+        curY = renderText(
+          `**${sIdx + 1}. ${sSec.title} (%${sSec.percentage} Ruhsal Çağrı):** ${sSec.description}\n` +
+          `**Ruhsal Ustalık Dalları:** ${sSec.recommendedRoles.join(', ')}`,
+          15, curY, 180, 5.8
+        );
+        curY += 3;
+      });
+    }
+
     // Ruh Haritası (Drakonik) 6 Temel Sütun Deşifresi
     if (data.soulCareer.soulPillars && data.soulCareer.soulPillars.length > 0) {
       ensureSpace(28);
@@ -577,27 +598,6 @@ export const downloadCareerPDF = async (
         15, curY, 180, 5.8
       );
       curY += 6;
-    }
-
-    // Ruhu Besleyen Kadersel Sektörler (7 Sektör Dağılımı)
-    const soulSectors = data.soulCareer.soulAllSectors || data.soulCareer.soulTopSectors;
-    if (soulSectors && soulSectors.length > 0) {
-      ensureSpace(28);
-      doc.setFont('LiberationSans', 'bold');
-      doc.setFontSize(11);
-      doc.setTextColor(...primaryDark);
-      doc.text('RUHU BESLEYEN KADERSEL SEKTÖRLER (7 SEKTÖR DAĞILIMI)', 15, curY);
-      curY += 5;
-
-      soulSectors.forEach((sSec, sIdx) => {
-        ensureSpace(20);
-        curY = renderText(
-          `**${sIdx + 1}. ${sSec.title} (%${sSec.percentage} Ruhsal Çağrı):** ${sSec.description}\n` +
-          `**Ruhsal Ustalık Dalları:** ${sSec.recommendedRoles.join(', ')}`,
-          15, curY, 180, 5.8
-        );
-        curY += 3;
-      });
     }
 
     // Ruh-Madde Sentez Köprüsü
