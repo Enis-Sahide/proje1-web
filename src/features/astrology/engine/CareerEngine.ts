@@ -1601,27 +1601,15 @@ function calculatePlanetaryCareerInsights(
     }
   };
 
-  const h2 = getHouse2Insight(house2Sign);
-  insights.push({
-    planet: '2. Ev (Para Evi)',
-    sign: house2Sign,
-    house: 2,
-    domain: 'Rızık & Para Kapısı',
-    iconName: h2.iconName,
-    title: h2.title,
-    explanation: h2.explanation,
-    suitableProfessions: h2.roles
-  });
-
-  // 2. KART: 10. EV (MC - KARİYER ZİRVESİ & TOPLUMSAL MESLEKİ MAKAMI)
+  // 1. KART: 10. EV (MC - KARİYER ZİRVESİ & TOPLUMSAL MESLEKİ MAKAMI)
   insights.push({
     planet: '10. Ev (MC)',
     sign: mcSign,
     house: 10,
-    domain: 'Kariyer Zirvesi & Unvan',
+    domain: '1. Sütun: Kariyer Zirvesi',
     iconName: 'Building2',
     title: `10. Ev ${mcSign} (MC) • Kamusal Kariyer Zirveniz & Mesleki İtibarınız`,
-    explanation: `Kariyer tepe noktanızın (MC) ${mcSign} burcunda olması; toplumun sizi hangi mesleki sıfat ve saygınlıkla hatırlayacağını belirler. Bu burcun doğasındaki sorumlulukları üstlendiğinizde kariyer basamaklarını hızla tırmanır, sektörünüzde otorite ve referans mercii olursunuz.`,
+    explanation: `Kariyer tepe noktanızın (MC) ${mcSign} burcunda olması; toplumun sizi hangi mesleki sıfat, sektör ve saygınlıkla hatırlayacağını belirler. Bu burcun doğasındaki sorumlulukları üstlendiğinizde kariyer basamaklarını hızla tırmanır, sektörünüzde otorite ve referans mercii olursunuz.`,
     suitableProfessions: [
       `${mcSign} Doğasında Yönetici & Uzman`,
       'Sektörel Otorite & Liyakat Sahibi',
@@ -1630,12 +1618,25 @@ function calculatePlanetaryCareerInsights(
     ]
   });
 
+  // 2. KART: 2. EV (RIZIK, MADDİ KAZANÇ & PARANIN AKTIĞI ALAN)
+  const h2 = getHouse2Insight(house2Sign);
+  insights.push({
+    planet: '2. Ev (Para Evi)',
+    sign: house2Sign,
+    house: 2,
+    domain: '2. Sütun: Rızık & Para',
+    iconName: h2.iconName,
+    title: h2.title,
+    explanation: h2.explanation,
+    suitableProfessions: h2.roles
+  });
+
   // 3. KART: 6. EV (GÜNLÜK ÇALIŞMA ORTAMI, RUTİN & SAHA ZEMİNİ)
   insights.push({
     planet: '6. Ev (Çalışma Evi)',
     sign: house6Sign,
     house: 6,
-    domain: 'Çalışma Ortamı & Rutin',
+    domain: '3. Sütun: Çalışma Sahası',
     iconName: 'FileText',
     title: `6. Ev ${house6Sign} • Günlük Mesai Zemininde Verimlilik & Hizmet`,
     explanation: `Çalışma hayatı evinizin ${house6Sign} burcunda olması; günlük mesainizin geçtiği ortamın niteliğini simgeler. Düzenli masa başı mı, analitik kodlama ve veri ekranları mı, atölye zanaatı mı yoksa sahada hareketli insan ilişkileri mi size en yüksek verimi sağlar; bu yerleşim çalışma ritminizi korur.`,
@@ -1647,57 +1648,57 @@ function calculatePlanetaryCareerInsights(
     ]
   });
 
-  // 4. KART: MERKÜR (Bilişsel Zeka, Kodlama, Resmi Yazışma & Ticaret)
+  // 4. KART: GÜNEŞ BURCU (MESLEKİ İRADE, YAŞAM AMACI & LİDERLİK ÖZÜ)
   insights.push({
-    planet: 'Merkür',
-    sign: mercury.sign,
-    house: mercury.house,
-    domain: 'Zeka, Kodlama & Ticaret',
+    planet: 'Güneş',
+    sign: sun.sign,
+    house: sun.house,
+    domain: '4. Sütun: İrade & Mizaç',
+    iconName: 'Building2',
+    title: `Güneş ${sun.sign} (${sun.house}. Ev) • Mesleki İrade & Yaşam Amacı`,
+    explanation: `Güneş'inizin ${sun.sign} burcundaki ve ${sun.house}. evdeki konumu; iş hayatındaki temel motivasyonunuzu, yaratıcı liderlik kumaşınızı ve kariyerinizde parlayacağınız ana mecrayı gösterir. Bu yerleşim, enerjinizi nereye akıttığınızda tükenmez bir şevkle ürettiğinizi deşifre eder.`,
+    suitableProfessions: [
+      `${sun.sign} Alanında Proje Yöneticisi`,
+      'Stratejik Karar Verici',
+      'Yaratıcı Direktör & Öncü',
+      'Bağımsız İnisiyatif Sahibi'
+    ]
+  });
+
+  // 5. KART: YÜKSELEN BURÇ (ASC - EYLEM MASKESİ, PRATİK VİTRİN & İŞ REFLEKSİ)
+  const ascSign = chart.ascendant?.sign || 'Koç';
+  insights.push({
+    planet: 'Yükselen (ASC)',
+    sign: ascSign,
+    house: 1,
+    domain: '5. Sütun: Eylem & Vitrin',
     iconName: 'FileText',
-    title: `Merkür ${mercury.sign} (${mercury.house}. Ev) • Bilişsel Mantık, Yazılım & Ticari Zeka`,
-    explanation: `Merkür'ün ${mercury.sign} yerleşimi; büro idaresi, resmi daire yazışmaları, kâtiplik, veri tasnifi, esnaflık ve perakende ticaret zekasını güçlendirir. Aynı zamanda parmak ve el koordinasyonu gerektiren hassas işlerde (yazılım kodlaması, saatçilik, enstrüman tuşları veya teknik çizim) seri bir pratiklik kazandırır.`,
+    title: `Yükselen ${ascSign} (ASC) • Pratik Vitrin, İş Refleksi & İlk İntiba`,
+    explanation: `Yükselen burcunuzun ${ascSign} olması; iş dünyasındaki eylem maskenizi, müşterileriniz ve çalışma ortaklarınızla kurduğunuz ilk bağı simgeler. Problemlere yaklaşım hızınız, iletişim üslubunuz ve profesyonel kimliğinizi dış dünyaya sergileme biçiminiz bu burcun enerjisiyle şekillenir.`,
     suitableProfessions: [
-      'Yazılım & Bilişim Geliştiricisi',
-      'Büro Yönetimi & İdari Memur',
-      'Ticari İşletmeci & Esnaf',
-      'Muhasebe & Evrak Raportörü',
-      'Editör & Yazışma Sorumlusu'
+      `${ascSign} Yetenekli Temsilci`,
+      'Müşteri & Paydaş Yöneticisi',
+      'Saha & İkna Lideri',
+      'Operasyonel Yürütücü'
     ]
   });
 
-  // 5. KART: MARS & SATÜRN (Saha Gücü, İmalat Sanayii & Devlet İntizamı)
+  // 6. KART: ŞANS NOKTASI (PARS FORTUNA) & MERKÜR (KADERSEL BEREKET & BİLİŞSEL DEHA)
+  const pof = chart.planets.find(p => p.name.includes('Şans') || p.name.includes('POF'));
+  const fortuneSign = pof?.sign || house2Sign;
   insights.push({
-    planet: 'Mars & Satürn',
-    sign: `${mars.sign} / ${saturn.sign}`,
-    house: mars.house,
-    domain: 'Saha, İmalat & Disiplin',
-    iconName: 'Hammer',
-    title: `Mars & Satürn • Saha Dayanıklılığı, İmalat Sanayii & Güvenlik`,
-    explanation: `Mars'ın ${mars.sign} ve Satürn'ün ${saturn.sign} yerleşimleri; sanayi atölyesi, mekanik tamirat, inşaat ve metalurji gibi bizzat sahada ter dökülen alanlarda yüksek dayanıklılık verir. Ayrıca devlet kurumlarında kamu memurluğu, arşiv intizamı, polislik/güvenlik veya cerrahi tıp gibi zorlu görevlerde sarsılmaz bir liyakat sunar.`,
+    planet: 'Pars Fortuna & Merkür',
+    sign: `${fortuneSign} / ${mercury.sign}`,
+    house: mercury.house,
+    domain: '6. Sütun: Şans & Zeka',
+    iconName: 'HeartHandshake',
+    title: `Şans Noktası & Merkür • Kadersel Bereket Kapısı & Bilişsel Deha`,
+    explanation: `Şans Noktanızın (${fortuneSign}) kadersel mıknatısı ile Merkür'ünüzün (${mercury.sign} • ${mercury.house}. Ev) analitik zekası birleşerek; sizi piyasada en zahmetsizce zenginleştirecek ve rakiplerinizden ayrıştıracak dehanızı oluşturur. Mantığınızı kadersel bereket alanınızla senkronize ettiğinizde başarı kaçınılmazdır.`,
     suitableProfessions: [
-      'Devlet Memuru & Büro Şefi',
-      'Sanayi & Makine Teknisyeni',
-      'Kolluk Kuvveti / Güvenlik Görevlisi',
-      'Mekanik Tesisat & Bakım Ustası',
-      'Saha Operasyon Şefi'
-    ]
-  });
-
-  // 6. KART: VENÜS & NEPTÜN (Tekstil, Müzik, Sanat & Ruhsal İlham)
-  insights.push({
-    planet: 'Venüs & Neptün',
-    sign: `${venus.sign} / ${neptune.sign}`,
-    house: venus.house,
-    domain: 'Sanat, Tekstil & Müzik',
-    iconName: 'Palette',
-    title: `Venüs & Neptün • Tekstil, Moda, Müzikal İlham & Zanaat Estetiği`,
-    explanation: `Venüs'ün ${venus.sign} ve Neptün'ün ${neptune.sign} ahengi; kumaş dokusu, tekstil tasarımı, renk uyumu, müzik kulağı, enstrüman icrası, görsel sanatlar ve dekorasyonda ruhu dinlendiren estetik eserler çıkarma dehanızı simgeler.`,
-    suitableProfessions: [
-      'Tekstil & Kumaş Tasarımcısı',
-      'Müzisyen, Besteci & Ses Sanatçısı',
-      'Moda & Stilist',
-      'Görsel Sanatlar & Ressam/Zanaatkar',
-      'Dekorasyon & Sahne Sanatçısı'
+      'Bilişim, Yazılım & Algoritma Uzmanı',
+      'Stratejik Ticaret & E-Ticaret Lideri',
+      'Finans & Büyüme Analisti',
+      'Kadersel Rızık Danışmanı'
     ]
   });
 
