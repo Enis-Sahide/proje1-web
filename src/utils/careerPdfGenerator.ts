@@ -421,7 +421,7 @@ export const downloadCareerPDF = async (
     doc.setFont('LiberationSans', 'normal');
     doc.setFontSize(8.5);
     doc.setTextColor(...muted);
-    doc.text(`Astro-Seek Standardı • 1 Gün = 1 Yıl İlerletim Formülü (${data.progressedCareer.currentAge} Yaş İlerletimi)`, 15, curY);
+    doc.text(`Kadim Zaman Döngüsü • 1 Gün = 1 Yıl İlerletim Formülü (${data.progressedCareer.currentAge} Yaş İlerletimi)`, 15, curY);
     curY += 8;
 
     // 1. İlerletilmiş Güneş
