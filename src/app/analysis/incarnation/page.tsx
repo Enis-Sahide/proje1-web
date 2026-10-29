@@ -1668,7 +1668,7 @@ export default function IncarnationAnalysisPage() {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         title="Giriş Yapın veya Kayıt Olun"
-        description="Karmik analiz raporunuzu 888 TL karşılığında satın alıp profilinizde ve e-postanızda güvenle saklayabilmeniz için lütfen giriş yapın."
+        description="Karmik analiz raporunuzu 888 TL karşılığında satın alıp doğrudan ekranınızdan anında indirmek ve sınırsız erişmek için lütfen giriş yapın."
         redirectUrl={`/checkout/guest?type=incarnation&date=${dateStr}&time=${timeStr}&city=${encodeURIComponent(cityKey?.name || '')}&lat=${cityKey?.lat || ''}&lon=${cityKey?.lon || ''}&tz=${cityKey?.tz || ''}`}
       />
 

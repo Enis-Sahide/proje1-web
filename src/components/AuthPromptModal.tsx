@@ -18,7 +18,7 @@ export default function AuthPromptModal({
   isOpen,
   onClose,
   title = "Ücretsiz Üyelik Gerekli",
-  description = "Satın aldığınız analiz raporunuzun e-postanıza güvenle iletilmesi ve profilinizde her zaman saklanabilmesi için lütfen ücretsiz giriş yapın veya 1 dakikada hesabınızı oluşturun.",
+  description = "Satın aldığınız analiz raporunuza doğrudan erişmek ve işlemlerinizi güvenle tamamlamak için lütfen ücretsiz giriş yapın veya 1 dakikada hesabınızı oluşturun.",
   redirectUrl = ""
 }: AuthPromptModalProps) {
   const router = useRouter();

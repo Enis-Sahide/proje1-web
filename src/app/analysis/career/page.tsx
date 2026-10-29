@@ -1799,7 +1799,7 @@ export default function CareerAnalysisPage() {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         title="Kariyer Analizi Üyeliği"
-        description="Raporunuzun güvenle e-postanıza iletilmesi ve dilediğiniz zaman profilinizden indirebilmeniz için lütfen giriş yapın veya ücretsiz hesap oluşturun."
+        description="Kariyer analiz raporunuzu satın alıp doğrudan ekranınızdan anında indirmek ve sınırsız erişmek için lütfen giriş yapın veya ücretsiz hesap oluşturun."
       />
     </div>
   );
