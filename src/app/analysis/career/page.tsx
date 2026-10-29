@@ -1012,44 +1012,78 @@ export default function CareerAnalysisPage() {
             )}
 
             {/* 5. KADERSEL EVRİLME (DHARMA - KUZEY DÜĞÜMÜ ROTASI) */}
+            {/* KADERSEL EVRİLME ROTASI (DHARMA) */}
             {result.dharmaPath && (
-              <div className="bg-gradient-to-br from-purple-500/10 via-black/60 to-black/80 border border-purple-500/30 p-5 sm:p-7 rounded-3xl relative overflow-hidden shadow-xl">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                    <Navigation size={22} />
+              <div className="bg-gradient-to-br from-purple-950/40 via-black/80 to-purple-900/30 border border-purple-500/30 p-5 sm:p-7 rounded-3xl relative overflow-hidden shadow-2xl">
+                {/* Başlık & İkon */}
+                <div className="flex items-start sm:items-center gap-3.5 mb-4">
+                  <div className="p-2.5 rounded-2xl bg-purple-500/15 text-purple-400 border border-purple-500/30 shadow-inner">
+                    <Navigation size={24} />
                   </div>
                   <div>
                     <span className="text-[10px] sm:text-xs uppercase tracking-widest text-purple-400 font-bold block">
-                      Kadersel Evrilme Rotası (Dharma)
+                      KADERSEL EVRİLME ROTASI (DHARMA & KUZEY DÜĞÜMÜ)
                     </span>
-                    <h3 className="text-lg sm:text-xl font-bold text-white">
+                    <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">
                       {result.dharmaPath.title}
                     </h3>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
-                  <div className="bg-white/5 border border-white/10 p-3.5 rounded-2xl">
-                    <span className="text-[10px] text-gray-400 uppercase tracking-wider block mb-1">
-                      Aşılması Gereken Konfor Alanı:
-                    </span>
-                    <p className="text-xs sm:text-sm text-gray-300">
-                      {result.dharmaPath.fromComfortZone}
-                    </p>
+                {/* Açıklayıcı Felsefe: Geçim Mesleği vs Kadersel Büyüme Köprüsü */}
+                <div className="bg-purple-950/30 border border-purple-500/20 p-4 rounded-2xl mb-4 text-xs sm:text-sm text-purple-200/90 leading-relaxed">
+                  <span className="font-semibold text-purple-300 block mb-1">
+                    🧭 Bu Rota Ne Anlama Geliyor ve Neden Hayatidir?
+                  </span>
+                  {result.dharmaPath.purposeAndMeaning}
+                </div>
+
+                {/* 2'li Karşılaştırma Matrisi */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  {/* Konfor Alanı & Tıkanma Riski */}
+                  <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex flex-col justify-between">
+                    <div>
+                      <span className="text-[10px] text-gray-400 uppercase tracking-wider block mb-1.5 font-bold">
+                        Aşılması Gereken Konfor Alanı (Eski Alışkanlıklar)
+                      </span>
+                      <p className="text-xs sm:text-sm text-gray-200 font-medium mb-3">
+                        {result.dharmaPath.fromComfortZone}
+                      </p>
+                    </div>
+                    <div className="bg-rose-950/30 border border-rose-500/25 p-3 rounded-xl">
+                      <span className="text-[10px] text-rose-400 uppercase tracking-wider block mb-1 font-bold">
+                        ⚠️ Neden Mesleki Sıkıntı Yaşarsınız? (Tıkanma Uyarısı)
+                      </span>
+                      <p className="text-xs text-rose-200/90 leading-relaxed">
+                        {result.dharmaPath.comfortZoneRisk}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="bg-purple-500/10 border border-purple-500/20 p-3.5 rounded-2xl">
-                    <span className="text-[10px] text-purple-300 uppercase tracking-wider block mb-1 font-bold">
-                      Kadersel Büyüme Hedefi:
-                    </span>
-                    <p className="text-xs sm:text-sm text-white font-medium">
-                      {result.dharmaPath.toGrowthMission}
-                    </p>
+                  {/* Kadersel Büyüme & Pratik Entegrasyon */}
+                  <div className="bg-purple-500/10 border border-purple-500/25 p-4 rounded-2xl flex flex-col justify-between">
+                    <div>
+                      <span className="text-[10px] text-purple-300 uppercase tracking-wider block mb-1.5 font-bold">
+                        Büyüme ve Kadersel Misyon Kapısı (Yeni Çağ Becerisi)
+                      </span>
+                      <p className="text-xs sm:text-sm text-white font-medium mb-3">
+                        {result.dharmaPath.toGrowthMission}
+                      </p>
+                    </div>
+                    <div className="bg-emerald-950/30 border border-emerald-500/25 p-3 rounded-xl">
+                      <span className="text-[10px] text-emerald-400 uppercase tracking-wider block mb-1 font-bold">
+                        🎯 Pratik Entegrasyon (Mevcut İşi Bırakmadan Nasıl Geçilir?)
+                      </span>
+                      <p className="text-xs text-emerald-200/90 leading-relaxed">
+                        {result.dharmaPath.integrationStrategy}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed bg-black/40 p-3.5 rounded-xl border border-white/5">
-                  ✨ <strong>Kariyer Sıçraması:</strong> {result.dharmaPath.careerImpact}
+                {/* Kadersel Sıçrama Özeti */}
+                <p className="text-xs sm:text-sm text-gray-200 leading-relaxed bg-black/50 p-4 rounded-xl border border-white/10">
+                  ✨ <strong className="text-purple-300">Kadersel Kariyer Sıçraması:</strong> {result.dharmaPath.careerImpact}
                 </p>
               </div>
             )}
@@ -1668,43 +1702,76 @@ export default function CareerAnalysisPage() {
 
             {/* 5. KADERSEL EVRİLME (DHARMA - KUZEY DÜĞÜMÜ ROTASI) */}
             {result.dharmaPath && (
-              <div className="bg-gradient-to-br from-purple-500/10 via-black/60 to-black/80 border border-purple-500/30 p-5 sm:p-7 rounded-3xl relative overflow-hidden shadow-xl">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="p-2.5 rounded-xl bg-purple-500/10 text-purple-400 border border-purple-500/20">
-                    <Navigation size={22} />
+              <div className="bg-gradient-to-br from-purple-950/40 via-black/80 to-purple-900/30 border border-purple-500/30 p-5 sm:p-7 rounded-3xl relative overflow-hidden shadow-2xl">
+                {/* Başlık & İkon */}
+                <div className="flex items-start sm:items-center gap-3.5 mb-4">
+                  <div className="p-2.5 rounded-2xl bg-purple-500/15 text-purple-400 border border-purple-500/30 shadow-inner">
+                    <Navigation size={24} />
                   </div>
                   <div>
                     <span className="text-[10px] sm:text-xs uppercase tracking-widest text-purple-400 font-bold block">
-                      Kadersel Evrilme Rotası (Dharma)
+                      KADERSEL EVRİLME ROTASI (DHARMA & KUZEY DÜĞÜMÜ)
                     </span>
-                    <h3 className="text-lg sm:text-xl font-bold text-white">
+                    <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">
                       {result.dharmaPath.title}
                     </h3>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
-                  <div className="bg-white/5 border border-white/10 p-3.5 rounded-2xl">
-                    <span className="text-[10px] text-gray-400 uppercase tracking-wider block mb-1">
-                      Aşılması Gereken Konfor Alanı (Geçmiş Alışkanlıklar)
-                    </span>
-                    <p className="text-xs sm:text-sm text-gray-300">
-                      {result.dharmaPath.fromComfortZone}
-                    </p>
+                {/* Açıklayıcı Felsefe: Geçim Mesleği vs Kadersel Büyüme Köprüsü */}
+                <div className="bg-purple-950/30 border border-purple-500/20 p-4 rounded-2xl mb-4 text-xs sm:text-sm text-purple-200/90 leading-relaxed">
+                  <span className="font-semibold text-purple-300 block mb-1">
+                    🧭 Bu Rota Ne Anlama Geliyor ve Neden Hayatidir?
+                  </span>
+                  {result.dharmaPath.purposeAndMeaning}
+                </div>
+
+                {/* 2'li Karşılaştırma Matrisi */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                  {/* Konfor Alanı & Tıkanma Riski */}
+                  <div className="bg-white/5 border border-white/10 p-4 rounded-2xl flex flex-col justify-between">
+                    <div>
+                      <span className="text-[10px] text-gray-400 uppercase tracking-wider block mb-1.5 font-bold">
+                        Aşılması Gereken Konfor Alanı (Eski Alışkanlıklar)
+                      </span>
+                      <p className="text-xs sm:text-sm text-gray-200 font-medium mb-3">
+                        {result.dharmaPath.fromComfortZone}
+                      </p>
+                    </div>
+                    <div className="bg-rose-950/30 border border-rose-500/25 p-3 rounded-xl">
+                      <span className="text-[10px] text-rose-400 uppercase tracking-wider block mb-1 font-bold">
+                        ⚠️ Neden Mesleki Sıkıntı Yaşarsınız? (Tıkanma Uyarısı)
+                      </span>
+                      <p className="text-xs text-rose-200/90 leading-relaxed">
+                        {result.dharmaPath.comfortZoneRisk}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="bg-purple-500/10 border border-purple-500/30 p-3.5 rounded-2xl">
-                    <span className="text-[10px] text-purple-300 uppercase tracking-wider block mb-1 font-semibold">
-                      Büyüme ve Kadersel Misyon Kapısı
-                    </span>
-                    <p className="text-xs sm:text-sm text-purple-100 font-medium">
-                      {result.dharmaPath.toGrowthMission}
-                    </p>
+                  {/* Kadersel Büyüme & Pratik Entegrasyon */}
+                  <div className="bg-purple-500/10 border border-purple-500/25 p-4 rounded-2xl flex flex-col justify-between">
+                    <div>
+                      <span className="text-[10px] text-purple-300 uppercase tracking-wider block mb-1.5 font-bold">
+                        Büyüme ve Kadersel Misyon Kapısı (Yeni Çağ Becerisi)
+                      </span>
+                      <p className="text-xs sm:text-sm text-white font-medium mb-3">
+                        {result.dharmaPath.toGrowthMission}
+                      </p>
+                    </div>
+                    <div className="bg-emerald-950/30 border border-emerald-500/25 p-3 rounded-xl">
+                      <span className="text-[10px] text-emerald-400 uppercase tracking-wider block mb-1 font-bold">
+                        🎯 Pratik Entegrasyon (Mevcut İşi Bırakmadan Nasıl Geçilir?)
+                      </span>
+                      <p className="text-xs text-emerald-200/90 leading-relaxed">
+                        {result.dharmaPath.integrationStrategy}
+                      </p>
+                    </div>
                   </div>
                 </div>
 
-                <p className="text-xs text-purple-200/90 bg-purple-500/15 p-3 rounded-xl border border-purple-500/20">
-                  ✨ <strong>Kadersel Sıçrama:</strong> {result.dharmaPath.careerImpact}
+                {/* Kadersel Sıçrama Özeti */}
+                <p className="text-xs sm:text-sm text-gray-200 leading-relaxed bg-black/50 p-4 rounded-xl border border-white/10">
+                  ✨ <strong className="text-purple-300">Kadersel Kariyer Sıçraması:</strong> {result.dharmaPath.careerImpact}
                 </p>
               </div>
             )}

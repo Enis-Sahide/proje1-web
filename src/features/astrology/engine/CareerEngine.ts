@@ -43,8 +43,11 @@ export interface FocusStrategyData {
 
 export interface DharmaPathData {
   title: string;
+  purposeAndMeaning: string;
   fromComfortZone: string;
+  comfortZoneRisk: string;
   toGrowthMission: string;
+  integrationStrategy: string;
   careerImpact: string;
 }
 
@@ -1196,86 +1199,133 @@ function calculateFocusStrategy(chart: NatalChartData, saturn: AstroPoint, hdTyp
 
 function calculateDharmaPath(northNode: AstroPoint): DharmaPathData {
   const sign = northNode.sign || 'Kova';
-  const nodeInterpretations: Record<string, { title: string; from: string; to: string; impact: string }> = {
+  const nodeInterpretations: Record<string, {
+    title: string;
+    purposeAndMeaning: string;
+    from: string;
+    risk: string;
+    to: string;
+    strategy: string;
+    impact: string;
+  }> = {
     'Koç': {
       title: 'Bağımsız Öncülük ve İnisiyatif Rotası',
-      from: 'Başkalarının onayını bekleme ve aşırı uyum konfor alanı',
-      to: 'Kendi bağımsız vizyonunun arkasında durarak ilk adımı atma cesareti',
-      impact: 'Kariyerinizde başkalarına sırtınızı dayamayı bıraktığınız an devasa bir sıçrama yaşarsınız.'
+      purposeAndMeaning: 'Bu rota; başkalarının onayına ve ortaklıklara aşırı bağımlı kalmaktan sıyrılarak, kendi adınızı ve bağımsız inisiyatifinizi merkeze alma ekseninizdir. Geçiminiz şu an bir ekiple veya ortaklıkla yürüyor olsa bile, kadersel sıçramanız kendi cesur kararlarınızın arkasında durmanızla başlar.',
+      from: 'Başkalarının onayını bekleme, çatışmadan kaçma ve aşırı uyum konfor alanı',
+      risk: 'Eğer sürekli başkalarını memnun etmeye ve onay beklemeye sığınırsanız; yıllar geçtikçe kendi potansiyelinizi hiç sergileyemediğinizi hisseder, hakkınızın yendiğini düşünür ve mesleğe karşı derin bir küskünlük yaşarsınız.',
+      to: 'Kendi bağımsız vizyonunun arkasında durarak ilk adımı atma cesareti ve öncü liderlik',
+      strategy: 'Mevcut ortaklığınızı veya işinizi bir gecede bırakmayın. Ancak işiniz içinde kimseden onay almadan doğrudan sizin yönettiğiniz özerk bir alt proje veya kendi adınıza bağımsız bir hizmet kanalı başlatın.',
+      impact: 'Kariyerinizde başkalarına sırtınızı dayamayı bırakıp kendi markanızı öne çıkardığınız an devasa bir sıçrama yaşarsınız.'
     },
     'Boğa': {
       title: 'Somut Varlık ve Kalıcı Değer Üretim Rotası',
-      from: 'Sürekli kriz yönetimi ve başkalarının finansal kaoslarına kapılma',
-      to: 'Kendi üretken varlıklarını, mülklerini ve sağlam sermayesini inşa etme',
-      impact: 'Kısa vadeli çalkantılardan uzaklaşıp kalıcı ve elle tutulur ürünler ürettiğinizde zenginlik kapınız açılır.'
+      purposeAndMeaning: 'Sürekli kriz yönetimi, borç-alacak stresi ve başkalarının finansal kaoslarına kapılmaktan çıkıp; sakin, bereketli, elle tutulur ve zamana meydan okuyan somut varlıklar üretme rotasıdır. Faturayı ödeyen telaşlı işlerin ötesinde kalıcı mülk ve sermaye inşa etme pusulanızdır.',
+      from: 'Sürekli kriz yönetimi, aşırı riskli spekülasyonlar ve başkalarının finansal kaoslarına kapılma',
+      risk: 'Eğer bu kriz ve kaos alışkanlığında kalırsanız; kariyeriniz hiçbir zaman sakin bir güvenli limana ulaşamaz, sinir sisteminiz yıpranır ve kazandığınız parayı elde tutamayıp sürekli sıfırdan başlama buhranı yaşarsınız.',
+      to: 'Kendi üretken varlıklarını, gayrimenkulünü, somut ürünlerini ve sağlam sermayesini inşa etme',
+      strategy: 'Mevcut nakit akışınızı korurken kazancınızı spekülatif maceralar yerine elle tutulur fiziki mülklere, somut ürün envanterine veya düzenli kira/telif getiren kalıcı varlıklara yatırın.',
+      impact: 'Kısa vadeli çalkantılardan uzaklaşıp kalıcı ve elle tutulur ürünler ürettiğinizde zenginlik kapınız kalıcı olarak açılır.'
     },
     'İkizler': {
       title: 'Dijital İletişim, Kod ve Çok Kanallı Ağlar Rotası',
-      from: 'Aşırı soyut felsefi teoriler ve hayatta karşılığı olmayan büyük iddialar',
-      to: 'Pratik kodlama, bilgi ticareti, dijital diller ve hızlı piyasa köprüleri kurma',
-      impact: 'Bilgiyi pratik araçlara ve dijital ürünlere dönüştürdüğünüzde kariyeriniz küresel ölçeğe ulaşır.'
+      purposeAndMeaning: 'Aşırı soyut teoriler ve havada kalan büyük iddialardan çıkıp; pratik kodlama, bilgi ticareti, dijital diller, çok kanallı ağlar ve piyasada doğrudan alıcısı olan araçlar üretme rotasıdır. Mevcut işiniz geleneksel bir zanaat veya hizmet olsa bile, kadersel sıçramanız bunu dijital araçlarla dünyaya bağlamaktan geçer.',
+      from: 'Uygulamaya dökülmeyen aşırı soyut felsefi teoriler ve hayatta karşılığı olmayan büyük iddialar',
+      risk: 'Eğer bilginizi somut dijital araçlara dökmezseniz; zihninizde devasa fikirler varken piyasada karşılık bulamaz, mesleğinizde kendinizi anlaşılmamış hissederek derin bir yalnızlık ve kariyer tıkanması yaşarsınız.',
+      to: 'Pratik kodlama, bilgi ticareti, dijital diller, e-ticaret ağları ve hızlı piyasa köprüleri kurma',
+      strategy: 'Mevcut uzmanlığınızı veya sanatsal üretiminizi terk etmeyin! Yaptığınız işi dijitalleştirecek pratik bir yazılım aracı, dijital bir eğitim/içerik kanalı veya web platformu kurarak bilgiyi dijital ürün formatında piyasaya sürün.',
+      impact: 'Bilgiyi pratik araçlara ve dijital ürünlere dönüştürdüğünüzde kariyeriniz yerelden küresel ölçeğe ulaşır.'
     },
     'Yengeç': {
       title: 'Koruyucu Güven Alanı ve Topluluk Liderliği Rotası',
-      from: 'Duygusuz, katı kurumsal hiyerarşilerde sadece unvan için yıpranma',
-      to: 'İnsanlara güven veren, aidiyet yaratan ve kendi ekosistemini koruyan liderlik',
-      impact: 'Çalışanlarınıza ve müşterilerinize sadakat ve güven hissettirdiğinizde rakipsiz olursunuz.'
+      purposeAndMeaning: 'Katı, duygusuz kurumsal unvan hırsından ve sadece statü için tükenmekten sıyrılarak; insanlara güven, aidiyet, şefkat ve koruma sunan samimi bir topluluk ekosistemi inşa etme rotasıdır. Başarıyı salt rakamlarda değil, dokunduğunuz hayatların sadakatinde bulursunuz.',
+      from: 'Duygusuz, katı kurumsal hiyerarşilerde sadece unvan ve makam için yıpranma alışkanlığı',
+      risk: 'Eğer sadece statü peşinde koşarsanız; zirveye çıksanız dahi içinizde koca bir anlamsızlık ve "Ben bunun için mi yaşadım?" boşluğu doğar, sağlığınız ve insani bağlarınız ciddi zarar görür.',
+      to: 'İnsanlara güven veren, aidiyet yaratan, şefkatli ve kendi ekosistemini koruyan liderlik',
+      strategy: 'İşinizde sadece mekanik kuralları uygulamak yerine; çalışanlarınızın ve müşterilerinizin kalbine dokunan, onları aile gibi hissettiren bir müşteri deneyimi ve güven ortamı yaratın.',
+      impact: 'Çalışanlarınıza ve müşterilerinize sadakat ve güven hissettirdiğinizde sektörünüzde rakipsiz ve alternatifsiz olursunuz.'
     },
     'Aslan': {
       title: 'Yaratıcı Sahne ve Karizmatik Marka Rotası',
-      from: 'Kolektif kalabalıkların arkasında saklanıp anonim kalarak yetenekleri gizleme',
-      to: 'Kendi kişisel markasını cesurca öne çıkarıp projenin vitrin yüzü olma',
+      purposeAndMeaning: 'Kolektif kalabalıkların arkasında anonim bir dişli olarak kalmaktan çıkıp; kendi kişisel markanızı, yaratıcı dehanızı ve vitrin yüzünüzü cesaretle sahneye çıkarma rotasıdır. Başkalarının projelerinde gizli kahraman olmak yerine, kendi eserinizin gururlu yüzü olmanız gerekir.',
+      from: 'Kolektif kalabalıkların arkasında saklanıp anonim kalarak yetenekleri gizleme konforu',
+      risk: 'Eğer sahneye çıkmazsanız; başkaları sizin ürettiğiniz değerlerle alkış ve servet toplarken siz gölgede kalır, zamanla mesleki tatminsizlik ve derin bir görünmezlik acısı çekersiniz.',
+      to: 'Kendi kişisel markasını cesurca öne çıkarıp projenin vitrin yüzü olma ve karizmatik liderlik',
+      strategy: 'Mevcut işinizde yürüttüğünüz projelerde kendi isminizi, imzanızı ve yüzünüzü öne çıkarın; sosyal medyada veya sektör toplantılarında işin vizyoneri olarak söz hakkı alın.',
       impact: 'Perde arkasından sahneye çıktığınız gün hak ettiğiniz finansal değere ve saygınlığa ulaşırsınız.'
     },
     'Başak': {
       title: 'Metodik Ustalık, Süreç Optimizasyonu ve Teknik Zanaat Rotası',
-      from: 'Kaotik hayallere kapılıp detayları ve disiplini küçümseme',
-      to: 'Saat gibi işleyen sistemler, kusursuz kodlama ve analitik kalite standartları kurma',
-      impact: 'Süreçleri mükemmelleştirip kimsenin fark edemediği hataları çözdüğünüzde sektörün aranan ismi olursunuz.'
+      purposeAndMeaning: 'Kaotik hayallere, belirsizliklere ve disiplinsiz hülyalara kapılmaktan çıkıp; metodik ustalık, süreç optimizasyonu, kusursuz kalite standartları ve somut teknik zanaat inşa etme rotasıdır. Hayalleri yeryüzüne indirip saat gibi işleyen bir sisteme dökme sanatıdır.',
+      from: 'Kaotik hayallere kapılıp detayları, operasyonel disiplini ve sistem kurmayı küçümseme',
+      risk: 'Eğer metodik düzene geçmezseniz; harika vizyonlarınız her zaman havada kalır, işleriniz dağınık ilerler ve sürekli organize olamamanın getirdiği suçluluk ve tükenmişlikle boğuşursunuz.',
+      to: 'Saat gibi işleyen sistemler, kusursuz kodlama/işçilik ve analitik kalite standartları kurma',
+      strategy: 'Günlük mesainize net metrikler, şablonlar ve kontrol listeleri getirin; işinizdeki kaotik süreçleri sadeleştirip hatasız çalışan bir iş akışına dönüştürün.',
+      impact: 'Süreçleri mükemmelleştirip kimsenin fark edemediği hataları çözdüğünüzde sektörün aranan referans ismi olursunuz.'
     },
     'Terazi': {
       title: 'Stratejik İttifaklar ve Diplomatik Müzakere Rotası',
-      from: 'Her şeyi tek başına yapmaya çalışıp tek tabanca inatlaşma',
-      to: 'Güçlü ortaklıklar kurma, iki tarafı da kazandıran sözleşmeler bağlama',
-      impact: 'Doğru ortaklarla el sıkıştığınızda işleriniz tek başınıza yapabileceğinizin 10 katı büyür.'
+      purposeAndMeaning: 'Tek başına her şeyi yapmaya çalışmaktan, sert inatlaşmalardan ve tek tabanca savaşmaktan çıkıp; güçlü stratejik ittifaklar, diplomatik müzakereler ve iki tarafı da kazandıran ortaklıklar kurma rotasıdır. Güçlerinizi birleştirerek sinerji yaratma olgunluğudur.',
+      from: 'Her şeyi tek başına yapmaya çalışıp tek tabanca inatlaşma ve aşırı rekabetçi savunma',
+      risk: 'Eğer her şeyi tek başınıza yapmaya inat ederseniz; fiziksel gücünüz ve zamanınız tükenir, büyüme sınırına toslarsınız ve yalnız savaşmanın getirdiği aşırı stresle mesleğe küsersiniz.',
+      to: 'Güçlü ortaklıklar kurma, iki tarafı da kazandıran sözleşmeler bağlama ve diplomatik ahenk',
+      strategy: 'Zayıf olduğunuz operasyonel alanları tek başınıza çözmeye uğraşmak yerine, bu alanlarda güçlü tamamlayıcı ortaklarla masaya oturun ve kazan-kazan modelleri kurgulayın.',
+      impact: 'Doğru ortaklarla el sıkıştığınızda işleriniz tek başınıza yapabileceğinizin 10 katı hızla büyür.'
     },
     'Akrep': {
       title: 'Stratejik Kriz Dönüşümü ve Derin Sermaye Rotası',
-      from: 'Yüzeysel konfor alanına saplanıp değişimden korkma',
-      to: 'Riskleri yönetme, siber güvenlik, kriz fırsatları ve derin dönüşüm yönetimi',
-      impact: 'Başkalarının korkup kaçtığı zorlu problemleri çözdüğünüzde kadersel servet kapılarınız aralanır.'
+      purposeAndMeaning: 'Statükoya, rahatlığa ve değişim korkusuna saplanıp kalmaktan çıkıp; riskleri yönetme, krizleri zenginliğe dönüştürme, siber güvenlik, derin sermaye ve ruhsal simya rotasıdır. Konfor alanını yırtıp piyasanın en tabu problemlerine cesaretle dalma gücüdür.',
+      from: 'Yüzeysel konfor alanına saplanıp değişimden korkma ve garanti olan vasatlığa sığınma',
+      risk: 'Eğer değişime direnirseniz; hayat krizleri zorla getirir, içsel bir çürüme ve monotonluğun getirdiği ağır bir ruhsal bıkkınlık içinde kendinizi tüketirsiniz.',
+      to: 'Riskleri yönetme, siber güvenlik, kriz fırsatları, derin psikoloji ve dönüşüm yönetimi',
+      strategy: 'Mevcut güvencenizi korurken sektörünüzdeki en zorlu, riskli veya krizli problemleri araştırmaya başlayın; bu derin sorunları çözen bir danışmanlık veya kriz yönetimi kası geliştirin.',
+      impact: 'Başkalarının korkup kaçtığı zorlu problemleri çözdüğünüzde kadersel servet kapılarınız ardına kadar aralanır.'
     },
     'Yay': {
       title: 'Küresel Vizyon, İhracat ve Yüksek Ufuklar Rotası',
-      from: 'Dar yerel piyasa dedikodularında ve küçük hesaplarda boğulma',
-      to: 'Uluslararası standartlar, yabancı diller, döviz bazlı ihracat ve küresel felsefe',
-      impact: 'Vizyonunuzu sınırların ötesine taşıdığınızda gerçek potansiyelinizin kilidi açılır.'
+      purposeAndMeaning: 'Dar yerel çevre dedikodularında, yüzeysel bilgi kırıntılarında ve küçük hesaplarda boğulmaktan çıkıp; küresel vizyon, yüksek akademi, uluslararası ticaret, diller ve büyük felsefe rotasıdır. Yerel sınırları aşarak evrensel ölçekte düşünme çağrısıdır.',
+      from: 'Dar yerel piyasa dedikodularında, günübirlik işlerde ve küçük hesaplarda boğulma',
+      risk: 'Eğer yerel sınırlarda kalırsanız; zihniniz hiperaktif bir dağınıklıkla yorulur, sürekli bir şeyler yapıp hiçbir büyük başarı elde edememe tatminsizliği yaşarsınız.',
+      to: 'Uluslararası standartlar, yabancı diller, döviz bazlı ihracat ve küresel felsefe inşa etme',
+      strategy: 'Yaptığınız işi yabancı dillere çevirin, uluslararası pazarları inceleyin veya global sertifikasyonlar alarak hizmetinizi dövizle gelir getirecek küresel bir platforma taşıyın.',
+      impact: 'Vizyonunuzu sınırların ötesine taşıdığınızda gerçek kariyer potansiyelinizin kilidi sonuna kadar açılır.'
     },
     'Oğlak': {
       title: 'Kurumsal Zirve, Büyük Mimarlık ve Kalıcı Miras Rotası',
-      from: 'Duygusal savrulmalarla kararlar alıp disiplinsiz davranma',
-      to: 'Sarsılmaz çalışma ahlakı, uzun vadeli strateji ve tepe yöneticilik',
-      impact: 'Sabırla 5-10 yıllık bir zirve planı yaptığınızda zamana meydan okuyan bir miras inşa edersiniz.'
+      purposeAndMeaning: 'Aşırı alınganlık, geçmişe takılma ve çocuksu konfor alanında kalmaktan çıkıp; sarsılmaz bir profesyonel ciddiyet, kurumsal zirve, uzun vadeli strateji ve kalıcı bir miras inşa etme rotasıdır. Zamanın yıpratamayacağı bir itibar kalesi kurmaktır.',
+      from: 'Duygusal savrulmalarla kararlar alıp disiplinsiz davranma ve profesyonel sorumluluktan kaçma',
+      risk: 'Eğer profesyonel olgunluğa geçmezseniz; iş hayatında sürekli alınganlıklar yaşar, duygusal kararlarla kariyerinizi baltalar ve yaşınız ilerledikçe saygı görmeme sancısı çekersiniz.',
+      to: 'Sarsılmaz çalışma ahlakı, uzun vadeli 10 yıllık strateji ve kurumsal tepe yöneticilik',
+      strategy: 'İşinizde duygusal kararları bir kenara bırakıp profesyonel sınırlara ve yazılı kurallara geçin; işinizi 5-10 yıl sonra da var olacak kurumsal bir yapıya dönüştürecek adımları atın.',
+      impact: 'Sabırla 5-10 yıllık bir zirve planı yaptığınızda zamana meydan okuyan devasa bir miras inşa edersiniz.'
     },
     'Kova': {
       title: 'Yapay Zeka, Derin Teknoloji ve Kolektif Devrim Rotası',
-      from: 'Sadece kişisel egoya ve dar çıkarlara odaklanıp geleneksel yolları tekrarlama',
-      to: 'Yapay zeka, dijital platformlar, açık kaynak ve geleceği şekillendiren teknolojiler',
-      impact: 'Kalıpları kırıp topluma çağ atlatacak inovatif çözümler ürettiğinizde çağın öncüsü olursunuz.'
+      purposeAndMeaning: 'Sadece kişisel egoya, dar çıkarlara ve "ben" merkezli alkış takıntısına hapsolmaktan çıkıp; yapay zeka, açık kaynak, kolektif devrim, dijital platformlar ve topluma çağ atlatacak inovasyon rotasıdır. Dünyayı geleceğe bağlayan özgürleştirici köprüdür.',
+      from: 'Sadece kişisel egoya, dar çıkarlara odaklanıp geleneksel yolları ve statü göstergelerini tekrarlama',
+      risk: 'Eğer sadece kendi egonuzu beslemeye odaklanırsanız; çağın teknolojisinden kopar, yalnızlaşır ve yeni nesil dünya düzeninde hızla demode kalmanın buhranını yaşarsınız.',
+      to: 'Yapay zeka, dijital platformlar, açık kaynak ve geleceği şekillendiren teknolojilerle topluma hizmet',
+      strategy: 'Mesleğinizi yapay zeka ve otomasyon araçlarıyla güçlendirin; tekil bir hizmet vermek yerine binlerce insanın aynı anda faydalanacağı bir dijital platform veya topluluk modeli geliştirin.',
+      impact: 'Kalıpları kırıp topluma çağ atlatacak inovatif çözümler ürettiğinizde çağın öncüsü ve lideri olursunuz.'
     },
     'Balık': {
       title: 'Vizyoner Sezgi, Sanat ve Holistik Dönüşüm Rotası',
-      from: 'Ruhsuz katı mantık labirentlerinde sıkışıp iç sesini bastırma',
-      to: 'İlham, sinematik vizyon, psikolojik sezgi ve insan ruhuna dokunan projeler',
-      impact: 'Mantığınızın yanına sezgilerinizi eklediğinizde piyasanın göremediği fırsatları önceden yakalarsınız.'
+      purposeAndMeaning: 'Aşırı kontrolcülük, ayrıntılarda boğulma ve her şeyi katı mantıkla çözme kaygısından çıkıp; sezgi, ilham, sinematik vizyon, holistik şifa ve insan ruhuna dokunan yaratıcı projelere teslim olma rotasıdır. Katı rasyonalizmi aşan ilahi sezgi kanalıdır.',
+      from: 'Ruhsuz katı mantık labirentlerinde sıkışıp iç sesini bastırma ve mükemmeliyetçilik felci',
+      risk: 'Eğer aşırı kontrolcülükte kalırsanız; kronik anksiyete ve aşırı stres yaşar, mükemmeliyetçilik yüzünden hiçbir işi bitiremez ve mesleğin tüm ruhunu kaybederek robotlaşma buhranına girersiniz.',
+      to: 'İlham, sinematik vizyon, psikolojik sezgi, holistik şifa ve insan ruhuna dokunan projeler',
+      strategy: 'İşinizdeki her şeyi mantıkla analiz etmeyi bırakıp içsel hislerinize ve ilhama alan açın; teknik uzmanlığınızın yanına estetik, hikaye anlatıcılığı ve insan ruhunu teselli eden manevi dokunuşu ekleyin.',
+      impact: 'Mantığınızın yanına sezgilerinizi eklediğinizde piyasanın göremediği fırsatları önceden yakalar ve kitleleri büyülersiniz.'
     }
   };
 
   const item = nodeInterpretations[sign] || nodeInterpretations['Kova'];
   return {
     title: item.title,
+    purposeAndMeaning: item.purposeAndMeaning,
     fromComfortZone: item.from,
+    comfortZoneRisk: item.risk,
     toGrowthMission: item.to,
+    integrationStrategy: item.strategy,
     careerImpact: item.impact
   };
 }

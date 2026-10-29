@@ -631,6 +631,7 @@ export const downloadCareerPDF = async (
 
   // 1. Kadersel Evrilme (Dharma)
   if (data.dharmaPath) {
+    ensureSpace(45);
     doc.setFont('LiberationSans', 'bold');
     doc.setFontSize(12);
     doc.setTextColor(...primaryDark);
@@ -638,10 +639,13 @@ export const downloadCareerPDF = async (
     curY += 6;
 
     curY = renderText(
-      `**Dharma Başlığı:** ${data.dharmaPath.title}\n\n` +
-      `**Aşılması Gereken Konfor Alanı (Güney Düğüm Alışkanlıkları):** ${data.dharmaPath.fromComfortZone}\n\n` +
-      `**Kadersel Büyüme Misyonu:** ${data.dharmaPath.toGrowthMission}\n\n` +
-      `✨ **Kariyer Sıçraması:** ${data.dharmaPath.careerImpact}`,
+      `**Dharma Ekseni:** ${data.dharmaPath.title}\n\n` +
+      `**🧭 Bu Rota Ne Anlama Geliyor ve Neden Hayatidir?:** ${data.dharmaPath.purposeAndMeaning}\n\n` +
+      `**Aşılması Gereken Konfor Alanı (Eski Alışkanlıklar):** ${data.dharmaPath.fromComfortZone}\n\n` +
+      `⚠️ **Neden Mesleki Sıkıntı Yaşarsınız? (Tıkanma Uyarısı):** ${data.dharmaPath.comfortZoneRisk}\n\n` +
+      `**Kadersel Büyüme & Yeni Çağ Becerisi:** ${data.dharmaPath.toGrowthMission}\n\n` +
+      `🎯 **Pratik Entegrasyon (Mevcut İşi Bırakmadan Nasıl Geçilir?):** ${data.dharmaPath.integrationStrategy}\n\n` +
+      `✨ **Kadersel Kariyer Sıçraması:** ${data.dharmaPath.careerImpact}`,
       15, curY, 180, 5.8
     );
     curY += 6;
