@@ -149,7 +149,12 @@ function CheckoutSuccessContent() {
     );
   }
 
-  const reportName = orderData?.analysisType === 'kabbalah' 
+  const isCareer = orderData?.analysisType === 'career' || orderData?.analysisType === 'kariyer';
+  const reportPath = isCareer ? '/analysis/career' : (orderData?.analysisType === 'kabbalah' ? '/analysis/kabbalah' : '/analysis');
+
+  const reportName = isCareer
+    ? 'Kariyer & Mesleki Yatkınlık Raporu'
+    : orderData?.analysisType === 'kabbalah' 
     ? 'Kabalistik 4 Alem Harita Analizi Raporu' 
     : (orderData?.analysisType === 'human-design' || orderData?.analysisType === 'human_design')
     ? 'Human Design Kapsamlı Yaşam Rehberi Raporu'
@@ -161,43 +166,47 @@ function CheckoutSuccessContent() {
 
   return (
     <div className="max-w-md w-full bg-black/80 backdrop-blur-xl border border-white/10 p-8 rounded-3xl text-center shadow-[0_0_50px_rgba(212,175,55,0.05)] flex flex-col items-center">
-      <div className="w-16 h-16 rounded-full bg-green-500/10 border border-green-500/30 flex items-center justify-center mb-6">
+      <div className="w-16 h-16 rounded-full bg-green-500/10 border border-green-500/30 flex items-center justify-center mb-5">
         <CheckCircle2 size={32} className="text-green-500" />
       </div>
       
-      <h1 className="text-2xl font-bold text-white mb-2">İşleminiz Başarılı!</h1>
-      <p className="text-mystic-text-muted text-sm mb-6">
-        Ödemeniz başarıyla tamamlandı. Hazırlanan raporunuz cihazınızda indirilmeye hazır!
+      <h1 className="text-2xl font-bold text-white mb-2">Tebrikler! Raporunuz Hazır</h1>
+      <p className="text-mystic-text-muted text-sm mb-5 leading-relaxed">
+        Ödemeniz başarıyla tamamlandı. Raporunuzu hemen indirebilirsiniz. Bu analiz modülü hesabınıza süresiz tanımlanmıştır; dilediğiniz zaman sınırsız analiz yapıp indirebilirsiniz.
       </p>
 
       {/* Info Box */}
-      <div className="w-full bg-white/5 border border-white/5 rounded-2xl p-4 text-left space-y-3 mb-6">
+      <div className="w-full bg-white/5 border border-white/5 rounded-2xl p-4 text-left space-y-2.5 mb-6">
         <div className="flex justify-between items-center text-xs">
           <span className="text-mystic-text-muted">Rapor Türü:</span>
           <span className="text-white font-semibold">{reportName}</span>
         </div>
         <div className="flex justify-between items-center text-xs">
-          <span className="text-mystic-text-muted">Gönderilen E-Posta:</span>
-          <span className="text-[#D4AF37] font-semibold">{orderData.email}</span>
+          <span className="text-mystic-text-muted">Erişim Durumu:</span>
+          <span className="text-green-400 font-semibold flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-green-400"></span> Süresiz & Sınırsız Açık
+          </span>
         </div>
       </div>
 
       <button 
         onClick={handleDownload}
         disabled={downloading}
-        className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-4 px-6 rounded-2xl transition-all disabled:opacity-50 flex items-center justify-center text-lg shadow-lg shadow-[#D4AF37]/20 mb-4"
+        className="w-full bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-4 px-6 rounded-2xl transition-all disabled:opacity-50 flex items-center justify-center text-base shadow-lg shadow-[#D4AF37]/20 mb-3"
       >
         {downloading ? (
-          <><Loader2 className="animate-spin mr-2" /> PDF Oluşturuluyor...</>
+          <><Loader2 className="animate-spin mr-2" size={20} /> PDF Oluşturuluyor...</>
         ) : (
-          <><Download className="mr-2" /> Raporu PDF Olarak İndir</>
+          <><Download className="mr-2" size={20} /> Raporu Hemen İndir (PDF)</>
         )}
       </button>
 
-      <div className="flex items-center gap-2 text-xs text-mystic-text-muted">
-        <Mail size={12} className="text-[#D4AF37]" />
-        <span>İndirme bağlantısı e-postanıza da gönderilmiştir.</span>
-      </div>
+      <button
+        onClick={() => router.push(reportPath)}
+        className="w-full bg-white/10 hover:bg-white/15 text-white/90 font-medium py-3 px-6 rounded-2xl transition-all text-sm mb-2"
+      >
+        Yeni Analiz Yap / Modüle Git
+      </button>
     </div>
   );
 }

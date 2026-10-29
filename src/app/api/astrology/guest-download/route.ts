@@ -6,6 +6,7 @@ import moment from 'moment-timezone';
 import { generateAstrologyChart, calculateDraconicChart, calculateHarmonicChart } from '@/features/astrology/engine/AstrologyEngine';
 import { getKabbalahAnalysis } from '@/features/astrology/engine/KabbalahInterpretations';
 import { getEsotericPlanetInterpretation } from '@/features/astrology/engine/KabbalahPlanetInterpretations';
+import { CareerEngine } from '@/features/astrology/engine/CareerEngine';
 
 export async function GET(request: Request) {
   try {
@@ -133,7 +134,6 @@ export async function GET(request: Request) {
         druidTree
       };
     } else if (order.analysisType === 'career' || order.analysisType === 'kariyer') {
-      const { CareerEngine } = require('@/features/astrology/engine/CareerEngine');
       const fullName = (order.birthData as any)?.fullName || (order.birthData as any)?.name || 'Danışan';
       const careerResult = await CareerEngine.analyze(
         fullName,
