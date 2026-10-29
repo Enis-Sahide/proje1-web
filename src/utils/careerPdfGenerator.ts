@@ -830,16 +830,81 @@ export const downloadCareerPDF = async (
     curY += 4;
   }
 
-  // Footer Note
-  ensureSpace(20);
-  curY += 4;
+  // ================= 7LAYERS DİĞER ANALİZLER & KEŞİF KARTI (VIRAL TANITIM ALANI) =================
+  ensureSpace(72);
+  curY += 3;
+
+  const promoBoxY = curY;
+  const promoBoxHeight = 64;
+
+  // Şık Arka Plan Kartı
+  doc.setFillColor(248, 250, 252);
   doc.setDrawColor(203, 213, 225);
-  doc.setLineWidth(0.4);
-  doc.line(15, curY, 195, curY);
-  curY += 5;
+  doc.setLineWidth(0.6);
+  doc.roundedRect(15, promoBoxY, 180, promoBoxHeight, 3, 3, 'FD');
+
+  // Başlık
+  doc.setFont('LiberationSans', 'bold');
+  doc.setFontSize(10.5);
+  doc.setTextColor(...primaryDark);
+  doc.text('✨ 7LAYERS İLE YAŞAMINIZIN DİĞER SIRLARINI KEŞFEDİN', 105, promoBoxY + 7, { align: 'center' });
+
   doc.setFont('LiberationSans', 'normal');
   doc.setFontSize(8);
   doc.setTextColor(...muted);
+  doc.text('Kadim ezoterik ilimler ve modern analiz motorumuzla kader haritanızın diğer katmanlarını çözün:', 105, promoBoxY + 11.5, { align: 'center' });
+
+  // 4 Adet Merak Uyandırıcı Analiz Maddesi
+  let itemY = promoBoxY + 17;
+  const promoItems = [
+    {
+      title: '🔮 Kadersel İlişki & Sinastri Uyumu:',
+      desc: 'Partnerinizle aranızdaki bağ bir tesadüf mü, karmik bir borç mu? Bilinçaltı dinamikler ve ilişki kaderi.'
+    },
+    {
+      title: '🌳 Kabala Yaşam Ağacı & Ruh Misyonu:',
+      desc: 'Ruhunuz bu enkarnasyona hangi sınavı aşmak için geldi? 10 Sefirot ve 22 Yol ile hayatın asıl manevi amacı.'
+    },
+    {
+      title: '🧬 Human Design (Bilinç & Enerji Tasarımı):',
+      desc: 'Doğru kararları zihninizle mi alıyorsunuz? Gerçek enerji tipinizi, auranızı ve tükenmeden yaşama stratejinizi öğrenin.'
+    },
+    {
+      title: '⏳ Kozmik Doğum Saati Tespiti (Rektifikasyon):',
+      desc: 'Doğum saatinizi tam bilmiyorsanız, geçmiş kilit olaylarınızla gerçek doğum dakikanızı matematiksel olarak bulun.'
+    }
+  ];
+
+  promoItems.forEach((item) => {
+    doc.setFont('LiberationSans', 'bold');
+    doc.setFontSize(8);
+    doc.setTextColor(...primaryDark);
+    doc.text(item.title, 19, itemY);
+
+    const titleWidth = doc.getTextWidth(item.title);
+    doc.setFont('LiberationSans', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(...muted);
+    doc.text(item.desc, 19 + titleWidth + 1.5, itemY);
+
+    itemY += 7.2;
+  });
+
+  // Call to Action (Ziyaret & Keşif Buton Bandı)
+  doc.setFillColor(15, 23, 42); // Slate 900
+  doc.roundedRect(19, promoBoxY + promoBoxHeight - 11, 172, 8, 2, 2, 'F');
+
+  doc.setTextColor(255, 255, 255);
+  doc.setFont('LiberationSans', 'bold');
+  doc.setFontSize(8.5);
+  doc.text('👉 Hemen Ziyaret Edin: www.7layers.tr  •  Kişiye Özel Derin Haritalar & Farkındalık Analizleri', 105, promoBoxY + promoBoxHeight - 6, { align: 'center' });
+
+  curY = promoBoxY + promoBoxHeight + 5;
+
+  // Telif Alt Notu
+  doc.setFont('LiberationSans', 'normal');
+  doc.setFontSize(7);
+  doc.setTextColor(148, 163, 184);
   doc.text(
     'Bu analiz 7Layers Ezoterik & Kozmik Astroloji Motoru ile üretilmiştir. © 7Layers. Bütün hakları saklıdır.',
     105,
