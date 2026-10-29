@@ -405,182 +405,351 @@ export class CareerEngine {
     const mcSign = chart.midheaven ? chart.midheaven.sign : 'Oğlak';
     const house2Sign = chart.houses[1] ? chart.houses[1].sign : 'Boğa';
     const house3Sign = chart.houses[2] ? chart.houses[2].sign : 'İkizler';
+    const house5Sign = chart.houses[4] ? chart.houses[4].sign : 'Aslan';
     const house6Sign = chart.houses[5] ? chart.houses[5].sign : 'Başak';
+    const house8Sign = chart.houses[7] ? chart.houses[7].sign : 'Akrep';
+    const house9Sign = chart.houses[8] ? chart.houses[8].sign : 'Yay';
+    const house12Sign = chart.houses[11] ? chart.houses[11].sign : 'Balık';
 
-    // A) MERKÜR & MARS BİLİŞSEL VE MEKANİK ETKİLEŞİMİ (Kodlama & Algoritma Dehası)
+    // A) EZOTERİK GEZEGEN ETKİLEŞİMLERİ & AÇILAR (Esoteric Planetary Aspects)
     chart.aspects.forEach(asp => {
       const pair = `${asp.planet1}-${asp.planet2}`;
 
-      if (pair.includes('Merkür') && pair.includes('Mars')) {
-        scores.technology += 36;
-        scores.systems += 22;
-        scores.leadership += 14;
+      // 1. Işın: İrade & Liderlik (Güneş - Mars / Plüton)
+      if ((pair.includes('Güneş') && pair.includes('Mars')) || (pair.includes('Güneş') && pair.includes('Plüton'))) {
+        scores.leadership += 26;
+        scores.finance += 12;
       }
+      // 7. Işın: Kozmik Kıvılcım & İleri Teknoloji (Uranüs - Merkür / Mars)
       if (pair.includes('Merkür') && pair.includes('Uranüs')) {
-        scores.technology += 34;
-        scores.systems += 16;
-      }
-      if (pair.includes('Merkür') && pair.includes('Satürn')) {
-        scores.systems += 30;
         scores.technology += 24;
+        scores.global += 14;
       }
       if (pair.includes('Mars') && pair.includes('Uranüs')) {
-        scores.technology += 22;
-        scores.leadership += 20;
+        scores.technology += 20;
+        scores.leadership += 15;
       }
-      if ((pair.includes('Güneş') || pair.includes('Mars')) && pair.includes('Jüpiter')) {
-        scores.global += 24;
-        scores.leadership += 20;
+      // Analitik Zeka & Problem Çözümü (Merkür - Mars)
+      if (pair.includes('Merkür') && pair.includes('Mars')) {
+        scores.technology += 16;
+        scores.systems += 16;
+        scores.leadership += 12;
       }
-      if (pair.includes('Venüs') && (pair.includes('Merkür') || pair.includes('Neptün'))) {
+      // 3. Işın: Sistem & Mantık Mimarisi (Merkür - Satürn)
+      if (pair.includes('Merkür') && pair.includes('Satürn')) {
+        scores.systems += 26;
+        scores.finance += 14;
+      }
+      // 5. Işın: Yüksek Sanat, Estetik & Uyum (Venüs - Neptün / Ay)
+      if (pair.includes('Venüs') && (pair.includes('Neptün') || pair.includes('Ay'))) {
         scores.creative += 26;
+        scores.human += 16;
       }
-      if (pair.includes('Ay') && pair.includes('Neptün')) {
+      // İletişim, Medya & Diplomasi (Venüs - Merkür)
+      if (pair.includes('Venüs') && pair.includes('Merkür')) {
+        scores.creative += 22;
+        scores.global += 14;
+      }
+      // 2. Işın: Büyük Servet, Güç & Varlık Yönetimi (Jüpiter - Plüton)
+      if (pair.includes('Jüpiter') && pair.includes('Plüton')) {
+        scores.finance += 28;
+        scores.leadership += 16;
+      }
+      // Kurumsal Finans & Ekonomi (Jüpiter - Satürn / Venüs - Satürn)
+      if ((pair.includes('Jüpiter') && pair.includes('Satürn')) || (pair.includes('Venüs') && pair.includes('Satürn'))) {
+        scores.finance += 22;
+        scores.systems += 20;
+      }
+      // 2. Işın: Yüksek Bilgelik, Hukuk & Akademi (Jüpiter - Güneş)
+      if ((pair.includes('Güneş') || pair.includes('Mars')) && pair.includes('Jüpiter')) {
+        scores.global += 26;
+        scores.leadership += 16;
+      }
+      // 6. Işın: Şifa, Psikoloji & Merhamet (Ay - Neptün / Plüton)
+      if (pair.includes('Ay') && (pair.includes('Neptün') || pair.includes('Plüton'))) {
+        scores.human += 28;
+        scores.creative += 14;
+      }
+      // Şifa & Kiron Rezonansı (Güneş/Merkür - Kiron)
+      if (pair.includes('Kiron') && (pair.includes('Güneş') || pair.includes('Merkür') || pair.includes('Ay'))) {
         scores.human += 26;
+      }
+      // Disiplinli Eylem & İnşaat (Mars - Satürn)
+      if (pair.includes('Mars') && pair.includes('Satürn')) {
+        scores.systems += 22;
+        scores.leadership += 16;
       }
     });
 
-    // B) 3. EV (Bilişsel Diller, Programlama ve Çocukluk Merakı)
-    if (['Kova', 'Başak', 'İkizler', 'Akrep'].includes(house3Sign)) {
+    // B) 2. EV (Finans, Değer Üretimi, Bankacılık & Somut Kaynaklar)
+    if (['Boğa', 'Oğlak', 'Akrep', 'Başak'].includes(house2Sign)) {
+      scores.finance += 22;
+    }
+    if ([jupiter.house, venus.house, pluto.house, saturn.house].includes(2)) {
+      scores.finance += 26;
+    }
+    if (mercury.house === 2) {
+      scores.finance += 16;
+      scores.systems += 14;
+    }
+
+    // C) 3. EV (Bilişsel Diller, Yazarlık, Medya, Temel Eğitim & İletişim)
+    if (['İkizler', 'Başak', 'Terazi'].includes(house3Sign)) {
+      scores.creative += 18;
+      scores.systems += 14;
+    } else if (['Kova', 'Akrep'].includes(house3Sign)) {
+      scores.technology += 18;
+      scores.systems += 12;
+    }
+    if (mercury.house === 3 || moon.house === 3) {
+      scores.creative += 20;
+      scores.systems += 14;
+    }
+    if (uranus.house === 3) {
+      scores.technology += 20;
+    }
+
+    // D) 5. EV (Yaratıcı İfade, Sanat, Sahne, Tasarım & Girişim)
+    if (['Aslan', 'Terazi', 'Balık', 'İkizler'].includes(house5Sign)) {
+      scores.creative += 22;
+    }
+    if ([sun.house, venus.house, neptune.house].includes(5)) {
+      scores.creative += 28;
+    }
+    if (mars.house === 5) {
+      scores.creative += 16;
+      scores.leadership += 16;
+    }
+
+    // E) 6. EV (Sağlık, Tıp, İnce Zanaat, Hizmet & Operasyon)
+    if (['Başak', 'Yengeç', 'Balık', 'Akrep'].includes(house6Sign)) {
+      scores.human += 22;
+      scores.systems += 16;
+    } else if (['Oğlak', 'Boğa', 'Kova'].includes(house6Sign)) {
+      scores.systems += 22;
+    }
+    if ([moon.house, neptune.house].includes(6)) {
+      scores.human += 28;
+    }
+    if ([saturn.house, mars.house].includes(6)) {
+      scores.systems += 24;
+    }
+    if (mercury.house === 6) {
+      scores.systems += 22;
+      scores.human += 14;
+    }
+    if (uranus.house === 6) {
       scores.technology += 20;
       scores.systems += 14;
     }
-    if ([mercury.house, mars.house, uranus.house, saturn.house].includes(3)) {
-      scores.technology += 24;
-      scores.systems += 16;
-    }
 
-    // C) 6. EV (Teknik Zanaat, Masadaki Fiili İş)
-    if (['Kova', 'Başak', 'Akrep', 'Oğlak'].includes(house6Sign)) {
-      scores.systems += 22;
-      scores.technology += 20;
-    }
-    if (uranus.house === 6) {
-      scores.technology += 35;
-      scores.systems += 18;
-    }
-    if (mercury.house === 6) {
-      scores.technology += 30;
-      scores.systems += 25;
-    }
-    if (mars.house === 6) {
-      scores.systems += 26;
-      scores.technology += 18;
-    }
-
-    // D) 10. EV (MC - Kariyer Zirvesi ve Toplumsal Unvan)
-    if (uranus.house === 10 || uranus.house === 9) {
-      scores.technology += 42;
-      scores.leadership += 18;
-    }
-    if (mercury.house === 10) {
-      scores.technology += 32;
-      scores.systems += 24;
-    }
-    if (saturn.house === 10) {
-      scores.systems += 32;
-      scores.leadership += 20;
-    }
-    if (sun.house === 10) {
-      scores.leadership += 32;
-    }
-    if (jupiter.house === 10) {
-      scores.global += 32;
-      scores.finance += 24;
-    }
-    if (pluto.house === 10) {
-      scores.finance += 26;
-      scores.technology += 18;
-      scores.leadership += 22;
-    }
-
-    // E) GEZEGEN BURÇ ASİLETLERİ (Dignities)
-    if (mercury.sign === 'Başak') {
-      scores.technology += 38;
-      scores.systems += 30;
-    } else if (mercury.sign === 'İkizler' || mercury.sign === 'Kova') {
-      scores.technology += 28;
-      scores.creative += 20;
-    } else if (mercury.sign === 'Akrep' || mercury.sign === 'Oğlak') {
-      scores.technology += 20;
-      scores.systems += 24;
-    }
-
-    if (['Kova', 'Başak', 'İkizler', 'Yay'].includes(uranus.sign)) {
-      scores.technology += 18;
-    }
-    if (['Oğlak', 'Akrep', 'Başak'].includes(saturn.sign)) {
-      scores.systems += 28;
+    // F) 8. EV (Dönüşüm, Büyük Finans, Cerrahi, Psikiyatri & Kriz Yönetimi)
+    if (['Akrep', 'Boğa', 'Oğlak'].includes(house8Sign)) {
       scores.finance += 20;
+      scores.human += 18;
     }
-    if (['Akrep', 'Koç', 'Oğlak'].includes(mars.sign)) {
-      scores.leadership += 24;
-      scores.systems += 20;
-      scores.technology += 14;
-    }
-    if (['Aslan', 'Koç', 'Yay'].includes(sun.sign)) {
-      scores.leadership += 28;
-      scores.global += 18;
-    }
-    if (['Yay', 'Balık', 'Yengeç', 'Boğa'].includes(jupiter.sign)) {
-      scores.global += 26;
+    if ([pluto.house, mars.house].includes(8)) {
+      scores.human += 24;
       scores.finance += 22;
     }
-    if (['Terazi', 'Boğa', 'Balık'].includes(venus.sign)) {
-      scores.creative += 28;
-      scores.human += 20;
-    }
-    if (['Yengeç', 'Boğa', 'Balık'].includes(moon.sign)) {
-      scores.human += 26;
+    if (jupiter.house === 8) {
+      scores.finance += 26;
     }
 
-    // F) YÜKSELEN BURÇ KATKISI
-    if (['Kova', 'Başak', 'İkizler'].includes(ascSign)) {
-      scores.technology += 22;
+    // G) 9. EV (Yüksek Dharma, Hukuk, Akademi, Felsefe & Global Vizyon)
+    if (['Yay', 'Balık', 'Kova', 'Terazi'].includes(house9Sign)) {
+      scores.global += 24;
+    }
+    if ([jupiter.house, sun.house].includes(9)) {
+      scores.global += 28;
+    }
+    if (mercury.house === 9) {
+      scores.global += 20;
+      scores.creative += 14;
+    }
+    if (uranus.house === 9) {
+      scores.technology += 18;
+      scores.global += 18;
+    }
+
+    // H) 10. EV (MC - Toplumsal Tepe Noktası & Mesleki Makam)
+    if (['Koç', 'Aslan'].includes(mcSign)) {
+      scores.leadership += 30;
+    } else if (['Boğa', 'Akrep'].includes(mcSign)) {
+      scores.finance += 28;
+    } else if (['İkizler', 'Terazi'].includes(mcSign)) {
+      scores.creative += 28;
+    } else if (['Yengeç', 'Balık'].includes(mcSign)) {
+      scores.human += 30;
+    } else if (['Başak', 'Oğlak'].includes(mcSign)) {
+      scores.systems += 30;
+    } else if (mcSign === 'Yay') {
+      scores.global += 30;
+    } else if (mcSign === 'Kova') {
+      scores.technology += 28;
+      scores.global += 16;
+    }
+
+    if (sun.house === 10) scores.leadership += 32;
+    if (saturn.house === 10) { scores.systems += 30; scores.leadership += 18; }
+    if (jupiter.house === 10) { scores.global += 30; scores.finance += 24; }
+    if (venus.house === 10) { scores.creative += 30; scores.finance += 16; }
+    if (mars.house === 10) { scores.leadership += 28; scores.systems += 16; }
+    if (moon.house === 10) { scores.human += 28; scores.creative += 16; }
+    if (uranus.house === 10) { scores.technology += 30; scores.global += 16; }
+    if (neptune.house === 10) { scores.human += 28; scores.creative += 26; }
+    if (pluto.house === 10) { scores.finance += 26; scores.leadership += 24; }
+    if (mercury.house === 10) { scores.systems += 22; scores.creative += 18; scores.technology += 16; }
+
+    // I) 12. EV (Kolektif Şifa, Sanat, Hastaneler & Arka Plan Stratejisi)
+    if ([neptune.house, moon.house, jupiter.house].includes(12)) {
+      scores.human += 26;
+      scores.creative += 18;
+    }
+
+    // J) GEZEGEN BURÇ ASİLETLERİ (Dignities)
+    if (sun.sign === 'Aslan' || sun.sign === 'Koç') {
+      scores.leadership += 26;
+    } else if (sun.sign === 'Yay') {
+      scores.leadership += 18;
+      scores.global += 22;
+    }
+
+    if (moon.sign === 'Yengeç' || moon.sign === 'Balık') {
+      scores.human += 28;
+    } else if (moon.sign === 'Boğa') {
+      scores.finance += 20;
+      scores.creative += 16;
+    }
+
+    if (mercury.sign === 'Başak') {
+      scores.systems += 28;
+      scores.technology += 18;
+    } else if (mercury.sign === 'İkizler') {
+      scores.creative += 24;
+      scores.technology += 16;
+    } else if (mercury.sign === 'Kova') {
+      scores.technology += 24;
+      scores.global += 18;
+    } else if (mercury.sign === 'Akrep' || mercury.sign === 'Oğlak') {
+      scores.systems += 22;
+      scores.finance += 18;
+    }
+
+    if (venus.sign === 'Boğa' || venus.sign === 'Terazi') {
+      scores.creative += 28;
+      scores.finance += 16;
+    } else if (venus.sign === 'Balık') {
+      scores.creative += 26;
+      scores.human += 24;
+    }
+
+    if (mars.sign === 'Koç' || mars.sign === 'Akrep' || mars.sign === 'Oğlak') {
+      scores.leadership += 24;
       scores.systems += 18;
-    } else if (['Koç', 'Aslan'].includes(ascSign)) {
+    }
+
+    if (jupiter.sign === 'Yay' || jupiter.sign === 'Balık') {
+      scores.global += 28;
+      scores.human += 18;
+    } else if (jupiter.sign === 'Yengeç' || jupiter.sign === 'Boğa') {
+      scores.finance += 24;
+      scores.global += 18;
+    }
+
+    if (saturn.sign === 'Oğlak' || saturn.sign === 'Kova' || saturn.sign === 'Terazi') {
+      scores.systems += 28;
+      scores.finance += 18;
+    }
+
+    if (uranus.sign === 'Kova') {
+      scores.technology += 26;
+    }
+    if (neptune.sign === 'Balık') {
+      scores.creative += 22;
+      scores.human += 24;
+    }
+    if (pluto.sign === 'Akrep') {
+      scores.finance += 22;
+      scores.human += 18;
+      scores.leadership += 18;
+    }
+
+    // K) YÜKSELEN BURÇ (ASC - Dış Dünyadaki Eylem Maskesi)
+    if (['Koç', 'Aslan'].includes(ascSign)) {
       scores.leadership += 22;
     } else if (['Boğa', 'Oğlak'].includes(ascSign)) {
       scores.finance += 20;
       scores.systems += 20;
+    } else if (['İkizler', 'Terazi'].includes(ascSign)) {
+      scores.creative += 22;
+    } else if (['Yengeç', 'Balık'].includes(ascSign)) {
+      scores.human += 24;
+    } else if (ascSign === 'Başak') {
+      scores.systems += 24;
+    } else if (ascSign === 'Yay') {
+      scores.global += 24;
+    } else if (ascSign === 'Kova') {
+      scores.technology += 22;
+      scores.global += 14;
     }
 
-    // G) NUMEROLOJİ (Yaşam Yolu, Doğum Günü Sayısı & İsim)
-    if (lifePathNum === 7) {
-      scores.technology += 32;
-      scores.systems += 22;
+    // L) NUMEROLOJİ (Yaşam Yolu, Doğum Günü Sayısı & İsim)
+    if (lifePathNum === 1 || lifePathNum === 5) {
+      scores.leadership += 24;
+    } else if (lifePathNum === 2 || lifePathNum === 6) {
+      scores.human += 26;
+      scores.creative += 16;
+    } else if (lifePathNum === 3) {
+      scores.creative += 26;
     } else if (lifePathNum === 4) {
-      scores.systems += 30;
+      scores.systems += 26;
+    } else if (lifePathNum === 7) {
       scores.technology += 20;
-    } else if (lifePathNum === 1 || lifePathNum === 5) {
-      scores.leadership += 26;
+      scores.systems += 18;
+      scores.global += 16;
     } else if (lifePathNum === 8 || lifePathNum === 22) {
-      scores.finance += 28;
+      scores.finance += 26;
       scores.leadership += 20;
-    }
-
-    if ([4, 7, 13, 22, 25, 31].includes(birthDayNum)) {
-      scores.technology += 20;
-      scores.systems += 18;
-    }
-
-    if (destinyNum === 7) scores.technology += 22;
-    else if (destinyNum === 4) scores.systems += 24;
-    else if (destinyNum === 8 || destinyNum === 22) scores.finance += 24;
-    else if (destinyNum === 1) scores.leadership += 22;
-    else if (destinyNum === 3) scores.creative += 24;
-    else if (destinyNum === 2 || destinyNum === 6) scores.human += 24;
-    else if (destinyNum === 9) scores.global += 22;
-
-    // H) HUMAN DESIGN TİPİ
-    if (hdType === 'Manifesting Jeneratör') {
-      scores.technology += 16;
-      scores.leadership += 16;
-    } else if (hdType === 'Manifestör') {
-      scores.leadership += 20;
-    } else if (hdType === 'Projektör') {
-      scores.systems += 18;
+    } else if (lifePathNum === 9) {
+      scores.global += 26;
       scores.human += 18;
+    } else if (lifePathNum === 11 || lifePathNum === 33) {
+      scores.human += 26;
+      scores.creative += 20;
+    }
+
+    if ([1, 10, 19, 28].includes(birthDayNum)) scores.leadership += 18;
+    else if ([2, 6, 11, 20, 24].includes(birthDayNum)) scores.human += 18;
+    else if ([3, 12, 21, 30].includes(birthDayNum)) scores.creative += 18;
+    else if ([4, 13, 22, 31].includes(birthDayNum)) scores.systems += 18;
+    else if ([5, 14, 23].includes(birthDayNum)) scores.global += 18;
+    else if ([7, 16, 25].includes(birthDayNum)) scores.technology += 18;
+    else if ([8, 17, 26].includes(birthDayNum)) scores.finance += 18;
+
+    if (destinyNum === 1) scores.leadership += 20;
+    else if (destinyNum === 2 || destinyNum === 6) scores.human += 20;
+    else if (destinyNum === 3) scores.creative += 20;
+    else if (destinyNum === 4) scores.systems += 20;
+    else if (destinyNum === 5 || destinyNum === 9) scores.global += 20;
+    else if (destinyNum === 7) scores.technology += 20;
+    else if (destinyNum === 8 || destinyNum === 22) scores.finance += 20;
+
+    // M) HUMAN DESIGN TİPİ
+    if (hdType === 'Manifestör') {
+      scores.leadership += 20;
+    } else if (hdType === 'Jeneratör') {
+      scores.systems += 16;
+      scores.creative += 14;
+    } else if (hdType === 'Manifesting Jeneratör') {
+      scores.leadership += 14;
+      scores.global += 14;
+    } else if (hdType === 'Projektör') {
+      scores.human += 18;
+      scores.systems += 16;
+    } else if (hdType === 'Reflektör') {
+      scores.human += 20;
+      scores.global += 18;
     }
 
     // 5. TÜM 7 SEKTÖRÜN BİREBİR TEKİL %100 DAĞILIMI
