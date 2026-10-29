@@ -114,10 +114,13 @@ const renderFormattedText = (text: string) => {
   });
 };
 
+import { useAnalysisAccess } from '@/hooks/useAnalysisAccess';
+
 export default function CosmicMatrixPage() {
   const router = useRouter();
   const { user, role } = useAuth();
-  const isMasterOrAdmin = role === 'master' || role === 'admin';
+  const { isUnlocked: isPurchasedOrAdmin } = useAnalysisAccess('cosmic-matrix');
+  const isMasterOrAdmin = role === 'master' || role === 'admin' || isPurchasedOrAdmin;
 
   const [name, setName] = useState('');
   const [dateStr, setDateStr] = useState('1990-01-01');

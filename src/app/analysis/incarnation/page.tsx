@@ -48,10 +48,13 @@ const ZODIAC_COLORS: Record<string, string> = {
   'Yengeç': '#0A84FF', 'Akrep': '#0A84FF', 'Balık': '#0A84FF',
 };
 
+import { useAnalysisAccess } from '@/hooks/useAnalysisAccess';
+
 export default function IncarnationAnalysisPage() {
   const router = useRouter();
   const { role, user } = useAuth();
-  const isMasterOrAdmin = role === 'master' || role === 'admin';
+  const { isUnlocked: isPurchasedOrAdmin } = useAnalysisAccess('incarnation');
+  const isMasterOrAdmin = role === 'master' || role === 'admin' || isPurchasedOrAdmin;
 
   // Form states
   const [dateStr, setDateStr] = useState('');

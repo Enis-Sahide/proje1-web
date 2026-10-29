@@ -72,10 +72,13 @@ const KABBALAH_HD_BRIDGE: Record<string, { title: string; subtitle: string; desc
   }
 };
 
+import { useAnalysisAccess } from '@/hooks/useAnalysisAccess';
+
 export default function KabbalahAnalysisPage() {
   const router = useRouter();
   const { role, user } = useAuth();
-  const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
+  const { isUnlocked: isPurchasedOrAdmin } = useAnalysisAccess('kabbalah');
+  const isApprenticeOrAbove = isPurchasedOrAdmin;
   const [showLockModal, setShowLockModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
 

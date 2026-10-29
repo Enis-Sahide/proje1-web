@@ -515,11 +515,14 @@ const getHolisticSynthesisText = (type: string) => {
   };
 };
 
+import { useAnalysisAccess } from '@/hooks/useAnalysisAccess';
+
 export default function HumanDesignPage() {
   const router = useRouter();
   const { role, user } = useAuth();
-  const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
-  const isMasterOrAdmin = role === 'master' || role === 'admin';
+  const { isUnlocked: isPurchasedOrAdmin } = useAnalysisAccess('human-design');
+  const isApprenticeOrAbove = isPurchasedOrAdmin;
+  const isMasterOrAdmin = role === 'master' || role === 'admin' || isPurchasedOrAdmin;
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [showResult, setShowResult] = useState(false);
   const [showLockModal, setShowLockModal] = useState(false);

@@ -54,10 +54,13 @@ const CHART_SIZE = 640;
 const CENTER = CHART_SIZE / 2;
 const RADIUS = CENTER - 85;
 
+import { useAnalysisAccess } from '@/hooks/useAnalysisAccess';
+
 export default function AstrologyPage() {
   const router = useRouter();
   const { role, user } = useAuth();
-  const isApprenticeOrAbove = role === 'apprentice' || role === 'journeyman' || role === 'master' || role === 'admin';
+  const { isUnlocked: isPurchasedOrAdmin } = useAnalysisAccess('astrology');
+  const isApprenticeOrAbove = isPurchasedOrAdmin;
   const [showLockModal, setShowLockModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
 

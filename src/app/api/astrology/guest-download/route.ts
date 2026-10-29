@@ -1,5 +1,5 @@
 import { db } from '@/db/client';
-import { guestOrders } from '@/db/schema';
+import { guestOrders, hdGates } from '@/db/schema';
 import { json, errorJson } from '@/lib/http/cors';
 import { eq } from 'drizzle-orm';
 import moment from 'moment-timezone';
@@ -7,6 +7,10 @@ import { generateAstrologyChart, calculateDraconicChart, calculateHarmonicChart 
 import { getKabbalahAnalysis } from '@/features/astrology/engine/KabbalahInterpretations';
 import { getEsotericPlanetInterpretation } from '@/features/astrology/engine/KabbalahPlanetInterpretations';
 import { CareerEngine } from '@/features/astrology/engine/CareerEngine';
+import { generateChart } from '@/utils/HumanDesignEngine';
+import { calculateIncarnationAnalysis } from '@/features/astrology/engine/IncarnationEngine';
+import { synthesizeCosmicMatrix } from '@/features/astrology/engine/CosmicMatrixEngine';
+import { getDruidTreeByDate } from '@/features/astrology/engine/DruidTreeEngine';
 
 export async function GET(request: Request) {
   try {
@@ -99,8 +103,6 @@ export async function GET(request: Request) {
         interpretations
       };
     } else if (order.analysisType === 'human-design' || order.analysisType === 'human_design') {
-      const { generateChart } = require('@/utils/HumanDesignEngine');
-      const { hdGates } = require('@/db/schema');
       const chartData = generateChart(dateObj);
       const gates = await db.select().from(hdGates);
       resultData = {
@@ -108,7 +110,6 @@ export async function GET(request: Request) {
         gatesData: gates
       };
     } else if (order.analysisType === 'incarnation' || order.analysisType === 'karmic') {
-      const { calculateIncarnationAnalysis } = require('@/features/astrology/engine/IncarnationEngine');
       const natalChart = await generateAstrologyChart(dateObj, cityData, false);
       const incarnation = calculateIncarnationAnalysis(natalChart, dateObj);
       resultData = {
@@ -116,13 +117,13 @@ export async function GET(request: Request) {
         incarnation
       };
     } else if (order.analysisType === 'cosmic-matrix' || order.analysisType === 'cosmic_matrix') {
-      const { generateChart } = require('@/utils/HumanDesignEngine');
-      const { synthesizeCosmicMatrix } = require('@/features/astrology/engine/CosmicMatrixEngine');
-      const { getDruidTreeByDate } = require('@/features/astrology/engine/DruidTreeEngine');
-
       const natalChart = await generateAstrologyChart(dateObj, cityData, false);
       const hdChart = generateChart(dateObj);
-      const cosmicMatrix = synthesizeCosmicMatrix(natalChart.planets, natalChart.aspects, hdChart);
+      const planetsInput = (natalChart.planets || []).map((p: any) => ({
+        ...p,
+        degree: p.absDegree ?? p.signDegree ?? 0
+      }));
+      const cosmicMatrix = synthesizeCosmicMatrix(planetsInput, natalChart.aspects, hdChart);
 
       const parts = localDate.split('-');
       const druidTree = getDruidTreeByDate(parseInt(parts[2], 10) || 1, parseInt(parts[1], 10) || 1);

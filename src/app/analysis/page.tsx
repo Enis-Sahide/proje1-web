@@ -167,7 +167,7 @@ export default function AnalysisPage() {
                   {tool.isMasterPreview && !isMasterOrAdmin && (
                     <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-amber-400/90 bg-amber-400/10 border border-amber-400/20 px-1.5 py-0.5 rounded-md mt-0.5">
                       <Sparkles size={10} />
-                      Usta & Rapor
+                      Kapsamlı Rapor
                     </span>
                   )}
                 </div>
