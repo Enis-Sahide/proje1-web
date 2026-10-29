@@ -568,24 +568,64 @@ export const downloadCareerPDF = async (
     );
     curY += 6;
 
-    // Ruhu Besleyen Kadersel Sektörler
-    if (data.soulCareer.soulTopSectors && data.soulCareer.soulTopSectors.length > 0) {
+    // Ruhu Besleyen Kadersel Sektörler (7 Sektör Dağılımı)
+    const soulSectors = data.soulCareer.soulAllSectors || data.soulCareer.soulTopSectors;
+    if (soulSectors && soulSectors.length > 0) {
       ensureSpace(28);
       doc.setFont('LiberationSans', 'bold');
       doc.setFontSize(11);
       doc.setTextColor(...primaryDark);
-      doc.text('RUHU BESLEYEN KADERSEL SEKTÖRLER', 15, curY);
+      doc.text('RUHU BESLEYEN KADERSEL SEKTÖRLER (7 SEKTÖR DAĞILIMI)', 15, curY);
       curY += 5;
 
-      data.soulCareer.soulTopSectors.slice(0, 2).forEach((sSec, sIdx) => {
+      soulSectors.forEach((sSec, sIdx) => {
         ensureSpace(20);
         curY = renderText(
           `**${sIdx + 1}. ${sSec.title} (%${sSec.percentage} Ruhsal Çağrı):** ${sSec.description}\n` +
           `**Ruhsal Ustalık Dalları:** ${sSec.recommendedRoles.join(', ')}`,
           15, curY, 180, 5.8
         );
-        curY += 4;
+        curY += 3;
       });
+    }
+
+    // Ruh Haritası (Drakonik) 6 Temel Sütun Deşifresi
+    if (data.soulCareer.soulPillars && data.soulCareer.soulPillars.length > 0) {
+      ensureSpace(28);
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(...primaryDark);
+      doc.text('RUH HARİTASI (DRAKONİK) 6 TEMEL SÜTUN DEŞİFRESİ', 15, curY);
+      curY += 5;
+
+      data.soulCareer.soulPillars.forEach((pillar) => {
+        ensureSpace(18);
+        curY = renderText(
+          `**${pillar.title} [${pillar.domain}]:** ${pillar.explanation}\n` +
+          `**Ruhsal Ustalık Alanları:** ${pillar.suitableProfessions.join(', ')}`,
+          15, curY, 180, 5.8
+        );
+        curY += 3;
+      });
+    }
+
+    // Drakonik Pars Fortuna (Kadersel Ruhsal Bereket Kapısı)
+    if (data.soulCareer.soulParsFortuna) {
+      ensureSpace(25);
+      doc.setFont('LiberationSans', 'bold');
+      doc.setFontSize(11);
+      doc.setTextColor(...primaryDark);
+      doc.text('KADERSEL RUHSAL ŞANS NOKTASI (DRAKONİK PARS FORTUNA)', 15, curY);
+      curY += 5;
+
+      const pof = data.soulCareer.soulParsFortuna;
+      curY = renderText(
+        `**Konum & Kapı:** ${pof.wealthPortalTitle}\n` +
+        `**Kadersel Bereket Alanı:** ${pof.karmicBlessingArea}\n` +
+        `**Zahmetsiz Bereket Formülü:** ${pof.practicalMonetizationGuidance}`,
+        15, curY, 180, 5.8
+      );
+      curY += 4;
     }
 
     // Ruh-Madde Sentez Köprüsü

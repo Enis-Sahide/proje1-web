@@ -109,6 +109,9 @@ export interface SoulCareerData {
     emotionalNourishment: string;
   };
   soulTopSectors: CareerSectorMatch[];
+  soulAllSectors: CareerSectorMatch[];
+  soulPillars: PlanetaryPlacementCareerInsight[];
+  soulParsFortuna: ParsFortunaWealthData;
   soulMaterialBridge: {
     materialIdentity: string;
     soulCalling: string;
@@ -1705,6 +1708,162 @@ function calculatePlanetaryCareerInsights(
   return insights;
 }
 
+function getSoulHouse2Insight(sign: string): { title: string; explanation: string; roles: string[]; iconName: string } {
+  const map: Record<string, { title: string; explanation: string; roles: string[]; iconName: string }> = {
+    'Koç': {
+      title: 'Drakonik 2. Ev Koç • Cesur Girişim, Bağımsız Ruhsal İnisiyatif & Öncülük Rızkı',
+      explanation: 'Ruhsal 2. evinizin Koç burcunda olması; manevi doyumunuzun ve ilahi rızkınızın kimseden icazet almadan başlattığınız cesur ruhsal adımlardan, korkusuz inisiyatiflerden ve öncü manevi projelerden akacağını simgeler.',
+      roles: ['Öncü Manevi Danışman', 'Bağımsız Ruhsal Girişimci', 'Cesaret Rehberi', 'Ezber Bozan Yaşam Koçu'],
+      iconName: 'Flame'
+    },
+    'Boğa': {
+      title: 'Drakonik 2. Ev Boğa • Kutsal Toprak, Doğal Şifa, Kalıcı Zanaat & Beden Dinginliği Rızkı',
+      explanation: 'Ruhsal 2. evinizin Boğa burcunda olması; ilahi bereketin doğayla, organik tarımla, doğal taşlarla, elle tutulur zanaat eserleriyle ve bedene huzur veren şifa uygulamalarıyla rezone olarak katlanacağını simgeler.',
+      roles: ['Doğal Şifacı & Fitoterapist', 'Kalıcı Zanaat Ustası', 'Organik Yaşam Rehberi', 'Mekân Enerji Tasarımcısı'],
+      iconName: 'Sparkles'
+    },
+    'İkizler': {
+      title: 'Drakonik 2. Ev İkizler • Kutsal Kelimeler, Yazı, Bilgelik Tercümesi & Zihinsel Bereket',
+      explanation: 'Ruhsal 2. evinizin İkizler burcunda olması; manevi rızkınızın yüksek bilgelik kodlarını sade dillere tercüme etmekten, yazarlıktan, kutsal bilgileri insanlara ulaştıran eğitim ve dijital köprülerden geleceğini gösterir.',
+      roles: ['Ruhsal Yazar & Editör', 'Ezoterik Bilgelik Eğitmeni', 'Manevi İletişim Mentörü', 'Kozmik Köprü Kurucu'],
+      iconName: 'BookOpen'
+    },
+    'Yengeç': {
+      title: 'Drakonik 2. Ev Yengeç • Koşulsuz Şefkat, Duygusal Sığınak & Ruhsal Besleme Bereketi',
+      explanation: 'Ruhsal 2. evinizin Yengeç burcunda olması; ilahi rızkın insanların kalbini ısıtacak güvenli yuvalar, sığınaklar ve şefkat alanları kurduğunuzda, ruhları sevgiyle besleyip koruduğunuzda taşacağını simgeler.',
+      roles: ['Bilinçaltı & Aile Dizimi Rehberi', 'Ruhsal Şefkat Danışmanı', 'Kadın & Çocuk İyilik Lideri', 'Duygusal Arınma Mentörü'],
+      iconName: 'Heart'
+    },
+    'Aslan': {
+      title: 'Drakonik 2. Ev Aslan • Kalpten Üretim, Sahne Işığı, Yaratıcı Sanat & Yaşama Sevinci Rızkı',
+      explanation: 'Ruhsal 2. evinizin Aslan burcunda olması; ruhsal kazancınızın içinizdeki ilahi yaratıcı ateşi sahneye, sanata ve görsel eserlere döktüğünüzde, insanlara yaşama sevinci ve asalet aşıladığınızda açılacağını simgeler.',
+      roles: ['Yaratıcı İlham Direktörü', 'Ruhsal Sahne Sanatçısı', 'Kalp Merkezli Lider', 'Özgün Sanat Eğitmeni'],
+      iconName: 'Sun'
+    },
+    'Başak': {
+      title: 'Drakonik 2. Ev Başak • Kutsal Hizmet, Arınma, Bitkisel Simya & İnce Zanaat Bereketi',
+      explanation: 'Ruhsal 2. evinizin Başak burcunda olması; manevi zenginliğinizin alçakgönüllülükle sunulan hizmetten, detoks, beden-zihin arınması ve dünyadaki karmaşayı dingin bir intizama kavuşturan kutsal zanaatten doğacağını simgeler.',
+      roles: ['Bütünsel Sağlık & Arınma Uzmanı', 'Kutsal Zanaatkâr', 'Ruh-Beden Denge Danışmanı', 'Şifalı Bitki Simyacısı'],
+      iconName: 'CheckCircle'
+    },
+    'Terazi': {
+      title: 'Drakonik 2. Ev Terazi • İlahi Ahenk, Kozmik Adalet, Estetik Güzellik & Kalp Yoldaşlığı Rızkı',
+      explanation: 'Ruhsal 2. evinizin Terazi burcunda olması; ilahi bereketin dünyadaki kutuplaşmaları sevgi ve diplomasiyle eritmekten, sanatı ruhsal bir mertebeye taşımaktan ve ilahi adaleti savunmaktan doğacağını simgeler.',
+      roles: ['Ruhsal İlişki Danışmanı', 'İlahi Estetik Tasarımcısı', 'Barış & Arabuluculuk Elçisi', 'Kozmik Adalet Savunucusu'],
+      iconName: 'Scale'
+    },
+    'Akrep': {
+      title: 'Drakonik 2. Ev Akrep • Ruhsal Simya, Gölge Şifası, Kriz Dönüşümü & Ezoterik Derinlik Rızkı',
+      explanation: 'Ruhsal 2. evinizin Akrep burcunda olması; en büyük manevi hazinenizin tabuları yıkmaktan, en derin ruhsal travmaları şifalandırmaktan ve insanların yüzleşmeye çekindiği gölgelerden elmaslar çıkarmaktan geleceğini simgeler.',
+      roles: ['Ruhsal Simyacı & Hipnoterapist', 'Kriz & Travma Dönüştürücüsü', 'Okült & Ezoterik Araştırmacı', 'Ölüm-Doğum Geçiş Rehberi'],
+      iconName: 'Compass'
+    },
+    'Yay': {
+      title: 'Drakonik 2. Ev Yay • Hakikat Yolculuğu, Evrensel Felsefe, Kutsal Mekânlar & Bilgelik Bereketi',
+      explanation: 'Ruhsal 2. evinizin Yay burcunda olması; manevi rızkınızın sınırları aşan kutsal seyahatlerden, kadim felsefeleri ve inançları araştırmaktan, insanlara umut ve yüksek vizyon aşılayan rehberlikten akacağını simgeler.',
+      roles: ['Hakikat & Felsefe Rehberi', 'Kutsal Yolculuk Rehberi', 'Evrensel Bilinç Eğitmeni', 'Manevi Yayıncı'],
+      iconName: 'Globe'
+    },
+    'Oğlak': {
+      title: 'Drakonik 2. Ev Oğlak • Zamansız Eserler, Kadim Disiplin, Akil Üstatlık & Ruhsal Yapı İnşası',
+      explanation: 'Ruhsal 2. evinizin Oğlak burcunda olması; manevi doyumunuzun geçici hevesler yerine asırlara meydan okuyan kalıcı ruhsal sistemler kurmaktan, manevi bir üstat ciddiyetiyle sorumluluk almaktan geleceğini simgeler.',
+      roles: ['Kadim Bilgelik Muhafızı', 'Ruhsal Sistem Mimarı', 'Akil Manevi Danışman', 'Kalıcı Enstitü Kurucusu'],
+      iconName: 'Shield'
+    },
+    'Kova': {
+      title: 'Drakonik 2. Ev Kova • Kolektif Uyanış, İnsani Kardeşlik Ağları & Özgürlükçü Bilinç Bereketi',
+      explanation: 'Ruhsal 2. evinizin Kova burcunda olması; ilahi rızkınızın insanlığı dogmalardan özgürleştiren kolektif projelerden, fütüristik ruhsal topluluklardan ve insanlığın hayrına adanmış özgün fikirlerden fışkıracağını simgeler.',
+      roles: ['Kolektif Uyanış Öncüsü', 'Topluluk & İyilik Mimarı', 'Alternatif Bilinç Araştırmacısı', 'Evrensel Kardeşlik Elçisi'],
+      iconName: 'Cpu'
+    },
+    'Balık': {
+      title: 'Drakonik 2. Ev Balık • Koşulsuz Merhamet, Müzik, İlahi Teslimiyet & Mistisizm Rızkı',
+      explanation: 'Ruhsal 2. evinizin Balık burcunda olması; manevi doyumunuzun ego sınırlarını eritip evrensel sevgi kanalını açmaktan, müzik, şiir, dua ve mistik şifa ile insan ruhuna dokunmaktan geleceğini simgeler.',
+      roles: ['Mistik Şifacı & Meditasyon Rehberi', 'Ruhsal Müzik Bestecisi', 'Merhamet & Yardım Hizmetkârı', 'İlahi Aşk Temsilcisi'],
+      iconName: 'Music'
+    }
+  };
+  return map[sign] || map['Balık'];
+}
+
+function getSoulHouse6Insight(sign: string): { title: string; explanation: string; roles: string[]; iconName: string } {
+  const map: Record<string, { title: string; explanation: string; roles: string[]; iconName: string }> = {
+    'Koç': {
+      title: 'Drakonik 6. Ev Koç • Dinamik, Harekete Geçirici & Cesur Manevi Hizmet Sahası',
+      explanation: 'Ruhsal çalışma hayatınızın Koç burcunda olması; günlük mesainizin insanları ataletten kurtaran, onları cesaretle ayağa kaldıran ve hızlı aksiyon gerektiren dinamik bir hizmet zemininde geçmesi gerektiğini simgeler.',
+      roles: ['Manevi Motivasyon Koçu', 'Kriz Çözücü Destek Uzmanı', 'Dinamik Yaşam Rehberi'],
+      iconName: 'Flame'
+    },
+    'Boğa': {
+      title: 'Drakonik 6. Ev Boğa • Dingin, Sabırlı, Doğayla Bütünleşik & Somut Şifa Rutini',
+      explanation: 'Ruhsal mesainizin Boğa burcunda olması; günlük kutsal rutininizin telaşsız, doğanın döngüleriyle uyumlu, bitkiler, toprak ve doğal malzemelerle elle tutulur huzur üreten bir alanda yeşereceğini gösterir.',
+      roles: ['Doğal Sağlık Uygulayıcısı', 'Atölye Zanaatkârı', 'Dinginlik & Meditasyon Alanı Yöneticisi'],
+      iconName: 'Sparkles'
+    },
+    'İkizler': {
+      title: 'Drakonik 6. Ev İkizler • Sürekli Zihinsel Öğrenme, Yazı, İletişim & Arınma Mesaisi',
+      explanation: 'Ruhsal mesainizin İkizler burcunda olması; günlük kutsal rutininizin okumak, yazmak, yüksek bilgileri insanlara ulaştırmak ve zihinlerdeki vesveseleri arındıran aydınlatıcı konuşmalar yapmak olduğunu simgeler.',
+      roles: ['Manevi İçerik Editörü', 'Bilinç Kitaplığı Koordinatörü', 'İletişim & Danışma Görevlisi'],
+      iconName: 'BookOpen'
+    },
+    'Yengeç': {
+      title: 'Drakonik 6. Ev Yengeç • Şefkatli Bakım, Duygusal Güven & Ruhsal Sağaltım Zemini',
+      explanation: 'Ruhsal mesainizin Yengeç burcunda olması; günlük rutininizin insanlara sıcak bir yuva şefkati sunmak, kırılmış kalpleri dinlemek ve duygusal travmaları sevgiyle sağaltmak olduğunu simgeler.',
+      roles: ['Duygusal Destek Danışmanı', 'Şefkat & Bakım Koordinatörü', 'Holistik Aile Rehberi'],
+      iconName: 'Heart'
+    },
+    'Aslan': {
+      title: 'Drakonik 6. Ev Aslan • İlham Verici, Yaratıcı, Coşkulu & Kalpten Hizmet Sahası',
+      explanation: 'Ruhsal mesainizin Aslan burcunda olması; günlük hizmetinizin neşe, yaratıcı coşku, çocuklara ve gençlere ilham olma ve kalpten sergilenen sanatsal performanslarla gerçekleşeceğini simgeler.',
+      roles: ['Yaratıcı Drama & Sanat Eğitmeni', 'Çocuk Gelişimi Manevi Danışmanı', 'İlham Verici Etkinlik Lideri'],
+      iconName: 'Sun'
+    },
+    'Başak': {
+      title: 'Drakonik 6. Ev Başak • Kusursuz İntizam, Arınma, Şifalı Rutin & Kutsal Zanaatkârlık',
+      explanation: 'Ruhsal mesainizin Başak burcunda olması; günlük hizmetinizin en saf haliyle detoks, beden-zihin sağlığı, ince ayar düzeltmeler ve dünyaya sessizce intizam getiren kutsal bir ibadet ritmi taşıdığını gösterir.',
+      roles: ['Bütünsel Sağlık Koçu', 'Arınma & Beslenme Mentörü', 'İntizam & Kalite Sorumlusu'],
+      iconName: 'CheckCircle'
+    },
+    'Terazi': {
+      title: 'Drakonik 6. Ev Terazi • Uyumlu, Estetik, Çatışmasız & Barışçıl Hizmet Sahası',
+      explanation: 'Ruhsal mesainizin Terazi burcunda olması; günlük rutininizin insanları barıştırmak, çalışma ortamına zarafet ve huzur katmak, adil dengeyi korumak ve estetik mekanlar oluşturmak olduğunu simgeler.',
+      roles: ['Arabulucu & Barış Temsilcisi', 'Estetik Alan Terapisti', 'Sosyal Denge Danışmanı'],
+      iconName: 'Scale'
+    },
+    'Akrep': {
+      title: 'Drakonik 6. Ev Akrep • Derin Arınma, Bilinçaltı Simyası & Kriz Çözücü Kutsal Mesai',
+      explanation: 'Ruhsal mesainizin Akrep burcunda olması; günlük hizmetinizin yüzeysel işlerle değil; en derin travmaları çözmek, negatif enerjileri arındırmak ve kriz anlarında sarsılmaz bir ruhsal kalkan olmak olduğunu simgeler.',
+      roles: ['Bilinçaltı Temizlik Uzmanı', 'Enerjetik Koruma Danışmanı', 'Kriz Dönüşüm Mentörü'],
+      iconName: 'Compass'
+    },
+    'Yay': {
+      title: 'Drakonik 6. Ev Yay • Ufuk Açıcı, Felsefi, Öğretici & Özgür Ruhlu Hizmet Sahası',
+      explanation: 'Ruhsal mesainizin Yay burcunda olması; günlük rutininizin kalıplara sıkışmadan, insanlara umut, evrensel vizyon ve bilgelik aşılayan felsefi ve çok kültürlü bir zemin üzerinde akacağını simgeler.',
+      roles: ['Evrensel Vizyon Eğitmeni', 'Kültürlerarası Hizmet Rehberi', 'Felsefi Yaşam Mentörü'],
+      iconName: 'Globe'
+    },
+    'Oğlak': {
+      title: 'Drakonik 6. Ev Oğlak • Disiplinli, Sağlam, Güvenilir & Kök Salan Manevi Görev Sahası',
+      explanation: 'Ruhsal mesainizin Oğlak burcunda olması; günlük kutsal rutininizin ciddiyetle yapılandırılmış, kurallara ve zamana saygılı, kalıcı ruhsal gelenekleri koruyan sağlam bir çalışma ahlakı üzerine kurulu olduğunu gösterir.',
+      roles: ['Manevi Disiplin & Etik Danışmanı', 'Geleneksel Metodoloji Uzmanı', 'Uzun Vadeli Proje Yöneticisi'],
+      iconName: 'Shield'
+    },
+    'Kova': {
+      title: 'Drakonik 6. Ev Kova • Yenilikçi, Kolektif, Hiyerarşisiz & Özgürlükçü Hizmet Alanı',
+      explanation: 'Ruhsal mesainizin Kova burcunda olması; günlük hizmetinizin alışılmış şablonların dışına çıkan, kolektif yardımlaşma ağlarını ören ve teknoloji/fikirlerle insanlığa karşılıksız fayda sunan bir mecra olduğunu simgeler.',
+      roles: ['Kolektif İyilik Koordinatörü', 'Alternatif Ağ Kurucu', 'İnsani Yardım İnovatörü'],
+      iconName: 'Cpu'
+    },
+    'Balık': {
+      title: 'Drakonik 6. Ev Balık • Sezgisel, Meditatif, Şifa & Dua ile Bütünleşen Kutsal Zemin',
+      explanation: 'Ruhsal mesainizin Balık burcunda olması; günlük kutsal mesainizin katı kurallardan arınmış, müzik, tefekkür, dua ve sezgisel rehberlikle insan ruhunu dinlendiren kutsal bir şifa tapınağı gibi işlemesini simgeler.',
+      roles: ['Sezgisel Danışman', 'Mistik Terapi Rehberi', 'Manevi Huzur Uygulayıcısı'],
+      iconName: 'Music'
+    }
+  };
+  return map[sign] || map['Balık'];
+}
+
 function calculateSoulCareer(
   natalChart: NatalChartData,
   draconicChart: NatalChartData,
@@ -1715,6 +1874,17 @@ function calculateSoulCareer(
   const dSun = draconicChart.planets.find(p => p.name === 'Güneş')?.sign || 'Koç';
   const dMoon = draconicChart.planets.find(p => p.name === 'Ay')?.sign || 'Koç';
   const dVenus = draconicChart.planets.find(p => p.name === 'Venüs')?.sign || 'Koç';
+  const dMercuryObj = draconicChart.planets.find(p => p.name === 'Merkür') || { sign: 'İkizler', house: 3 };
+  const dMercurySign = dMercuryObj.sign;
+  const dMars = draconicChart.planets.find(p => p.name === 'Mars')?.sign || 'Koç';
+  const dJupiter = draconicChart.planets.find(p => p.name === 'Jüpiter')?.sign || 'Yay';
+  const dSaturn = draconicChart.planets.find(p => p.name === 'Satürn')?.sign || 'Oğlak';
+  const dUranus = draconicChart.planets.find(p => p.name === 'Uranüs')?.sign || 'Kova';
+  const dNeptune = draconicChart.planets.find(p => p.name === 'Neptün')?.sign || 'Balık';
+  const dPof = draconicChart.planets.find(p => p.name.includes('Şans') || p.name.includes('POF'));
+
+  const dHouse2Sign = draconicChart.houses?.[1]?.sign || dAsc;
+  const dHouse6Sign = draconicChart.houses?.[5]?.sign || dAsc;
 
   // 1. Ruhsal Tepe Noktası (Drakonik MC) - Kadersel Çağrı
   const mcCallings: Record<string, { title: string; calling: string; impact: string }> = {
@@ -1798,35 +1968,56 @@ function calculateSoulCareer(
     'Balık': 'Ruhunuz koşulsuz teslimiyeti, ilahi merhameti ve sanatsal ilhamla dünyayı arındırmayı seçti.'
   };
 
-  // 3. Ruhu Besleyen Kadersel Sektörler (Drakonik Gezegen Dağılımı)
+  // 3. Ruhu Besleyen Kadersel Sektörler (7 Sektörün Tamamı - Drakonik Harita Dağılımı)
   const soulScores: Record<string, number> = {
-    creative: 25,
-    human: 25,
-    global: 20,
+    creative: 20,
+    human: 20,
+    global: 15,
     systems: 15,
-    technology: 10,
-    finance: 10,
+    technology: 15,
+    finance: 15,
     leadership: 15
   };
 
-  if (['Balık', 'Terazi', 'Boğa', 'Aslan'].includes(dVenus) || ['Balık', 'Yengeç', 'Yay'].includes(dMc)) {
-    soulScores.creative += 35;
-    soulScores.human += 25;
-  }
-  if (['Başak', 'Oğlak'].includes(dMc) || ['Başak', 'Yengeç'].includes(dMoon)) {
-    soulScores.human += 30;
-    soulScores.systems += 25;
-  }
-  if (['Yay', 'Kova'].includes(dMc) || ['Yay', 'Kova'].includes(dSun)) {
-    soulScores.global += 35;
-    soulScores.creative += 20;
-  }
+  // 1. Creative
+  if (['Balık', 'Terazi', 'Boğa', 'Aslan', 'Yengeç'].includes(dVenus)) soulScores.creative += 30;
+  if (['Balık', 'Terazi', 'Boğa', 'Aslan'].includes(dMc)) soulScores.creative += 25;
+  if (['Balık', 'Yengeç', 'Boğa'].includes(dNeptune) || ['Balık', 'Yengeç'].includes(dMoon)) soulScores.creative += 20;
+
+  // 2. Human (Eğitim, Sağlık, Kamu & Şifa)
+  if (['Başak', 'Yengeç', 'Balık', 'Terazi'].includes(dMoon)) soulScores.human += 30;
+  if (['Başak', 'Balık', 'Yengeç'].includes(dHouse6Sign)) soulScores.human += 25;
+  if (['Başak', 'Yengeç', 'Oğlak'].includes(dMc)) soulScores.human += 20;
+
+  // 3. Global (Dış Ticaret, Lojistik, Yüksek Akademi)
+  if (['Yay', 'Kova', 'İkizler'].includes(dJupiter)) soulScores.global += 30;
+  if (['Yay', 'Kova'].includes(dMc)) soulScores.global += 25;
+  if (['Yay', 'İkizler'].includes(dMercurySign)) soulScores.global += 20;
+
+  // 4. Technology (Yazılım, Bilişim & Mühendislik)
+  if (['Kova', 'İkizler', 'Başak', 'Akrep'].includes(dUranus)) soulScores.technology += 30;
+  if (['Kova', 'İkizler', 'Başak'].includes(dMercurySign)) soulScores.technology += 25;
+  if (['Kova', 'İkizler', 'Koç'].includes(dMc)) soulScores.technology += 20;
+
+  // 5. Systems (Ağır Sanayi, Fabrikalar, Enerji & İnşaat)
+  if (['Oğlak', 'Boğa', 'Başak', 'Akrep'].includes(dSaturn)) soulScores.systems += 30;
+  if (['Koç', 'Akrep', 'Oğlak'].includes(dMars)) soulScores.systems += 25;
+  if (['Oğlak', 'Boğa'].includes(dMc)) soulScores.systems += 20;
+
+  // 6. Finance (Finans, Gayrimenkul, Bankacılık & Sermaye)
+  if (['Boğa', 'Akrep', 'Oğlak'].includes(dHouse2Sign)) soulScores.finance += 30;
+  if (['Boğa', 'Oğlak', 'Aslan'].includes(dVenus)) soulScores.finance += 25;
+  if (['Boğa', 'Akrep'].includes(dMc)) soulScores.finance += 20;
+
+  // 7. Leadership (Hukuk, Savunma, Stratejik Yönetim)
+  if (['Aslan', 'Koç', 'Oğlak', 'Akrep'].includes(dSun)) soulScores.leadership += 30;
+  if (['Aslan', 'Koç', 'Yay'].includes(dMars)) soulScores.leadership += 25;
+  if (['Aslan', 'Koç', 'Oğlak'].includes(dMc)) soulScores.leadership += 20;
 
   const soulTotal = Object.values(soulScores).reduce((a, b) => a + b, 0);
   const sortedSoulKeys = Object.keys(soulScores).sort((a, b) => soulScores[b] - soulScores[a]);
-  const soulTopKeys = sortedSoulKeys.slice(0, 3);
 
-  const soulTopSectors: CareerSectorMatch[] = soulTopKeys.map(k => {
+  const soulAllSectors: CareerSectorMatch[] = sortedSoulKeys.map(k => {
     const def = SECTOR_DEFINITIONS[k];
     const pct = Math.round((soulScores[k] / soulTotal) * 100);
     return {
@@ -1842,7 +2033,110 @@ function calculateSoulCareer(
     };
   });
 
-  // 4. Ruh & Madde Denge Köprüsü:
+  const pctSum = soulAllSectors.reduce((sum, s) => sum + s.percentage, 0);
+  if (pctSum !== 100 && soulAllSectors.length > 0) {
+    soulAllSectors[0].percentage += (100 - pctSum);
+  }
+  const soulTopSectors = soulAllSectors;
+
+  // 4. Drakonik Pars Fortuna (Ruhsal Kadersel Rızık Kapısı)
+  const rawSoulPof = calculateParsFortunaWealth(draconicChart);
+  const soulParsFortuna: ParsFortunaWealthData = {
+    ...rawSoulPof,
+    wealthPortalTitle: `Drakonik ${rawSoulPof.sign} (${rawSoulPof.house}. Ev) • Kadersel Ruhsal Bereket Kapısı`,
+    karmicBlessingArea: `Ruh haritanızda Pars Fortuna'nın ${rawSoulPof.sign} burcunda ve ${rawSoulPof.house}. evde olması; dünyevi kaygılardan arındığınızda ilahi rızkın doğrudan ${rawSoulPof.karmicBlessingArea}`,
+    practicalMonetizationGuidance: `Ruhsal Doyum ve Zahmetsiz Bereket Formülü: ${rawSoulPof.practicalMonetizationGuidance}`
+  };
+
+  // 5. Ruh Haritası (Drakonik) 6 Temel Sütun Deşifresi
+  const dHouse2 = getSoulHouse2Insight(dHouse2Sign);
+  const dHouse6 = getSoulHouse6Insight(dHouse6Sign);
+  const dFortuneSign = dPof?.sign || dHouse2Sign;
+
+  const soulPillars: PlanetaryPlacementCareerInsight[] = [
+    {
+      planet: 'Drakonik 10. Ev (Ruhsal MC)',
+      sign: dMc,
+      house: 10,
+      domain: '1. Sütun: Ruhsal Makam',
+      iconName: 'Building2',
+      title: `Drakonik 10. Ev ${dMc} (Ruhsal MC) • Kadersel Ruh Çağrınız & İlahi Mertebeniz`,
+      explanation: `Ruh haritanızın tepe noktasının (MC) ${dMc} burcunda olması; bu enkarnasyonda insanlığa bırakacağınız en derin manevi mirası ve ruhsal otoritenizi simgeler. ${mcData.calling}`,
+      suitableProfessions: [
+        `${dMc} Ruhsal Liderliği`,
+        'Kolektif Bilinç Rehberi',
+        'Manevi Eser & Sistem İnşacısı',
+        'İlahi İtibar Temsilcisi'
+      ]
+    },
+    {
+      planet: 'Drakonik 2. Ev (Manevi Rızık)',
+      sign: dHouse2Sign,
+      house: 2,
+      domain: '2. Sütun: Ruhsal Rızık',
+      iconName: dHouse2.iconName,
+      title: dHouse2.title,
+      explanation: dHouse2.explanation,
+      suitableProfessions: dHouse2.roles
+    },
+    {
+      planet: 'Drakonik 6. Ev (Kutsal Hizmet)',
+      sign: dHouse6Sign,
+      house: 6,
+      domain: '3. Sütun: Kutsal Hizmet',
+      iconName: dHouse6.iconName,
+      title: dHouse6.title,
+      explanation: dHouse6.explanation,
+      suitableProfessions: dHouse6.roles
+    },
+    {
+      planet: 'Drakonik Güneş',
+      sign: dSun,
+      house: draconicChart.planets.find(p => p.name === 'Güneş')?.house || 1,
+      domain: '4. Sütun: Ruhsal İrade',
+      iconName: 'Sun',
+      title: `Drakonik Güneş ${dSun} • Ruhun İlahi Işığı & Enkarnasyonel İrade`,
+      explanation: `Ruh haritanızdaki Güneş'in ${dSun} burcunda olması; ruhunuzun bu dünyada hangi frekansı yayarak parıldamayı seçtiğini deşifre eder. Maddi dünyanın ötesinde egodan arınmış saf yaratıcı iradeniz bu burcun bilgelik kodlarıyla rezone olur.`,
+      suitableProfessions: [
+        `${dSun} Bilgeliğinde Üretici`,
+        'İlham Verici Yaratıcı Güç',
+        'Manevi Odak & Aydınlatıcı',
+        'Ruhsal İnisiyatif Önderi'
+      ]
+    },
+    {
+      planet: 'Drakonik Yükselen (ASC)',
+      sign: dAsc,
+      house: 1,
+      domain: '5. Sütun: Ruhsal Vitrin',
+      iconName: 'Eye',
+      title: `Drakonik Yükselen ${dAsc} (ASC) • Ruhun Enkarnasyon Özü & İlahi Maske`,
+      explanation: ascEssences[dAsc] || `Ruhunuz bu dünyadaki varoluşunu ${dAsc} bilinciyle başlatmıştır. Manevi auranız ve dünyaya yansıttığınız ruhsal ilk intiba bu derin kumaştan örülüdür.`,
+      suitableProfessions: [
+        `${dAsc} Özüyle Hizmet Eden`,
+        'Ruhsal İntiba Rehberi',
+        'Manevi İkna & İletişim',
+        'Aura & Frekans Temsilcisi'
+      ]
+    },
+    {
+      planet: 'Drakonik Pars Fortuna & Merkür',
+      sign: `${dFortuneSign} / ${dMercurySign}`,
+      house: dMercuryObj.house || 3,
+      domain: '6. Sütun: Ruhsal Bereket & Zeka',
+      iconName: 'Sparkles',
+      title: `Drakonik Şans Noktası & Merkür • Kadersel Manevi Bereket & İlahi Biliş`,
+      explanation: `Ruh haritanızdaki Şans Noktası'nın (${dFortuneSign}) kadersel mıknatısı ile Drakonik Merkür'ünüzün (${dMercurySign}) yüksek sezgisel zekası birleştiğinde; zahmetsiz bir içsel doyum, ilahi bilgi akışı ve ruhsal refah tezahür eder. Zihninizi bu manevi kanala açtığınızda hem dünyevi hem ruhsal bereket kendiliğinden akar.`,
+      suitableProfessions: [
+        'Ezoterik Bilgelik & Sezgisel Danışmanlık',
+        'Felsefi, İlahi & Sanatsal Yazarlık',
+        'Bütünsel Şifa & Bilişsel Rehberlik',
+        'Kadersel Bereket Mentörlüğü'
+      ]
+    }
+  ];
+
+  // 6. Ruh & Madde Denge Köprüsü:
   const soulMaterialBridge = {
     materialIdentity: `${primaryMaterialSector.shortTitle} alanındaki dünyevi mesleğiniz (Sosyal Güvence & Rızık)`,
     soulCalling: `Drakonik ${dMc} MC: ${mcData.title}`,
@@ -1871,6 +2165,9 @@ function calculateSoulCareer(
       emotionalNourishment: `Ruhunuz ${dMoon} doğasında beslenir; dinginlik, duygusal derinlik ve samimiyet onun en büyük yakıtıdır.`
     },
     soulTopSectors,
+    soulAllSectors,
+    soulPillars,
+    soulParsFortuna,
     soulMaterialBridge
   };
 }
