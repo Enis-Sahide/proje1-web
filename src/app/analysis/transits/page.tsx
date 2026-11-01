@@ -36,7 +36,8 @@ import {
   generateCurrentSkyOverview,
   CurrentSkyOverview,
   generatePersonalTransitOverview,
-  PersonalTransitOverview
+  PersonalTransitOverview,
+  LIFE_AREA_NAMES
 } from '@/features/astrology/engine/TransitSynthesisEngine';
 import { AstroCity, TransitChartData, AstroPoint, AstroAspect } from '@/features/astrology/engine/AstrologyConstants';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
@@ -483,30 +484,30 @@ export default function TransitsPage() {
 
         {/* Mode Selector Segmented Switch */}
         <div className="flex justify-center mb-8">
-          <div className="inline-flex p-1.5 rounded-2xl bg-black/60 border border-white/10 backdrop-blur-xl shadow-2xl max-w-full overflow-x-auto">
+          <div className="grid grid-cols-2 sm:inline-flex w-full sm:w-auto p-1.5 rounded-2xl bg-black/60 border border-white/10 backdrop-blur-xl shadow-2xl">
             <button
               type="button"
               onClick={() => setAnalysisMode('MUNDANE')}
-              className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${
+              className={`flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-6 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${
                 analysisMode === 'MUNDANE'
                   ? 'bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8] text-black shadow-lg shadow-cyan-500/25'
                   : 'text-mystic-text-muted hover:text-white'
               }`}
             >
-              <Globe size={16} />
-              <span>Kolektif Gökyüzü Açıları (Bağımsız)</span>
+              <Globe size={15} className="shrink-0" />
+              <span className="truncate">Anlık Gökyüzü</span>
             </button>
             <button
               type="button"
               onClick={() => setAnalysisMode('PERSONAL')}
-              className={`flex items-center gap-2 px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${
+              className={`flex items-center justify-center gap-1.5 sm:gap-2 px-3 sm:px-6 py-2.5 sm:py-3 rounded-xl font-bold text-xs sm:text-sm transition-all whitespace-nowrap ${
                 analysisMode === 'PERSONAL'
                   ? 'bg-gradient-to-r from-[#D4AF37] to-[#F59E0B] text-black shadow-lg shadow-amber-500/25'
                   : 'text-mystic-text-muted hover:text-white'
               }`}
             >
-              <Sparkles size={16} />
-              <span>Kişisel Transitler (Bi-Wheel Haritam)</span>
+              <Sparkles size={15} className="shrink-0" />
+              <span className="truncate">Kişisel Transitler</span>
             </button>
           </div>
         </div>
@@ -527,18 +528,18 @@ export default function TransitsPage() {
             <div className="bg-[#0A0D14]/90 sm:backdrop-blur-md border border-white/10 p-4 sm:p-6 rounded-3xl flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 shadow-xl">
               
               {/* Left: View Tabs */}
-              <div className="flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 shadow-lg">
+              <div className="grid grid-cols-2 sm:flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 shadow-lg w-full sm:w-auto">
                 <button
                   type="button"
                   onClick={() => setSkyTab('WHEEL')}
-                  className={`flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+                  className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
                     skyTab === 'WHEEL'
                       ? 'bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8] text-black shadow-lg'
                       : 'text-mystic-text-muted hover:text-white'
                   }`}
                 >
-                  <Orbit size={15} />
-                  <span>Gökyüzü Çarkı & Açıları</span>
+                  <Orbit size={15} className="shrink-0" />
+                  <span className="truncate">Gökyüzü Çarkı</span>
                 </button>
                 <button
                   type="button"
@@ -548,14 +549,14 @@ export default function TransitsPage() {
                       fetchSkyTimeline(skyTimelineRange, skyDateStr);
                     }
                   }}
-                  className={`flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
+                  className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all ${
                     skyTab === 'TIMELINE'
                       ? 'bg-gradient-to-r from-[#0EA5E9] to-[#38BDF8] text-black shadow-lg'
                       : 'text-mystic-text-muted hover:text-white'
                   }`}
                 >
-                  <Calendar size={15} />
-                  <span>Kozmik Zaman Çizelgesi</span>
+                  <Calendar size={15} className="shrink-0" />
+                  <span className="truncate">Zaman Çizelgesi</span>
                 </button>
               </div>
 
@@ -624,15 +625,6 @@ export default function TransitsPage() {
                 </div>
               ) : skyChartData ? (
                 <div className="space-y-8">
-                  {/* Aktif Kozmik Faz & Tutulma Enerjisi */}
-                  {currentSkyLunation && (
-                    <LunationDisplayCard
-                      event={currentSkyLunation.event}
-                      statusText={currentSkyLunation.statusText}
-                      activeSolarEclipse={currentSkyLunation.activeSolarEclipse}
-                    />
-                  )}
-
                   {/* Wheel & Aspects Split */}
                   <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     
@@ -1407,6 +1399,15 @@ export default function TransitsPage() {
                         })}
                     </div>
                   </div>
+
+                  {/* Aktif Kozmik Faz & Tutulma Enerjisi */}
+                  {currentSkyLunation && (
+                    <LunationDisplayCard
+                      event={currentSkyLunation.event}
+                      statusText={currentSkyLunation.statusText}
+                      activeSolarEclipse={currentSkyLunation.activeSolarEclipse}
+                    />
+                  )}
                 </div>
               ) : null
             )}
@@ -1556,16 +1557,6 @@ export default function TransitsPage() {
                 {/* Personal Tab 1: Bi-Wheel */}
                 {personalTab === 'BIWHEEL' && (
                   <div className="space-y-10">
-                    {/* Bu Dönemin Ay Fazı & Tutulmasının Doğum Haritanıza Etkisi */}
-                    {personalLunation && (
-                      <LunationDisplayCard
-                        event={personalLunation.event}
-                        natalHouses={natalHousesList}
-                        statusText={personalLunation.statusText}
-                        activeSolarEclipse={personalLunation.activeSolarEclipse}
-                      />
-                    )}
-
                     <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-8 rounded-3xl shadow-2xl flex flex-col items-center w-full max-w-full overflow-hidden">
                       <div className="flex w-full flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-6 mb-8 gap-4">
                          <div>
@@ -1811,7 +1802,7 @@ export default function TransitsPage() {
                                   <div className="text-[10px] text-gray-400 flex items-center justify-between border-t border-white/5 pt-1.5">
                                     <span>T: {asp.transitSign} {asp.transitDegree}°</span>
                                     <span>➔</span>
-                                    <span>N: {asp.natalSign} {asp.natalDegree}° ({asp.natalHouse}. Ev)</span>
+                                    <span>N: {asp.natalSign} {asp.natalDegree}° ({LIFE_AREA_NAMES[asp.natalHouse] || `${asp.natalHouse}. Ev`})</span>
                                   </div>
                                   <p className="text-[11px] text-gray-300 leading-snug">
                                     {asp.summary}
@@ -1907,7 +1898,7 @@ export default function TransitsPage() {
                               </span>
                               {ut.aspects.length === 0 ? (
                                 <div className="text-xs text-gray-400 italic bg-white/[0.02] p-3 rounded-xl border border-white/5">
-                                  Şu anda doğrudan majör bir natal gezegene açı yapmıyor; {ut.house}. evinizin genel atmosferini sessizce dönüştürüyor.
+                                  Şu anda doğrudan majör bir natal gezegene açı yapmıyor; {ut.houseKeywords} konularınızın genel atmosferini sessizce dönüştürüyor.
                                 </div>
                               ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
@@ -1928,7 +1919,7 @@ export default function TransitsPage() {
                                         </span>
                                         {asp.natalHouse && (
                                           <span className="text-[11px] text-gray-400">
-                                            [{asp.natalHouse}. Ev]
+                                            [{LIFE_AREA_NAMES[asp.natalHouse] || `${asp.natalHouse}. Ev`}]
                                           </span>
                                         )}
                                       </div>
@@ -2038,6 +2029,16 @@ export default function TransitsPage() {
                           </div>
                         </div>
                       </div>
+                    )}
+
+                    {/* Bu Dönemin Ay Fazı & Tutulmasının Doğum Haritanıza Etkisi */}
+                    {personalLunation && (
+                      <LunationDisplayCard
+                        event={personalLunation.event}
+                        natalHouses={natalHousesList}
+                        statusText={personalLunation.statusText}
+                        activeSolarEclipse={personalLunation.activeSolarEclipse}
+                      />
                     )}
                   </div>
                 )}
