@@ -31,6 +31,15 @@ interface LunationDisplayCardProps {
   statusText?: string;
   isCompact?: boolean;
   activeSolarEclipse?: ActiveSolarEclipseInfo | null;
+  liveLunarPhase?: {
+    phaseName: string;
+    illumination: number;
+    phaseIcon: string;
+    esotericSecret: string;
+    moonSign?: string;
+    moonDegree?: number;
+    moonHouse?: number;
+  };
 }
 
 export default function LunationDisplayCard({
@@ -39,6 +48,7 @@ export default function LunationDisplayCard({
   statusText,
   isCompact = false,
   activeSolarEclipse,
+  liveLunarPhase,
 }: LunationDisplayCardProps) {
   // Hem Güneş Kadersel Çatısı hem de Ay Fazı varsayılan olarak kompakt/kapalı başlar, tıklandığında açılır
   const [isSolarOpen, setIsSolarOpen] = useState(false);
@@ -184,10 +194,20 @@ export default function LunationDisplayCard({
                 <span>{event.sign} {event.phaseName}</span>
                 <span className="text-[#D4AF37] text-sm font-normal">({event.signSymbol} {event.degree})</span>
               </h3>
-              <div className="flex items-center gap-2 text-[11px] text-stone-400 mt-1">
+              <div className="flex flex-wrap items-center gap-2 text-[11px] text-stone-400 mt-1">
                 <span>Etki: <strong className="text-white">{durationInfo.totalDuration}</strong></span>
                 {statusText && <span className="text-emerald-400 font-semibold">● {statusText}</span>}
               </div>
+              {liveLunarPhase && (
+                <div className="mt-2 inline-flex flex-wrap items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-500/10 border border-sky-500/30 text-[11px] font-bold text-sky-300">
+                  <span>{liveLunarPhase.phaseIcon}</span>
+                  <span>
+                    Bugün: {liveLunarPhase.phaseName} (%{liveLunarPhase.illumination} Işık)
+                    {liveLunarPhase.moonSign ? ` • Ay ${liveLunarPhase.moonSign} ${liveLunarPhase.moonDegree ?? 0}°` : ''}
+                    {liveLunarPhase.moonHouse ? ` (${liveLunarPhase.moonHouse}. Evinizde)` : ''}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
@@ -204,6 +224,27 @@ export default function LunationDisplayCard({
         {/* Açılır Faz Detay İçeriği */}
         {isLunarOpen && (
           <div className="p-5 sm:p-7 border-t border-white/10 space-y-6 animate-in fade-in duration-300">
+            {/* 🌗 3. KATMAN: BUGÜNÜN CANLI AY FAZI & ANLIK EV AKIŞI */}
+            {liveLunarPhase && (
+              <div className="p-4 sm:p-5 rounded-2xl bg-sky-950/25 border border-sky-500/30 space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+                    <span>{liveLunarPhase.phaseIcon}</span> Bugünün Canlı Ay Fazı & Ruhsal Ritmi
+                  </span>
+                  <span className="text-xs font-black text-amber-300 bg-amber-500/15 px-2.5 py-0.5 rounded-full border border-amber-500/30">
+                    %{liveLunarPhase.illumination} Işık
+                  </span>
+                </div>
+                <div className="text-sm sm:text-base font-bold text-white">
+                  {liveLunarPhase.phaseName}
+                  {liveLunarPhase.moonSign ? ` • Transit Ay ${liveLunarPhase.moonSign} (${liveLunarPhase.moonDegree ?? 0}°)` : ''}
+                  {liveLunarPhase.moonHouse ? ` — ${liveLunarPhase.moonHouse}. Evinizde` : ''}
+                </div>
+                <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
+                  {liveLunarPhase.esotericSecret}
+                </p>
+              </div>
+            )}
             {/* Süre Rozeti */}
             <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-white/[0.02] border border-white/5 text-xs text-white/80">
               <div className="flex items-center gap-1.5">

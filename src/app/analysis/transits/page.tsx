@@ -481,26 +481,8 @@ export default function TransitsPage() {
           </span>
         </div>
 
-        {/* 1. BÖLÜM: EZOTERİİK GÖKYÜZÜ KİMLİĞİ (Ay Fazı + 4 Element Dengesi + Çakra/Sefira Rezonansı) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
-          {/* Kart A: Gerçek Ay Fazı & Ezoterik Ritm */}
-          <div className="bg-black/50 border border-amber-500/20 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between space-y-2">
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#D4AF37] flex items-center gap-1.5">
-                <span>{esotericSignature.lunarPhase.phaseIcon}</span> Ay Fazı & Ruhsal Ritm
-              </span>
-              <span className="text-[11px] font-black text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
-                %{esotericSignature.lunarPhase.illumination} Işık
-              </span>
-            </div>
-            <div className="text-xs sm:text-sm font-bold text-white">
-              {esotericSignature.lunarPhase.phaseName}
-            </div>
-            <p className="text-[11px] text-white/65 leading-relaxed">
-              {esotericSignature.lunarPhase.esotericSecret}
-            </p>
-          </div>
-
+        {/* 1. BÖLÜM: EZOTERİİK GÖKYÜZÜ KİMLİĞİ (4 Element Dengesi + Çakra/Sefira Rezonansı) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
           {/* Kart B: Canlı 4 Element Dengesi */}
           <div className="bg-black/50 border border-sky-500/20 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between space-y-2.5">
             <div className="flex items-center justify-between gap-2">
@@ -769,6 +751,15 @@ export default function TransitsPage() {
                 </div>
               ) : skyChartData ? (
                 <div className="space-y-8">
+                  {/* Aktif Kozmik Faz, Tutulma & Canlı Günlük Ay Ritmi */}
+                  {currentSkyLunation && (
+                    <LunationDisplayCard
+                      event={currentSkyLunation.event}
+                      statusText={currentSkyLunation.statusText}
+                      activeSolarEclipse={currentSkyLunation.activeSolarEclipse}
+                      liveLunarPhase={currentSkyOverview?.barometer?.esotericSignature?.lunarPhase}
+                    />
+                  )}
                   {/* Top Full-Width Analysis: Active Sky Aspects or Planetary Sign Transits */}
                   <div>
                     <div className="bg-[#0A0D14]/90 sm:backdrop-blur-md border border-white/10 p-4 sm:p-6 rounded-3xl shadow-xl flex flex-col">
@@ -1450,15 +1441,6 @@ export default function TransitsPage() {
                     </div>
                   </div>
 
-                  {/* Aktif Kozmik Faz & Tutulma Enerjisi */}
-                  {currentSkyLunation && (
-                    <LunationDisplayCard
-                      event={currentSkyLunation.event}
-                      statusText={currentSkyLunation.statusText}
-                      activeSolarEclipse={currentSkyLunation.activeSolarEclipse}
-                    />
-                  )}
-
                   {/* Anlık Gökyüzü Çarkı (Mundane Wheel) */}
                   <div className="bg-[#0A0D14]/90 sm:backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-6 rounded-3xl shadow-xl flex flex-col items-center">
                     <div className="w-full flex items-center justify-between border-b border-white/10 pb-4 mb-4">
@@ -1672,6 +1654,16 @@ export default function TransitsPage() {
                 {/* Personal Tab 1: Bi-Wheel */}
                 {personalTab === 'BIWHEEL' && (
                   <div className="space-y-10">
+                    {/* Bu Dönemin Ay Fazı, Tutulması & Canlı Günlük Ay Geçişinin Doğum Haritanıza Etkisi */}
+                    {personalLunation && (
+                      <LunationDisplayCard
+                        event={personalLunation.event}
+                        natalHouses={natalHousesList}
+                        statusText={personalLunation.statusText}
+                        activeSolarEclipse={personalLunation.activeSolarEclipse}
+                        liveLunarPhase={personalOverview?.barometer?.esotericSignature?.lunarPhase}
+                      />
+                    )}
                     {/* Personal View Switcher */}
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-black/50 p-3 rounded-2xl border border-white/10 mb-6">
                       <div className="flex flex-wrap items-center gap-2">
@@ -2037,16 +2029,6 @@ export default function TransitsPage() {
                           </div>
                         </div>
                       </div>
-                    )}
-
-                    {/* Bu Dönemin Ay Fazı & Tutulmasının Doğum Haritanıza Etkisi */}
-                    {personalLunation && (
-                      <LunationDisplayCard
-                        event={personalLunation.event}
-                        natalHouses={natalHousesList}
-                        statusText={personalLunation.statusText}
-                        activeSolarEclipse={personalLunation.activeSolarEclipse}
-                      />
                     )}
 
                     <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-8 rounded-3xl shadow-2xl flex flex-col items-center w-full max-w-full overflow-hidden">
