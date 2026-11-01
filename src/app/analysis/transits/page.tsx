@@ -226,6 +226,7 @@ export default function TransitsPage() {
   const [natalDateStr, setNatalDateStr] = useState('1990-01-01');
   const [natalTimeStr, setNatalTimeStr] = useState('12:00');
   const [cityKey, setCityKey] = useState<AstroCity | null>(null);
+  const [transitCityKey, setTransitCityKey] = useState<AstroCity | null>(null);
   const [transitDateStr, setTransitDateStr] = useState(defaultTDate);
   const [transitTimeStr, setTransitTimeStr] = useState(defaultTTime);
 
@@ -323,7 +324,8 @@ export default function TransitsPage() {
           natalTime: natalTimeStr,
           transitDate: transitDateStr,
           transitTime: transitTimeStr,
-          cityData: cityKey
+          cityData: cityKey,
+          transitCityData: transitCityKey || cityKey
         })
       });
 
@@ -479,26 +481,8 @@ export default function TransitsPage() {
           </span>
         </div>
 
-        {/* 1. BÖLÜM: EZOTERİİK GÖKYÜZÜ KİMLİĞİ (Ay Fazı + 4 Element Dengesi + Çakra/Sefira Rezonansı) */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
-          {/* Kart A: Gerçek Ay Fazı & Ezoterik Ritm */}
-          <div className="bg-black/50 border border-amber-500/20 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between space-y-2">
-            <div className="flex items-center justify-between gap-2">
-              <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#D4AF37] flex items-center gap-1.5">
-                <span>{esotericSignature.lunarPhase.phaseIcon}</span> Ay Fazı & Ruhsal Ritm
-              </span>
-              <span className="text-[11px] font-black text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
-                %{esotericSignature.lunarPhase.illumination} Işık
-              </span>
-            </div>
-            <div className="text-xs sm:text-sm font-bold text-white">
-              {esotericSignature.lunarPhase.phaseName}
-            </div>
-            <p className="text-[11px] text-white/65 leading-relaxed">
-              {esotericSignature.lunarPhase.esotericSecret}
-            </p>
-          </div>
-
+        {/* 1. BÖLÜM: EZOTERİİK GÖKYÜZÜ KİMLİĞİ (4 Element Dengesi + Çakra/Sefira Rezonansı) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
           {/* Kart B: Canlı 4 Element Dengesi */}
           <div className="bg-black/50 border border-sky-500/20 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between space-y-2.5">
             <div className="flex items-center justify-between gap-2">
@@ -567,22 +551,19 @@ export default function TransitsPage() {
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5">
             {attributes.map((attr) => {
-              const barColor = attr.isEsoteric
-                ? '#A855F7'
-                : attr.score >= 8
-                ? '#10B981'
-                : attr.score >= 6
-                ? '#0EA5E9'
-                : '#F59E0B';
+              const barColor =
+                attr.score >= 8
+                  ? '#10B981'
+                  : attr.score >= 6
+                  ? '#0EA5E9'
+                  : attr.score >= 4
+                  ? '#F59E0B'
+                  : '#FB7185';
 
               return (
                 <div
                   key={attr.id}
-                  className={`rounded-xl px-3 py-2.5 border transition-all flex items-center justify-between gap-2 ${
-                    attr.isEsoteric
-                      ? 'bg-gradient-to-r from-purple-950/35 via-black/60 to-amber-950/20 border-purple-500/30'
-                      : 'bg-black/45 border-white/10'
-                  }`}
+                  className="rounded-xl px-3 py-2.5 border transition-all flex items-center justify-between gap-2 bg-black/45 border-white/10"
                 >
                   <span className="text-[11px] sm:text-xs font-bold text-white leading-tight">
                     {attr.title}
@@ -770,6 +751,15 @@ export default function TransitsPage() {
                 </div>
               ) : skyChartData ? (
                 <div className="space-y-8">
+                  {/* Aktif Kozmik Faz, Tutulma & Canlı Günlük Ay Ritmi */}
+                  {currentSkyLunation && (
+                    <LunationDisplayCard
+                      event={currentSkyLunation.event}
+                      statusText={currentSkyLunation.statusText}
+                      activeSolarEclipse={currentSkyLunation.activeSolarEclipse}
+                      liveLunarPhase={currentSkyOverview?.barometer?.esotericSignature?.lunarPhase}
+                    />
+                  )}
                   {/* Top Full-Width Analysis: Active Sky Aspects or Planetary Sign Transits */}
                   <div>
                     <div className="bg-[#0A0D14]/90 sm:backdrop-blur-md border border-white/10 p-4 sm:p-6 rounded-3xl shadow-xl flex flex-col">
@@ -1451,15 +1441,6 @@ export default function TransitsPage() {
                     </div>
                   </div>
 
-                  {/* Aktif Kozmik Faz & Tutulma Enerjisi */}
-                  {currentSkyLunation && (
-                    <LunationDisplayCard
-                      event={currentSkyLunation.event}
-                      statusText={currentSkyLunation.statusText}
-                      activeSolarEclipse={currentSkyLunation.activeSolarEclipse}
-                    />
-                  )}
-
                   {/* Anlık Gökyüzü Çarkı (Mundane Wheel) */}
                   <div className="bg-[#0A0D14]/90 sm:backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-6 rounded-3xl shadow-xl flex flex-col items-center">
                     <div className="w-full flex items-center justify-between border-b border-white/10 pb-4 mb-4">
@@ -1591,9 +1572,9 @@ export default function TransitsPage() {
 
                   <div className="bg-[#0EA5E9]/5 p-6 rounded-2xl border border-[#0EA5E9]/20">
                     <h3 className="text-xl font-bold text-[#0EA5E9] mb-4 flex items-center gap-2">
-                      <Compass size={20}/> 2. Transit (Geçiş) Tarihi
+                      <Compass size={20}/> 2. Transit (Geçiş) Tarihi & Konumu
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-mystic-text-muted mb-2">Transit Tarihi *</label>
                         <input required type="date" min="1900-01-01" max="2100-12-31" value={transitDateStr} onChange={e => setTransitDateStr(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-[#0EA5E9] transition-colors touch-manipulation" />
@@ -1601,6 +1582,15 @@ export default function TransitsPage() {
                       <div>
                         <label className="block text-sm font-medium text-mystic-text-muted mb-2">Transit Saati</label>
                         <SafeTimePicker value={transitTimeStr} onChange={setTransitTimeStr} required />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-mystic-text-muted mb-2">Transit Şehri (Opsiyonel)</label>
+                        <LocationAutocomplete
+                          required={false}
+                          placeholder="Boşsa doğum şehri alınır..."
+                          onSelect={(c) => setTransitCityKey(c)}
+                          className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-[#0EA5E9] transition-colors"
+                        />
                       </div>
                     </div>
                   </div>
@@ -1649,11 +1639,11 @@ export default function TransitsPage() {
                   <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
                     <div className="text-left sm:text-right">
                       <span className="text-[10px] text-mystic-text-muted block">Harita Sahibi</span>
-                      <span className="text-[11px] sm:text-xs font-bold text-white truncate max-w-[180px] block">{cityKey?.name || 'Seçildi'} • {natalDateStr}</span>
+                      <span className="text-[11px] sm:text-xs font-bold text-white truncate max-w-[240px] block">Doğum: {cityKey?.name || 'Seçildi'} • Transit: {(transitCityKey || cityKey)?.name || 'Seçildi'}</span>
                     </div>
                     <button 
                       type="button"
-                      onClick={() => { setTransitData(null); setTimelineData(null); }} 
+                      onClick={() => { setTransitData(null); setTimelineData(null); setTransitCityKey(null); }} 
                       className="text-xs px-3.5 py-1.5 sm:py-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap shrink-0 cursor-pointer"
                     >
                       Yeni Harita Seç
@@ -1664,6 +1654,16 @@ export default function TransitsPage() {
                 {/* Personal Tab 1: Bi-Wheel */}
                 {personalTab === 'BIWHEEL' && (
                   <div className="space-y-10">
+                    {/* Bu Dönemin Ay Fazı, Tutulması & Canlı Günlük Ay Geçişinin Doğum Haritanıza Etkisi */}
+                    {personalLunation && (
+                      <LunationDisplayCard
+                        event={personalLunation.event}
+                        natalHouses={natalHousesList}
+                        statusText={personalLunation.statusText}
+                        activeSolarEclipse={personalLunation.activeSolarEclipse}
+                        liveLunarPhase={personalOverview?.barometer?.esotericSignature?.lunarPhase}
+                      />
+                    )}
                     {/* Personal View Switcher */}
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-black/50 p-3 rounded-2xl border border-white/10 mb-6">
                       <div className="flex flex-wrap items-center gap-2">
@@ -2029,16 +2029,6 @@ export default function TransitsPage() {
                           </div>
                         </div>
                       </div>
-                    )}
-
-                    {/* Bu Dönemin Ay Fazı & Tutulmasının Doğum Haritanıza Etkisi */}
-                    {personalLunation && (
-                      <LunationDisplayCard
-                        event={personalLunation.event}
-                        natalHouses={natalHousesList}
-                        statusText={personalLunation.statusText}
-                        activeSolarEclipse={personalLunation.activeSolarEclipse}
-                      />
                     )}
 
                     <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-8 rounded-3xl shadow-2xl flex flex-col items-center w-full max-w-full overflow-hidden">

@@ -31,6 +31,15 @@ interface LunationDisplayCardProps {
   statusText?: string;
   isCompact?: boolean;
   activeSolarEclipse?: ActiveSolarEclipseInfo | null;
+  liveLunarPhase?: {
+    phaseName: string;
+    illumination: number;
+    phaseIcon: string;
+    esotericSecret: string;
+    moonSign?: string;
+    moonDegree?: number;
+    moonHouse?: number;
+  };
 }
 
 export default function LunationDisplayCard({
@@ -39,6 +48,7 @@ export default function LunationDisplayCard({
   statusText,
   isCompact = false,
   activeSolarEclipse,
+  liveLunarPhase,
 }: LunationDisplayCardProps) {
   // Hem Güneş Kadersel Çatısı hem de Ay Fazı varsayılan olarak kompakt/kapalı başlar, tıklandığında açılır
   const [isSolarOpen, setIsSolarOpen] = useState(false);
@@ -62,6 +72,17 @@ export default function LunationDisplayCard({
   // Kişisel harita ev hesaplaması
   const houseNumber = calculateLunationHouse(event.sign, natalHouses);
   const houseInterp = HOUSE_LUNATION_INTERPRETATIONS[houseNumber]?.[event.phase];
+
+  // 6 Aylık Güneş Tutulması Çatısı kolektif ve kişisel ev hesaplaması
+  const solarSignInterp = solarUmbrella
+    ? SIGN_LUNATION_INTERPRETATIONS[solarUmbrella.event.sign]?.['solar_eclipse']
+    : null;
+  const solarHouseNumber = solarUmbrella
+    ? calculateLunationHouse(solarUmbrella.event.sign, natalHouses)
+    : 1;
+  const solarHouseInterp = solarUmbrella && natalHouses
+    ? HOUSE_LUNATION_INTERPRETATIONS[solarHouseNumber]?.['solar_eclipse']
+    : null;
 
   // Renk ve Rozet Mantığı
   const isSolar = event.phase === 'solar_eclipse';
@@ -139,14 +160,96 @@ export default function LunationDisplayCard({
 
           {/* Açılır Detay İçeriği */}
           {isSolarOpen && (
-            <div className="p-4 sm:p-5 border-t border-amber-500/20 bg-black/60 space-y-3 animate-in fade-in duration-300">
-              <div className="flex items-center gap-2 text-xs font-mono text-amber-200/90 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20 self-start">
-                <Clock size={13} className="text-amber-400 shrink-0" />
-                <span>{solarUmbrella.statusText}</span>
+            <div className="p-4 sm:p-6 border-t border-amber-500/20 bg-black/60 space-y-5 animate-in fade-in duration-300">
+              <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200/90">
+                <div className="flex items-center gap-1.5 font-mono">
+                  <Clock size={13} className="text-amber-400 shrink-0" />
+                  <span>{solarUmbrella.statusText}</span>
+                </div>
+                <span>
+                  Etki Süresi: <strong className="text-white">6 Ay</strong> • Pik: <strong className="text-white">±15 Gün</strong>
+                </span>
               </div>
-              <p className="text-xs sm:text-sm text-stone-200 leading-relaxed">
-                Bu 6 aylık kadersel çatı, kolektif ve bireysel düzeyde {solarUmbrella.event.sign} arketipinin yönettiği yaşam alanlarında köklü bir yeniden yapılanma ve inisiyasyon sürecini başlatmıştır. Günlük ve aylık tüm ay fazları bu ana güneş çatısının altında şekillenir.
-              </p>
+
+              {/* Kolektif Güneş Tutulması Enerjisi (Sadece genel modda gösterilir) */}
+              {(!natalHouses || !solarHouseInterp) && solarSignInterp && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                    <Sparkles size={16} /> Kolektif Gökyüzü Enerjisi: {solarSignInterp.title}
+                  </h4>
+                  <p className="text-sm text-white/85 leading-relaxed">
+                    {solarSignInterp.collective}
+                  </p>
+                </div>
+              )}
+
+              {/* Kişisel Harita Güneş Tutulması Portalı (Kişisel modda gösterilir) */}
+              {natalHouses && solarHouseInterp && (
+                <div className="p-4 sm:p-6 rounded-3xl bg-gradient-to-b from-amber-500/[0.06] to-white/[0.01] border border-amber-500/35 space-y-4 shadow-xl">
+                  <div className="border-b border-white/10 pb-3">
+                    <span className="text-xs font-extrabold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <span>☀️</span>
+                      <span>{solarUmbrella.event.sign} Güneş Tutulması • {solarHouseNumber}. Evinizde</span>
+                    </span>
+                    <h5 className="text-base sm:text-lg font-black text-white mt-1">
+                      {(solarHouseInterp.portalName || solarHouseInterp.title).replace(/^\d+\.\s*Ev:\s*/i, '')}
+                    </h5>
+                  </div>
+
+                  {solarHouseInterp.portalMeaning && (
+                    <p className="text-xs text-white/70 italic leading-relaxed">
+                      {solarHouseInterp.portalMeaning}
+                    </p>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
+                    <div className="p-4 rounded-2xl bg-rose-950/20 border border-rose-500/30 space-y-2">
+                      <div className="flex items-center gap-2 text-rose-300 font-bold text-xs uppercase tracking-wider">
+                        <AlertTriangle size={15} className="text-rose-400 shrink-0" />
+                        <span>Alt Bilinç / Gölge Hali</span>
+                      </div>
+                      <p className="text-xs text-rose-100/85 leading-relaxed">
+                        {solarHouseInterp.shadowState || solarHouseInterp.personalImpact}
+                      </p>
+                      <span className="text-[10px] text-rose-300/60 block pt-1 italic">
+                        Ego, korku ve sınav seviyesinde günlük yaşam deneyimi
+                      </span>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-amber-950/20 border border-[#D4AF37]/40 space-y-2">
+                      <div className="flex items-center gap-2 text-amber-300 font-bold text-xs uppercase tracking-wider">
+                        <Crown size={15} className="text-[#D4AF37] shrink-0" />
+                        <span>Üst Bilinç / Ruhsal Boyut</span>
+                      </div>
+                      <p className="text-xs text-amber-100/90 leading-relaxed">
+                        {solarHouseInterp.elevatedState || solarHouseInterp.personalImpact}
+                      </p>
+                      <span className="text-[10px] text-amber-300/60 block pt-1 italic">
+                        7 çakra dengede ve arınmış bilinçle açılan inisiyasyon
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-emerald-950/20 border border-emerald-500/30 flex items-start gap-2.5 text-xs text-emerald-100/90">
+                    <Leaf size={16} className="text-emerald-400 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-emerald-300 block mb-0.5">Çakra & Manevi Denge Reçetesi:</strong>
+                      <span className="leading-relaxed">{solarHouseInterp.spiritualAdvice || solarHouseInterp.advice}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Güneş Tutulması Ritüel Önerisi */}
+              {solarSignInterp?.ritual && (
+                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-start gap-3 text-xs text-white/70">
+                  <Flame size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-white block mb-0.5">Bu 6 Aylık Tutulma Döneminin Manevi Arınma & Ritüel Tavsiyesi:</strong>
+                    <span>{solarSignInterp.ritual}</span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -184,7 +287,7 @@ export default function LunationDisplayCard({
                 <span>{event.sign} {event.phaseName}</span>
                 <span className="text-[#D4AF37] text-sm font-normal">({event.signSymbol} {event.degree})</span>
               </h3>
-              <div className="flex items-center gap-2 text-[11px] text-stone-400 mt-1">
+              <div className="flex flex-wrap items-center gap-2 text-[11px] text-stone-400 mt-1">
                 <span>Etki: <strong className="text-white">{durationInfo.totalDuration}</strong></span>
                 {statusText && <span className="text-emerald-400 font-semibold">● {statusText}</span>}
               </div>
@@ -214,36 +317,33 @@ export default function LunationDisplayCard({
                 Pik Noktası: <strong className="text-white/90">{durationInfo.peakWindow}</strong>
               </span>
             </div>
-
-            {/* Kolektif / Genel Gökyüzü Teması */}
-            <div className="space-y-2">
-              <h4 className="text-sm font-bold text-[#D4AF37] uppercase tracking-wider flex items-center gap-2">
-                <Sparkles size={16} /> Kolektif Gökyüzü Enerjisi: {signInterp.title}
-              </h4>
-              <p className="text-sm text-white/85 leading-relaxed">
-                {signInterp.collective}
-              </p>
-              <p className="text-xs text-white/60 italic leading-relaxed pt-1">
-                {durationInfo.description}
-              </p>
-            </div>
+            {/* Kolektif / Genel Gökyüzü Teması (Sadece kolektif modda gösterilir; kişisel haritada doğrudan kişisel portal açılır) */}
+            {(!natalHouses || !houseInterp) && (
+              <div className="space-y-2">
+                <h4 className="text-sm font-bold text-[#D4AF37] uppercase tracking-wider flex items-center gap-2">
+                  <Sparkles size={16} /> Kolektif Gökyüzü Enerjisi: {signInterp.title}
+                </h4>
+                <p className="text-sm text-white/85 leading-relaxed">
+                  {signInterp.collective}
+                </p>
+                <p className="text-xs text-white/60 italic leading-relaxed pt-1">
+                  {durationInfo.description}
+                </p>
+              </div>
+            )}
 
             {/* Kişisel Harita Ezoterik İnisiyasyon Portalı (Varsa) */}
             {natalHouses && houseInterp && (
               <div className="p-4 sm:p-6 rounded-3xl bg-gradient-to-b from-white/[0.04] to-white/[0.01] border border-[#D4AF37]/35 space-y-4 shadow-xl">
                 {/* Portal Başlığı */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
-                  <div>
-                    <span className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-widest flex items-center gap-1.5">
-                      <Compass size={14} /> Kişisel Doğum Haritası Portalı
-                    </span>
-                    <h5 className="text-base sm:text-lg font-black text-white mt-0.5">
-                      {houseInterp.portalName || houseInterp.title}
-                    </h5>
-                  </div>
-                  <span className="px-3 py-1 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] font-black text-xs self-start sm:self-auto">
-                    {houseNumber}. Evinizde
+                <div className="border-b border-white/10 pb-3">
+                  <span className="text-xs font-extrabold text-[#D4AF37] uppercase tracking-wider flex items-center gap-1.5">
+                    <span>{isSolar ? '☀️' : isLunar ? '🌑' : isFullMoon ? '🌕' : '🌑'}</span>
+                    <span>{event.sign} {event.phaseName} • {houseNumber}. Evinizde</span>
                   </span>
+                  <h5 className="text-base sm:text-lg font-black text-white mt-1">
+                    {(houseInterp.portalName || houseInterp.title).replace(/^\d+\.\s*Ev:\s*/i, '')}
+                  </h5>
                 </div>
 
                 {/* Portal Anlam Açıklaması */}
@@ -301,6 +401,28 @@ export default function LunationDisplayCard({
                 <span>{signInterp.ritual}</span>
               </div>
             </div>
+
+            {/* 🌗 3. KATMAN: BUGÜNÜN CANLI AY FAZI & ANLIK EV AKIŞI */}
+            {liveLunarPhase && (
+              <div className="p-4 sm:p-5 rounded-2xl bg-sky-950/25 border border-sky-500/30 space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+                    <span>{liveLunarPhase.phaseIcon}</span> Bugünün Canlı Ay Fazı & Ruhsal Ritmi
+                  </span>
+                  <span className="text-xs font-black text-amber-300 bg-amber-500/15 px-2.5 py-0.5 rounded-full border border-amber-500/30">
+                    %{liveLunarPhase.illumination} Işık
+                  </span>
+                </div>
+                <div className="text-sm sm:text-base font-bold text-white">
+                  {liveLunarPhase.phaseName}
+                  {liveLunarPhase.moonSign ? ` • Transit Ay ${liveLunarPhase.moonSign} (${liveLunarPhase.moonDegree ?? 0}°)` : ''}
+                  {liveLunarPhase.moonHouse ? ` — ${liveLunarPhase.moonHouse}. Evinizde` : ''}
+                </div>
+                <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
+                  {liveLunarPhase.esotericSecret}
+                </p>
+              </div>
+            )}
           </div>
         )}
       </div>

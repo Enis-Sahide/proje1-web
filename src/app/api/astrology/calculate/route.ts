@@ -1,10 +1,30 @@
 import { NextRequest } from 'next/server';
 import { generateAstrologyChart, calculateDraconicChart, calculateHarmonicChart } from '@/features/astrology/engine/AstrologyEngine';
+import { getFullPlanetInterpretation, getHouseCuspInterpretation } from '@/features/astrology/engine/AstrologyInterpretations';
 import { json, errorJson, preflight } from '@/lib/http/cors';
 import moment from 'moment-timezone';
 
 export async function OPTIONS() {
   return preflight();
+}
+
+function enrichChartWithInterpretations(chart: any) {
+  if (!chart) return chart;
+  const enrichPoint = (p: any) => p ? ({
+    ...p,
+    interpretation: getFullPlanetInterpretation(p.name, p.sign, p.house)
+  }) : p;
+
+  return {
+    ...chart,
+    planets: Array.isArray(chart.planets) ? chart.planets.map(enrichPoint) : chart.planets,
+    ascendant: enrichPoint(chart.ascendant),
+    midheaven: enrichPoint(chart.midheaven),
+    houses: Array.isArray(chart.houses) ? chart.houses.map((h: any) => ({
+      ...h,
+      interpretation: getHouseCuspInterpretation(h.house, h.sign)
+    })) : chart.houses,
+  };
 }
 
 export async function POST(req: NextRequest) {
@@ -23,12 +43,13 @@ export async function POST(req: NextRequest) {
       return errorJson('Geçersiz tarih formatı.', 400);
     }
 
-    const assiahChart = await generateAstrologyChart(dateObj, cityData, false);
+    const rawAssiahChart = await generateAstrologyChart(dateObj, cityData, false);
+    const assiahChart = enrichChartWithInterpretations(rawAssiahChart);
 
     if (calcAllWorlds) {
-      const yetzirahChart = calculateDraconicChart(assiahChart);
-      const beriyahChart = calculateHarmonicChart(assiahChart, 9);
-      const atzilutChart = await generateAstrologyChart(dateObj, cityData, true); // Heliocentric
+      const yetzirahChart = enrichChartWithInterpretations(calculateDraconicChart(rawAssiahChart));
+      const beriyahChart = enrichChartWithInterpretations(calculateHarmonicChart(rawAssiahChart, 9));
+      const atzilutChart = enrichChartWithInterpretations(await generateAstrologyChart(dateObj, cityData, true));
       
       return json({
         success: true,
