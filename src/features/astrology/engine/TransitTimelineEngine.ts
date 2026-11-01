@@ -725,7 +725,7 @@ export async function calculateTransitTimeline(
               details: `【Kişisel Yaşam Alanı (Ev) Geçişi: ${hTitle}】\n` +
                 `Transit ${tBody.name}, bu döngü boyunca haritanızın ${curHouse}. evinden geçer. Bu dönemde ${hTheme} konuları gündeminizin merkezine yerleşir ve köklü bir farkındalık süreci başlar.\n\n` +
                 `【Dönüşüm Rehberliği】\nBu evin getirdiği sorumlulukları ve fırsatları ertelemeden, yapıcı bir bilinçle sahiplenin.`,
-              advice: `${curHouse}. evinizin temsil ettiği konularda farkındalıkla ve dengeli hareket edin.`,
+              advice: `${hTheme.charAt(0).toUpperCase() + hTheme.slice(1)} konularında farkındalıkla ve dengeli hareket edin.`,
               chakraLayer: `Kişisel Yaşam Alanı: ${hTitle}`,
               durationDays,
               status,

@@ -36,7 +36,8 @@ import {
   generateCurrentSkyOverview,
   CurrentSkyOverview,
   generatePersonalTransitOverview,
-  PersonalTransitOverview
+  PersonalTransitOverview,
+  LIFE_AREA_NAMES
 } from '@/features/astrology/engine/TransitSynthesisEngine';
 import { AstroCity, TransitChartData, AstroPoint, AstroAspect } from '@/features/astrology/engine/AstrologyConstants';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
@@ -1801,7 +1802,7 @@ export default function TransitsPage() {
                                   <div className="text-[10px] text-gray-400 flex items-center justify-between border-t border-white/5 pt-1.5">
                                     <span>T: {asp.transitSign} {asp.transitDegree}°</span>
                                     <span>➔</span>
-                                    <span>N: {asp.natalSign} {asp.natalDegree}° ({asp.natalHouse}. Ev)</span>
+                                    <span>N: {asp.natalSign} {asp.natalDegree}° ({LIFE_AREA_NAMES[asp.natalHouse] || `${asp.natalHouse}. Ev`})</span>
                                   </div>
                                   <p className="text-[11px] text-gray-300 leading-snug">
                                     {asp.summary}
@@ -1897,7 +1898,7 @@ export default function TransitsPage() {
                               </span>
                               {ut.aspects.length === 0 ? (
                                 <div className="text-xs text-gray-400 italic bg-white/[0.02] p-3 rounded-xl border border-white/5">
-                                  Şu anda doğrudan majör bir natal gezegene açı yapmıyor; {ut.house}. evinizin genel atmosferini sessizce dönüştürüyor.
+                                  Şu anda doğrudan majör bir natal gezegene açı yapmıyor; {ut.houseKeywords} konularınızın genel atmosferini sessizce dönüştürüyor.
                                 </div>
                               ) : (
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
@@ -1918,7 +1919,7 @@ export default function TransitsPage() {
                                         </span>
                                         {asp.natalHouse && (
                                           <span className="text-[11px] text-gray-400">
-                                            [{asp.natalHouse}. Ev]
+                                            [{LIFE_AREA_NAMES[asp.natalHouse] || `${asp.natalHouse}. Ev`}]
                                           </span>
                                         )}
                                       </div>

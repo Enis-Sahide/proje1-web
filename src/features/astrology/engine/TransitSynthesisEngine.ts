@@ -226,7 +226,7 @@ export function generateUnifiedPlanetTransit(
     const isHarmonious = asp.type === 'Üçgen' || asp.type === 'Sekstil' || (asp.type === 'Kavuşum' && !['Satürn', 'Mars', 'Plüton'].includes(asp.transitPlanet));
 
     let summary = '';
-    const nTheme = nHouse ? `${nHouse}. evinizdeki (${HOUSE_SHORT_THEMES[nHouse]})` : '';
+    const nTheme = nHouse ? `${HOUSE_SHORT_THEMES[nHouse]} alanınızdaki` : '';
     switch (asp.type) {
       case 'Kavuşum':
         summary = `${nTheme} Natal ${asp.natalPlanet} ile kavuşarak bu alanda yepyeni ve yoğun bir odak döngüsü başlatıyor.`;
@@ -324,24 +324,24 @@ export function generateUnifiedPlanetTransit(
   const retroText = transitPlanet.isRetrograde ? ' (Retro Harekette)' : '';
   const headline = `Transit ${pName} ${house}. Evinizde (${sign} ${transitPlanet.degreeInSign}°)${retroText}`;
 
-  let synthesisSummary = `Transit ${pName}, ${sign} burcunda seyrederek haritanızın ${house}. evini (${houseTheme}) doğrudan tetikliyor. `;
+  let synthesisSummary = `Transit ${pName}, ${sign} burcunda seyrederek doğrudan ${houseTheme} konularınızı tetikliyor. `;
   if (aspectInfos.length > 0) {
     const challenging = aspectInfos.filter(a => !a.isHarmonious);
     const harmonious = aspectInfos.filter(a => a.isHarmonious);
     
     if (challenging.length > 0 && harmonious.length > 0) {
-      synthesisSummary += `Aynı anda haritanızdaki ${challenging.map(a => `${a.natalHouse ? `${a.natalHouse}. evdeki ` : ''}${a.natalPlanet} (${a.aspectType})`).join(', ')} ile yüzleşme hattı kurarken; ${harmonious.map(a => `${a.natalPlanet} (${a.aspectType})`).join(', ')} ile güçlü bir çıkış ve destek kapısı açıyor.`;
+      synthesisSummary += `Aynı anda haritanızdaki ${challenging.map(a => `${a.natalHouse ? `${HOUSE_SHORT_THEMES[a.natalHouse]} alanındaki ` : ''}${a.natalPlanet} (${a.aspectType})`).join(', ')} ile yüzleşme hattı kurarken; ${harmonious.map(a => `${a.natalPlanet} (${a.aspectType})`).join(', ')} ile güçlü bir çıkış ve destek kapısı açıyor.`;
     } else if (challenging.length > 0) {
-      synthesisSummary += `Bu süreçte özellikle ${challenging.map(a => `${a.natalHouse ? `${a.natalHouse}. evdeki ` : ''}${a.natalPlanet} (${a.aspectType})`).join(', ')} teması üzerinden hayatınızda önemli bir yüzleşme ve yapılandırma talep ediyor.`;
+      synthesisSummary += `Bu süreçte özellikle ${challenging.map(a => `${a.natalHouse ? `${HOUSE_SHORT_THEMES[a.natalHouse]} alanındaki ` : ''}${a.natalPlanet} (${a.aspectType})`).join(', ')} teması üzerinden hayatınızda önemli bir yüzleşme ve yapılandırma talep ediyor.`;
     } else {
-      synthesisSummary += `Bu geçiş, ${harmonious.map(a => `${a.natalHouse ? `${a.natalHouse}. evdeki ` : ''}${a.natalPlanet} (${a.aspectType})`).join(', ')} ile uyumlanarak bu hayat alanında işlerinizi kolaylaştıran verimli bir akış sunuyor.`;
+      synthesisSummary += `Bu geçiş, ${harmonious.map(a => `${a.natalHouse ? `${HOUSE_SHORT_THEMES[a.natalHouse]} alanındaki ` : ''}${a.natalPlanet} (${a.aspectType})`).join(', ')} ile uyumlanarak bu hayat alanında işlerinizi kolaylaştıran verimli bir akış sunuyor.`;
     }
   } else {
     synthesisSummary += `Şu an doğrudan majör bir natal gezegene açı yapmasa da, bu yaşam alanınızın arka planını sessiz ve derinden dönüştürmeye devam ediyor.`;
   }
 
   const actionAdvice = customInterp?.advice || 
-    `Bu süreçte ${house}. evinizin temsil ettiği konularda aceleci olmadan, bilinçli ve yapıcı sınırlar çizerek hareket edin. Karşınıza çıkan durumları kriz değil, ruhsal olgunlaşma fırsatı olarak görün.`;
+    `Bu süreçte ${houseTheme} konularında aceleci olmadan, bilinçli ve yapıcı sınırlar çizerek hareket edin. Karşınıza çıkan durumları kriz değil, ruhsal olgunlaşma fırsatı olarak görün.`;
 
   const chakraLayer = customInterp?.chakra || PLANET_CHAKRAS[pName] || 'Kozmik Katman Entegrasyonu';
 
@@ -351,8 +351,8 @@ export function generateUnifiedPlanetTransit(
     `【Bireysel Eylem & Dönüşüm Rehberliği】\n${actionAdvice}\n\n` +
     `【Metnin Oluşturulduğu Kaynaklar】\n` +
     `Bu analiz aşağıdaki astrolojik ve enerjetik katmanların sentezlenmesiyle oluşturulmuştur:\n\n` +
-    `【Yaşam Alanı Etkisi: ${houseTitle}】\n` +
-    `${pName}, astrolojide ${PLANET_NATURES[pName] || 'önemli enerjileri'} temsil eder. Bu geçiş sizin ${house}. evinizden geçerken; ${houseTheme} alanınızda köklü bir uyanış ve farkındalık yaratır.\n\n`;
+    `【Yaşam Alanı Etkisi: ${LIFE_AREA_NAMES[house] || houseTitle}】\n` +
+    `${pName}, astrolojide ${PLANET_NATURES[pName] || 'önemli enerjileri'} temsil eder. Bu geçiş; ${houseTheme} alanınızda köklü bir uyanış ve farkındalık yaratır.\n\n`;
 
   if (hdGateInfo) {
     detailedAnalysis += `【Human Design & Davranışsal Arketip】\n` +
@@ -367,7 +367,7 @@ export function generateUnifiedPlanetTransit(
 
   if (aspectInfos.length > 0) {
     detailedAnalysis += `【Bütünleşik Açı Bağlantıları & Tetiklenen Alanlar】\n` +
-      aspectInfos.map(a => `• ${a.aspectType} Natal ${a.natalPlanet}${a.natalHouse ? ` (${a.natalHouse}. Ev)` : ''} [Orb: ${a.orb.toFixed(1)}°]: ${a.summary}`).join('\n') + '\n\n';
+      aspectInfos.map(a => `• ${a.aspectType} Natal ${a.natalPlanet}${a.natalHouse ? ` (${LIFE_AREA_NAMES[a.natalHouse] || HOUSE_SHORT_THEMES[a.natalHouse]})` : ''} [Orb: ${a.orb.toFixed(1)}°]: ${a.summary}`).join('\n') + '\n\n';
   }
 
   if (transitPlanet.isRetrograde) {
@@ -872,25 +872,25 @@ export function generatePersonalTransitOverview(
     const nDeg = nPlanet?.degreeInSign ?? 0;
 
     let summary = '';
-    const nArea = HOUSE_SHORT_THEMES[nHouse] || `${nHouse}. evinizi`;
+    const nArea = HOUSE_SHORT_THEMES[nHouse] || 'bu yaşam alanınız';
     switch (asp.type) {
       case 'Kavuşum':
-        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), ${nHouse}. evinizdeki Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile tam kavuşumda. ${nArea} alanında taze ve yoğun bir başlangıç enerjisi açıyor.`;
+        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile tam kavuşumda. Doğrudan ${nArea} konularında taze ve yoğun bir başlangıç enerjisi açıyor.`;
         break;
       case 'Üçgen':
-        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), ${nHouse}. evinizdeki Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile uyumlu üçgen açıda. Bu alanda çabasız ve destekleyici bir akış sunuyor.`;
+        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile uyumlu üçgen açıda. ${nArea} konularında çabasız ve destekleyici bir akış sunuyor.`;
         break;
       case 'Sekstil':
-        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), ${nHouse}. evinizdeki Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile sekstil açıda. Somut fırsatları fark edip değerlendirmeniz için kapı açıyor.`;
+        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile sekstil açıda. ${nArea} alanında somut fırsatları fark edip değerlendirmeniz için kapı açıyor.`;
         break;
       case 'Kare':
-        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), ${nHouse}. evinizdeki Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile kare açıda. ${nArea} konusunda sizi harekete geçiren yapıcı bir gerilim ve eşik yaratıyor.`;
+        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile kare açıda. ${nArea} konularında sizi harekete geçiren yapıcı bir gerilim ve eşik yaratıyor.`;
         break;
       case 'Karşıt':
-        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), ${nHouse}. evinizdeki Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile karşıt açıda. İkili dengelerde ve sınırlarınızda farkındalık sınavı veriyor.`;
+        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile karşıt açıda. ${nArea} ekseninde ikili dengelerde ve sınırlarınızda farkındalık sınavı veriyor.`;
         break;
       default:
-        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile ${asp.type} açısında.`;
+        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile ${asp.type} açısında (${nArea}).`;
     }
 
     const badge = asp.orb <= 0.8 ? `★ Tam Pik (${asp.orb.toFixed(1)}°)` : `${asp.orb.toFixed(1)}° Orb`;
@@ -929,7 +929,7 @@ export function generatePersonalTransitOverview(
 
   const focusHouses = sortedHouses.slice(0, 2).map(item => ({
     house: item.house,
-    title: HOUSE_TITLES[item.house] || `${item.house}. Ev`,
+    title: LIFE_AREA_NAMES[item.house] || HOUSE_SHORT_THEMES[item.house] || 'Yaşam Alanı',
     description: HOUSE_SHORT_THEMES[item.house] || 'bu yaşam alanınız',
     planetNames: item.planetNames
   }));
@@ -977,7 +977,7 @@ export function generatePersonalTransitOverview(
   const peak = topAspects[0];
   let headline = 'Doğum Haritanızda Dengeli Kozmik Akış';
   let subHeadline = focusHouses.length > 0 
-    ? `Ana Odak: ${focusHouses.map(h => `${h.house}. Ev (${h.description})`).join(' ve ')}`
+    ? `Ana Odak: ${focusHouses.map(h => `${h.title} (${h.description})`).join(' ve ')}`
     : 'Bütünsel Dönüşüm Süreci';
 
   if (peak) {
@@ -990,13 +990,14 @@ export function generatePersonalTransitOverview(
 
   let themeDescription = '';
   if (focusHouses.length > 0) {
-    themeDescription = `Bugün haritanızda en yoğun kozmik hareketlilik doğrudan ${focusHouses.map(h => `${h.house}. evinizde (${h.description})`).join(' ve ')} üzerinde toplanıyor. `;
+    themeDescription = `Bugün haritanızda en yoğun kozmik hareketlilik doğrudan ${focusHouses.map(h => h.description).join(' ile ')} konularında toplanıyor. `;
   } else {
     themeDescription = `Bugün gezegen geçişleri doğum haritanızın kilit noktalarını hassas açılarla aydınlatıyor. `;
   }
 
   if (peak) {
-    themeDescription += `Özellikle ${peak.transitPlanet} (${peak.transitSign} ${peak.transitDegree}°) ile ${peak.natalHouse}. evinizdeki Natal ${peak.natalPlanet} (${peak.natalSign} ${peak.natalDegree}°) arasındaki ${peak.aspectType} açısı (${peak.orb.toFixed(1)}° tolerans), günün belirleyici dinamiğini çiziyor. `;
+    const peakThemes = HOUSE_SHORT_THEMES[peak.natalHouse] || 'bu yaşam alanınız';
+    themeDescription += `Özellikle ${peak.transitPlanet} (${peak.transitSign} ${peak.transitDegree}°) ile ${peakThemes} alanınızdaki Natal ${peak.natalPlanet} (${peak.natalSign} ${peak.natalDegree}°) arasındaki ${peak.aspectType} açısı (${peak.orb.toFixed(1)}° tolerans), günün belirleyici dinamiğini çiziyor. `;
   }
 
   themeDescription += `Dış dünyadaki gelişmelere fevri tepkiler vermek yerine, kendi içsel merkezinizi koruyarak adımlarınızı bilinçli atmanız sürecin hediyelerini açığa çıkaracaktır.`;
@@ -1009,7 +1010,8 @@ export function generatePersonalTransitOverview(
 
   if (harmoniousAspects.length > 0) {
     harmoniousAspects.forEach(asp => {
-      opportunities.push(`Transit ${asp.transitPlanet} (${asp.transitSign} ${asp.transitDegree}°) ➔ Natal ${asp.natalPlanet} (${asp.natalSign} ${asp.natalDegree}°): ${asp.natalHouse}. evinizdeki potansiyellerinizi rahatlıkla açığa çıkarabilir, önünüze çıkan fırsatları değerlendirebilirsiniz.`);
+      const houseTopics = HOUSE_SHORT_THEMES[asp.natalHouse] || 'bu yaşam alanınız';
+      opportunities.push(`Transit ${asp.transitPlanet} (${asp.transitSign} ${asp.transitDegree}°) ➔ Natal ${asp.natalPlanet} (${asp.natalSign} ${asp.natalDegree}°): ${houseTopics} konularındaki potansiyellerinizi rahatlıkla açığa çıkarabilir, önünüze çıkan fırsatları değerlendirebilirsiniz.`);
     });
   } else {
     opportunities.push('Günün sakin enerjisi altında geçmiş planlarınızı gözden geçirmek ve içsel dinginliği güçlendirmek için elverişli bir zemin var.');
@@ -1017,16 +1019,19 @@ export function generatePersonalTransitOverview(
 
   if (challengingAspects.length > 0) {
     challengingAspects.forEach(asp => {
-      cautions.push(`Transit ${asp.transitPlanet} (${asp.transitSign} ${asp.transitDegree}°) ➔ Natal ${asp.natalPlanet} (${asp.natalSign} ${asp.natalDegree}°): ${asp.natalHouse}. ev konularında fevri restleşmelerden ve acele kararlardan kaçının; sınırlarınızı koruyarak ilerleyin.`);
+      const houseTopics = HOUSE_SHORT_THEMES[asp.natalHouse] || 'bu yaşam alanınız';
+      cautions.push(`Transit ${asp.transitPlanet} (${asp.transitSign} ${asp.transitDegree}°) ➔ Natal ${asp.natalPlanet} (${asp.natalSign} ${asp.natalDegree}°): ${houseTopics} konularında fevri restleşmelerden ve acele kararlardan kaçının; sınırlarınızı koruyarak ilerleyin.`);
     });
   } else {
     cautions.push('Aşırı rahatlığa kapılıp tamamlanması gereken sorumluluklarınızı ertelemekten kaçının.');
   }
 
+  const peakHouseTopics = peak ? (HOUSE_SHORT_THEMES[peak.natalHouse] || 'bu yaşam alanınız') : '';
+  const capitalizedPeakTopics = peakHouseTopics ? peakHouseTopics.charAt(0).toUpperCase() + peakHouseTopics.slice(1) : '';
   const lifeAdvice = peak
     ? (peak.isHarmonious 
-        ? `${peak.natalHouse}. evinizin sunduğu bereketli akışı cesaret ve şükranla karşılayın; ertelediğiniz adımları hayata geçirin.`
-        : `${peak.natalHouse}. evinizde beliren sürtüşmeleri bir kriz değil, sizi daha sağlam ve olgun kılan bir basamak olarak görün.`)
+        ? `${capitalizedPeakTopics} konularında oluşan bereketli akışı cesaret ve şükranla karşılayın; ertelediğiniz adımları hayata geçirin.`
+        : `${capitalizedPeakTopics} konularında beliren sürtüşmeleri bir kriz değil, sizi daha sağlam ve olgun kılan bir basamak olarak görün.`)
     : 'Haritanızdaki sakin akışı içsel dinlenme ve hedeflerinizi sadeleştirme fırsatı olarak değerlendirin.';
 
   return {
