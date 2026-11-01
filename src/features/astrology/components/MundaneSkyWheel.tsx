@@ -61,11 +61,15 @@ export default function MundaneSkyWheel({
   const R_PLANET_RING = RADIUS - 60;
   const R_ASPECT_CORE = RADIUS - 90;
 
-  // Major visible bodies (Memoized for high performance)
+  // Major visible bodies (Memoized & deduplicated by planet name)
   const visiblePlanets = useMemo(() => {
-    return planets.filter(p => 
-      ['Güneş', 'Ay', 'Merkür', 'Venüs', 'Mars', 'Jüpiter', 'Satürn', 'Uranüs', 'Neptün', 'Plüton', 'Kiron', 'Lilith', 'Kuzey Ay Düğümü'].includes(p.name)
-    );
+    const allowed = new Set(['Güneş', 'Ay', 'Merkür', 'Venüs', 'Mars', 'Jüpiter', 'Satürn', 'Uranüs', 'Neptün', 'Plüton', 'Kiron', 'Lilith', 'Kuzey Ay Düğümü']);
+    const seen = new Set<string>();
+    return planets.filter(p => {
+      if (!allowed.has(p.name) || seen.has(p.name)) return false;
+      seen.add(p.name);
+      return true;
+    });
   }, [planets]);
 
   const planetMap = useMemo(() => {
@@ -182,7 +186,7 @@ export default function MundaneSkyWheel({
 
             return (
               <g 
-                key={`pl-${p.name}`} 
+                key={`pl-${p.name}-${i}`} 
                 className="cursor-pointer transition-transform duration-200"
                 onMouseEnter={() => setHoveredPlanet(p.name)}
                 onMouseLeave={() => setHoveredPlanet(null)}
