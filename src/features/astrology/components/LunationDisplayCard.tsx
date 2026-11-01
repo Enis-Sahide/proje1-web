@@ -215,18 +215,20 @@ export default function LunationDisplayCard({
               </span>
             </div>
 
-            {/* Kolektif / Genel Gökyüzü Teması */}
-            <div className="space-y-2">
-              <h4 className="text-sm font-bold text-[#D4AF37] uppercase tracking-wider flex items-center gap-2">
-                <Sparkles size={16} /> Kolektif Gökyüzü Enerjisi: {signInterp.title}
-              </h4>
-              <p className="text-sm text-white/85 leading-relaxed">
-                {signInterp.collective}
-              </p>
-              <p className="text-xs text-white/60 italic leading-relaxed pt-1">
-                {durationInfo.description}
-              </p>
-            </div>
+            {/* Kolektif / Genel Gökyüzü Teması (Sadece kolektif modda gösterilir; kişisel haritada doğrudan kişisel portal açılır) */}
+            {(!natalHouses || !houseInterp) && (
+              <div className="space-y-2">
+                <h4 className="text-sm font-bold text-[#D4AF37] uppercase tracking-wider flex items-center gap-2">
+                  <Sparkles size={16} /> Kolektif Gökyüzü Enerjisi: {signInterp.title}
+                </h4>
+                <p className="text-sm text-white/85 leading-relaxed">
+                  {signInterp.collective}
+                </p>
+                <p className="text-xs text-white/60 italic leading-relaxed pt-1">
+                  {durationInfo.description}
+                </p>
+              </div>
+            )}
 
             {/* Kişisel Harita Ezoterik İnisiyasyon Portalı (Varsa) */}
             {natalHouses && houseInterp && (

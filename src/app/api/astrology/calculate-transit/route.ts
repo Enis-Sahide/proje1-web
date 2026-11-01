@@ -16,18 +16,34 @@ export async function POST(req: NextRequest) {
       return errorJson('Eksik parametreler.', 400, { success: false });
     }
 
-    const nMoment = moment.tz(`${natalDate} ${natalTime}:00`, 'YYYY-MM-DD HH:mm:ss', cityData.tz);
+    const normCity = {
+      name: cityData.name || 'İstanbul',
+      lat: cityData.lat ?? cityData.latitude ?? 41.0082,
+      lon: cityData.lon ?? cityData.longitude ?? 28.9784,
+      tz: cityData.tz || cityData.timezone || 'Europe/Istanbul',
+      country: cityData.country || 'Türkiye'
+    };
+
+    const rawTCity = transitCityData || cityData;
+    const normTCity = {
+      name: rawTCity.name || normCity.name,
+      lat: rawTCity.lat ?? rawTCity.latitude ?? normCity.lat,
+      lon: rawTCity.lon ?? rawTCity.longitude ?? normCity.lon,
+      tz: rawTCity.tz || rawTCity.timezone || normCity.tz,
+      country: rawTCity.country || normCity.country
+    };
+
+    const nMoment = moment.tz(`${natalDate} ${natalTime}:00`, 'YYYY-MM-DD HH:mm:ss', normCity.tz);
     const nDateObj = nMoment.toDate();
 
-    const tCity = transitCityData || cityData;
-    const tMoment = moment.tz(`${transitDate} ${transitTime}:00`, 'YYYY-MM-DD HH:mm:ss', tCity.tz || tCity.timezone || cityData.tz);
+    const tMoment = moment.tz(`${transitDate} ${transitTime}:00`, 'YYYY-MM-DD HH:mm:ss', normTCity.tz);
     const tDateObj = tMoment.toDate();
 
     if (isNaN(nDateObj.getTime()) || isNaN(tDateObj.getTime())) {
       return errorJson('Geçersiz tarih formatı.', 400, { success: false });
     }
 
-    const transitData = await generateTransitChart(nDateObj, tDateObj, cityData, tCity);
+    const transitData = await generateTransitChart(nDateObj, tDateObj, normCity, normTCity);
 
     return json({
       success: true,

@@ -569,22 +569,19 @@ export default function TransitsPage() {
 
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5">
             {attributes.map((attr) => {
-              const barColor = attr.isEsoteric
-                ? '#A855F7'
-                : attr.score >= 8
-                ? '#10B981'
-                : attr.score >= 6
-                ? '#0EA5E9'
-                : '#F59E0B';
+              const barColor =
+                attr.score >= 8
+                  ? '#10B981'
+                  : attr.score >= 6
+                  ? '#0EA5E9'
+                  : attr.score >= 4
+                  ? '#F59E0B'
+                  : '#FB7185';
 
               return (
                 <div
                   key={attr.id}
-                  className={`rounded-xl px-3 py-2.5 border transition-all flex items-center justify-between gap-2 ${
-                    attr.isEsoteric
-                      ? 'bg-gradient-to-r from-purple-950/35 via-black/60 to-amber-950/20 border-purple-500/30'
-                      : 'bg-black/45 border-white/10'
-                  }`}
+                  className="rounded-xl px-3 py-2.5 border transition-all flex items-center justify-between gap-2 bg-black/45 border-white/10"
                 >
                   <span className="text-[11px] sm:text-xs font-bold text-white leading-tight">
                     {attr.title}
