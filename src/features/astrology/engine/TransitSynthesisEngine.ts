@@ -643,6 +643,302 @@ export function generateUnifiedSkyPlanets(
   });
 }
 
+export interface CosmicCoreEnergyItem {
+  code: 'FİZ' | 'DUY' | 'ENT' | 'RUH';
+  label: string;
+  score: number; // 1 - 100
+  trend: 'up' | 'down';
+  colorHex: string;
+}
+
+export interface CosmicAttributeGauge {
+  id: 'influence' | 'defense' | 'mobility' | 'progress' | 'cognition' | 'endurance' | 'diplomacy' | 'luck';
+  titleTop: string;
+  titleBottom: string;
+  score: number; // 1 - 10
+  percent: number; // 10 - 100
+  subtitle: string;
+}
+
+export interface DetailedCosmicBarometer {
+  mental: { score: number; label: string; tone: string };
+  emotional: { score: number; label: string; tone: string };
+  action: { score: number; label: string; tone: string };
+  coreEnergies: CosmicCoreEnergyItem[];
+  attributes: CosmicAttributeGauge[];
+}
+
+function clampNum(val: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, val));
+}
+
+function buildDetailedCosmicBarometer(
+  planets: AstroPoint[],
+  aspects: { p1: string; p2: string; aspectType: string; orb: number; isHarmonious: boolean; house1?: number; house2?: number }[],
+  isPersonal: boolean,
+  natalHouses?: AstroPoint[]
+): DetailedCosmicBarometer {
+  const getPlanet = (name: string) => planets.find(p => p.name === name);
+  const sun = getPlanet('Güneş');
+  const moon = getPlanet('Ay');
+  const mercury = getPlanet('Merkür');
+  const venus = getPlanet('Venüs');
+  const mars = getPlanet('Mars');
+  const jupiter = getPlanet('Jüpiter');
+  const saturn = getPlanet('Satürn');
+  const uranus = getPlanet('Uranüs');
+  const neptune = getPlanet('Neptün');
+  const pluto = getPlanet('Plüton');
+
+  const FIRE_SIGNS = ['Koç', 'Aslan', 'Yay'];
+  const EARTH_SIGNS = ['Boğa', 'Başak', 'Oğlak'];
+  const AIR_SIGNS = ['İkizler', 'Terazi', 'Kova'];
+  const WATER_SIGNS = ['Yengeç', 'Akrep', 'Balık'];
+
+  const CARDINAL_SIGNS = ['Koç', 'Yengeç', 'Terazi', 'Oğlak'];
+  const FIXED_SIGNS = ['Boğa', 'Aslan', 'Akrep', 'Kova'];
+  const MUTABLE_SIGNS = ['İkizler', 'Başak', 'Yay', 'Balık'];
+
+  // Continuous astronomical harmonic wave from exact longitudes (ensures hourly/daily responsiveness)
+  const sunLon = sun?.longitude ?? 0;
+  const moonLon = moon?.longitude ?? 90;
+  const marsLon = mars?.longitude ?? 180;
+  const mercLon = mercury?.longitude ?? 45;
+  const venLon = venus?.longitude ?? 120;
+  const jupLon = jupiter?.longitude ?? 240;
+  const satLon = saturn?.longitude ?? 300;
+  const nepLon = neptune?.longitude ?? 330;
+
+  const degToRad = (d: number) => (d * Math.PI) / 180;
+  const lunarPhaseAngle = ((moonLon - sunLon) % 360 + 360) % 360;
+
+  // Base continuous waves (-12 to +12) based on exact degrees & minutes
+  const physWave = Math.sin(degToRad(moonLon * 2 + marsLon)) * 11 + Math.cos(degToRad(lunarPhaseAngle)) * 7;
+  const emoWave = Math.sin(degToRad(moonLon * 3 - venLon)) * 14 + Math.sin(degToRad(lunarPhaseAngle)) * 9;
+  const entWave = Math.cos(degToRad(mercLon * 2 + moonLon)) * 12 + Math.sin(degToRad(moonLon - mercLon)) * 8;
+  const spirWave = Math.sin(degToRad(nepLon * 4 + moonLon * 2)) * 15 + Math.cos(degToRad(lunarPhaseAngle * 2)) * 10;
+
+  // Base Core Energy Scores (0-100 scale)
+  let fizRaw = 56 + physWave;
+  let duyRaw = 54 + emoWave;
+  let entRaw = 58 + entWave;
+  let ruhRaw = 48 + spirWave;
+
+  let fizTrendDelta = 0;
+  let duyTrendDelta = 0;
+  let entTrendDelta = 0;
+  let ruhTrendDelta = 0;
+
+  // Sign Element & Modality Contributions
+  const moonSign = moon?.sign || 'Koç';
+  const sunSign = sun?.sign || 'Koç';
+  const marsSign = mars?.sign || 'Koç';
+  const mercSign = mercury?.sign || 'İkizler';
+
+  if (FIRE_SIGNS.includes(moonSign)) { fizRaw += 14; entRaw += 4; fizTrendDelta += 2; }
+  if (EARTH_SIGNS.includes(moonSign)) { fizRaw += 9; entRaw += 7; }
+  if (AIR_SIGNS.includes(moonSign)) { entRaw += 15; duyRaw -= 5; entTrendDelta += 2; }
+  if (WATER_SIGNS.includes(moonSign)) { duyRaw += 16; ruhRaw += 18; duyTrendDelta += 2; ruhTrendDelta += 3; }
+
+  if (FIRE_SIGNS.includes(marsSign)) { fizRaw += 10; fizTrendDelta += 1.5; }
+  if (AIR_SIGNS.includes(mercSign) || mercSign === 'Başak') { entRaw += 9; entTrendDelta += 1.5; }
+  if (WATER_SIGNS.includes(sunSign)) { ruhRaw += 10; duyRaw += 6; }
+
+  // Retrograde penalties/shifts
+  if (mercury?.isRetrograde) { entRaw -= 12; ruhRaw += 8; entTrendDelta -= 3; }
+  if (mars?.isRetrograde) { fizRaw -= 14; fizTrendDelta -= 3; }
+  if (venus?.isRetrograde) { duyRaw -= 10; duyTrendDelta -= 2; }
+
+  // Personal House Contributions (if in PERSONAL mode)
+  if (isPersonal && natalHouses && natalHouses.length > 0 && moon) {
+    const mHouse = moon.house || getHouseFromLongitude(moon.longitude, natalHouses);
+    if ([1, 5, 6].includes(mHouse)) { fizRaw += 10; fizTrendDelta += 2; }
+    if ([4, 7, 8].includes(mHouse)) { duyRaw += 12; duyTrendDelta += 2; }
+    if ([3, 9, 10, 11].includes(mHouse)) { entRaw += 11; entTrendDelta += 2; }
+    if ([8, 9, 12].includes(mHouse)) { ruhRaw += 16; ruhTrendDelta += 3; }
+  }
+
+  // 8 Detailed Attribute Raw Scores (Base around 52 on 0-100 scale, mapped to 1-10)
+  let attrInfluence = 54 + Math.sin(degToRad(sunLon * 2 + marsLon)) * 8;      // Etki & Nüfuz
+  let attrDefense = 53 + Math.cos(degToRad(satLon * 2 + marsLon)) * 8;        // Savunma & Direnç
+  let attrMobility = 55 + Math.sin(degToRad(moonLon * 2 + mercLon)) * 9;      // Hareketlilik & Esneklik
+  let attrProgress = 54 + Math.cos(degToRad(jupLon * 2 + sunLon)) * 8;        // Erişim & İlerleme
+  let attrCognition = 56 + Math.sin(degToRad(mercLon * 2 + satLon)) * 8;      // Biliş & Tefekkür
+  let attrEndurance = 55 + Math.cos(degToRad(satLon * 2 + sunLon)) * 7;       // Dayanıklılık & Güvenilirlik
+  let attrDiplomacy = 54 + Math.sin(degToRad(venLon * 2 + mercLon)) * 9;      // İletişim & Diplomasi
+  let attrLuck = 52 + Math.cos(degToRad(jupLon * 2 + venLon)) * 10;           // Şans & Rahatlık
+
+  // Modality & Sign adjustments to 8 attributes
+  if (CARDINAL_SIGNS.includes(moonSign) || CARDINAL_SIGNS.includes(sunSign)) {
+    attrInfluence += 6;
+    attrProgress += 7;
+  }
+  if (FIXED_SIGNS.includes(moonSign) || FIXED_SIGNS.includes(sunSign)) {
+    attrDefense += 8;
+    attrEndurance += 9;
+    attrMobility -= 5;
+  }
+  if (MUTABLE_SIGNS.includes(moonSign) || MUTABLE_SIGNS.includes(mercSign)) {
+    attrMobility += 11;
+    attrCognition += 6;
+  }
+  if (EARTH_SIGNS.includes(moonSign)) {
+    attrEndurance += 8;
+    attrDefense += 6;
+  }
+  if (AIR_SIGNS.includes(moonSign) || venLon % 30 > 15) {
+    attrDiplomacy += 7;
+  }
+
+  // Continuous Aspect Contributions (Orb-weighted!)
+  for (const asp of aspects) {
+    if (asp.orb > 4.5) continue;
+    const weight = Math.pow(Math.max(0, (4.5 - asp.orb) / 4.5), 1.15); // 0.0 to 1.0 smooth curve
+    const sign = asp.isHarmonious ? 1 : -1;
+    const pair = [asp.p1, asp.p2];
+    const has = (names: string[]) => names.some(n => pair.includes(n));
+
+    // Core Energies aspect impact
+    if (has(['Güneş', 'Mars', 'Plüton'])) {
+      fizRaw += (asp.isHarmonious ? 12 : (asp.aspectType === 'Kavuşum' ? 10 : -7)) * weight;
+      fizTrendDelta += sign * 2.5 * weight;
+    }
+    if (has(['Ay', 'Venüs', 'Neptün'])) {
+      duyRaw += (asp.isHarmonious ? 14 : -11) * weight;
+      duyTrendDelta += sign * 3 * weight;
+    }
+    if (has(['Merkür', 'Uranüs', 'Jüpiter', 'Satürn'])) {
+      entRaw += (asp.isHarmonious ? 13 : -9) * weight;
+      entTrendDelta += sign * 2.5 * weight;
+    }
+    if (has(['Neptün', 'Plüton', 'Kiron', 'Kuzey Ay Düğümü', 'Ay'])) {
+      ruhRaw += (asp.isHarmonious ? 15 : 6) * weight; // Even hard spiritual aspects deepen spiritual awareness, though trines lift it higher
+      ruhTrendDelta += (asp.isHarmonious ? 3 : -1.5) * weight;
+    }
+
+    // 1. Etki & Nüfuz (Güneş, Plüton, Mars, Jüpiter, Tepe Noktası, Yükselen)
+    if (has(['Güneş', 'Plüton', 'Mars', 'Jüpiter', 'Tepe Noktası (MC)', 'Yükselen (ASC)'])) {
+      attrInfluence += (asp.isHarmonious ? 12 : (asp.aspectType === 'Kavuşum' ? 9 : -6)) * weight;
+    }
+
+    // 2. Savunma & Direnç (Satürn, Mars, Plüton, Kiron)
+    if (has(['Satürn', 'Mars', 'Plüton', 'Kiron'])) {
+      attrDefense += (asp.isHarmonious ? 11 : 4) * weight;
+    }
+
+    // 3. Hareketlilik & Esneklik (Merkür, Uranüs, Ay, Mars)
+    if (has(['Merkür', 'Uranüs', 'Ay', 'Mars'])) {
+      attrMobility += (asp.isHarmonious ? 12 : -8) * weight;
+    }
+
+    // 4. Erişim & İlerleme (Jüpiter, Mars, Güneş, Kuzey Ay Düğümü)
+    if (has(['Jüpiter', 'Mars', 'Güneş', 'Kuzey Ay Düğümü', 'Tepe Noktası (MC)'])) {
+      attrProgress += (asp.isHarmonious ? 13 : -8) * weight;
+    }
+
+    // 5. Biliş & Tefekkür (Merkür, Satürn, Neptün, Uranüs, Kiron)
+    if (has(['Merkür', 'Satürn', 'Neptün', 'Uranüs', 'Kiron'])) {
+      attrCognition += (asp.isHarmonious ? 12 : (pair.includes('Satürn') ? 5 : -7)) * weight;
+    }
+
+    // 6. Dayanıklılık & Güvenilirlik (Satürn, Güneş, Venüs, Mars)
+    if (has(['Satürn', 'Güneş', 'Venüs', 'Mars'])) {
+      attrEndurance += (asp.isHarmonious ? 12 : (pair.includes('Uranüs') ? -10 : -5)) * weight;
+    }
+
+    // 7. İletişim & Diplomasi (Venüs, Merkür, Jüpiter, Ay)
+    if (has(['Venüs', 'Merkür', 'Jüpiter', 'Ay'])) {
+      attrDiplomacy += (asp.isHarmonious ? 14 : -10) * weight;
+    }
+
+    // 8. Şans & Rahatlık (Jüpiter, Venüs, Şans Noktası (POF), Güneş, Ay)
+    if (has(['Jüpiter', 'Venüs', 'Şans Noktası (POF)', 'Güneş', 'Ay'])) {
+      attrLuck += (asp.isHarmonious ? 15 : -11) * weight;
+    }
+  }
+
+  const fizScore = Math.round(clampNum(fizRaw, 12, 99));
+  const duyScore = Math.round(clampNum(duyRaw, 10, 98));
+  const entScore = Math.round(clampNum(entRaw, 15, 98));
+  const ruhScore = Math.round(clampNum(ruhRaw, 8, 99));
+
+  const coreEnergies: CosmicCoreEnergyItem[] = [
+    {
+      code: 'FİZ',
+      label: 'Fiziksel & Eylem',
+      score: fizScore,
+      trend: fizTrendDelta >= 0 ? 'up' : 'down',
+      colorHex: '#EF4444'
+    },
+    {
+      code: 'DUY',
+      label: 'Duygusal Akış',
+      score: duyScore,
+      trend: duyTrendDelta >= 0 ? 'up' : 'down',
+      colorHex: '#22C55E'
+    },
+    {
+      code: 'ENT',
+      label: 'Entelektüel Odak',
+      score: entScore,
+      trend: entTrendDelta >= 0 ? 'up' : 'down',
+      colorHex: '#38BDF8'
+    },
+    {
+      code: 'RUH',
+      label: 'Ruhsal Sezgi',
+      score: ruhScore,
+      trend: ruhTrendDelta >= 0 ? 'up' : 'down',
+      colorHex: '#A855F7'
+    }
+  ];
+
+  const toGauge = (
+    id: CosmicAttributeGauge['id'],
+    titleTop: string,
+    titleBottom: string,
+    rawVal: number,
+    highSub: string,
+    midSub: string,
+    lowSub: string
+  ): CosmicAttributeGauge => {
+    const pct = Math.round(clampNum(rawVal, 18, 96));
+    const score10 = clampNum(Math.round(pct / 10), 2, 10);
+    const subtitle = score10 >= 8 ? highSub : score10 >= 6 ? midSub : lowSub;
+    return {
+      id,
+      titleTop,
+      titleBottom,
+      score: score10,
+      percent: pct,
+      subtitle
+    };
+  };
+
+  const attributes: CosmicAttributeGauge[] = [
+    toGauge('influence', 'ETKİ', 'NÜFUZ', attrInfluence, 'Güçlü İrade & Karizma', 'Dengeli Duruş', 'Gözlemde Kalın'),
+    toGauge('defense', 'SAVUNMA', 'DİRENÇ', attrDefense, 'Sağlam Sınır & Kalkan', 'Kontrollü Koruma', 'Hassas Sınırlar'),
+    toGauge('mobility', 'HAREKETLİLİK', 'ESNEKLİK', attrMobility, 'Çevik & Hızlı Uyum', 'Esnek Akış', 'Sabit & Ağır Tempo'),
+    toGauge('progress', 'ERİŞİM', 'İLERLEME', attrProgress, 'Hedefe Doğrudan Atılım', 'Adım Adım İlerleme', 'Hazırlık Evresi'),
+    toGauge('cognition', 'BİLİŞ', 'TEFEKKÜR', attrCognition, 'Derin Analiz & İdrak', 'Berrak Düşünce', 'Zihni Dinlendirin'),
+    toGauge('endurance', 'DAYANIKLILIK', 'GÜVENİLİRLİK', attrEndurance, 'Sarsılmaz İstikrar', 'Sabırlı & Kararlı', 'Enerjiyi Koruyun'),
+    toGauge('diplomacy', 'İLETİŞİM', 'DİPLOMASİ', attrDiplomacy, 'Yüksek İkna & Uyum', 'Yapıcı Diyalog', 'Yanlış Anlaşılma Riski'),
+    toGauge('luck', 'ŞANS', 'RAHATLIK', attrLuck, 'Açık Kısmet & Akış', 'Dengeli Fırsatlar', 'Emek & Sabır İster')
+  ];
+
+  const mentalTone = entScore >= 75 ? 'Yüksek & Berrak' : entScore >= 55 ? 'Stratejik & Dengeli' : 'Dağınık / Dinlenme Gerek';
+  const emotionalTone = duyScore >= 75 ? 'Yoğun & Sezgisel' : duyScore >= 55 ? 'Dengeli & Sakin' : 'Hassas / Sınır Koruma';
+  const actionTone = fizScore >= 75 ? 'Dinamik & Kararlı' : fizScore >= 55 ? 'Ölçülü & İstikrarlı' : 'Temkinli / Gözlemde Kal';
+
+  return {
+    mental: { score: entScore, label: `${entScore}%`, tone: mentalTone },
+    emotional: { score: duyScore, label: `${duyScore}%`, tone: emotionalTone },
+    action: { score: fizScore, label: `${fizScore}%`, tone: actionTone },
+    coreEnergies,
+    attributes
+  };
+}
+
 export interface CurrentSkyOverview {
   headline: string;
   subHeadline: string;
@@ -652,11 +948,7 @@ export interface CurrentSkyOverview {
   moonMood: string;
   sunSign: string;
   sunDegree: number;
-  barometer: {
-    mental: { score: number; label: string; tone: string };
-    emotional: { score: number; label: string; tone: string };
-    action: { score: number; label: string; tone: string };
-  };
+  barometer: DetailedCosmicBarometer;
   opportunities: PersonalGuidanceItem[];
   cautions: PersonalGuidanceItem[];
   topAspects: {
@@ -747,41 +1039,18 @@ export function generateCurrentSkyOverview(
   const allEnrichedSkyAspects = validAspects.map(enrichSkyAspect);
   const topAspects = allEnrichedSkyAspects.slice(0, 3);
 
-  // Barometre Puanları Hesaplama
-  let mentalScore = 72;
-  let emotionalScore = 70;
-  let actionScore = 68;
-
-  // Ay burcu elementi
-  if (['Yengeç', 'Akrep', 'Balık'].includes(moonSign)) {
-    emotionalScore += 16;
-  } else if (['İkizler', 'Terazi', 'Kova'].includes(moonSign)) {
-    mentalScore += 14;
-  } else if (['Koç', 'Aslan', 'Yay'].includes(moonSign)) {
-    actionScore += 18;
-  } else if (['Boğa', 'Başak', 'Oğlak'].includes(moonSign)) {
-    mentalScore += 8;
-    actionScore += 8;
-  }
-
-  // Açıların etkisi
-  topAspects.forEach(asp => {
-    if (asp.isHarmonious) {
-      mentalScore += 4;
-      actionScore += 4;
-    } else {
-      emotionalScore += 6;
-      actionScore += 2;
-    }
-  });
-
-  mentalScore = Math.min(95, Math.max(45, mentalScore));
-  emotionalScore = Math.min(96, Math.max(50, emotionalScore));
-  actionScore = Math.min(94, Math.max(48, actionScore));
-
-  const mentalTone = mentalScore >= 80 ? 'Yüksek & Berrak' : mentalScore >= 65 ? 'Stratejik & Dengeli' : 'Dağınık / Dikkat İstiyor';
-  const emotionalTone = emotionalScore >= 80 ? 'Yoğun & Sezgisel' : emotionalScore >= 65 ? 'Dengeli & Sakin' : 'Hassas / Dinlenme Gerek';
-  const actionTone = actionScore >= 80 ? 'Dinamik & Kararlı' : actionScore >= 65 ? 'Ölçülü & İstikrarlı' : 'Ağır / Bekle-Gör';
+  // Detaylı 4 Ana Frekans + 8 Boyutlu Barometre Hesaplama
+  const detailedSkyBarometer = buildDetailedCosmicBarometer(
+    allSkyPlanets,
+    allEnrichedSkyAspects.map(a => ({
+      p1: a.p1,
+      p2: a.p2,
+      aspectType: a.aspectType,
+      orb: a.orb,
+      isHarmonious: a.isHarmonious
+    })),
+    false
+  );
 
   // Başlık Kurgusu
   const peakAspect = topAspects[0];
@@ -845,11 +1114,7 @@ export function generateCurrentSkyOverview(
     moonMood: moonData.mood,
     sunSign,
     sunDegree: sunDeg,
-    barometer: {
-      mental: { score: mentalScore, label: `${mentalScore}%`, tone: mentalTone },
-      emotional: { score: emotionalScore, label: `${emotionalScore}%`, tone: emotionalTone },
-      action: { score: actionScore, label: `${actionScore}%`, tone: actionTone }
-    },
+    barometer: detailedSkyBarometer,
     opportunities,
     cautions,
     topAspects
@@ -1011,11 +1276,7 @@ export interface PersonalTransitOverview {
     description: string;
     planetNames: string[];
   }[];
-  barometer: {
-    mental: { score: number; label: string; tone: string };
-    emotional: { score: number; label: string; tone: string };
-    action: { score: number; label: string; tone: string };
-  };
+  barometer: DetailedCosmicBarometer;
   opportunities: PersonalGuidanceItem[];
   cautions: PersonalGuidanceItem[];
   topAspects: {
@@ -1132,45 +1393,21 @@ export function generatePersonalTransitOverview(
     planetNames: item.planetNames
   }));
 
-  // Barometre Puanları Hesaplama
-  let mentalScore = 74;
-  let emotionalScore = 70;
-  let actionScore = 72;
-
-  const tMoon = transitPlanets.find(p => p.name === 'Ay');
-  const tMoonHouse = tMoon ? (tMoon.house || getHouseFromLongitude(tMoon.longitude, natalHouses)) : 1;
-
-  if ([1, 5, 9].includes(tMoonHouse)) {
-    actionScore += 12;
-    mentalScore += 6;
-  } else if ([4, 8, 12].includes(tMoonHouse)) {
-    emotionalScore += 16;
-    actionScore -= 4;
-  } else if ([3, 6, 10].includes(tMoonHouse)) {
-    mentalScore += 14;
-    actionScore += 8;
-  } else if ([2, 7, 11].includes(tMoonHouse)) {
-    mentalScore += 8;
-    emotionalScore += 8;
-  }
-
-  topAspects.forEach(asp => {
-    if (asp.isHarmonious) {
-      mentalScore += 5;
-      actionScore += 4;
-    } else {
-      emotionalScore += 6;
-      actionScore += 2;
-    }
-  });
-
-  mentalScore = Math.min(95, Math.max(45, mentalScore));
-  emotionalScore = Math.min(96, Math.max(48, emotionalScore));
-  actionScore = Math.min(95, Math.max(46, actionScore));
-
-  const mentalTone = mentalScore >= 80 ? 'Yüksek & Berrak' : mentalScore >= 65 ? 'Stratejik & Dengeli' : 'Dağınık / Dinlenme İhtiyacı';
-  const emotionalTone = emotionalScore >= 80 ? 'Yoğun & Sezgisel' : emotionalScore >= 65 ? 'Dengeli & Dingin' : 'Hassas / Sınır Koruma';
-  const actionTone = actionScore >= 80 ? 'Kararlı & Cesur' : actionScore >= 65 ? 'Ölçülü & İstikrarlı' : 'Temkinli / Gözlemde Kal';
+  // Detaylı 4 Ana Frekans + 8 Boyutlu Kişisel Barometre Hesaplama
+  const detailedPersonalBarometer = buildDetailedCosmicBarometer(
+    transitPlanets,
+    allEnrichedAspects.map(a => ({
+      p1: a.transitPlanet,
+      p2: a.natalPlanet,
+      aspectType: a.aspectType,
+      orb: a.orb,
+      isHarmonious: a.isHarmonious,
+      house1: a.transitHouse,
+      house2: a.natalHouse
+    })),
+    true,
+    natalHouses
+  );
 
   const peak = topAspects[0];
   const mainFocusTitle = focusHouses[0]?.title || 'Yaşam Alanlarınız';
@@ -1236,11 +1473,7 @@ export function generatePersonalTransitOverview(
     subHeadline,
     themeDescription,
     focusHouses,
-    barometer: {
-      mental: { score: mentalScore, label: `${mentalScore}%`, tone: mentalTone },
-      emotional: { score: emotionalScore, label: `${emotionalScore}%`, tone: emotionalTone },
-      action: { score: actionScore, label: `${actionScore}%`, tone: actionTone }
-    },
+    barometer: detailedPersonalBarometer,
     opportunities: opportunities.slice(0, 3),
     cautions: cautions.slice(0, 3),
     topAspects,

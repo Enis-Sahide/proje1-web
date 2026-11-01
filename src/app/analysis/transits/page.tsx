@@ -37,6 +37,7 @@ import {
   CurrentSkyOverview,
   generatePersonalTransitOverview,
   PersonalTransitOverview,
+  DetailedCosmicBarometer,
   LIFE_AREA_NAMES
 } from '@/features/astrology/engine/TransitSynthesisEngine';
 import { AstroCity, TransitChartData, AstroPoint, AstroAspect } from '@/features/astrology/engine/AstrologyConstants';
@@ -460,6 +461,197 @@ export default function TransitsPage() {
     );
   };
 
+  const renderAttributeSvgIcon = (id: string) => {
+    switch (id) {
+      case 'influence': // Hammer / Mjolnir (Etki & Nüfuz)
+        return (
+          <svg viewBox="0 0 36 36" className="w-8 h-8 text-amber-400 shrink-0" fill="currentColor">
+            <path d="M21.5 4.5l10 10-4.2 4.2-10-10L21.5 4.5zM15.9 10.1l10 10-2.1 2.1-10-10 2.1-2.1z" />
+            <rect x="6" y="22" width="14" height="3.6" rx="1.5" transform="rotate(-45 6 22)" />
+            <circle cx="6.5" cy="29.5" r="2" />
+          </svg>
+        );
+      case 'defense': // Shield (Savunma & Direnç)
+        return (
+          <svg viewBox="0 0 36 36" className="w-8 h-8 text-sky-400 shrink-0" fill="currentColor">
+            <path d="M18 3L6 8v9.5C6 25.8 11.1 32.3 18 34c6.9-1.7 12-8.2 12-16.5V8L18 3zm0 4.2l8 3.3v6.8c0 6.1-3.4 11.2-8 12.7V7.2z" />
+          </svg>
+        );
+      case 'mobility': // Dynamic Acrobat / Agility (Hareketlilik & Esneklik)
+        return (
+          <svg viewBox="0 0 36 36" className="w-8 h-8 text-emerald-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="19" cy="7" r="3" fill="currentColor" stroke="none" />
+            <path d="M9 12l8 3 8-6" />
+            <path d="M17 15l-2 8-7 6" />
+            <path d="M15 23l8 3 4 6" />
+          </svg>
+        );
+      case 'progress': // Bullseye Target (Erişim & İlerleme)
+        return (
+          <svg viewBox="0 0 36 36" className="w-8 h-8 text-rose-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.4">
+            <circle cx="18" cy="18" r="11" />
+            <circle cx="18" cy="18" r="6.5" />
+            <circle cx="18" cy="18" r="2.5" fill="currentColor" />
+            <path d="M18 3v3M18 30v3M3 18h3M30 18h3" strokeLinecap="round" />
+          </svg>
+        );
+      case 'cognition': // Open Book with Radiant Insight (Biliş & Tefekkür)
+        return (
+          <svg viewBox="0 0 36 36" className="w-8 h-8 text-cyan-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 26c4-2 9-2 14 1 5-3 10-3 14-1V12c-4-2-9-2-14 1-5-3-10-3-14-1v14z" />
+            <path d="M18 13v14" />
+            <path d="M18 5v3M12 7l1.5 2.5M24 7l-1.5 2.5" />
+          </svg>
+        );
+      case 'endurance': // Atlas / Strength Globe (Dayanıklılık & Güvenilirlik)
+        return (
+          <svg viewBox="0 0 36 36" className="w-8 h-8 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="18" cy="12" r="7.5" />
+            <path d="M11 12h14M18 4.5c2.2 2 3.5 4.6 3.5 7.5s-1.3 5.5-3.5 7.5c-2.2-2-3.5-4.6-3.5-7.5S15.8 6.5 18 4.5z" />
+            <path d="M10 19l5 4h6l5-4" />
+            <path d="M15 23v6l-3 4M21 23v6l3 4" />
+          </svg>
+        );
+      case 'diplomacy': // Handshake (İletişim & Diplomasi)
+        return (
+          <svg viewBox="0 0 36 36" className="w-8 h-8 text-purple-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M4 16l6-6 6 2 5-3 5 3 6 4-5 6-5-3-5 4-6-3-7-4z" />
+            <path d="M13 21l4 4M17 19l4 4M21 17l3 3" />
+          </svg>
+        );
+      case 'luck': // Lucky Horseshoe (Şans & Rahatlık)
+      default:
+        return (
+          <svg viewBox="0 0 36 36" className="w-8 h-8 text-emerald-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round">
+            <path d="M9 7v11a9 9 0 0 0 18 0V7" />
+            <path d="M6 7h5M25 7h5" strokeWidth="3" />
+            <circle cx="11.5" cy="14" r="1" fill="currentColor" stroke="none" />
+            <circle cx="24.5" cy="14" r="1" fill="currentColor" stroke="none" />
+            <circle cx="18" cy="24.5" r="1" fill="currentColor" stroke="none" />
+          </svg>
+        );
+    }
+  };
+
+  const renderDetailedCosmicBarometer = (barometer: DetailedCosmicBarometer, title: string) => {
+    const radius = 18;
+    const circumference = 2 * Math.PI * radius;
+
+    return (
+      <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 sm:p-5 space-y-5">
+        {/* Top Header + 4 Core Energy Percentages (FİZ, DUY, ENT, RUH) */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-white/10 pb-4">
+          <div className="flex items-center gap-2">
+            <Activity size={15} className="text-[#0EA5E9]" />
+            <span className="text-xs uppercase tracking-wider font-extrabold text-white">
+              {title}
+            </span>
+          </div>
+
+          {/* 4 Core Energy Indicators (FİZ, DUY, ENT, RUH) */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 w-full lg:w-auto">
+            {barometer.coreEnergies.map((ce) => (
+              <div
+                key={ce.code}
+                className="bg-black/50 border border-white/10 rounded-xl px-3 py-2 flex items-center justify-between gap-3"
+              >
+                <div className="flex items-center gap-2">
+                  {/* Zigzag Lightning Trend Arrow */}
+                  {ce.trend === 'up' ? (
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0" fill="none" stroke={ce.colorHex} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="3 17 9 11 13 15 21 7" />
+                      <polyline points="15 7 21 7 21 13" />
+                    </svg>
+                  ) : (
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0" fill="none" stroke={ce.colorHex} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <polyline points="3 7 9 13 13 9 21 17" />
+                      <polyline points="15 17 21 17 21 11" />
+                    </svg>
+                  )}
+                  <div>
+                    <div className="text-xs font-black tracking-wide leading-none" style={{ color: ce.colorHex }}>
+                      {ce.code}
+                    </div>
+                    <div className="text-[9px] text-white/45 font-medium mt-0.5 truncate max-w-[78px]">
+                      {ce.label}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-sm sm:text-base font-black tabular-nums" style={{ color: ce.colorHex }}>
+                  %{ce.score}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* 8 Detailed Attribute Gauges (1-10 Circular Rings + Archetype Icons) */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-3.5">
+          {barometer.attributes.map((attr) => {
+            const dashOffset = circumference - (attr.percent / 100) * circumference;
+            const ringColor = attr.score >= 8 ? '#34D399' : attr.score >= 6 ? '#38BDF8' : '#F59E0B';
+            return (
+              <div
+                key={attr.id}
+                className="bg-black/45 hover:bg-black/65 border border-white/10 rounded-2xl p-3.5 flex flex-col items-center text-center transition-all group"
+              >
+                {/* Icon + 1-10 Circular Ring Row */}
+                <div className="flex items-center justify-center gap-3 mb-2.5">
+                  <div className="p-2 rounded-xl bg-white/[0.04] border border-white/5 group-hover:scale-105 transition-transform">
+                    {renderAttributeSvgIcon(attr.id)}
+                  </div>
+
+                  {/* Circular 1-10 Score Gauge */}
+                  <div className="relative w-12 h-12 flex items-center justify-center shrink-0">
+                    <svg className="w-12 h-12 -rotate-90" viewBox="0 0 44 44">
+                      <circle
+                        cx="22"
+                        cy="22"
+                        r={radius}
+                        fill="none"
+                        stroke="rgba(255,255,255,0.12)"
+                        strokeWidth="3.5"
+                      />
+                      <circle
+                        cx="22"
+                        cy="22"
+                        r={radius}
+                        fill="none"
+                        stroke={ringColor}
+                        strokeWidth="3.5"
+                        strokeLinecap="round"
+                        strokeDasharray={circumference}
+                        strokeDashoffset={dashOffset}
+                      />
+                    </svg>
+                    <span className="absolute text-sm font-black text-white tabular-nums">
+                      {attr.score}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Two-Line Uppercase Attribute Name */}
+                <div className="leading-tight">
+                  <div className="text-[11px] sm:text-xs font-extrabold tracking-wider text-white uppercase">
+                    {attr.titleTop}
+                  </div>
+                  <div className="text-[10px] sm:text-[11px] font-bold tracking-wider text-[#D4AF37] uppercase">
+                    {attr.titleBottom}
+                  </div>
+                </div>
+
+                {/* Subtle status subtitle */}
+                <span className="text-[10px] text-white/45 mt-1 font-normal">
+                  {attr.subtitle}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen pt-24 pb-24 px-4 sm:px-6 relative">
       <div className="max-w-6xl mx-auto">
@@ -734,49 +926,8 @@ export default function TransitsPage() {
                                   </p>
                                 </div>
 
-                                {/* Kozmik Barometre */}
-                                <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-4">
-                                  <span className="text-[10px] uppercase tracking-wider font-extrabold text-[#0EA5E9] block mb-3 flex items-center gap-1.5">
-                                    <Activity size={12} /> Kozmik Frekans Barometresi
-                                  </span>
-                                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                    {/* Mental */}
-                                    <div className="space-y-1.5 bg-black/40 p-3 rounded-xl border border-white/5">
-                                      <div className="flex justify-between items-center text-xs">
-                                        <span className="text-stone-300 font-medium">🧠 Zihinsel Odak</span>
-                                        <span className="font-extrabold text-cyan-300">{currentSkyOverview.barometer.mental.label}</span>
-                                      </div>
-                                      <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
-                                        <div className="bg-gradient-to-r from-cyan-500 to-blue-500 h-1.5 rounded-full" style={{ width: `${currentSkyOverview.barometer.mental.score}%` }} />
-                                      </div>
-                                      <span className="text-[10px] text-stone-400 block">{currentSkyOverview.barometer.mental.tone}</span>
-                                    </div>
-
-                                    {/* Emotional */}
-                                    <div className="space-y-1.5 bg-black/40 p-3 rounded-xl border border-white/5">
-                                      <div className="flex justify-between items-center text-xs">
-                                        <span className="text-stone-300 font-medium">🌊 Duygusal Akış</span>
-                                        <span className="font-extrabold text-purple-300">{currentSkyOverview.barometer.emotional.label}</span>
-                                      </div>
-                                      <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
-                                        <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-1.5 rounded-full" style={{ width: `${currentSkyOverview.barometer.emotional.score}%` }} />
-                                      </div>
-                                      <span className="text-[10px] text-stone-400 block">{currentSkyOverview.barometer.emotional.tone}</span>
-                                    </div>
-
-                                    {/* Action */}
-                                    <div className="space-y-1.5 bg-black/40 p-3 rounded-xl border border-white/5">
-                                      <div className="flex justify-between items-center text-xs">
-                                        <span className="text-stone-300 font-medium">⚡ Eylem & Atılım</span>
-                                        <span className="font-extrabold text-[#D4AF37]">{currentSkyOverview.barometer.action.label}</span>
-                                      </div>
-                                      <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
-                                        <div className="bg-gradient-to-r from-amber-500 to-[#D4AF37] h-1.5 rounded-full" style={{ width: `${currentSkyOverview.barometer.action.score}%` }} />
-                                      </div>
-                                      <span className="text-[10px] text-stone-400 block">{currentSkyOverview.barometer.action.tone}</span>
-                                    </div>
-                                  </div>
-                                </div>
+                                {/* Kozmik Frekans & Yetkinlik Barometresi */}
+                                {renderDetailedCosmicBarometer(currentSkyOverview.barometer, 'Kozmik Frekans & Yetkinlik Barometresi')}
 
                                 {/* Fırsatlar & Tuzaklar (Do / Don't) */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -1652,81 +1803,31 @@ export default function TransitsPage() {
                           </p>
                         </div>
 
-                        {/* Odak Yaşam Alanları & Enerji Barometresi */}
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-                          {/* Sol: Odak Yaşam Alanları (5 cols) */}
-                          <div className="lg:col-span-5 bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3">
-                            <span className="text-[11px] font-extrabold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
-                              <Compass size={13} /> Bugünün Odak Yaşam Alanları
-                            </span>
-                            <div className="space-y-2.5">
-                              {personalOverview.focusHouses.map((fh, idx) => (
-                                <div key={`fh-${idx}`} className="bg-black/40 border border-white/5 rounded-xl p-3">
-                                  <div className="flex items-center justify-between gap-2 mb-1">
-                                    <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"></span>
-                                      {fh.title}
-                                    </span>
-                                    <span className="text-[10px] text-amber-300/80 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
-                                      {fh.planetNames.join(', ')}
-                                    </span>
-                                  </div>
-                                  <p className="text-[11px] text-gray-400 capitalize">
-                                    {fh.description}
-                                  </p>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
+                        {/* Kişisel Enerji & Yetkinlik Barometresi */}
+                        {renderDetailedCosmicBarometer(personalOverview.barometer, 'Kişisel Enerji & Yetkinlik Barometresi')}
 
-                          {/* Sağ: 3 Boyutlu Enerji & Akış Barometresi (7 cols) */}
-                          <div className="lg:col-span-7 bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3">
-                            <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#D4AF37] flex items-center gap-1.5">
-                              <Activity size={13} /> Kişisel Enerji & Akış Barometresi
-                            </span>
-                            <div className="space-y-3 pt-1">
-                              {/* Zihinsel */}
-                              <div>
-                                <div className="flex justify-between items-center text-xs mb-1">
-                                  <span className="text-gray-300 font-medium">Zihinsel Netlik & Karar Gücü</span>
-                                  <span className="text-sky-400 font-bold">{personalOverview.barometer.mental.label} • {personalOverview.barometer.mental.tone}</span>
+                        {/* Odak Yaşam Alanları */}
+                        <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3">
+                          <span className="text-[11px] font-extrabold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+                            <Compass size={13} /> Bugünün Odak Yaşam Alanları
+                          </span>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {personalOverview.focusHouses.map((fh, idx) => (
+                              <div key={`fh-${idx}`} className="bg-black/40 border border-white/5 rounded-xl p-3">
+                                <div className="flex items-center justify-between gap-2 mb-1">
+                                  <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"></span>
+                                    {fh.title}
+                                  </span>
+                                  <span className="text-[10px] text-amber-300/80 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
+                                    {fh.planetNames.join(', ')}
+                                  </span>
                                 </div>
-                                <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                                  <div 
-                                    className="bg-gradient-to-r from-sky-500 to-cyan-400 h-full rounded-full transition-all duration-700" 
-                                    style={{ width: `${personalOverview.barometer.mental.score}%` }} 
-                                  />
-                                </div>
+                                <p className="text-[11px] text-gray-400 capitalize">
+                                  {fh.description}
+                                </p>
                               </div>
-
-                              {/* Duygusal */}
-                              <div>
-                                <div className="flex justify-between items-center text-xs mb-1">
-                                  <span className="text-gray-300 font-medium">Duygusal Denge & İç Huzur</span>
-                                  <span className="text-emerald-400 font-bold">{personalOverview.barometer.emotional.label} • {personalOverview.barometer.emotional.tone}</span>
-                                </div>
-                                <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                                  <div 
-                                    className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-700" 
-                                    style={{ width: `${personalOverview.barometer.emotional.score}%` }} 
-                                  />
-                                </div>
-                              </div>
-
-                              {/* Eylem */}
-                              <div>
-                                <div className="flex justify-between items-center text-xs mb-1">
-                                  <span className="text-gray-300 font-medium">Eylem & İlerleme Enerjisi</span>
-                                  <span className="text-amber-400 font-bold">{personalOverview.barometer.action.label} • {personalOverview.barometer.action.tone}</span>
-                                </div>
-                                <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                                  <div 
-                                    className="bg-gradient-to-r from-amber-500 to-yellow-400 h-full rounded-full transition-all duration-700" 
-                                    style={{ width: `${personalOverview.barometer.action.score}%` }} 
-                                  />
-                                </div>
-                              </div>
-                            </div>
+                            ))}
                           </div>
                         </div>
 
