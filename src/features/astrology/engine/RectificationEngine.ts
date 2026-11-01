@@ -223,16 +223,19 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
   let targetDates: string[] = [];
 
   if (dateMode === 'exact') {
-    targetDates = [input.birthDate || '1992-06-15'];
+    if (!input.birthDate) throw new Error('Lütfen geçerli bir doğum tarihi giriniz.');
+    targetDates = [input.birthDate];
   } else if (dateMode === 'month') {
-    const y = input.birthYear || 1991;
-    const m = input.birthMonth || 4;
+    if (!input.birthYear) throw new Error('Lütfen geçerli bir doğum yılı giriniz.');
+    const y = input.birthYear;
+    const m = input.birthMonth || 1;
     const daysInMonth = new Date(y, m, 0).getDate();
     for (let d = 1; d <= daysInMonth; d++) {
       targetDates.push(`${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`);
     }
   } else if (dateMode === 'season') {
-    const y = input.birthYear || 1991;
+    if (!input.birthYear) throw new Error('Lütfen geçerli bir doğum yılı giriniz.');
+    const y = input.birthYear;
     const season = input.birthSeason || 'spring';
     let startM = 3, endM = 5;
     if (season === 'summer') { startM = 6; endM = 8; }
@@ -329,7 +332,7 @@ export async function runAutomatedRectification(input: RectificationInput): Prom
   const topDateCandidates = sortedDays.slice(0, 3);
 
   // 2. EN İYİ GÜN ÜZERİNDEN 24 SAATLİK DİLİMİ TARA
-  const finalBirthDate = dateMode === 'exact' ? (input.birthDate || '1992-06-15') : bestDay.dateStr;
+  const finalBirthDate = dateMode === 'exact' ? input.birthDate! : bestDay.dateStr;
   const [bYear, bMonth, bDay] = finalBirthDate.split('-').map(Number);
   
   const momentBirth = moment.tz(`${finalBirthDate} 12:00:00`, tzName);

@@ -1,14 +1,47 @@
 import { NextRequest } from 'next/server';
 import path from 'path';
 import fs from 'fs';
-import { DRUID_TREES } from '@/features/astrology/engine/DruidTreeEngine';
+import { DRUID_TREES, getDruidTreeAnalysis } from '@/features/astrology/engine/DruidTreeEngine';
 import { renderDruidTreeCard } from '@/features/astrology/server/druidTreeCardService';
+import { json, errorJson, preflight } from '@/lib/http/cors';
 
 export const dynamic = 'force-dynamic';
+
+export async function OPTIONS() {
+  return preflight();
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json().catch(() => ({}));
+    const { day, month, includeAllTrees } = body;
+
+    const analysis = day && month ? getDruidTreeAnalysis(Number(day), Number(month)) : null;
+    return json({
+      success: true,
+      analysis,
+      trees: includeAllTrees ? DRUID_TREES : undefined,
+    });
+  } catch (error: any) {
+    console.error('Druid tree analysis POST error:', error);
+    return errorJson(error.message || 'Druid ağacı analizi hesaplanamadı.', 500);
+  }
+}
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+    const mode = searchParams.get('mode');
+    if (mode === 'list') {
+      const day = searchParams.get('day');
+      const month = searchParams.get('month');
+      return json({
+        success: true,
+        trees: DRUID_TREES,
+        analysis: day && month ? getDruidTreeAnalysis(Number(day), Number(month)) : null,
+      });
+    }
+
     const treeId = searchParams.get('treeId');
     const name = searchParams.get('name') || '';
 
