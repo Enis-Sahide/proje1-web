@@ -202,22 +202,7 @@ export async function generateAstrologyChart(dateObj: Date, cityInput: string | 
 
   // 4. Derived & Esoteric Points
   if (!isHeliocentric) {
-    // a) Kuzey Ay Düğümü
-    const nodeCalc = swe.swe_calc_ut(jd, Constants.SE_TRUE_NODE, flags);
-    const northNodeLon = mod360(nodeCalc.xx[0]);
-    const nodeSpeed = nodeCalc.xx[3];
-    const nnData = getSignAndDegree(northNodeLon);
-    planets.push({
-      name: 'Kuzey Ay Düğümü',
-      longitude: northNodeLon,
-      sign: nnData.sign,
-      degreeInSign: nnData.degreeInSign,
-      minutes: nnData.minutes,
-      house: getHouseForLon(northNodeLon, cuspDegrees),
-      isRetrograde: nodeSpeed < 0 
-    });
-
-    // b) Vertex
+    // a) Vertex
     const vxData = getSignAndDegree(vertexDeg);
     planets.push({
       name: 'Vertex (Vx)',
