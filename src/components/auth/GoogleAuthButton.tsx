@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState } from 'react';
-import { Loader2 } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Loader2, ExternalLink } from 'lucide-react';
 
 interface GoogleAuthButtonProps {
   redirectUrl?: string;
@@ -38,8 +38,23 @@ export default function GoogleAuthButton({
   className = ''
 }: GoogleAuthButtonProps) {
   const [loading, setLoading] = useState(false);
+  const [isInAppBrowser, setIsInAppBrowser] = useState(false);
+  const [showInAppHint, setShowInAppHint] = useState(false);
+
+  useEffect(() => {
+    if (typeof navigator !== 'undefined') {
+      const ua = navigator.userAgent || '';
+      if (/Instagram|FBAN|FBAV|Line\/|TikTok/i.test(ua)) {
+        setIsInAppBrowser(true);
+      }
+    }
+  }, []);
 
   const handleClick = () => {
+    if (isInAppBrowser) {
+      setShowInAppHint(true);
+      return;
+    }
     setLoading(true);
     const targetUrl = redirectUrl 
       ? `/api/auth/google?redirect=${encodeURIComponent(redirectUrl)}`
@@ -48,23 +63,35 @@ export default function GoogleAuthButton({
   };
 
   return (
-    <button
-      type="button"
-      onClick={handleClick}
-      disabled={loading}
-      className={`w-full flex items-center justify-center gap-3 py-3.5 px-4 rounded-xl bg-white hover:bg-neutral-100 text-neutral-800 font-semibold text-sm transition-all duration-200 shadow-md hover:shadow-lg active:scale-[0.99] cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed ${className}`}
-    >
-      {loading ? (
-        <>
-          <Loader2 size={18} className="animate-spin text-neutral-600" />
-          <span>Google Bağlantısı Açılıyor...</span>
-        </>
-      ) : (
-        <>
-          <GoogleIcon size={18} />
-          <span>{label}</span>
-        </>
+    <div className="space-y-2">
+      <button
+        type="button"
+        onClick={handleClick}
+        disabled={loading}
+        className={`w-full flex items-center justify-center gap-3 py-3.5 px-4 rounded-xl bg-white hover:bg-neutral-100 text-neutral-800 font-semibold text-sm transition-all duration-200 shadow-md hover:shadow-lg active:scale-[0.99] cursor-pointer disabled:opacity-75 disabled:cursor-not-allowed ${className}`}
+      >
+        {loading ? (
+          <>
+            <Loader2 size={18} className="animate-spin text-neutral-600" />
+            <span>Google Bağlantısı Açılıyor...</span>
+          </>
+        ) : (
+          <>
+            <GoogleIcon size={18} />
+            <span>{label}</span>
+          </>
+        )}
+      </button>
+
+      {(isInAppBrowser || showInAppHint) && (
+        <div className="rounded-xl bg-amber-500/15 border border-amber-500/35 p-3 text-left text-[11px] sm:text-xs text-amber-200 leading-relaxed">
+          <div className="font-bold text-amber-300 flex items-center gap-1.5 mb-0.5">
+            <ExternalLink size={13} className="shrink-0" />
+            <span>Instagram İçi Tarayıcı Bilgilendirmesi</span>
+          </div>
+          Google güvenlik kuralları gereği uygulama içi tarayıcılarda Google girişi kısıtlanmaktadır. Aşağıdaki <strong>E-posta ile Giriş / Ücretsiz Hesap Oluştur</strong> butonlarıyla saniyeler içinde devam edebilir veya sağ üstteki <strong>⋯</strong> menüsünden <strong>"Tarayıcıda Aç"</strong> seçeneğini kullanabilirsiniz.
+        </div>
       )}
-    </button>
+    </div>
   );
 }
