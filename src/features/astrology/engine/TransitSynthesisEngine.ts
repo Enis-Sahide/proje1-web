@@ -746,7 +746,7 @@ const CHAKRA_SEPHIRAH_MAP: Record<string, { chakra: string; sephirah: string; gu
   },
   'Plüton': {
     chakra: 'Kök & Sakral Çakra',
-    sephirah: 'Da'at (Gizli Bilgi, Küllerinden Doğuş & Simya)',
+    sephirah: "Da'at (Gizli Bilgi, Küllerinden Doğuş & Simya)",
     guidance: 'Miadını doldurmuş korkuları ve kontrol takıntısını bırakarak gerçek gücünüze uyanın.'
   },
   'Kiron': {
