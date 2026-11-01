@@ -224,28 +224,6 @@ export default function LunationDisplayCard({
                 Pik Noktası: <strong className="text-white/90">{durationInfo.peakWindow}</strong>
               </span>
             </div>
-            {/* 🌗 3. KATMAN: BUGÜNÜN CANLI AY FAZI & ANLIK EV AKIŞI */}
-            {liveLunarPhase && (
-              <div className="p-4 sm:p-5 rounded-2xl bg-sky-950/25 border border-sky-500/30 space-y-2">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
-                    <span>{liveLunarPhase.phaseIcon}</span> Bugünün Canlı Ay Fazı & Ruhsal Ritmi
-                  </span>
-                  <span className="text-xs font-black text-amber-300 bg-amber-500/15 px-2.5 py-0.5 rounded-full border border-amber-500/30">
-                    %{liveLunarPhase.illumination} Işık
-                  </span>
-                </div>
-                <div className="text-sm sm:text-base font-bold text-white">
-                  {liveLunarPhase.phaseName}
-                  {liveLunarPhase.moonSign ? ` • Transit Ay ${liveLunarPhase.moonSign} (${liveLunarPhase.moonDegree ?? 0}°)` : ''}
-                  {liveLunarPhase.moonHouse ? ` — ${liveLunarPhase.moonHouse}. Evinizde` : ''}
-                </div>
-                <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
-                  {liveLunarPhase.esotericSecret}
-                </p>
-              </div>
-            )}
-
             {/* Kolektif / Genel Gökyüzü Teması (Sadece kolektif modda gösterilir; kişisel haritada doğrudan kişisel portal açılır) */}
             {(!natalHouses || !houseInterp) && (
               <div className="space-y-2">
@@ -319,6 +297,28 @@ export default function LunationDisplayCard({
                     <span className="leading-relaxed">{houseInterp.spiritualAdvice || houseInterp.advice}</span>
                   </div>
                 </div>
+              </div>
+            )}
+
+            {/* 🌗 3. KATMAN: BUGÜNÜN CANLI AY FAZI & ANLIK EV AKIŞI */}
+            {liveLunarPhase && (
+              <div className="p-4 sm:p-5 rounded-2xl bg-sky-950/25 border border-sky-500/30 space-y-2">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-sky-300 flex items-center gap-1.5">
+                    <span>{liveLunarPhase.phaseIcon}</span> Bugünün Canlı Ay Fazı & Ruhsal Ritmi
+                  </span>
+                  <span className="text-xs font-black text-amber-300 bg-amber-500/15 px-2.5 py-0.5 rounded-full border border-amber-500/30">
+                    %{liveLunarPhase.illumination} Işık
+                  </span>
+                </div>
+                <div className="text-sm sm:text-base font-bold text-white">
+                  {liveLunarPhase.phaseName}
+                  {liveLunarPhase.moonSign ? ` • Transit Ay ${liveLunarPhase.moonSign} (${liveLunarPhase.moonDegree ?? 0}°)` : ''}
+                  {liveLunarPhase.moonHouse ? ` — ${liveLunarPhase.moonHouse}. Evinizde` : ''}
+                </div>
+                <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
+                  {liveLunarPhase.esotericSecret}
+                </p>
               </div>
             )}
 
