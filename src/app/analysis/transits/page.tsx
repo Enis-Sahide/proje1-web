@@ -1553,28 +1553,6 @@ export default function TransitsPage() {
                 {/* Personal Tab 1: Bi-Wheel */}
                 {personalTab === 'BIWHEEL' && (
                   <div className="space-y-10">
-                    <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-8 rounded-3xl shadow-2xl flex flex-col items-center w-full max-w-full overflow-hidden">
-                      <div className="flex w-full flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-6 mb-8 gap-4">
-                         <div>
-                           <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-3 mb-2">
-                             <Compass className="text-[#0EA5E9] shrink-0" /> Çift Çemberli Transit Haritası
-                           </h2>
-                           <div className="flex flex-col gap-1 text-xs sm:text-sm">
-                             <p className="text-[#D4AF37] flex items-center gap-2">
-                               <span className="w-2 h-2 rounded-full bg-[#D4AF37] shrink-0"></span>
-                               Natal: {cityKey ? cityKey.name : ''} • {natalDateStr ? natalDateStr.split('-').reverse().join('.') : ''} {natalTimeStr}
-                             </p>
-                             <p className="text-[#0EA5E9] flex items-center gap-2">
-                               <span className="w-2.5 h-2.5 rounded-full bg-[#0EA5E9] inline-block shrink-0"></span>
-                               Transit (Dış Çember): {transitDateStr ? transitDateStr.split('-').reverse().join('.') : ''} {transitTimeStr}
-                             </p>
-                           </div>
-                         </div>
-                      </div>
-
-                      {renderBiWheel()}
-                    </div>
-
                     {/* Personal View Switcher */}
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-black/50 p-3 rounded-2xl border border-white/10 mb-6">
                       <div className="flex flex-wrap items-center gap-2">
@@ -2028,6 +2006,28 @@ export default function TransitsPage() {
                         activeSolarEclipse={personalLunation.activeSolarEclipse}
                       />
                     )}
+
+                    <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-8 rounded-3xl shadow-2xl flex flex-col items-center w-full max-w-full overflow-hidden">
+                      <div className="flex w-full flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-6 mb-8 gap-4">
+                         <div>
+                           <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-3 mb-2">
+                             <Compass className="text-[#0EA5E9] shrink-0" /> Çift Çemberli Transit Haritası
+                           </h2>
+                           <div className="flex flex-col gap-1 text-xs sm:text-sm">
+                             <p className="text-[#D4AF37] flex items-center gap-2">
+                               <span className="w-2 h-2 rounded-full bg-[#D4AF37] shrink-0"></span>
+                               Natal: {cityKey ? cityKey.name : ''} • {natalDateStr ? natalDateStr.split('-').reverse().join('.') : ''} {natalTimeStr}
+                             </p>
+                             <p className="text-[#0EA5E9] flex items-center gap-2">
+                               <span className="w-2.5 h-2.5 rounded-full bg-[#0EA5E9] inline-block shrink-0"></span>
+                               Transit (Dış Çember): {transitDateStr ? transitDateStr.split('-').reverse().join('.') : ''} {transitTimeStr}
+                             </p>
+                           </div>
+                         </div>
+                      </div>
+
+                      {renderBiWheel()}
+                    </div>
 
                     {/* Önemli Bilgilendirme */}
                     <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 p-6 rounded-3xl flex items-start gap-4">
