@@ -10,7 +10,12 @@ interface LocationAutocompleteProps {
   className?: string;
 }
 
-export default function LocationAutocomplete({ onSelect, defaultDisplay = '', placeholder = 'Şehir Ara...', className = '' }: LocationAutocompleteProps) {
+export default function LocationAutocomplete({
+  onSelect,
+  defaultDisplay = '',
+  placeholder = 'Şehir Ara...',
+  className = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#D4AF37] transition-colors'
+}: LocationAutocompleteProps) {
   const [query, setQuery] = useState(defaultDisplay);
   const [results, setResults] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState(false);
