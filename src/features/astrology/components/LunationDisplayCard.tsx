@@ -300,6 +300,15 @@ export default function LunationDisplayCard({
               </div>
             )}
 
+            {/* Ritüel / Arınma Önerisi */}
+            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-start gap-3 text-xs text-white/70">
+              <Flame size={16} className="text-amber-400 shrink-0 mt-0.5" />
+              <div>
+                <strong className="text-white block mb-0.5">Bu Dönemin Manevi Arınma & Ritüel Tavsiyesi:</strong>
+                <span>{signInterp.ritual}</span>
+              </div>
+            </div>
+
             {/* 🌗 3. KATMAN: BUGÜNÜN CANLI AY FAZI & ANLIK EV AKIŞI */}
             {liveLunarPhase && (
               <div className="p-4 sm:p-5 rounded-2xl bg-sky-950/25 border border-sky-500/30 space-y-2">
@@ -321,15 +330,6 @@ export default function LunationDisplayCard({
                 </p>
               </div>
             )}
-
-            {/* Ritüel / Arınma Önerisi */}
-            <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-start gap-3 text-xs text-white/70">
-              <Flame size={16} className="text-amber-400 shrink-0 mt-0.5" />
-              <div>
-                <strong className="text-white block mb-0.5">Bu Dönemin Manevi Arınma & Ritüel Tavsiyesi:</strong>
-                <span>{signInterp.ritual}</span>
-              </div>
-            </div>
           </div>
         )}
       </div>
