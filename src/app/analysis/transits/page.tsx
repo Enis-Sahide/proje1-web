@@ -625,54 +625,9 @@ export default function TransitsPage() {
                 </div>
               ) : skyChartData ? (
                 <div className="space-y-8">
-                  {/* Wheel & Aspects Split */}
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    
-                    {/* Left: Mundane Sky Wheel (7 cols) */}
-                    <div className="lg:col-span-7 bg-[#0A0D14]/90 sm:backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-6 rounded-3xl shadow-xl flex flex-col items-center">
-                      <div className="w-full flex items-center justify-between border-b border-white/10 pb-4 mb-4">
-                        <div>
-                          <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                            <Orbit className="text-[#0EA5E9]" size={20} />
-                            Anlık Gökyüzü Çarkı (Mundane Wheel)
-                          </h3>
-                          <p className="text-xs text-mystic-text-muted">
-                            {skyDateStr.split('-').reverse().join('.')} {skyTimeStr} • Gezegenlerin zodyaktaki anlık yerleşimleri
-                          </p>
-                        </div>
-                        <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#0EA5E9]/10 text-[#0EA5E9] border border-[#0EA5E9]/20">
-                          {skyChartData.aspects.length} Açı Aktif
-                        </span>
-                      </div>
-
-                      <MundaneSkyWheel 
-                        planets={skyChartData.planets}
-                        aspects={skyChartData.aspects}
-                        ascendant={skyChartData.ascendant}
-                        onSelectAspect={(asp: any) => {
-                          if (asp.interpretation) {
-                            setSelectedInterp({
-                              title: asp.interpretation.title,
-                              content: `${asp.interpretation.summary}\n\n【Kolektif Etki】\n${asp.interpretation.collectiveTheme}\n\n【Günün Tavsiyesi】\n${asp.interpretation.dailyAdvice}`,
-                              extra: asp.interpretation.chakraResonance
-                            });
-                          }
-                        }}
-                        onSelectPlanet={(planet) => {
-                          const interp = getSkyPlanetSignInterpretation(
-                            planet.name,
-                            planet.sign,
-                            planet.degreeInSign,
-                            planet.minutes,
-                            planet.isRetrograde
-                          );
-                          setSelectedInterp(interp);
-                        }}
-                      />
-                    </div>
-
-                    {/* Right: Active Sky Aspects or Planetary Sign Transits (5 cols) */}
-                    <div className="lg:col-span-5 bg-[#0A0D14]/90 sm:backdrop-blur-md border border-white/10 p-4 sm:p-6 rounded-3xl shadow-xl flex flex-col">
+                  {/* Top Full-Width Analysis: Active Sky Aspects or Planetary Sign Transits */}
+                  <div>
+                    <div className="bg-[#0A0D14]/90 sm:backdrop-blur-md border border-white/10 p-4 sm:p-6 rounded-3xl shadow-xl flex flex-col">
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-white/10 pb-4 mb-4 gap-3">
                         <div className="inline-flex p-1 rounded-xl bg-white/5 border border-white/10 w-full sm:w-auto">
                           <button
@@ -824,32 +779,50 @@ export default function TransitsPage() {
                                 </div>
 
                                 {/* Fırsatlar & Tuzaklar (Do / Don't) */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   {/* Fırsatlar */}
-                                  <div className="bg-emerald-950/20 border border-emerald-500/20 rounded-2xl p-4 space-y-2">
+                                  <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 sm:p-5 space-y-3">
                                     <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5 uppercase tracking-wider">
-                                      <CheckCircle2 size={14} /> Bugünün Fırsatları
+                                      <CheckCircle2 size={14} /> 🌟 Bugünün Fırsatları & Destekleri
                                     </span>
-                                    <ul className="space-y-1.5 text-xs text-stone-200">
+                                    <ul className="space-y-3">
                                       {currentSkyOverview.opportunities.map((item, idx) => (
-                                        <li key={idx} className="flex items-start gap-1.5">
-                                          <span className="text-emerald-400 shrink-0 mt-0.5">✦</span>
-                                          <span>{item}</span>
+                                        <li key={idx} className="bg-black/30 border border-emerald-500/10 rounded-xl p-3 flex items-start gap-2.5">
+                                          <span className="text-emerald-400 font-bold shrink-0 mt-0.5">✓</span>
+                                          <div className="space-y-1">
+                                            <p className="text-xs sm:text-sm font-medium text-white leading-relaxed">
+                                              {item.text}
+                                            </p>
+                                            {item.astroTag && (
+                                              <span className="block text-[10px] text-white/35 font-normal">
+                                                {item.astroTag}
+                                              </span>
+                                            )}
+                                          </div>
                                         </li>
                                       ))}
                                     </ul>
                                   </div>
 
                                   {/* Tuzaklar / Dikkat */}
-                                  <div className="bg-amber-950/20 border border-amber-500/20 rounded-2xl p-4 space-y-2">
-                                    <span className="text-xs font-bold text-amber-400 flex items-center gap-1.5 uppercase tracking-wider">
-                                      <AlertTriangle size={14} /> Neden Kaçınmalı?
+                                  <div className="bg-rose-500/5 border border-rose-500/20 rounded-2xl p-4 sm:p-5 space-y-3">
+                                    <span className="text-xs font-bold text-rose-400 flex items-center gap-1.5 uppercase tracking-wider">
+                                      <AlertTriangle size={14} /> ⚠️ Dikkat Edilmesi Gerekenler
                                     </span>
-                                    <ul className="space-y-1.5 text-xs text-stone-200">
+                                    <ul className="space-y-3">
                                       {currentSkyOverview.cautions.map((item, idx) => (
-                                        <li key={idx} className="flex items-start gap-1.5">
-                                          <span className="text-amber-400 shrink-0 mt-0.5">✦</span>
-                                          <span>{item}</span>
+                                        <li key={idx} className="bg-black/30 border border-rose-500/10 rounded-xl p-3 flex items-start gap-2.5">
+                                          <span className="text-rose-400 font-bold shrink-0 mt-0.5">!</span>
+                                          <div className="space-y-1">
+                                            <p className="text-xs sm:text-sm font-medium text-white leading-relaxed">
+                                              {item.text}
+                                            </p>
+                                            {item.astroTag && (
+                                              <span className="block text-[10px] text-white/35 font-normal">
+                                                {item.astroTag}
+                                              </span>
+                                            )}
+                                          </div>
                                         </li>
                                       ))}
                                     </ul>
@@ -1404,6 +1377,62 @@ export default function TransitsPage() {
                       activeSolarEclipse={currentSkyLunation.activeSolarEclipse}
                     />
                   )}
+
+                  {/* Anlık Gökyüzü Çarkı (Mundane Wheel) */}
+                  <div className="bg-[#0A0D14]/90 sm:backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-6 rounded-3xl shadow-xl flex flex-col items-center">
+                    <div className="w-full flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+                      <div>
+                        <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                          <Orbit className="text-[#0EA5E9]" size={20} />
+                          Anlık Gökyüzü Çarkı (Mundane Wheel)
+                        </h3>
+                        <p className="text-xs text-mystic-text-muted">
+                          {skyDateStr.split('-').reverse().join('.')} {skyTimeStr} • Gezegenlerin zodyaktaki anlık yerleşimleri
+                        </p>
+                      </div>
+                      <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#0EA5E9]/10 text-[#0EA5E9] border border-[#0EA5E9]/20">
+                        {skyChartData.aspects.length} Açı Aktif
+                      </span>
+                    </div>
+
+                    <MundaneSkyWheel 
+                      planets={skyChartData.planets}
+                      aspects={skyChartData.aspects}
+                      ascendant={skyChartData.ascendant}
+                      onSelectAspect={(asp: any) => {
+                        if (asp.interpretation) {
+                          setSelectedInterp({
+                            title: asp.interpretation.title,
+                            content: `${asp.interpretation.summary}\n\n【Kolektif Etki】\n${asp.interpretation.collectiveTheme}\n\n【Günün Tavsiyesi】\n${asp.interpretation.dailyAdvice}`,
+                            extra: asp.interpretation.chakraResonance
+                          });
+                        }
+                      }}
+                      onSelectPlanet={(planet) => {
+                        const interp = getSkyPlanetSignInterpretation(
+                          planet.name,
+                          planet.sign,
+                          planet.degreeInSign,
+                          planet.minutes,
+                          planet.isRetrograde
+                        );
+                        setSelectedInterp(interp);
+                      }}
+                    />
+                  </div>
+
+                  {/* Önemli Bilgilendirme */}
+                  <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 p-6 rounded-3xl flex items-start gap-4">
+                    <AlertCircle className="text-[#D4AF37] shrink-0 mt-0.5" size={24} />
+                    <div>
+                      <h4 className="text-sm font-bold text-white mb-2 uppercase tracking-wider">Önemli Bilgilendirme</h4>
+                      <p className="text-xs text-mystic-text-muted leading-relaxed">
+                        Sistemimiz tarafından sunulan yorumlar, astrolojik hesaplama algoritmaları ile üretilmektedir. 
+                        Astrolojide hiçbir gösterge tek başına bir anlam ifade etmez. Gökyüzündeki herhangi bir gezegen konumu, burç geçişi veya açı; 
+                        her zaman gökyüzünün bütünsel bağlamı ve kendi doğum haritanızın dinamikleri ile birlikte değerlendirilmelidir.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               ) : null
             )}

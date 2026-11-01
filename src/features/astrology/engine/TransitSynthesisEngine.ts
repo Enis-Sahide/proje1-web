@@ -657,8 +657,8 @@ export interface CurrentSkyOverview {
     emotional: { score: number; label: string; tone: string };
     action: { score: number; label: string; tone: string };
   };
-  opportunities: string[];
-  cautions: string[];
+  opportunities: PersonalGuidanceItem[];
+  cautions: PersonalGuidanceItem[];
   topAspects: {
     p1: string;
     p2: string;
@@ -707,19 +707,45 @@ export function generateCurrentSkyOverview(
   const validAspects = (allSkyAspects || []).filter(a => a.orb <= 3.2);
   validAspects.sort((a, b) => a.orb - b.orb);
 
-  const topAspects = validAspects.slice(0, 3).map(asp => {
-    const isHarmonious = asp.type === 'Üçgen' || asp.type === 'Sekstil' || (asp.type === 'Kavuşum' && !['Satürn', 'Mars', 'Plüton'].includes(asp.planet2));
+  const enrichSkyAspect = (asp: any) => {
+    const isHarmonious = asp.type === 'Üçgen' || asp.type === 'Sekstil' || (asp.type === 'Kavuşum' && !['Satürn', 'Mars', 'Plüton', 'Kiron', 'Lilith'].includes(asp.planet2));
     const interp = asp.interpretation || getSkyAspectInterpretation(asp.planet1, asp.planet2, asp.type);
+    const p1Obj = allSkyPlanets.find(p => p.name === asp.planet1);
+    const p2Obj = allSkyPlanets.find(p => p.name === asp.planet2);
+    const p1Coord = p1Obj ? `${p1Obj.sign} ${p1Obj.degreeInSign}°` : '';
+    const p2Coord = p2Obj ? `${p2Obj.sign} ${p2Obj.degreeInSign}°` : '';
+
+    // Clean summary without leading technical planet-aspect jargon if present
+    let cleanSummary = interp?.summary || '';
+    cleanSummary = cleanSummary.replace(/^Gökyüzünde\s+.*?açısı;\s*/i, '');
+    if (cleanSummary) {
+      cleanSummary = cleanSummary.charAt(0).toUpperCase() + cleanSummary.slice(1);
+    } else {
+      cleanSummary = isHarmonious
+        ? 'İletişim, karar alma ve günlük akışta destekleyici, uyumlu bir frekans sağlıyor.'
+        : 'Sabır, denge ve bilinçli sınırlar gerektiren bir farkındalık eşiği oluşturuyor.';
+    }
+
+    const dailyAdvice = interp?.dailyAdvice || '';
+    const collectiveTheme = interp?.collectiveTheme || '';
+
     return {
       p1: asp.planet1,
       p2: asp.planet2,
+      p1Coord,
+      p2Coord,
       aspectType: asp.type,
       orb: asp.orb,
       isHarmonious,
-      summary: interp?.summary || `${asp.planet1} - ${asp.planet2} ${asp.type} açısı.`,
-      badge: asp.orb <= 1.0 ? 'Pik Etki (Kesin)' : `${asp.orb.toFixed(1)}° Orb`
+      summary: cleanSummary,
+      dailyAdvice,
+      collectiveTheme,
+      badge: asp.orb <= 1.0 ? `★ Tam Pik (${asp.orb.toFixed(1)}°)` : `${asp.orb.toFixed(1)}° Orb`
     };
-  });
+  };
+
+  const allEnrichedSkyAspects = validAspects.map(enrichSkyAspect);
+  const topAspects = allEnrichedSkyAspects.slice(0, 3);
 
   // Barometre Puanları Hesaplama
   let mentalScore = 72;
@@ -773,24 +799,42 @@ export function generateCurrentSkyOverview(
   // Vurucu 2-3 Cümlelik Genel Anlatı
   let vibeNarrative = `Bugün genel atmosfer ${moonData.mood.toLowerCase()} bir frekansta akıyor. `;
   if (peakAspect) {
-    vibeNarrative += `${peakAspect.summary.replace(/^.*?;\s*/, '')} `;
+    vibeNarrative += `${peakAspect.summary} `;
   }
   vibeNarrative += `Günün anahtarı: Duygusal dalgalanmalar karşısında merkezinizde kalarak, ${moonData.doAction.toLowerCase()}`;
 
-  // Fırsatlar ve Tuzaklar
-  const opportunities = [
-    moonData.doAction,
-    peakAspect?.isHarmonious
-      ? `${peakAspect.p1} ve ${peakAspect.p2} temasının getirdiği ilhamı somut projelere dönüştürün.`
-      : 'Zorlayıcı görünen durumları olgunlukla karşılayıp içsel sınırlarınızı netleştirin.'
+  // Fırsatlar ve Tuzaklar (Vurgulu insan dili + altta minik teknik etiket)
+  const opportunities: PersonalGuidanceItem[] = [
+    {
+      text: moonData.doAction,
+      astroTag: `Ay ${moonSign} Burcunda (${moonDeg}°) • Duygusal Akış`
+    }
   ];
 
-  const cautions = [
-    moonData.dontAction,
-    peakAspect && !peakAspect.isHarmonious
-      ? `${peakAspect.p1} ve ${peakAspect.p2} geriliminde aceleci kararlar almaktan ve restleşmelerden uzak durun.`
-      : 'Günün getirdiği rahatlığa fazla kapılıp önemli sorumlulukları ertelemeyin.'
+  const harmoniousSky = allEnrichedSkyAspects.filter(a => a.isHarmonious).slice(0, 2);
+  harmoniousSky.forEach(asp => {
+    const advicePart = asp.dailyAdvice ? ` ${asp.dailyAdvice}` : '';
+    opportunities.push({
+      text: `${asp.summary}${advicePart}`,
+      astroTag: `Gökyüzü: ${asp.p1}${asp.p1Coord ? ` (${asp.p1Coord})` : ''} • ${asp.aspectType} • ${asp.p2}${asp.p2Coord ? ` (${asp.p2Coord})` : ''} (${asp.orb.toFixed(1)}° Orb)`
+    });
+  });
+
+  const cautions: PersonalGuidanceItem[] = [
+    {
+      text: moonData.dontAction,
+      astroTag: `Ay ${moonSign} Burcunda (${moonDeg}°) • Gölge Hassasiyet`
+    }
   ];
+
+  const challengingSky = allEnrichedSkyAspects.filter(a => !a.isHarmonious).slice(0, 2);
+  challengingSky.forEach(asp => {
+    const advicePart = asp.dailyAdvice ? ` ${asp.dailyAdvice}` : '';
+    cautions.push({
+      text: `${asp.summary}${advicePart}`,
+      astroTag: `Gökyüzü: ${asp.p1}${asp.p1Coord ? ` (${asp.p1Coord})` : ''} • ${asp.aspectType} • ${asp.p2}${asp.p2Coord ? ` (${asp.p2Coord})` : ''} (${asp.orb.toFixed(1)}° Orb)`
+    });
+  });
 
   return {
     headline,
