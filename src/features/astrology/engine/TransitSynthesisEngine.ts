@@ -1090,92 +1090,72 @@ function buildDetailedCosmicBarometer(
   ];
 
   // ==========================================================================
-  // B) 10 DETAILED ATTRIBUTES (Neutral Base = 52 -> 5/10, Max Cap = 9/10)
+  // B) 8 DISTINCT PLANETARY LIFE DIMENSIONS (Zero Overlap Between Rulers)
   // ==========================================================================
 
-  // 1. Özgüven & Duruş (Güneş + Mars + Plüton; Cardinal/Fire boost, Water/Mutable drag)
-  const infAsp = evalNormalizedAspectImpact(['Güneş', 'Mars', 'Yükselen (ASC)'], ['Satürn', 'Neptün']);
+  // 1. Özgüven & İrade Duruşu (Yönetici: Güneş & Yükselen — Öz-değer ve görünür irade)
+  const infAsp = evalNormalizedAspectImpact(['Güneş', 'Yükselen (ASC)'], ['Satürn', 'Neptün']);
   const attrInfluence = 56
     + infAsp.scoreDelta
-    + (sunDig * 0.6 + marsDig * 0.4)
-    + (firePct - waterPct) * 0.18
-    + (cardinalPct - 33.3) * 0.15
-    + Math.sin(degToRad(sunLon + marsLon)) * 3;
+    + sunDig * 0.85
+    + (firePct - 25) * 0.22
+    + Math.sin(degToRad(sunLon * 2)) * 3;
 
-  // 2. Enerji Kalkanı & Sınırlar (Satürn + Mars; Earth/Fixed boost, hard Neptune/Moon weakens boundaries)
-  const defAsp = evalNormalizedAspectImpact(['Satürn', 'Mars'], ['Neptün', 'Plüton', 'Lilith']);
-  const attrDefense = 56
-    + defAsp.scoreDelta
-    + (satDig * 0.65 + marsDig * 0.35)
-    + (earthPct - airPct) * 0.18
-    + (fixedPct - mutablePct) * 0.16
-    + Math.cos(degToRad(satLon + moonLon)) * 3;
-
-  // 3. Değişime & Akışa Uyum (Merkür + Uranüs + Ay; Mutable/Air boost, Fixed/Earth resistance lowers it!)
-  const mobAsp = evalNormalizedAspectImpact(['Merkür', 'Uranüs', 'Ay'], ['Satürn']);
-  const attrMobility = 56
-    + mobAsp.scoreDelta
-    + (mercDig * 0.5 + uraDig * 0.5)
-    + (mutablePct - fixedPct) * 0.25
-    + (airPct - earthPct) * 0.18
-    + Math.sin(degToRad(moonLon + mercLon)) * 3;
-
-  // 4. Hedef & Somut Sonuç (Mars + Jüpiter + Güneş + MC; Cardinal/Earth/Fire boost)
-  const progAsp = evalNormalizedAspectImpact(['Mars', 'Jüpiter', 'Tepe Noktası (MC)'], ['Satürn', 'Neptün']);
+  // 2. Eylem & İş Bitirme Gücü (Yönetici: Mars & Tepe Noktası — Cesaret, somut atılım ve hedef)
+  const progAsp = evalNormalizedAspectImpact(['Mars', 'Tepe Noktası (MC)'], ['Satürn', 'Neptün']);
   const attrProgress = 56
     + progAsp.scoreDelta
-    + (marsDig * 0.5 + jupDig * 0.5)
-    + (cardinalPct - mutablePct) * 0.20
-    + ((firePct + earthPct) - 50) * 0.16
-    + Math.cos(degToRad(jupLon + marsLon)) * 3;
+    + marsDig * 0.85
+    + (cardinalPct - 33.3) * 0.22
+    + Math.cos(degToRad(marsLon * 2)) * 3;
 
-  // 5. Derin Kavrayış & Hikmet (Merkür + Satürn + Uranüs; Air/Earth boost, hard Mars/Neptune fogs mind)
-  const cogAsp = evalNormalizedAspectImpact(['Merkür', 'Satürn'], ['Mars', 'Neptün']);
+  // 3. Zihinsel Analiz & Odak (Yönetici: Merkür — Düşünce berraklığı, öğrenme ve strateji)
+  const cogAsp = evalNormalizedAspectImpact(['Merkür'], ['Neptün', 'Mars']);
   const attrCognition = 56
     + cogAsp.scoreDelta
-    + (mercDig * 0.6 + satDig * 0.4)
-    + ((airPct + earthPct) - 50) * 0.18
-    + Math.sin(degToRad(mercLon + satLon)) * 3;
+    + mercDig * 0.85
+    + (airPct - 25) * 0.22
+    + Math.sin(degToRad(mercLon * 2)) * 3;
 
-  // 6. Sabır & İstikrar (Satürn + Venüs; Fixed/Earth boost, Mutable/Fire restlessness lowers it!)
-  const endAsp = evalNormalizedAspectImpact(['Satürn', 'Venüs'], ['Uranüs', 'Mars']);
-  const attrEndurance = 56
-    + endAsp.scoreDelta
-    + (satDig * 0.65 + venDig * 0.35)
-    + (fixedPct - mutablePct) * 0.25
-    + (earthPct - firePct) * 0.20
-    + Math.cos(degToRad(satLon + venLon)) * 3;
-
-  // 7. Sosyal Ahenk & İkna (Venüs + Merkür; Air/Water boost, hard Mars/Pluto/Saturn creates friction)
-  const dipAsp = evalNormalizedAspectImpact(['Venüs', 'Merkür'], ['Mars', 'Plüton', 'Satürn']);
+  // 4. Sosyal Ahenk & İlişkiler (Yönetici: Venüs — Sevgi dili, uzlaşı, diplomasi ve çekim)
+  const dipAsp = evalNormalizedAspectImpact(['Venüs'], ['Mars', 'Plüton', 'Satürn']);
   const attrDiplomacy = 56
     + dipAsp.scoreDelta
-    + (venDig * 0.6 + mercDig * 0.4)
-    + (airPct - firePct) * 0.18
-    + Math.sin(degToRad(venLon + mercLon)) * 3;
+    + venDig * 0.85
+    + ((airPct + waterPct) - 50) * 0.16
+    + Math.cos(degToRad(venLon * 2)) * 3;
 
-  // 8. Bereket & Doğal Kısmet (Jüpiter + Venüs + Şans Noktası (POF))
-  const luckAsp = evalNormalizedAspectImpact(['Jüpiter', 'Venüs', 'Şans Noktası (POF)'], ['Satürn', 'Kiron']);
+  // 5. Sabır & Sınır Kalkanı (Yönetici: Satürn — Öz disiplin, istikrar ve ruhsal sınır koruma)
+  const endAsp = evalNormalizedAspectImpact(['Satürn'], ['Uranüs', 'Mars']);
+  const attrEndurance = 56
+    + endAsp.scoreDelta
+    + satDig * 0.85
+    + (earthPct - 25) * 0.25
+    + (fixedPct - mutablePct) * 0.18
+    + Math.sin(degToRad(satLon * 2)) * 3;
+
+  // 6. Değişime & Yeniliğe Uyum (Yönetici: Uranüs — Esneklik, çeviklik ve ani manevra kabiliyeti)
+  const mobAsp = evalNormalizedAspectImpact(['Uranüs'], ['Satürn']);
+  const attrMobility = 56
+    + mobAsp.scoreDelta
+    + uraDig * 0.85
+    + (mutablePct - fixedPct) * 0.28
+    + Math.cos(degToRad((uranus?.longitude ?? 60) * 2 + moonLon)) * 3;
+
+  // 7. Bereket & Doğal Kısmet (Yönetici: Jüpiter & Şans Noktası — Fırsatlar, büyüme ve bolluk)
+  const luckAsp = evalNormalizedAspectImpact(['Jüpiter', 'Şans Noktası (POF)'], ['Satürn', 'Kiron']);
   const attrLuck = 56
     + luckAsp.scoreDelta
-    + (jupDig * 0.6 + venDig * 0.4)
-    + Math.cos(degToRad(jupLon + venLon)) * 3.5;
+    + jupDig * 0.85
+    + Math.sin(degToRad(jupLon * 2 + venLon)) * 3.5;
 
-  // 9. Kadersel Çekim & Tezahür (Kuzey Ay Düğümü + Vertex + Plüton + Jüpiter)
-  const manAsp = evalNormalizedAspectImpact(['Kuzey Ay Düğümü', 'Vertex (Vx)', 'Plüton'], ['Satürn']);
-  const attrManifest = 56
-    + manAsp.scoreDelta
-    + (pluDig * 0.5 + jupDig * 0.4)
-    + (waterPct + firePct - 50) * 0.15
-    + Math.sin(degToRad((northNode?.longitude ?? 0) + moonLon)) * 3.5;
-
-  // 10. Ruhsal Şifa & Arınma (Kiron + Neptün + Ay)
-  const healAsp = evalNormalizedAspectImpact(['Kiron', 'Neptün', 'Ay'], ['Mars', 'Satürn'], ['Venüs', 'Jüpiter', 'Neptün', 'Ay']);
+  // 8. Ruhsal Şifa & Kadersel Akış (Yönetici: Neptün, Kiron, K. Ay Düğümü & Vertex — Arınma ve eşzamanlılık)
+  const healAsp = evalNormalizedAspectImpact(['Kiron', 'Neptün', 'Kuzey Ay Düğümü', 'Vertex (Vx)'], ['Mars', 'Satürn'], ['Venüs', 'Jüpiter', 'Neptün', 'Kuzey Ay Düğümü']);
   const attrHealing = 56
     + healAsp.scoreDelta
-    + (nepDig * 0.5 + moonDig * 0.5)
+    + (nepDig * 0.55 + pluDig * 0.30)
     + (waterPct - 25) * 0.25
-    + Math.cos(degToRad((chiron?.longitude ?? 0) + nepLon)) * 3.5;
+    + Math.cos(degToRad((chiron?.longitude ?? 0) + nepLon + moonLon)) * 3.5;
 
   const toGauge = (
     id: CosmicAttributeGauge['id'],
@@ -1187,7 +1167,6 @@ function buildDetailedCosmicBarometer(
     lowSub: string,
     isEsoteric = false
   ): CosmicAttributeGauge => {
-    // Clamp raw percentage between 20 and 90 so 1-10 score naturally ranges from 2/10 to 9/10 (never artificial 10/10)
     const pct = Math.round(clampNum(rawVal, 20, 90));
     const score10 = clampNum(Math.round(pct / 10), 2, 9);
     const subtitle = score10 >= 7 ? highSub : score10 >= 5 ? midSub : lowSub;
@@ -1203,16 +1182,14 @@ function buildDetailedCosmicBarometer(
   };
 
   const attributes: CosmicAttributeGauge[] = [
-    toGauge('influence', 'Özgüven & Duruş', 'Güneş • Mars • Plüton', attrInfluence, 'Güçlü İrade & Doğal Karizma', 'Dengeli & Net Duruş', 'Geri Planda Gözlem Zamanı'),
-    toGauge('defense', 'Enerji Kalkanı & Sınırlar', 'Satürn • Mars • Kiron', attrDefense, 'Sağlam Ruhsal Sınırlar', 'Kontrollü Alan Koruma', 'Aurayı Yoran Ortamlardan Kaçının'),
-    toGauge('mobility', 'Değişime & Akışa Uyum', 'Merkür • Uranüs • Ay', attrMobility, 'Çevik & Esnek Manevra Gücü', 'Uyumlu & Dengeli Tempo', 'Acele Etmeden Sabit İlerleyin'),
-    toGauge('progress', 'Hedef & Somut Sonuç', 'Jüpiter • Mars • Güneş', attrProgress, 'İş Bitirme & Doğrudan Atılım', 'Adım Adım Kararlı İlerleme', 'Yeni Atılım Yerine Hazırlık Evresi'),
-    toGauge('cognition', 'Derin Kavrayış & Hikmet', 'Merkür • Satürn • Uranüs', attrCognition, 'Büyük Resmi Görme & İdrak', 'Berrak & Analitik Düşünce', 'Aşırı Düşünmeyi Bırakın'),
-    toGauge('endurance', 'Sabır & İstikrar', 'Satürn • Sabit & Toprak', attrEndurance, 'Sarsılmaz Disiplin & Güven', 'Sabırlı & Ölçülü Devamlılık', 'Gücünüzü Tek Noktada Toplayın'),
-    toGauge('diplomacy', 'Sosyal Ahenk & İkna', 'Venüs • Merkür • Ay', attrDiplomacy, 'Tatlı Dil, Uzlaşı & Çekim', 'Yapıcı & Dengeli Diyalog', 'Yanlış Anlaşılmalara Dikkat'),
-    toGauge('luck', 'Bereket & Doğal Kısmet', 'Jüpiter • Venüs • POF', attrLuck, 'Çabasız Akış & Açık Kısmet', 'Emeğin Karşılığını Alma', 'Şansa Değil Stratejiye Güvenin'),
-    toGauge('manifestation', 'Kadersel Çekim & Tezahür', 'K. Ay Düğümü • Vertex • Plüton', attrManifest, 'Yüksek Niyet & Eşzamanlılık Kapısı', 'Kadersel İşaretler Devrede', 'Zorlamak Yerine Teslimiyette Kalın', true),
-    toGauge('healing', 'Ruhsal Şifa & Arınma', 'Kiron • Neptün • Ay', attrHealing, 'Derin Blokaj Çözümü & Ferahlama', 'Duygusal Onarım Süreci', 'Kendinize Şefkat Gösterin', true)
+    toGauge('influence', 'Özgüven & İrade Duruşu', 'Güneş • Yükselen', attrInfluence, 'Güçlü İrade & Doğal Karizma', 'Dengeli & Net Duruş', 'Geri Planda Gözlem Zamanı'),
+    toGauge('progress', 'Eylem & İş Bitirme Gücü', 'Mars • Tepe Noktası', attrProgress, 'Cesur Atılım & Somut Sonuç', 'Adım Adım Kararlı İlerleme', 'Enerjiyi Zorlamadan Koruyun'),
+    toGauge('cognition', 'Zihinsel Analiz & Odak', 'Merkür', attrCognition, 'Keskin İdrak & Net Karar', 'Dengeli & Analitik Düşünce', 'Zihinsel Dağınıklığa Dikkat'),
+    toGauge('diplomacy', 'Sosyal Ahenk & İlişkiler', 'Venüs', attrDiplomacy, 'Tatlı Dil, Uzlaşı & Çekim', 'Yapıcı & Dengeli Diyalog', 'İlişkilerde Alınganlığa Dikkat'),
+    toGauge('endurance', 'Sabır & Sınır Kalkanı', 'Satürn', attrEndurance, 'Sağlam Disiplin & Ruhsal Sınır', 'Sabırlı & Kontrollü Koruma', 'Ağır Sorumluluklarla Yüklenmeyin'),
+    toGauge('mobility', 'Değişime & Yeniliğe Uyum', 'Uranüs • Değişken Nitelik', attrMobility, 'Çevik & Esnek Manevra Gücü', 'Akışla Uyumlu Tempo', 'Sabit Fikirlilikten Kaçının'),
+    toGauge('luck', 'Bereket & Doğal Kısmet', 'Jüpiter • Şans Noktası', attrLuck, 'Açık Kısmet & Büyüme Fırsatı', 'Emeğin Karşılığını Alma', 'Risk Yerine Garanti Adımlar Atın'),
+    toGauge('healing', 'Ruhsal Şifa & Kadersel Akış', 'Neptün • Kiron • K. Ay Düğümü', attrHealing, 'Yüksek Sezgi & Blokaj Çözümü', 'İçsel Onarım & İşaretleri Okuma', 'Zihni Dinlendirip Akışta Kalın', true)
   ];
 
   const mentalTone = entScore >= 70 ? 'Yüksek & Berrak' : entScore >= 50 ? 'Stratejik & Dengeli' : 'Dağınık / Dinlenme Gerek';

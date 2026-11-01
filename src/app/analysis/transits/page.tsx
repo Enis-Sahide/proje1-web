@@ -554,57 +554,11 @@ export default function TransitsPage() {
           </div>
         </div>
 
-        {/* 2. BÖLÜM: 4 ANA KOZMİK FREKANS KANALI (Taşma Yapmayan Özgün Barlar) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {coreEnergies.map((ce) => (
-            <div
-              key={ce.code}
-              className="bg-black/55 border border-white/10 rounded-2xl p-3.5 space-y-2"
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-bold text-white truncate">
-                  {ce.label}
-                </span>
-                <div className="flex items-center gap-1 shrink-0">
-                  <span
-                    className="text-[10px] font-bold px-1.5 py-0.5 rounded"
-                    style={{
-                      backgroundColor: `${ce.colorHex}20`,
-                      color: ce.colorHex
-                    }}
-                  >
-                    {ce.trend === 'up' ? '▲ Yükselişte' : '▼ Dengeleniyor'}
-                  </span>
-                  <span className="text-sm font-black tabular-nums" style={{ color: ce.colorHex }}>
-                    %{ce.score}
-                  </span>
-                </div>
-              </div>
-
-              {/* Işıltılı Doluluk Çubuğu */}
-              <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                <div
-                  className="h-full rounded-full transition-all duration-700"
-                  style={{
-                    width: `${ce.score}%`,
-                    backgroundColor: ce.colorHex,
-                    boxShadow: `0 0 10px ${ce.colorHex}80`
-                  }}
-                />
-              </div>
-
-              <div className="text-[10px] text-white/50 font-medium">
-                {ce.statusText}
-              </div>
-            </div>
-          ))}
-        </div>
-
         {/* 3. BÖLÜM: 10 BOYUTLU 7LAYERS YAŞAM & EZOTERİİK PUSULASI (10 Kademeli Işıltılı Segment Bar) */}
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-extrabold uppercase tracking-wider text-white/75">
-              10 Boyutlu Yaşam & Yetkinlik Pusulası
+              8 Boyutlu Yaşam & Yetkinlik Pusulası
             </span>
             <span className="text-[10px] text-white/40">
               1–10 Kademeli Anlık Rezonans
