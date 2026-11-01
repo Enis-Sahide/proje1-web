@@ -1260,147 +1260,6 @@ const MOON_MOODS: Record<string, { mood: string; energy: string; doAction: strin
   'Balık': { mood: 'Şefkatli, ilham dolu ve akışta', energy: 'Süptil & Manevi', doAction: 'Meditasyon, sanat ve şifa çalışmalarına yönelin, sezgilerinize kulak verin.', dontAction: 'Sorumluluklardan kaçmaktan ve kurban psikolojisine bürünmekten kaçının.' },
 };
 
-export function generateCurrentSkyOverview(
-  allSkyPlanets: AstroPoint[],
-  allSkyAspects: any[]
-): CurrentSkyOverview | null {
-  if (!allSkyPlanets || allSkyPlanets.length === 0) return null;
-
-  const sun = allSkyPlanets.find(p => p.name === 'Güneş');
-  const moon = allSkyPlanets.find(p => p.name === 'Ay');
-  const mercury = allSkyPlanets.find(p => p.name === 'Merkür');
-  const mars = allSkyPlanets.find(p => p.name === 'Mars');
-
-  const moonSign = moon?.sign || 'Koç';
-  const moonDeg = moon?.degreeInSign ?? 0;
-  const sunSign = sun?.sign || 'Terazi';
-  const sunDeg = sun?.degreeInSign ?? 0;
-
-  const moonData = MOON_MOODS[moonSign] || MOON_MOODS['Koç'];
-
-  // Açıları dar orb'a göre filtrele ve sırala
-  const validAspects = (allSkyAspects || []).filter(a => a.orb <= 3.2);
-  validAspects.sort((a, b) => a.orb - b.orb);
-
-  const enrichSkyAspect = (asp: any) => {
-    const isHarmonious = asp.type === 'Üçgen' || asp.type === 'Sekstil' || (asp.type === 'Kavuşum' && !['Satürn', 'Mars', 'Plüton', 'Kiron', 'Lilith'].includes(asp.planet2));
-    const interp = asp.interpretation || getSkyAspectInterpretation(asp.planet1, asp.planet2, asp.type);
-    const p1Obj = allSkyPlanets.find(p => p.name === asp.planet1);
-    const p2Obj = allSkyPlanets.find(p => p.name === asp.planet2);
-    const p1Coord = p1Obj ? `${p1Obj.sign} ${p1Obj.degreeInSign}°` : '';
-    const p2Coord = p2Obj ? `${p2Obj.sign} ${p2Obj.degreeInSign}°` : '';
-
-    // Clean summary without leading technical planet-aspect jargon if present
-    let cleanSummary = interp?.summary || '';
-    cleanSummary = cleanSummary.replace(/^Gökyüzünde\s+.*?açısı;\s*/i, '');
-    if (cleanSummary) {
-      cleanSummary = cleanSummary.charAt(0).toUpperCase() + cleanSummary.slice(1);
-    } else {
-      cleanSummary = isHarmonious
-        ? 'İletişim, karar alma ve günlük akışta destekleyici, uyumlu bir frekans sağlıyor.'
-        : 'Sabır, denge ve bilinçli sınırlar gerektiren bir farkındalık eşiği oluşturuyor.';
-    }
-
-    const dailyAdvice = interp?.dailyAdvice || '';
-    const collectiveTheme = interp?.collectiveTheme || '';
-
-    return {
-      p1: asp.planet1,
-      p2: asp.planet2,
-      p1Coord,
-      p2Coord,
-      aspectType: asp.type,
-      orb: asp.orb,
-      isHarmonious,
-      summary: cleanSummary,
-      dailyAdvice,
-      collectiveTheme,
-      badge: asp.orb <= 1.0 ? `★ Tam Pik (${asp.orb.toFixed(1)}°)` : `${asp.orb.toFixed(1)}° Orb`
-    };
-  };
-
-  const allEnrichedSkyAspects = validAspects.map(enrichSkyAspect);
-  const topAspects = allEnrichedSkyAspects.slice(0, 3);
-
-  // Detaylı 4 Ana Frekans + 8 Boyutlu Barometre Hesaplama
-  const detailedSkyBarometer = buildDetailedCosmicBarometer(
-    allSkyPlanets,
-    allEnrichedSkyAspects.map(a => ({
-      p1: a.p1,
-      p2: a.p2,
-      aspectType: a.aspectType,
-      orb: a.orb,
-      isHarmonious: a.isHarmonious
-    })),
-    false
-  );
-
-  // Başlık Kurgusu (Alttaki metinlerle tekrara düşmeyen net atmosfer başlığı)
-  const peakAspect = topAspects[0];
-  let headline = `Gökyüzü İklimi: ${moonData.mood} Enerjiler`;
-  if (peakAspect) {
-    if (peakAspect.isHarmonious) {
-      headline = `Destekleyici Gökyüzü Akışı: ${moonData.mood}`;
-    } else {
-      headline = `Bilinçli Denge & Farkındalık Günü: ${moonData.mood}`;
-    }
-  }
-
-  const subHeadline = `☉ Güneş ${sunSign} (${sunDeg}°) • ☽ Ay ${moonSign} (${moonDeg}°)`;
-
-  // Genel Anlatı (Alttaki Fırsat/Dikkat maddelerini kopyalamadan günün sentez özeti)
-  const sunFlavor = SIGN_FLAVORS[sunSign] || { adj: 'odaklı', style: 'farkındalıkla ilerleyerek' };
-  const vibeNarrative = `Güneş'in ${sunSign} burcundaki ${sunFlavor.adj} doğası ile Ay'ın ${moonSign} burcundaki ${moonData.energy.toLowerCase()} ritmi birleşiyor. Bugün kararlarınızda ${sunFlavor.style} hareket etmek ve duygusal tepkilerde aşırılıklardan kaçınmak günün potansiyelini en verimli şekilde kullanmanızı sağlayacaktır.`;
-
-  // Fırsatlar ve Tuzaklar (Vurgulu insan dili + altta minik teknik etiket)
-  const opportunities: PersonalGuidanceItem[] = [
-    {
-      text: moonData.doAction,
-      astroTag: `Ay ${moonSign} Burcunda (${moonDeg}°) • Duygusal Akış`
-    }
-  ];
-
-  const harmoniousSky = allEnrichedSkyAspects.filter(a => a.isHarmonious).slice(0, 2);
-  harmoniousSky.forEach(asp => {
-    const advicePart = asp.dailyAdvice ? ` ${asp.dailyAdvice}` : '';
-    opportunities.push({
-      text: `${asp.summary}${advicePart}`,
-      astroTag: `Gökyüzü: ${asp.p1}${asp.p1Coord ? ` (${asp.p1Coord})` : ''} • ${asp.aspectType} • ${asp.p2}${asp.p2Coord ? ` (${asp.p2Coord})` : ''} (${asp.orb.toFixed(1)}° Orb)`
-    });
-  });
-
-  const cautions: PersonalGuidanceItem[] = [
-    {
-      text: moonData.dontAction,
-      astroTag: `Ay ${moonSign} Burcunda (${moonDeg}°) • Gölge Hassasiyet`
-    }
-  ];
-
-  const challengingSky = allEnrichedSkyAspects.filter(a => !a.isHarmonious).slice(0, 2);
-  challengingSky.forEach(asp => {
-    const advicePart = asp.dailyAdvice ? ` ${asp.dailyAdvice}` : '';
-    cautions.push({
-      text: `${asp.summary}${advicePart}`,
-      astroTag: `Gökyüzü: ${asp.p1}${asp.p1Coord ? ` (${asp.p1Coord})` : ''} • ${asp.aspectType} • ${asp.p2}${asp.p2Coord ? ` (${asp.p2Coord})` : ''} (${asp.orb.toFixed(1)}° Orb)`
-    });
-  });
-
-  return {
-    headline,
-    subHeadline,
-    vibeNarrative,
-    moonSign,
-    moonDegree: moonDeg,
-    moonMood: moonData.mood,
-    sunSign,
-    sunDegree: sunDeg,
-    barometer: detailedSkyBarometer,
-    opportunities,
-    cautions,
-    topAspects
-  };
-}
-
 const SIGN_FLAVORS: Record<string, { adj: string; style: string }> = {
   'Koç': { adj: 'cesur, öncü ve doğrudan', style: 'inisyatif alarak ve korkusuzca adım atarak' },
   'Boğa': { adj: 'dingin, sağlam ve güven odaklı', style: 'somut değerler üreterek ve sabırla inşa ederek' },
@@ -1480,6 +1339,228 @@ export interface PersonalGuidanceItem {
 function capitalizeFirst(str: string): string {
   if (!str) return '';
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+type EnrichedSkyAspectItem = {
+  p1: string;
+  p2: string;
+  p1Sign: string;
+  p1Coord: string;
+  p2Coord: string;
+  aspectType: string;
+  orb: number;
+  isHarmonious: boolean;
+  summary: string;
+  badge: string;
+};
+
+function buildMundaneSynthesizedOpportunities(
+  aspects: EnrichedSkyAspectItem[],
+  moonSign: string,
+  moonDeg: number,
+  moonDoAction: string
+): PersonalGuidanceItem[] {
+  const items: PersonalGuidanceItem[] = [
+    {
+      text: moonDoAction,
+      astroTag: `Ay ${moonSign} Burcunda (${moonDeg}°) • Günlük Duygusal Ritim`
+    }
+  ];
+
+  // Group by target planet (p2) so two sky aspects hitting the same point are synthesized together
+  const groups = new Map<string, EnrichedSkyAspectItem[]>();
+  for (const asp of aspects) {
+    const key = asp.p2;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(asp);
+  }
+
+  for (const [, group] of groups.entries()) {
+    if (items.length >= 3) break;
+    const primary = group[0];
+    const signFlavor = SIGN_FLAVORS[primary.p1Sign] || { adj: 'akıcı', style: 'farkındalıkla hareket ederek' };
+    const p1Gift = TRANSIT_PLANET_GIFT[primary.p1] || 'destekleyici bir akış sunarken';
+    const p2Core = NATAL_PLANET_CORE[primary.p2] || 'günlük akışınızı';
+
+    if (group.length === 1) {
+      const actionPhrase = primary.aspectType === 'Üçgen'
+        ? `${signFlavor.style} işlerinizi çok daha çabasız, doğal ve verimli bir şekilde sonuçlandırabilirsiniz.`
+        : primary.aspectType === 'Sekstil'
+        ? `${signFlavor.style} karşınıza çıkan iletişim ve girişim fırsatlarını somut kazanca dönüştürebilirsiniz.`
+        : `${signFlavor.style} odaklandığınız konularda güçlü ve kalıcı bir başlangıç yapabilirsiniz.`;
+
+      const text = `${capitalizeFirst(signFlavor.adj)} gökyüzü enerjisi, ${p1Gift} ${p2Core} destekliyor. Bugün ${actionPhrase}`;
+      const astroTag = `Gökyüzü: ${primary.p1}${primary.p1Coord ? ` (${primary.p1Coord})` : ''} • ${primary.aspectType} • ${primary.p2}${primary.p2Coord ? ` (${primary.p2Coord})` : ''} [${primary.orb.toFixed(1)}°]`;
+      items.push({ text, astroTag });
+    } else {
+      const second = group[1];
+      const secondGift = TRANSIT_PLANET_GIFT[second.p1] || 'ekstra bir uyum kanalı açarken';
+      const text = `Gökyüzünde çift yönlü destekleyici bir akış devrede: bir yandan ${p1Gift}, diğer yandan ${secondGift} ${p2Core} güçlendiriyor. Bugün ${signFlavor.style} önemli adımlarınızı güvenle hızlandırabilirsiniz.`;
+      const astroTag = group
+        .map(g => `${g.p1}${g.p1Coord ? ` (${g.p1Coord})` : ''} • ${g.aspectType}`)
+        .join(' + ') + ` → ${primary.p2}${primary.p2Coord ? ` (${primary.p2Coord})` : ''}`;
+      items.push({ text, astroTag });
+    }
+  }
+
+  return items;
+}
+
+function buildMundaneSynthesizedCautions(
+  aspects: EnrichedSkyAspectItem[],
+  moonSign: string,
+  moonDeg: number,
+  moonDontAction: string
+): PersonalGuidanceItem[] {
+  const items: PersonalGuidanceItem[] = [
+    {
+      text: moonDontAction,
+      astroTag: `Ay ${moonSign} Burcunda (${moonDeg}°) • Gölge Hassasiyet`
+    }
+  ];
+
+  // Group by target planet (p2) so two challenging sky aspects hitting the same point are synthesized together
+  const groups = new Map<string, EnrichedSkyAspectItem[]>();
+  for (const asp of aspects) {
+    const key = asp.p2;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(asp);
+  }
+
+  for (const [, group] of groups.entries()) {
+    if (items.length >= 3) break;
+    const primary = group[0];
+    const signFlavor = SIGN_FLAVORS[primary.p1Sign] || { adj: 'yoğun', style: 'sakin ve dengeli kalarak' };
+    const p1Challenge = TRANSIT_PLANET_CHALLENGE[primary.p1] || 'günlük akışta ekstra dikkat ve sabır gerektirebilir';
+    const p2Core = NATAL_PLANET_CORE[primary.p2] || 'içsel dengenizi';
+
+    if (group.length === 1) {
+      const warningPhrase = primary.aspectType === 'Karşıt'
+        ? 'İki uç arasında savrulmak veya zıtlaşmak yerine, ilişkilerde ve kararlarda orta yolu bulmaya özen gösterin.'
+        : primary.aspectType === 'Kare'
+        ? 'Yükselen içsel baskıyı fevri tepkilere dönüştürmeyin; sınırlarınızı koruyup stratejik ve sabırlı ilerleyin.'
+        : primary.aspectType === 'Kavuşum'
+        ? `Yoğunlaşan bu baskıyı aceleci kararlarla değil, ${signFlavor.style} yönetin.`
+        : 'Kör noktalara ve ani yargılara kapılmadan önce şartların netleşmesini bekleyin.';
+
+      const text = `${capitalizeFirst(p2Core)} etkileyen güncel gökyüzü açısı, sizi ${p1Challenge}. ${warningPhrase}`;
+      const astroTag = `Gökyüzü: ${primary.p1}${primary.p1Coord ? ` (${primary.p1Coord})` : ''} • ${primary.aspectType} • ${primary.p2}${primary.p2Coord ? ` (${primary.p2Coord})` : ''} [${primary.orb.toFixed(1)}°]`;
+      items.push({ text, astroTag });
+    } else {
+      const second = group[1];
+      const secondChallenge = TRANSIT_PLANET_CHALLENGE[second.p1] || 'ekstra bir gerilim yaratabilir';
+      const text = `${capitalizeFirst(p2Core)} üzerinde şu an çift yönlü bir gökyüzü baskısı var: bir yandan ${p1Challenge}, diğer yandan ${secondChallenge}. Bugün aceleci yargılardan kaçınıp ${signFlavor.style} süreci gözlemleyin.`;
+      const astroTag = group
+        .map(g => `${g.p1}${g.p1Coord ? ` (${g.p1Coord})` : ''} • ${g.aspectType}`)
+        .join(' + ') + ` → ${primary.p2}${primary.p2Coord ? ` (${primary.p2Coord})` : ''}`;
+      items.push({ text, astroTag });
+    }
+  }
+
+  return items;
+}
+
+export function generateCurrentSkyOverview(
+  allSkyPlanets: AstroPoint[],
+  allSkyAspects: any[]
+): CurrentSkyOverview | null {
+  if (!allSkyPlanets || allSkyPlanets.length === 0) return null;
+
+  const sun = allSkyPlanets.find(p => p.name === 'Güneş');
+  const moon = allSkyPlanets.find(p => p.name === 'Ay');
+
+  const moonSign = moon?.sign || 'Koç';
+  const moonDeg = moon?.degreeInSign ?? 0;
+  const sunSign = sun?.sign || 'Terazi';
+  const sunDeg = sun?.degreeInSign ?? 0;
+
+  const moonData = MOON_MOODS[moonSign] || MOON_MOODS['Koç'];
+
+  // Açıları dar orb'a göre filtrele ve sırala
+  const validAspects = (allSkyAspects || []).filter(a => a.orb <= 3.2);
+  validAspects.sort((a, b) => a.orb - b.orb);
+
+  const enrichSkyAspect = (asp: any): EnrichedSkyAspectItem => {
+    const isHarmonious = asp.type === 'Üçgen' || asp.type === 'Sekstil' || (asp.type === 'Kavuşum' && !['Satürn', 'Mars', 'Plüton', 'Kiron', 'Lilith'].includes(asp.planet2));
+    const p1Obj = allSkyPlanets.find(p => p.name === asp.planet1);
+    const p2Obj = allSkyPlanets.find(p => p.name === asp.planet2);
+    const p1Sign = p1Obj?.sign || 'Koç';
+    const p1Coord = p1Obj ? `${p1Obj.sign} ${p1Obj.degreeInSign}°` : '';
+    const p2Coord = p2Obj ? `${p2Obj.sign} ${p2Obj.degreeInSign}°` : '';
+
+    const signFlavor = SIGN_FLAVORS[p1Sign] || { adj: 'aktif', style: 'farkındalıkla' };
+    const p2Core = NATAL_PLANET_CORE[asp.planet2] || 'kolektif akışı';
+    const summary = isHarmonious
+      ? `${capitalizeFirst(p2Core)} destekleyen ${signFlavor.adj} bir gökyüzü uyumu devrede.`
+      : `${capitalizeFirst(p2Core)} sınayan ve bilinçli denge gerektiren bir eşik yaşanıyor.`;
+
+    return {
+      p1: asp.planet1,
+      p2: asp.planet2,
+      p1Sign,
+      p1Coord,
+      p2Coord,
+      aspectType: asp.type,
+      orb: asp.orb,
+      isHarmonious,
+      summary,
+      badge: asp.orb <= 1.0 ? `★ Tam Pik (${asp.orb.toFixed(1)}°)` : `${asp.orb.toFixed(1)}° Orb`
+    };
+  };
+
+  const allEnrichedSkyAspects = validAspects.map(enrichSkyAspect);
+  const topAspects = allEnrichedSkyAspects.slice(0, 3);
+
+  // Detaylı 8 Boyutlu Barometre Hesaplama
+  const detailedSkyBarometer = buildDetailedCosmicBarometer(
+    allSkyPlanets,
+    allEnrichedSkyAspects.map(a => ({
+      p1: a.p1,
+      p2: a.p2,
+      aspectType: a.aspectType,
+      orb: a.orb,
+      isHarmonious: a.isHarmonious
+    })),
+    false
+  );
+
+  // Başlık Kurgusu (Alttaki metinlerle tekrara düşmeyen net atmosfer başlığı)
+  const peakAspect = topAspects[0];
+  let headline = `Gökyüzü İklimi: ${moonData.mood} Enerjiler`;
+  if (peakAspect) {
+    if (peakAspect.isHarmonious) {
+      headline = `Destekleyici Gökyüzü Akışı: ${moonData.mood}`;
+    } else {
+      headline = `Bilinçli Denge & Farkındalık Günü: ${moonData.mood}`;
+    }
+  }
+
+  const subHeadline = `☉ Güneş ${sunSign} (${sunDeg}°) • ☽ Ay ${moonSign} (${moonDeg}°)`;
+
+  // Genel Anlatı (Alttaki Fırsat/Dikkat maddelerini kopyalamadan günün sentez özeti)
+  const sunFlavor = SIGN_FLAVORS[sunSign] || { adj: 'odaklı', style: 'farkındalıkla ilerleyerek' };
+  const vibeNarrative = `Güneş'in ${sunSign} burcundaki ${sunFlavor.adj} doğası ile Ay'ın ${moonSign} burcundaki ${moonData.energy.toLowerCase()} ritmi birleşiyor. Bugün kararlarınızda ${sunFlavor.style} hareket etmek ve duygusal tepkilerde aşırılıklardan kaçınmak günün potansiyelini en verimli şekilde kullanmanızı sağlayacaktır.`;
+
+  const harmoniousSky = allEnrichedSkyAspects.filter(a => a.isHarmonious);
+  const challengingSky = allEnrichedSkyAspects.filter(a => !a.isHarmonious);
+
+  const opportunities = buildMundaneSynthesizedOpportunities(harmoniousSky, moonSign, moonDeg, moonData.doAction);
+  const cautions = buildMundaneSynthesizedCautions(challengingSky, moonSign, moonDeg, moonData.dontAction);
+
+  return {
+    headline,
+    subHeadline,
+    vibeNarrative,
+    moonSign,
+    moonDegree: moonDeg,
+    moonMood: moonData.mood,
+    sunSign,
+    sunDegree: sunDeg,
+    barometer: detailedSkyBarometer,
+    opportunities,
+    cautions,
+    topAspects
+  };
 }
 
 type EnrichedPersonalAspect = {
