@@ -9,6 +9,7 @@ interface LocationAutocompleteProps {
   defaultDisplay?: string;
   placeholder?: string;
   className?: string;
+  required?: boolean;
 }
 
 export default function LocationAutocomplete({
@@ -16,7 +17,8 @@ export default function LocationAutocomplete({
   onQueryChange,
   defaultDisplay = '',
   placeholder = 'Şehir Ara...',
-  className = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-[#D4AF37] transition-colors'
+  className = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-[#D4AF37] transition-colors',
+  required = true
 }: LocationAutocompleteProps) {
   const [query, setQuery] = useState(defaultDisplay);
   const [results, setResults] = useState<any[]>([]);
@@ -133,7 +135,7 @@ export default function LocationAutocomplete({
         placeholder={placeholder}
         className={className}
         autoComplete="off"
-        required
+        required={required}
       />
       
       {isLoading && (

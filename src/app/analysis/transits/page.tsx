@@ -226,6 +226,7 @@ export default function TransitsPage() {
   const [natalDateStr, setNatalDateStr] = useState('1990-01-01');
   const [natalTimeStr, setNatalTimeStr] = useState('12:00');
   const [cityKey, setCityKey] = useState<AstroCity | null>(null);
+  const [transitCityKey, setTransitCityKey] = useState<AstroCity | null>(null);
   const [transitDateStr, setTransitDateStr] = useState(defaultTDate);
   const [transitTimeStr, setTransitTimeStr] = useState(defaultTTime);
 
@@ -323,7 +324,8 @@ export default function TransitsPage() {
           natalTime: natalTimeStr,
           transitDate: transitDateStr,
           transitTime: transitTimeStr,
-          cityData: cityKey
+          cityData: cityKey,
+          transitCityData: transitCityKey || cityKey
         })
       });
 
@@ -1591,9 +1593,9 @@ export default function TransitsPage() {
 
                   <div className="bg-[#0EA5E9]/5 p-6 rounded-2xl border border-[#0EA5E9]/20">
                     <h3 className="text-xl font-bold text-[#0EA5E9] mb-4 flex items-center gap-2">
-                      <Compass size={20}/> 2. Transit (Geçiş) Tarihi
+                      <Compass size={20}/> 2. Transit (Geçiş) Tarihi & Konumu
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                       <div>
                         <label className="block text-sm font-medium text-mystic-text-muted mb-2">Transit Tarihi *</label>
                         <input required type="date" min="1900-01-01" max="2100-12-31" value={transitDateStr} onChange={e => setTransitDateStr(e.target.value)} className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-base text-white focus:outline-none focus:border-[#0EA5E9] transition-colors touch-manipulation" />
@@ -1601,6 +1603,15 @@ export default function TransitsPage() {
                       <div>
                         <label className="block text-sm font-medium text-mystic-text-muted mb-2">Transit Saati</label>
                         <SafeTimePicker value={transitTimeStr} onChange={setTransitTimeStr} required />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-mystic-text-muted mb-2">Transit Şehri (Opsiyonel)</label>
+                        <LocationAutocomplete
+                          required={false}
+                          placeholder="Boşsa doğum şehri alınır..."
+                          onSelect={(c) => setTransitCityKey(c)}
+                          className="w-full bg-black/50 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-[#0EA5E9] transition-colors"
+                        />
                       </div>
                     </div>
                   </div>
@@ -1649,11 +1660,11 @@ export default function TransitsPage() {
                   <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
                     <div className="text-left sm:text-right">
                       <span className="text-[10px] text-mystic-text-muted block">Harita Sahibi</span>
-                      <span className="text-[11px] sm:text-xs font-bold text-white truncate max-w-[180px] block">{cityKey?.name || 'Seçildi'} • {natalDateStr}</span>
+                      <span className="text-[11px] sm:text-xs font-bold text-white truncate max-w-[240px] block">Doğum: {cityKey?.name || 'Seçildi'} • Transit: {(transitCityKey || cityKey)?.name || 'Seçildi'}</span>
                     </div>
                     <button 
                       type="button"
-                      onClick={() => { setTransitData(null); setTimelineData(null); }} 
+                      onClick={() => { setTransitData(null); setTimelineData(null); setTransitCityKey(null); }} 
                       className="text-xs px-3.5 py-1.5 sm:py-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap shrink-0 cursor-pointer"
                     >
                       Yeni Harita Seç
