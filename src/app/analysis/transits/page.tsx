@@ -565,7 +565,7 @@ export default function TransitsPage() {
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5">
             {attributes.map((attr) => {
               const barColor = attr.isEsoteric
                 ? '#A855F7'
@@ -578,58 +578,52 @@ export default function TransitsPage() {
               return (
                 <div
                   key={attr.id}
-                  className={`rounded-2xl p-3.5 border transition-all space-y-2 ${
+                  className={`rounded-xl p-2.5 sm:p-3 border transition-all space-y-1.5 ${
                     attr.isEsoteric
                       ? 'bg-gradient-to-r from-purple-950/35 via-black/60 to-amber-950/20 border-purple-500/30'
                       : 'bg-black/45 border-white/10'
                   }`}
                 >
                   {/* Üst Satır: Başlık + 10 üzerinden Puan Rozeti */}
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                      <span
-                        className="w-2 h-2 rounded-full shrink-0"
-                        style={{ backgroundColor: barColor, boxShadow: `0 0 8px ${barColor}` }}
-                      />
-                      <span className="text-xs sm:text-sm font-extrabold text-white">
-                        {attr.title}
-                      </span>
-                    </div>
+                  <div className="flex items-start justify-between gap-1.5">
+                    <span className="text-[11px] sm:text-xs font-extrabold text-white leading-tight">
+                      {attr.title}
+                    </span>
                     <span
-                      className="text-xs font-black px-2 py-0.5 rounded-lg border shrink-0 tabular-nums"
+                      className="text-[10px] sm:text-xs font-black px-1.5 py-0.5 rounded-md border shrink-0 tabular-nums leading-none"
                       style={{
                         color: barColor,
                         borderColor: `${barColor}40`,
                         backgroundColor: `${barColor}15`
                       }}
                     >
-                      {attr.score} / 10
+                      {attr.score}/10
                     </span>
                   </div>
 
                   {/* Orta Satır: 10 Kademeli (Segmented) Işıltılı Enerji Barı */}
-                  <div className="grid grid-cols-10 gap-1 pt-0.5">
+                  <div className="grid grid-cols-10 gap-0.5 sm:gap-1 pt-0.5">
                     {Array.from({ length: 10 }).map((_, segIdx) => {
                       const isActive = segIdx < attr.score;
                       return (
                         <div
                           key={segIdx}
-                          className="h-2 rounded-sm transition-all"
+                          className="h-1.5 rounded-sm transition-all"
                           style={{
                             backgroundColor: isActive ? barColor : 'rgba(255,255,255,0.08)',
-                            boxShadow: isActive ? `0 0 6px ${barColor}60` : 'none'
+                            boxShadow: isActive ? `0 0 5px ${barColor}60` : 'none'
                           }}
                         />
                       );
                     })}
                   </div>
 
-                  {/* Alt Satır: İnsan Odaklı Rehber Notu + Küçük Gezegen Kaynağı */}
-                  <div className="flex items-center justify-between gap-2 pt-0.5">
-                    <span className="text-[11px] font-medium text-white/80">
+                  {/* Alt Satır: İnsan Odaklı Rehber Notu */}
+                  <div className="flex flex-col pt-0.5">
+                    <span className="text-[10px] font-medium text-white/75 leading-tight">
                       {attr.subtitle}
                     </span>
-                    <span className="text-[9px] text-white/35 font-normal shrink-0">
+                    <span className="text-[8px] text-white/30 font-normal mt-0.5">
                       {attr.astroDrivers}
                     </span>
                   </div>
@@ -916,9 +910,6 @@ export default function TransitsPage() {
                                   </p>
                                 </div>
 
-                                {/* Kozmik Frekans & Yetkinlik Barometresi */}
-                                {renderDetailedCosmicBarometer(currentSkyOverview.barometer, 'Kozmik Frekans & Yetkinlik Barometresi')}
-
                                 {/* Fırsatlar & Tuzaklar (Do / Don't) */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   {/* Fırsatlar */}
@@ -991,6 +982,9 @@ export default function TransitsPage() {
                                     </div>
                                   </div>
                                 )}
+
+                                {/* Kozmik Frekans & Yetkinlik Barometresi (Açıklamaların Altında) */}
+                                {renderDetailedCosmicBarometer(currentSkyOverview.barometer, 'Kozmik Frekans & Yetkinlik Barometresi')}
 
                                 {/* Detay Açıcı Buton */}
                                 <div className="pt-3 border-t border-white/10 flex justify-center">
@@ -1793,9 +1787,6 @@ export default function TransitsPage() {
                           </p>
                         </div>
 
-                        {/* Kişisel Enerji & Yetkinlik Barometresi */}
-                        {renderDetailedCosmicBarometer(personalOverview.barometer, 'Kişisel Enerji & Yetkinlik Barometresi')}
-
                         {/* Odak Yaşam Alanları */}
                         <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3">
                           <span className="text-[11px] font-extrabold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
@@ -1898,6 +1889,9 @@ export default function TransitsPage() {
                             </div>
                           </div>
                         )}
+
+                        {/* Kişisel Enerji & Yetkinlik Barometresi (Açıklamaların Altında) */}
+                        {renderDetailedCosmicBarometer(personalOverview.barometer, 'Kişisel Enerji & Yetkinlik Barometresi')}
 
                         {/* Alt Reçete / Bilgelik Notu */}
                         <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
