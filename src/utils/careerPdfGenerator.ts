@@ -884,7 +884,26 @@ export const downloadCareerPDF = async (
     { align: 'center' }
   );
 
-  // Save the PDF
+  // Save the PDF (with Instagram / Mobile WebView fallback)
   const filename = `7Layers_Kariyer_Raporu_${(birthInfo.fullName || 'Danisan').replace(/\s+/g, '_')}.pdf`;
+  const ua = typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
+  const isInAppWebView = /Instagram|FBAN|FBAV/i.test(ua);
+
+  if (isInAppWebView && typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+    try {
+      const pdfBlob = doc.output('blob');
+      const pdfFile = new File([pdfBlob], filename, { type: 'application/pdf' });
+      if (!navigator.canShare || navigator.canShare({ files: [pdfFile] })) {
+        await navigator.share({
+          files: [pdfFile],
+          title: '7Layers Mesleki Yatkınlık & Kariyer Raporu',
+        });
+        return;
+      }
+    } catch {
+      // Paylaşım iptal edilirse standart indirmeye devam et
+    }
+  }
+
   doc.save(filename);
 };

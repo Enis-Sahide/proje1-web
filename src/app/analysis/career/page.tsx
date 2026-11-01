@@ -31,6 +31,7 @@ export default function CareerAnalysisPage() {
   const [birthDate, setBirthDate] = useState('');
   const [birthTime, setBirthTime] = useState('12:00');
   const [birthCity, setBirthCity] = useState<AstroCity | null>(null);
+  const [cityQuery, setCityQuery] = useState('');
 
   const [isLoading, setIsLoading] = useState(false);
   const [isPdfLoading, setIsPdfLoading] = useState(false);
@@ -40,6 +41,25 @@ export default function CareerAnalysisPage() {
   const [activeLayer, setActiveLayer] = useState<'material' | 'soul'>('material');
 
   const isEffectiveUnlocked = Boolean(result?.isUnlocked || isMasterOrAdmin);
+
+  // Restore saved form state from sessionStorage (for Instagram WebView / Auth redirects)
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem('7layers_career_draft');
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        if (parsed.fullName) setFullName(parsed.fullName);
+        if (parsed.birthDate) setBirthDate(parsed.birthDate);
+        if (parsed.birthTime) setBirthTime(parsed.birthTime);
+        if (parsed.birthCity) {
+          setBirthCity(parsed.birthCity);
+          setCityQuery(`${parsed.birthCity.name}, ${parsed.birthCity.country}`);
+        }
+      }
+    } catch {
+      // sessionStorage erişimi kısıtlıysa yoksay
+    }
+  }, []);
 
   // Load from user profile if exists
   useEffect(() => {
@@ -67,21 +87,72 @@ export default function CareerAnalysisPage() {
       setError('Lütfen Doğum Tarihinizi seçiniz.');
       return;
     }
-    if (!birthCity) {
-      setError('Lütfen Doğum Yerinizi listeden seçiniz.');
+
+    let resolvedCity = birthCity;
+
+    // Kullanıcı şehir adını yazıp açılan listedeki satıra tıklamadan doğrudan butona bastıysa otomatik eşleştir
+    if (!resolvedCity && cityQuery.trim().length >= 2) {
+      const qNorm = cityQuery.split(',')[0].trim().toLocaleLowerCase('tr-TR');
+      const staticMatch = ASTRO_CITIES.find(
+        c => c.name.toLocaleLowerCase('tr-TR') === qNorm || c.name.toLocaleLowerCase('tr-TR').startsWith(qNorm)
+      );
+      if (staticMatch) {
+        resolvedCity = staticMatch;
+        setBirthCity(staticMatch);
+      } else {
+        try {
+          setIsLoading(true);
+          const geoRes = await fetch(
+            `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(cityQuery.split(',')[0].trim())}&count=1&language=tr`
+          );
+          const geoData = await geoRes.json();
+          if (geoData.results && geoData.results.length > 0) {
+            const first = geoData.results[0];
+            resolvedCity = {
+              name: first.name,
+              lat: first.latitude,
+              lon: first.longitude,
+              country: first.country || 'Türkiye',
+              tz: first.timezone || 'Europe/Istanbul'
+            };
+            setBirthCity(resolvedCity);
+          }
+        } catch {
+          // Geocoding yedek araması başarısız olursa standart uyarıya düş
+        }
+      }
+    }
+
+    if (!resolvedCity) {
+      setIsLoading(false);
+      setError('Lütfen Doğum Yerinizi (Şehir) yazıp listeden seçiniz.');
       return;
     }
 
     setIsLoading(true);
 
     try {
+      try {
+        sessionStorage.setItem(
+          '7layers_career_draft',
+          JSON.stringify({
+            fullName: fullName.trim(),
+            birthDate,
+            birthTime: birthTime || '12:00',
+            birthCity: resolvedCity
+          })
+        );
+      } catch {
+        // sessionStorage kısıtlıysa yoksay
+      }
+
       const data = await apiFetch<CareerAnalysisResult>('/api/astrology/career', {
         method: 'POST',
         body: JSON.stringify({
           fullName: fullName.trim(),
           birthDate,
           birthTime: birthTime || '12:00',
-          birthCity
+          birthCity: resolvedCity
         })
       });
 
@@ -244,7 +315,7 @@ export default function CareerAnalysisPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   placeholder="Örn: Baha Yılmaz"
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#EAB308] transition-colors"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-[#EAB308] transition-colors"
                   required
                 />
               </div>
@@ -258,7 +329,7 @@ export default function CareerAnalysisPage() {
                     type="date"
                     value={birthDate}
                     onChange={(e) => setBirthDate(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#EAB308] transition-colors"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-[#EAB308] transition-colors"
                     required
                   />
                 </div>
@@ -271,32 +342,41 @@ export default function CareerAnalysisPage() {
                     type="time"
                     value={birthTime}
                     onChange={(e) => setBirthTime(e.target.value)}
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-[#EAB308] transition-colors"
+                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-[#EAB308] transition-colors"
                   />
                   <span className="text-[10px] text-gray-500 mt-1 block">Bilinmiyorsa 12:00 kalabilir.</span>
                 </div>
               </div>
 
-              <div>
-                <label className="text-xs font-semibold text-gray-300 mb-1.5 block">
+              <div className="pb-2">
+                <label className="text-xs font-semibold text-gray-300 mb-2 block">
                   Doğum Yeri (Şehir)
                 </label>
                 <LocationAutocomplete
                   defaultDisplay={birthCity ? `${birthCity.name}, ${birthCity.country}` : ''}
                   onSelect={(city) => setBirthCity(city)}
-                  placeholder="Doğduğunuz şehri yazın..."
+                  onQueryChange={(q) => setCityQuery(q)}
+                  placeholder="Doğduğunuz şehri yazın (Örn: İstanbul)..."
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-base sm:text-sm text-white focus:outline-none focus:border-[#EAB308] transition-colors"
                 />
+                <span className="text-[11px] text-gray-400 mt-2 block">
+                  {birthCity
+                    ? `✓ Seçilen Konum: ${birthCity.name}, ${birthCity.country}`
+                    : 'En az 3 harf yazarak açılan listeden doğduğunuz şehri seçiniz.'}
+                </span>
               </div>
 
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full min-h-[48px] bg-gradient-to-r from-[#EAB308] via-[#D4AF37] to-[#EAB308] hover:opacity-95 text-black font-extrabold text-sm sm:text-base py-3.5 sm:py-4 rounded-xl transition-all shadow-[0_0_30px_rgba(234,179,8,0.35)] flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
-              >
-                <Briefcase size={18} />
-                <span>Kariyer Raporumu Çıkar</span>
-                <ArrowRight size={16} />
-              </button>
+              <div className="pt-4 sm:pt-6">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full min-h-[52px] bg-gradient-to-r from-[#EAB308] via-[#D4AF37] to-[#EAB308] hover:opacity-95 text-black font-extrabold text-sm sm:text-base py-3.5 sm:py-4 rounded-xl transition-all shadow-[0_0_30px_rgba(234,179,8,0.35)] flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+                >
+                  <Briefcase size={18} />
+                  <span>Kariyer Raporumu Çıkar</span>
+                  <ArrowRight size={16} />
+                </button>
+              </div>
             </form>
           </div>
         )}
@@ -1745,6 +1825,16 @@ export default function CareerAnalysisPage() {
         onClose={() => setShowAuthModal(false)}
         title="Kariyer Analizi Üyeliği"
         description="Kariyer analiz raporunuzu satın alıp doğrudan ekranınızdan anında indirmek ve sınırsız erişmek için lütfen giriş yapın veya ücretsiz hesap oluşturun."
+        redirectUrl={`/checkout/guest?${new URLSearchParams({
+          type: 'career',
+          fullName: fullName.trim() || result?.personalInfo.fullName || '',
+          date: birthDate || result?.personalInfo.birthDate || '',
+          time: birthTime || result?.personalInfo.birthTime || '12:00',
+          city: birthCity?.name || result?.personalInfo.cityName || '',
+          lat: (birthCity?.lat || '').toString(),
+          lon: (birthCity?.lon || '').toString(),
+          tz: birthCity?.tz || ''
+        }).toString()}`}
       />
     </div>
   );

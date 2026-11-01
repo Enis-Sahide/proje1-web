@@ -1,29 +1,37 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
-import { AstroCity } from '@/features/astrology/engine/AstrologyConstants';
+import { AstroCity, ASTRO_CITIES } from '@/features/astrology/engine/AstrologyConstants';
 
 interface LocationAutocompleteProps {
   onSelect: (city: AstroCity) => void;
+  onQueryChange?: (query: string) => void;
   defaultDisplay?: string;
   placeholder?: string;
   className?: string;
 }
 
-export default function LocationAutocomplete({ onSelect, defaultDisplay = '', placeholder = 'Şehir Ara...', className = '' }: LocationAutocompleteProps) {
+export default function LocationAutocomplete({
+  onSelect,
+  onQueryChange,
+  defaultDisplay = '',
+  placeholder = 'Şehir Ara...',
+  className = 'w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-base sm:text-sm text-white focus:outline-none focus:border-[#D4AF37] transition-colors'
+}: LocationAutocompleteProps) {
   const [query, setQuery] = useState(defaultDisplay);
   const [results, setResults] = useState<any[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const hasSelectedRef = useRef<boolean>(Boolean(defaultDisplay));
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   // defaultDisplay dışarıdan yüklendiğinde (örn. URL parametresinden veya state'ten) kutuyu otomatik doldur
   useEffect(() => {
     if (defaultDisplay && defaultDisplay !== query) {
       setQuery(defaultDisplay);
+      hasSelectedRef.current = true;
     }
   }, [defaultDisplay]);
-
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -37,8 +45,8 @@ export default function LocationAutocomplete({ onSelect, defaultDisplay = '', pl
 
   useEffect(() => {
     const fetchCities = async () => {
-      if (query.length < 3) {
-        setResults([]);
+      if (query.length < 3 || hasSelectedRef.current) {
+        if (query.length < 3) setResults([]);
         return;
       }
 
@@ -60,13 +68,16 @@ export default function LocationAutocomplete({ onSelect, defaultDisplay = '', pl
       }
     };
 
-    const debounceTimer = setTimeout(fetchCities, 500);
+    const debounceTimer = setTimeout(fetchCities, 350);
     return () => clearTimeout(debounceTimer);
   }, [query]);
 
   const handleSelect = (result: any) => {
     const displayStr = `${result.name}, ${result.admin1 || ''} ${result.country}`;
-    setQuery(displayStr.replace(/, \s*/g, ', ').replace(/ ,/g, ','));
+    const formatted = displayStr.replace(/, \s*/g, ', ').replace(/ ,/g, ',');
+    hasSelectedRef.current = true;
+    setQuery(formatted);
+    if (onQueryChange) onQueryChange(formatted);
     setIsOpen(false);
 
     const city: AstroCity = {
@@ -80,20 +91,48 @@ export default function LocationAutocomplete({ onSelect, defaultDisplay = '', pl
     onSelect(city);
   };
 
+  const handleBlur = () => {
+    // Kullanıcı şehir adını yazıp listedeki satıra dokunmadan kutudan çıkarsa ilk eşleşen şehri otomatik seç
+    setTimeout(() => {
+      if (!hasSelectedRef.current && query.trim().length >= 2) {
+        if (results.length > 0) {
+          handleSelect(results[0]);
+        } else {
+          const qNorm = query.trim().toLocaleLowerCase('tr-TR');
+          const staticMatch = ASTRO_CITIES.find(
+            c => c.name.toLocaleLowerCase('tr-TR') === qNorm || c.name.toLocaleLowerCase('tr-TR').startsWith(qNorm)
+          );
+          if (staticMatch) {
+            hasSelectedRef.current = true;
+            const formatted = `${staticMatch.name}, ${staticMatch.country}`;
+            setQuery(formatted);
+            if (onQueryChange) onQueryChange(formatted);
+            onSelect(staticMatch);
+            setIsOpen(false);
+          }
+        }
+      }
+    }, 180);
+  };
+
   return (
     <div ref={wrapperRef} className="relative w-full">
       <input
         type="text"
         value={query}
         onChange={(e) => {
+          hasSelectedRef.current = false;
           setQuery(e.target.value);
+          if (onQueryChange) onQueryChange(e.target.value);
           setIsOpen(true);
         }}
         onFocus={() => {
           if (results.length > 0) setIsOpen(true);
         }}
+        onBlur={handleBlur}
         placeholder={placeholder}
         className={className}
+        autoComplete="off"
         required
       />
       
@@ -108,10 +147,14 @@ export default function LocationAutocomplete({ onSelect, defaultDisplay = '', pl
           {results.map((result) => (
             <li
               key={result.id}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                handleSelect(result);
+              }}
               onClick={() => handleSelect(result)}
-              className="px-4 py-3 hover:bg-white/10 cursor-pointer text-white border-b border-white/5 last:border-0 transition-colors"
+              className="px-4 py-3 hover:bg-white/10 active:bg-white/15 cursor-pointer text-white border-b border-white/5 last:border-0 transition-colors"
             >
-              <div className="font-bold">{result.name}</div>
+              <div className="font-bold text-sm">{result.name}</div>
               <div className="text-xs text-mystic-text-muted">
                 {result.admin1 ? `${result.admin1}, ` : ''}{result.country}
               </div>

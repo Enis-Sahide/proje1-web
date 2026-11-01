@@ -37,6 +37,7 @@ import {
   CurrentSkyOverview,
   generatePersonalTransitOverview,
   PersonalTransitOverview,
+  DetailedCosmicBarometer,
   LIFE_AREA_NAMES
 } from '@/features/astrology/engine/TransitSynthesisEngine';
 import { AstroCity, TransitChartData, AstroPoint, AstroAspect } from '@/features/astrology/engine/AstrologyConstants';
@@ -460,6 +461,150 @@ export default function TransitsPage() {
     );
   };
 
+  const renderDetailedCosmicBarometer = (barometer: DetailedCosmicBarometer, title: string) => {
+    const { esotericSignature, coreEnergies, attributes } = barometer;
+
+    return (
+      <div className="bg-gradient-to-br from-white/[0.04] via-black/40 to-[#11052C]/40 border border-white/10 rounded-3xl p-4 sm:p-6 space-y-6 shadow-xl">
+        {/* Başlık */}
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3.5">
+          <div className="flex items-center gap-2">
+            <Sparkles size={16} className="text-[#D4AF37]" />
+            <span className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-white">
+              {title}
+            </span>
+          </div>
+          <span className="text-[10px] text-white/45 font-medium">
+            7Layers Kozmik Frekans Sentezi
+          </span>
+        </div>
+
+        {/* 1. BÖLÜM: EZOTERİİK GÖKYÜZÜ KİMLİĞİ (Ay Fazı + 4 Element Dengesi + Çakra/Sefira Rezonansı) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
+          {/* Kart A: Gerçek Ay Fazı & Ezoterik Ritm */}
+          <div className="bg-black/50 border border-amber-500/20 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#D4AF37] flex items-center gap-1.5">
+                <span>{esotericSignature.lunarPhase.phaseIcon}</span> Ay Fazı & Ruhsal Ritm
+              </span>
+              <span className="text-[11px] font-black text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                %{esotericSignature.lunarPhase.illumination} Işık
+              </span>
+            </div>
+            <div className="text-xs sm:text-sm font-bold text-white">
+              {esotericSignature.lunarPhase.phaseName}
+            </div>
+            <p className="text-[11px] text-white/65 leading-relaxed">
+              {esotericSignature.lunarPhase.esotericSecret}
+            </p>
+          </div>
+
+          {/* Kart B: Canlı 4 Element Dengesi */}
+          <div className="bg-black/50 border border-sky-500/20 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between space-y-2.5">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-sky-400">
+                🔥🌍💨💧 Kozmik Element Dengesi
+              </span>
+            </div>
+            <div className="grid grid-cols-4 gap-1.5 pt-0.5">
+              <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-1.5 text-center">
+                <div className="text-[10px] text-orange-300 font-bold">Ateş</div>
+                <div className="text-xs font-black text-white">%{esotericSignature.elementBalance.firePct}</div>
+              </div>
+              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-1.5 text-center">
+                <div className="text-[10px] text-emerald-300 font-bold">Toprak</div>
+                <div className="text-xs font-black text-white">%{esotericSignature.elementBalance.earthPct}</div>
+              </div>
+              <div className="bg-sky-500/10 border border-sky-500/20 rounded-lg p-1.5 text-center">
+                <div className="text-[10px] text-sky-300 font-bold">Hava</div>
+                <div className="text-xs font-black text-white">%{esotericSignature.elementBalance.airPct}</div>
+              </div>
+              <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-1.5 text-center">
+                <div className="text-[10px] text-purple-300 font-bold">Su</div>
+                <div className="text-xs font-black text-white">%{esotericSignature.elementBalance.waterPct}</div>
+              </div>
+            </div>
+            <p className="text-[10px] text-white/60 leading-snug">
+              <strong className="text-white/85">{esotericSignature.elementBalance.dominantLabel.split(':')[0]}:</strong>{' '}
+              {esotericSignature.elementBalance.lackingAdvice}
+            </p>
+          </div>
+
+          {/* Kart C: Aktif Çakra & Hayat Ağacı (Sefira) Rezonansı */}
+          <div className="bg-black/50 border border-purple-500/25 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-purple-300">
+                🔮 Çakra & Hayat Ağacı Frekansı
+              </span>
+              <span className="text-[10px] font-bold text-purple-200 bg-purple-500/15 px-2 py-0.5 rounded-full border border-purple-500/25">
+                {esotericSignature.chakraResonance.activePlanet} Odağı
+              </span>
+            </div>
+            <div>
+              <div className="text-xs font-bold text-white">
+                {esotericSignature.chakraResonance.chakraName}
+              </div>
+              <div className="text-[11px] font-semibold text-[#D4AF37]">
+                {esotericSignature.chakraResonance.sephirahName}
+              </div>
+            </div>
+            <p className="text-[11px] text-white/65 leading-relaxed">
+              {esotericSignature.chakraResonance.guidance}
+            </p>
+          </div>
+        </div>
+
+        {/* 3. BÖLÜM: 10 BOYUTLU 7LAYERS YAŞAM & EZOTERİİK PUSULASI (10 Kademeli Işıltılı Segment Bar) */}
+        <div className="space-y-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-white/75">
+              8 Boyutlu Yaşam & Yetkinlik Pusulası
+            </span>
+            <span className="text-[10px] text-white/40">
+              1–10 Kademeli Anlık Rezonans
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-2.5">
+            {attributes.map((attr) => {
+              const barColor = attr.isEsoteric
+                ? '#A855F7'
+                : attr.score >= 8
+                ? '#10B981'
+                : attr.score >= 6
+                ? '#0EA5E9'
+                : '#F59E0B';
+
+              return (
+                <div
+                  key={attr.id}
+                  className={`rounded-xl px-3 py-2.5 border transition-all flex items-center justify-between gap-2 ${
+                    attr.isEsoteric
+                      ? 'bg-gradient-to-r from-purple-950/35 via-black/60 to-amber-950/20 border-purple-500/30'
+                      : 'bg-black/45 border-white/10'
+                  }`}
+                >
+                  <span className="text-[11px] sm:text-xs font-bold text-white leading-tight">
+                    {attr.title}
+                  </span>
+                  <span
+                    className="text-[10px] sm:text-xs font-extrabold px-1.5 py-0.5 rounded shrink-0 tabular-nums leading-none"
+                    style={{
+                      color: barColor,
+                      backgroundColor: `${barColor}15`
+                    }}
+                  >
+                    {attr.score}/10
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="min-h-screen pt-24 pb-24 px-4 sm:px-6 relative">
       <div className="max-w-6xl mx-auto">
@@ -625,54 +770,9 @@ export default function TransitsPage() {
                 </div>
               ) : skyChartData ? (
                 <div className="space-y-8">
-                  {/* Wheel & Aspects Split */}
-                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                    
-                    {/* Left: Mundane Sky Wheel (7 cols) */}
-                    <div className="lg:col-span-7 bg-[#0A0D14]/90 sm:backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-6 rounded-3xl shadow-xl flex flex-col items-center">
-                      <div className="w-full flex items-center justify-between border-b border-white/10 pb-4 mb-4">
-                        <div>
-                          <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                            <Orbit className="text-[#0EA5E9]" size={20} />
-                            Anlık Gökyüzü Çarkı (Mundane Wheel)
-                          </h3>
-                          <p className="text-xs text-mystic-text-muted">
-                            {skyDateStr.split('-').reverse().join('.')} {skyTimeStr} • Gezegenlerin zodyaktaki anlık yerleşimleri
-                          </p>
-                        </div>
-                        <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#0EA5E9]/10 text-[#0EA5E9] border border-[#0EA5E9]/20">
-                          {skyChartData.aspects.length} Açı Aktif
-                        </span>
-                      </div>
-
-                      <MundaneSkyWheel 
-                        planets={skyChartData.planets}
-                        aspects={skyChartData.aspects}
-                        ascendant={skyChartData.ascendant}
-                        onSelectAspect={(asp: any) => {
-                          if (asp.interpretation) {
-                            setSelectedInterp({
-                              title: asp.interpretation.title,
-                              content: `${asp.interpretation.summary}\n\n【Kolektif Etki】\n${asp.interpretation.collectiveTheme}\n\n【Günün Tavsiyesi】\n${asp.interpretation.dailyAdvice}`,
-                              extra: asp.interpretation.chakraResonance
-                            });
-                          }
-                        }}
-                        onSelectPlanet={(planet) => {
-                          const interp = getSkyPlanetSignInterpretation(
-                            planet.name,
-                            planet.sign,
-                            planet.degreeInSign,
-                            planet.minutes,
-                            planet.isRetrograde
-                          );
-                          setSelectedInterp(interp);
-                        }}
-                      />
-                    </div>
-
-                    {/* Right: Active Sky Aspects or Planetary Sign Transits (5 cols) */}
-                    <div className="lg:col-span-5 bg-[#0A0D14]/90 sm:backdrop-blur-md border border-white/10 p-4 sm:p-6 rounded-3xl shadow-xl flex flex-col">
+                  {/* Top Full-Width Analysis: Active Sky Aspects or Planetary Sign Transits */}
+                  <div>
+                    <div className="bg-[#0A0D14]/90 sm:backdrop-blur-md border border-white/10 p-4 sm:p-6 rounded-3xl shadow-xl flex flex-col">
                       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between border-b border-white/10 pb-4 mb-4 gap-3">
                         <div className="inline-flex p-1 rounded-xl bg-white/5 border border-white/10 w-full sm:w-auto">
                           <button
@@ -779,108 +879,59 @@ export default function TransitsPage() {
                                   </p>
                                 </div>
 
-                                {/* Kozmik Barometre */}
-                                <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-4">
-                                  <span className="text-[10px] uppercase tracking-wider font-extrabold text-[#0EA5E9] block mb-3 flex items-center gap-1.5">
-                                    <Activity size={12} /> Kozmik Frekans Barometresi
-                                  </span>
-                                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                    {/* Mental */}
-                                    <div className="space-y-1.5 bg-black/40 p-3 rounded-xl border border-white/5">
-                                      <div className="flex justify-between items-center text-xs">
-                                        <span className="text-stone-300 font-medium">🧠 Zihinsel Odak</span>
-                                        <span className="font-extrabold text-cyan-300">{currentSkyOverview.barometer.mental.label}</span>
-                                      </div>
-                                      <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
-                                        <div className="bg-gradient-to-r from-cyan-500 to-blue-500 h-1.5 rounded-full" style={{ width: `${currentSkyOverview.barometer.mental.score}%` }} />
-                                      </div>
-                                      <span className="text-[10px] text-stone-400 block">{currentSkyOverview.barometer.mental.tone}</span>
-                                    </div>
-
-                                    {/* Emotional */}
-                                    <div className="space-y-1.5 bg-black/40 p-3 rounded-xl border border-white/5">
-                                      <div className="flex justify-between items-center text-xs">
-                                        <span className="text-stone-300 font-medium">🌊 Duygusal Akış</span>
-                                        <span className="font-extrabold text-purple-300">{currentSkyOverview.barometer.emotional.label}</span>
-                                      </div>
-                                      <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
-                                        <div className="bg-gradient-to-r from-purple-500 to-pink-500 h-1.5 rounded-full" style={{ width: `${currentSkyOverview.barometer.emotional.score}%` }} />
-                                      </div>
-                                      <span className="text-[10px] text-stone-400 block">{currentSkyOverview.barometer.emotional.tone}</span>
-                                    </div>
-
-                                    {/* Action */}
-                                    <div className="space-y-1.5 bg-black/40 p-3 rounded-xl border border-white/5">
-                                      <div className="flex justify-between items-center text-xs">
-                                        <span className="text-stone-300 font-medium">⚡ Eylem & Atılım</span>
-                                        <span className="font-extrabold text-[#D4AF37]">{currentSkyOverview.barometer.action.label}</span>
-                                      </div>
-                                      <div className="w-full bg-white/10 rounded-full h-1.5 overflow-hidden">
-                                        <div className="bg-gradient-to-r from-amber-500 to-[#D4AF37] h-1.5 rounded-full" style={{ width: `${currentSkyOverview.barometer.action.score}%` }} />
-                                      </div>
-                                      <span className="text-[10px] text-stone-400 block">{currentSkyOverview.barometer.action.tone}</span>
-                                    </div>
-                                  </div>
-                                </div>
+                                {/* Kozmik Frekans & Yetkinlik Barometresi */}
+                                {renderDetailedCosmicBarometer(currentSkyOverview.barometer, 'Kozmik Frekans & Yetkinlik Barometresi')}
 
                                 {/* Fırsatlar & Tuzaklar (Do / Don't) */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   {/* Fırsatlar */}
-                                  <div className="bg-emerald-950/20 border border-emerald-500/20 rounded-2xl p-4 space-y-2">
+                                  <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 sm:p-5 space-y-3">
                                     <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5 uppercase tracking-wider">
-                                      <CheckCircle2 size={14} /> Bugünün Fırsatları
+                                      <CheckCircle2 size={14} /> 🌟 Bugünün Fırsatları & Destekleri
                                     </span>
-                                    <ul className="space-y-1.5 text-xs text-stone-200">
+                                    <ul className="space-y-3">
                                       {currentSkyOverview.opportunities.map((item, idx) => (
-                                        <li key={idx} className="flex items-start gap-1.5">
-                                          <span className="text-emerald-400 shrink-0 mt-0.5">✦</span>
-                                          <span>{item}</span>
+                                        <li key={idx} className="bg-black/30 border border-emerald-500/10 rounded-xl p-3 flex items-start gap-2.5">
+                                          <span className="text-emerald-400 font-bold shrink-0 mt-0.5">✓</span>
+                                          <div className="space-y-1">
+                                            <p className="text-xs sm:text-sm font-medium text-white leading-relaxed">
+                                              {item.text}
+                                            </p>
+                                            {item.astroTag && (
+                                              <span className="block text-[10px] text-white/35 font-normal">
+                                                {item.astroTag}
+                                              </span>
+                                            )}
+                                          </div>
                                         </li>
                                       ))}
                                     </ul>
                                   </div>
 
                                   {/* Tuzaklar / Dikkat */}
-                                  <div className="bg-amber-950/20 border border-amber-500/20 rounded-2xl p-4 space-y-2">
-                                    <span className="text-xs font-bold text-amber-400 flex items-center gap-1.5 uppercase tracking-wider">
-                                      <AlertTriangle size={14} /> Neden Kaçınmalı?
+                                  <div className="bg-rose-500/5 border border-rose-500/20 rounded-2xl p-4 sm:p-5 space-y-3">
+                                    <span className="text-xs font-bold text-rose-400 flex items-center gap-1.5 uppercase tracking-wider">
+                                      <AlertTriangle size={14} /> ⚠️ Dikkat Edilmesi Gerekenler
                                     </span>
-                                    <ul className="space-y-1.5 text-xs text-stone-200">
+                                    <ul className="space-y-3">
                                       {currentSkyOverview.cautions.map((item, idx) => (
-                                        <li key={idx} className="flex items-start gap-1.5">
-                                          <span className="text-amber-400 shrink-0 mt-0.5">✦</span>
-                                          <span>{item}</span>
+                                        <li key={idx} className="bg-black/30 border border-rose-500/10 rounded-xl p-3 flex items-start gap-2.5">
+                                          <span className="text-rose-400 font-bold shrink-0 mt-0.5">!</span>
+                                          <div className="space-y-1">
+                                            <p className="text-xs sm:text-sm font-medium text-white leading-relaxed">
+                                              {item.text}
+                                            </p>
+                                            {item.astroTag && (
+                                              <span className="block text-[10px] text-white/35 font-normal">
+                                                {item.astroTag}
+                                              </span>
+                                            )}
+                                          </div>
                                         </li>
                                       ))}
                                     </ul>
                                   </div>
                                 </div>
-
-                                {/* Pik Açı Rozetleri */}
-                                {currentSkyOverview.topAspects.length > 0 && (
-                                  <div className="pt-2 border-t border-white/5">
-                                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-stone-400 block mb-2">
-                                      Şu An Gökyüzünde Pik Yapan Kilit Açılar:
-                                    </span>
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                      {currentSkyOverview.topAspects.map((asp, idx) => (
-                                        <div key={idx} className="bg-white/[0.02] border border-white/10 rounded-xl p-2.5 space-y-1">
-                                          <div className="flex items-center justify-between text-xs font-bold">
-                                            <span className={asp.isHarmonious ? 'text-emerald-300' : 'text-amber-300'}>
-                                              {asp.p1} {asp.aspectType} {asp.p2}
-                                            </span>
-                                            <span className="text-[10px] text-stone-400 bg-white/5 px-1.5 py-0.5 rounded">
-                                              {asp.badge}
-                                            </span>
-                                          </div>
-                                          <p className="text-[11px] text-stone-300 leading-snug line-clamp-2">
-                                            {asp.summary}
-                                          </p>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
 
                                 {/* Detay Açıcı Buton */}
                                 <div className="pt-3 border-t border-white/10 flex justify-center">
@@ -1408,6 +1459,62 @@ export default function TransitsPage() {
                       activeSolarEclipse={currentSkyLunation.activeSolarEclipse}
                     />
                   )}
+
+                  {/* Anlık Gökyüzü Çarkı (Mundane Wheel) */}
+                  <div className="bg-[#0A0D14]/90 sm:backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-6 rounded-3xl shadow-xl flex flex-col items-center">
+                    <div className="w-full flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+                      <div>
+                        <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                          <Orbit className="text-[#0EA5E9]" size={20} />
+                          Anlık Gökyüzü Çarkı (Mundane Wheel)
+                        </h3>
+                        <p className="text-xs text-mystic-text-muted">
+                          {skyDateStr.split('-').reverse().join('.')} {skyTimeStr} • Gezegenlerin zodyaktaki anlık yerleşimleri
+                        </p>
+                      </div>
+                      <span className="text-xs font-bold px-3 py-1 rounded-full bg-[#0EA5E9]/10 text-[#0EA5E9] border border-[#0EA5E9]/20">
+                        {skyChartData.aspects.length} Açı Aktif
+                      </span>
+                    </div>
+
+                    <MundaneSkyWheel 
+                      planets={skyChartData.planets}
+                      aspects={skyChartData.aspects}
+                      ascendant={skyChartData.ascendant}
+                      onSelectAspect={(asp: any) => {
+                        if (asp.interpretation) {
+                          setSelectedInterp({
+                            title: asp.interpretation.title,
+                            content: `${asp.interpretation.summary}\n\n【Kolektif Etki】\n${asp.interpretation.collectiveTheme}\n\n【Günün Tavsiyesi】\n${asp.interpretation.dailyAdvice}`,
+                            extra: asp.interpretation.chakraResonance
+                          });
+                        }
+                      }}
+                      onSelectPlanet={(planet) => {
+                        const interp = getSkyPlanetSignInterpretation(
+                          planet.name,
+                          planet.sign,
+                          planet.degreeInSign,
+                          planet.minutes,
+                          planet.isRetrograde
+                        );
+                        setSelectedInterp(interp);
+                      }}
+                    />
+                  </div>
+
+                  {/* Önemli Bilgilendirme */}
+                  <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 p-6 rounded-3xl flex items-start gap-4">
+                    <AlertCircle className="text-[#D4AF37] shrink-0 mt-0.5" size={24} />
+                    <div>
+                      <h4 className="text-sm font-bold text-white mb-2 uppercase tracking-wider">Önemli Bilgilendirme</h4>
+                      <p className="text-xs text-mystic-text-muted leading-relaxed">
+                        Sistemimiz tarafından sunulan yorumlar, astrolojik hesaplama algoritmaları ile üretilmektedir. 
+                        Astrolojide hiçbir gösterge tek başına bir anlam ifade etmez. Gökyüzündeki herhangi bir gezegen konumu, burç geçişi veya açı; 
+                        her zaman gökyüzünün bütünsel bağlamı ve kendi doğum haritanızın dinamikleri ile birlikte değerlendirilmelidir.
+                      </p>
+                    </div>
+                  </div>
                 </div>
               ) : null
             )}
@@ -1557,41 +1664,6 @@ export default function TransitsPage() {
                 {/* Personal Tab 1: Bi-Wheel */}
                 {personalTab === 'BIWHEEL' && (
                   <div className="space-y-10">
-                    <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-8 rounded-3xl shadow-2xl flex flex-col items-center w-full max-w-full overflow-hidden">
-                      <div className="flex w-full flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-6 mb-8 gap-4">
-                         <div>
-                           <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-3 mb-2">
-                             <Compass className="text-[#0EA5E9] shrink-0" /> Çift Çemberli Transit Haritası
-                           </h2>
-                           <div className="flex flex-col gap-1 text-xs sm:text-sm">
-                             <p className="text-[#D4AF37] flex items-center gap-2">
-                               <span className="w-2 h-2 rounded-full bg-[#D4AF37] shrink-0"></span>
-                               Natal: {cityKey ? cityKey.name : ''} • {natalDateStr ? natalDateStr.split('-').reverse().join('.') : ''} {natalTimeStr}
-                             </p>
-                             <p className="text-[#0EA5E9] flex items-center gap-2">
-                               <span className="w-2.5 h-2.5 rounded-full bg-[#0EA5E9] inline-block shrink-0"></span>
-                               Transit (Dış Çember): {transitDateStr ? transitDateStr.split('-').reverse().join('.') : ''} {transitTimeStr}
-                             </p>
-                           </div>
-                         </div>
-                      </div>
-
-                      {renderBiWheel()}
-                    </div>
-
-                    {/* Önemli Bilgilendirme */}
-                    <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 p-6 rounded-3xl flex items-start gap-4">
-                      <AlertCircle className="text-[#D4AF37] shrink-0 mt-0.5" size={24} />
-                      <div>
-                        <h4 className="text-sm font-bold text-white mb-2 uppercase tracking-wider">Önemli Bilgilendirme</h4>
-                        <p className="text-xs text-mystic-text-muted leading-relaxed">
-                          Sistemimiz tarafından sunulan yorumlar, astrolojik hesaplama algoritmaları ile üretilmektedir. 
-                          Astrolojide hiçbir gösterge tek başına bir anlam ifade etmez. Haritanızdaki herhangi bir gezegen konumu, ev yerleşimi veya açı; 
-                          her zaman doğum haritanızın tamamı, diğer gezegen yerleşimleri ve gökyüzünün bütünsel bağlamı ile ilişkilendirilerek değerlendirilmelidir.
-                        </p>
-                      </div>
-                    </div>
-
                     {/* Personal View Switcher */}
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-black/50 p-3 rounded-2xl border border-white/10 mb-6">
                       <div className="flex flex-wrap items-center gap-2">
@@ -1662,156 +1734,84 @@ export default function TransitsPage() {
                           </p>
                         </div>
 
-                        {/* Odak Yaşam Alanları & Enerji Barometresi */}
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-                          {/* Sol: Odak Yaşam Alanları (5 cols) */}
-                          <div className="lg:col-span-5 bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3">
-                            <span className="text-[11px] font-extrabold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
-                              <Compass size={13} /> Bugünün Odak Yaşam Alanları
-                            </span>
-                            <div className="space-y-2.5">
-                              {personalOverview.focusHouses.map((fh, idx) => (
-                                <div key={`fh-${idx}`} className="bg-black/40 border border-white/5 rounded-xl p-3">
-                                  <div className="flex items-center justify-between gap-2 mb-1">
-                                    <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                                      <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"></span>
-                                      {fh.title}
-                                    </span>
-                                    <span className="text-[10px] text-amber-300/80 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
-                                      {fh.planetNames.join(', ')}
-                                    </span>
-                                  </div>
-                                  <p className="text-[11px] text-gray-400 capitalize">
-                                    {fh.description}
-                                  </p>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
+                        {/* Kişisel Enerji & Yetkinlik Barometresi */}
+                        {renderDetailedCosmicBarometer(personalOverview.barometer, 'Kişisel Enerji & Yetkinlik Barometresi')}
 
-                          {/* Sağ: 3 Boyutlu Enerji & Akış Barometresi (7 cols) */}
-                          <div className="lg:col-span-7 bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3">
-                            <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#D4AF37] flex items-center gap-1.5">
-                              <Activity size={13} /> Kişisel Enerji & Akış Barometresi
-                            </span>
-                            <div className="space-y-3 pt-1">
-                              {/* Zihinsel */}
-                              <div>
-                                <div className="flex justify-between items-center text-xs mb-1">
-                                  <span className="text-gray-300 font-medium">Zihinsel Netlik & Karar Gücü</span>
-                                  <span className="text-sky-400 font-bold">{personalOverview.barometer.mental.label} • {personalOverview.barometer.mental.tone}</span>
+                        {/* Odak Yaşam Alanları */}
+                        <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3">
+                          <span className="text-[11px] font-extrabold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
+                            <Compass size={13} /> Bugünün Odak Yaşam Alanları
+                          </span>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            {personalOverview.focusHouses.map((fh, idx) => (
+                              <div key={`fh-${idx}`} className="bg-black/40 border border-white/5 rounded-xl p-3">
+                                <div className="flex items-center justify-between gap-2 mb-1">
+                                  <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#D4AF37]"></span>
+                                    {fh.title}
+                                  </span>
+                                  <span className="text-[10px] text-amber-300/80 bg-amber-500/10 px-2 py-0.5 rounded-md border border-amber-500/20">
+                                    {fh.planetNames.join(', ')}
+                                  </span>
                                 </div>
-                                <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                                  <div 
-                                    className="bg-gradient-to-r from-sky-500 to-cyan-400 h-full rounded-full transition-all duration-700" 
-                                    style={{ width: `${personalOverview.barometer.mental.score}%` }} 
-                                  />
-                                </div>
+                                <p className="text-[11px] text-gray-400 capitalize">
+                                  {fh.description}
+                                </p>
                               </div>
-
-                              {/* Duygusal */}
-                              <div>
-                                <div className="flex justify-between items-center text-xs mb-1">
-                                  <span className="text-gray-300 font-medium">Duygusal Denge & İç Huzur</span>
-                                  <span className="text-emerald-400 font-bold">{personalOverview.barometer.emotional.label} • {personalOverview.barometer.emotional.tone}</span>
-                                </div>
-                                <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                                  <div 
-                                    className="bg-gradient-to-r from-emerald-500 to-teal-400 h-full rounded-full transition-all duration-700" 
-                                    style={{ width: `${personalOverview.barometer.emotional.score}%` }} 
-                                  />
-                                </div>
-                              </div>
-
-                              {/* Eylem */}
-                              <div>
-                                <div className="flex justify-between items-center text-xs mb-1">
-                                  <span className="text-gray-300 font-medium">Eylem & İlerleme Enerjisi</span>
-                                  <span className="text-amber-400 font-bold">{personalOverview.barometer.action.label} • {personalOverview.barometer.action.tone}</span>
-                                </div>
-                                <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
-                                  <div 
-                                    className="bg-gradient-to-r from-amber-500 to-yellow-400 h-full rounded-full transition-all duration-700" 
-                                    style={{ width: `${personalOverview.barometer.action.score}%` }} 
-                                  />
-                                </div>
-                              </div>
-                            </div>
+                            ))}
                           </div>
                         </div>
 
                         {/* Fırsatlar ve Sınavlar */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {/* Fırsat Kapıları */}
-                          <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 sm:p-5 space-y-2.5">
+                          <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 sm:p-5 space-y-3">
                             <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
                               <Sparkles size={14} /> 🌟 Bugün Sizin İçin Fırsatlar & Destekler
                             </span>
-                            <ul className="space-y-2">
+                            <ul className="space-y-3">
                               {personalOverview.opportunities.map((opp, idx) => (
-                                <li key={`opp-${idx}`} className="text-xs text-gray-200 leading-relaxed flex items-start gap-2">
-                                  <span className="text-emerald-400 shrink-0 mt-0.5">✓</span>
-                                  <span>{opp}</span>
+                                <li key={`opp-${idx}`} className="bg-black/30 border border-emerald-500/10 rounded-xl p-3 flex items-start gap-2.5">
+                                  <span className="text-emerald-400 font-bold shrink-0 mt-0.5">✓</span>
+                                  <div className="space-y-1">
+                                    <p className="text-xs sm:text-sm font-medium text-white leading-relaxed">
+                                      {opp.text}
+                                    </p>
+                                    {opp.astroTag && (
+                                      <span className="block text-[10px] text-white/35 font-normal">
+                                        {opp.astroTag}
+                                      </span>
+                                    )}
+                                  </div>
                                 </li>
                               ))}
                             </ul>
                           </div>
 
                           {/* Dikkat ve Sınırlar */}
-                          <div className="bg-rose-500/5 border border-rose-500/20 rounded-2xl p-4 sm:p-5 space-y-2.5">
+                          <div className="bg-rose-500/5 border border-rose-500/20 rounded-2xl p-4 sm:p-5 space-y-3">
                             <span className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
                               <AlertCircle size={14} /> ⚠️ Dikkat Edilmesi Gereken Sınavlar
                             </span>
-                            <ul className="space-y-2">
+                            <ul className="space-y-3">
                               {personalOverview.cautions.map((cau, idx) => (
-                                <li key={`cau-${idx}`} className="text-xs text-gray-200 leading-relaxed flex items-start gap-2">
-                                  <span className="text-rose-400 shrink-0 mt-0.5">!</span>
-                                  <span>{cau}</span>
+                                <li key={`cau-${idx}`} className="bg-black/30 border border-rose-500/10 rounded-xl p-3 flex items-start gap-2.5">
+                                  <span className="text-rose-400 font-bold shrink-0 mt-0.5">!</span>
+                                  <div className="space-y-1">
+                                    <p className="text-xs sm:text-sm font-medium text-white leading-relaxed">
+                                      {cau.text}
+                                    </p>
+                                    {cau.astroTag && (
+                                      <span className="block text-[10px] text-white/35 font-normal">
+                                        {cau.astroTag}
+                                      </span>
+                                    )}
+                                  </div>
                                 </li>
                               ))}
                             </ul>
                           </div>
                         </div>
-
-                        {/* En Güçlü Kişisel Tetikleyiciler (Pik Transitler & Kesin Dereceler) */}
-                        {personalOverview.topAspects.length > 0 && (
-                          <div className="space-y-2.5">
-                            <span className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
-                              <Zap size={14} className="text-[#0EA5E9]" /> En Etkin Kişisel Tetikleyiciler (Pik Transitler)
-                            </span>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                              {personalOverview.topAspects.map((asp, idx) => (
-                                <div 
-                                  key={`pa-${idx}`}
-                                  className="bg-black/50 border border-white/10 hover:border-cyan-500/30 rounded-2xl p-3.5 space-y-2 text-xs"
-                                >
-                                  <div className="flex items-center justify-between gap-1">
-                                    <span className="font-bold text-white flex items-center gap-1">
-                                      <span className="text-[#0EA5E9]">{PLANET_SYMBOLS[asp.transitPlanet] || '★'}</span>
-                                      <span>{asp.transitPlanet}</span>
-                                      <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${asp.isHarmonious ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
-                                        {asp.aspectType}
-                                      </span>
-                                      <span className="text-[#D4AF37]">{PLANET_SYMBOLS[asp.natalPlanet] || '★'}</span>
-                                      <span>{asp.natalPlanet}</span>
-                                    </span>
-                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/25 shrink-0">
-                                      {asp.badge}
-                                    </span>
-                                  </div>
-                                  <div className="text-[10px] text-gray-400 flex items-center justify-between border-t border-white/5 pt-1.5">
-                                    <span>T: {asp.transitSign} {asp.transitDegree}°</span>
-                                    <span>➔</span>
-                                    <span>N: {asp.natalSign} {asp.natalDegree}° ({LIFE_AREA_NAMES[asp.natalHouse] || `${asp.natalHouse}. Ev`})</span>
-                                  </div>
-                                  <p className="text-[11px] text-gray-300 leading-snug">
-                                    {asp.summary}
-                                  </p>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
 
                         {/* Alt Reçete / Bilgelik Notu */}
                         <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
@@ -2040,6 +2040,41 @@ export default function TransitsPage() {
                         activeSolarEclipse={personalLunation.activeSolarEclipse}
                       />
                     )}
+
+                    <div className="bg-black/50 backdrop-blur-md border border-[#0EA5E9]/30 p-4 sm:p-8 rounded-3xl shadow-2xl flex flex-col items-center w-full max-w-full overflow-hidden">
+                      <div className="flex w-full flex-col md:flex-row items-start md:items-center justify-between border-b border-white/10 pb-6 mb-8 gap-4">
+                         <div>
+                           <h2 className="text-xl sm:text-2xl font-bold text-white flex items-center gap-3 mb-2">
+                             <Compass className="text-[#0EA5E9] shrink-0" /> Çift Çemberli Transit Haritası
+                           </h2>
+                           <div className="flex flex-col gap-1 text-xs sm:text-sm">
+                             <p className="text-[#D4AF37] flex items-center gap-2">
+                               <span className="w-2 h-2 rounded-full bg-[#D4AF37] shrink-0"></span>
+                               Natal: {cityKey ? cityKey.name : ''} • {natalDateStr ? natalDateStr.split('-').reverse().join('.') : ''} {natalTimeStr}
+                             </p>
+                             <p className="text-[#0EA5E9] flex items-center gap-2">
+                               <span className="w-2.5 h-2.5 rounded-full bg-[#0EA5E9] inline-block shrink-0"></span>
+                               Transit (Dış Çember): {transitDateStr ? transitDateStr.split('-').reverse().join('.') : ''} {transitTimeStr}
+                             </p>
+                           </div>
+                         </div>
+                      </div>
+
+                      {renderBiWheel()}
+                    </div>
+
+                    {/* Önemli Bilgilendirme */}
+                    <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 p-6 rounded-3xl flex items-start gap-4">
+                      <AlertCircle className="text-[#D4AF37] shrink-0 mt-0.5" size={24} />
+                      <div>
+                        <h4 className="text-sm font-bold text-white mb-2 uppercase tracking-wider">Önemli Bilgilendirme</h4>
+                        <p className="text-xs text-mystic-text-muted leading-relaxed">
+                          Sistemimiz tarafından sunulan yorumlar, astrolojik hesaplama algoritmaları ile üretilmektedir. 
+                          Astrolojide hiçbir gösterge tek başına bir anlam ifade etmez. Haritanızdaki herhangi bir gezegen konumu, ev yerleşimi veya açı; 
+                          her zaman doğum haritanızın tamamı, diğer gezegen yerleşimleri ve gökyüzünün bütünsel bağlamı ile ilişkilendirilerek değerlendirilmelidir.
+                        </p>
+                      </div>
+                    </div>
                   </div>
                 )}
 
