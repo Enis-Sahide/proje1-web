@@ -812,6 +812,134 @@ export function generateCurrentSkyOverview(
   };
 }
 
+const SIGN_FLAVORS: Record<string, { adj: string; style: string }> = {
+  'Koç': { adj: 'cesur, öncü ve doğrudan', style: 'inisyatif alarak ve korkusuzca adım atarak' },
+  'Boğa': { adj: 'dingin, sağlam ve güven odaklı', style: 'somut değerler üreterek ve sabırla inşa ederek' },
+  'İkizler': { adj: 'zihinsel açıdan çevik, meraklı ve iletişim odaklı', style: 'yeni fikirler geliştirerek, konuşarak ve bağlantı kurarak' },
+  'Yengeç': { adj: 'şefkatli, sezgisel ve koruyucu', style: 'duygusal bağları güçlendirerek ve iç sesinize kulak vererek' },
+  'Aslan': { adj: 'özgüvenli, yaratıcı ve sıcak', style: 'kendi ışığınızı ortaya koyarak ve yürekten ifade ederek' },
+  'Başak': { adj: 'analitik, özenli ve çözüm odaklı', style: 'detayları sadeleştirerek ve pratik düzen kurarak' },
+  'Terazi': { adj: 'uzlaşmacı, zarif ve denge arayan', style: 'adil bir diyalog ve karşılıklı uyum kurarak' },
+  'Akrep': { adj: 'derin, sezgisel ve dönüştürücü', style: 'yüzeyin altındaki gerçeği görerek ve stratejik hareket ederek' },
+  'Yay': { adj: 'vizyoner, iyimser ve özgürlükçü', style: 'ufkunuzu genişleterek ve büyük resme odaklanarak' },
+  'Oğlak': { adj: 'disiplinli, kararlı ve gerçekçi', style: 'uzun vadeli sorumluluk alarak ve sağlam sınırlar çizerek' },
+  'Kova': { adj: 'yenilikçi, özgün ve ezber bozan', style: 'alışılmış kalıpların dışına çıkarak ve bağımsız düşünerek' },
+  'Balık': { adj: 'ilham dolu, empatik ve ruhsal', style: 'sezgisel akışa güvenerek ve şefkatle yaklaşarak' }
+};
+
+const TRANSIT_PLANET_GIFT: Record<string, string> = {
+  'Güneş': 'yaşam enerjinizi, görünürlüğünüzü ve bilinçli iradenizi parlatırken',
+  'Ay': 'duygusal sezgilerinizi, samimi bağ kurma ihtiyacınızı ve içsel akışınızı harekete geçirirken',
+  'Merkür': 'zihinsel berraklığınızı, karar alma hızınızı ve iletişim becerinizi güçlendirirken',
+  'Venüs': 'ilişkilerde uyumu, çekim gücünüzü, sevgi akışını ve maddi/manevi bereketi artırırken',
+  'Mars': 'cesaretinizi, fiziksel motivasyonunuzu ve ertelediğiniz adımları atma gücünüzü ateşlerken',
+  'Jüpiter': 'büyüme fırsatlarını, şansı, iyimserliği ve ufuk açıcı destekleri büyütürken',
+  'Satürn': 'kalıcı yapı kurma gücünüzü, sabrınızı ve uzun vadeli güven inşa etme disiplininizi sağlamlaştırırken',
+  'Uranüs': 'ani zihinsel uyanışları, sürpriz sıçramaları ve kalıpları kıran özgürleştirici yenilikleri tetiklerken',
+  'Neptün': 'ruhsal ilhamınızı, yaratıcı hayal gücünüzü ve sezgisel şifa kanalınızı derinleştirirken',
+  'Plüton': 'küllerinden doğan içsel gücünüzü, karizmanızı ve kökten yenilenme kapasitenizi açığa çıkarırken',
+  'Kiron': 'geçmiş yaraları bilgeliğe dönüştüren derin bir içsel şifa ve kabullenme kapısı açarken',
+  'Lilith': 'bastırılmış otantik gücünüzü ve boyun eğmeyen özgüveninizi uyandırırken',
+  'Kuzey Ay Düğümü': 'sizi ruhsal tekamülünüze ve geleceğin kadersel fırsatlarına doğru çekerken',
+  'Şans Noktası (POF)': 'doğal akışta gelen kısmet, sevinç ve zahmetsiz denge noktanızı aydınlatırken',
+  'Vertex (Vx)': 'beklenmedik ama kadersel nitelikteki karşılaşmaları ve dönüm noktalarını hızlandırırken'
+};
+
+const TRANSIT_PLANET_CHALLENGE: Record<string, string> = {
+  'Güneş': 'ego çatışmalarına, irade savaşlarına veya aşırı gurur kaynaklı gerilimlere çekebilir',
+  'Ay': 'anlık duygusal dalgalanmalara, alınganlığa veya geçmişten gelen güvensizlik tepkilerine açık hale getirebilir',
+  'Merkür': 'zihinsel aşırı yüklenmeye, yanlış anlaşılmalara veya aceleci ve keskin sözlere zemin hazırlayabilir',
+  'Venüs': 'ilişkilerde beklenti krizlerine, değer sorgulamalarına veya gereksiz harcama eğilimine yol açabilir',
+  'Mars': 'sabırsızlığa, ani öfke patlamalarına ve fevri restleşmelere karşı ekstra dikkat gerektirir',
+  'Jüpiter': 'aşırı iyimserlikle boyunuzu aşan sözler vermeye, abartıya ve sınırları zorlamaya itebilir',
+  'Satürn': 'gecikmeler, ağır sorumluluklar veya daralma hissi üzerinden dayanıklılığınızı ve sabrınızı sınayabilir',
+  'Uranüs': 'beklenmedik plan değişiklikleri, huzursuzluk ve ani kopuş dürtüsüyle sinir sisteminizi zorlayabilir',
+  'Neptün': 'belirsizlik, kafa karışıklığı, gerçeklerden kaçış veya yanılsama riskine karşı uyanık olmayı gerektirir',
+  'Plüton': 'derin güç savaşları, kontrol takıntısı veya artık miadını doldurmuş bağları bırakma krizi doğurabilir',
+  'Kiron': 'eski bir kırgınlığın veya yetersizlik hissinin tetiklenmesiyle duygusal hassasiyet yaratabilir',
+  'Lilith': 'bastırılmış öfke, gölge kıskançlıklar veya keskin sınır ihlali tepkilerini yüzeye çıkarabilir',
+  'Kuzey Ay Düğümü': 'alışkın olduğunuz konfor alanından çıkarken yaşadığınız içsel direnci görünür kılabilir',
+  'Şans Noktası (POF)': 'kolaycılığa kaçma veya mevcut kısmeti fark edemeyip içsel huzuru dağıtma sınavı getirebilir',
+  'Vertex (Vx)': 'kontrolünüz dışında gelişen kadersel karşılaşmalar ve ani yön değişimleriyle dengenizi sınayabilir'
+};
+
+const NATAL_PLANET_CORE: Record<string, string> = {
+  'Güneş': 'temel kimliğinizi, yaşam amacınızı ve özgüven merkezinizi',
+  'Ay': 'duygusal ihtiyaçlarınızı, içsel güvenlik alanınızı ve kalp huzurunuzu',
+  'Merkür': 'düşünce yapınızı, öğrenme biçiminizi ve kendinizi ifade etme dilinizi',
+  'Venüs': 'sevgi dilinizi, ilişki beklentilerinizi ve öz değer algınızı',
+  'Mars': 'eylem tarzınızı, sınır koruma refleksinizi ve yaşam enerjinizi',
+  'Jüpiter': 'hayat vizyonunuzu, inançlarınızı ve bolluk bilincinizi',
+  'Satürn': 'sorumluluk bilincinizi, kariyer omurganızı ve sınırlarınızı',
+  'Uranüs': 'bireysel özgünlüğünüzü ve özgürlük alanınızı',
+  'Neptün': 'sezgisel dünyanızı, hayallerinizi ve ruhsal duyarlılığınızı',
+  'Plüton': 'derin psikolojik gücünüzü ve krizleri dönüştürme potansiyelinizi',
+  'Kiron': 'en hassas ruhsal yaranızı ve şifalanma kapasitenizi',
+  'Lilith': 'tavizsiz doğanızı ve bastırılmış içgüdüsel gücünüzü',
+  'Kuzey Ay Düğümü': 'bu hayattaki kadersel gelişim yönünüzü',
+  'Şans Noktası (POF)': 'doğuştan gelen kısmet ve içsel neşe kaynağınızı',
+  'Vertex (Vx)': 'kadersel kesişme ve önemli karşılaşma noktanızı',
+  'Yükselen (ASC)': 'dış dünyaya sunduğunuz duruşu, beden enerjinizi ve kişisel başlangıçlarınızı',
+  'Tepe Noktası (MC)': 'toplumsal hedeflerinizi, mesleki yönünüzü ve görünür başarınızı'
+};
+
+function buildDynamicAspectOpportunity(params: {
+  transitPlanet: string;
+  transitSign: string;
+  transitDegree: number;
+  transitHouse: number;
+  natalPlanet: string;
+  natalSign: string;
+  natalDegree: number;
+  natalHouse: number;
+  aspectType: string;
+}): string {
+  const { transitPlanet, transitSign, transitDegree, transitHouse, natalPlanet, natalSign, natalDegree, natalHouse, aspectType } = params;
+  const signFlavor = SIGN_FLAVORS[transitSign] || { adj: 'dinamik', style: 'farkındalıkla hareket ederek' };
+  const tGift = TRANSIT_PLANET_GIFT[transitPlanet] || 'yeni bir farkındalık ve destek akışı sunarken';
+  const nCore = NATAL_PLANET_CORE[natalPlanet] || 'doğuştan gelen potansiyelinizi';
+  const nArea = HOUSE_SHORT_THEMES[natalHouse] || 'bu yaşam alanınız';
+  const tArea = HOUSE_SHORT_THEMES[transitHouse] || 'güncel gündeminiz';
+
+  const aspectAction = aspectType === 'Üçgen'
+    ? `aradaki uyumlu üçgen açı sayesinde ${signFlavor.style} çabasız ve akıcı sonuçlar alabilirsiniz.`
+    : aspectType === 'Sekstil'
+    ? `aradaki sekstil açının sunduğu kapıyı ${signFlavor.style} somut bir girişime ve iletişime dönüştürebilirsiniz.`
+    : `bu kavuşumun yoğun odak gücüyle ${signFlavor.style} yepyeni ve kalıcı bir sayfa açabilirsiniz.`;
+
+  const houseBridge = transitHouse !== natalHouse
+    ? `${tArea} alanındaki hareketlilik, doğrudan ${nArea} konularınızı besliyor; `
+    : `Doğrudan ${nArea} konularınızda yoğunlaşan bu etkiyle `;
+
+  return `Transit ${transitPlanet} (${transitSign} ${transitDegree}°) ➔ Natal ${natalPlanet} (${natalSign} ${natalDegree}°): ${transitSign} burcunun ${signFlavor.adj} doğasıyla çalışan Transit ${transitPlanet}, ${tGift} ${nCore} destekliyor. ${houseBridge}${aspectAction}`;
+}
+
+function buildDynamicAspectCaution(params: {
+  transitPlanet: string;
+  transitSign: string;
+  transitDegree: number;
+  transitHouse: number;
+  natalPlanet: string;
+  natalSign: string;
+  natalDegree: number;
+  natalHouse: number;
+  aspectType: string;
+}): string {
+  const { transitPlanet, transitSign, transitDegree, transitHouse, natalPlanet, natalSign, natalDegree, natalHouse, aspectType } = params;
+  const tChallenge = TRANSIT_PLANET_CHALLENGE[transitPlanet] || 'içsel bir gerilim ve sınav yaratabilir';
+  const nCore = NATAL_PLANET_CORE[natalPlanet] || 'hassas dengelerinizi';
+  const nArea = HOUSE_SHORT_THEMES[natalHouse] || 'bu yaşam alanınız';
+  const tArea = HOUSE_SHORT_THEMES[transitHouse] || 'güncel gündeminiz';
+
+  const aspectWarning = aspectType === 'Karşıt'
+    ? `Karşıt açının yarattığı kutuplaşmada bir tarafı seçip diğerini feda etmek yerine, ${tArea} ile ${nArea} arasında bilinçli bir denge kurun.`
+    : aspectType === 'Kare'
+    ? `Kare açının getirdiği içsel baskıyı fevri tepkilere dönüştürmeyin; ${nArea} konularında sabırla ve sınırlarınızı koruyarak yapılandırıcı adımlar atın.`
+    : `${nArea} konularında aceleci yargılardan kaçınıp süreci gözlemleyerek yönetin.`;
+
+  return `Transit ${transitPlanet} (${transitSign} ${transitDegree}°) ➔ Natal ${natalPlanet} (${natalSign} ${natalDegree}°): ${transitSign} burcundaki Transit ${transitPlanet}, ${nCore} tetikleyerek sizi ${tChallenge}. ${aspectWarning}`;
+}
+
 export interface PersonalTransitOverview {
   headline: string;
   subHeadline: string;
@@ -833,6 +961,7 @@ export interface PersonalTransitOverview {
     transitPlanet: string;
     transitSign: string;
     transitDegree: number;
+    transitHouse: number;
     natalPlanet: string;
     natalSign: string;
     natalDegree: number;
@@ -860,37 +989,41 @@ export function generatePersonalTransitOverview(
   const validAspects = (allTransitAspect || []).filter(a => a.orb <= 3.5);
   validAspects.sort((a, b) => a.orb - b.orb);
 
-  const topAspects = validAspects.slice(0, 3).map(asp => {
+  const enrichAspect = (asp: TransitAspect) => {
     const tPlanet = transitPlanets.find(p => p.name === asp.transitPlanet);
     const nPlanet = natalPlanets.find(p => p.name === asp.natalPlanet);
+    const tHouse = tPlanet ? (tPlanet.house || getHouseFromLongitude(tPlanet.longitude, natalHouses)) : 1;
     const nHouse = nPlanet ? (nPlanet.house || getHouseFromLongitude(nPlanet.longitude, natalHouses)) : 1;
-    const isHarmonious = asp.type === 'Üçgen' || asp.type === 'Sekstil' || (asp.type === 'Kavuşum' && !['Satürn', 'Mars', 'Plüton'].includes(asp.transitPlanet));
+    const isHarmonious = asp.type === 'Üçgen' || asp.type === 'Sekstil' || (asp.type === 'Kavuşum' && !['Satürn', 'Mars', 'Plüton', 'Kiron', 'Lilith'].includes(asp.transitPlanet));
 
     const tSign = tPlanet?.sign || '';
     const tDeg = tPlanet?.degreeInSign ?? 0;
     const nSign = nPlanet?.sign || '';
     const nDeg = nPlanet?.degreeInSign ?? 0;
 
-    let summary = '';
+    const signFlavor = SIGN_FLAVORS[tSign] || { adj: 'aktif', style: 'farkındalıkla' };
+    const nCore = NATAL_PLANET_CORE[asp.natalPlanet] || 'doğuştan gelen potansiyelinizi';
     const nArea = HOUSE_SHORT_THEMES[nHouse] || 'bu yaşam alanınız';
+
+    let summary = '';
     switch (asp.type) {
       case 'Kavuşum':
-        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile tam kavuşumda. Doğrudan ${nArea} konularında taze ve yoğun bir başlangıç enerjisi açıyor.`;
+        summary = `${tSign} burcunun ${signFlavor.adj} enerjisiyle gelen Transit ${asp.transitPlanet}, ${nCore} doğrudan uyandırıyor; ${nArea} konularında yoğun bir odak ve yeni başlangıç döngüsü açıyor.`;
         break;
       case 'Üçgen':
-        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile uyumlu üçgen açıda. ${nArea} konularında çabasız ve destekleyici bir akış sunuyor.`;
+        summary = `${tSign} burcundaki Transit ${asp.transitPlanet}, ${nCore} uyumlu üçgen açıyla besliyor; ${nArea} konularında ${signFlavor.style} çabasız bir ilerleme sağlıyor.`;
         break;
       case 'Sekstil':
-        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile sekstil açıda. ${nArea} alanında somut fırsatları fark edip değerlendirmeniz için kapı açıyor.`;
+        summary = `${tSign} burcundaki Transit ${asp.transitPlanet}, ${nCore} destekleyici bir sekstil açıyla harekete geçiriyor; ${nArea} alanında somut adımlarla büyüyen fırsatlar sunuyor.`;
         break;
       case 'Kare':
-        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile kare açıda. ${nArea} konularında sizi harekete geçiren yapıcı bir gerilim ve eşik yaratıyor.`;
+        summary = `${tSign} burcundaki Transit ${asp.transitPlanet}, ${nCore} kare açıyla zorlayarak konfor alanınızdan çıkarıyor; ${nArea} konularında ertelediğiniz kararları yapılandırmanızı istiyor.`;
         break;
       case 'Karşıt':
-        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile karşıt açıda. ${nArea} ekseninde ikili dengelerde ve sınırlarınızda farkındalık sınavı veriyor.`;
+        summary = `${tSign} burcundaki Transit ${asp.transitPlanet}, ${nCore} karşıt açıyla aynalıyor; ${nArea} ekseninde ilişkisel ve içsel sınırlarınızı dengelemeniz için önemli bir farkındalık sunuyor.`;
         break;
       default:
-        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), Natal ${asp.natalPlanet} (${nSign} ${nDeg}°) ile ${asp.type} açısında (${nArea}).`;
+        summary = `Transit ${asp.transitPlanet} (${tSign} ${tDeg}°), ${nCore} (${nArea}) ile ${asp.type} etkileşiminde.`;
     }
 
     const badge = asp.orb <= 0.8 ? `★ Tam Pik (${asp.orb.toFixed(1)}°)` : `${asp.orb.toFixed(1)}° Orb`;
@@ -899,6 +1032,7 @@ export function generatePersonalTransitOverview(
       transitPlanet: asp.transitPlanet,
       transitSign: tSign,
       transitDegree: tDeg,
+      transitHouse: tHouse,
       natalPlanet: asp.natalPlanet,
       natalSign: nSign,
       natalDegree: nDeg,
@@ -909,7 +1043,10 @@ export function generatePersonalTransitOverview(
       isHarmonious,
       summary
     };
-  });
+  };
+
+  const allEnrichedAspects = validAspects.map(enrichAspect);
+  const topAspects = allEnrichedAspects.slice(0, 3);
 
   // Odak Yaşam Alanları (En çok transit gezegen alan evler)
   const houseCounts: Record<number, string[]> = {};
@@ -1005,13 +1142,12 @@ export function generatePersonalTransitOverview(
   const opportunities: string[] = [];
   const cautions: string[] = [];
 
-  const harmoniousAspects = topAspects.filter(a => a.isHarmonious);
-  const challengingAspects = topAspects.filter(a => !a.isHarmonious);
+  const harmoniousAspects = allEnrichedAspects.filter(a => a.isHarmonious).slice(0, 3);
+  const challengingAspects = allEnrichedAspects.filter(a => !a.isHarmonious).slice(0, 3);
 
   if (harmoniousAspects.length > 0) {
     harmoniousAspects.forEach(asp => {
-      const houseTopics = HOUSE_SHORT_THEMES[asp.natalHouse] || 'bu yaşam alanınız';
-      opportunities.push(`Transit ${asp.transitPlanet} (${asp.transitSign} ${asp.transitDegree}°) ➔ Natal ${asp.natalPlanet} (${asp.natalSign} ${asp.natalDegree}°): ${houseTopics} konularındaki potansiyellerinizi rahatlıkla açığa çıkarabilir, önünüze çıkan fırsatları değerlendirebilirsiniz.`);
+      opportunities.push(buildDynamicAspectOpportunity(asp));
     });
   } else {
     opportunities.push('Günün sakin enerjisi altında geçmiş planlarınızı gözden geçirmek ve içsel dinginliği güçlendirmek için elverişli bir zemin var.');
@@ -1019,8 +1155,7 @@ export function generatePersonalTransitOverview(
 
   if (challengingAspects.length > 0) {
     challengingAspects.forEach(asp => {
-      const houseTopics = HOUSE_SHORT_THEMES[asp.natalHouse] || 'bu yaşam alanınız';
-      cautions.push(`Transit ${asp.transitPlanet} (${asp.transitSign} ${asp.transitDegree}°) ➔ Natal ${asp.natalPlanet} (${asp.natalSign} ${asp.natalDegree}°): ${houseTopics} konularında fevri restleşmelerden ve acele kararlardan kaçının; sınırlarınızı koruyarak ilerleyin.`);
+      cautions.push(buildDynamicAspectCaution(asp));
     });
   } else {
     cautions.push('Aşırı rahatlığa kapılıp tamamlanması gereken sorumluluklarınızı ertelemekten kaçının.');
@@ -1030,8 +1165,8 @@ export function generatePersonalTransitOverview(
   const capitalizedPeakTopics = peakHouseTopics ? peakHouseTopics.charAt(0).toUpperCase() + peakHouseTopics.slice(1) : '';
   const lifeAdvice = peak
     ? (peak.isHarmonious 
-        ? `${capitalizedPeakTopics} konularında oluşan bereketli akışı cesaret ve şükranla karşılayın; ertelediğiniz adımları hayata geçirin.`
-        : `${capitalizedPeakTopics} konularında beliren sürtüşmeleri bir kriz değil, sizi daha sağlam ve olgun kılan bir basamak olarak görün.`)
+        ? `${capitalizedPeakTopics} konularında ${peak.transitPlanet}'in sunduğu bereketli akışı cesaret ve şükranla karşılayın; ertelediğiniz adımları hayata geçirin.`
+        : `${capitalizedPeakTopics} konularında ${peak.transitPlanet} etkisiyle beliren sürtüşmeleri bir kriz değil, sizi daha sağlam ve olgun kılan bir basamak olarak görün.`)
     : 'Haritanızdaki sakin akışı içsel dinlenme ve hedeflerinizi sadeleştirme fırsatı olarak değerlendirin.';
 
   return {
@@ -1050,4 +1185,3 @@ export function generatePersonalTransitOverview(
     lifeAdvice
   };
 }
-
