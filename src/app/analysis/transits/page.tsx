@@ -578,32 +578,24 @@ export default function TransitsPage() {
               return (
                 <div
                   key={attr.id}
-                  className={`rounded-xl p-2.5 sm:p-3 border transition-all space-y-1.5 ${
+                  className={`rounded-xl px-3 py-2.5 border transition-all flex items-center justify-between gap-2 ${
                     attr.isEsoteric
                       ? 'bg-gradient-to-r from-purple-950/35 via-black/60 to-amber-950/20 border-purple-500/30'
                       : 'bg-black/45 border-white/10'
                   }`}
                 >
-                  {/* Üst Satır: Başlık + Ufak Puan Göstergesi */}
-                  <div className="flex items-start justify-between gap-1.5">
-                    <span className="text-[11px] sm:text-xs font-bold text-white leading-tight">
-                      {attr.title}
-                    </span>
-                    <span
-                      className="text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0 tabular-nums leading-none"
-                      style={{
-                        color: barColor,
-                        backgroundColor: `${barColor}15`
-                      }}
-                    >
-                      {attr.score}/10
-                    </span>
-                  </div>
-
-                  {/* Alt Satır: İnsan Odaklı Rehber Notu */}
-                  <p className="text-[10px] font-normal text-white/65 leading-snug">
-                    {attr.subtitle}
-                  </p>
+                  <span className="text-[11px] sm:text-xs font-bold text-white leading-tight">
+                    {attr.title}
+                  </span>
+                  <span
+                    className="text-[10px] sm:text-xs font-extrabold px-1.5 py-0.5 rounded shrink-0 tabular-nums leading-none"
+                    style={{
+                      color: barColor,
+                      backgroundColor: `${barColor}15`
+                    }}
+                  >
+                    {attr.score}/10
+                  </span>
                 </div>
               );
             })}
@@ -887,6 +879,9 @@ export default function TransitsPage() {
                                   </p>
                                 </div>
 
+                                {/* Kozmik Frekans & Yetkinlik Barometresi */}
+                                {renderDetailedCosmicBarometer(currentSkyOverview.barometer, 'Kozmik Frekans & Yetkinlik Barometresi')}
+
                                 {/* Fırsatlar & Tuzaklar (Do / Don't) */}
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   {/* Fırsatlar */}
@@ -959,9 +954,6 @@ export default function TransitsPage() {
                                     </div>
                                   </div>
                                 )}
-
-                                {/* Kozmik Frekans & Yetkinlik Barometresi (Açıklamaların Altında) */}
-                                {renderDetailedCosmicBarometer(currentSkyOverview.barometer, 'Kozmik Frekans & Yetkinlik Barometresi')}
 
                                 {/* Detay Açıcı Buton */}
                                 <div className="pt-3 border-t border-white/10 flex justify-center">
@@ -1764,6 +1756,9 @@ export default function TransitsPage() {
                           </p>
                         </div>
 
+                        {/* Kişisel Enerji & Yetkinlik Barometresi */}
+                        {renderDetailedCosmicBarometer(personalOverview.barometer, 'Kişisel Enerji & Yetkinlik Barometresi')}
+
                         {/* Odak Yaşam Alanları */}
                         <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 sm:p-5 space-y-3">
                           <span className="text-[11px] font-extrabold uppercase tracking-wider text-sky-400 flex items-center gap-1.5">
@@ -1866,9 +1861,6 @@ export default function TransitsPage() {
                             </div>
                           </div>
                         )}
-
-                        {/* Kişisel Enerji & Yetkinlik Barometresi (Açıklamaların Altında) */}
-                        {renderDetailedCosmicBarometer(personalOverview.barometer, 'Kişisel Enerji & Yetkinlik Barometresi')}
 
                         {/* Alt Reçete / Bilgelik Notu */}
                         <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
