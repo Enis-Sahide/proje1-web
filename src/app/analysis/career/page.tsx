@@ -277,26 +277,34 @@ export default function CareerAnalysisPage() {
                 </div>
               </div>
 
-              <div>
-                <label className="text-xs font-semibold text-gray-300 mb-1.5 block">
+              <div className="pb-2">
+                <label className="text-xs font-semibold text-gray-300 mb-2 block">
                   Doğum Yeri (Şehir)
                 </label>
                 <LocationAutocomplete
                   defaultDisplay={birthCity ? `${birthCity.name}, ${birthCity.country}` : ''}
                   onSelect={(city) => setBirthCity(city)}
-                  placeholder="Doğduğunuz şehri yazın..."
+                  placeholder="Doğduğunuz şehri yazın (Örn: İstanbul)..."
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3.5 text-sm text-white focus:outline-none focus:border-[#EAB308] transition-colors"
                 />
+                <span className="text-[11px] text-gray-400 mt-2 block">
+                  {birthCity
+                    ? `✓ Seçilen Konum: ${birthCity.name}, ${birthCity.country}`
+                    : 'En az 3 harf yazarak açılan listeden doğduğunuz şehri seçiniz.'}
+                </span>
               </div>
 
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full min-h-[48px] bg-gradient-to-r from-[#EAB308] via-[#D4AF37] to-[#EAB308] hover:opacity-95 text-black font-extrabold text-sm sm:text-base py-3.5 sm:py-4 rounded-xl transition-all shadow-[0_0_30px_rgba(234,179,8,0.35)] flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
-              >
-                <Briefcase size={18} />
-                <span>Kariyer Raporumu Çıkar</span>
-                <ArrowRight size={16} />
-              </button>
+              <div className="pt-4 sm:pt-6">
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className="w-full min-h-[52px] bg-gradient-to-r from-[#EAB308] via-[#D4AF37] to-[#EAB308] hover:opacity-95 text-black font-extrabold text-sm sm:text-base py-3.5 sm:py-4 rounded-xl transition-all shadow-[0_0_30px_rgba(234,179,8,0.35)] flex items-center justify-center gap-2 cursor-pointer active:scale-[0.99]"
+                >
+                  <Briefcase size={18} />
+                  <span>Kariyer Raporumu Çıkar</span>
+                  <ArrowRight size={16} />
+                </button>
+              </div>
             </form>
           </div>
         )}
