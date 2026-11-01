@@ -198,16 +198,6 @@ export default function LunationDisplayCard({
                 <span>Etki: <strong className="text-white">{durationInfo.totalDuration}</strong></span>
                 {statusText && <span className="text-emerald-400 font-semibold">● {statusText}</span>}
               </div>
-              {liveLunarPhase && (
-                <div className="mt-2 inline-flex flex-wrap items-center gap-1.5 px-2.5 py-1 rounded-lg bg-sky-500/10 border border-sky-500/30 text-[11px] font-bold text-sky-300">
-                  <span>{liveLunarPhase.phaseIcon}</span>
-                  <span>
-                    Bugün: {liveLunarPhase.phaseName} (%{liveLunarPhase.illumination} Işık)
-                    {liveLunarPhase.moonSign ? ` • Ay ${liveLunarPhase.moonSign} ${liveLunarPhase.moonDegree ?? 0}°` : ''}
-                    {liveLunarPhase.moonHouse ? ` (${liveLunarPhase.moonHouse}. Evinizde)` : ''}
-                  </span>
-                </div>
-              )}
             </div>
           </div>
 
@@ -224,6 +214,16 @@ export default function LunationDisplayCard({
         {/* Açılır Faz Detay İçeriği */}
         {isLunarOpen && (
           <div className="p-5 sm:p-7 border-t border-white/10 space-y-6 animate-in fade-in duration-300">
+            {/* Süre Rozeti */}
+            <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-white/[0.02] border border-white/5 text-xs text-white/80">
+              <div className="flex items-center gap-1.5">
+                <Clock size={14} className="text-[#D4AF37]" />
+                <span>Etki Süresi: <strong className="text-white font-bold">{durationInfo.totalDuration}</strong></span>
+              </div>
+              <span>
+                Pik Noktası: <strong className="text-white/90">{durationInfo.peakWindow}</strong>
+              </span>
+            </div>
             {/* 🌗 3. KATMAN: BUGÜNÜN CANLI AY FAZI & ANLIK EV AKIŞI */}
             {liveLunarPhase && (
               <div className="p-4 sm:p-5 rounded-2xl bg-sky-950/25 border border-sky-500/30 space-y-2">
@@ -245,16 +245,6 @@ export default function LunationDisplayCard({
                 </p>
               </div>
             )}
-            {/* Süre Rozeti */}
-            <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-white/[0.02] border border-white/5 text-xs text-white/80">
-              <div className="flex items-center gap-1.5">
-                <Clock size={14} className="text-[#D4AF37]" />
-                <span>Etki Süresi: <strong className="text-white font-bold">{durationInfo.totalDuration}</strong></span>
-              </div>
-              <span>
-                Pik Noktası: <strong className="text-white/90">{durationInfo.peakWindow}</strong>
-              </span>
-            </div>
 
             {/* Kolektif / Genel Gökyüzü Teması (Sadece kolektif modda gösterilir; kişisel haritada doğrudan kişisel portal açılır) */}
             {(!natalHouses || !houseInterp) && (
@@ -275,21 +265,14 @@ export default function LunationDisplayCard({
             {natalHouses && houseInterp && (
               <div className="p-4 sm:p-6 rounded-3xl bg-gradient-to-b from-white/[0.04] to-white/[0.01] border border-[#D4AF37]/35 space-y-4 shadow-xl">
                 {/* Portal Başlığı */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
-                  <div>
-                    <span className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-widest flex items-center gap-1.5">
-                      <Compass size={14} /> {isSolar ? '☀️' : isLunar ? '🌑' : isFullMoon ? '🌕' : '🌑'} {event.sign} {event.phaseName} ({event.signSymbol} {event.degree}) — {durationInfo.totalDuration}lük Kişisel Harita Etkisi
-                    </span>
-                    <h5 className="text-base sm:text-lg font-black text-white mt-0.5">
-                      {houseInterp.portalName || houseInterp.title}
-                    </h5>
-                    <p className="text-[11px] text-amber-200/80 font-medium mt-0.5">
-                      Aktif {event.sign} {event.phaseName} süreci ({durationInfo.totalDuration} boyunca) doğum haritanızın {houseNumber}. evini aydınlatıyor:
-                    </p>
-                  </div>
-                  <span className="px-3 py-1 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] font-black text-xs self-start sm:self-auto shrink-0">
-                    {event.phaseName}: {houseNumber}. Evinizde
+                <div className="border-b border-white/10 pb-3">
+                  <span className="text-xs font-extrabold text-[#D4AF37] uppercase tracking-wider flex items-center gap-1.5">
+                    <span>{isSolar ? '☀️' : isLunar ? '🌑' : isFullMoon ? '🌕' : '🌑'}</span>
+                    <span>{event.sign} {event.phaseName} • {houseNumber}. Evinizde</span>
                   </span>
+                  <h5 className="text-base sm:text-lg font-black text-white mt-1">
+                    {(houseInterp.portalName || houseInterp.title).replace(/^\d+\.\s*Ev:\s*/i, '')}
+                  </h5>
                 </div>
 
                 {/* Portal Anlam Açıklaması */}
