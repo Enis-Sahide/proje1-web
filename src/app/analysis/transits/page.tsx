@@ -475,7 +475,7 @@ export default function TransitsPage() {
             </span>
           </div>
           <span className="text-[10px] text-white/45 font-medium">
-            7Layers Astrolojik & Ezoterik Frekans Sentezi
+            7Layers Kozmik Frekans Sentezi
           </span>
         </div>
 
@@ -604,7 +604,7 @@ export default function TransitsPage() {
         <div className="space-y-2.5">
           <div className="flex items-center justify-between">
             <span className="text-[11px] font-extrabold uppercase tracking-wider text-white/75">
-              10 Boyutlu Yaşam & Ezoterik Yetkinlik Pusulası
+              10 Boyutlu Yaşam & Yetkinlik Pusulası
             </span>
             <span className="text-[10px] text-white/40">
               1–10 Kademeli Anlık Rezonans
@@ -637,14 +637,9 @@ export default function TransitsPage() {
                         className="w-2 h-2 rounded-full shrink-0"
                         style={{ backgroundColor: barColor, boxShadow: `0 0 8px ${barColor}` }}
                       />
-                      <span className="text-xs sm:text-sm font-extrabold text-white truncate">
+                      <span className="text-xs sm:text-sm font-extrabold text-white">
                         {attr.title}
                       </span>
-                      {attr.isEsoteric && (
-                        <span className="text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 shrink-0">
-                          Ezoterik
-                        </span>
-                      )}
                     </div>
                     <span
                       className="text-xs font-black px-2 py-0.5 rounded-lg border shrink-0 tabular-nums"
