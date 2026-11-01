@@ -53,7 +53,12 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    const activeSolarEclipse = getActiveSolarEclipse(targetDate);
+    const rawSolarEclipse = getActiveSolarEclipse(targetDate);
+    const activeSolarEclipse = rawSolarEclipse ? {
+      ...rawSolarEclipse,
+      signInterpretation: SIGN_LUNATION_INTERPRETATIONS[rawSolarEclipse.event.sign]?.['solar_eclipse'] || null,
+      personal: null,
+    } : null;
     const signInterpretation = SIGN_LUNATION_INTERPRETATIONS[event.sign]?.[event.phase] || null;
 
     return json({
@@ -113,11 +118,12 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const activeSolarEclipse = getActiveSolarEclipse(targetDate);
+    const rawSolarEclipse = getActiveSolarEclipse(targetDate);
     const signInterpretation = SIGN_LUNATION_INTERPRETATIONS[event.sign]?.[event.phase] || null;
 
     // Kişisel Natal Ev Portalı Hesabı
     let personal = null;
+    let solarPersonal = null;
     if (Array.isArray(body.natalHouses) && body.natalHouses.length > 0) {
       const houseNumber = calculateLunationHouse(event.sign, body.natalHouses);
       const houseInterp = HOUSE_LUNATION_INTERPRETATIONS[houseNumber]?.[event.phase];
@@ -134,7 +140,29 @@ export async function POST(req: NextRequest) {
           advice: houseInterp.advice,
         };
       }
+      if (rawSolarEclipse) {
+        const sHouseNumber = calculateLunationHouse(rawSolarEclipse.event.sign, body.natalHouses);
+        const sHouseInterp = HOUSE_LUNATION_INTERPRETATIONS[sHouseNumber]?.['solar_eclipse'];
+        if (sHouseInterp) {
+          solarPersonal = {
+            houseNumber: sHouseNumber,
+            title: sHouseInterp.title,
+            portalName: sHouseInterp.portalName,
+            portalMeaning: sHouseInterp.portalMeaning,
+            shadowState: sHouseInterp.shadowState,
+            elevatedState: sHouseInterp.elevatedState,
+            spiritualAdvice: sHouseInterp.spiritualAdvice,
+            personalImpact: sHouseInterp.personalImpact,
+            advice: sHouseInterp.advice,
+          };
+        }
+      }
     }
+    const activeSolarEclipse = rawSolarEclipse ? {
+      ...rawSolarEclipse,
+      signInterpretation: SIGN_LUNATION_INTERPRETATIONS[rawSolarEclipse.event.sign]?.['solar_eclipse'] || null,
+      personal: solarPersonal,
+    } : null;
 
     return json({
       success: true,

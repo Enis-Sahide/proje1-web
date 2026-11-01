@@ -73,6 +73,17 @@ export default function LunationDisplayCard({
   const houseNumber = calculateLunationHouse(event.sign, natalHouses);
   const houseInterp = HOUSE_LUNATION_INTERPRETATIONS[houseNumber]?.[event.phase];
 
+  // 6 Aylık Güneş Tutulması Çatısı kolektif ve kişisel ev hesaplaması
+  const solarSignInterp = solarUmbrella
+    ? SIGN_LUNATION_INTERPRETATIONS[solarUmbrella.event.sign]?.['solar_eclipse']
+    : null;
+  const solarHouseNumber = solarUmbrella
+    ? calculateLunationHouse(solarUmbrella.event.sign, natalHouses)
+    : 1;
+  const solarHouseInterp = solarUmbrella && natalHouses
+    ? HOUSE_LUNATION_INTERPRETATIONS[solarHouseNumber]?.['solar_eclipse']
+    : null;
+
   // Renk ve Rozet Mantığı
   const isSolar = event.phase === 'solar_eclipse';
   const isLunar = event.phase === 'lunar_eclipse';
@@ -149,14 +160,96 @@ export default function LunationDisplayCard({
 
           {/* Açılır Detay İçeriği */}
           {isSolarOpen && (
-            <div className="p-4 sm:p-5 border-t border-amber-500/20 bg-black/60 space-y-3 animate-in fade-in duration-300">
-              <div className="flex items-center gap-2 text-xs font-mono text-amber-200/90 bg-amber-500/10 px-3 py-1.5 rounded-xl border border-amber-500/20 self-start">
-                <Clock size={13} className="text-amber-400 shrink-0" />
-                <span>{solarUmbrella.statusText}</span>
+            <div className="p-4 sm:p-6 border-t border-amber-500/20 bg-black/60 space-y-5 animate-in fade-in duration-300">
+              <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200/90">
+                <div className="flex items-center gap-1.5 font-mono">
+                  <Clock size={13} className="text-amber-400 shrink-0" />
+                  <span>{solarUmbrella.statusText}</span>
+                </div>
+                <span>
+                  Etki Süresi: <strong className="text-white">6 Ay</strong> • Pik: <strong className="text-white">±15 Gün</strong>
+                </span>
               </div>
-              <p className="text-xs sm:text-sm text-stone-200 leading-relaxed">
-                Bu 6 aylık kadersel çatı, kolektif ve bireysel düzeyde {solarUmbrella.event.sign} arketipinin yönettiği yaşam alanlarında köklü bir yeniden yapılanma ve inisiyasyon sürecini başlatmıştır. Günlük ve aylık tüm ay fazları bu ana güneş çatısının altında şekillenir.
-              </p>
+
+              {/* Kolektif Güneş Tutulması Enerjisi (Sadece genel modda gösterilir) */}
+              {(!natalHouses || !solarHouseInterp) && solarSignInterp && (
+                <div className="space-y-2">
+                  <h4 className="text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-2">
+                    <Sparkles size={16} /> Kolektif Gökyüzü Enerjisi: {solarSignInterp.title}
+                  </h4>
+                  <p className="text-sm text-white/85 leading-relaxed">
+                    {solarSignInterp.collective}
+                  </p>
+                </div>
+              )}
+
+              {/* Kişisel Harita Güneş Tutulması Portalı (Kişisel modda gösterilir) */}
+              {natalHouses && solarHouseInterp && (
+                <div className="p-4 sm:p-6 rounded-3xl bg-gradient-to-b from-amber-500/[0.06] to-white/[0.01] border border-amber-500/35 space-y-4 shadow-xl">
+                  <div className="border-b border-white/10 pb-3">
+                    <span className="text-xs font-extrabold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                      <span>☀️</span>
+                      <span>{solarUmbrella.event.sign} Güneş Tutulması • {solarHouseNumber}. Evinizde</span>
+                    </span>
+                    <h5 className="text-base sm:text-lg font-black text-white mt-1">
+                      {(solarHouseInterp.portalName || solarHouseInterp.title).replace(/^\d+\.\s*Ev:\s*/i, '')}
+                    </h5>
+                  </div>
+
+                  {solarHouseInterp.portalMeaning && (
+                    <p className="text-xs text-white/70 italic leading-relaxed">
+                      {solarHouseInterp.portalMeaning}
+                    </p>
+                  )}
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 pt-1">
+                    <div className="p-4 rounded-2xl bg-rose-950/20 border border-rose-500/30 space-y-2">
+                      <div className="flex items-center gap-2 text-rose-300 font-bold text-xs uppercase tracking-wider">
+                        <AlertTriangle size={15} className="text-rose-400 shrink-0" />
+                        <span>Alt Bilinç / Gölge Hali</span>
+                      </div>
+                      <p className="text-xs text-rose-100/85 leading-relaxed">
+                        {solarHouseInterp.shadowState || solarHouseInterp.personalImpact}
+                      </p>
+                      <span className="text-[10px] text-rose-300/60 block pt-1 italic">
+                        Ego, korku ve sınav seviyesinde günlük yaşam deneyimi
+                      </span>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-amber-950/20 border border-[#D4AF37]/40 space-y-2">
+                      <div className="flex items-center gap-2 text-amber-300 font-bold text-xs uppercase tracking-wider">
+                        <Crown size={15} className="text-[#D4AF37] shrink-0" />
+                        <span>Üst Bilinç / Ruhsal Boyut</span>
+                      </div>
+                      <p className="text-xs text-amber-100/90 leading-relaxed">
+                        {solarHouseInterp.elevatedState || solarHouseInterp.personalImpact}
+                      </p>
+                      <span className="text-[10px] text-amber-300/60 block pt-1 italic">
+                        7 çakra dengede ve arınmış bilinçle açılan inisiyasyon
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-3.5 sm:p-4 rounded-2xl bg-emerald-950/20 border border-emerald-500/30 flex items-start gap-2.5 text-xs text-emerald-100/90">
+                    <Leaf size={16} className="text-emerald-400 shrink-0 mt-0.5" />
+                    <div>
+                      <strong className="text-emerald-300 block mb-0.5">Çakra & Manevi Denge Reçetesi:</strong>
+                      <span className="leading-relaxed">{solarHouseInterp.spiritualAdvice || solarHouseInterp.advice}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Güneş Tutulması Ritüel Önerisi */}
+              {solarSignInterp?.ritual && (
+                <div className="p-4 rounded-2xl bg-white/[0.02] border border-white/5 flex items-start gap-3 text-xs text-white/70">
+                  <Flame size={16} className="text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-white block mb-0.5">Bu 6 Aylık Tutulma Döneminin Manevi Arınma & Ritüel Tavsiyesi:</strong>
+                    <span>{solarSignInterp.ritual}</span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </div>
