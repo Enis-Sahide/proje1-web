@@ -864,18 +864,14 @@ export default function TransitsPage() {
                                     </span>
                                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                                       {currentSkyOverview.topAspects.map((asp, idx) => (
-                                        <div key={idx} className="bg-white/[0.02] border border-white/10 rounded-xl p-2.5 space-y-1">
-                                          <div className="flex items-center justify-between text-xs font-bold">
-                                            <span className={asp.isHarmonious ? 'text-emerald-300' : 'text-amber-300'}>
-                                              {asp.p1} {asp.aspectType} {asp.p2}
-                                            </span>
-                                            <span className="text-[10px] text-stone-400 bg-white/5 px-1.5 py-0.5 rounded">
-                                              {asp.badge}
-                                            </span>
-                                          </div>
-                                          <p className="text-[11px] text-stone-300 leading-snug line-clamp-2">
+                                        <div key={idx} className="bg-white/[0.03] border border-white/10 rounded-xl p-3 flex flex-col justify-between gap-2">
+                                          <p className="text-xs text-white font-medium leading-relaxed">
                                             {asp.summary}
                                           </p>
+                                          <div className="flex items-center justify-between text-[10px] text-white/40 pt-1.5 border-t border-white/5">
+                                            <span>{asp.p1} • {asp.aspectType} • {asp.p2}</span>
+                                            <span>{asp.badge}</span>
+                                          </div>
                                         </div>
                                       ))}
                                     </div>
@@ -1743,30 +1739,48 @@ export default function TransitsPage() {
                         {/* Fırsatlar ve Sınavlar */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           {/* Fırsat Kapıları */}
-                          <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 sm:p-5 space-y-2.5">
+                          <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-2xl p-4 sm:p-5 space-y-3">
                             <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
                               <Sparkles size={14} /> 🌟 Bugün Sizin İçin Fırsatlar & Destekler
                             </span>
-                            <ul className="space-y-2">
+                            <ul className="space-y-3">
                               {personalOverview.opportunities.map((opp, idx) => (
-                                <li key={`opp-${idx}`} className="text-xs text-gray-200 leading-relaxed flex items-start gap-2">
-                                  <span className="text-emerald-400 shrink-0 mt-0.5">✓</span>
-                                  <span>{opp}</span>
+                                <li key={`opp-${idx}`} className="bg-black/30 border border-emerald-500/10 rounded-xl p-3 flex items-start gap-2.5">
+                                  <span className="text-emerald-400 font-bold shrink-0 mt-0.5">✓</span>
+                                  <div className="space-y-1">
+                                    <p className="text-xs sm:text-sm font-medium text-white leading-relaxed">
+                                      {opp.text}
+                                    </p>
+                                    {opp.astroTag && (
+                                      <span className="block text-[10px] text-white/35 font-normal">
+                                        {opp.astroTag}
+                                      </span>
+                                    )}
+                                  </div>
                                 </li>
                               ))}
                             </ul>
                           </div>
 
                           {/* Dikkat ve Sınırlar */}
-                          <div className="bg-rose-500/5 border border-rose-500/20 rounded-2xl p-4 sm:p-5 space-y-2.5">
+                          <div className="bg-rose-500/5 border border-rose-500/20 rounded-2xl p-4 sm:p-5 space-y-3">
                             <span className="text-xs font-bold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
                               <AlertCircle size={14} /> ⚠️ Dikkat Edilmesi Gereken Sınavlar
                             </span>
-                            <ul className="space-y-2">
+                            <ul className="space-y-3">
                               {personalOverview.cautions.map((cau, idx) => (
-                                <li key={`cau-${idx}`} className="text-xs text-gray-200 leading-relaxed flex items-start gap-2">
-                                  <span className="text-rose-400 shrink-0 mt-0.5">!</span>
-                                  <span>{cau}</span>
+                                <li key={`cau-${idx}`} className="bg-black/30 border border-rose-500/10 rounded-xl p-3 flex items-start gap-2.5">
+                                  <span className="text-rose-400 font-bold shrink-0 mt-0.5">!</span>
+                                  <div className="space-y-1">
+                                    <p className="text-xs sm:text-sm font-medium text-white leading-relaxed">
+                                      {cau.text}
+                                    </p>
+                                    {cau.astroTag && (
+                                      <span className="block text-[10px] text-white/35 font-normal">
+                                        {cau.astroTag}
+                                      </span>
+                                    )}
+                                  </div>
                                 </li>
                               ))}
                             </ul>
@@ -1777,36 +1791,23 @@ export default function TransitsPage() {
                         {personalOverview.topAspects.length > 0 && (
                           <div className="space-y-2.5">
                             <span className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
-                              <Zap size={14} className="text-[#0EA5E9]" /> En Etkin Kişisel Tetikleyiciler (Pik Transitler)
+                              <Zap size={14} className="text-[#0EA5E9]" /> Günün Öne Çıkan Kişisel Etkileri
                             </span>
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                               {personalOverview.topAspects.map((asp, idx) => (
                                 <div 
                                   key={`pa-${idx}`}
-                                  className="bg-black/50 border border-white/10 hover:border-cyan-500/30 rounded-2xl p-3.5 space-y-2 text-xs"
+                                  className="bg-black/50 border border-white/10 hover:border-cyan-500/30 rounded-2xl p-4 flex flex-col justify-between gap-2.5"
                                 >
-                                  <div className="flex items-center justify-between gap-1">
-                                    <span className="font-bold text-white flex items-center gap-1">
-                                      <span className="text-[#0EA5E9]">{PLANET_SYMBOLS[asp.transitPlanet] || '★'}</span>
-                                      <span>{asp.transitPlanet}</span>
-                                      <span className={`text-[10px] font-bold px-1.5 py-0.2 rounded ${asp.isHarmonious ? 'bg-emerald-500/20 text-emerald-400' : 'bg-rose-500/20 text-rose-400'}`}>
-                                        {asp.aspectType}
-                                      </span>
-                                      <span className="text-[#D4AF37]">{PLANET_SYMBOLS[asp.natalPlanet] || '★'}</span>
-                                      <span>{asp.natalPlanet}</span>
-                                    </span>
-                                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-cyan-500/15 text-cyan-300 border border-cyan-500/25 shrink-0">
-                                      {asp.badge}
-                                    </span>
-                                  </div>
-                                  <div className="text-[10px] text-gray-400 flex items-center justify-between border-t border-white/5 pt-1.5">
-                                    <span>T: {asp.transitSign} {asp.transitDegree}°</span>
-                                    <span>➔</span>
-                                    <span>N: {asp.natalSign} {asp.natalDegree}° ({LIFE_AREA_NAMES[asp.natalHouse] || `${asp.natalHouse}. Ev`})</span>
-                                  </div>
-                                  <p className="text-[11px] text-gray-300 leading-snug">
+                                  <p className="text-xs sm:text-sm text-white font-medium leading-relaxed">
                                     {asp.summary}
                                   </p>
+                                  <div className="pt-2 border-t border-white/5 flex flex-wrap items-center justify-between gap-1 text-[10px] text-white/40">
+                                    <span>
+                                      {PLANET_SYMBOLS[asp.transitPlanet] || ''} {asp.transitPlanet} ({asp.transitSign} {asp.transitDegree}°) • {asp.aspectType} • {PLANET_SYMBOLS[asp.natalPlanet] || ''} {asp.natalPlanet}
+                                    </span>
+                                    <span className="text-white/35">{asp.badge}</span>
+                                  </div>
                                 </div>
                               ))}
                             </div>
