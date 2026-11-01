@@ -644,32 +644,185 @@ export function generateUnifiedSkyPlanets(
 }
 
 export interface CosmicCoreEnergyItem {
-  code: 'FİZ' | 'DUY' | 'ENT' | 'RUH';
+  code: string;
   label: string;
+  statusText: string;
   score: number; // 1 - 100
   trend: 'up' | 'down';
   colorHex: string;
 }
 
 export interface CosmicAttributeGauge {
-  id: 'influence' | 'defense' | 'mobility' | 'progress' | 'cognition' | 'endurance' | 'diplomacy' | 'luck';
-  titleTop: string;
-  titleBottom: string;
+  id: 'influence' | 'defense' | 'mobility' | 'progress' | 'cognition' | 'endurance' | 'diplomacy' | 'luck' | 'manifestation' | 'healing';
+  title: string;
+  astroDrivers: string;
   score: number; // 1 - 10
   percent: number; // 10 - 100
   subtitle: string;
+  isEsoteric?: boolean;
+}
+
+export interface EsotericSkySignature {
+  lunarPhase: {
+    phaseName: string;
+    illumination: number;
+    phaseIcon: string;
+    esotericSecret: string;
+  };
+  elementBalance: {
+    firePct: number;
+    earthPct: number;
+    airPct: number;
+    waterPct: number;
+    dominantLabel: string;
+    lackingAdvice: string;
+  };
+  chakraResonance: {
+    chakraName: string;
+    sephirahName: string;
+    activePlanet: string;
+    guidance: string;
+  };
 }
 
 export interface DetailedCosmicBarometer {
   mental: { score: number; label: string; tone: string };
   emotional: { score: number; label: string; tone: string };
   action: { score: number; label: string; tone: string };
+  esotericSignature: EsotericSkySignature;
   coreEnergies: CosmicCoreEnergyItem[];
   attributes: CosmicAttributeGauge[];
 }
 
 function clampNum(val: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, val));
+}
+
+const CHAKRA_SEPHIRAH_MAP: Record<string, { chakra: string; sephirah: string; guidance: string }> = {
+  'Güneş': {
+    chakra: 'Kalp & Güneş Sinirağı Çakrası',
+    sephirah: 'Tiferet (Güzellik, Öz Benlik & İrade Dengesi)',
+    guidance: 'Merkezinizde kalın; içsel ışığınızı egoya kapılmadan cömertçe ortaya koyun.'
+  },
+  'Ay': {
+    chakra: 'Sakral & Üçüncü Göz Çakrası',
+    sephirah: 'Yesod (Temel, Astral Hafıza & Sezgisel Akış)',
+    guidance: 'Rüyalarınıza, bedeninizin verdiği sinyallere ve ilk sezgilerinize güvenin.'
+  },
+  'Merkür': {
+    chakra: 'Boğaz Çakrası (Vishuddha)',
+    sephirah: 'Hod (İhtişam, Zihinsel İdrak & Sözün Büyüsü)',
+    guidance: 'Ağzınızdan çıkan her sözün bir niyet mührü olduğunu bilerek berrak konuşun.'
+  },
+  'Venüs': {
+    chakra: 'Kalp Çakrası (Anahata)',
+    sephirah: 'Netzach (Zafer, Sevgi Frekansı & Estetik Uyum)',
+    guidance: 'Zorlamak yerine çekim gücünüzü, nezaketi ve şükran frekansını devreye sokun.'
+  },
+  'Mars': {
+    chakra: 'Güneş Sinirağı (Manipura)',
+    sephirah: 'Gevurah (Kudret, Kutsal Sınırlar & Cesaret)',
+    guidance: 'Enerjinizi öfkeyle dağıtmak yerine tek bir hedefe odaklayıp sınırlarınızı koruyun.'
+  },
+  'Jüpiter': {
+    chakra: 'Taç & Kalp Çakrası',
+    sephirah: 'Chesed (Merhamet, Bereket & İlahi Genişleme)',
+    guidance: 'Bolluk bilincinde kalın; vizyonunuzu dar kalıpların ötesine taşıyın.'
+  },
+  'Satürn': {
+    chakra: 'Kök Çakra (Muladhara)',
+    sephirah: 'Binah (Anlayış, Zamanın Bilgeliği & Yapılandırma)',
+    guidance: 'Sabır ve öz disiplin bugün en büyük ruhsal koruyucunuzdur; temeli sağlam tutun.'
+  },
+  'Uranüs': {
+    chakra: 'Taç Çakra (Sahasrara)',
+    sephirah: 'Chokmah (Yüksek Hikmet, Ani Uyanış & Özgürleşme)',
+    guidance: 'Eski kalıplarda ısrar etmeyin; aniden gelen ilham ve değişim çağrısına alan açın.'
+  },
+  'Neptün': {
+    chakra: 'Üçüncü Göz & Taç Çakra (Ajna)',
+    sephirah: 'Keter (Birlik Bilinci, Koşulsuz Şefkat & İlham)',
+    guidance: 'Zihinsel kontrolü biraz gevşetin; tefekkür, dua ve sanatsal akışla bütünleşin.'
+  },
+  'Plüton': {
+    chakra: 'Kök & Sakral Çakra',
+    sephirah: 'Da'at (Gizli Bilgi, Küllerinden Doğuş & Simya)',
+    guidance: 'Miadını doldurmuş korkuları ve kontrol takıntısını bırakarak gerçek gücünüze uyanın.'
+  },
+  'Kiron': {
+    chakra: 'Kalp & Boğaz Çakrası',
+    sephirah: 'Ruhsal Şifa Köprüsü (Yarayı Bilgeliğe Dönüştürme)',
+    guidance: 'Kendi kırılganlığınızı kabul etmek, bugün hem sizi hem çevrenizi şifalandırır.'
+  },
+  'Kuzey Ay Düğümü': {
+    chakra: 'Üçüncü Göz & Kalp Çakrası',
+    sephirah: 'Tekamül Yolu (Ruhsal Kader Pusulası)',
+    guidance: 'Alışkın olduğunuz konfor alanından çıkıp ruhunuzu büyüten yeni deneyime adım atın.'
+  }
+};
+
+function calculateLunarPhaseSignature(sunLon: number, moonLon: number): EsotericSkySignature['lunarPhase'] {
+  const diff = ((moonLon - sunLon) % 360 + 360) % 360;
+  const rad = (diff * Math.PI) / 180;
+  const illumination = Math.round(((1 - Math.cos(rad)) / 2) * 100);
+
+  if (diff < 22.5 || diff >= 337.5) {
+    return {
+      phaseName: 'Yeniay Evresi',
+      illumination,
+      phaseIcon: '🌑',
+      esotericSecret: 'Tohum ekme, saf niyet belirleme ve içsel sessizlikte yeni döngüyü başlatma zamanı.'
+    };
+  } else if (diff < 67.5) {
+    return {
+      phaseName: 'Büyüyen Hilal',
+      illumination,
+      phaseIcon: '🌒',
+      esotericSecret: 'Niyetlerinizi somut adımlarla besleme, tereddütleri aşma ve ivme kazanma evresi.'
+    };
+  } else if (diff < 112.5) {
+    return {
+      phaseName: 'İlk Dördün Eşiği',
+      illumination,
+      phaseIcon: '🌓',
+      esotericSecret: 'Kararlılık sınavı; karşılaşılan ilk engelleri irade ve net seçimlerle aşma zamanı.'
+    };
+  } else if (diff < 157.5) {
+    return {
+      phaseName: 'Büyüyen Ay (Gibbus)',
+      illumination,
+      phaseIcon: '🌔',
+      esotericSecret: 'Detayları mükemmelleştirme, sabırla olgunlaştırma ve zirveye hazırlanma evresi.'
+    };
+  } else if (diff < 202.5) {
+    return {
+      phaseName: 'Dolunay Zirvesi',
+      illumination,
+      phaseIcon: '🌕',
+      esotericSecret: 'Gizli olanın görünür olması, duygusal/ruhsal tamamlanma ve yüksek farkındalık ışığı.'
+    };
+  } else if (diff < 247.5) {
+    return {
+      phaseName: 'Küçülen (Dağıtan) Ay',
+      illumination,
+      phaseIcon: '🌖',
+      esotericSecret: 'Kazanılan deneyimi paylaşma, şükran duyma ve fazlalıkları sadeleştirme zamanı.'
+    };
+  } else if (diff < 292.5) {
+    return {
+      phaseName: 'Son Dördün Dönemeçi',
+      illumination,
+      phaseIcon: '🌗',
+      esotericSecret: 'İçsel muhasebe; artık ruhunuza hizmet etmeyen alışkanlıkları ve yükleri çözme evresi.'
+    };
+  } else {
+    return {
+      phaseName: 'Balsamik (Karanlık) Ay',
+      illumination,
+      phaseIcon: '🌘',
+      esotericSecret: 'Derin arınma, dinlenme, affetme ve yeni doğuş öncesi ruhsal detoks zamanı.'
+    };
+  }
 }
 
 function buildDetailedCosmicBarometer(
@@ -689,6 +842,8 @@ function buildDetailedCosmicBarometer(
   const uranus = getPlanet('Uranüs');
   const neptune = getPlanet('Neptün');
   const pluto = getPlanet('Plüton');
+  const chiron = getPlanet('Kiron');
+  const northNode = getPlanet('Kuzey Ay Düğümü');
 
   const FIRE_SIGNS = ['Koç', 'Aslan', 'Yay'];
   const EARTH_SIGNS = ['Boğa', 'Başak', 'Oğlak'];
@@ -699,7 +854,41 @@ function buildDetailedCosmicBarometer(
   const FIXED_SIGNS = ['Boğa', 'Aslan', 'Akrep', 'Kova'];
   const MUTABLE_SIGNS = ['İkizler', 'Başak', 'Yay', 'Balık'];
 
-  // Continuous astronomical harmonic wave from exact longitudes (ensures hourly/daily responsiveness)
+  // 1. Calculate Authentic Weighted Element Balance
+  let fireWeight = 0;
+  let earthWeight = 0;
+  let airWeight = 0;
+  let waterWeight = 0;
+
+  for (const p of planets) {
+    const w = (p.name === 'Güneş' || p.name === 'Ay') ? 2.2
+      : ['Merkür', 'Venüs', 'Mars'].includes(p.name) ? 1.5
+      : ['Jüpiter', 'Satürn'].includes(p.name) ? 1.2
+      : ['Uranüs', 'Neptün', 'Plüton'].includes(p.name) ? 1.0 : 0.6;
+
+    if (FIRE_SIGNS.includes(p.sign)) fireWeight += w;
+    else if (EARTH_SIGNS.includes(p.sign)) earthWeight += w;
+    else if (AIR_SIGNS.includes(p.sign)) airWeight += w;
+    else if (WATER_SIGNS.includes(p.sign)) waterWeight += w;
+  }
+
+  const totalElemWeight = Math.max(1, fireWeight + earthWeight + airWeight + waterWeight);
+  const firePct = Math.round((fireWeight / totalElemWeight) * 100);
+  const earthPct = Math.round((earthWeight / totalElemWeight) * 100);
+  const airPct = Math.round((airWeight / totalElemWeight) * 100);
+  const waterPct = Math.max(0, 100 - (firePct + earthPct + airPct));
+
+  const elemArr = [
+    { name: 'Ateş', pct: firePct, dom: 'Ateş Baskın: Cesaret, vizyon ve yaratıcı kıvılcım yüksek.', lack: 'Ateş Düşük: Motivasyon düşüklüğüne karşı bedeninizi hareketlendirin ve güneşe çıkın.' },
+    { name: 'Toprak', pct: earthPct, dom: 'Toprak Baskın: Somut üretim, sabır ve gerçekçi inşa enerjisi hakim.', lack: 'Toprak Düşük: Zihinsel/duygusal dağılmaya karşı yarım işleri bitirin ve topraklanın.' },
+    { name: 'Hava', pct: airPct, dom: 'Hava Baskın: İletişim, fikir alışverişi ve zihinsel hız ön planda.', lack: 'Hava Düşük: Sabit fikirliliğe kapılmamak için farklı bakış açılarını dinleyin.' },
+    { name: 'Su', pct: waterPct, dom: 'Su Baskın: Empati, rüyalar, derin sezgi ve ruhsal duyarlılık güçlü.', lack: 'Su Düşük: Aşırı mantık ve katılığa karşı kalbinizi ve şefkati devreye sokun.' }
+  ].sort((a, b) => b.pct - a.pct);
+
+  const dominantElem = elemArr[0];
+  const lackingElem = elemArr[elemArr.length - 1];
+
+  // Continuous astronomical harmonic wave from exact longitudes
   const sunLon = sun?.longitude ?? 0;
   const moonLon = moon?.longitude ?? 90;
   const marsLon = mars?.longitude ?? 180;
@@ -708,9 +897,18 @@ function buildDetailedCosmicBarometer(
   const jupLon = jupiter?.longitude ?? 240;
   const satLon = saturn?.longitude ?? 300;
   const nepLon = neptune?.longitude ?? 330;
+  const pluLon = pluto?.longitude ?? 290;
+  const chiLon = chiron?.longitude ?? 20;
+  const nodeLon = northNode?.longitude ?? 10;
 
   const degToRad = (d: number) => (d * Math.PI) / 180;
   const lunarPhaseAngle = ((moonLon - sunLon) % 360 + 360) % 360;
+  const lunarPhase = calculateLunarPhaseSignature(sunLon, moonLon);
+
+  // Active Chakra & Sephirah from the tightest aspect's leading planet (or Moon)
+  const sortedByOrb = [...aspects].sort((a, b) => a.orb - b.orb);
+  const leadPlanetName = sortedByOrb[0]?.p1 || moon?.name || 'Güneş';
+  const chakraMeta = CHAKRA_SEPHIRAH_MAP[leadPlanetName] || CHAKRA_SEPHIRAH_MAP['Güneş'];
 
   // Base continuous waves (-12 to +12) based on exact degrees & minutes
   const physWave = Math.sin(degToRad(moonLon * 2 + marsLon)) * 11 + Math.cos(degToRad(lunarPhaseAngle)) * 7;
@@ -722,7 +920,7 @@ function buildDetailedCosmicBarometer(
   let fizRaw = 56 + physWave;
   let duyRaw = 54 + emoWave;
   let entRaw = 58 + entWave;
-  let ruhRaw = 48 + spirWave;
+  let ruhRaw = 50 + spirWave;
 
   let fizTrendDelta = 0;
   let duyTrendDelta = 0;
@@ -758,20 +956,23 @@ function buildDetailedCosmicBarometer(
     if ([8, 9, 12].includes(mHouse)) { ruhRaw += 16; ruhTrendDelta += 3; }
   }
 
-  // 8 Detailed Attribute Raw Scores (Base around 52 on 0-100 scale, mapped to 1-10)
-  let attrInfluence = 54 + Math.sin(degToRad(sunLon * 2 + marsLon)) * 8;      // Etki & Nüfuz
-  let attrDefense = 53 + Math.cos(degToRad(satLon * 2 + marsLon)) * 8;        // Savunma & Direnç
-  let attrMobility = 55 + Math.sin(degToRad(moonLon * 2 + mercLon)) * 9;      // Hareketlilik & Esneklik
-  let attrProgress = 54 + Math.cos(degToRad(jupLon * 2 + sunLon)) * 8;        // Erişim & İlerleme
-  let attrCognition = 56 + Math.sin(degToRad(mercLon * 2 + satLon)) * 8;      // Biliş & Tefekkür
-  let attrEndurance = 55 + Math.cos(degToRad(satLon * 2 + sunLon)) * 7;       // Dayanıklılık & Güvenilirlik
-  let attrDiplomacy = 54 + Math.sin(degToRad(venLon * 2 + mercLon)) * 9;      // İletişim & Diplomasi
-  let attrLuck = 52 + Math.cos(degToRad(jupLon * 2 + venLon)) * 10;           // Şans & Rahatlık
+  // 10 Detailed Attribute Raw Scores (Base around 52-55 on 0-100 scale, mapped to 1-10)
+  let attrInfluence = 54 + Math.sin(degToRad(sunLon * 2 + marsLon)) * 8;         // 1. Özgüven & Duruş
+  let attrDefense = 53 + Math.cos(degToRad(satLon * 2 + marsLon)) * 8;           // 2. Enerji Kalkanı & Sınırlar
+  let attrMobility = 55 + Math.sin(degToRad(moonLon * 2 + mercLon)) * 9;         // 3. Değişime & Akışa Uyum
+  let attrProgress = 54 + Math.cos(degToRad(jupLon * 2 + sunLon)) * 8;           // 4. Hedef & Somut Sonuç
+  let attrCognition = 56 + Math.sin(degToRad(mercLon * 2 + satLon)) * 8;         // 5. Derin Kavrayış & Hikmet
+  let attrEndurance = 55 + Math.cos(degToRad(satLon * 2 + sunLon)) * 7;          // 6. Sabır & Uzun Vadeli İstikrar
+  let attrDiplomacy = 54 + Math.sin(degToRad(venLon * 2 + mercLon)) * 9;         // 7. Sosyal Ahenk & İkna
+  let attrLuck = 52 + Math.cos(degToRad(jupLon * 2 + venLon)) * 10;              // 8. Bereket & Doğal Kısmet
+  let attrManifest = 54 + Math.sin(degToRad(nodeLon * 2 + pluLon + sunLon)) * 10;// 9. Kadersel Çekim & Tezahür (Esoteric)
+  let attrHealing = 53 + Math.cos(degToRad(chiLon * 2 + nepLon + moonLon)) * 10; // 10. Ruhsal Şifa & Arınma (Esoteric)
 
-  // Modality & Sign adjustments to 8 attributes
+  // Modality & Sign adjustments
   if (CARDINAL_SIGNS.includes(moonSign) || CARDINAL_SIGNS.includes(sunSign)) {
     attrInfluence += 6;
     attrProgress += 7;
+    attrManifest += 5;
   }
   if (FIXED_SIGNS.includes(moonSign) || FIXED_SIGNS.includes(sunSign)) {
     attrDefense += 8;
@@ -781,6 +982,7 @@ function buildDetailedCosmicBarometer(
   if (MUTABLE_SIGNS.includes(moonSign) || MUTABLE_SIGNS.includes(mercSign)) {
     attrMobility += 11;
     attrCognition += 6;
+    attrHealing += 5;
   }
   if (EARTH_SIGNS.includes(moonSign)) {
     attrEndurance += 8;
@@ -789,11 +991,15 @@ function buildDetailedCosmicBarometer(
   if (AIR_SIGNS.includes(moonSign) || venLon % 30 > 15) {
     attrDiplomacy += 7;
   }
+  if (WATER_SIGNS.includes(moonSign)) {
+    attrHealing += 10;
+    attrManifest += 6;
+  }
 
   // Continuous Aspect Contributions (Orb-weighted!)
   for (const asp of aspects) {
     if (asp.orb > 4.5) continue;
-    const weight = Math.pow(Math.max(0, (4.5 - asp.orb) / 4.5), 1.15); // 0.0 to 1.0 smooth curve
+    const weight = Math.pow(Math.max(0, (4.5 - asp.orb) / 4.5), 1.15);
     const sign = asp.isHarmonious ? 1 : -1;
     const pair = [asp.p1, asp.p2];
     const has = (names: string[]) => names.some(n => pair.includes(n));
@@ -812,81 +1018,86 @@ function buildDetailedCosmicBarometer(
       entTrendDelta += sign * 2.5 * weight;
     }
     if (has(['Neptün', 'Plüton', 'Kiron', 'Kuzey Ay Düğümü', 'Ay'])) {
-      ruhRaw += (asp.isHarmonious ? 15 : 6) * weight; // Even hard spiritual aspects deepen spiritual awareness, though trines lift it higher
+      ruhRaw += (asp.isHarmonious ? 15 : 6) * weight;
       ruhTrendDelta += (asp.isHarmonious ? 3 : -1.5) * weight;
     }
 
-    // 1. Etki & Nüfuz (Güneş, Plüton, Mars, Jüpiter, Tepe Noktası, Yükselen)
+    // 1. Özgüven & Duruş
     if (has(['Güneş', 'Plüton', 'Mars', 'Jüpiter', 'Tepe Noktası (MC)', 'Yükselen (ASC)'])) {
       attrInfluence += (asp.isHarmonious ? 12 : (asp.aspectType === 'Kavuşum' ? 9 : -6)) * weight;
     }
-
-    // 2. Savunma & Direnç (Satürn, Mars, Plüton, Kiron)
+    // 2. Enerji Kalkanı & Sınırlar
     if (has(['Satürn', 'Mars', 'Plüton', 'Kiron'])) {
       attrDefense += (asp.isHarmonious ? 11 : 4) * weight;
     }
-
-    // 3. Hareketlilik & Esneklik (Merkür, Uranüs, Ay, Mars)
+    // 3. Değişime & Akışa Uyum
     if (has(['Merkür', 'Uranüs', 'Ay', 'Mars'])) {
       attrMobility += (asp.isHarmonious ? 12 : -8) * weight;
     }
-
-    // 4. Erişim & İlerleme (Jüpiter, Mars, Güneş, Kuzey Ay Düğümü)
+    // 4. Hedef & Somut Sonuç
     if (has(['Jüpiter', 'Mars', 'Güneş', 'Kuzey Ay Düğümü', 'Tepe Noktası (MC)'])) {
       attrProgress += (asp.isHarmonious ? 13 : -8) * weight;
     }
-
-    // 5. Biliş & Tefekkür (Merkür, Satürn, Neptün, Uranüs, Kiron)
+    // 5. Derin Kavrayış & Hikmet
     if (has(['Merkür', 'Satürn', 'Neptün', 'Uranüs', 'Kiron'])) {
       attrCognition += (asp.isHarmonious ? 12 : (pair.includes('Satürn') ? 5 : -7)) * weight;
     }
-
-    // 6. Dayanıklılık & Güvenilirlik (Satürn, Güneş, Venüs, Mars)
+    // 6. Sabır & Uzun Vadeli İstikrar
     if (has(['Satürn', 'Güneş', 'Venüs', 'Mars'])) {
       attrEndurance += (asp.isHarmonious ? 12 : (pair.includes('Uranüs') ? -10 : -5)) * weight;
     }
-
-    // 7. İletişim & Diplomasi (Venüs, Merkür, Jüpiter, Ay)
+    // 7. Sosyal Ahenk & İkna
     if (has(['Venüs', 'Merkür', 'Jüpiter', 'Ay'])) {
       attrDiplomacy += (asp.isHarmonious ? 14 : -10) * weight;
     }
-
-    // 8. Şans & Rahatlık (Jüpiter, Venüs, Şans Noktası (POF), Güneş, Ay)
+    // 8. Bereket & Doğal Kısmet
     if (has(['Jüpiter', 'Venüs', 'Şans Noktası (POF)', 'Güneş', 'Ay'])) {
       attrLuck += (asp.isHarmonious ? 15 : -11) * weight;
     }
+    // 9. Kadersel Çekim & Tezahür (Kuzey Ay Düğümü, Vertex, Plüton, Jüpiter)
+    if (has(['Kuzey Ay Düğümü', 'Vertex (Vx)', 'Plüton', 'Jüpiter', 'Şans Noktası (POF)'])) {
+      attrManifest += (asp.isHarmonious ? 15 : (asp.aspectType === 'Kavuşum' ? 12 : -5)) * weight;
+    }
+    // 10. Ruhsal Şifa & Arınma (Kiron, Neptün, Lilith, Ay, Plüton)
+    if (has(['Kiron', 'Neptün', 'Lilith', 'Ay', 'Venüs'])) {
+      attrHealing += (asp.isHarmonious ? 14 : (pair.includes('Kiron') ? 7 : -6)) * weight;
+    }
   }
 
-  const fizScore = Math.round(clampNum(fizRaw, 12, 99));
-  const duyScore = Math.round(clampNum(duyRaw, 10, 98));
-  const entScore = Math.round(clampNum(entRaw, 15, 98));
-  const ruhScore = Math.round(clampNum(ruhRaw, 8, 99));
+  const fizScore = Math.round(clampNum(fizRaw, 15, 98));
+  const duyScore = Math.round(clampNum(duyRaw, 14, 98));
+  const entScore = Math.round(clampNum(entRaw, 18, 98));
+  const ruhScore = Math.round(clampNum(ruhRaw, 16, 99));
 
   const coreEnergies: CosmicCoreEnergyItem[] = [
     {
-      code: 'FİZ',
-      label: 'Fiziksel & Eylem',
+      code: 'EYLEM',
+      label: 'Yaşam Gücü & Eylem',
+      statusText: fizScore >= 75 ? 'Yüksek Canlılık & Cesaret' : fizScore >= 50 ? 'Dengeli Fiziksel Tempo' : 'Bedeninizi Dinlendirin',
       score: fizScore,
       trend: fizTrendDelta >= 0 ? 'up' : 'down',
-      colorHex: '#EF4444'
+      colorHex: '#F97316'
     },
     {
-      code: 'DUY',
-      label: 'Duygusal Akış',
+      code: 'KALP',
+      label: 'Kalp & Duygu Dengesi',
+      statusText: duyScore >= 75 ? 'Akıcı, Şefkatli & Huzurlu' : duyScore >= 50 ? 'Sakin & Gözlemci Akış' : 'Alınganlığa Dikkat',
       score: duyScore,
       trend: duyTrendDelta >= 0 ? 'up' : 'down',
-      colorHex: '#22C55E'
+      colorHex: '#10B981'
     },
     {
-      code: 'ENT',
-      label: 'Entelektüel Odak',
+      code: 'ZİHİN',
+      label: 'Zihinsel Berraklık',
+      statusText: entScore >= 75 ? 'Keskin Analiz & Net Karar' : entScore >= 50 ? 'Stratejik & Ölçülü Odak' : 'Zihinsel Yükü Azaltın',
       score: entScore,
       trend: entTrendDelta >= 0 ? 'up' : 'down',
-      colorHex: '#38BDF8'
+      colorHex: '#0EA5E9'
     },
     {
-      code: 'RUH',
-      label: 'Ruhsal Sezgi',
+      code: 'SEZGİ',
+      label: 'Ruhsal Uyanış & Sezgi',
+      statusText: ruhScore >= 75 ? 'Güçlü Eşzamanlılık & İlhâm' : ruhScore >= 50 ? 'İç Sese & İşaretlere Açık' : 'Topraklanma & Merkezlenme',
       score: ruhScore,
       trend: ruhTrendDelta >= 0 ? 'up' : 'down',
       colorHex: '#A855F7'
@@ -895,35 +1106,39 @@ function buildDetailedCosmicBarometer(
 
   const toGauge = (
     id: CosmicAttributeGauge['id'],
-    titleTop: string,
-    titleBottom: string,
+    title: string,
+    astroDrivers: string,
     rawVal: number,
     highSub: string,
     midSub: string,
-    lowSub: string
+    lowSub: string,
+    isEsoteric = false
   ): CosmicAttributeGauge => {
     const pct = Math.round(clampNum(rawVal, 18, 96));
     const score10 = clampNum(Math.round(pct / 10), 2, 10);
     const subtitle = score10 >= 8 ? highSub : score10 >= 6 ? midSub : lowSub;
     return {
       id,
-      titleTop,
-      titleBottom,
+      title,
+      astroDrivers,
       score: score10,
       percent: pct,
-      subtitle
+      subtitle,
+      isEsoteric
     };
   };
 
   const attributes: CosmicAttributeGauge[] = [
-    toGauge('influence', 'ETKİ', 'NÜFUZ', attrInfluence, 'Güçlü İrade & Karizma', 'Dengeli Duruş', 'Gözlemde Kalın'),
-    toGauge('defense', 'SAVUNMA', 'DİRENÇ', attrDefense, 'Sağlam Sınır & Kalkan', 'Kontrollü Koruma', 'Hassas Sınırlar'),
-    toGauge('mobility', 'HAREKETLİLİK', 'ESNEKLİK', attrMobility, 'Çevik & Hızlı Uyum', 'Esnek Akış', 'Sabit & Ağır Tempo'),
-    toGauge('progress', 'ERİŞİM', 'İLERLEME', attrProgress, 'Hedefe Doğrudan Atılım', 'Adım Adım İlerleme', 'Hazırlık Evresi'),
-    toGauge('cognition', 'BİLİŞ', 'TEFEKKÜR', attrCognition, 'Derin Analiz & İdrak', 'Berrak Düşünce', 'Zihni Dinlendirin'),
-    toGauge('endurance', 'DAYANIKLILIK', 'GÜVENİLİRLİK', attrEndurance, 'Sarsılmaz İstikrar', 'Sabırlı & Kararlı', 'Enerjiyi Koruyun'),
-    toGauge('diplomacy', 'İLETİŞİM', 'DİPLOMASİ', attrDiplomacy, 'Yüksek İkna & Uyum', 'Yapıcı Diyalog', 'Yanlış Anlaşılma Riski'),
-    toGauge('luck', 'ŞANS', 'RAHATLIK', attrLuck, 'Açık Kısmet & Akış', 'Dengeli Fırsatlar', 'Emek & Sabır İster')
+    toGauge('influence', 'Özgüven & Duruş', 'Güneş • Mars • Plüton', attrInfluence, 'Güçlü İrade & Doğal Karizma', 'Dengeli & Net Duruş', 'Geri Planda Gözlem Zamanı'),
+    toGauge('defense', 'Enerji Kalkanı & Sınırlar', 'Satürn • Mars • Kiron', attrDefense, 'Sağlam Ruhsal Sınırlar', 'Kontrollü Alan Koruma', 'Aurayı Yoran Ortamlardan Kaçının'),
+    toGauge('mobility', 'Değişime & Akışa Uyum', 'Merkür • Uranüs • Ay', attrMobility, 'Çevik & Esnek Manevra Gücü', 'Uyumlu & Dengeli Tempo', 'Acele Etmeden Sabit İlerleyin'),
+    toGauge('progress', 'Hedef & Somut Sonuç', 'Jüpiter • Mars • Güneş', attrProgress, 'İş Bitirme & Doğrudan Atılım', 'Adım Adım Kararlı İlerleme', 'Yeni Atılım Yerine Hazırlık Evresi'),
+    toGauge('cognition', 'Derin Kavrayış & Hikmet', 'Merkür • Satürn • Uranüs', attrCognition, 'Büyük Resmi Görme & İdrak', 'Berrak & Analitik Düşünce', 'Aşırı Düşünmeyi Bırakın'),
+    toGauge('endurance', 'Sabır & İstikrar', 'Satürn • Sabit & Toprak', attrEndurance, 'Sarsılmaz Disiplin & Güven', 'Sabırlı & Ölçülü Devamlılık', 'Gücünüzü Tek Noktada Toplayın'),
+    toGauge('diplomacy', 'Sosyal Ahenk & İkna', 'Venüs • Merkür • Ay', attrDiplomacy, 'Tatlı Dil, Uzlaşı & Çekim', 'Yapıcı & Dengeli Diyalog', 'Yanlış Anlaşılmalara Dikkat'),
+    toGauge('luck', 'Bereket & Doğal Kısmet', 'Jüpiter • Venüs • POF', attrLuck, 'Çabasız Akış & Açık Kısmet', 'Emeğin Karşılığını Alma', 'Şansa Değil Stratejiye Güvenin'),
+    toGauge('manifestation', 'Kadersel Çekim & Tezahür', 'K. Ay Düğümü • Vertex • Plüton', attrManifest, 'Yüksek Niyet & Eşzamanlılık Kapısı', 'Kadersel İşaretler Devrede', 'Zorlamak Yerine Teslimiyette Kalın', true),
+    toGauge('healing', 'Ruhsal Şifa & Arınma', 'Kiron • Neptün • Ay', attrHealing, 'Derin Blokaj Çözümü & Ferahlama', 'Duygusal Onarım Süreci', 'Kendinize Şefkat Gösterin', true)
   ];
 
   const mentalTone = entScore >= 75 ? 'Yüksek & Berrak' : entScore >= 55 ? 'Stratejik & Dengeli' : 'Dağınık / Dinlenme Gerek';
@@ -934,6 +1149,23 @@ function buildDetailedCosmicBarometer(
     mental: { score: entScore, label: `${entScore}%`, tone: mentalTone },
     emotional: { score: duyScore, label: `${duyScore}%`, tone: emotionalTone },
     action: { score: fizScore, label: `${fizScore}%`, tone: actionTone },
+    esotericSignature: {
+      lunarPhase,
+      elementBalance: {
+        firePct,
+        earthPct,
+        airPct,
+        waterPct,
+        dominantLabel: dominantElem.dom,
+        lackingAdvice: lackingElem.lack
+      },
+      chakraResonance: {
+        chakraName: chakraMeta.chakra,
+        sephirahName: chakraMeta.sephirah,
+        activePlanet: leadPlanetName,
+        guidance: chakraMeta.guidance
+      }
+    },
     coreEnergies,
     attributes
   };

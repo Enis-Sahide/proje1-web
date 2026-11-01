@@ -461,192 +461,233 @@ export default function TransitsPage() {
     );
   };
 
-  const renderAttributeSvgIcon = (id: string) => {
-    switch (id) {
-      case 'influence': // Hammer / Mjolnir (Etki & Nüfuz)
-        return (
-          <svg viewBox="0 0 36 36" className="w-8 h-8 text-amber-400 shrink-0" fill="currentColor">
-            <path d="M21.5 4.5l10 10-4.2 4.2-10-10L21.5 4.5zM15.9 10.1l10 10-2.1 2.1-10-10 2.1-2.1z" />
-            <rect x="6" y="22" width="14" height="3.6" rx="1.5" transform="rotate(-45 6 22)" />
-            <circle cx="6.5" cy="29.5" r="2" />
-          </svg>
-        );
-      case 'defense': // Shield (Savunma & Direnç)
-        return (
-          <svg viewBox="0 0 36 36" className="w-8 h-8 text-sky-400 shrink-0" fill="currentColor">
-            <path d="M18 3L6 8v9.5C6 25.8 11.1 32.3 18 34c6.9-1.7 12-8.2 12-16.5V8L18 3zm0 4.2l8 3.3v6.8c0 6.1-3.4 11.2-8 12.7V7.2z" />
-          </svg>
-        );
-      case 'mobility': // Dynamic Acrobat / Agility (Hareketlilik & Esneklik)
-        return (
-          <svg viewBox="0 0 36 36" className="w-8 h-8 text-emerald-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="19" cy="7" r="3" fill="currentColor" stroke="none" />
-            <path d="M9 12l8 3 8-6" />
-            <path d="M17 15l-2 8-7 6" />
-            <path d="M15 23l8 3 4 6" />
-          </svg>
-        );
-      case 'progress': // Bullseye Target (Erişim & İlerleme)
-        return (
-          <svg viewBox="0 0 36 36" className="w-8 h-8 text-rose-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.4">
-            <circle cx="18" cy="18" r="11" />
-            <circle cx="18" cy="18" r="6.5" />
-            <circle cx="18" cy="18" r="2.5" fill="currentColor" />
-            <path d="M18 3v3M18 30v3M3 18h3M30 18h3" strokeLinecap="round" />
-          </svg>
-        );
-      case 'cognition': // Open Book with Radiant Insight (Biliş & Tefekkür)
-        return (
-          <svg viewBox="0 0 36 36" className="w-8 h-8 text-cyan-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M4 26c4-2 9-2 14 1 5-3 10-3 14-1V12c-4-2-9-2-14 1-5-3-10-3-14-1v14z" />
-            <path d="M18 13v14" />
-            <path d="M18 5v3M12 7l1.5 2.5M24 7l-1.5 2.5" />
-          </svg>
-        );
-      case 'endurance': // Atlas / Strength Globe (Dayanıklılık & Güvenilirlik)
-        return (
-          <svg viewBox="0 0 36 36" className="w-8 h-8 text-amber-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="18" cy="12" r="7.5" />
-            <path d="M11 12h14M18 4.5c2.2 2 3.5 4.6 3.5 7.5s-1.3 5.5-3.5 7.5c-2.2-2-3.5-4.6-3.5-7.5S15.8 6.5 18 4.5z" />
-            <path d="M10 19l5 4h6l5-4" />
-            <path d="M15 23v6l-3 4M21 23v6l3 4" />
-          </svg>
-        );
-      case 'diplomacy': // Handshake (İletişim & Diplomasi)
-        return (
-          <svg viewBox="0 0 36 36" className="w-8 h-8 text-purple-400 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M4 16l6-6 6 2 5-3 5 3 6 4-5 6-5-3-5 4-6-3-7-4z" />
-            <path d="M13 21l4 4M17 19l4 4M21 17l3 3" />
-          </svg>
-        );
-      case 'luck': // Lucky Horseshoe (Şans & Rahatlık)
-      default:
-        return (
-          <svg viewBox="0 0 36 36" className="w-8 h-8 text-emerald-300 shrink-0" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round">
-            <path d="M9 7v11a9 9 0 0 0 18 0V7" />
-            <path d="M6 7h5M25 7h5" strokeWidth="3" />
-            <circle cx="11.5" cy="14" r="1" fill="currentColor" stroke="none" />
-            <circle cx="24.5" cy="14" r="1" fill="currentColor" stroke="none" />
-            <circle cx="18" cy="24.5" r="1" fill="currentColor" stroke="none" />
-          </svg>
-        );
-    }
-  };
-
   const renderDetailedCosmicBarometer = (barometer: DetailedCosmicBarometer, title: string) => {
-    const radius = 18;
-    const circumference = 2 * Math.PI * radius;
+    const { esotericSignature, coreEnergies, attributes } = barometer;
 
     return (
-      <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-4 sm:p-5 space-y-5">
-        {/* Top Header + 4 Core Energy Percentages (FİZ, DUY, ENT, RUH) */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-white/10 pb-4">
+      <div className="bg-gradient-to-br from-white/[0.04] via-black/40 to-[#11052C]/40 border border-white/10 rounded-3xl p-4 sm:p-6 space-y-6 shadow-xl">
+        {/* Başlık */}
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3.5">
           <div className="flex items-center gap-2">
-            <Activity size={15} className="text-[#0EA5E9]" />
-            <span className="text-xs uppercase tracking-wider font-extrabold text-white">
+            <Sparkles size={16} className="text-[#D4AF37]" />
+            <span className="text-xs sm:text-sm uppercase tracking-wider font-extrabold text-white">
               {title}
             </span>
           </div>
+          <span className="text-[10px] text-white/45 font-medium">
+            7Layers Astrolojik & Ezoterik Frekans Sentezi
+          </span>
+        </div>
 
-          {/* 4 Core Energy Indicators (FİZ, DUY, ENT, RUH) */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-3 w-full lg:w-auto">
-            {barometer.coreEnergies.map((ce) => (
-              <div
-                key={ce.code}
-                className="bg-black/50 border border-white/10 rounded-xl px-3 py-2 flex items-center justify-between gap-3"
-              >
-                <div className="flex items-center gap-2">
-                  {/* Zigzag Lightning Trend Arrow */}
-                  {ce.trend === 'up' ? (
-                    <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0" fill="none" stroke={ce.colorHex} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="3 17 9 11 13 15 21 7" />
-                      <polyline points="15 7 21 7 21 13" />
-                    </svg>
-                  ) : (
-                    <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0" fill="none" stroke={ce.colorHex} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <polyline points="3 7 9 13 13 9 21 17" />
-                      <polyline points="15 17 21 17 21 11" />
-                    </svg>
-                  )}
-                  <div>
-                    <div className="text-xs font-black tracking-wide leading-none" style={{ color: ce.colorHex }}>
-                      {ce.code}
-                    </div>
-                    <div className="text-[9px] text-white/45 font-medium mt-0.5 truncate max-w-[78px]">
-                      {ce.label}
-                    </div>
-                  </div>
-                </div>
-                <div className="text-sm sm:text-base font-black tabular-nums" style={{ color: ce.colorHex }}>
-                  %{ce.score}
-                </div>
+        {/* 1. BÖLÜM: EZOTERİİK GÖKYÜZÜ KİMLİĞİ (Ay Fazı + 4 Element Dengesi + Çakra/Sefira Rezonansı) */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-3.5">
+          {/* Kart A: Gerçek Ay Fazı & Ezoterik Ritm */}
+          <div className="bg-black/50 border border-amber-500/20 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#D4AF37] flex items-center gap-1.5">
+                <span>{esotericSignature.lunarPhase.phaseIcon}</span> Ay Fazı & Ruhsal Ritm
+              </span>
+              <span className="text-[11px] font-black text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded-full border border-amber-500/20">
+                %{esotericSignature.lunarPhase.illumination} Işık
+              </span>
+            </div>
+            <div className="text-xs sm:text-sm font-bold text-white">
+              {esotericSignature.lunarPhase.phaseName}
+            </div>
+            <p className="text-[11px] text-white/65 leading-relaxed">
+              {esotericSignature.lunarPhase.esotericSecret}
+            </p>
+          </div>
+
+          {/* Kart B: Canlı 4 Element Dengesi */}
+          <div className="bg-black/50 border border-sky-500/20 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between space-y-2.5">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-sky-400">
+                🔥🌍💨💧 Kozmik Element Dengesi
+              </span>
+            </div>
+            <div className="grid grid-cols-4 gap-1.5 pt-0.5">
+              <div className="bg-orange-500/10 border border-orange-500/20 rounded-lg p-1.5 text-center">
+                <div className="text-[10px] text-orange-300 font-bold">Ateş</div>
+                <div className="text-xs font-black text-white">%{esotericSignature.elementBalance.firePct}</div>
               </div>
-            ))}
+              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-lg p-1.5 text-center">
+                <div className="text-[10px] text-emerald-300 font-bold">Toprak</div>
+                <div className="text-xs font-black text-white">%{esotericSignature.elementBalance.earthPct}</div>
+              </div>
+              <div className="bg-sky-500/10 border border-sky-500/20 rounded-lg p-1.5 text-center">
+                <div className="text-[10px] text-sky-300 font-bold">Hava</div>
+                <div className="text-xs font-black text-white">%{esotericSignature.elementBalance.airPct}</div>
+              </div>
+              <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-1.5 text-center">
+                <div className="text-[10px] text-purple-300 font-bold">Su</div>
+                <div className="text-xs font-black text-white">%{esotericSignature.elementBalance.waterPct}</div>
+              </div>
+            </div>
+            <p className="text-[10px] text-white/60 leading-snug">
+              <strong className="text-white/85">{esotericSignature.elementBalance.dominantLabel.split(':')[0]}:</strong>{' '}
+              {esotericSignature.elementBalance.lackingAdvice}
+            </p>
+          </div>
+
+          {/* Kart C: Aktif Çakra & Hayat Ağacı (Sefira) Rezonansı */}
+          <div className="bg-black/50 border border-purple-500/25 rounded-2xl p-3.5 sm:p-4 flex flex-col justify-between space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-purple-300">
+                🔮 Çakra & Hayat Ağacı Frekansı
+              </span>
+              <span className="text-[10px] font-bold text-purple-200 bg-purple-500/15 px-2 py-0.5 rounded-full border border-purple-500/25">
+                {esotericSignature.chakraResonance.activePlanet} Odağı
+              </span>
+            </div>
+            <div>
+              <div className="text-xs font-bold text-white">
+                {esotericSignature.chakraResonance.chakraName}
+              </div>
+              <div className="text-[11px] font-semibold text-[#D4AF37]">
+                {esotericSignature.chakraResonance.sephirahName}
+              </div>
+            </div>
+            <p className="text-[11px] text-white/65 leading-relaxed">
+              {esotericSignature.chakraResonance.guidance}
+            </p>
           </div>
         </div>
 
-        {/* 8 Detailed Attribute Gauges (1-10 Circular Rings + Archetype Icons) */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-3.5">
-          {barometer.attributes.map((attr) => {
-            const dashOffset = circumference - (attr.percent / 100) * circumference;
-            const ringColor = attr.score >= 8 ? '#34D399' : attr.score >= 6 ? '#38BDF8' : '#F59E0B';
-            return (
-              <div
-                key={attr.id}
-                className="bg-black/45 hover:bg-black/65 border border-white/10 rounded-2xl p-3.5 flex flex-col items-center text-center transition-all group"
-              >
-                {/* Icon + 1-10 Circular Ring Row */}
-                <div className="flex items-center justify-center gap-3 mb-2.5">
-                  <div className="p-2 rounded-xl bg-white/[0.04] border border-white/5 group-hover:scale-105 transition-transform">
-                    {renderAttributeSvgIcon(attr.id)}
+        {/* 2. BÖLÜM: 4 ANA KOZMİK FREKANS KANALI (Taşma Yapmayan Özgün Barlar) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {coreEnergies.map((ce) => (
+            <div
+              key={ce.code}
+              className="bg-black/55 border border-white/10 rounded-2xl p-3.5 space-y-2"
+            >
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-xs font-bold text-white truncate">
+                  {ce.label}
+                </span>
+                <div className="flex items-center gap-1 shrink-0">
+                  <span
+                    className="text-[10px] font-bold px-1.5 py-0.5 rounded"
+                    style={{
+                      backgroundColor: `${ce.colorHex}20`,
+                      color: ce.colorHex
+                    }}
+                  >
+                    {ce.trend === 'up' ? '▲ Yükselişte' : '▼ Dengeleniyor'}
+                  </span>
+                  <span className="text-sm font-black tabular-nums" style={{ color: ce.colorHex }}>
+                    %{ce.score}
+                  </span>
+                </div>
+              </div>
+
+              {/* Işıltılı Doluluk Çubuğu */}
+              <div className="w-full bg-white/10 h-2 rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{
+                    width: `${ce.score}%`,
+                    backgroundColor: ce.colorHex,
+                    boxShadow: `0 0 10px ${ce.colorHex}80`
+                  }}
+                />
+              </div>
+
+              <div className="text-[10px] text-white/50 font-medium">
+                {ce.statusText}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* 3. BÖLÜM: 10 BOYUTLU 7LAYERS YAŞAM & EZOTERİİK PUSULASI (10 Kademeli Işıltılı Segment Bar) */}
+        <div className="space-y-2.5">
+          <div className="flex items-center justify-between">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-white/75">
+              10 Boyutlu Yaşam & Ezoterik Yetkinlik Pusulası
+            </span>
+            <span className="text-[10px] text-white/40">
+              1–10 Kademeli Anlık Rezonans
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {attributes.map((attr) => {
+              const barColor = attr.isEsoteric
+                ? '#A855F7'
+                : attr.score >= 8
+                ? '#10B981'
+                : attr.score >= 6
+                ? '#0EA5E9'
+                : '#F59E0B';
+
+              return (
+                <div
+                  key={attr.id}
+                  className={`rounded-2xl p-3.5 border transition-all space-y-2 ${
+                    attr.isEsoteric
+                      ? 'bg-gradient-to-r from-purple-950/35 via-black/60 to-amber-950/20 border-purple-500/30'
+                      : 'bg-black/45 border-white/10'
+                  }`}
+                >
+                  {/* Üst Satır: Başlık + 10 üzerinden Puan Rozeti */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <span
+                        className="w-2 h-2 rounded-full shrink-0"
+                        style={{ backgroundColor: barColor, boxShadow: `0 0 8px ${barColor}` }}
+                      />
+                      <span className="text-xs sm:text-sm font-extrabold text-white truncate">
+                        {attr.title}
+                      </span>
+                      {attr.isEsoteric && (
+                        <span className="text-[9px] uppercase tracking-wider font-bold px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30 shrink-0">
+                          Ezoterik
+                        </span>
+                      )}
+                    </div>
+                    <span
+                      className="text-xs font-black px-2 py-0.5 rounded-lg border shrink-0 tabular-nums"
+                      style={{
+                        color: barColor,
+                        borderColor: `${barColor}40`,
+                        backgroundColor: `${barColor}15`
+                      }}
+                    >
+                      {attr.score} / 10
+                    </span>
                   </div>
 
-                  {/* Circular 1-10 Score Gauge */}
-                  <div className="relative w-12 h-12 flex items-center justify-center shrink-0">
-                    <svg className="w-12 h-12 -rotate-90" viewBox="0 0 44 44">
-                      <circle
-                        cx="22"
-                        cy="22"
-                        r={radius}
-                        fill="none"
-                        stroke="rgba(255,255,255,0.12)"
-                        strokeWidth="3.5"
-                      />
-                      <circle
-                        cx="22"
-                        cy="22"
-                        r={radius}
-                        fill="none"
-                        stroke={ringColor}
-                        strokeWidth="3.5"
-                        strokeLinecap="round"
-                        strokeDasharray={circumference}
-                        strokeDashoffset={dashOffset}
-                      />
-                    </svg>
-                    <span className="absolute text-sm font-black text-white tabular-nums">
-                      {attr.score}
+                  {/* Orta Satır: 10 Kademeli (Segmented) Işıltılı Enerji Barı */}
+                  <div className="grid grid-cols-10 gap-1 pt-0.5">
+                    {Array.from({ length: 10 }).map((_, segIdx) => {
+                      const isActive = segIdx < attr.score;
+                      return (
+                        <div
+                          key={segIdx}
+                          className="h-2 rounded-sm transition-all"
+                          style={{
+                            backgroundColor: isActive ? barColor : 'rgba(255,255,255,0.08)',
+                            boxShadow: isActive ? `0 0 6px ${barColor}60` : 'none'
+                          }}
+                        />
+                      );
+                    })}
+                  </div>
+
+                  {/* Alt Satır: İnsan Odaklı Rehber Notu + Küçük Gezegen Kaynağı */}
+                  <div className="flex items-center justify-between gap-2 pt-0.5">
+                    <span className="text-[11px] font-medium text-white/80">
+                      {attr.subtitle}
+                    </span>
+                    <span className="text-[9px] text-white/35 font-normal shrink-0">
+                      {attr.astroDrivers}
                     </span>
                   </div>
                 </div>
-
-                {/* Two-Line Uppercase Attribute Name */}
-                <div className="leading-tight">
-                  <div className="text-[11px] sm:text-xs font-extrabold tracking-wider text-white uppercase">
-                    {attr.titleTop}
-                  </div>
-                  <div className="text-[10px] sm:text-[11px] font-bold tracking-wider text-[#D4AF37] uppercase">
-                    {attr.titleBottom}
-                  </div>
-                </div>
-
-                {/* Subtle status subtitle */}
-                <span className="text-[10px] text-white/45 mt-1 font-normal">
-                  {attr.subtitle}
-                </span>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
       </div>
     );
