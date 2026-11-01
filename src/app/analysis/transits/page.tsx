@@ -584,16 +584,15 @@ export default function TransitsPage() {
                       : 'bg-black/45 border-white/10'
                   }`}
                 >
-                  {/* Üst Satır: Başlık + 10 üzerinden Puan Rozeti */}
+                  {/* Üst Satır: Başlık + Ufak Puan Göstergesi */}
                   <div className="flex items-start justify-between gap-1.5">
-                    <span className="text-[11px] sm:text-xs font-extrabold text-white leading-tight">
+                    <span className="text-[11px] sm:text-xs font-bold text-white leading-tight">
                       {attr.title}
                     </span>
                     <span
-                      className="text-[10px] sm:text-xs font-black px-1.5 py-0.5 rounded-md border shrink-0 tabular-nums leading-none"
+                      className="text-[9px] font-bold px-1.5 py-0.5 rounded shrink-0 tabular-nums leading-none"
                       style={{
                         color: barColor,
-                        borderColor: `${barColor}40`,
                         backgroundColor: `${barColor}15`
                       }}
                     >
@@ -601,32 +600,10 @@ export default function TransitsPage() {
                     </span>
                   </div>
 
-                  {/* Orta Satır: 10 Kademeli (Segmented) Işıltılı Enerji Barı */}
-                  <div className="grid grid-cols-10 gap-0.5 sm:gap-1 pt-0.5">
-                    {Array.from({ length: 10 }).map((_, segIdx) => {
-                      const isActive = segIdx < attr.score;
-                      return (
-                        <div
-                          key={segIdx}
-                          className="h-1.5 rounded-sm transition-all"
-                          style={{
-                            backgroundColor: isActive ? barColor : 'rgba(255,255,255,0.08)',
-                            boxShadow: isActive ? `0 0 5px ${barColor}60` : 'none'
-                          }}
-                        />
-                      );
-                    })}
-                  </div>
-
                   {/* Alt Satır: İnsan Odaklı Rehber Notu */}
-                  <div className="flex flex-col pt-0.5">
-                    <span className="text-[10px] font-medium text-white/75 leading-tight">
-                      {attr.subtitle}
-                    </span>
-                    <span className="text-[8px] text-white/30 font-normal mt-0.5">
-                      {attr.astroDrivers}
-                    </span>
-                  </div>
+                  <p className="text-[10px] font-normal text-white/65 leading-snug">
+                    {attr.subtitle}
+                  </p>
                 </div>
               );
             })}
