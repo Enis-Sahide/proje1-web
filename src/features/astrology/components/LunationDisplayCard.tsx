@@ -278,14 +278,17 @@ export default function LunationDisplayCard({
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/10 pb-3">
                   <div>
                     <span className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-widest flex items-center gap-1.5">
-                      <Compass size={14} /> Kişisel Doğum Haritası Portalı
+                      <Compass size={14} /> {isSolar ? '☀️' : isLunar ? '🌑' : isFullMoon ? '🌕' : '🌑'} {event.sign} {event.phaseName} ({event.signSymbol} {event.degree}) — {durationInfo.totalDuration}lük Kişisel Harita Etkisi
                     </span>
                     <h5 className="text-base sm:text-lg font-black text-white mt-0.5">
                       {houseInterp.portalName || houseInterp.title}
                     </h5>
+                    <p className="text-[11px] text-amber-200/80 font-medium mt-0.5">
+                      Aktif {event.sign} {event.phaseName} süreci ({durationInfo.totalDuration} boyunca) doğum haritanızın {houseNumber}. evini aydınlatıyor:
+                    </p>
                   </div>
-                  <span className="px-3 py-1 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] font-black text-xs self-start sm:self-auto">
-                    {houseNumber}. Evinizde
+                  <span className="px-3 py-1 rounded-full bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] font-black text-xs self-start sm:self-auto shrink-0">
+                    {event.phaseName}: {houseNumber}. Evinizde
                   </span>
                 </div>
 
