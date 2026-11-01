@@ -1335,25 +1335,22 @@ export function generateCurrentSkyOverview(
     false
   );
 
-  // Başlık Kurgusu
+  // Başlık Kurgusu (Alttaki metinlerle tekrara düşmeyen net atmosfer başlığı)
   const peakAspect = topAspects[0];
-  let headline = `Günün Ruh Hali: ${moonData.mood} Bir Atmosfer`;
+  let headline = `Gökyüzü İklimi: ${moonData.mood} Enerjiler`;
   if (peakAspect) {
     if (peakAspect.isHarmonious) {
-      headline = `Akıcı ve Destekleyici Enerjiler: ${moonData.mood}`;
+      headline = `Destekleyici Gökyüzü Akışı: ${moonData.mood}`;
     } else {
-      headline = `Farkındalık ve Denge Zamanı: ${moonData.mood}`;
+      headline = `Bilinçli Denge & Farkındalık Günü: ${moonData.mood}`;
     }
   }
 
   const subHeadline = `☉ Güneş ${sunSign} (${sunDeg}°) • ☽ Ay ${moonSign} (${moonDeg}°)`;
 
-  // Vurucu 2-3 Cümlelik Genel Anlatı
-  let vibeNarrative = `Bugün genel atmosfer ${moonData.mood.toLowerCase()} bir frekansta akıyor. `;
-  if (peakAspect) {
-    vibeNarrative += `${peakAspect.summary} `;
-  }
-  vibeNarrative += `Günün anahtarı: Duygusal dalgalanmalar karşısında merkezinizde kalarak, ${moonData.doAction.toLowerCase()}`;
+  // Genel Anlatı (Alttaki Fırsat/Dikkat maddelerini kopyalamadan günün sentez özeti)
+  const sunFlavor = SIGN_FLAVORS[sunSign] || { adj: 'odaklı', style: 'farkındalıkla ilerleyerek' };
+  const vibeNarrative = `Güneş'in ${sunSign} burcundaki ${sunFlavor.adj} doğası ile Ay'ın ${moonSign} burcundaki ${moonData.energy.toLowerCase()} ritmi birleşiyor. Bugün kararlarınızda ${sunFlavor.style} hareket etmek ve duygusal tepkilerde aşırılıklardan kaçınmak günün potansiyelini en verimli şekilde kullanmanızı sağlayacaktır.`;
 
   // Fırsatlar ve Tuzaklar (Vurgulu insan dili + altta minik teknik etiket)
   const opportunities: PersonalGuidanceItem[] = [
@@ -1485,7 +1482,7 @@ function capitalizeFirst(str: string): string {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-function buildDynamicAspectOpportunity(params: {
+type EnrichedPersonalAspect = {
   transitPlanet: string;
   transitSign: string;
   transitDegree: number;
@@ -1495,58 +1492,102 @@ function buildDynamicAspectOpportunity(params: {
   natalDegree: number;
   natalHouse: number;
   aspectType: string;
-}): PersonalGuidanceItem {
-  const { transitPlanet, transitSign, transitDegree, transitHouse, natalPlanet, natalSign, natalDegree, natalHouse, aspectType } = params;
-  const signFlavor = SIGN_FLAVORS[transitSign] || { adj: 'dinamik', style: 'farkındalıkla hareket ederek' };
-  const tGift = TRANSIT_PLANET_GIFT[transitPlanet] || 'yeni bir farkındalık ve destek akışı sunarken';
-  const nCore = NATAL_PLANET_CORE[natalPlanet] || 'doğuştan gelen potansiyelinizi';
-  const nArea = HOUSE_SHORT_THEMES[natalHouse] || 'bu yaşam alanınız';
-  const tArea = HOUSE_SHORT_THEMES[transitHouse] || 'güncel gündeminiz';
+  orb: number;
+  badge: string;
+  isHarmonious: boolean;
+  summary: string;
+};
 
-  const aspectAction = aspectType === 'Üçgen'
-    ? `${signFlavor.style} çabasız, doğal ve akıcı sonuçlar elde edebilirsiniz.`
-    : aspectType === 'Sekstil'
-    ? `${signFlavor.style} önünüze çıkan fırsatları somut bir girişime ve iletişime dönüştürebilirsiniz.`
-    : `${signFlavor.style} bu alanda yepyeni ve kalıcı bir sayfa açabilirsiniz.`;
+function buildSynthesizedOpportunities(aspects: EnrichedPersonalAspect[]): PersonalGuidanceItem[] {
+  // Group harmonious aspects by target natalPlanet so the same natal point/house is never repeated in separate cards
+  const groups = new Map<string, EnrichedPersonalAspect[]>();
+  for (const asp of aspects) {
+    const key = asp.natalPlanet;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(asp);
+  }
 
-  const houseBridge = transitHouse !== natalHouse
-    ? `${capitalizeFirst(tArea)} alanındaki hareketlilik doğrudan ${nArea} konularınızı besliyor; `
-    : `Doğrudan ${nArea} konularınızda yoğunlaşan bu süreçte `;
+  const items: PersonalGuidanceItem[] = [];
+  for (const [, group] of groups.entries()) {
+    if (items.length >= 3) break;
+    const primary = group[0];
+    const signFlavor = SIGN_FLAVORS[primary.transitSign] || { adj: 'dinamik', style: 'farkındalıkla hareket ederek' };
+    const tGift = TRANSIT_PLANET_GIFT[primary.transitPlanet] || 'yeni bir farkındalık ve destek akışı sunarken';
+    const nCore = NATAL_PLANET_CORE[primary.natalPlanet] || 'doğuştan gelen potansiyelinizi';
+    const nArea = HOUSE_SHORT_THEMES[primary.natalHouse] || 'bu yaşam alanınız';
+    const tArea = HOUSE_SHORT_THEMES[primary.transitHouse] || 'güncel gündeminiz';
 
-  const text = `${capitalizeFirst( signFlavor.adj )} bir enerji akışı, ${tGift} ${nCore} güçlendiriyor. ${houseBridge}${aspectAction}`;
-  const astroTag = `Transit ${transitPlanet} (${transitSign} ${transitDegree}°) • ${aspectType} • Natal ${natalPlanet} (${natalSign} ${natalDegree}°)`;
-  return { text, astroTag };
+    if (group.length === 1) {
+      const aspectAction = primary.aspectType === 'Üçgen'
+        ? `${signFlavor.style} çabasız, doğal ve akıcı sonuçlar elde edebilirsiniz.`
+        : primary.aspectType === 'Sekstil'
+        ? `${signFlavor.style} önünüze çıkan fırsatları somut bir girişime ve iletişime dönüştürebilirsiniz.`
+        : `${signFlavor.style} bu alanda yepyeni ve kalıcı bir sayfa açabilirsiniz.`;
+
+      const houseBridge = primary.transitHouse !== primary.natalHouse
+        ? `${capitalizeFirst(tArea)} alanındaki hareketlilik doğrudan ${nArea} konularınızı besliyor; `
+        : `Doğrudan ${nArea} konularınızda yoğunlaşan bu süreçte `;
+
+      const text = `${capitalizeFirst(signFlavor.adj)} bir enerji akışı, ${tGift} ${nCore} güçlendiriyor. ${houseBridge}${aspectAction}`;
+      const astroTag = `Transit ${primary.transitPlanet} (${primary.transitSign} ${primary.transitDegree}°) • ${primary.aspectType} • Natal ${primary.natalPlanet} (${primary.natalSign} ${primary.natalDegree}°) [${primary.orb.toFixed(1)}°]`;
+      items.push({ text, astroTag });
+    } else {
+      // Multiple transits supporting the exact same natal point: synthesize them into one unified insight!
+      const second = group[1];
+      const secondGift = TRANSIT_PLANET_GIFT[second.transitPlanet] || 'ekstra bir destek kanalı açarken';
+      const text = `${capitalizeFirst(nArea)} konularınızda çift yönlü güçlü bir destek var: ${tGift}, aynı anda ${secondGift} ${nCore} besliyor. Bu birleşik akışı ${signFlavor.style} somut ve kalıcı adımlara dönüştürebilirsiniz.`;
+      const astroTag = group
+        .map(g => `Transit ${g.transitPlanet} (${g.transitSign} ${g.transitDegree}°) • ${g.aspectType}`)
+        .join(' + ') + ` → Natal ${primary.natalPlanet} (${primary.natalSign} ${primary.natalDegree}°)`;
+      items.push({ text, astroTag });
+    }
+  }
+  return items;
 }
 
-function buildDynamicAspectCaution(params: {
-  transitPlanet: string;
-  transitSign: string;
-  transitDegree: number;
-  transitHouse: number;
-  natalPlanet: string;
-  natalSign: string;
-  natalDegree: number;
-  natalHouse: number;
-  aspectType: string;
-}): PersonalGuidanceItem {
-  const { transitPlanet, transitSign, transitDegree, transitHouse, natalPlanet, natalSign, natalDegree, natalHouse, aspectType } = params;
-  const signFlavor = SIGN_FLAVORS[transitSign] || { adj: 'yoğun', style: 'dengeli kalarak' };
-  const tChallenge = TRANSIT_PLANET_CHALLENGE[transitPlanet] || 'içsel bir gerilim ve sınav yaratabilir';
-  const nCore = NATAL_PLANET_CORE[natalPlanet] || 'hassas dengelerinizi';
-  const nArea = HOUSE_SHORT_THEMES[natalHouse] || 'bu yaşam alanınız';
-  const tArea = HOUSE_SHORT_THEMES[transitHouse] || 'güncel gündeminiz';
+function buildSynthesizedCautions(aspects: EnrichedPersonalAspect[]): PersonalGuidanceItem[] {
+  // Group challenging aspects by target natalPlanet so the same natal point/house is never repeated in separate cards
+  const groups = new Map<string, EnrichedPersonalAspect[]>();
+  for (const asp of aspects) {
+    const key = asp.natalPlanet;
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key)!.push(asp);
+  }
 
-  const aspectWarning = aspectType === 'Karşıt'
-    ? `İki uç arasında savrulmak yerine, ${tArea} ile ${nArea} konuları arasında bilinçli ve sakin bir denge kurun.`
-    : aspectType === 'Kare'
-    ? `${capitalizeFirst(nArea)} konularında yükselen içsel baskıyı fevri tepkilere dönüştürmeyin; sabırla ve sınırlarınızı koruyarak ilerleyin.`
-    : aspectType === 'Kavuşum'
-    ? `${capitalizeFirst(nArea)} alanında yoğunlaşan bu baskıyı aceleci kararlarla değil, ${signFlavor.style} yönetin.`
-    : `${capitalizeFirst(nArea)} konularında kör noktalara ve ani yargılara kapılmadan önce şartların netleşmesini bekleyin.`;
+  const items: PersonalGuidanceItem[] = [];
+  for (const [, group] of groups.entries()) {
+    if (items.length >= 3) break;
+    const primary = group[0];
+    const signFlavor = SIGN_FLAVORS[primary.transitSign] || { adj: 'yoğun', style: 'dengeli kalarak' };
+    const tChallenge = TRANSIT_PLANET_CHALLENGE[primary.transitPlanet] || 'içsel bir gerilim ve sınav yaratabilir';
+    const nCore = NATAL_PLANET_CORE[primary.natalPlanet] || 'hassas dengelerinizi';
+    const nArea = HOUSE_SHORT_THEMES[primary.natalHouse] || 'bu yaşam alanınız';
+    const tArea = HOUSE_SHORT_THEMES[primary.transitHouse] || 'güncel gündeminiz';
 
-  const text = `${capitalizeFirst(nCore)} tetikleyen güncel etkiler, sizi ${tChallenge}. ${aspectWarning}`;
-  const astroTag = `Transit ${transitPlanet} (${transitSign} ${transitDegree}°) • ${aspectType} • Natal ${natalPlanet} (${natalSign} ${natalDegree}°)`;
-  return { text, astroTag };
+    if (group.length === 1) {
+      const aspectWarning = primary.aspectType === 'Karşıt'
+        ? `İki uç arasında savrulmak yerine, ${tArea} ile ${nArea} konuları arasında bilinçli ve sakin bir denge kurun.`
+        : primary.aspectType === 'Kare'
+        ? `${capitalizeFirst(nArea)} konularında yükselen içsel baskıyı fevri tepkilere dönüştürmeyin; sabırla ve sınırlarınızı koruyarak ilerleyin.`
+        : primary.aspectType === 'Kavuşum'
+        ? `${capitalizeFirst(nArea)} alanında yoğunlaşan bu baskıyı aceleci kararlarla değil, ${signFlavor.style} yönetin.`
+        : `${capitalizeFirst(nArea)} konularında kör noktalara ve ani yargılara kapılmadan önce şartların netleşmesini bekleyin.`;
+
+      const text = `${capitalizeFirst(nCore)} etkileyen bu süreç, sizi ${tChallenge}. ${aspectWarning}`;
+      const astroTag = `Transit ${primary.transitPlanet} (${primary.transitSign} ${primary.transitDegree}°) • ${primary.aspectType} • Natal ${primary.natalPlanet} (${primary.natalSign} ${primary.natalDegree}°) [${primary.orb.toFixed(1)}°]`;
+      items.push({ text, astroTag });
+    } else {
+      // Multiple transits challenging the exact same natal point: synthesize them into one unified warning!
+      const second = group[1];
+      const secondChallenge = TRANSIT_PLANET_CHALLENGE[second.transitPlanet] || 'ekstra bir hassasiyet oluşturabilir';
+      const text = `${capitalizeFirst(nArea)} konularınızda şu an çift yönlü bir hassasiyet devrede: ${capitalizeFirst(nCore)} tetikleyen bu birleşik etki, bir yandan ${tChallenge}, diğer yandan ${secondChallenge}. Bu süreçte aceleci yargılardan kaçınıp ${signFlavor.style} süreci gözlemleyin.`;
+      const astroTag = group
+        .map(g => `Transit ${g.transitPlanet} (${g.transitSign} ${g.transitDegree}°) • ${g.aspectType}`)
+        .join(' + ') + ` → Natal ${primary.natalPlanet} (${primary.natalSign} ${primary.natalDegree}°)`;
+      items.push({ text, astroTag });
+    }
+  }
+  return items;
 }
 
 export interface PersonalTransitOverview {
@@ -1562,21 +1603,7 @@ export interface PersonalTransitOverview {
   barometer: DetailedCosmicBarometer;
   opportunities: PersonalGuidanceItem[];
   cautions: PersonalGuidanceItem[];
-  topAspects: {
-    transitPlanet: string;
-    transitSign: string;
-    transitDegree: number;
-    transitHouse: number;
-    natalPlanet: string;
-    natalSign: string;
-    natalDegree: number;
-    natalHouse: number;
-    aspectType: string;
-    orb: number;
-    badge: string;
-    isHarmonious: boolean;
-    summary: string;
-  }[];
+  topAspects: EnrichedPersonalAspect[];
   lifeAdvice: string;
 }
 
@@ -1594,7 +1621,7 @@ export function generatePersonalTransitOverview(
   const validAspects = (allTransitAspect || []).filter(a => a.orb <= 3.5);
   validAspects.sort((a, b) => a.orb - b.orb);
 
-  const enrichAspect = (asp: TransitAspect) => {
+  const enrichAspect = (asp: TransitAspect): EnrichedPersonalAspect => {
     const tPlanet = transitPlanets.find(p => p.name === asp.transitPlanet);
     const nPlanet = natalPlanets.find(p => p.name === asp.natalPlanet);
     const tHouse = tPlanet ? (tPlanet.house || getHouseFromLongitude(tPlanet.longitude, natalHouses)) : 1;
@@ -1676,7 +1703,7 @@ export function generatePersonalTransitOverview(
     planetNames: item.planetNames
   }));
 
-  // Detaylı 4 Ana Frekans + 8 Boyutlu Kişisel Barometre Hesaplama
+  // Detaylı Barometre Hesaplama
   const detailedPersonalBarometer = buildDetailedCosmicBarometer(
     transitPlanets,
     allEnrichedAspects.map(a => ({
@@ -1695,8 +1722,9 @@ export function generatePersonalTransitOverview(
   const peak = topAspects[0];
   const mainFocusTitle = focusHouses[0]?.title || 'Yaşam Alanlarınız';
   let headline = `${mainFocusTitle} Odağında Dengeli Akış`;
-  let subHeadline = focusHouses.length > 0 
-    ? `Ana Odak: ${focusHouses.map(h => `${h.title} (${h.description})`).join(' ve ')}`
+  // Kısa ve tekrarsız alt başlık (açıklamalar zaten Odak Yaşam Alanları kutusunda yer alıyor)
+  const subHeadline = focusHouses.length > 0 
+    ? `Yoğunlaşan Alanlar: ${focusHouses.map(h => h.title).join(' & ')}`
     : 'Bütünsel Dönüşüm Süreci';
 
   if (peak) {
@@ -1708,38 +1736,28 @@ export function generatePersonalTransitOverview(
     }
   }
 
+  // Giriş paragrafı: Alttaki Odak Alanları açıklamasını veya Fırsat/Sınav cümlesini kopyalamadan genel dengeyi anlatır
+  const harmoniousCount = allEnrichedAspects.filter(a => a.isHarmonious).length;
+  const challengingCount = allEnrichedAspects.filter(a => !a.isHarmonious).length;
   let themeDescription = '';
-  if (focusHouses.length > 0) {
-    themeDescription = `Bugün haritanızda en yoğun hareketlilik doğrudan ${focusHouses.map(h => h.description).join(' ile ')} konularında toplanıyor. `;
+  if (harmoniousCount > challengingCount) {
+    themeDescription = 'Bugün kişisel haritanızda destekleyici ve ön açıcı açılar ağırlıkta. Uzun süredir beklettiğiniz adımları devreye sokmak, iletişim kurmak ve akışın sunduğu fırsatları somutlaştırmak için elverişli bir dönemdesiniz.';
+  } else if (challengingCount > harmoniousCount) {
+    themeDescription = 'Bugün haritanızda farkındalık, sabır ve bilinçli sınırlar gerektiren dönüştürücü açılar öne çıkıyor. Ani tepkiler vermek yerine şartları sakinlikle gözlemlemek ve enerjinizi öncelikli hedeflerinize odaklamak süreci güçlenerek yönetmenizi sağlayacaktır.';
   } else {
-    themeDescription = `Bugün gökyüzü geçişleri yaşam alanlarınızın kilit noktalarını harekete geçiriyor. `;
+    themeDescription = 'Bugün haritanızda hem destekleyici fırsatlar hem de dikkat gerektiren eşikler dengeli bir dağılım gösteriyor. Fırsat kapılarını cesaretle değerlendirirken, hassas konularda esnek ve merkezde kalmanız günün anahtarıdır.';
   }
 
-  if (peak) {
-    themeDescription += `${peak.summary} `;
-  }
+  const harmoniousAspects = allEnrichedAspects.filter(a => a.isHarmonious);
+  const challengingAspects = allEnrichedAspects.filter(a => !a.isHarmonious);
 
-  themeDescription += `Dış dünyadaki gelişmelere fevri tepkiler vermek yerine, kendi içsel merkezinizi koruyarak adımlarınızı bilinçli atmanız sürecin hediyelerini açığa çıkaracaktır.`;
-
-  const opportunities: PersonalGuidanceItem[] = [];
-  const cautions: PersonalGuidanceItem[] = [];
-
-  const harmoniousAspects = allEnrichedAspects.filter(a => a.isHarmonious).slice(0, 3);
-  const challengingAspects = allEnrichedAspects.filter(a => !a.isHarmonious).slice(0, 3);
-
-  if (harmoniousAspects.length > 0) {
-    harmoniousAspects.forEach(asp => {
-      opportunities.push(buildDynamicAspectOpportunity(asp));
-    });
-  } else {
+  const opportunities = buildSynthesizedOpportunities(harmoniousAspects);
+  if (opportunities.length === 0) {
     opportunities.push({ text: 'Günün sakin enerjisi altında geçmiş planlarınızı gözden geçirmek ve içsel dinginliği güçlendirmek için elverişli bir zemin var.' });
   }
 
-  if (challengingAspects.length > 0) {
-    challengingAspects.forEach(asp => {
-      cautions.push(buildDynamicAspectCaution(asp));
-    });
-  } else {
+  const cautions = buildSynthesizedCautions(challengingAspects);
+  if (cautions.length === 0) {
     cautions.push({ text: 'Aşırı rahatlığa kapılıp tamamlanması gereken sorumluluklarınızı ertelemekten kaçının.' });
   }
 

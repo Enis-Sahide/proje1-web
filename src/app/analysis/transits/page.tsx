@@ -933,28 +933,6 @@ export default function TransitsPage() {
                                   </div>
                                 </div>
 
-                                {/* Pik Açı Rozetleri */}
-                                {currentSkyOverview.topAspects.length > 0 && (
-                                  <div className="pt-2 border-t border-white/5">
-                                    <span className="text-[10px] uppercase tracking-wider font-extrabold text-stone-400 block mb-2">
-                                      Şu An Gökyüzünde Pik Yapan Kilit Açılar:
-                                    </span>
-                                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                                      {currentSkyOverview.topAspects.map((asp, idx) => (
-                                        <div key={idx} className="bg-white/[0.03] border border-white/10 rounded-xl p-3 flex flex-col justify-between gap-2">
-                                          <p className="text-xs text-white font-medium leading-relaxed">
-                                            {asp.summary}
-                                          </p>
-                                          <div className="flex items-center justify-between text-[10px] text-white/40 pt-1.5 border-t border-white/5">
-                                            <span>{asp.p1} • {asp.aspectType} • {asp.p2}</span>
-                                            <span>{asp.badge}</span>
-                                          </div>
-                                        </div>
-                                      ))}
-                                    </div>
-                                  </div>
-                                )}
-
                                 {/* Detay Açıcı Buton */}
                                 <div className="pt-3 border-t border-white/10 flex justify-center">
                                   <button
@@ -1834,33 +1812,6 @@ export default function TransitsPage() {
                             </ul>
                           </div>
                         </div>
-
-                        {/* En Güçlü Kişisel Tetikleyiciler (Pik Transitler & Kesin Dereceler) */}
-                        {personalOverview.topAspects.length > 0 && (
-                          <div className="space-y-2.5">
-                            <span className="text-xs font-bold uppercase tracking-wider text-gray-400 flex items-center gap-1.5">
-                              <Zap size={14} className="text-[#0EA5E9]" /> Günün Öne Çıkan Kişisel Etkileri
-                            </span>
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                              {personalOverview.topAspects.map((asp, idx) => (
-                                <div 
-                                  key={`pa-${idx}`}
-                                  className="bg-black/50 border border-white/10 hover:border-cyan-500/30 rounded-2xl p-4 flex flex-col justify-between gap-2.5"
-                                >
-                                  <p className="text-xs sm:text-sm text-white font-medium leading-relaxed">
-                                    {asp.summary}
-                                  </p>
-                                  <div className="pt-2 border-t border-white/5 flex flex-wrap items-center justify-between gap-1 text-[10px] text-white/40">
-                                    <span>
-                                      {PLANET_SYMBOLS[asp.transitPlanet] || ''} {asp.transitPlanet} ({asp.transitSign} {asp.transitDegree}°) • {asp.aspectType} • {PLANET_SYMBOLS[asp.natalPlanet] || ''} {asp.natalPlanet}
-                                    </span>
-                                    <span className="text-white/35">{asp.badge}</span>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
 
                         {/* Alt Reçete / Bilgelik Notu */}
                         <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
