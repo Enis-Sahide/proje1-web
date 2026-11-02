@@ -1,6 +1,6 @@
 import { desc, eq } from 'drizzle-orm';
 import { db } from '@/db/client';
-import { chatMessages, chatProfiles, chatRooms, profiles, users } from '@/db/schema';
+import { chatMessages, chatNotifications, chatProfiles, chatRooms, profiles, users } from '@/db/schema';
 import { json, errorJson, preflight } from '@/lib/http/cors';
 import { getAuthPayload } from '@/lib/auth/session';
 import { getAccount } from '@/lib/auth/account';
@@ -8,6 +8,7 @@ import {
   ensureChatReady,
   formatSafeDisplayName,
   ROLE_TITLES,
+  sendExpoPushNotification,
   validateChatMessageContent,
 } from '@/lib/chat/chatService';
 
@@ -137,14 +138,18 @@ export async function POST(request: Request) {
 
     let replyPreviewName: string | null = null;
     let replyPreviewText: string | null = null;
+    let replyTargetUserId: string | null = null;
+    let replyTargetPushToken: string | null = null;
 
     if (replyToId) {
       const [targetMsg] = await db
         .select({
+          userId: chatMessages.userId,
           content: chatMessages.content,
           fullName: users.fullName,
           email: users.email,
           nickname: chatProfiles.nickname,
+          expoPushToken: chatProfiles.expoPushToken,
         })
         .from(chatMessages)
         .innerJoin(users, eq(chatMessages.userId, users.id))
@@ -154,6 +159,8 @@ export async function POST(request: Request) {
       if (targetMsg) {
         replyPreviewName = formatSafeDisplayName(targetMsg.fullName, targetMsg.email, targetMsg.nickname);
         replyPreviewText = targetMsg.content.slice(0, 90);
+        replyTargetUserId = targetMsg.userId;
+        replyTargetPushToken = targetMsg.expoPushToken || null;
       }
     }
 
@@ -170,6 +177,34 @@ export async function POST(request: Request) {
       .returning();
 
     const senderName = formatSafeDisplayName(account.fullName, account.email, cp?.nickname);
+
+    // Create notification & trigger push if replying to another user's message
+    if (replyTargetUserId && replyTargetUserId !== account.id) {
+      try {
+        await db.insert(chatNotifications).values({
+          recipientUserId: replyTargetUserId,
+          senderUserId: account.id,
+          senderName,
+          roomId,
+          roomTitle: room.title,
+          roomIcon: room.icon,
+          messageId: inserted.id,
+          messagePreview: validation.cleaned.slice(0, 120),
+          isRead: false,
+        });
+
+        if (replyTargetPushToken) {
+          void sendExpoPushNotification(
+            replyTargetPushToken,
+            `${room.icon} ${room.title} • Yeni Yanıt`,
+            `@${senderName}: "${validation.cleaned.slice(0, 85)}"`,
+            { roomId, messageId: inserted.id, type: 'chat_reply' }
+          );
+        }
+      } catch (notifErr) {
+        console.error('[POST /api/chat/messages] Notification error:', notifErr);
+      }
+    }
 
     return json({
       success: true,
@@ -237,3 +272,4 @@ export async function DELETE(request: Request) {
 }
 
 export const OPTIONS = preflight;
+

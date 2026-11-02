@@ -142,6 +142,13 @@ export default function EsotericCouncilChatPage() {
   );
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const roomParam = params.get('room');
+      if (roomParam) {
+        setActiveRoomId(roomParam);
+      }
+    }
     fetchRooms();
   }, [fetchRooms, isLoggedIn]);
 
@@ -150,6 +157,15 @@ export default function EsotericCouncilChatPage() {
     setReplyTarget(null);
     fetchMessages(activeRoomId, false);
 
+    if (isLoggedIn && activeRoomId) {
+      fetch('/api/chat/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ action: 'mark_read', roomId: activeRoomId }),
+      }).catch(() => {});
+    }
+
     const interval = setInterval(() => {
       if (document.visibilityState === 'visible') {
         fetchMessages(activeRoomId, true);
@@ -157,7 +173,7 @@ export default function EsotericCouncilChatPage() {
     }, 4000);
 
     return () => clearInterval(interval);
-  }, [activeRoomId, fetchMessages]);
+  }, [activeRoomId, fetchMessages, isLoggedIn]);
 
   const handleSendMessage = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -719,3 +735,4 @@ export default function EsotericCouncilChatPage() {
     </div>
   );
 }
+

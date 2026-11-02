@@ -110,9 +110,15 @@ export async function ensureChatReady() {
       CREATE TABLE IF NOT EXISTS chat_profiles (
         user_id UUID PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,
         nickname TEXT,
+        expo_push_token TEXT,
         is_muted BOOLEAN NOT NULL DEFAULT FALSE,
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
       );
+    `);
+
+    await db.execute(sql`
+      ALTER TABLE chat_profiles
+      ADD COLUMN IF NOT EXISTS expo_push_token TEXT;
     `);
 
     await db.execute(sql`
@@ -131,6 +137,27 @@ export async function ensureChatReady() {
     await db.execute(sql`
       CREATE INDEX IF NOT EXISTS idx_chat_messages_room_created
       ON chat_messages (room_id, created_at DESC);
+    `);
+
+    await db.execute(sql`
+      CREATE TABLE IF NOT EXISTS chat_notifications (
+        id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+        recipient_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        sender_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+        sender_name TEXT NOT NULL,
+        room_id TEXT NOT NULL REFERENCES chat_rooms(id) ON DELETE CASCADE,
+        room_title TEXT NOT NULL,
+        room_icon TEXT NOT NULL DEFAULT '💬',
+        message_id UUID NOT NULL,
+        message_preview TEXT NOT NULL,
+        is_read BOOLEAN NOT NULL DEFAULT FALSE,
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      );
+    `);
+
+    await db.execute(sql`
+      CREATE INDEX IF NOT EXISTS idx_chat_notifications_recipient
+      ON chat_notifications (recipient_user_id, is_read, created_at DESC);
     `);
 
     for (const room of DEFAULT_CHAT_ROOMS) {
@@ -153,6 +180,34 @@ export async function ensureChatReady() {
     isInitialized = true;
   } catch (err) {
     console.error('[ensureChatReady] Error:', err);
+  }
+}
+
+export async function sendExpoPushNotification(
+  expoPushToken: string | null | undefined,
+  title: string,
+  body: string,
+  data?: Record<string, any>
+) {
+  if (!expoPushToken || !expoPushToken.startsWith('ExponentPushToken[')) return;
+  try {
+    await fetch('https://exp.host/--/api/v2/push/send', {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Accept-encoding': 'gzip, deflate',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        to: expoPushToken,
+        sound: 'default',
+        title,
+        body,
+        data: data || {},
+      }),
+    });
+  } catch (err) {
+    console.warn('[sendExpoPushNotification] Failed:', err);
   }
 }
 
