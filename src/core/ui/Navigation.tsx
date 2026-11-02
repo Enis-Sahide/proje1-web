@@ -63,6 +63,7 @@ export default function Navigation() {
     { name: 'Frekans Odası', href: '/meditation' },
     { name: 'Nefes', href: '/breathwork' },
     { name: 'Analiz', href: '/analysis' },
+    { name: 'Meclis', href: '/meclis' },
     { name: 'Blog', href: '/blog' },
     { name: 'Dersler', href: '/kadim-dersler', requiresAuth: true },
     { name: 'Seviyeler', href: '/membership', requiresAuth: true, isLockedForNonAdmin: true },
