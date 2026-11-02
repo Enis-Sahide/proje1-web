@@ -8,6 +8,7 @@ import PlanetaryHourWidget from '@/features/astrology/components/PlanetaryHourWi
 import { ChevronDown, Quote, Loader2, Smartphone, Sparkles, ChevronRight } from 'lucide-react';
 import MoonCyclesWidget from '@/features/astrology/components/MoonCyclesWidget';
 import SchumannMiniWidget from '@/features/astrology/components/SchumannMiniWidget';
+import MeclisMiniWidget from '@/features/astrology/components/MeclisMiniWidget';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PLANET_DAY_GUIDELINES } from '@/utils/PlanetaryHours';
@@ -180,8 +181,9 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Right: Yıllık Ay Döngüleri & Schumann Mini */}
+            {/* Right: Yıllık Ay Döngüleri & Schumann Mini & Kadim Meclis */}
             <div className="w-full lg:w-1/3 flex flex-col items-center lg:items-start order-3 lg:order-3 gap-6">
+              <MeclisMiniWidget />
               <SchumannMiniWidget />
               <MoonCyclesWidget />
             </div>
