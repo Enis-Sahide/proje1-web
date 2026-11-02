@@ -18,6 +18,7 @@ import {
   CheckCircle2,
 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
+import { apiFetch } from '@/lib/apiClient';
 
 interface ChatRoom {
   id: string;
@@ -185,18 +186,15 @@ export default function EsotericCouncilChatPage() {
     setFeedbackError(null);
     setIsSending(true);
     try {
-      const res = await fetch('/api/chat/messages', {
+      const data = await apiFetch('/api/chat/messages', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           roomId: activeRoomId,
           content: trimmed,
           replyToId: replyTarget?.id || null,
         }),
       });
-      const data = await res.json();
-      if (!res.ok || !data?.success) {
+      if (!data?.success) {
         setFeedbackError(data?.error || 'Mesaj gönderilemedi.');
         return;
       }
@@ -213,8 +211,8 @@ export default function EsotericCouncilChatPage() {
         );
         setTimeout(() => scrollToBottom(true), 50);
       }
-    } catch {
-      setFeedbackError('Bağlantı hatası oluştu.');
+    } catch (err: any) {
+      setFeedbackError(err?.message || 'Bağlantı hatası oluştu.');
     } finally {
       setIsSending(false);
     }
@@ -222,12 +220,10 @@ export default function EsotericCouncilChatPage() {
 
   const handleDeleteMessage = async (msgId: string) => {
     try {
-      const res = await fetch(`/api/chat/messages?id=${encodeURIComponent(msgId)}`, {
+      const data = await apiFetch(`/api/chat/messages?id=${encodeURIComponent(msgId)}`, {
         method: 'DELETE',
-        credentials: 'include',
       });
-      const data = await res.json();
-      if (res.ok && data?.success) {
+      if (data?.success) {
         setMessages((prev) => prev.filter((m) => m.id !== msgId));
         setRooms((prev) =>
           prev.map((r) =>
@@ -235,7 +231,8 @@ export default function EsotericCouncilChatPage() {
           )
         );
       }
-    } catch (err) {
+    } catch (err: any) {
+      setFeedbackError(err?.message || 'Mesaj silinemedi.');
       console.error('Mesaj silinemedi:', err);
     }
   };
@@ -248,14 +245,11 @@ export default function EsotericCouncilChatPage() {
     setIsSavingNickname(true);
 
     try {
-      const res = await fetch('/api/chat/nickname', {
+      const data = await apiFetch('/api/chat/nickname', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ nickname: nicknameInput.trim() }),
       });
-      const data = await res.json();
-      if (!res.ok || !data?.success) {
+      if (!data?.success) {
         setFeedbackError(data?.error || 'Rumuz kaydedilemedi.');
         return;
       }
@@ -272,8 +266,8 @@ export default function EsotericCouncilChatPage() {
       setFeedbackSuccess(`Sohbet görünüm adınız "${data.effectiveDisplayName}" olarak güncellendi.`);
       setShowNicknameModal(false);
       fetchMessages(activeRoomId, true);
-    } catch {
-      setFeedbackError('Rumuz güncellenirken bağlantı hatası oluştu.');
+    } catch (err: any) {
+      setFeedbackError(err?.message || 'Rumuz güncellenirken bağlantı hatası oluştu.');
     } finally {
       setIsSavingNickname(false);
     }

@@ -2,11 +2,11 @@ import { asc, eq, sql } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { chatRooms, chatProfiles, chatMessages } from '@/db/schema';
 import { json, errorJson, preflight } from '@/lib/http/cors';
-import { getAuthPayload } from '@/lib/auth/session';
 import { getAccount } from '@/lib/auth/account';
 import {
   ensureChatReady,
   formatSafeDisplayName,
+  resolveChatUserId,
   ROLE_TITLES,
 } from '@/lib/chat/chatService';
 
@@ -50,9 +50,9 @@ export async function GET(request: Request) {
       isAdmin: boolean;
     } | null = null;
 
-    const payload = await getAuthPayload(request);
-    if (payload?.sub) {
-      const account = await getAccount(payload.sub);
+    const userId = await resolveChatUserId(request);
+    if (userId) {
+      const account = await getAccount(userId);
       if (account) {
         const [cp] = await db
           .select()

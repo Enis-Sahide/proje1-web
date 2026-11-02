@@ -1,7 +1,38 @@
 import 'server-only';
-import { sql } from 'drizzle-orm';
+import { createHash } from 'node:crypto';
+import { eq, sql } from 'drizzle-orm';
 import { db } from '@/db/client';
-import { chatRooms } from '@/db/schema';
+import { chatRooms, sessions } from '@/db/schema';
+import { getAuthPayload, readRefreshCookie } from '@/lib/auth/session';
+
+export async function resolveChatUserId(request: Request): Promise<string | null> {
+  const payload = await getAuthPayload(request);
+  if (payload?.sub) {
+    return payload.sub;
+  }
+
+  const refreshToken = readRefreshCookie(request);
+  if (!refreshToken) {
+    return null;
+  }
+
+  try {
+    const hash = createHash('sha256').update(refreshToken).digest('hex');
+    const [row] = await db.select().from(sessions).where(eq(sessions.refreshTokenHash, hash));
+    if (!row || row.expiresAt.getTime() < Date.now()) {
+      return null;
+    }
+    if (row.revokedAt) {
+      const revokedSecsAgo = (Date.now() - row.revokedAt.getTime()) / 1000;
+      if (revokedSecsAgo > 60) {
+        return null;
+      }
+    }
+    return row.userId;
+  } catch {
+    return null;
+  }
+}
 
 export interface SeedRoom {
   id: string;

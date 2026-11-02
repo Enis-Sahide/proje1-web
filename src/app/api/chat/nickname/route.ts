@@ -2,11 +2,11 @@ import { and, eq, ne, sql } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { chatProfiles } from '@/db/schema';
 import { json, errorJson, preflight } from '@/lib/http/cors';
-import { getAuthPayload } from '@/lib/auth/session';
 import { getAccount } from '@/lib/auth/account';
 import {
   ensureChatReady,
   formatSafeDisplayName,
+  resolveChatUserId,
   validateNickname,
 } from '@/lib/chat/chatService';
 
@@ -16,12 +16,12 @@ export async function POST(request: Request) {
   try {
     await ensureChatReady();
 
-    const payload = await getAuthPayload(request);
-    if (!payload?.sub) {
+    const userId = await resolveChatUserId(request);
+    if (!userId) {
       return errorJson('Rumuz belirlemek için giriş yapmalısınız.', 401);
     }
 
-    const account = await getAccount(payload.sub);
+    const account = await getAccount(userId);
     if (!account) {
       return errorJson('Kullanıcı bulunamadı.', 404);
     }

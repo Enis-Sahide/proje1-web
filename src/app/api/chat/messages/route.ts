@@ -2,11 +2,11 @@ import { desc, eq } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { chatMessages, chatNotifications, chatProfiles, chatRooms, profiles, users } from '@/db/schema';
 import { json, errorJson, preflight } from '@/lib/http/cors';
-import { getAuthPayload } from '@/lib/auth/session';
 import { getAccount } from '@/lib/auth/account';
 import {
   ensureChatReady,
   formatSafeDisplayName,
+  resolveChatUserId,
   ROLE_TITLES,
   sendExpoPushNotification,
   validateChatMessageContent,
@@ -21,8 +21,7 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const roomId = searchParams.get('roomId') || 'genel-meydan';
 
-    const payload = await getAuthPayload(request);
-    const currentUserId = payload?.sub || null;
+    const currentUserId = await resolveChatUserId(request);
 
     const rows = await db
       .select({
@@ -82,12 +81,12 @@ export async function POST(request: Request) {
   try {
     await ensureChatReady();
 
-    const payload = await getAuthPayload(request);
-    if (!payload?.sub) {
+    const userId = await resolveChatUserId(request);
+    if (!userId) {
       return errorJson('Mesaj göndermek için üye girişi yapmalısınız.', 401);
     }
 
-    const account = await getAccount(payload.sub);
+    const account = await getAccount(userId);
     if (!account) {
       return errorJson('Kullanıcı hesabı bulunamadı.', 404);
     }
@@ -233,12 +232,12 @@ export async function DELETE(request: Request) {
   try {
     await ensureChatReady();
 
-    const payload = await getAuthPayload(request);
-    if (!payload?.sub) {
+    const userId = await resolveChatUserId(request);
+    if (!userId) {
       return errorJson('Yetkisiz işlem.', 401);
     }
 
-    const account = await getAccount(payload.sub);
+    const account = await getAccount(userId);
     if (!account) {
       return errorJson('Kullanıcı bulunamadı.', 404);
     }

@@ -2,8 +2,7 @@ import { and, desc, eq } from 'drizzle-orm';
 import { db } from '@/db/client';
 import { chatNotifications, chatProfiles } from '@/db/schema';
 import { json, errorJson, preflight } from '@/lib/http/cors';
-import { getAuthPayload } from '@/lib/auth/session';
-import { ensureChatReady } from '@/lib/chat/chatService';
+import { ensureChatReady, resolveChatUserId } from '@/lib/chat/chatService';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,8 +10,8 @@ export async function GET(request: Request) {
   try {
     await ensureChatReady();
 
-    const payload = await getAuthPayload(request);
-    if (!payload?.sub) {
+    const userId = await resolveChatUserId(request);
+    if (!userId) {
       return json({
         success: true,
         unreadCount: 0,
@@ -23,7 +22,7 @@ export async function GET(request: Request) {
     const notifications = await db
       .select()
       .from(chatNotifications)
-      .where(eq(chatNotifications.recipientUserId, payload.sub))
+      .where(eq(chatNotifications.recipientUserId, userId))
       .orderBy(desc(chatNotifications.createdAt))
       .limit(20);
 
@@ -54,8 +53,8 @@ export async function POST(request: Request) {
   try {
     await ensureChatReady();
 
-    const payload = await getAuthPayload(request);
-    if (!payload?.sub) {
+    const userId = await resolveChatUserId(request);
+    if (!userId) {
       return errorJson('Yetkisiz işlem.', 401);
     }
 
@@ -71,16 +70,16 @@ export async function POST(request: Request) {
       const [existing] = await db
         .select()
         .from(chatProfiles)
-        .where(eq(chatProfiles.userId, payload.sub));
+        .where(eq(chatProfiles.userId, userId));
 
       if (existing) {
         await db
           .update(chatProfiles)
           .set({ expoPushToken, updatedAt: new Date() })
-          .where(eq(chatProfiles.userId, payload.sub));
+          .where(eq(chatProfiles.userId, userId));
       } else {
         await db.insert(chatProfiles).values({
-          userId: payload.sub,
+          userId,
           expoPushToken,
           updatedAt: new Date(),
         });
@@ -100,7 +99,7 @@ export async function POST(request: Request) {
           .where(
             and(
               eq(chatNotifications.id, notificationId),
-              eq(chatNotifications.recipientUserId, payload.sub)
+              eq(chatNotifications.recipientUserId, userId)
             )
           );
       } else if (roomId) {
@@ -110,14 +109,14 @@ export async function POST(request: Request) {
           .where(
             and(
               eq(chatNotifications.roomId, roomId),
-              eq(chatNotifications.recipientUserId, payload.sub)
+              eq(chatNotifications.recipientUserId, userId)
             )
           );
       } else {
         await db
           .update(chatNotifications)
           .set({ isRead: true })
-          .where(eq(chatNotifications.recipientUserId, payload.sub));
+          .where(eq(chatNotifications.recipientUserId, userId));
       }
 
       return json({ success: true });
@@ -131,3 +130,4 @@ export async function POST(request: Request) {
 }
 
 export const OPTIONS = preflight;
+
