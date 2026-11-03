@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/core/ui/Navigation";
@@ -8,11 +8,19 @@ import RouteGuard from "@/core/ui/RouteGuard";
 import AnimatedBackground from "@/core/ui/AnimatedBackground";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
 import ClarityProvider from "@/components/ClarityProvider";
+import IosInstallBanner from "@/components/IosInstallBanner";
 import Footer from "@/core/ui/Footer";
 
 const inter = Inter({
   subsets: ["latin"],
 });
+
+export const viewport: Viewport = {
+  themeColor: "#050508",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://www.7layers.tr'),
@@ -21,6 +29,12 @@ export const metadata: Metadata = {
     template: "%s | 7Layers Ancient Knowledge Realm"
   },
   description: "7Layers Ancient Knowledge Realm (Kadim Bilgiler Alanı) - İnsan Tasarımı (Human Design), Çakra Analizi, Schumann Rezonansı, Gezegen Saatleri ve Kadim İlimler platformu. Kendinizi ve kozmik enerjileri keşfedin.",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "black-translucent",
+    title: "7Layers",
+  },
   keywords: [
     "7layers",
     "7layers ancient knowledge realm",
@@ -34,7 +48,8 @@ export const metadata: Metadata = {
     "meditasyon",
     "nefes egzersizleri",
     "kadim bilgiler",
-    "7layers android"
+    "7layers android",
+    "7layers ios"
   ],
   authors: [{ name: "7Layers Ancient Knowledge Realm" }],
   creator: "7Layers",
@@ -42,9 +57,14 @@ export const metadata: Metadata = {
     google: 'a15kbuAKAeY4DSM8hNw31SrHZjIoSb1IIyMFTBEhq14',
   },
   icons: {
-    icon: '/gold-logo.png',
-    shortcut: '/gold-logo.png',
-    apple: '/gold-logo.png',
+    icon: [
+      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    shortcut: '/icon-192.png',
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
   },
   openGraph: {
     title: "7Layers Ancient Knowledge Realm | Kadim Bilgiler Alanı",
@@ -93,6 +113,7 @@ export default function RootLayout({
               <main className="flex-grow flex flex-col">
                 {children}
               </main>
+              <IosInstallBanner />
               <Footer />
             </RouteGuard>
           </AuthProvider>
