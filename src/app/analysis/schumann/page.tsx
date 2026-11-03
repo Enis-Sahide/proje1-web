@@ -68,6 +68,9 @@ interface KpData {
   schumann_real?: RealSchumannRow;
   peak_a1_24h?: number;
   peak_score_24h?: number;
+  is_offline?: boolean;
+  offline_warning?: string | null;
+  last_cached_at?: string | null;
 }
 
 interface HoverInfo {
@@ -910,38 +913,77 @@ export default function SchumannPage() {
             </div>
           ) : (
             <div className="w-full flex flex-col justify-center items-center py-6 bg-black/40 rounded-2xl border border-white/5 relative overflow-hidden group">
+              {/* Offline Warning Banner when sos70.ru is unreachable */}
+              {data?.is_offline && (
+                <div className="w-[calc(100%-2rem)] mb-5 bg-amber-500/10 border border-amber-500/40 rounded-2xl p-4 flex items-start gap-3 text-left shadow-[0_0_25px_rgba(245,158,11,0.12)]">
+                  <AlertCircle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5 animate-pulse" />
+                  <div className="flex-1">
+                    <div className="text-xs font-extrabold text-amber-300 uppercase tracking-wider mb-1">
+                      ⚠️ Tomsk Rasathanesi (sos70.ru) Veri Kaynağına Şu Anda Ulaşılamıyor
+                    </div>
+                    <p className="text-xs text-amber-100/90 leading-relaxed">
+                      {data.offline_warning || 'Kaynak sunucuya erişilemediği için anlık veri çekilemiyor. Boş ekran yerine veri kesintisinden önceki en son hesaplanan spektrogram görseli ve ölçüm değerleri sunulmaktadır.'}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {/* Header block with local and observer times */}
               <div className="flex flex-col sm:flex-row items-center gap-3 px-4 mb-4 text-center z-10 w-full justify-center">
-                <div className="bg-[#00E5FF]/10 border border-[#00E5FF]/30 text-[#00E5FF] text-[10px] font-extrabold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-lg tracking-wider uppercase">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse"></span> Canlı Gözlemevi Ölçümü
-                </div>
+                {data?.is_offline ? (
+                  <div className="bg-amber-500/15 border border-amber-500/40 text-amber-300 text-[10px] font-extrabold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-lg tracking-wider uppercase">
+                    <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Çevrimdışı Arşiv • Son Hesaplanan Veri
+                  </div>
+                ) : (
+                  <div className="bg-[#00E5FF]/10 border border-[#00E5FF]/30 text-[#00E5FF] text-[10px] font-extrabold px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-lg tracking-wider uppercase">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#00E5FF] animate-pulse"></span> Canlı Gözlemevi Ölçümü
+                  </div>
+                )}
                 {data?.schumann_real && (
                   <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-white/90 font-semibold font-sans">
                     <span className="bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
-                      Yerel Saat: <span className="text-[#00E5FF]">{formatRealTime(data.schumann_real.time_utc)}</span>
+                      {data?.is_offline ? 'Son Kayıt (Yerel): ' : 'Yerel Saat: '}
+                      <span className="text-[#00E5FF]">{formatRealTime(data.schumann_real.time_utc)}</span>
                     </span>
                     <span className="text-white/30 font-normal">|</span>
                     <span className="bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">
-                      Tomsk Saati: <span className="text-[#A78BFA]">{formatTomskTime(data.schumann_real.time_utc)}</span>
+                      {data?.is_offline ? 'Son Kayıt (Tomsk): ' : 'Tomsk Saati: '}
+                      <span className="text-[#A78BFA]">{formatTomskTime(data.schumann_real.time_utc)}</span>
                     </span>
                   </div>
                 )}
               </div>
 
               {/* Scrollable Spectrogram Container */}
-              <div className="w-full overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent">
+              <div className="w-full overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-white/10 scrollbar-track-transparent relative">
                 <div className="min-w-[750px] px-4 mt-2 relative">
                   <img 
                     src={`/api/schumann/image?t=${timestamp}`} 
-                    alt="Canlı Schumann Rezonans Spektrogramı (Tomsk, Rusya)" 
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (!target.src.endsWith('/shm.jpg')) {
+                        target.src = '/shm.jpg';
+                      }
+                    }}
+                    alt="Schumann Rezonans Spektrogramı (Tomsk, Rusya)" 
                     className="w-full h-auto rounded-xl border border-white/10 shadow-[0_4px_30px_rgba(0,0,0,0.8)]"
                   />
+                  {data?.is_offline && (
+                    <div className="absolute top-3 left-8 right-8 pointer-events-none flex justify-center">
+                      <div className="bg-black/85 backdrop-blur-md border border-amber-500/60 text-amber-300 px-4 py-2 rounded-xl shadow-[0_4px_20px_rgba(0,0,0,0.9)] flex items-center gap-2 text-xs font-bold">
+                        <AlertCircle className="w-4 h-4 text-amber-400 shrink-0" />
+                        <span>SOS70 Kaynağına Ulaşılamıyor • Kesinti Öncesi En Son Hesaplanan Veri Görseli</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
 
               <div className="mt-2 text-center px-4">
                 <span className="text-xs text-mystic-text-muted">
-                  Grafik verileri Space Observing System 70 (Tomsk, Rusya) üzerinden her saat güncellenmektedir. Mobil cihazlarda grafiği yatayda kaydırarak inceleyebilirsiniz.
+                  {data?.is_offline
+                    ? '⚠️ Space Observing System 70 (Tomsk, Rusya) sunucusuna şu anda erişilemediğinden kesinti öncesi alınan en son spektrogram görseli gösterilmektedir.'
+                    : 'Grafik verileri Space Observing System 70 (Tomsk, Rusya) üzerinden her saat güncellenmektedir. Mobil cihazlarda grafiği yatayda kaydırarak inceleyebilirsiniz.'}
                 </span>
               </div>
             </div>

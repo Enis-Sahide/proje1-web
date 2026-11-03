@@ -1,9 +1,13 @@
 import { json, errorJson, preflight } from '@/lib/http/cors';
 import sharp from 'sharp';
+import fs from 'fs/promises';
+import path from 'path';
 import { db } from '@/db/client';
 import * as schema from '@/db/schema';
 
 export const dynamic = 'force-dynamic';
+
+const FALLBACK_IMAGE_PATH = path.join(process.cwd(), 'public', 'shm.jpg');
 
 export async function OPTIONS() {
   return preflight();
@@ -150,13 +154,14 @@ async function fetchRealSchumannData(): Promise<RealSchumannRow | null> {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         },
+        signal: AbortSignal.timeout(4000),
         next: { revalidate: 180 } // Cache for 3 minutes
       });
       if (res.ok) {
         return await res.text();
       }
-    } catch (e) {
-      console.error(`Error fetching .afq file ${filename}:`, e);
+    } catch (e: any) {
+      console.warn(`Error fetching .afq file ${filename}:`, e?.message || e);
     }
     return null;
   };
@@ -210,20 +215,46 @@ async function detectFlaresFromImage(): Promise<{
   score: number; 
   peakA1: number; 
   score24h: number; 
-  peakA124h: number; 
+  peakA124h: number;
+  isOffline: boolean;
+  cachedAt?: string;
 } | null> {
   try {
-    const url = 'https://sos70.ru/provider.php?file=shm.jpg';
-    const res = await fetch(url, {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Referer': 'https://sos70.ru/'
-      },
-      next: { revalidate: 300 } // Cache for 5 minutes
-    });
-    if (!res.ok) return null;
-    
-    const buffer = Buffer.from(await res.arrayBuffer());
+    let buffer: Buffer | null = null;
+    let isOffline = false;
+    let cachedAt: string | undefined;
+
+    try {
+      const url = 'https://sos70.ru/provider.php?file=shm.jpg';
+      const res = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+          'Referer': 'https://sos70.ru/'
+        },
+        signal: AbortSignal.timeout(4500),
+        next: { revalidate: 300 } // Cache for 5 minutes
+      });
+      if (res.ok) {
+        buffer = Buffer.from(await res.arrayBuffer());
+        try {
+          await fs.writeFile(FALLBACK_IMAGE_PATH, buffer);
+        } catch (writeErr) {
+          console.warn('Could not write cached public/shm.jpg:', writeErr);
+        }
+      }
+    } catch (liveErr: any) {
+      console.warn('SOS70 live image unreachable, using cached public/shm.jpg:', liveErr?.message || liveErr);
+    }
+
+    if (!buffer) {
+      isOffline = true;
+      buffer = await fs.readFile(FALLBACK_IMAGE_PATH);
+      try {
+        const stat = await fs.stat(FALLBACK_IMAGE_PATH);
+        cachedAt = stat.mtime.toISOString();
+      } catch {}
+    }
+
     const image = sharp(buffer);
     const { data, info } = await image.raw().toBuffer({ resolveWithObject: true });
     
@@ -338,7 +369,9 @@ async function detectFlaresFromImage(): Promise<{
       score: score,
       peakA1: peakA1,
       score24h: score24h,
-      peakA124h: peakA124h
+      peakA124h: peakA124h,
+      isOffline: isOffline,
+      cachedAt: cachedAt
     };
   } catch (err) {
     console.error('Error detecting flares from image:', err);
@@ -356,14 +389,16 @@ export async function GET(req: Request) {
     // 1. Fetch actual Schumann values from Tomsk .afq logs
     let realSchumann = await fetchRealSchumannData();
     
-    // Detect flares/bursts dynamically from the live spectrogram image
+    // Detect flares/bursts dynamically from the live spectrogram image (or cached shm.jpg fallback)
     const imageFlareData = await detectFlaresFromImage();
+    const isOffline = !realSchumann && (!imageFlareData || imageFlareData.isOffline);
+
     if (imageFlareData) {
       if (!realSchumann) {
-        // Create fallback object since .afq log is offline but spectrogram image works
+        // Create fallback object since .afq log is offline
         realSchumann = {
-          time_tomsk: 'Canlı Gözlem',
-          time_utc: new Date().toISOString(),
+          time_tomsk: imageFlareData.isOffline ? 'Son Hesaplanan Kayıt' : 'Canlı Gözlem',
+          time_utc: imageFlareData.cachedAt || new Date().toISOString(),
           a1: imageFlareData.peakA1,
           f1: 7.83,
           q1: 10,
@@ -377,7 +412,7 @@ export async function GET(req: Request) {
           f4: 26.4,
           q4: 10
         };
-      } else if (imageFlareData.peakA1 > realSchumann.a1) {
+      } else if (!imageFlareData.isOffline && imageFlareData.peakA1 > realSchumann.a1) {
         console.log(`Image-based flare detected! Scaling A1 from ${realSchumann.a1} to ${imageFlareData.peakA1}`);
         realSchumann.a1 = imageFlareData.peakA1;
       }
@@ -427,7 +462,12 @@ export async function GET(req: Request) {
       triggered_g_level: triggeredGLevel,
       schumann_rules: allRules,
       peak_a1_24h: finalPeakA1,
-      peak_score_24h: finalPeakScore
+      peak_score_24h: finalPeakScore,
+      is_offline: isOffline,
+      offline_warning: isOffline
+        ? 'Tomsk Rasathanesi (sos70.ru) veri kaynağına şu anda ulaşılamıyor. Boş ekran yerine veri kesintisinden önceki en son hesaplanan spektrogram görseli ve ölçüm değerleri gösterilmektedir.'
+        : null,
+      last_cached_at: imageFlareData?.cachedAt || null
     });
   } catch (error: any) {
     console.error('Schumann API Error:', error);
