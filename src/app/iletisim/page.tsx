@@ -76,6 +76,10 @@ const FAQS = [
     a: '7Layers\'ta satın aldığınız her analiz modülü, tek ödeme ile hesabınıza süresiz ve sınırsız sorgulama hakkıyla açılır. Farklı doğum bilgileriyle kendiniz veya yakınlarınız için dilediğiniz kadar yeni analiz yapabilirsiniz.'
   },
   {
+    q: 'Seviyemi (Çırak, Kalfa, Usta) nereden ve nasıl yükseltebilirim?',
+    a: 'Kadim Dersler ve Sınavlar bölümündeki ilgili seviye sınavlarını %80 ve üzeri başarıyla tamamladığınızda bir üst seviyeye (Çırak, Kalfa veya Usta) yükselmeye hak kazanırsınız. Sınav şartını sağladıktan sonra Profil veya Seviye Yükselt sayfası üzerinden ilgili seviyenin ödemesini gerçekleştirdiğinizde yeni seviyeniz aktif olur ve o seviyede kaldığınız sürece ilgili derecenin tüm ayrıcalıklarına sahip olursunuz.'
+  },
+  {
     q: 'Analiz satın almak için üye olmam gerekiyor mu?',
     a: 'Satın aldığınız analiz haklarının hesabınıza kalıcı olarak tanımlanabilmesi ve dilediğiniz zaman sınırsız sorgulama yapabilmeniz için ücretsiz üye girişi yaparak işlem gerçekleştirmeniz yeterlidir.'
   }
