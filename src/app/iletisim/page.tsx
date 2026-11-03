@@ -68,12 +68,16 @@ const CATEGORIES = [
 
 const FAQS = [
   {
-    q: 'Satın aldığım analiz raporu e-postama ne zaman ulaşır?',
-    a: 'Ödemeniz onaylandığı anda yapay zekâ ve ezoterik hesaplama motorumuz raporunuzu hazırlar. Raporunuz genellikle 1-3 dakika içerisinde hem ekranda indirilebilir hale gelir hem de e-posta adresinize PDF olarak gönderilir.'
+    q: 'Satın aldığım analizlere nasıl erişebilirim ve PDF olarak nasıl indiririm?',
+    a: 'Ödemeniz onaylandığı anda ilgili analiz modülü hesabınıza anında tanımlanır. Doğrudan analiz sayfası üzerinden sorgulamanızı yapabilir, tüm katmanları ekranda inceleyebilir ve "PDF Raporu İndir" butonuyla raporunuzu cihazınıza indirebilirsiniz.'
   },
   {
-    q: 'Raporumu e-posta kutumda göremiyorum, ne yapmalıyım?',
-    a: 'Lütfen öncelikle Spam / İstenmeyen veya Tanıtımlar klasörlerinizi kontrol ediniz. Yine de bulamadıysanız aşağıdaki formdan bize sipariş e-postanızı iletmeniz yeterlidir; ekibimiz hemen manuel gönderim sağlar.'
+    q: 'Satın aldığım bir analizde kaç kez sorgulama yapabilirim?',
+    a: '7Layers''ta satın aldığınız her analiz modülü, tek ödeme ile hesabınıza süresiz ve sınırsız sorgulama hakkıyla açılır. Farklı doğum bilgileriyle kendiniz veya yakınlarınız için dilediğiniz kadar yeni analiz yapabilirsiniz.'
+  },
+  {
+    q: 'Analiz satın almak için üye olmam gerekiyor mu?',
+    a: 'Satın aldığınız analiz haklarının hesabınıza kalıcı olarak tanımlanabilmesi ve dilediğiniz zaman sınırsız sorgulama yapabilmeniz için ücretsiz üye girişi yaparak işlem gerçekleştirmeniz yeterlidir.'
   }
 ];
 
