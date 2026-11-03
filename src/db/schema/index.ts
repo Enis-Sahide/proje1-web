@@ -6,3 +6,4 @@ export * from './analytics';
 
 export * from './payment';
 export * from './contact';
+export * from './chat';

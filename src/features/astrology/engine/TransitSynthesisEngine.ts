@@ -1033,10 +1033,22 @@ function buildDetailedCosmicBarometer(
    * Normalized Orb-Weighted Aspect Evaluator (-26 to +26)
    * Prevents cumulative runaway inflation when there are many aspects!
    */
+  // Classical "İntikal-i Nur" (Translation of Light):
+  // Slow outer-planet pairs only act as a full daily event on days when a Fast/Personal planet (Sun, Moon, Mercury, Venus, Mars) aspects one of them!
+  const FAST_LIGHT_CARRIERS = ['Güneş', 'Ay', 'Merkür', 'Venüs', 'Mars', 'Yükselen (ASC)', 'Tepe Noktası (MC)'];
+  const SLOW_GENERATIONAL = ['Uranüs', 'Neptün', 'Plüton', 'Kiron', 'Kuzey Ay Düğümü', 'Lilith'];
+  const litSlowPlanets = new Set<string>();
+  for (const asp of aspects) {
+    if (asp.orb > 3.2) continue;
+    if (FAST_LIGHT_CARRIERS.includes(asp.p1) && SLOW_GENERATIONAL.includes(asp.p2)) litSlowPlanets.add(asp.p2);
+    if (FAST_LIGHT_CARRIERS.includes(asp.p2) && SLOW_GENERATIONAL.includes(asp.p1)) litSlowPlanets.add(asp.p1);
+  }
+
   const evalNormalizedAspectImpact = (
     primaryPlanets: string[],
     disruptorPlanets: string[] = [],
-    conjunctionBenefics: string[] = ['Jüpiter', 'Venüs', 'Güneş', 'Şans Noktası (POF)']
+    conjunctionBenefics: string[] = ['Jüpiter', 'Venüs', 'Güneş', 'Şans Noktası (POF)'],
+    isHealingChannel = false
   ): { scoreDelta: number; netTrend: number } => {
     let weightedValenceSum = 0;
     let totalOrbWeight = 0;
@@ -1047,10 +1059,17 @@ function buildDetailedCosmicBarometer(
       const p2Match = primaryPlanets.includes(asp.p2);
       if (!p1Match && !p2Match) continue;
 
+      // İntikal-i Nur: If both planets are slow generational planets in mundane sky, only give full weight if a fast planet is translating light to them today (or orb <= 0.3°)
+      const bothSlow = !isPersonal && SLOW_GENERATIONAL.includes(asp.p1) && SLOW_GENERATIONAL.includes(asp.p2);
+      const isLitToday = litSlowPlanets.has(asp.p1) || litSlowPlanets.has(asp.p2) || asp.orb <= 0.3;
+      const lightTranslationFactor = (bothSlow && !isLitToday) ? 0.15 : 1.0;
+
       // Primary relevance: both planets in group = 1.25x, one planet in group = 1.0x
-      const relevance = (p1Match && p2Match) ? 1.25 : 1.0;
+      const relevance = ((p1Match && p2Match) ? 1.25 : 1.0) * lightTranslationFactor;
       const orbProximity = Math.pow(Math.max(0, (4.2 - asp.orb) / 4.2), 1.25);
       const w = orbProximity * relevance;
+
+      const involvesChiron = asp.p1 === 'Kiron' || asp.p2 === 'Kiron';
 
       let valence = 0;
       if (asp.aspectType === 'Üçgen') {
@@ -1058,9 +1077,10 @@ function buildDetailedCosmicBarometer(
       } else if (asp.aspectType === 'Sekstil') {
         valence = 0.78;
       } else if (asp.aspectType === 'Kare') {
-        valence = -1.0;
+        valence = (isHealingChannel && involvesChiron) ? 0.25 : -1.0;
       } else if (asp.aspectType === 'Karşıt') {
-        valence = -0.88;
+        // Chiron oppositions trigger cathartic wound-healing awareness in the healing dimension (while penalizing relational/personal comfort elsewhere)
+        valence = (isHealingChannel && involvesChiron) ? 0.35 : -0.88;
       } else if (asp.aspectType === 'Görmeyen') {
         valence = -0.65;
       } else if (asp.aspectType === 'Kavuşum') {
@@ -1103,7 +1123,7 @@ function buildDetailedCosmicBarometer(
   const fizAspect = evalNormalizedAspectImpact(['Güneş', 'Mars'], ['Satürn', 'Neptün']);
   const duyAspect = evalNormalizedAspectImpact(['Ay', 'Venüs'], ['Satürn', 'Plüton', 'Mars']);
   const entAspect = evalNormalizedAspectImpact(['Merkür', 'Uranüs'], ['Neptün', 'Mars']);
-  const ruhAspect = evalNormalizedAspectImpact(['Neptün', 'Ay', 'Kiron', 'Kuzey Ay Düğümü'], ['Satürn'], ['Jüpiter', 'Venüs', 'Neptün', 'Kuzey Ay Düğümü']);
+  const ruhAspect = evalNormalizedAspectImpact(['Neptün', 'Plüton', 'Ay', 'Kiron', 'Kuzey Ay Düğümü'], ['Satürn'], ['Jüpiter', 'Venüs', 'Neptün', 'Plüton', 'Kuzey Ay Düğümü'], true);
 
   const getPersonalOrSkyDignity = (tp: AstroPoint | undefined, favHouses: number[], chalHouses: number[], allowRetro = false) => {
     const tDig = getPlanetDignityScore(tp, allowRetro);
@@ -1255,12 +1275,12 @@ function buildDetailedCosmicBarometer(
     + jupDig * 0.85
     + Math.sin(degToRad(jupLon * 2 + venLon)) * 3.5;
 
-  // 8. Ruhsal Şifa & Kadersel Akış (Yönetici: Neptün, Kiron, K. Ay Düğümü & Vertex — Arınma ve eşzamanlılık)
-  const healAsp = evalNormalizedAspectImpact(['Kiron', 'Neptün', 'Kuzey Ay Düğümü', 'Vertex (Vx)'], ['Mars', 'Satürn'], ['Venüs', 'Jüpiter', 'Neptün', 'Kuzey Ay Düğümü']);
+  // 8. Ruhsal Şifa & Kadersel Akış (Yönetici: Neptün, Plüton, Kiron, K. Ay Düğümü & Vertex — Arınma ve eşzamanlılık)
+  const healAsp = evalNormalizedAspectImpact(['Kiron', 'Neptün', 'Plüton', 'Kuzey Ay Düğümü', 'Vertex (Vx)'], ['Mars', 'Satürn'], ['Venüs', 'Jüpiter', 'Neptün', 'Plüton', 'Güneş', 'Kuzey Ay Düğümü'], true);
   const attrHealing = 56
     + healAsp.scoreDelta
     + (nepDig * 0.55 + pluDig * 0.30)
-    + (waterPct - 25) * 0.25
+    + Math.max(0, waterPct - 25) * 0.25
     + Math.cos(degToRad((chiron?.longitude ?? 0) + nepLon + moonLon)) * 3.5;
 
   const toGauge = (
@@ -1374,7 +1394,7 @@ const SIGN_FLAVORS: Record<string, { adj: string; style: string }> = {
   'Aslan': { adj: 'özgüvenli, yaratıcı ve sıcak', style: 'kendi ışığınızı ortaya koyarak ve yürekten ifade ederek' },
   'Başak': { adj: 'analitik, özenli ve çözüm odaklı', style: 'detayları sadeleştirerek ve pratik düzen kurarak' },
   'Terazi': { adj: 'uzlaşmacı, zarif ve denge arayan', style: 'adil bir diyalog ve karşılıklı uyum kurarak' },
-  'Akrep': { adj: 'derin, sezgisel ve dönüştürücü', style: 'yüzeyin altındaki gerçeği görerek ve stratejik hareket ederek' },
+  'Akrep': { adj: 'derin, sezgisel ve dönüştürücü', style: 'yüzeyin altındaki gerçeği görerek ve stratejik adımlar atarak' },
   'Yay': { adj: 'vizyoner, iyimser ve özgürlükçü', style: 'ufkunuzu genişleterek ve büyük resme odaklanarak' },
   'Oğlak': { adj: 'disiplinli, kararlı ve gerçekçi', style: 'uzun vadeli sorumluluk alarak ve sağlam sınırlar çizerek' },
   'Kova': { adj: 'yenilikçi, özgün ve ezber bozan', style: 'alışılmış kalıpların dışına çıkarak ve bağımsız düşünerek' },
@@ -1582,8 +1602,26 @@ export function generateCurrentSkyOverview(
 
   const moonData = MOON_MOODS[moonSign] || MOON_MOODS['Koç'];
 
-  // Açıları dar orb'a göre filtrele ve sırala
-  const validAspects = (allSkyAspects || []).filter(a => a.orb <= 3.2);
+  // İntikal-i Nur (Işığın Taşınması): İki ağır kuşak gezegeni arasındaki aylarca süren açılar,
+  // yalnızca o gün hızlı/kişisel bir gezegen (Güneş, Ay, Merkür, Venüs, Mars) o noktaya açı yapıp ışığı taşıyorsa (veya <= 0.3° tam pik ise) günün aktif olayı sayılır.
+  const FAST_DAILY_PLANETS = ['Güneş', 'Ay', 'Merkür', 'Venüs', 'Mars'];
+  const SLOW_OUTER_PLANETS = ['Uranüs', 'Neptün', 'Plüton', 'Kiron', 'Kuzey Ay Düğümü', 'Lilith'];
+  const dailyLitOuterPlanets = new Set<string>();
+  for (const a of (allSkyAspects || [])) {
+    if (a.orb > 3.2) continue;
+    if (FAST_DAILY_PLANETS.includes(a.planet1) && SLOW_OUTER_PLANETS.includes(a.planet2)) dailyLitOuterPlanets.add(a.planet2);
+    if (FAST_DAILY_PLANETS.includes(a.planet2) && SLOW_OUTER_PLANETS.includes(a.planet1)) dailyLitOuterPlanets.add(a.planet1);
+  }
+
+  // Açıları dar orb'a ve İntikal-i Nur kuralına göre filtrele ve sırala
+  const validAspects = (allSkyAspects || []).filter(a => {
+    if (a.orb > 3.2) return false;
+    const bothOuter = SLOW_OUTER_PLANETS.includes(a.planet1) && SLOW_OUTER_PLANETS.includes(a.planet2);
+    if (bothOuter && a.orb > 0.35 && !dailyLitOuterPlanets.has(a.planet1) && !dailyLitOuterPlanets.has(a.planet2)) {
+      return false;
+    }
+    return true;
+  });
   validAspects.sort((a, b) => a.orb - b.orb);
 
   const enrichSkyAspect = (asp: any): EnrichedSkyAspectItem => {

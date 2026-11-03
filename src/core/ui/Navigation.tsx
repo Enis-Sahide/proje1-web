@@ -1,12 +1,24 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { usePathname } from 'next/navigation';
-import { Menu, X, Sparkles, User, LogIn, Shield, Lock, Wrench, LogOut, Home, Compass, Activity } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
+import { Menu, X, Sparkles, User, LogIn, Lock, Wrench, LogOut, Home, Compass, Activity, Bell, CheckCheck, MessageSquareReply } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
+
+interface ChatNotificationItem {
+  id: string;
+  roomId: string;
+  roomTitle: string;
+  roomIcon: string;
+  senderName: string;
+  messageId: string;
+  messagePreview: string;
+  isRead: boolean;
+  createdAt: string;
+}
 
 const ROLE_SHORT_LABELS: Record<string, string> = {
   free: 'Ücretsiz',
@@ -35,7 +47,14 @@ interface NavItem {
 export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [notifications, setNotifications] = useState<ChatNotificationItem[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [liveToast, setLiveToast] = useState<ChatNotificationItem | null>(null);
+  const seenNotifIdsRef = useRef<Set<string>>(new Set());
+  const initialFetchDoneRef = useRef(false);
   const pathname = usePathname();
+  const router = useRouter();
 
   const { user, role, logout } = useAuth();
   const isLoggedIn = !!user;
@@ -58,11 +77,92 @@ export default function Navigation() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    if (!isLoggedIn) {
+      setNotifications([]);
+      setUnreadCount(0);
+      seenNotifIdsRef.current.clear();
+      initialFetchDoneRef.current = false;
+      return;
+    }
+
+    let active = true;
+
+    const fetchNotifications = async () => {
+      try {
+        const res = await fetch('/api/chat/notifications', { cache: 'no-store' });
+        const data = await res.json();
+        if (!active || !data.success) return;
+
+        const list: ChatNotificationItem[] = data.notifications || [];
+        setNotifications(list);
+        setUnreadCount(data.unreadCount || 0);
+
+        if (!initialFetchDoneRef.current) {
+          list.forEach((n) => seenNotifIdsRef.current.add(n.id));
+          initialFetchDoneRef.current = true;
+        } else {
+          const newestUnread = list.find((n) => !n.isRead && !seenNotifIdsRef.current.has(n.id));
+          list.forEach((n) => seenNotifIdsRef.current.add(n.id));
+          if (newestUnread) {
+            setLiveToast(newestUnread);
+            setTimeout(() => {
+              setLiveToast((prev) => (prev?.id === newestUnread.id ? null : prev));
+            }, 6500);
+          }
+        }
+      } catch {
+        // ignore transient network errors
+      }
+    };
+
+    void fetchNotifications();
+    const timer = setInterval(fetchNotifications, 8000);
+    return () => {
+      active = false;
+      clearInterval(timer);
+    };
+  }, [isLoggedIn]);
+
+  const handleNotificationClick = async (notif: ChatNotificationItem) => {
+    setNotifOpen(false);
+    setLiveToast(null);
+    if (!notif.isRead) {
+      setNotifications((prev) => prev.map((n) => (n.id === notif.id ? { ...n, isRead: true } : n)));
+      setUnreadCount((prev) => Math.max(0, prev - 1));
+      try {
+        await fetch('/api/chat/notifications', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action: 'mark_read', notificationId: notif.id }),
+        });
+      } catch {
+        // ignore
+      }
+    }
+    router.push(`/meclis?room=${encodeURIComponent(notif.roomId)}`);
+  };
+
+  const handleMarkAllRead = async () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+    setUnreadCount(0);
+    try {
+      await fetch('/api/chat/notifications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'mark_read' }),
+      });
+    } catch {
+      // ignore
+    }
+  };
+
   const baseLinks: NavItem[] = [
     { name: 'Ana Sayfa', href: '/' },
     { name: 'Frekans Odası', href: '/meditation' },
     { name: 'Nefes', href: '/breathwork' },
     { name: 'Analiz', href: '/analysis' },
+    { name: 'Meclis', href: '/meclis' },
     { name: 'Blog', href: '/blog' },
     { name: 'Dersler', href: '/kadim-dersler', requiresAuth: true },
     { name: 'Seviyeler', href: '/membership', requiresAuth: true, isLockedForNonAdmin: true },
@@ -71,10 +171,6 @@ export default function Navigation() {
 
   const isMaster = role === 'master';
 
-  // Yönetim paneli kendi kabuğunu (AdminSidebar) kullanır; ödeme iframe'inde de gizli.
-  // ÖNEMLİ: Bu kontrol tüm hook çağrılarından SONRA gelmeli — aksi halde rota
-  // değiştiğinde render'lar arasında hook sayısı değişir ("Rendered fewer hooks
-  // than expected").
   const hidden = pathname?.startsWith('/admin') || pathname?.startsWith('/checkout/iframe');
   if (hidden) {
     return null;
@@ -113,20 +209,34 @@ export default function Navigation() {
           isAdmin ? 'flex xl:hidden' : 'flex lg:hidden'
         }`}>
           {isLoggedIn ? (
-            <Link 
-              href="/profile"
-              className="flex items-center gap-2 text-mystic-text-muted hover:text-mystic-accent transition-colors"
-            >
-              <div className="flex flex-col items-end leading-none">
-                <span className="text-[11px] font-semibold text-white truncate max-w-[70px] mb-0.5">{getDisplayName()}</span>
-                <span className={`px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-widest scale-90 origin-right ${ROLE_BADGE_STYLES[role] || ROLE_BADGE_STYLES.free}`}>
-                  {ROLE_SHORT_LABELS[role] || 'Üye'}
-                </span>
-              </div>
-              <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-mystic-primary shadow-inner shrink-0">
-                <User size={14} />
-              </div>
-            </Link>
+            <>
+              <button
+                onClick={() => setNotifOpen((prev) => !prev)}
+                className="relative w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-mystic-primary hover:bg-white/10 transition-colors"
+                title="Meclis Bildirimleri"
+              >
+                <Bell size={14} />
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-amber-500 text-black text-[9px] font-extrabold flex items-center justify-center shadow">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
+                )}
+              </button>
+              <Link 
+                href="/profile"
+                className="flex items-center gap-2 text-mystic-text-muted hover:text-mystic-accent transition-colors"
+              >
+                <div className="flex flex-col items-end leading-none">
+                  <span className="text-[11px] font-semibold text-white truncate max-w-[70px] mb-0.5">{getDisplayName()}</span>
+                  <span className={`px-1.5 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-widest scale-90 origin-right ${ROLE_BADGE_STYLES[role] || ROLE_BADGE_STYLES.free}`}>
+                    {ROLE_SHORT_LABELS[role] || 'Üye'}
+                  </span>
+                </div>
+                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-mystic-primary shadow-inner shrink-0">
+                  <User size={14} />
+                </div>
+              </Link>
+            </>
           ) : (
             <Link 
               href="/auth/login" 
@@ -189,11 +299,16 @@ export default function Navigation() {
                 <Link 
                   key={link.name} 
                   href={link.href}
-                  className={`text-[10px] xl:text-[11px] 2xl:text-xs uppercase tracking-wider font-medium transition-colors hover:text-mystic-accent whitespace-nowrap ${
+                  className={`text-[10px] xl:text-[11px] 2xl:text-xs uppercase tracking-wider font-medium transition-colors hover:text-mystic-accent whitespace-nowrap flex items-center gap-1 ${
                     pathname === link.href ? 'text-mystic-accent border-b border-mystic-accent pb-1' : 'text-mystic-text-muted'
                   }`}
                 >
-                  {link.name}
+                  <span>{link.name}</span>
+                  {link.href === '/meclis' && unreadCount > 0 && (
+                    <span className="px-1.5 py-0.2 rounded-full bg-amber-500 text-black text-[9px] font-extrabold leading-tight">
+                      {unreadCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -203,6 +318,18 @@ export default function Navigation() {
           <div className="flex items-center gap-1.5 xl:gap-2">
               {isLoggedIn ? (
                 <div className="flex items-center gap-1.5 xl:gap-2">
+                  <button
+                    onClick={() => setNotifOpen((prev) => !prev)}
+                    className="relative w-8 h-8 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center text-mystic-primary transition-colors"
+                    title="Meclis Yanıt Bildirimleri"
+                  >
+                    <Bell size={14} />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-amber-500 text-black text-[9px] font-extrabold flex items-center justify-center shadow">
+                        {unreadCount > 9 ? '9+' : unreadCount}
+                      </span>
+                    )}
+                  </button>
                   <Link 
                     href="/profile"
                     className="text-mystic-text-muted hover:text-mystic-accent text-[11px] xl:text-xs flex items-center gap-1 transition-colors cursor-pointer group shrink-0"
@@ -231,6 +358,122 @@ export default function Navigation() {
         </div>
 
       </div>
+
+      {/* Notification Dropdown Panel */}
+      <AnimatePresence>
+        {notifOpen && isLoggedIn && (
+          <>
+            <div
+              className="fixed inset-0 z-40"
+              onClick={() => setNotifOpen(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, y: -8, scale: 0.97 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -8, scale: 0.97 }}
+              className="fixed right-4 top-16 w-[22rem] max-w-[calc(100vw-2rem)] bg-[#0E0E18]/98 backdrop-blur-xl border border-amber-500/25 rounded-2xl shadow-2xl z-50 overflow-hidden"
+            >
+              <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between bg-white/[0.02]">
+                <div className="flex items-center gap-2">
+                  <Bell size={14} className="text-amber-400" />
+                  <span className="text-xs font-bold uppercase tracking-wider text-white">
+                    Meclis Yanıtları
+                  </span>
+                  {unreadCount > 0 && (
+                    <span className="px-1.5 py-0.5 rounded-full bg-amber-500/20 border border-amber-500/40 text-amber-300 text-[10px] font-bold">
+                      {unreadCount} Yeni
+                    </span>
+                  )}
+                </div>
+                {unreadCount > 0 && (
+                  <button
+                    onClick={handleMarkAllRead}
+                    className="text-[10px] text-amber-400 hover:text-amber-300 flex items-center gap-1 font-medium"
+                  >
+                    <CheckCheck size={12} />
+                    Tümünü Okundu Say
+                  </button>
+                )}
+              </div>
+
+              <div className="max-h-80 overflow-y-auto divide-y divide-white/5">
+                {notifications.length === 0 ? (
+                  <div className="py-8 px-4 text-center text-xs text-white/40">
+                    Henüz mesajlarınıza gelen bir yanıt bildirimi bulunmuyor.
+                  </div>
+                ) : (
+                  notifications.map((n) => (
+                    <button
+                      key={n.id}
+                      onClick={() => handleNotificationClick(n)}
+                      className={`w-full text-left px-4 py-3 transition-colors hover:bg-white/5 flex items-start gap-3 ${
+                        !n.isRead ? 'bg-amber-500/[0.07]' : ''
+                      }`}
+                    >
+                      <span className="text-lg shrink-0 mt-0.5">{n.roomIcon || '🏛️'}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[11px] font-bold text-amber-300 truncate">
+                            @{n.senderName} yanıtladı
+                          </span>
+                          {!n.isRead && (
+                            <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
+                          )}
+                        </div>
+                        <p className="text-xs text-white/85 line-clamp-2 mt-0.5">
+                          &ldquo;{n.messagePreview}&rdquo;
+                        </p>
+                        <span className="text-[10px] text-white/40 mt-1 block">
+                          {n.roomTitle}
+                        </span>
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* Live Incoming Reply Toast */}
+      <AnimatePresence>
+        {liveToast && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, x: 20 }}
+            animate={{ opacity: 1, y: 0, x: 0 }}
+            exit={{ opacity: 0, y: -20, x: 20 }}
+            className="fixed top-20 right-4 z-50 max-w-sm bg-[#121220]/95 backdrop-blur-xl border border-amber-500/40 rounded-2xl p-3.5 shadow-[0_10px_30px_rgba(0,0,0,0.75)] flex items-start gap-3"
+          >
+            <div className="w-9 h-9 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0">
+              <MessageSquareReply size={18} />
+            </div>
+            <div
+              onClick={() => handleNotificationClick(liveToast)}
+              className="flex-1 min-w-0 cursor-pointer"
+            >
+              <div className="text-[10px] font-extrabold uppercase tracking-wider text-amber-400">
+                {liveToast.roomIcon} {liveToast.roomTitle} • Yeni Yanıt
+              </div>
+              <div className="text-xs font-bold text-white mt-0.5">
+                @{liveToast.senderName} mesajınıza yanıt verdi:
+              </div>
+              <p className="text-xs text-white/75 line-clamp-2 mt-0.5">
+                &ldquo;{liveToast.messagePreview}&rdquo;
+              </p>
+              <span className="inline-block mt-1 text-[10px] text-amber-300 font-semibold underline">
+                Odaya Git &rarr;
+              </span>
+            </div>
+            <button
+              onClick={() => setLiveToast(null)}
+              className="text-white/40 hover:text-white p-1"
+            >
+              <X size={14} />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Mobile Bottom Navigation Bar (Footer Bar) */}
       <div className={`fixed bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] max-w-md bg-mystic-dark/95 backdrop-blur-xl border border-white/10 rounded-2xl py-2 px-3 shadow-[0_10px_35px_rgba(0,0,0,0.8),0_0_20px_rgba(212,175,55,0.05)] z-50 justify-between items-center ${
@@ -373,11 +616,16 @@ export default function Navigation() {
                       key={link.name} 
                       href={link.href}
                       onClick={() => setMobileMenuOpen(false)}
-                      className={`text-base py-3 border-b border-mystic-dark/30 ${
+                      className={`text-base py-3 border-b border-mystic-dark/30 flex items-center justify-between ${
                         pathname === link.href ? 'text-mystic-accent font-semibold' : 'text-mystic-text'
                       }`}
                     >
-                      {link.name}
+                      <span>{link.name}</span>
+                      {link.href === '/meclis' && unreadCount > 0 && (
+                        <span className="px-2 py-0.5 rounded-full bg-amber-500 text-black text-xs font-extrabold">
+                          {unreadCount} Yanıt
+                        </span>
+                      )}
                     </Link>
                   );
                 })}
