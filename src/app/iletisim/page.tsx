@@ -60,7 +60,6 @@ function YouTubeIcon({ size = 16, className = "" }: { size?: number; className?:
 
 const CATEGORIES = [
   { id: 'report_support', label: 'Analiz Raporu & Sipariş Desteği' },
-  { id: 'birth_correction', label: 'Doğum Saati / Bilgi Düzeltme' },
   { id: 'tech_account', label: 'Üyelik & Teknik Destek' },
   { id: 'collaboration', label: 'İş Birliği & Kurumsal' },
   { id: 'feedback', label: 'Öneri & Geri Bildirim' },
@@ -69,16 +68,20 @@ const CATEGORIES = [
 
 const FAQS = [
   {
-    q: 'Satın aldığım analiz raporu e-postama ne zaman ulaşır?',
-    a: 'Ödemeniz onaylandığı anda yapay zekâ ve ezoterik hesaplama motorumuz raporunuzu hazırlar. Raporunuz genellikle 1-3 dakika içerisinde hem ekranda indirilebilir hale gelir hem de e-posta adresinize PDF olarak gönderilir.'
+    q: 'Satın aldığım analizlere nasıl erişebilirim ve PDF olarak nasıl indiririm?',
+    a: 'Ödemeniz onaylandığı anda ilgili analiz modülü hesabınıza anında tanımlanır. Doğrudan analiz sayfası üzerinden sorgulamanızı yapabilir, tüm katmanları ekranda inceleyebilir ve "PDF Raporu İndir" butonuyla raporunuzu cihazınıza indirebilirsiniz.'
   },
   {
-    q: 'Doğum saatimi veya bilgilerimi yanlış girdim, ne yapmalıyım?',
-    a: 'Sipariş numaranız ve doğru doğum bilgilerinizle birlikte iletişim formundan veya info@7layers.tr adresinden bize ulaştığınızda, teknik ekibimiz raporunuzu ücretsiz olarak güncelleyip e-postanıza yeniden iletir.'
+    q: 'Satın aldığım bir analizde kaç kez sorgulama yapabilirim?',
+    a: '7Layers\'ta satın aldığınız her analiz modülü, tek ödeme ile hesabınıza süresiz ve sınırsız sorgulama hakkıyla açılır. Farklı doğum bilgileriyle kendiniz veya yakınlarınız için dilediğiniz kadar yeni analiz yapabilirsiniz.'
   },
   {
-    q: 'Raporumu e-posta kutumda göremiyorum, ne yapmalıyım?',
-    a: 'Lütfen öncelikle Spam / İstenmeyen veya Tanıtımlar klasörlerinizi kontrol ediniz. Yine de bulamadıysanız aşağıdaki formdan bize sipariş e-postanızı iletmeniz yeterlidir; ekibimiz hemen manuel gönderim sağlar.'
+    q: 'Seviyemi (Çırak, Kalfa, Usta) nereden ve nasıl yükseltebilirim?',
+    a: 'Kadim Dersler ve Sınavlar bölümündeki ilgili seviye sınavlarını %80 ve üzeri başarıyla tamamladığınızda bir üst seviyeye (Çırak, Kalfa veya Usta) yükselmeye hak kazanırsınız. Sınav şartını sağladıktan sonra Profil veya Seviye Yükselt sayfası üzerinden ilgili seviyenin ödemesini gerçekleştirdiğinizde yeni seviyeniz aktif olur ve o seviyede kaldığınız sürece ilgili derecenin tüm ayrıcalıklarına sahip olursunuz.'
+  },
+  {
+    q: 'Analiz satın almak için üye olmam gerekiyor mu?',
+    a: 'Satın aldığınız analiz haklarının hesabınıza kalıcı olarak tanımlanabilmesi ve dilediğiniz zaman sınırsız sorgulama yapabilmeniz için ücretsiz üye girişi yaparak işlem gerçekleştirmeniz yeterlidir.'
   }
 ];
 

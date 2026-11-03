@@ -291,15 +291,6 @@ async function onPaymentCompleted(
           .set({ paymentStatus: 'success', downloadToken })
           .where(eq(guestOrders.id, guestOrderId));
 
-        // E-posta gönderimi ödemeyi bloke etmemeli.
-        try {
-          const { sendGuestDownloadEmail } = await import('@/lib/mail/smtp');
-          void sendGuestDownloadEmail(order.email, downloadToken, order.analysisType).catch(
-            (err: unknown) => console.error('[payment] indirme e-postası gönderilemedi:', err),
-          );
-        } catch (err) {
-          console.error('[payment] e-posta modülü yüklenemedi:', err);
-        }
       }
     }
   }

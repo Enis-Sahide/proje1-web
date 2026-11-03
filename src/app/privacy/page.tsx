@@ -39,7 +39,7 @@ export default function PrivacyPage() {
             <div>
               <h2 className="text-xl font-bold text-white mb-2">1. Toplanan Veriler ve Şifre Güvenliği</h2>
               <p className="text-white/70 text-sm">
-                Hesabınızı oluştururken ve doğrularken yalnızca adınız, soyadınız ve e-posta adresiniz toplanır. Hesabınıza ait şifreler, endüstri standardı olan **Supabase Auth** altyapısında tek yönlü kriptografik algoritmalar ile şifrelenmiş (hashed) olarak saklanır. Sistem yöneticilerimiz de dahil olmak üzere hiç kimse şifrelerinizi düz metin olarak göremez veya erişemez.
+                Hesabınızı oluştururken ve doğrularken yalnızca adınız, soyadınız ve e-posta adresiniz toplanır. Hesabınıza ait şifreler, endüstri standardı tek yönlü kriptografik algoritmalar ile şifrelenmiş (hashed) olarak güvenli sunucu altyapımızda saklanır. Sistem yöneticilerimiz de dahil olmak üzere hiç kimse şifrelerinizi düz metin olarak göremez veya erişemez.
               </p>
             </div>
           </div>
@@ -65,7 +65,7 @@ export default function PrivacyPage() {
             <div>
               <h2 className="text-xl font-bold text-white mb-2">3. Üçüncü Taraflarla Paylaşım</h2>
               <p className="text-white/70 text-sm">
-                7Layers, kişisel verilerinizi asla üçüncü şahıslara satmaz, kiralamaz veya ticari amaçlarla paylaşmaz. Verileriniz yalnızca kendi bulut veritabanımız olan Supabase altyapısında SSL/TLS protokolleri ile şifrelenmiş güvenli tüneller üzerinden taşınır ve depolanır.
+                7Layers, kişisel verilerinizi asla üçüncü şahıslara satmaz, kiralamaz veya ticari amaçlarla paylaşmaz. Verileriniz yalnızca 7Layers&apos;ın kendi güvenli sunucu ve veritabanı altyapısında SSL/TLS protokolleri ile şifrelenmiş güvenli tüneller üzerinden taşınır ve depolanır.
               </p>
             </div>
           </div>
@@ -78,7 +78,7 @@ export default function PrivacyPage() {
             <div>
               <h2 className="text-xl font-bold text-white mb-2">4. Veri Silme ve Kullanıcı Hakları (Kişisel Verileri Silme Talebi)</h2>
               <p className="text-white/70 text-sm">
-                Dilediğiniz zaman profil ayarlarınız üzerinden veya doğrudan <a href="mailto:info@7layers.tr" className="text-mystic-primary underline hover:text-white">info@7layers.tr</a> adresine yazarak hesabınızın, analiz geçmişinizin ve tüm ilişkili verilerinizin veritabanımızdan kalıcı olarak silinmesini talep edebilirsiniz. Talebiniz üzerine tüm kişisel bilgileriniz Supabase sistemlerimizden geri döndürülemeyecek şekilde silinir.
+                Dilediğiniz zaman profil ayarlarınız üzerinden veya doğrudan <a href="mailto:info@7layers.tr" className="text-mystic-primary underline hover:text-white">info@7layers.tr</a> adresine yazarak hesabınızın, analiz geçmişinizin ve tüm ilişkili verilerinizin veritabanımızdan kalıcı olarak silinmesini talep edebilirsiniz. Talebiniz üzerine tüm kişisel bilgileriniz sunucu ve veritabanı sistemlerimizden geri döndürülemeyecek şekilde silinir.
               </p>
             </div>
           </div>
