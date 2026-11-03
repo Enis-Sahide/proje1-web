@@ -1,8 +1,8 @@
 import 'server-only';
 import { desc, eq, sql } from 'drizzle-orm';
 import { db } from '@/db/client';
-import { chatMessages, chatProfiles, profiles, users } from '@/db/schema';
-import { formatSafeDisplayName } from './chatService';
+import { chatMessages, chatNotifications, chatProfiles, profiles, users } from '@/db/schema';
+import { formatSafeDisplayName, sendExpoPushNotification } from './chatService';
 
 interface CommunityPersona {
   key: string;
@@ -384,6 +384,11 @@ export async function ensureCommunitySeededAndActive(): Promise<void> {
   }
   await globalForSeed.__communitySeedPromise;
 
+  // Vakti gelen (5-30 dk gecikmeli) zamanlanmış yanıtları teslim et
+  void processDueScheduledReplies().catch((err) => {
+    console.warn('[communitySeed] Scheduled reply delivery warning:', err);
+  });
+
   const now = Date.now();
   const lastCheck = globalForSeed.__lastRotationCheckAt || 0;
   if (now - lastCheck > 10 * 60 * 1000) {
@@ -395,6 +400,26 @@ export async function ensureCommunitySeededAndActive(): Promise<void> {
 }
 
 async function runInitialCommunitySeed(): Promise<void> {
+  // Zamanlanmış yanıt kuyruğu tablosu
+  await db.execute(sql`
+    CREATE TABLE IF NOT EXISTS chat_scheduled_replies (
+      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+      room_id TEXT NOT NULL,
+      room_title TEXT NOT NULL,
+      room_icon TEXT NOT NULL DEFAULT '💬',
+      persona_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      persona_display_name TEXT NOT NULL,
+      recipient_user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+      recipient_display_name TEXT NOT NULL,
+      reply_to_message_id UUID NOT NULL,
+      reply_preview_text TEXT NOT NULL,
+      reply_content TEXT NOT NULL,
+      deliver_at TIMESTAMPTZ NOT NULL,
+      delivered BOOLEAN NOT NULL DEFAULT FALSE,
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+  `);
+
   // Mükerrer (çift) mesajları temizle
   await db.execute(sql`
     DELETE FROM chat_messages a
@@ -525,7 +550,6 @@ async function runInitialCommunitySeed(): Promise<void> {
     }
   }
 
-  // Son güvenlik kontrolü: paralel isteklerden oluşabilecek mükerrer kayıtları sil
   await db.execute(sql`
     DELETE FROM chat_messages a
     USING chat_messages b
@@ -533,6 +557,235 @@ async function runInitialCommunitySeed(): Promise<void> {
       AND a.content = b.content
       AND a.id > b.id
   `);
+}
+
+function generateContextualPersonaReply(roomId: string, userMessage: string, recipientName: string): string {
+  const lower = userMessage.toLocaleLowerCase('tr-TR');
+  const firstName = recipientName.split(' ')[0] || 'dostum';
+
+  // Teşekkür / Selamlaşma
+  if (lower.includes('teşekkür') || lower.includes('sağ ol') || lower.includes('eyvallah') || lower.includes('harika')) {
+    const thanksPool = [
+      `Rica ederim ${firstName}, bu yolda birbirimize ayna tutmak hepimizin farkındalığını büyütüyor. Katkın için ben teşekkür ederim.`,
+      `Ne demek ${firstName}, mecliste deneyimlerin paylaşılması enerjiyi çok daha berraklaştırıyor. Yolun açık olsun.`,
+      `Çok mutlu oldum ${firstName}, kendi içsel gözlemlerini de fırsat buldukça paylaşırsan keyifle okuruz.`,
+    ];
+    return thanksPool[Math.floor(Math.random() * thanksPool.length)];
+  }
+
+  // Odaya özel bağlamsal yanıt havuzları
+  const roomReplies: Record<string, string[]> = {
+    'genel-meydan': [
+      `Çok güzel bir noktaya değindin ${firstName}. Özellikle günlük gökyüzü sentezini ve kendi içsel ritmini bir arada gözlemlediğinde taşlar çok daha hızlı yerine oturuyor.`,
+      `Katılıyorum ${firstName}. İlk başta kavramlar yoğun gelebilir ama hem analizlerdeki özet katmanları hem de Kadim Dersleri sindire sindire ilerledikçe her şey netleşiyor.`,
+      `Paylaşımın için teşekkürler ${firstName}. Kendi merkezinde kalıp nefes ve frekans pratiklerini günlük rutine eklemek bile büyük fark yaratıyor.`,
+    ],
+    'kabala': [
+      `Çok yerinde bir tespit ${firstName}. Hayat Ağacında her küre (Sefira) aslında kendi bilincimizin bir katmanıdır; Assiah’ta fark ettiğin her kalıp Yetzirah ve Beriyah’ta çözülmeye başlar.`,
+      `Kesinlikle öyle ${firstName}. Özellikle Beden (Tropikal) ve Ruh (Drakonik) haritalarını 4 Alem matrisinde karşılaştırdığında hangi kürede denge kurman gerektiği çok net görülüyor.`,
+      `Bu gözlemin çok değerli ${firstName}. Orta sütun (Keter - Tiferet - Yesod - Malkuth) dengesini koruduğunda sağ ve sol sütun arasındaki kutupluluk kendiliğinden uyumlanır.`,
+    ],
+    'sembolizm': [
+      `Çok derin bir gözlem ${firstName}. Kadim semboller zihnin mantık filtresini aşarak doğrudan bilinçaltı ve üst-bilinçle konuşur; gördüğün işaretleri not almak harika bir pratik.`,
+      `Haklısın ${firstName}. Kutsal geometri ve arketipler üzerine tefekkür ettikçe hayatın içindeki eşzamanlılıkların (synchronicity) dili çok daha anlaşılır hale geliyor.`,
+    ],
+    'astroloji': [
+      `Harika bir nokta ${firstName}. Doğum haritasında özellikle Kuzey Ay Düğümü, Satürn ve MC (Tepe Noktası) üçlüsünü birlikte okumak kadersel yönü çok berraklaştırıyor.`,
+      `Çok doğru ${firstName}. Gezegen transitlerini birer zorlama değil, içimizdeki potansiyeli uyandıran göksel gelişim pencereleri olarak gördüğümüzde akış tamamen değişiyor.`,
+      `Kesinlikle katılıyorum ${firstName}. Tropikal harita dünyadaki aracımızı, Drakonik harita ise ruhsal pusulamızı gösteriyor; ikisini sentezlemek en doğrusu.`,
+    ],
+    'human-design': [
+      `Çok güzel ifade ettin ${firstName}. Human Design’da zihni karar mekanizması olmaktan çıkarıp kendi Strateji ve Otoritemize güvendiğimiz anda direnç kalkıyor.`,
+      `Kesinlikle ${firstName}. Özellikle tanımsız (açık) merkezlerimizden aldığımız dış koşullandırmaları fark etmek bile enerjimizi korumada devrim yaratıyor.`,
+    ],
+    'numeroloji': [
+      `Çok güzel bir farkındalık ${firstName}. Doğum tarihinden gelen Yaşam Yolu sayısı ile isimdeki harflerin çakra titreşimi birleştiğinde kişinin yaşam melodisi ortaya çıkıyor.`,
+      `Haklısın ${firstName}. Özellikle kişisel yıl ve kişisel gün döngülerine uyumlanarak adım atmak, akıntıya karşı kürek çekmeyi bırakıp rüzgarı arkana almak gibi.`,
+    ],
+    'kelt-druid': [
+      `Çok güzel bir paylaşım ${firstName}. Doğanın döngüleri ve Kelt ağaç arketipleri bize her mevsimin ve her ruh halinin bir bilgeliği olduğunu hatırlatıyor.`,
+      `Kesinlikle ${firstName}. Topraklanma ve doğanın ritmiyle hizalanmak, zihinsel karmaşayı en hızlı şifalandıran kadim anahtarlardan biri.`,
+    ],
+    'cakra-sifa': [
+      `Çok doğru bir gözlem ${firstName}. Nefes çalışmalarıyla Solfeggio frekanslarını birleştirmek otonom sinir sistemini ve çakra akışını çok hızlı dengeliyor.`,
+      `Şifa olsun ${firstName}. Özellikle Schumann Rezonansının yükseldiği günlerde su tüketimini artırmak ve kök-kalp çakra dengesine odaklanmak bedeni çok rahatlatıyor.`,
+    ],
+  };
+
+  const pool = roomReplies[roomId] || roomReplies['genel-meydan'];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+export async function schedulePersonaReplyIfApplicable(params: {
+  roomId: string;
+  roomTitle: string;
+  roomIcon: string;
+  userMessageId: string;
+  userMessageContent: string;
+  senderUserId: string;
+  senderDisplayName: string;
+  replyTargetUserId: string | null;
+}): Promise<void> {
+  try {
+    if (!params.replyTargetUserId || params.replyTargetUserId === params.senderUserId) {
+      return;
+    }
+
+    // Yanıt verilen kişi bir topluluk profili (@7layers.internal) mi kontrol et
+    const [targetUser] = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        fullName: users.fullName,
+        nickname: chatProfiles.nickname,
+      })
+      .from(users)
+      .leftJoin(chatProfiles, eq(users.id, chatProfiles.userId))
+      .where(eq(users.id, params.replyTargetUserId));
+
+    if (!targetUser || !targetUser.email.endsWith('@7layers.internal')) {
+      return;
+    }
+
+    const personaDisplayName = formatSafeDisplayName(
+      targetUser.fullName,
+      targetUser.email,
+      targetUser.nickname
+    );
+
+    const replyContent = generateContextualPersonaReply(
+      params.roomId,
+      params.userMessageContent,
+      params.senderDisplayName
+    );
+
+    // 5 ile 30 dakika arası rastgele gecikme (milisaniye)
+    const delayMinutes = Math.floor(Math.random() * 26) + 5; // 5..30 dk
+    const delayMs = delayMinutes * 60 * 1000;
+    const deliverAt = new Date(Date.now() + delayMs);
+
+    await db.execute(sql`
+      INSERT INTO chat_scheduled_replies (
+        room_id,
+        room_title,
+        room_icon,
+        persona_user_id,
+        persona_display_name,
+        recipient_user_id,
+        recipient_display_name,
+        reply_to_message_id,
+        reply_preview_text,
+        reply_content,
+        deliver_at
+      ) VALUES (
+        ${params.roomId},
+        ${params.roomTitle},
+        ${params.roomIcon},
+        ${targetUser.id},
+        ${personaDisplayName},
+        ${params.senderUserId},
+        ${params.senderDisplayName},
+        ${params.userMessageId},
+        ${params.userMessageContent.slice(0, 90)},
+        ${replyContent},
+        ${deliverAt}
+      )
+    `);
+
+    // Sunucu çalışmaya devam ettiği sürece tam zamanında teslim etmesi için zamanlayıcı kur
+    const timer = setTimeout(() => {
+      void processDueScheduledReplies().catch((err) => {
+        console.warn('[communitySeed] Timer delivery error:', err);
+      });
+    }, delayMs + 500);
+
+    if (typeof (timer as any)?.unref === 'function') {
+      (timer as any).unref();
+    }
+  } catch (err) {
+    console.warn('[schedulePersonaReplyIfApplicable] Error:', err);
+  }
+}
+
+export async function processDueScheduledReplies(): Promise<void> {
+  const dueRes = await db.execute<{
+    id: string;
+    room_id: string;
+    room_title: string;
+    room_icon: string;
+    persona_user_id: string;
+    persona_display_name: string;
+    recipient_user_id: string;
+    recipient_display_name: string;
+    reply_to_message_id: string;
+    reply_preview_text: string;
+    reply_content: string;
+  }>(sql`
+    UPDATE chat_scheduled_replies
+    SET delivered = TRUE
+    WHERE delivered = FALSE AND deliver_at <= NOW()
+    RETURNING
+      id,
+      room_id,
+      room_title,
+      room_icon,
+      persona_user_id,
+      persona_display_name,
+      recipient_user_id,
+      recipient_display_name,
+      reply_to_message_id,
+      reply_preview_text,
+      reply_content
+  `);
+
+  const rows = dueRes.rows || [];
+  for (const row of rows) {
+    // Kullanıcının mesajı silinmişse yanıt gönderme
+    const [origMsg] = await db
+      .select({ id: chatMessages.id })
+      .from(chatMessages)
+      .where(eq(chatMessages.id, row.reply_to_message_id));
+
+    if (!origMsg) continue;
+
+    const [inserted] = await db
+      .insert(chatMessages)
+      .values({
+        roomId: row.room_id,
+        userId: row.persona_user_id,
+        content: row.reply_content,
+        replyToId: row.reply_to_message_id,
+        replyPreviewName: row.recipient_display_name,
+        replyPreviewText: row.reply_preview_text,
+      })
+      .returning({ id: chatMessages.id });
+
+    await db.insert(chatNotifications).values({
+      recipientUserId: row.recipient_user_id,
+      senderUserId: row.persona_user_id,
+      senderName: row.persona_display_name,
+      roomId: row.room_id,
+      roomTitle: row.room_title,
+      roomIcon: row.room_icon,
+      messageId: inserted.id,
+      messagePreview: row.reply_content.slice(0, 120),
+      isRead: false,
+    });
+
+    const [recipientProfile] = await db
+      .select({ expoPushToken: chatProfiles.expoPushToken })
+      .from(chatProfiles)
+      .where(eq(chatProfiles.userId, row.recipient_user_id));
+
+    if (recipientProfile?.expoPushToken) {
+      void sendExpoPushNotification(
+        recipientProfile.expoPushToken,
+        `${row.room_icon} ${row.room_title} • Yeni Yanıt`,
+        `@${row.persona_display_name}: "${row.reply_content.slice(0, 85)}"`,
+        { roomId: row.room_id, messageId: inserted.id, type: 'chat_reply' }
+      );
+    }
+  }
 }
 
 async function refreshRoomRecency(): Promise<void> {

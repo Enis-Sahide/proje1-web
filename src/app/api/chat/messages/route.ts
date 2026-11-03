@@ -3,6 +3,7 @@ import { db } from '@/db/client';
 import { chatMessages, chatNotifications, chatProfiles, chatRooms, profiles, users } from '@/db/schema';
 import { json, errorJson, preflight } from '@/lib/http/cors';
 import { getAccount } from '@/lib/auth/account';
+import { schedulePersonaReplyIfApplicable } from '@/lib/chat/communitySeed';
 import {
   ensureChatReady,
   formatSafeDisplayName,
@@ -200,6 +201,16 @@ export async function POST(request: Request) {
             { roomId, messageId: inserted.id, type: 'chat_reply' }
           );
         }
+        void schedulePersonaReplyIfApplicable({
+          roomId,
+          roomTitle: room.title,
+          roomIcon: room.icon,
+          userMessageId: inserted.id,
+          userMessageContent: validation.cleaned,
+          senderUserId: account.id,
+          senderDisplayName: senderName,
+          replyTargetUserId,
+        });
       } catch (notifErr) {
         console.error('[POST /api/chat/messages] Notification error:', notifErr);
       }
