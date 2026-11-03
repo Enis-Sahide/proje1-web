@@ -370,23 +370,24 @@ export const AMBIENT_ROTATION_POOL: Record<string, Array<{ personaKey: string; c
   ],
 };
 
-let seedPromise: Promise<void> | null = null;
-let lastRotationCheckAt = 0;
+const globalForSeed = globalThis as unknown as {
+  __communitySeedPromise?: Promise<void> | null;
+  __lastRotationCheckAt?: number;
+};
 
 export async function ensureCommunitySeededAndActive(): Promise<void> {
-  if (!seedPromise) {
-    seedPromise = runInitialCommunitySeed().catch((err) => {
+  if (!globalForSeed.__communitySeedPromise) {
+    globalForSeed.__communitySeedPromise = runInitialCommunitySeed().catch((err) => {
       console.error('[communitySeed] Initial seed error:', err);
-      seedPromise = null;
+      globalForSeed.__communitySeedPromise = null;
     });
   }
-  await seedPromise;
+  await globalForSeed.__communitySeedPromise;
 
-  // Her 10 dakikada bir odaların son mesaj zamanını kontrol et;
-  // en son mesaj 40 dakikadan eskiyse o odaya doğal bir güncel mesaj/zaman güncellemesi yap
   const now = Date.now();
-  if (now - lastRotationCheckAt > 10 * 60 * 1000) {
-    lastRotationCheckAt = now;
+  const lastCheck = globalForSeed.__lastRotationCheckAt || 0;
+  if (now - lastCheck > 10 * 60 * 1000) {
+    globalForSeed.__lastRotationCheckAt = now;
     void refreshRoomRecency().catch((err) => {
       console.warn('[communitySeed] Rotation check warning:', err);
     });
@@ -394,6 +395,15 @@ export async function ensureCommunitySeededAndActive(): Promise<void> {
 }
 
 async function runInitialCommunitySeed(): Promise<void> {
+  // Mükerrer (çift) mesajları temizle
+  await db.execute(sql`
+    DELETE FROM chat_messages a
+    USING chat_messages b
+    WHERE a.room_id = b.room_id
+      AND a.content = b.content
+      AND a.id > b.id
+  `);
+
   // 1. Persona kullanıcılarını ve profillerini oluştur / güncelle
   const personaIdMap = new Map<string, { id: string; displayName: string }>();
 
@@ -447,7 +457,7 @@ async function runInitialCommunitySeed(): Promise<void> {
     });
   }
 
-  // 2. Her oda için eğer mesaj sayısı 4'ten azsa başlangıç diyaloglarını ekle
+  // 2. Her oda için eksik başlangıç diyaloglarını tekil olarak ekle
   const now = Date.now();
   for (const [roomId, dialogues] of Object.entries(ROOM_SEED_DIALOGUES)) {
     const [{ count }] = await db
@@ -465,6 +475,21 @@ async function runInitialCommunitySeed(): Promise<void> {
       const item = dialogues[i];
       const persona = personaIdMap.get(item.personaKey);
       if (!persona) continue;
+
+      const existingMsgRes = await db.execute<{ id: string }>(sql`
+        SELECT id FROM chat_messages
+        WHERE room_id = ${roomId} AND content = ${item.content}
+        LIMIT 1
+      `);
+      const existingRow = existingMsgRes.rows?.[0];
+      if (existingRow?.id) {
+        insertedMessages.push({
+          id: existingRow.id,
+          senderName: persona.displayName,
+          content: item.content,
+        });
+        continue;
+      }
 
       let replyToId: string | null = null;
       let replyPreviewName: string | null = null;
@@ -499,6 +524,15 @@ async function runInitialCommunitySeed(): Promise<void> {
       });
     }
   }
+
+  // Son güvenlik kontrolü: paralel isteklerden oluşabilecek mükerrer kayıtları sil
+  await db.execute(sql`
+    DELETE FROM chat_messages a
+    USING chat_messages b
+    WHERE a.room_id = b.room_id
+      AND a.content = b.content
+      AND a.id > b.id
+  `);
 }
 
 async function refreshRoomRecency(): Promise<void> {
@@ -519,10 +553,8 @@ async function refreshRoomRecency(): Promise<void> {
     if (!latest) continue;
 
     const ageMinutes = (now - new Date(latest.createdAt).getTime()) / (60 * 1000);
-    // Son mesaj 45 dakikadan eskiyse havuzdan sıradaki doğal mesajı güncel saatle ekle (veya mevcut seed mesajların zamanını tazele)
     if (ageMinutes < 45) continue;
 
-    // Havuzdan son mesajla aynı olmayan bir mesaj seç
     const candidate = poolItems.find((x) => x.content !== latest.content) || poolItems[0];
     if (!candidate) continue;
 
@@ -535,13 +567,12 @@ async function refreshRoomRecency(): Promise<void> {
       .where(eq(users.email, personaDef.email));
     if (!u) continue;
 
-    // Aynı metin daha önce bu odada varsa onu silip güncel zamanla yeniden ekle ki veritabanı şişmesin
     await db.execute(sql`
       DELETE FROM chat_messages
-      WHERE room_id = ${roomId} AND user_id = ${u.id} AND content = ${candidate.content}
+      WHERE room_id = ${roomId} AND content = ${candidate.content}
     `);
 
-    const randomRecentOffsetMs = Math.floor(Math.random() * 14 + 3) * 60 * 1000; // 3-17 dk önce
+    const randomRecentOffsetMs = Math.floor(Math.random() * 14 + 3) * 60 * 1000;
     await db.insert(chatMessages).values({
       roomId,
       userId: u.id,
