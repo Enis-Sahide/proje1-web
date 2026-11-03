@@ -155,7 +155,7 @@ async function fetchRealSchumannData(): Promise<RealSchumannRow | null> {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         },
         signal: AbortSignal.timeout(4000),
-        next: { revalidate: 180 } // Cache for 3 minutes
+        cache: 'no-store'
       });
       if (res.ok) {
         return await res.text();
@@ -232,7 +232,7 @@ async function detectFlaresFromImage(): Promise<{
           'Referer': 'https://sos70.ru/'
         },
         signal: AbortSignal.timeout(4500),
-        next: { revalidate: 300 } // Cache for 5 minutes
+        cache: 'no-store'
       });
       if (res.ok) {
         buffer = Buffer.from(await res.arrayBuffer());
@@ -246,13 +246,13 @@ async function detectFlaresFromImage(): Promise<{
       console.warn('SOS70 live image unreachable, using cached public/shm.jpg:', liveErr?.message || liveErr);
     }
 
+    // Last known measurement before SOS70 outage: Nov 2, 2026 02:30 Turkey Time (23:30 UTC Nov 1 / 06:30 Tomsk Nov 2)
+    const LAST_KNOWN_MEASUREMENT_UTC = '2026-11-01T23:30:00.000Z';
+
     if (!buffer) {
       isOffline = true;
       buffer = await fs.readFile(FALLBACK_IMAGE_PATH);
-      try {
-        const stat = await fs.stat(FALLBACK_IMAGE_PATH);
-        cachedAt = stat.mtime.toISOString();
-      } catch {}
+      cachedAt = LAST_KNOWN_MEASUREMENT_UTC;
     }
 
     const image = sharp(buffer);
@@ -465,7 +465,7 @@ export async function GET(req: Request) {
       peak_score_24h: finalPeakScore,
       is_offline: isOffline,
       offline_warning: isOffline
-        ? 'Tomsk Rasathanesi (sos70.ru) veri kaynağına şu anda ulaşılamıyor. Boş ekran yerine veri kesintisinden önceki en son hesaplanan spektrogram görseli ve ölçüm değerleri gösterilmektedir.'
+        ? 'Tomsk Rasathanesi (sos70.ru) veri kaynağına 2 Kasım 02:30 (TSİ) itibarıyla ulaşılamamaktadır. Boş ekran yerine kesinti öncesi alınan en son hesaplanan spektrogram görseli ve ölçüm değerleri gösterilmektedir.'
         : null,
       last_cached_at: imageFlareData?.cachedAt || null
     });
