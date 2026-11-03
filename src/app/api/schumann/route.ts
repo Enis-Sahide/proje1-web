@@ -231,7 +231,7 @@ async function detectFlaresFromImage(): Promise<{
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
           'Referer': 'https://sos70.ru/'
         },
-        signal: AbortSignal.timeout(4500),
+        signal: AbortSignal.timeout(3500),
         cache: 'no-store'
       });
       if (res.ok) {
@@ -243,16 +243,55 @@ async function detectFlaresFromImage(): Promise<{
         }
       }
     } catch (liveErr: any) {
-      console.warn('SOS70 live image unreachable, using cached public/shm.jpg:', liveErr?.message || liveErr);
+      console.warn('SOS70 live image unreachable:', liveErr?.message || liveErr);
     }
 
-    // Last known measurement before SOS70 outage: Nov 2, 2026 02:30 Turkey Time (23:30 UTC Nov 1 / 06:30 Tomsk Nov 2)
-    const LAST_KNOWN_MEASUREMENT_UTC = '2026-11-01T23:30:00.000Z';
+    // Last known measurement before SOS70 outage: Nov 2, 2026 02:50 Turkey Time (23:50:39 UTC Nov 1 / 06:50 Tomsk Nov 2)
+    let fallbackCapturedAt = '2026-11-01T23:50:39.113Z';
+
+    if (!buffer) {
+      // Try schumannresonancedata.com archive mirror
+      try {
+        const srdUrl = 'https://ljnpynnorwveqpsgkxws.supabase.co/rest/v1/sonogram_data?select=id,captured_at,image_url,status&status=eq.active&order=captured_at.desc&limit=1';
+        const srdKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqbnB5bm5vcnd2ZXFwc2dreHdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxNzA3ODgsImV4cCI6MjA3NDc0Njc4OH0.oETMBS9xsjhZk1KDH43FkNO-EEK9bhxw0reYHc2-crE';
+        const metaRes = await fetch(srdUrl, {
+          headers: {
+            apikey: srdKey,
+            Authorization: `Bearer ${srdKey}`,
+          },
+          signal: AbortSignal.timeout(3500),
+          cache: 'no-store',
+        });
+
+        if (metaRes.ok) {
+          const rows = await metaRes.json();
+          if (Array.isArray(rows) && rows.length > 0 && rows[0].image_url) {
+            fallbackCapturedAt = rows[0].captured_at || fallbackCapturedAt;
+            const ageMs = Date.now() - new Date(fallbackCapturedAt).getTime();
+            isOffline = ageMs > 35 * 60 * 1000;
+            cachedAt = fallbackCapturedAt;
+
+            const imgRes = await fetch(rows[0].image_url, {
+              signal: AbortSignal.timeout(4000),
+              cache: 'no-store',
+            });
+            if (imgRes.ok) {
+              buffer = Buffer.from(await imgRes.arrayBuffer());
+              try {
+                await fs.writeFile(FALLBACK_IMAGE_PATH, buffer);
+              } catch {}
+            }
+          }
+        }
+      } catch (mirrorErr: any) {
+        console.warn('Mirror sonogram metadata fetch failed:', mirrorErr?.message || mirrorErr);
+      }
+    }
 
     if (!buffer) {
       isOffline = true;
       buffer = await fs.readFile(FALLBACK_IMAGE_PATH);
-      cachedAt = LAST_KNOWN_MEASUREMENT_UTC;
+      cachedAt = fallbackCapturedAt;
     }
 
     const image = sharp(buffer);
@@ -322,7 +361,20 @@ async function detectFlaresFromImage(): Promise<{
       cleanBrightnesses.push(sum / keepCount);
     }
 
-    const latestAvg = cleanBrightnesses[latestDataIndex] || 4.0;
+    // Find rightmost non-black (measured) column in case spectrogram ends before 24:00 (e.g. outage at 06:50 Tomsk)
+    let rightmostValidIdx = latestDataIndex;
+    for (let i = cleanBrightnesses.length - 1; i >= 20; i--) {
+      if (cleanBrightnesses[i] > 3.5) {
+        rightmostValidIdx = Math.max(20, i - 3);
+        break;
+      }
+    }
+
+    const effectiveIdx = (isOffline || (cleanBrightnesses[latestDataIndex] ?? 0) <= 3.5)
+      ? rightmostValidIdx
+      : latestDataIndex;
+
+    const latestAvg = cleanBrightnesses[effectiveIdx] || 4.0;
     
     // 2. 24 saatlik peak hesapla (filtreli temiz alandaki maksimum sütun)
     let maxOverallBr = 4.0;
@@ -465,7 +517,7 @@ export async function GET(req: Request) {
       peak_score_24h: finalPeakScore,
       is_offline: isOffline,
       offline_warning: isOffline
-        ? 'Tomsk Rasathanesi (sos70.ru) veri kaynağına 2 Kasım 02:30 (TSİ) itibarıyla ulaşılamamaktadır. Boş ekran yerine kesinti öncesi alınan en son hesaplanan spektrogram görseli ve ölçüm değerleri gösterilmektedir.'
+        ? 'Tomsk Rasathanesi (sos70.ru) veri kaynağına 2 Kasım 02:50 (TSİ) itibarıyla ulaşılamamaktadır. Boş ekran yerine kesinti öncesi alınan en son hesaplanan spektrogram görseli ve ölçüm değerleri gösterilmektedir.'
         : null,
       last_cached_at: imageFlareData?.cachedAt || null
     });
