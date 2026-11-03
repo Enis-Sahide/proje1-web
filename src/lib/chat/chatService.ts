@@ -122,7 +122,15 @@ export const DEFAULT_CHAT_ROOMS: SeedRoom[] = [
 let isInitialized = false;
 
 export async function ensureChatReady() {
-  if (isInitialized) return;
+  if (isInitialized) {
+    try {
+      const { ensureCommunitySeededAndActive } = await import('./communitySeed');
+      await ensureCommunitySeededAndActive();
+    } catch {
+      // ignore
+    }
+    return;
+  }
   try {
     await db.execute(sql`
       CREATE TABLE IF NOT EXISTS chat_rooms (
@@ -209,6 +217,8 @@ export async function ensureChatReady() {
     }
 
     isInitialized = true;
+    const { ensureCommunitySeededAndActive } = await import('./communitySeed');
+    await ensureCommunitySeededAndActive();
   } catch (err) {
     console.error('[ensureChatReady] Error:', err);
   }
