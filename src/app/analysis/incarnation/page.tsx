@@ -200,6 +200,34 @@ export default function IncarnationAnalysisPage() {
           </p>
         </div>
 
+        {!isMasterOrAdmin ? (
+          <div className="max-w-md mx-auto my-10 bg-[#0F111A] border border-[#D4AF37]/40 rounded-3xl p-7 text-center shadow-[0_0_40px_rgba(212,175,55,0.2)]">
+            <div className="w-14 h-14 rounded-2xl bg-[#D4AF37]/15 border border-[#D4AF37]/35 text-[#D4AF37] mx-auto mb-4 flex items-center justify-center">
+              <Lock size={28} />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">Karmik & Enkarnasyon Analizi</h3>
+            <p className="text-mystic-text-muted text-sm mb-7 leading-relaxed">
+              Bu analizi kullanabilmek için ödeme yapmanız gerekir. Tek ödeme ile sınırsız sorgulama yapabilirsiniz.
+            </p>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => router.push('/analysis')}
+                className="flex-1 bg-white/5 hover:bg-white/10 border border-white/15 text-gray-300 font-semibold py-3 px-4 rounded-xl transition-all cursor-pointer"
+              >
+                Çık
+              </button>
+              <button
+                type="button"
+                onClick={handlePurchaseReport}
+                className="flex-1 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all cursor-pointer shadow-lg shadow-[#D4AF37]/20"
+              >
+                Ödeme Yap
+              </button>
+            </div>
+          </div>
+        ) : (
+        <>
         {/* Input Form Card */}
         <div className="bg-mystic-surface/60 backdrop-blur-md rounded-3xl p-6 sm:p-8 border border-mystic-surface-light shadow-2xl mb-12 max-w-3xl mx-auto">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
@@ -253,6 +281,9 @@ export default function IncarnationAnalysisPage() {
             </button>
           </div>
         </div>
+
+                </>
+        )}
 
         {/* RESULTS SECTION */}
         {resultData && birthInfo && (

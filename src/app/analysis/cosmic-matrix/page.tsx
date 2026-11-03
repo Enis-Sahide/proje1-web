@@ -345,7 +345,33 @@ export default function CosmicMatrixPage() {
         </div>
 
         {/* Giriş & Form Alanı */}
-        {!report ? (
+        {!isMasterOrAdmin ? (
+          <div className="max-w-md mx-auto my-12 bg-[#0F111A] border border-[#D4AF37]/40 rounded-3xl p-7 text-center shadow-[0_0_40px_rgba(212,175,55,0.2)]">
+            <div className="w-14 h-14 rounded-2xl bg-[#D4AF37]/15 border border-[#D4AF37]/35 text-[#D4AF37] mx-auto mb-4 flex items-center justify-center">
+              <Lock size={28} />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">7Layers Kozmik Matris</h3>
+            <p className="text-gray-300 text-sm mb-7 leading-relaxed">
+              Bu analizi kullanabilmek için ödeme yapmanız gerekir. Tek ödeme ile sınırsız sorgulama yapabilirsiniz.
+            </p>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={() => router.push('/analysis')}
+                className="flex-1 bg-white/5 hover:bg-white/10 border border-white/15 text-gray-300 font-semibold py-3 px-4 rounded-xl transition-all cursor-pointer"
+              >
+                Çık
+              </button>
+              <button
+                type="button"
+                onClick={handlePurchaseReport}
+                className="flex-1 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all cursor-pointer shadow-lg shadow-[#D4AF37]/20"
+              >
+                Ödeme Yap
+              </button>
+            </div>
+          </div>
+        ) : !report ? (
           <div className="max-w-3xl mx-auto text-center space-y-8 py-10">
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-amber-300 text-xs font-medium tracking-wide">
