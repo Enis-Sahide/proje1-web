@@ -73,7 +73,7 @@ const FAQS = [
   },
   {
     q: 'Satın aldığım bir analizde kaç kez sorgulama yapabilirim?',
-    a: '7Layers''ta satın aldığınız her analiz modülü, tek ödeme ile hesabınıza süresiz ve sınırsız sorgulama hakkıyla açılır. Farklı doğum bilgileriyle kendiniz veya yakınlarınız için dilediğiniz kadar yeni analiz yapabilirsiniz.'
+    a: '7Layers\'ta satın aldığınız her analiz modülü, tek ödeme ile hesabınıza süresiz ve sınırsız sorgulama hakkıyla açılır. Farklı doğum bilgileriyle kendiniz veya yakınlarınız için dilediğiniz kadar yeni analiz yapabilirsiniz.'
   },
   {
     q: 'Analiz satın almak için üye olmam gerekiyor mu?',
