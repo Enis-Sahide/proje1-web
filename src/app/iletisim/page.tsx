@@ -60,7 +60,6 @@ function YouTubeIcon({ size = 16, className = "" }: { size?: number; className?:
 
 const CATEGORIES = [
   { id: 'report_support', label: 'Analiz Raporu & Sipariş Desteği' },
-  { id: 'birth_correction', label: 'Doğum Saati / Bilgi Düzeltme' },
   { id: 'tech_account', label: 'Üyelik & Teknik Destek' },
   { id: 'collaboration', label: 'İş Birliği & Kurumsal' },
   { id: 'feedback', label: 'Öneri & Geri Bildirim' },
@@ -71,10 +70,6 @@ const FAQS = [
   {
     q: 'Satın aldığım analiz raporu e-postama ne zaman ulaşır?',
     a: 'Ödemeniz onaylandığı anda yapay zekâ ve ezoterik hesaplama motorumuz raporunuzu hazırlar. Raporunuz genellikle 1-3 dakika içerisinde hem ekranda indirilebilir hale gelir hem de e-posta adresinize PDF olarak gönderilir.'
-  },
-  {
-    q: 'Doğum saatimi veya bilgilerimi yanlış girdim, ne yapmalıyım?',
-    a: 'Sipariş numaranız ve doğru doğum bilgilerinizle birlikte iletişim formundan veya info@7layers.tr adresinden bize ulaştığınızda, teknik ekibimiz raporunuzu ücretsiz olarak güncelleyip e-postanıza yeniden iletir.'
   },
   {
     q: 'Raporumu e-posta kutumda göremiyorum, ne yapmalıyım?',
