@@ -201,20 +201,23 @@ export async function POST(request: Request) {
             { roomId, messageId: inserted.id, type: 'chat_reply' }
           );
         }
-        void schedulePersonaReplyIfApplicable({
-          roomId,
-          roomTitle: room.title,
-          roomIcon: room.icon,
-          userMessageId: inserted.id,
-          userMessageContent: validation.cleaned,
-          senderUserId: account.id,
-          senderDisplayName: senderName,
-          replyTargetUserId,
-        });
       } catch (notifErr) {
         console.error('[POST /api/chat/messages] Notification error:', notifErr);
       }
     }
+
+    // Yanıt verilen veya @etiketlenen kişi topluluk üyesiyse 5-30 dk gecikmeli yanıtı kuyruğa yaz (await ile garantili)
+    await schedulePersonaReplyIfApplicable({
+      roomId,
+      roomTitle: room.title,
+      roomIcon: room.icon,
+      userMessageId: inserted.id,
+      userMessageContent: validation.cleaned,
+      senderUserId: account.id,
+      senderDisplayName: senderName,
+      replyTargetUserId,
+      quotedBotText: replyPreviewText,
+    });
 
     return json({
       success: true,
@@ -282,4 +285,3 @@ export async function DELETE(request: Request) {
 }
 
 export const OPTIONS = preflight;
-

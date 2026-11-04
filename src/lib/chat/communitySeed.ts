@@ -1,7 +1,7 @@
 import 'server-only';
-import { desc, eq, sql } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { db } from '@/db/client';
-import { chatMessages, chatNotifications, chatProfiles, profiles, users } from '@/db/schema';
+import { chatMessages, chatNotifications, chatProfiles, chatRooms, profiles, users } from '@/db/schema';
 import { formatSafeDisplayName, sendExpoPushNotification } from './chatService';
 
 interface CommunityPersona {
@@ -333,46 +333,8 @@ export const ROOM_SEED_DIALOGUES: Record<string, SeedDialogueItem[]> = {
   ],
 };
 
-// Zaman içinde odaya yeni mesaj eklemek için ekstra döngüsel diyalog havuzu
-export const AMBIENT_ROTATION_POOL: Record<string, Array<{ personaKey: string; content: string }>> = {
-  'genel-meydan': [
-    { personaKey: 'kuzey', content: 'Bugünkü Kozmik Gökyüzü Rehberinde hem Beden hem Ruh haritası sentezini okudum, güne niyet koymak için harika bir pusula oluyor.' },
-    { personaKey: 'derin', content: 'Yeni katılan tüm yolculara hoş geldiniz diyorum. Kadim Dersler bölümündeki okuma sırasını takip etmenizi özellikle tavsiye ederim.' },
-    { personaKey: 'mert', content: 'Günün gezegen saatlerine dikkat ederek çalıştığımda verimimin iki katına çıktığını fark ettim.' },
-  ],
-  'kabala': [
-    { personaKey: 'hermes', content: 'Yesod küresi Ay ile yönetilir; bilinçaltı kalıplarımızı temizlemeden Malkuth yani fiziksel hayatımızdaki yansımaları değiştiremeyiz.' },
-    { personaKey: 'sefirot', content: '4 Alem haritasında Atzilut (Helyosentrik) katmanı, ruhun Güneş merkezli en saf niyetini gösterir.' },
-  ],
-  'sembolizm': [
-    { personaKey: 'emre', content: 'Hermetik ilkelerden "Yukarıda ne varsa aşağıda da o vardır" yasası, hem astrolojinin hem de kutsal geometrinin temel taşıdır.' },
-    { personaKey: 'derin', content: 'Rüyalarda görülen suyun berraklığı doğrudan duygusal bedenin (Yetzirah) o anki durumunu yansıtır.' },
-  ],
-  'astroloji': [
-    { personaKey: 'defne', content: 'Satürn döngüsü (29-30 yaş) insanı gerçekten sahte olan her şeyden arındırıp kendi hakiki omurgasını kurmaya zorluyor.' },
-    { personaKey: 'kuzey', content: 'Drakonik harita ile Tropikal harita arasındaki kavuşumlar, bu enkarnasyona taşıdığımız en güçlü ruhsal sözleşmeleri gösteriyor.' },
-  ],
-  'human-design': [
-    { personaKey: 'cem', content: 'Projektörler için en önemli soru "Ben kimim?" değil, "Beni gerçekten kim görüyor ve tanıyor?" sorusudur.' },
-    { personaKey: 'defne', content: 'Jeneratör ve MG’ler için tatmin duygusu doğru yolda olduğumuzun, hüsransa stratejiden çıktığımızın en net sinyalidir.' },
-  ],
-  'numeroloji': [
-    { personaKey: 'emre', content: 'Doğum tarihimizdeki rakamlar bu hayata getirdiğimiz araçları, ismimizdeki harf titreşimleri ise bu araçları hangi frekansta kullandığımızı gösterir.' },
-    { personaKey: 'nil', content: 'Kişisel gün sayımı takip etmeye başladığımdan beri hangi gün dinlenip hangi gün adım atacağımı çok daha dengeli planlıyorum.' },
-  ],
-  'kelt-druid': [
-    { personaKey: 'ogham', content: 'Huş ağacı (Beith) Ogham alfabesinin ilk harfidir; arınmayı, yeni doğuşu ve eski kabuğu geride bırakma cesaretini simgeler.' },
-    { personaKey: 'asli', content: 'Doğanın dört elementiyle (Toprak, Su, Ateş, Hava) günlük ritmimi uyumlamak zihinsel berraklığımı çok güçlendirdi.' },
-  ],
-  'cakra-sifa': [
-    { personaKey: 'aurora', content: 'Kalp çakrası (639 Hz) alt üç maddi çakra ile üst üç ruhsal çakranın denge noktasıdır; şefkat ve affetme en güçlü frekans yükselticidir.' },
-    { personaKey: 'asli', content: 'Sabahları 5 dakika Kutu Nefesi (4-4-4-4) yapmak bütün gün sinir sistemini dengede tutuyor.' },
-  ],
-};
-
 const globalForSeed = globalThis as unknown as {
   __communitySeedPromise?: Promise<void> | null;
-  __lastRotationCheckAt?: number;
 };
 
 export async function ensureCommunitySeededAndActive(): Promise<void> {
@@ -384,18 +346,12 @@ export async function ensureCommunitySeededAndActive(): Promise<void> {
   }
   await globalForSeed.__communitySeedPromise;
 
-  // Vakti gelen (5-30 dk gecikmeli) zamanlanmış yanıtları teslim et
-  void processDueScheduledReplies().catch((err) => {
+  // Vakti gelen (5-30 dk gecikmeli) zamanlanmış yanıtları ve geçmişte yanıtsız kalmış kullanıcı mesajlarını işle
+  try {
+    await scanAndScheduleUnansweredUserReplies();
+    await processDueScheduledReplies();
+  } catch (err) {
     console.warn('[communitySeed] Scheduled reply delivery warning:', err);
-  });
-
-  const now = Date.now();
-  const lastCheck = globalForSeed.__lastRotationCheckAt || 0;
-  if (now - lastCheck > 10 * 60 * 1000) {
-    globalForSeed.__lastRotationCheckAt = now;
-    void refreshRoomRecency().catch((err) => {
-      console.warn('[communitySeed] Rotation check warning:', err);
-    });
   }
 }
 
@@ -427,6 +383,38 @@ async function runInitialCommunitySeed(): Promise<void> {
     WHERE a.room_id = b.room_id
       AND a.content = b.content
       AND a.id > b.id
+  `);
+
+  // Eski ambient rotation nedeniyle gerçek kullanıcı yanıtının altına kaymış olan bot mesajlarını düzelt:
+  // 1) "Yeni katılan tüm yolculara hoş geldiniz diyorum..." mesajını (rotasyonla sonradan eklendiyse) temizle
+  await db.execute(sql`
+    DELETE FROM chat_messages
+    WHERE room_id = 'genel-meydan'
+      AND content = 'Yeni katılan tüm yolculara hoş geldiniz diyorum. Kadim Dersler bölümündeki okuma sırasını takip etmenizi özellikle tavsiye ederim.'
+  `);
+
+  // 2) KuzeyDüğümü'nün "Bugünkü Kozmik Gökyüzü Rehberinde..." mesajına gerçek bir kullanıcı yanıt verdiyse,
+  //    KuzeyDüğümü'nün mesaj tarihini o yanıtın 18 dakika öncesine çek ve reply_to_id bağını onar.
+  await db.execute(sql`
+    UPDATE chat_messages AS bot_msg
+    SET created_at = user_reply.created_at - INTERVAL '18 minutes'
+    FROM chat_messages AS user_reply
+    WHERE bot_msg.room_id = 'genel-meydan'
+      AND bot_msg.content LIKE 'Bugünkü Kozmik Gökyüzü Rehberinde%'
+      AND user_reply.room_id = 'genel-meydan'
+      AND user_reply.reply_preview_text LIKE 'Bugünkü Kozmik Gökyüzü Rehberinde%'
+      AND bot_msg.created_at > user_reply.created_at
+  `);
+
+  await db.execute(sql`
+    UPDATE chat_messages AS user_reply
+    SET reply_to_id = bot_msg.id
+    FROM chat_messages AS bot_msg
+    WHERE user_reply.room_id = 'genel-meydan'
+      AND bot_msg.room_id = 'genel-meydan'
+      AND user_reply.reply_to_id IS NULL
+      AND user_reply.reply_preview_text LIKE 'Bugünkü Kozmik Gökyüzü Rehberinde%'
+      AND bot_msg.content LIKE 'Bugünkü Kozmik Gökyüzü Rehberinde%'
   `);
 
   // 1. Persona kullanıcılarını ve profillerini oluştur / güncelle
@@ -559,11 +547,50 @@ async function runInitialCommunitySeed(): Promise<void> {
   `);
 }
 
-function generateContextualPersonaReply(roomId: string, userMessage: string, recipientName: string): string {
+export function generateContextualPersonaReply(
+  roomId: string,
+  userMessage: string,
+  recipientName: string,
+  quotedBotText?: string | null
+): string {
   const lower = userMessage.toLocaleLowerCase('tr-TR');
+  const quotedLower = (quotedBotText || '').toLocaleLowerCase('tr-TR');
+  const combined = `${lower} ${quotedLower}`;
   const firstName = recipientName.split(' ')[0] || 'dostum';
 
-  // Teşekkür / Selamlaşma
+  // 1. "Nerede / görmedim / bulamadım / nasıl" soruları için nokta atışı rehber yanıtlar
+  const isWhereOrHowQuestion =
+    lower.includes('nerede') ||
+    lower.includes('nerde') ||
+    lower.includes('görmedim') ||
+    lower.includes('gormedim') ||
+    lower.includes('grmedim') ||
+    lower.includes('bulamadım') ||
+    lower.includes('bulamadim') ||
+    lower.includes('hangi bölüm') ||
+    lower.includes('nasıl bak') ||
+    lower.includes('nasil bak') ||
+    lower.includes('nasıl gir');
+
+  if (isWhereOrHowQuestion) {
+    if (
+      combined.includes('kozmik gökyüzü') ||
+      combined.includes('gökyüzü rehberi') ||
+      combined.includes('beden hem ruh') ||
+      combined.includes('sentez')
+    ) {
+      return `Ana sayfadaki (veya üst menüdeki) 'Kişisel Analizler' bölümünden 'Kozmik Gökyüzü Rehberi' ve 'Kabalistik 4 Alem' kartlarına tıklayarak görebilirsin ${firstName}. Doğum bilgilerini girdiğinde hem Beden hem Ruh haritası sentezin otomatik açılıyor.`;
+    }
+    if (combined.includes('ders') || combined.includes('sınav') || combined.includes('derece') || combined.includes('çırak')) {
+      return `Üst menüdeki 'Kadim Dersler' sekmesinden tüm ders modüllerine ve derece sınavlarına ulaşabilirsin ${firstName}.`;
+    }
+    if (combined.includes('schumann') || combined.includes('frekans') || combined.includes('nefes') || combined.includes('gezegen saat')) {
+      return `Menüdeki 'Kişisel Analizler' ve 'Kadim Uygulamalar' bölümlerinden canlı Schumann Rezonansı, Gezegen Saatleri ve Nefes/Frekans çalışmalarına doğrudan ulaşabilirsin ${firstName}.`;
+    }
+    return `Üst menüdeki 'Kişisel Analizler' ve 'Kadim Dersler' bölümlerinden bahsettiğim tüm analiz ve sentez ekranlarına doğrudan ulaşabilirsin ${firstName}. Doğum bilgilerin kayıtlıysa sistem senin için otomatik hesaplıyor.`;
+  }
+
+  // 2. Teşekkür / Selamlaşma
   if (lower.includes('teşekkür') || lower.includes('sağ ol') || lower.includes('eyvallah') || lower.includes('harika')) {
     const thanksPool = [
       `Rica ederim ${firstName}, bu yolda birbirimize ayna tutmak hepimizin farkındalığını büyütüyor. Katkın için ben teşekkür ederim.`,
@@ -573,7 +600,7 @@ function generateContextualPersonaReply(roomId: string, userMessage: string, rec
     return thanksPool[Math.floor(Math.random() * thanksPool.length)];
   }
 
-  // Odaya özel bağlamsal yanıt havuzları
+  // 3. Odaya özel bağlamsal yanıt havuzları
   const roomReplies: Record<string, string[]> = {
     'genel-meydan': [
       `Çok güzel bir noktaya değindin ${firstName}. Özellikle günlük gökyüzü sentezini ve kendi içsel ritmini bir arada gözlemlediğinde taşlar çok daha hızlı yerine oturuyor.`,
@@ -625,9 +652,37 @@ export async function schedulePersonaReplyIfApplicable(params: {
   senderUserId: string;
   senderDisplayName: string;
   replyTargetUserId: string | null;
+  quotedBotText?: string | null;
 }): Promise<void> {
   try {
-    if (!params.replyTargetUserId || params.replyTargetUserId === params.senderUserId) {
+    let targetUserId = params.replyTargetUserId;
+
+    // Eğer Yanıtla'ya basmadan mesaj içinde @TakmaAd yazdıysa onu da yakala
+    if (!targetUserId && params.userMessageContent.includes('@')) {
+      const lowerContent = params.userMessageContent.toLocaleLowerCase('tr-TR');
+      for (const p of COMMUNITY_PERSONAS) {
+        const display = formatSafeDisplayName(p.fullName, p.email, p.nickname).toLocaleLowerCase('tr-TR');
+        if (lowerContent.includes(`@${display}`)) {
+          const [u] = await db.select({ id: users.id }).from(users).where(eq(users.email, p.email));
+          if (u) {
+            targetUserId = u.id;
+            break;
+          }
+        }
+      }
+    }
+
+    if (!targetUserId || targetUserId === params.senderUserId) {
+      return;
+    }
+
+    // Bu mesaja zaten zamanlanmış bir yanıt varsa tekrar ekleme
+    const existingScheduled = await db.execute<{ id: string }>(sql`
+      SELECT id FROM chat_scheduled_replies
+      WHERE reply_to_message_id = ${params.userMessageId}
+      LIMIT 1
+    `);
+    if (existingScheduled.rows && existingScheduled.rows.length > 0) {
       return;
     }
 
@@ -641,7 +696,7 @@ export async function schedulePersonaReplyIfApplicable(params: {
       })
       .from(users)
       .leftJoin(chatProfiles, eq(users.id, chatProfiles.userId))
-      .where(eq(users.id, params.replyTargetUserId));
+      .where(eq(users.id, targetUserId));
 
     if (!targetUser || !targetUser.email.endsWith('@7layers.internal')) {
       return;
@@ -656,7 +711,8 @@ export async function schedulePersonaReplyIfApplicable(params: {
     const replyContent = generateContextualPersonaReply(
       params.roomId,
       params.userMessageContent,
-      params.senderDisplayName
+      params.senderDisplayName,
+      params.quotedBotText
     );
 
     // 5 ile 30 dakika arası rastgele gecikme (milisaniye)
@@ -704,6 +760,152 @@ export async function schedulePersonaReplyIfApplicable(params: {
     }
   } catch (err) {
     console.warn('[schedulePersonaReplyIfApplicable] Error:', err);
+  }
+}
+
+/**
+ * Geçmişte gerçek bir kullanıcının bir bota yanıt verip de (sunucu yeniden başlatması veya
+ * önceki sürüm geçişi yüzünden) henüz yanıt alamadığı mesajları tarar ve kuyruğa ekler.
+ */
+async function scanAndScheduleUnansweredUserReplies(): Promise<void> {
+  const unansweredRes = await db.execute<{
+    id: string;
+    room_id: string;
+    user_id: string;
+    content: string;
+    reply_to_id: string | null;
+    reply_preview_name: string | null;
+    reply_preview_text: string | null;
+    created_at: string;
+    sender_full_name: string | null;
+    sender_email: string;
+    sender_nickname: string | null;
+  }>(sql`
+    SELECT
+      m.id,
+      m.room_id,
+      m.user_id,
+      m.content,
+      m.reply_to_id,
+      m.reply_preview_name,
+      m.reply_preview_text,
+      m.created_at,
+      u.full_name AS sender_full_name,
+      u.email AS sender_email,
+      cp.nickname AS sender_nickname
+    FROM chat_messages m
+    INNER JOIN users u ON u.id = m.user_id
+    LEFT JOIN chat_profiles cp ON cp.user_id = m.user_id
+    WHERE u.email NOT LIKE '%@7layers.internal'
+      AND (m.reply_to_id IS NOT NULL OR m.reply_preview_name IS NOT NULL)
+      AND NOT EXISTS (
+        SELECT 1 FROM chat_messages r WHERE r.reply_to_id = m.id
+      )
+      AND NOT EXISTS (
+        SELECT 1 FROM chat_scheduled_replies sr WHERE sr.reply_to_message_id = m.id
+      )
+    ORDER BY m.created_at ASC
+    LIMIT 20
+  `);
+
+  const rows = unansweredRes.rows || [];
+  if (rows.length === 0) return;
+
+  for (const row of rows) {
+    let personaEmail: string | null = null;
+
+    if (row.reply_to_id) {
+      const [targetMsg] = await db
+        .select({ email: users.email })
+        .from(chatMessages)
+        .innerJoin(users, eq(chatMessages.userId, users.id))
+        .where(eq(chatMessages.id, row.reply_to_id));
+      if (targetMsg?.email?.endsWith('@7layers.internal')) {
+        personaEmail = targetMsg.email;
+      }
+    }
+
+    if (!personaEmail && row.reply_preview_name) {
+      const matchedPersona = COMMUNITY_PERSONAS.find((p) => {
+        const displayName = formatSafeDisplayName(p.fullName, p.email, p.nickname);
+        return displayName === row.reply_preview_name || p.nickname === row.reply_preview_name;
+      });
+      if (matchedPersona) {
+        personaEmail = matchedPersona.email;
+      }
+    }
+
+    if (!personaEmail) continue;
+
+    const [personaUser] = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        fullName: users.fullName,
+        nickname: chatProfiles.nickname,
+      })
+      .from(users)
+      .leftJoin(chatProfiles, eq(users.id, chatProfiles.userId))
+      .where(eq(users.email, personaEmail));
+
+    if (!personaUser) continue;
+
+    const [room] = await db.select().from(chatRooms).where(eq(chatRooms.id, row.room_id));
+    const roomTitle = room?.title || 'Genel Meydan';
+    const roomIcon = room?.icon || '🏛️';
+
+    const senderDisplayName = formatSafeDisplayName(
+      row.sender_full_name,
+      row.sender_email,
+      row.sender_nickname
+    );
+    const personaDisplayName = formatSafeDisplayName(
+      personaUser.fullName,
+      personaUser.email,
+      personaUser.nickname
+    );
+
+    const replyContent = generateContextualPersonaReply(
+      row.room_id,
+      row.content,
+      senderDisplayName,
+      row.reply_preview_text
+    );
+
+    const msgCreatedMs = new Date(row.created_at).getTime();
+    const ageMs = Date.now() - msgCreatedMs;
+    const delayMinutes = Math.floor(Math.random() * 26) + 5; // 5..30 dk
+    const targetDeliverMs = msgCreatedMs + delayMinutes * 60 * 1000;
+    // Eğer mesaj zaten 5-30 dk süresini doldurmuşsa (örn. dün akşam yazılmışsa) hemen şimdi teslim et
+    const deliverAt = ageMs >= delayMinutes * 60 * 1000 ? new Date(Date.now() - 1000) : new Date(targetDeliverMs);
+
+    await db.execute(sql`
+      INSERT INTO chat_scheduled_replies (
+        room_id,
+        room_title,
+        room_icon,
+        persona_user_id,
+        persona_display_name,
+        recipient_user_id,
+        recipient_display_name,
+        reply_to_message_id,
+        reply_preview_text,
+        reply_content,
+        deliver_at
+      ) VALUES (
+        ${row.room_id},
+        ${roomTitle},
+        ${roomIcon},
+        ${personaUser.id},
+        ${personaDisplayName},
+        ${row.user_id},
+        ${senderDisplayName},
+        ${row.id},
+        ${row.content.slice(0, 90)},
+        ${replyContent},
+        ${deliverAt}
+      )
+    `);
   }
 }
 
@@ -785,52 +987,5 @@ export async function processDueScheduledReplies(): Promise<void> {
         { roomId: row.room_id, messageId: inserted.id, type: 'chat_reply' }
       );
     }
-  }
-}
-
-async function refreshRoomRecency(): Promise<void> {
-  const now = Date.now();
-
-  for (const [roomId, poolItems] of Object.entries(AMBIENT_ROTATION_POOL)) {
-    const [latest] = await db
-      .select({
-        id: chatMessages.id,
-        createdAt: chatMessages.createdAt,
-        content: chatMessages.content,
-      })
-      .from(chatMessages)
-      .where(eq(chatMessages.roomId, roomId))
-      .orderBy(desc(chatMessages.createdAt))
-      .limit(1);
-
-    if (!latest) continue;
-
-    const ageMinutes = (now - new Date(latest.createdAt).getTime()) / (60 * 1000);
-    if (ageMinutes < 45) continue;
-
-    const candidate = poolItems.find((x) => x.content !== latest.content) || poolItems[0];
-    if (!candidate) continue;
-
-    const personaDef = COMMUNITY_PERSONAS.find((p) => p.key === candidate.personaKey);
-    if (!personaDef) continue;
-
-    const [u] = await db
-      .select({ id: users.id })
-      .from(users)
-      .where(eq(users.email, personaDef.email));
-    if (!u) continue;
-
-    await db.execute(sql`
-      DELETE FROM chat_messages
-      WHERE room_id = ${roomId} AND content = ${candidate.content}
-    `);
-
-    const randomRecentOffsetMs = Math.floor(Math.random() * 14 + 3) * 60 * 1000;
-    await db.insert(chatMessages).values({
-      roomId,
-      userId: u.id,
-      content: candidate.content,
-      createdAt: new Date(now - randomRecentOffsetMs),
-    });
   }
 }
