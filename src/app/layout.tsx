@@ -8,7 +8,6 @@ import RouteGuard from "@/core/ui/RouteGuard";
 import AnimatedBackground from "@/core/ui/AnimatedBackground";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
 import ClarityProvider from "@/components/ClarityProvider";
-import IosInstallBanner from "@/components/IosInstallBanner";
 import Footer from "@/core/ui/Footer";
 
 const inter = Inter({
@@ -29,7 +28,6 @@ export const metadata: Metadata = {
     template: "%s | 7Layers Ancient Knowledge Realm"
   },
   description: "7Layers Ancient Knowledge Realm (Kadim Bilgiler Alanı) - İnsan Tasarımı (Human Design), Çakra Analizi, Schumann Rezonansı, Gezegen Saatleri ve Kadim İlimler platformu. Kendinizi ve kozmik enerjileri keşfedin.",
-  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
@@ -113,7 +111,6 @@ export default function RootLayout({
               <main className="flex-grow flex flex-col">
                 {children}
               </main>
-              <IosInstallBanner />
               <Footer />
             </RouteGuard>
           </AuthProvider>
