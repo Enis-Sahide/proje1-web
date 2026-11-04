@@ -121,13 +121,15 @@ export const DEFAULT_CHAT_ROOMS: SeedRoom[] = [
 
 let isInitialized = false;
 
-export async function ensureChatReady() {
+export async function ensureChatReady(runCommunityEngine = true) {
   if (isInitialized) {
-    try {
-      const { ensureCommunitySeededAndActive } = await import('./communitySeed');
-      await ensureCommunitySeededAndActive();
-    } catch {
-      // ignore
+    if (runCommunityEngine) {
+      try {
+        const { ensureCommunitySeededAndActive } = await import('./communitySeed');
+        await ensureCommunitySeededAndActive();
+      } catch {
+        // ignore
+      }
     }
     return;
   }
@@ -217,8 +219,14 @@ export async function ensureChatReady() {
     }
 
     isInitialized = true;
-    const { ensureCommunitySeededAndActive } = await import('./communitySeed');
-    await ensureCommunitySeededAndActive();
+    if (runCommunityEngine) {
+      const { ensureCommunitySeededAndActive } = await import('./communitySeed');
+      await ensureCommunitySeededAndActive();
+    } else {
+      void import('./communitySeed').then(({ ensureCommunitySeededAndActive }) =>
+        ensureCommunitySeededAndActive().catch(() => {})
+      );
+    }
   } catch (err) {
     console.error('[ensureChatReady] Error:', err);
   }

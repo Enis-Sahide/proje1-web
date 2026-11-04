@@ -501,6 +501,8 @@ const ONGOING_DIALOGUE_CHAINS: Record<string, OngoingDialogueChain[]> = {
 
 const globalForSeed = globalThis as unknown as {
   __communitySeedPromise?: Promise<void> | null;
+  __communityEngineLock?: Promise<void> | null;
+  __lastReplyScanAt?: number;
   __lastOngoingCheckAt?: number;
 };
 
@@ -513,25 +515,44 @@ export async function ensureCommunitySeededAndActive(): Promise<void> {
   }
   await globalForSeed.__communitySeedPromise;
 
-  // 1) Geçmişte yanıtsız kalmış gerçek kullanıcı mesajlarını tara ve zamanı gelen yanıtları teslim et
-  try {
-    await scanAndScheduleUnansweredUserReplies();
-    await processDueScheduledReplies();
-  } catch (err) {
-    console.warn('[communitySeed] Scheduled reply delivery warning:', err);
+  if (globalForSeed.__communityEngineLock) {
+    return globalForSeed.__communityEngineLock;
   }
 
-  // 2) Odalarda eski mesajları silmeden belirli aralıklarla yeni sohbet akışı başlat
   const now = Date.now();
-  const lastOngoing = globalForSeed.__lastOngoingCheckAt || 0;
-  if (now - lastOngoing > 2 * 60 * 1000) {
-    globalForSeed.__lastOngoingCheckAt = now;
-    try {
-      await advanceOngoingCommunityChat();
-    } catch (err) {
-      console.warn('[communitySeed] Ongoing chat warning:', err);
-    }
+  const lastScan = globalForSeed.__lastReplyScanAt || 0;
+  if (now - lastScan < 10 * 1000) {
+    return;
   }
+  globalForSeed.__lastReplyScanAt = now;
+
+  globalForSeed.__communityEngineLock = (async () => {
+    try {
+      // 1) Geçmişte yanıtsız kalmış gerçek kullanıcı mesajlarını tara ve zamanı gelen yanıtları teslim et
+      try {
+        await scanAndScheduleUnansweredUserReplies();
+        await processDueScheduledReplies();
+      } catch (err) {
+        console.warn('[communitySeed] Scheduled reply delivery warning:', err);
+      }
+
+      // 2) Odalarda eski mesajları silmeden belirli aralıklarla yeni sohbet akışı başlat
+      const currentNow = Date.now();
+      const lastOngoing = globalForSeed.__lastOngoingCheckAt || 0;
+      if (currentNow - lastOngoing > 2 * 60 * 1000) {
+        globalForSeed.__lastOngoingCheckAt = currentNow;
+        try {
+          await advanceOngoingCommunityChat();
+        } catch (err) {
+          console.warn('[communitySeed] Ongoing chat warning:', err);
+        }
+      }
+    } finally {
+      globalForSeed.__communityEngineLock = null;
+    }
+  })();
+
+  await globalForSeed.__communityEngineLock;
 }
 
 async function runInitialCommunitySeed(): Promise<void> {
@@ -553,6 +574,14 @@ async function runInitialCommunitySeed(): Promise<void> {
       delivered BOOLEAN NOT NULL DEFAULT FALSE,
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
+  `);
+
+  // Mükerrer (çift) zamanlanmış yanıtları temizle
+  await db.execute(sql`
+    DELETE FROM chat_scheduled_replies a
+    USING chat_scheduled_replies b
+    WHERE a.reply_to_message_id = b.reply_to_message_id
+      AND a.id > b.id
   `);
 
   // Mükerrer (çift) mesajları temizle
@@ -939,7 +968,7 @@ export async function schedulePersonaReplyIfApplicable(params: {
         ${params.userMessageId},
         ${params.userMessageContent.slice(0, 90)},
         ${replyContent},
-        ${deliverAt}
+        ${deliverAt.toISOString()}::timestamptz
       )
     `);
 
@@ -1100,7 +1129,7 @@ async function scanAndScheduleUnansweredUserReplies(): Promise<void> {
         ${row.id},
         ${row.content.slice(0, 90)},
         ${replyContent},
-        ${deliverAt}
+        ${deliverAt.toISOString()}::timestamptz
       )
     `);
   }
@@ -1343,7 +1372,7 @@ async function advanceOngoingCommunityChat(): Promise<void> {
         ${insertedOpener.id},
         ${chosenChain.openerText.slice(0, 90)},
         ${chosenChain.responderText},
-        ${deliverAt}
+        ${deliverAt.toISOString()}::timestamptz
       )
     `);
   }
