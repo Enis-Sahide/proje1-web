@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, Sparkles, User, LogIn, Lock, Wrench, LogOut, Home, Compass, Activity, Bell, CheckCheck, MessageSquareReply } from 'lucide-react';
+import { Menu, X, Sparkles, User, LogIn, Lock, Wrench, LogOut, Home, Compass, Activity, Bell, CheckCheck, MessageSquareReply, MessageSquare } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
 
@@ -502,14 +502,21 @@ export default function Navigation() {
         </Link>
         
         <Link 
-          href="/breathwork" 
+          href="/meclis" 
           onClick={() => setMobileMenuOpen(false)}
-          className={`flex flex-col items-center justify-center flex-1 py-1 transition-colors ${
-            pathname === '/breathwork' ? 'text-mystic-accent' : 'text-mystic-text-muted hover:text-white'
+          className={`relative flex flex-col items-center justify-center flex-1 py-1 transition-colors ${
+            pathname === '/meclis' ? 'text-mystic-accent' : 'text-mystic-text-muted hover:text-white'
           }`}
         >
-          <Activity size={18} />
-          <span className="text-[9px] mt-1 font-semibold uppercase tracking-wider">Nefes</span>
+          <div className="relative">
+            <MessageSquare size={18} />
+            {unreadCount > 0 && (
+              <span className="absolute -top-1.5 -right-2 min-w-[14px] h-[14px] px-0.5 rounded-full bg-amber-500 text-black text-[9px] font-extrabold flex items-center justify-center shadow">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
+          </div>
+          <span className="text-[9px] mt-1 font-semibold uppercase tracking-wider">Meclis</span>
         </Link>
         
         <Link 
