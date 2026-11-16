@@ -5,6 +5,8 @@ export const dynamic = 'force-dynamic';
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const redirectTarget = searchParams.get('redirect') || '/';
+  const platform = searchParams.get('platform') || 'web';
+  const mobileRedirect = searchParams.get('mobile_redirect') || 'proje1://google-auth';
 
   const clientId = process.env.GOOGLE_CLIENT_ID;
   if (!clientId) {
@@ -14,13 +16,21 @@ export async function GET(request: Request) {
   // Origin tespiti (Localhost vs Canlı alan adı)
   const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || '';
   const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
-  
+
   const redirectUri = isLocal
     ? 'http://localhost:3000/api/auth/google/callback'
     : 'https://7layers.tr/api/auth/google/callback';
 
-  // Kullanıcının dönmek istediği URL'yi state içinde taşıyalım
-  const state = Buffer.from(JSON.stringify({ redirect: redirectTarget })).toString('base64url');
+  // Kullanıcının dönmek istediği URL'yi ve platform bilgisini state içinde taşıyalım
+  const state = Buffer.from(
+    JSON.stringify({
+      redirect: redirectTarget,
+      platform,
+      mobileRedirect: mobileRedirect.startsWith('proje1://') || mobileRedirect.startsWith('exp://')
+        ? mobileRedirect
+        : 'proje1://google-auth',
+    })
+  ).toString('base64url');
 
   const googleAuthUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth');
   googleAuthUrl.searchParams.set('client_id', clientId);

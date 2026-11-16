@@ -10,6 +10,12 @@ import { createSession, setAuthCookies } from '@/lib/auth/session';
 
 export const dynamic = 'force-dynamic';
 
+function buildMobileRedirectUrl(baseSchemeUrl: string, params: Record<string, string>): string {
+  const separator = baseSchemeUrl.includes('?') ? '&' : '?';
+  const query = new URLSearchParams(params).toString();
+  return `${baseSchemeUrl}${separator}${query}`;
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
@@ -20,13 +26,25 @@ export async function GET(request: Request) {
   const isLocal = host.includes('localhost') || host.includes('127.0.0.1');
   const origin = isLocal ? 'http://localhost:3000' : 'https://7layers.tr';
 
-  // State içerisindeki hedef yönlendirme adresini ayrıştır
+  // State içerisindeki hedef yönlendirme adresini ve platform bilgisini ayrıştır
   let redirectTarget = '/';
+  let isMobilePlatform = false;
+  let mobileRedirectBase = 'proje1://google-auth';
+
   if (state) {
     try {
       const parsed = JSON.parse(Buffer.from(state, 'base64url').toString('utf8'));
       if (parsed.redirect && typeof parsed.redirect === 'string') {
         redirectTarget = parsed.redirect;
+      }
+      if (parsed.platform === 'mobile') {
+        isMobilePlatform = true;
+      }
+      if (
+        typeof parsed.mobileRedirect === 'string' &&
+        (parsed.mobileRedirect.startsWith('proje1://') || parsed.mobileRedirect.startsWith('exp://'))
+      ) {
+        mobileRedirectBase = parsed.mobileRedirect;
       }
     } catch (e) {
       console.warn('[Google OAuth] State decode failed:', e);
@@ -35,6 +53,13 @@ export async function GET(request: Request) {
 
   // Kullanıcı Google ekranında iptal ettiyse veya hata döndüyse
   if (error || !code) {
+    if (isMobilePlatform) {
+      return NextResponse.redirect(
+        buildMobileRedirectUrl(mobileRedirectBase, {
+          auth_error: error || 'Google ile giriş iptal edildi.',
+        })
+      );
+    }
     const errorUrl = new URL(redirectTarget, origin);
     errorUrl.searchParams.set('auth_error', error || 'Google ile giriş iptal edildi.');
     return NextResponse.redirect(errorUrl.toString());
@@ -45,6 +70,11 @@ export async function GET(request: Request) {
 
   if (!clientId || !clientSecret) {
     console.error('[Google OAuth] Missing Google Client credentials');
+    if (isMobilePlatform) {
+      return NextResponse.redirect(
+        buildMobileRedirectUrl(mobileRedirectBase, { auth_error: 'google_config_missing' })
+      );
+    }
     return NextResponse.redirect(new URL('/?auth_error=google_config_missing', origin));
   }
 
@@ -69,6 +99,11 @@ export async function GET(request: Request) {
     const tokenData = await tokenRes.json();
     if (!tokenRes.ok || !tokenData.access_token) {
       console.error('[Google OAuth] Token exchange error:', tokenData);
+      if (isMobilePlatform) {
+        return NextResponse.redirect(
+          buildMobileRedirectUrl(mobileRedirectBase, { auth_error: 'google_token_failed' })
+        );
+      }
       return NextResponse.redirect(new URL(`/?auth_error=google_token_failed`, origin));
     }
 
@@ -80,6 +115,11 @@ export async function GET(request: Request) {
     const userInfo = await userInfoRes.json();
     if (!userInfoRes.ok || !userInfo.email) {
       console.error('[Google OAuth] UserInfo fetch error:', userInfo);
+      if (isMobilePlatform) {
+        return NextResponse.redirect(
+          buildMobileRedirectUrl(mobileRedirectBase, { auth_error: 'google_userinfo_failed' })
+        );
+      }
       return NextResponse.redirect(new URL(`/?auth_error=google_userinfo_failed`, origin));
     }
 
@@ -149,7 +189,17 @@ export async function GET(request: Request) {
       request.headers.get('user-agent'),
     );
 
-    // 5. Hedef sayfaya çerezlerle yönlendir
+    // 5. Mobil uygulama isteğiyse doğrudan deep-link ile token'ları döndür
+    if (isMobilePlatform) {
+      return NextResponse.redirect(
+        buildMobileRedirectUrl(mobileRedirectBase, {
+          accessToken,
+          refreshToken,
+        })
+      );
+    }
+
+    // 6. Web isteğiyse hedef sayfaya çerezlerle yönlendir
     const targetUrl = new URL(redirectTarget, origin);
     const response = NextResponse.redirect(targetUrl);
     setAuthCookies(response, accessToken, refreshToken, expiresAt);
@@ -158,6 +208,11 @@ export async function GET(request: Request) {
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : 'Bilinmeyen OAuth hatası';
     console.error('[Google OAuth Callback] Error:', msg);
+    if (isMobilePlatform) {
+      return NextResponse.redirect(
+        buildMobileRedirectUrl(mobileRedirectBase, { auth_error: msg })
+      );
+    }
     return NextResponse.redirect(new URL(`/?auth_error=${encodeURIComponent(msg)}`, origin));
   }
 }
