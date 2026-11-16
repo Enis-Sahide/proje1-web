@@ -9,10 +9,87 @@ export const dynamic = 'force-dynamic';
 
 const FALLBACK_IMAGE_PATH = path.join(process.cwd(), 'public', 'shm.jpg');
 
+interface SharedSchumannImageCache {
+  buffer: Buffer;
+  fetchedAt: number;
+  isOffline: boolean;
+  capturedAt: string;
+  source: 'live-sos70' | 'live-mirror' | 'fallback-cache';
+}
+
+const globalForSchumann = globalThis as unknown as {
+  __schumannImageCache?: SharedSchumannImageCache;
+  __schumannJsonCache?: { payload: any; fetchedAt: number };
+  __schumannRulesCache?: { rules: any[]; fetchedAt: number };
+};
+
+const DEFAULT_SCHUMANN_RULES = [
+  {
+    minScore: '0.0',
+    title: 'Dingin Elektromanyetik Akış (Sakin Faz)',
+    science: '',
+    symptoms: 'Zihinsel netlik, dengeli enerji seviyeleri, sakin uyku düzeni ve bedensel rahatlık. Olağanüstü bir uyarılma belirtisi beklenmez.',
+    spiritual: 'Zihnin gürültüsünü yatıştırmak, yeni bilgiler öğrenmek, kadim dersleri çalışmak ve kök çakra meditasyonları yapmak için en ideal dönemdir. Enerjinizin merkezlendiği bu dingin zamanı tefekkür ile değerlendirebilirsiniz.',
+  },
+  {
+    minScore: '3.0',
+    title: 'Hafif Schumann Dalgalanması (Hafif Uyarım Seviyesi)',
+    science: '',
+    symptoms: 'Rüyalarda belirgin netleşme ve sembolizm artışı, sezgisel uyanışlar, zihinde yaratıcı fikir patlamaları, kulaklarda hafif dalgalı uğultular ve hafif tatlı bir yorgunluk/esneme hali.',
+    spiritual: 'Uyanış kapıları hafifçe uyarılmaktadır. Meditasyon, günlük tutma, rüya analizleri yapma ve yaratıcı projelere odaklanma için harika bir akıştır. Üçüncü göz bölgesine mavi/mor bir ışık hayal ederek odaklanabilirsiniz.',
+  },
+  {
+    minScore: '5.0',
+    title: 'Aktif Schumann Manyetik Fırtınası (G1-G2 Seviyesi)',
+    science: '',
+    symptoms: 'Kalp atışlarında ani hızlanma veya genişleme hissi, vücutta hafif statik elektrik birikimi (dokunulan yerlerin çarpması), hafif eklem ve şakak ağrıları, uykuya dalmakta gecikme ve içsel sabırsızlık.',
+    spiritual: 'Kalp çakrası ve aura alanı genişlemektedir. Bedendeki fazla elektriği boşaltmak için tuzlu su banyosu yapın veya çıplak elle toprağa dokunun. Kalp merkezli nefes pratikleri (4 saniye al, 4 saniye ver) yaparak kozmik akışı bedende dengeleyin.',
+  },
+  {
+    minScore: '7.0',
+    title: 'Şiddetli Schumann Fırtınası (G3 Seviyesi)',
+    science: '',
+    symptoms: 'Sinir sisteminde belirgin uyarılma, uyku düzeninde dalgalanmalar (derin uykusuzluk ya da rüya yoğunluğu), baş ve ense bölgesinde hafif basınç, kulaklarda kesintisiz tiz çınlamalar ve çok canlı, sembolik rüyalar.',
+    spiritual: 'DNA sarmallarında uyarım ve ışık kodlarının entegrasyonu aktiftir. Bedeninizi yormadan hafif egzersizler yapın. Bol su tüketin, topraklanın ve yüksek frekanslı meditasyonlara odaklanın.',
+  },
+  {
+    minScore: '8.0',
+    title: 'Ağır Schumann Fırtınası (G4 Seviyesi)',
+    science: '',
+    symptoms: 'Yoğun fiziksel yorgunluk ve kas seğirmeleri (frekans uyumlanması), baş bölgesinde taç kısmına doğru yayılan basınç, uyku düzeninde derin kaymalar (gece yarısı uyanıp tekrar uyuyamama), zaman algısında geçici bükülmeler.',
+    spiritual: 'Taç çakra portalı tamamen açılmıştır ve yüksek boyutlu ışık bedene geçiş enerjisi aktiftir. Bugün kendinizi zorlayacak fiziksel işlerden kesinlikle kaçının. Taç çakranızdan giren beyaz ışığın bedeninizi yıkayarak yere aktığını imgeleyin.',
+  },
+  {
+    minScore: '9.0',
+    title: 'Ekstrem Schumann Rezonans Fırtınası (G5 Zirve Seviyesi)',
+    science: '',
+    symptoms: 'Sinir sisteminin en yüksek kapasitede uyarılması, derin trans benzeri uyku halleri veya mutlak uykusuzluk, baş ve ensede çok yoğun basınç, kulaklarda çok yüksek tonda uğultu/çınlama sesleri, aşırı duyarlılık ve bedensel hafiflik/ağırlık hissi dalgalanmaları.',
+    spiritual: 'Zirve boyutlar arası geçiş portalı ve hücresel simya devrededir. Kollektif bilinçle ve kozmik kaynakla bütünleşme anıdır. Bol alkali su tüketin ve çıplak ayakla nemli toprağa basarak mutlak topraklanma sağlayın. Zihni tamamen susturarak teslimiyet meditasyonu yapın.',
+  },
+];
+
+async function getSchumannRulesSafe(): Promise<any[]> {
+  const cached = globalForSchumann.__schumannRulesCache;
+  if (cached && Date.now() - cached.fetchedAt < 10 * 60 * 1000) {
+    return cached.rules;
+  }
+  try {
+    const dbPromise = db.select().from(schema.schumannRules);
+    const timeoutPromise = new Promise<null>((resolve) => setTimeout(() => resolve(null), 2000));
+    const rows = await Promise.race([dbPromise, timeoutPromise]);
+    if (Array.isArray(rows) && rows.length > 0) {
+      globalForSchumann.__schumannRulesCache = { rules: rows, fetchedAt: Date.now() };
+      return rows;
+    }
+  } catch (err: any) {
+    console.warn('getSchumannRulesSafe fallback used:', err?.message || err);
+  }
+  return DEFAULT_SCHUMANN_RULES;
+}
+
 export async function OPTIONS() {
   return preflight();
 }
-
 
 function getCosmicImpactStatusInfo(score: number) {
   if (score < 3.0) {
@@ -43,10 +120,9 @@ function getCosmicImpactStatusInfo(score: number) {
   }
 }
 
-async function generateRulesAnalysis(score: number, a1: number, f1: number) {
+async function generateRulesAnalysis(rules: any[], score: number, a1: number, f1: number) {
   try {
-    const rules = await db.select().from(schema.schumannRules);
-    const sortedRules = rules.sort((a, b) => parseFloat(a.minScore) - parseFloat(b.minScore));
+    const sortedRules = [...rules].sort((a, b) => parseFloat(a.minScore) - parseFloat(b.minScore));
 
     let matchedRule = sortedRules[0];
     for (const rule of sortedRules) {
@@ -86,7 +162,7 @@ async function generateRulesAnalysis(score: number, a1: number, f1: number) {
       spiritual: matchedRule.spiritual,
     };
   } catch (err) {
-    console.error('Error fetching schumann rules from DB:', err);
+    console.error('Error generating schumann rules analysis:', err);
     return {
       title: 'Dingin Elektromanyetik Akış (Sakin Faz)',
       science: `Tomsk Rasathanesi ölçümlerine göre Schumann Rezonansı ana frekansı ${f1.toFixed(2)} Hz (Genlik A1: ${a1.toFixed(1)}) seviyesinde dengeli ve doğal titreşiminde seyrediyor. İyonosfer tabakası sakin durumda.`,
@@ -95,7 +171,6 @@ async function generateRulesAnalysis(score: number, a1: number, f1: number) {
     };
   }
 }
-
 
 interface RealSchumannRow {
   time_tomsk: string;
@@ -136,7 +211,7 @@ const getSchumannScoreFromA1 = (a1: number): number => {
 async function fetchRealSchumannData(): Promise<RealSchumannRow | null> {
   const tomskOffset = 7 * 60 * 60 * 1000;
   const nowTomsk = new Date(Date.now() + tomskOffset);
-  
+
   const getFilename = (date: Date) => {
     const yyyy = date.getUTCFullYear();
     const mm = String(date.getUTCMonth() + 1).padStart(2, '0');
@@ -145,36 +220,18 @@ async function fetchRealSchumannData(): Promise<RealSchumannRow | null> {
   };
 
   const currentFilename = getFilename(nowTomsk);
-  const prevFilename = getFilename(new Date(nowTomsk.getTime() - 24 * 60 * 60 * 1000));
-
-  const tryFetch = async (filename: string): Promise<string | null> => {
-    try {
-      const url = `https://sos70.ru/images/${filename}`;
-      const res = await fetch(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        },
-        signal: AbortSignal.timeout(4000),
-        cache: 'no-store'
-      });
-      if (res.ok) {
-        return await res.text();
-      }
-    } catch (e: any) {
-      console.warn(`Error fetching .afq file ${filename}:`, e?.message || e);
-    }
-    return null;
-  };
-
-  let dataText = await tryFetch(currentFilename);
-  if (!dataText) {
-    console.log(`Current day's .afq file not found, falling back to previous day: ${prevFilename}`);
-    dataText = await tryFetch(prevFilename);
-  }
-
-  if (!dataText) return null;
 
   try {
+    const url = `https://sos70.ru/images/${currentFilename}`;
+    const res = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      },
+      signal: AbortSignal.timeout(1500),
+      cache: 'no-store'
+    });
+    if (!res.ok) return null;
+    const dataText = await res.text();
     const lines = dataText.split('\n')
       .map(line => line.trim())
       .filter(line => line.length > 0 && line.startsWith('2'));
@@ -205,16 +262,15 @@ async function fetchRealSchumannData(): Promise<RealSchumannRow | null> {
       f4: parseFloat(parts[12]) || 0,
       q4: parseFloat(parts[13]) || 0,
     };
-  } catch (parseErr) {
-    console.error('Error parsing .afq file:', parseErr);
+  } catch {
     return null;
   }
 }
 
-async function detectFlaresFromImage(): Promise<{ 
-  score: number; 
-  peakA1: number; 
-  score24h: number; 
+async function detectFlaresFromImage(): Promise<{
+  score: number;
+  peakA1: number;
+  score24h: number;
   peakA124h: number;
   isOffline: boolean;
   cachedAt?: string;
@@ -224,33 +280,52 @@ async function detectFlaresFromImage(): Promise<{
     let isOffline = false;
     let cachedAt: string | undefined;
 
-    try {
-      const url = 'https://sos70.ru/provider.php?file=shm.jpg';
-      const res = await fetch(url, {
-        headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-          'Referer': 'https://sos70.ru/'
-        },
-        signal: AbortSignal.timeout(3500),
-        cache: 'no-store'
-      });
-      if (res.ok) {
-        buffer = Buffer.from(await res.arrayBuffer());
-        try {
-          await fs.writeFile(FALLBACK_IMAGE_PATH, buffer);
-        } catch (writeErr) {
-          console.warn('Could not write cached public/shm.jpg:', writeErr);
-        }
-      }
-    } catch (liveErr: any) {
-      console.warn('SOS70 live image unreachable:', liveErr?.message || liveErr);
+    // 0. Check shared in-memory spectrogram image cache first (3-min TTL)
+    const cachedImg = globalForSchumann.__schumannImageCache;
+    if (cachedImg && Date.now() - cachedImg.fetchedAt < 180_000) {
+      buffer = cachedImg.buffer;
+      isOffline = cachedImg.isOffline;
+      cachedAt = cachedImg.capturedAt;
     }
 
-    // Last known measurement before SOS70 outage: Nov 2, 2026 02:50 Turkey Time (23:50:39 UTC Nov 1 / 06:50 Tomsk Nov 2)
+    // 1. Fetch live SOS70 spectrogram if not in memory cache
+    if (!buffer) {
+      try {
+        const url = 'https://sos70.ru/provider.php?file=shm.jpg';
+        const res = await fetch(url, {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Referer': 'https://sos70.ru/'
+          },
+          signal: AbortSignal.timeout(4000),
+          cache: 'no-store'
+        });
+        if (res.ok) {
+          const buf = Buffer.from(await res.arrayBuffer());
+          if (buf.length > 5000 && buf[0] === 0xff && buf[1] === 0xd8) {
+            buffer = buf;
+            isOffline = false;
+            cachedAt = new Date().toISOString();
+            globalForSchumann.__schumannImageCache = {
+              buffer: buf,
+              fetchedAt: Date.now(),
+              isOffline: false,
+              capturedAt: cachedAt,
+              source: 'live-sos70',
+            };
+            try {
+              await fs.writeFile(FALLBACK_IMAGE_PATH, buf);
+            } catch {}
+          }
+        }
+      } catch (liveErr: any) {
+        console.warn('SOS70 live image unreachable:', liveErr?.message || liveErr);
+      }
+    }
+
     let fallbackCapturedAt = '2026-11-01T23:50:39.113Z';
 
     if (!buffer) {
-      // Try schumannresonancedata.com archive mirror
       try {
         const srdUrl = 'https://ljnpynnorwveqpsgkxws.supabase.co/rest/v1/sonogram_data?select=id,captured_at,image_url,status&status=eq.active&order=captured_at.desc&limit=1';
         const srdKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxqbnB5bm5vcnd2ZXFwc2dreHdzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTkxNzA3ODgsImV4cCI6MjA3NDc0Njc4OH0.oETMBS9xsjhZk1KDH43FkNO-EEK9bhxw0reYHc2-crE';
@@ -259,7 +334,7 @@ async function detectFlaresFromImage(): Promise<{
             apikey: srdKey,
             Authorization: `Bearer ${srdKey}`,
           },
-          signal: AbortSignal.timeout(3500),
+          signal: AbortSignal.timeout(3000),
           cache: 'no-store',
         });
 
@@ -268,18 +343,28 @@ async function detectFlaresFromImage(): Promise<{
           if (Array.isArray(rows) && rows.length > 0 && rows[0].image_url) {
             fallbackCapturedAt = rows[0].captured_at || fallbackCapturedAt;
             const ageMs = Date.now() - new Date(fallbackCapturedAt).getTime();
-            isOffline = ageMs > 35 * 60 * 1000;
+            isOffline = ageMs > 45 * 60 * 1000;
             cachedAt = fallbackCapturedAt;
 
             const imgRes = await fetch(rows[0].image_url, {
-              signal: AbortSignal.timeout(4000),
+              signal: AbortSignal.timeout(3500),
               cache: 'no-store',
             });
             if (imgRes.ok) {
-              buffer = Buffer.from(await imgRes.arrayBuffer());
-              try {
-                await fs.writeFile(FALLBACK_IMAGE_PATH, buffer);
-              } catch {}
+              const buf = Buffer.from(await imgRes.arrayBuffer());
+              if (buf.length > 5000) {
+                buffer = buf;
+                globalForSchumann.__schumannImageCache = {
+                  buffer: buf,
+                  fetchedAt: Date.now(),
+                  isOffline,
+                  capturedAt: fallbackCapturedAt,
+                  source: isOffline ? 'fallback-cache' : 'live-mirror',
+                };
+                try {
+                  await fs.writeFile(FALLBACK_IMAGE_PATH, buf);
+                } catch {}
+              }
             }
           }
         }
@@ -296,20 +381,19 @@ async function detectFlaresFromImage(): Promise<{
 
     const image = sharp(buffer);
     const { data, info } = await image.raw().toBuffer({ resolveWithObject: true });
-    
+
     const dataStartX = 60;
-    // S 70 O S logosu ve renk lejantı sağdaki 21:00-24:00 (X=1200+) arasını kapladığı için taramayı 1200'de kesiyoruz.
     const dataEndX = 1200;
     const bgRegions = [
       { start: 55, end: 85 },   // 2 - 5 Hz
       { start: 130, end: 155 }, // 10 - 12.5 Hz
       { start: 190, end: 215 }  // 16 - 18.5 Hz
     ];
-    
+
     let minBr = 255;
     let maxBr = 0;
     const colBrightnesses: number[] = [];
-    
+
     for (let x = dataStartX; x <= dataEndX; x++) {
       let sumBr = 0;
       let count = 0;
@@ -329,19 +413,15 @@ async function detectFlaresFromImage(): Promise<{
       if (avgBr < minBr) minBr = avgBr;
       if (avgBr > maxBr) maxBr = avgBr;
     }
-    
-    // 1. Tomsk saatini ve buna karşılık gelen X koordinatını hesapla (safe alanda kalarak)
+
     const tomskOffset = 7 * 60 * 60 * 1000;
     const nowTomsk = new Date(Date.now() + tomskOffset);
     const tomskHours = nowTomsk.getUTCHours() + nowTomsk.getUTCMinutes() / 60;
-    
-    // Genişlik hesabı: dataStartX (60) ile dataEndX (1200) arası 0-21 saat aralığını kapsar
-    const dataWidth = dataEndX - dataStartX;
+
     const currentX = Math.round(dataStartX + tomskHours * ((1420 - dataStartX) / 24));
     const clampedCurrentX = Math.max(dataStartX, Math.min(dataEndX, currentX));
     const latestDataIndex = clampedCurrentX - dataStartX;
 
-    // Grid çizgilerini (ince dikey beyaz çizgileri) filtrelemek için 7 piksellik kayan pencerede en parlak 2 değeri çöpe atıp ortalama alıyoruz
     const cleanBrightnesses: number[] = [];
     const halfWin = 3;
     for (let i = 0; i < colBrightnesses.length; i++) {
@@ -361,7 +441,6 @@ async function detectFlaresFromImage(): Promise<{
       cleanBrightnesses.push(sum / keepCount);
     }
 
-    // Find rightmost non-black (measured) column in case spectrogram ends before 24:00 (e.g. outage at 06:50 Tomsk)
     let rightmostValidIdx = latestDataIndex;
     for (let i = cleanBrightnesses.length - 1; i >= 20; i--) {
       if (cleanBrightnesses[i] > 3.5) {
@@ -375,8 +454,7 @@ async function detectFlaresFromImage(): Promise<{
       : latestDataIndex;
 
     const latestAvg = cleanBrightnesses[effectiveIdx] || 4.0;
-    
-    // 2. 24 saatlik peak hesapla (filtreli temiz alandaki maksimum sütun)
+
     let maxOverallBr = 4.0;
     const safeStart = Math.min(20, cleanBrightnesses.length);
     const safeEnd = cleanBrightnesses.length;
@@ -387,43 +465,37 @@ async function detectFlaresFromImage(): Promise<{
     }
 
     const getA1FromBrightness = (avgBr: number): number => {
-      // 0 - 45 (Koyu Mavi): Sakin (A1: 4.0 - 8.0)
       if (avgBr <= 45.0) {
         return parseFloat((4.0 + (avgBr / 45.0) * 4.0).toFixed(1));
       }
-      // 45 - 65 (Açık Mavi / Yeşil): G1 (A1: 8.0 - 15.0)
       if (avgBr <= 65.0) {
         return parseFloat((8.0 + ((avgBr - 45.0) / 20.0) * 7.0).toFixed(1));
       }
-      // 65 - 85 (Yeşil / Sarı): G2 (A1: 15.0 - 25.0)
       if (avgBr <= 85.0) {
         return parseFloat((15.0 + ((avgBr - 65.0) / 20.0) * 10.0).toFixed(1));
       }
-      // 85 - 100 (Sarı / Kırmızı): G3 (A1: 25.0 - 40.0)
       if (avgBr <= 100.0) {
         return parseFloat((25.0 + ((avgBr - 85.0) / 15.0) * 15.0).toFixed(1));
       }
-      // 100 - 112 (Turuncu / Kırmızı): G4 (A1: 40.0 - 55.0)
       if (avgBr <= 112.0) {
         return parseFloat((40.0 + ((avgBr - 100.0) / 12.0) * 15.0).toFixed(1));
       }
-      // 112 - 255 (Saf Beyaz): G5 (A1: 55.0 - 90.0+)
       return parseFloat((55.0 + Math.min(35.0, ((avgBr - 112.0) / 15.0) * 35.0)).toFixed(1));
     };
 
     const peakA1 = getA1FromBrightness(latestAvg);
     const score = getSchumannScoreFromA1(peakA1);
-    
+
     const peakA124h = getA1FromBrightness(maxOverallBr);
     const score24h = getSchumannScoreFromA1(peakA124h);
 
     return {
-      score: score,
-      peakA1: peakA1,
-      score24h: score24h,
-      peakA124h: peakA124h,
-      isOffline: isOffline,
-      cachedAt: cachedAt
+      score,
+      peakA1,
+      score24h,
+      peakA124h,
+      isOffline,
+      cachedAt
     };
   } catch (err) {
     console.error('Error detecting flares from image:', err);
@@ -438,16 +510,24 @@ export async function GET(req: Request) {
     const hasSimulatedA1 = simulatedA1Param !== null && simulatedA1Param !== '';
     const simulatedA1 = hasSimulatedA1 ? parseFloat(simulatedA1Param!) : null;
 
-    // 1. Fetch actual Schumann values from Tomsk .afq logs
-    let realSchumann = await fetchRealSchumannData();
-    
-    // Detect flares/bursts dynamically from the live spectrogram image (or cached shm.jpg fallback)
-    const imageFlareData = await detectFlaresFromImage();
+    if (!hasSimulatedA1 && globalForSchumann.__schumannJsonCache) {
+      const age = Date.now() - globalForSchumann.__schumannJsonCache.fetchedAt;
+      if (age < 120_000) {
+        return json(globalForSchumann.__schumannJsonCache.payload);
+      }
+    }
+
+    const [realSchumannFromAfq, imageFlareData, allRules] = await Promise.all([
+      fetchRealSchumannData(),
+      detectFlaresFromImage(),
+      getSchumannRulesSafe(),
+    ]);
+
+    let realSchumann = realSchumannFromAfq;
     const isOffline = !realSchumann && (!imageFlareData || imageFlareData.isOffline);
 
     if (imageFlareData) {
       if (!realSchumann) {
-        // Create fallback object since .afq log is offline
         realSchumann = {
           time_tomsk: imageFlareData.isOffline ? 'Son Hesaplanan Kayıt' : 'Canlı Gözlem',
           time_utc: imageFlareData.cachedAt || new Date().toISOString(),
@@ -465,19 +545,18 @@ export async function GET(req: Request) {
           q4: 10
         };
       } else if (!imageFlareData.isOffline && imageFlareData.peakA1 > realSchumann.a1) {
-        console.log(`Image-based flare detected! Scaling A1 from ${realSchumann.a1} to ${imageFlareData.peakA1}`);
         realSchumann.a1 = imageFlareData.peakA1;
       }
     }
-    
-    // 2. Calculate custom cosmic impact score (0.0 to 10.0)
+
     const finalA1 = simulatedA1 !== null ? simulatedA1 : (realSchumann ? realSchumann.a1 : 6.0);
     const finalF1 = simulatedA1 !== null ? (7.83 + (simulatedA1 / 75.0) * 0.5) : (realSchumann ? realSchumann.f1 : 7.83);
     const finalImpactScore = getSchumannScoreFromA1(finalA1);
-    
+
     const cosmicStatus = getCosmicImpactStatusInfo(finalImpactScore);
 
     const aiAnalysis = await generateRulesAnalysis(
+      allRules,
       finalImpactScore,
       finalA1,
       finalF1
@@ -503,9 +582,7 @@ export async function GET(req: Request) {
     const finalPeakA1 = simulatedA1 !== null ? simulatedA1 : peakA124h;
     const finalPeakScore = getSchumannScoreFromA1(finalPeakA1);
 
-    const allRules = await db.select().from(schema.schumannRules);
-
-    return json({
+    const payload = {
       cosmic_impact_score: finalImpactScore,
       cosmic_status_label: cosmicStatus.label,
       cosmic_status_desc: cosmicStatus.desc,
@@ -517,10 +594,19 @@ export async function GET(req: Request) {
       peak_score_24h: finalPeakScore,
       is_offline: isOffline,
       offline_warning: isOffline
-        ? 'Tomsk Rasathanesi (sos70.ru) veri kaynağına 2 Kasım 02:50 (TSİ) itibarıyla ulaşılamamaktadır. Boş ekran yerine kesinti öncesi alınan en son hesaplanan spektrogram görseli ve ölçüm değerleri gösterilmektedir.'
+        ? 'Tomsk Rasathanesi (sos70.ru) veri kaynağına şu anda ulaşılamamaktadır. Boş ekran yerine kesinti öncesi alınan en son hesaplanan spektrogram görseli ve ölçüm değerleri gösterilmektedir.'
         : null,
       last_cached_at: imageFlareData?.cachedAt || null
-    });
+    };
+
+    if (!hasSimulatedA1) {
+      globalForSchumann.__schumannJsonCache = {
+        payload,
+        fetchedAt: Date.now(),
+      };
+    }
+
+    return json(payload);
   } catch (error: any) {
     console.error('Schumann API Error:', error);
     return errorJson('Kozmik hava durumu verileri yüklenirken bir hata oluştu.', 500);
