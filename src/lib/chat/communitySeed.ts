@@ -88,7 +88,7 @@ export const ROOM_SEED_DIALOGUES: Record<string, SeedDialogueItem[]> = {
     },
     {
       personaKey: 'asli',
-      content: 'Kesinlikle katılıyorum, 4-7-8 nefes tekniğiyle birleştirince kalp ritmi hemen dengeleniyor.',
+      content: '4-7-8 nefes tekniğiyle 528 Hz frekansını birleştirince kalp ritmi hemen dengeleniyor Mert, akşam saatleri için en güzel pratik.',
       replyToIndex: 5,
       minsAgo: 34,
     },
@@ -112,7 +112,7 @@ export const ROOM_SEED_DIALOGUES: Record<string, SeedDialogueItem[]> = {
     },
     {
       personaKey: 'sefirot',
-      content: 'Çok güzel bir örnek. Assiah senin bu dünyadaki aracın ve düzen kurma disiplinin; Yetzirah ise ruhunun asıl özlemi olan bilgelik ve ufuk arayışıdır. İkisini birleştirdiğinde Kestirme Yol (Shortcut) açılır.',
+      content: 'Assiah senin bu dünyadaki aracın ve düzen kurma disiplinin; Yetzirah ise ruhunun asıl özlemi olan bilgelik ve ufuk arayışıdır. İkisini birleştirdiğinde Kestirme Yol (Shortcut) açılır.',
       replyToIndex: 1,
       minsAgo: 210,
     },
@@ -194,7 +194,7 @@ export const ROOM_SEED_DIALOGUES: Record<string, SeedDialogueItem[]> = {
     },
     {
       personaKey: 'kuzey',
-      content: 'Kesinlikle, çoğu kişi sadece Güneş burcuna bakıyor ama kariyerde MC, 2. ev ve 6. ev yöneticileri ile Drakonik MC bambaşka bir derinlik veriyor.',
+      content: 'Çoğu kişi sadece Güneş burcuna bakıyor ama kariyerde MC, 2. ev ve 6. ev yöneticileri ile Drakonik MC bambaşka bir derinlik veriyor Defne.',
       replyToIndex: 2,
       minsAgo: 120,
     },
@@ -223,7 +223,7 @@ export const ROOM_SEED_DIALOGUES: Record<string, SeedDialogueItem[]> = {
     },
     {
       personaKey: 'cem',
-      content: 'Duygusal otoritede bir gece uyumak bile kararın rengini tamamen değiştiriyor, çok doğru bir farkındalık.',
+      content: 'Duygusal otoritede bir gece uyumak bile kararın rengini tamamen değiştiriyor Mert, en sağlam süzgeç o.',
       replyToIndex: 1,
       minsAgo: 180,
     },
@@ -359,13 +359,13 @@ const ONGOING_DIALOGUE_CHAINS: Record<string, OngoingDialogueChain[]> = {
       openerKey: 'elif',
       openerText: 'Kozmik Matris Sentez raporundaki 7 katmanlı özeti bugün tekrar not alarak okudum; özellikle gölge yanlarımla yüzleşme kısmı çok ufuk açıcı.',
       responderKey: 'derin',
-      responderText: 'Kesinlikle Elif, gölgeyi bastırmak yerine onu fark edip dönüştürmek bilincin en büyük sıçrama noktasıdır.',
+      responderText: 'Gölgeyi bastırmak yerine onu fark edip dönüştürmek bilincin en büyük sıçrama noktasıdır Elif. İnsan kendi karanlığıyla barıştığında ışığı da parlıyor.',
     },
     {
       openerKey: 'mert',
       openerText: 'Bugün Gezegen Saatleri ekranından Merkür saatini takip edip yarım kalan yazılarımı tamamladım, zihinsel odaklanma gerçekten çok fark ediyor.',
       responderKey: 'hermes',
-      responderText: 'Kadim gelenekte "doğru eylemi doğru kozmik saatle buluşturmak" simyanın ilk adımıdır Mert, harika bir gözlem.',
+      responderText: 'Kadim gelenekte doğru eylemi doğru kozmik saatle buluşturmak simyanın ilk adımıdır Mert. Rüzgarı arkana alarak yürümek gibi.',
     },
     {
       openerKey: 'zeynep',
@@ -377,13 +377,43 @@ const ONGOING_DIALOGUE_CHAINS: Record<string, OngoingDialogueChain[]> = {
       openerKey: 'kaan',
       openerText: 'Kabalistik 4 Alem ile Human Design analizini yan yana koyduğunuzda ikisinin birbirini nasıl tamamladığını fark ettiniz mi?',
       responderKey: 'sefirot',
-      responderText: 'Çok doğru bir nokta Kaan. Zaten Human Design da Hayat Ağacı kanalları ve çakra merkezlerinin modern bir sentezidir; kökleri aynı kadim bilgeliğe dayanır.',
+      responderText: 'Zaten Human Design da Hayat Ağacı kanalları ve çakra merkezlerinin modern bir sentezidir Kaan; kökleri aynı kadim bilgeliğe dayanır.',
     },
     {
       openerKey: 'asli',
       openerText: 'Günün koşturmacası içinde sadece 3 dakika bile olsa diyafram nefesine dönmek insanı hemen kendi merkezine geri çağırıyor.',
       responderKey: 'kuzey',
       responderText: 'Nefes, ruh ile beden arasındaki en somut köprüdür Aslı; farkındalığın daim olsun.',
+    },
+    {
+      openerKey: 'burak',
+      openerText: 'Yeni Ay ve Dolunay geçişlerinde uyku düzenim hep değişiyor. Son zamanlarda gece yatmadan önce 4-7-8 nefesini deniyorum, zihni ciddi anlamda yatıştırıyor.',
+      responderKey: 'aurora',
+      responderText: 'Ay fazları bedendeki sıvı dengesini ve epifiz bezini doğrudan etkiliyor Burak. Akşam saatlerinde ekran ışığını azaltıp 4-7-8 nefesine geçmek sinir sistemini hemen parasempatik moda alıyor.',
+    },
+    {
+      openerKey: 'nil',
+      openerText: 'Bazen gün içinde aynı sayı dizilerini üst üste görmek tesadüf olamayacak kadar net hissettiriyor. Bugün üç kez 11:11 yakaladım.',
+      responderKey: 'emre',
+      responderText: 'Eşzamanlılıklar zihnin o an hangi frekansta olduğunu gösteren işaret fişekleri gibidir Nil. O an aklından geçen niyeti not almak çok işe yarıyor.',
+    },
+    {
+      openerKey: 'defne',
+      openerText: 'Sabah uyanır uyanmaz telefona bakmak yerine ilk 10 dakikayı sessizlikte geçirmeye başladım; günün geri kalanındaki stres eşiğim bambaşka oldu.',
+      responderKey: 'leyla',
+      responderText: 'Sabahın ilk dakikaları teta dalgalarının hala aktif olduğu en kıymetli eşik Defne. O alanı dış dünyaya değil kendi niyetine açmak bütün günü koruyor.',
+    },
+    {
+      openerKey: 'cem',
+      openerText: 'Beden haritasıyla Ruh (Drakonik) haritasını karşılaştırırken en çok Yükselen burçlarımın farkı dikkatimi çekti; dışarıya verdiğim tepkiyle içsel arayışım çok farklıymış.',
+      responderKey: 'kuzey',
+      responderText: 'Tropikal yükselen hayata taktığımız maske ve savunma kalkanımızdır Cem; Drakonik yükselen ise ruhun o maskenin altında aslında neyi deneyimlemek istediğini fısıldar.',
+    },
+    {
+      openerKey: 'ogham',
+      openerText: 'Şehir hayatında betonun içinde kaldıkça insanın enerjisi nasıl da ağırlaşıyor. Bugün yarım saat toprak ve ağaçlarla temas etmek bile zihnimi sıfırladı.',
+      responderKey: 'asli',
+      responderText: 'Çıplak ayakla toprağa basmak ya da bir ağacın gövdesine yaslanmak bedendeki statik elektriği en hızlı boşaltan yöntem OghamBilgesi.',
     },
   ],
 
@@ -392,7 +422,7 @@ const ONGOING_DIALOGUE_CHAINS: Record<string, OngoingDialogueChain[]> = {
       openerKey: 'kaan',
       openerText: 'Yesod küresi Ay ile yönetildiği için rüyalar ve bilinçaltı imgeler bu merkezde toplanıyor. Yesod dengelendiğinde Malkuth yani günlük hayatımız da berraklaşıyor.',
       responderKey: 'sefirot',
-      responderText: 'Çok doğru Kaan. Yesod kirli bir ayna gibiyse üst alemlerden (Tiferet’ten) gelen ışık fiziksel dünyaya çarpık yansır; içsel arınma bu yüzden şarttır.',
+      responderText: 'Yesod kirli bir ayna gibiyse üst alemlerden (Tiferet’ten) gelen ışık fiziksel dünyaya çarpık yansır Kaan; içsel arınma bu yüzden şarttır.',
     },
     {
       openerKey: 'leyla',
@@ -404,7 +434,19 @@ const ONGOING_DIALOGUE_CHAINS: Record<string, OngoingDialogueChain[]> = {
       openerKey: 'derin',
       openerText: 'Gevurah (Disiplin/Sınır) olmadan Hesed (Merhamet/Bolluk) kontrolsüzce dağılır. Hayatta sınır çizmeyi öğrenmek de ruhsal gelişimin bir parçası.',
       responderKey: 'sefirot',
-      responderText: 'Harika bir özet Derin. Suyun akabilmesi için nehir yatağının (Gevurah) sağlam olması gerekir.',
+      responderText: 'Suyun akabilmesi için nehir yatağının (Gevurah) sağlam olması gerekir Derin; sınırlar ışığı hapseden duvarlar değil, onu taşıyan kaptır.',
+    },
+    {
+      openerKey: 'elif',
+      openerText: 'Hod (Zihin/Mantık) ve Netzach (Duygu/Arzu) arasındaki denge bozulduğunda insan ya aşırı analizden adım atamıyor ya da dürtüsel kararlar veriyor.',
+      responderKey: 'kaan',
+      responderText: 'İkisinin ortasındaki Tiferet (Kalp) bilincine çıkmadan o sarkaç hep sallanır Elif. Kalp merkezi mantıkla sezgiyi aynı potada eritiyor.',
+    },
+    {
+      openerKey: 'burak',
+      openerText: 'Beriyah (Yaratım) alemiyle Yetzirah (Biçimlenme) alemi arasındaki farkı kendi hayatımda niyet koymak ve o niyeti alışkanlığa dönüştürmek olarak gözlemliyorum.',
+      responderKey: 'leyla',
+      responderText: 'Tam üstüne bastın Burak; Beriyah tohumun içindeki öz fikir, Yetzirah ise o tohumun filizlenirken aldığı duygusal ve zihinsel kalıptır.',
     },
   ],
 
@@ -413,13 +455,25 @@ const ONGOING_DIALOGUE_CHAINS: Record<string, OngoingDialogueChain[]> = {
       openerKey: 'emre',
       openerText: 'Hermetik ilkelerden "Yukarıda ne varsa aşağıda da o vardır" yasası, hem astrolojinin hem de kutsal geometrinin temel taşıdır.',
       responderKey: 'hermes',
-      responderText: 'Mikrokozmos (insan) ile makrokozmos (evren) birbirinin kusursuz aynasıdır; kendini bilen evreni bilir.',
+      responderText: 'Mikrokozmos (insan) ile makrokozmos (evren) birbirinin kusursuz aynasıdır Emre; kendini bilen evreni bilir.',
     },
     {
       openerKey: 'nil',
       openerText: 'Rüyalarda görülen suyun berraklığı doğrudan duygusal bedenin (Yetzirah) o anki durumunu yansıtıyor; bulanık su zihinsel ve duygusal karmaşaya işaret ediyor.',
       responderKey: 'derin',
-      responderText: 'Çok yerinde bir tespit Nil. Uyumadan önce niyet koymak ve zihni sakinleştirmek rüya sembollerini çok daha netleştiriyor.',
+      responderText: 'Uyumadan önce niyet koymak ve zihni sakinleştirmek rüya sembollerini çok daha netleştiriyor Nil.',
+    },
+    {
+      openerKey: 'leyla',
+      openerText: 'Rüyamda sürekli eski bir evin bilmediğim yeni odalarını keşfettiğimi görüyorum. Sembolizm derslerinden sonra bunun kendi bilinçaltımda yeni açılan potansiyeller olduğunu anladım.',
+      responderKey: 'hermes',
+      responderText: 'Ev arketipi doğrudan kişinin kendi psişesidir ZoharIşığı. Yeni odalar veya çatı katı görmek, daha önce fark etmediğin üst bilinç katmanlarına kapı araladığını gösterir.',
+    },
+    {
+      openerKey: 'mert',
+      openerText: 'Ouroboros (kendi kuyruğunu ısıran yılan) sembolü bana hep bitişlerin aslında yeni bir başlangıcın besini olduğunu hatırlatıyor.',
+      responderKey: 'emre',
+      responderText: 'Simyada "Prima Materia"nın döngüsel dönüşümüdür Mert; doğada ve ruhta hiçbir enerji kaybolmaz, sadece form değiştirir.',
     },
   ],
 
@@ -434,7 +488,19 @@ const ONGOING_DIALOGUE_CHAINS: Record<string, OngoingDialogueChain[]> = {
       openerKey: 'burak',
       openerText: 'Drakonik harita ile Tropikal harita arasındaki kavuşumlar, bu enkarnasyona taşıdığımız en güçlü ruhsal sözleşmeleri gösteriyor.',
       responderKey: 'hermes',
-      responderText: 'Özellikle Güneş, Ay veya Yükselen dereceleri iki haritada üst üste geliyorsa ruhun kadersel teması çok güçlü çalışır.',
+      responderText: 'Özellikle Güneş, Ay veya Yükselen dereceleri iki haritada üst üste geliyorsa ruhun kadersel teması çok güçlü çalışır Burak.',
+    },
+    {
+      openerKey: 'elif',
+      openerText: 'Yeni Ay dönemlerinde haritamda hangi ev tetikleniyorsa o alanda somut bir tohum ekmeye özen gösteriyorum; Dolunayda ise sonuçları çok net görünür oluyor.',
+      responderKey: 'defne',
+      responderText: 'Yeni Ay niyetin toprağa düştüğü karanlık ve verimli evredir Elif; özellikle ilk 8 saat içinde niyeti yazıya dökmek o evin enerjisini çok güzel aktive ediyor.',
+    },
+    {
+      openerKey: 'cem',
+      openerText: 'Güney Ay Düğümü konfor alanımız olduğu için stres anında hemen oraya kaçıyoruz ama asıl büyüme Kuzey Ay Düğümünün olduğu evin sorumluluğunu alınca başlıyor.',
+      responderKey: 'kuzey',
+      responderText: 'Güney Düğümü tamamen çöpe atmak değil Cem, oradaki ustalığı Kuzey Düğümün hedefi için yakıt olarak kullanmak gerçek dengeyi kuruyor.',
     },
   ],
 
@@ -443,13 +509,19 @@ const ONGOING_DIALOGUE_CHAINS: Record<string, OngoingDialogueChain[]> = {
       openerKey: 'cem',
       openerText: 'Projektörler için en önemli soru "Ben kimim?" değil, "Beni gerçekten kim görüyor ve değerimi tanıyor?" sorusudur.',
       responderKey: 'defne',
-      responderText: 'Ve doğru daveti aldıklarında bir Projektörün rehberliği bütün ekibin enerjisini en verimli şekilde yönlendiriyor.',
+      responderText: 'Doğru daveti aldıklarında bir Projektörün rehberliği bütün ekibin enerjisini en verimli şekilde yönlendiriyor Cem.',
     },
     {
       openerKey: 'elif',
       openerText: 'Jeneratör ve MG’ler için tatmin duygusu doğru yolda olduğumuzun, hüsransa stratejiden çıktığımızın en net sinyali.',
       responderKey: 'mert',
-      responderText: 'Ne zaman zihnimle "bunu yapmalıyım" diye zorlasam hüsran yaşıyorum; sakral yanıtı beklediğimde ise iş kendiliğinden akıyor.',
+      responderText: 'Ne zaman zihnimle "bunu yapmalıyım" diye zorlasam hüsran yaşıyorum Elif; sakral yanıtı beklediğimde ise iş kendiliğinden akıyor.',
+    },
+    {
+      openerKey: 'asli',
+      openerText: 'Duygusal Otoriteye sahip biri olarak "hemen şimdi" karar vermemeyi öğrenmek hayatımdaki en büyük özgürlük oldu; duygusal dalganın durulmasını beklemek şart.',
+      responderKey: 'cem',
+      responderText: 'Solar Pleksus tanımlıysa anlık coşkuyla ya da anlık düşüşle verilen sözler sonradan hep yük oluyor Aslı; "bunun üzerine bir gece uyuyayım" demek en sağlam anahtar.',
     },
   ],
 
@@ -458,13 +530,19 @@ const ONGOING_DIALOGUE_CHAINS: Record<string, OngoingDialogueChain[]> = {
       openerKey: 'emre',
       openerText: 'Doğum tarihimizdeki rakamlar bu hayata getirdiğimiz araçları, ismimizdeki harf titreşimleri ise bu araçları hangi frekansta kullandığımızı gösterir.',
       responderKey: 'nil',
-      responderText: 'Kişisel gün sayımı takip etmeye başladığımdan beri hangi gün dinlenip hangi gün adım atacağımı çok daha dengeli planlıyorum.',
+      responderText: 'Kişisel gün sayımı takip etmeye başladığımdan beri hangi gün dinlenip hangi gün adım atacağımı çok daha dengeli planlıyorum Emre.',
     },
     {
       openerKey: 'zeynep',
       openerText: 'Yaşam Yolu 9 olanların "tamamlanma ve insanlığa şefkat" enerjisi çok yüksek ama geçmişi bırakmakta zorlanabiliyorlar.',
       responderKey: 'aurora',
-      responderText: 'Çok doğru Zeynep; 9 sayısı eski döngüyü sevgiyle uğurlayıp ellerini yeniye açmayı öğrendiğinde gerçek bilgeliğe ulaşır.',
+      responderText: '9 sayısı eski döngüyü sevgiyle uğurlayıp ellerini yeniye açmayı öğrendiğinde gerçek bilgeliğe ulaşır Zeynep.',
+    },
+    {
+      openerKey: 'kaan',
+      openerText: '11, 22 ve 33 gibi Üstat Sayılara sahip haritalarda sinir sistemi yüksek voltajlı bir trafo gibi çalışıyor; topraklanma olmazsa içsel gerilim yaratabiliyor.',
+      responderKey: 'emre',
+      responderText: 'Üstat sayıların sırrı önce alt basamağını (2, 4, 6) sağlamlaştırmaktır Kaan; kökleri sağlam olmayan ağaç yüksek rüzgarı taşıyamaz.',
     },
   ],
 
@@ -473,13 +551,19 @@ const ONGOING_DIALOGUE_CHAINS: Record<string, OngoingDialogueChain[]> = {
       openerKey: 'ogham',
       openerText: 'Huş ağacı (Beith) Ogham alfabesinin ilk harfidir; arınmayı, yeni doğuşu ve eski kabuğu geride bırakma cesaretini simgeler.',
       responderKey: 'asli',
-      responderText: 'Doğanın dört elementiyle (Toprak, Su, Ateş, Hava) günlük ritmimi uyumlamak zihinsel berraklığımı çok güçlendirdi.',
+      responderText: 'Doğanın dört elementiyle (Toprak, Su, Ateş, Hava) günlük ritmimi uyumlamak zihinsel berraklığımı çok güçlendirdi OghamBilgesi.',
     },
     {
       openerKey: 'leyla',
       openerText: 'Üvez ağacı (Luis) kadim Kelt geleneğinde psi-koruma ve sezgisel ayırt etme gücüyle bilinir; enerji alanını korumak isteyenler için harika bir arketip.',
       responderKey: 'ogham',
-      responderText: 'Kesinlikle ZoharIşığı; Üvez arketipi dışsal telkinlere kapılmadan kendi içsel hakikatini duymayı öğretir.',
+      responderText: 'Üvez arketipi dışsal telkinlere kapılmadan kendi içsel hakikatini duymayı öğretir ZoharIşığı.',
+    },
+    {
+      openerKey: 'derin',
+      openerText: 'Meşe ağacı (Duir) Keltlerde dayanıklılığın ve zamanın ötesindeki kapıların bekçisidir; zorlu geçiş dönemlerinde Meşe arketipiyle meditasyon yapmak çok güç veriyor.',
+      responderKey: 'ogham',
+      responderText: 'Druid kelimesinin kökü bile Meşe bilgeliğinden gelir Derin; fırtınada kırılmayan köklerin sırrı oradadır.',
     },
   ],
 
@@ -488,13 +572,19 @@ const ONGOING_DIALOGUE_CHAINS: Record<string, OngoingDialogueChain[]> = {
       openerKey: 'aurora',
       openerText: 'Kalp çakrası (639 Hz) alt üç maddi çakra ile üst üç ruhsal çakranın denge noktasıdır; şefkat ve affetme en güçlü frekans yükselticidir.',
       responderKey: 'asli',
-      responderText: 'Sabahları 5 dakika Kutu Nefesi (4-4-4-4) yapmak ve kalp merkezine odaklanmak bütün gün sinir sistemini dengede tutuyor.',
+      responderText: 'Sabahları 5 dakika Kutu Nefesi (4-4-4-4) yapmak ve kalp merkezine odaklanmak bütün gün sinir sistemini dengede tutuyor AuroraFrekans.',
     },
     {
       openerKey: 'nil',
       openerText: 'Boğaz çakrası (741 Hz) sadece konuşmakla değil, kendi içsel gerçeğimizi bastırmadan ifade edebilmekle doğrudan bağlantılı.',
       responderKey: 'derin',
       responderText: 'İfade edilemeyen her söz boğaz ve tiroid bölgesinde enerji düğümü oluşturur Nil; ses frekanslarıyla çalışmak bu yüzden çok şifalı.',
+    },
+    {
+      openerKey: 'zeynep',
+      openerText: 'Schumann Rezonansında beyaz patlamaların olduğu günlerde baş ağrısı ve kulak çınlaması yaşayan var mı? Bol su içip 432 Hz dinlemek bana çok iyi geldi.',
+      responderKey: 'aurora',
+      responderText: 'Yerkürenin elektromanyetik alanı yükseldiğinde beyin dalgalarımız da o frekansa uyumlanmaya çalışıyor Zeynep; tuzlu ılık duş ve çıplak ayakla topraklanma semptomları hemen hafifletir.',
     },
   ],
 };
@@ -591,6 +681,33 @@ async function runInitialCommunitySeed(): Promise<void> {
     WHERE a.room_id = b.room_id
       AND a.content = b.content
       AND a.id > b.id
+  `);
+
+  // Eski basmakalıp günlük şablon mesajlarını temizle
+  await db.execute(sql`
+    DELETE FROM chat_messages
+    WHERE content LIKE '%gününün yöneticisi%; bugün özellikle%'
+       OR content LIKE 'Çok güzel hatırlattın. Ben de bugün % saatinde nefes ve harita sentezimi birleştirerek çalıştım%'
+  `);
+
+  await db.execute(sql`
+    DELETE FROM chat_scheduled_replies
+    WHERE reply_content LIKE '%gününün yöneticisi%; bugün özellikle%'
+       OR reply_content LIKE 'Çok güzel hatırlattın. Ben de bugün % saatinde nefes ve harita sentezimi birleştirerek çalıştım%'
+  `);
+
+  // Pinokyo veya diğer kullanıcıların Yeni Ay / genel sorularına verilmiş eski basmakalıp yanıtları doğal içerikle güncelle
+  await db.execute(sql`
+    UPDATE chat_messages
+    SET content = 'Yeni Ay dönemleri tohum ekme ve niyeti somutlaştırma vaktidir Pinokyo. Özellikle Yeni Ayın haritanda düştüğü evi Kozmik Gökyüzü Rehberinden kontrol edip o alanla ilgili 3 net niyet yazmanı, akşamları da 4-7-8 nefesiyle zihni sakinleştirmeni öneririm; ilk hilal görünene kadar atılan küçük ama kararlı adımlar çok hızlı kök salar.'
+    WHERE content LIKE 'Çok güzel bir noktaya değindin Pinokyo%'
+      AND reply_preview_text LIKE '%yeni ayda ne yapmalı%'
+  `);
+
+  await db.execute(sql`
+    UPDATE chat_messages
+    SET content = 'Harika haber Pinokyo! Mobilden bildirimlerle takip etmek ve anlık sohbete katılmak çok daha pratik olmuş, hoş geldin.'
+    WHERE reply_preview_text LIKE 'Arkadaşlar Mobil uygulayı guncelleyin%'
   `);
 
   // Eski ambient rotation nedeniyle gerçek kullanıcı yanıtının altına kaymış olan bot mesajlarını düzelt:
@@ -755,7 +872,7 @@ export function generateContextualPersonaReply(
   const combined = `${lower} ${quotedLower}`;
   const firstName = recipientName.split(' ')[0] || 'dostum';
 
-  // 1. "Nerede / görmedim / bulamadım / nasıl" soruları için nokta atışı rehber yanıtlar
+  // 1. "Nerede / görmedim / bulamadım / nasıl girilir" uygulama içi yönlendirme soruları
   const isWhereOrHowQuestion =
     lower.includes('nerede') ||
     lower.includes('nerde') ||
@@ -787,7 +904,154 @@ export function generateContextualPersonaReply(
     return `Üst menüdeki 'Kişisel Analizler' ve 'Kadim Dersler' bölümlerinden bahsettiğim tüm analiz ve sentez ekranlarına doğrudan ulaşabilirsin ${firstName}. Doğum bilgilerin kayıtlıysa sistem senin için otomatik hesaplıyor.`;
   }
 
-  // 2. Selamlaşma / Merhaba
+  // 2. Yeni Ay / Dolunay / Ay Fazları / Tutulma soruları ve paylaşımları
+  if (
+    lower.includes('yeni ay') ||
+    lower.includes('yeniay') ||
+    lower.includes('dolunay') ||
+    lower.includes('tutulma') ||
+    lower.includes('hilal') ||
+    lower.includes('ay faz')
+  ) {
+    const moonPool = [
+      `Yeni Ay dönemleri tohum ekme ve niyeti somutlaştırma vaktidir ${firstName}. Özellikle Yeni Ayın haritanda düştüğü evi Kozmik Gökyüzü Rehberinden kontrol edip o alanla ilgili 3 net niyet yazmanı, akşamları da 4-7-8 nefesiyle zihni sakinleştirmeni öneririm; ilk hilal görünene kadar atılan küçük ama kararlı adımlar çok hızlı kök salar.`,
+      `Ay döngülerinde Yeni Ay içe çekilip niyet belirleme, Dolunay ise artık hizmet etmeyen yükleri bırakma ve tamamlanma evresidir ${firstName}. Bu süreçte su tüketimini artırmak, 528 Hz frekansıyla kısa bir nefes çalışması yapmak ve öğrendiğin dersleri günlük küçük rutinlere dökmek enerjiyi çok dengeli tutar.`,
+      `Yeni Ay enerjisinde zihin çok hızlı dağılabildiği için bir deftere bu döngüde hayatında neyi başlatmak istediğini şimdiki zaman kipiyle yazmak çok etkilidir ${firstName}. Ayrıca Gezegen Saatlerinden Jüpiter veya Güneş saatini seçip niyet çalışmanı o vakitte yaparsan akış çok daha güçlü çalışır.`,
+    ];
+    return moonPool[Math.floor(Math.random() * moonPool.length)];
+  }
+
+  // 3. Gezegen Saatleri ile ilgili mesajlar
+  if (
+    lower.includes('gezegen saat') ||
+    lower.includes('merkür saat') ||
+    lower.includes('jüpiter saat') ||
+    lower.includes('venüs saat') ||
+    lower.includes('mars saat') ||
+    lower.includes('satürn saat') ||
+    lower.includes('güneş saat') ||
+    lower.includes('ay saat')
+  ) {
+    const planetaryPool = [
+      `Gezegen saatleriyle hizalanmak akıntıya karşı yüzmeyi bırakıp rüzgarı arkana almak gibidir ${firstName}. Özellikle önemli başlangıçları Güneş veya Jüpiter saatine, derin araştırma ve yazıları Merkür saatine, içsel arınma ve yapılandırmayı Satürn saatine denk getirdiğinde verim katlanarak artıyor.`,
+      `Ben de günümü planlarken mutlaka Keldani gezegen sırasına bakıyorum ${firstName}. Mars saatinde tartışmalardan kaçınıp fiziksel harekete odaklanmak, Venüs saatinde ise sanata ve ikili ilişkilere vakit ayırmak günün ritmini bambaşka bir dengeye oturtuyor.`,
+    ];
+    return planetaryPool[Math.floor(Math.random() * planetaryPool.length)];
+  }
+
+  // 4. Çakra, Frekans, Nefes, Schumann, Uyku, Yorgunluk, Baş Ağrısı
+  if (
+    lower.includes('schumann') ||
+    lower.includes('frekans') ||
+    lower.includes('çakra') ||
+    lower.includes('cakra') ||
+    lower.includes('nefes') ||
+    lower.includes('baş ağrı') ||
+    lower.includes('yorgun') ||
+    lower.includes('uyku') ||
+    lower.includes('çınlama') ||
+    lower.includes('topraklan')
+  ) {
+    const healingPool = [
+      `Yerkürenin elektromanyetik frekansı yükseldiğinde veya yoğun enerji geçişlerinde sinir sistemi ilk tepkiyi verir ${firstName}. Gün içinde 5 dakika Kutu Nefesi (4-4-4-4) uygulamak, bol su içmek ve mümkünse çıplak ayakla toprağa basmak bedendeki fazla statik yükü hemen boşaltır.`,
+      `Beden ve enerji alanı yorulduğunda zorlamak yerine 432 Hz veya 528 Hz frekansını kısık seste açıp diyafram nefesine dönmek en hızlı şifadır ${firstName}. Özellikle Kök ve Kalp çakrası dengelendiğinde zihinsel ağırlık kendiliğinden dağılıyor.`,
+    ];
+    return healingPool[Math.floor(Math.random() * healingPool.length)];
+  }
+
+  // 5. Rüya, Sembol, İşaret, Sayı Sekansları (11:11 vb.)
+  if (
+    lower.includes('rüya') ||
+    lower.includes('ruya') ||
+    lower.includes('sembol') ||
+    lower.includes('11:11') ||
+    lower.includes('işaret') ||
+    lower.includes('kabus') ||
+    lower.includes('arketip')
+  ) {
+    const symbolPool = [
+      `Rüyalar ve gün içinde karşılaştığımız tekrarlayan semboller, bilinçaltının (Yesod küresinin) bizimle kurduğu doğrudan dildir ${firstName}. Uyanır uyanmaz rüya detaylarını veya o sembolü gördüğün anki duygunu birkaç cümleyle not edersen birkaç hafta içinde kendi kişisel sembol sözlüğün ortaya çıkar.`,
+      `Sembolizmde dışsal anlamdan çok o imgenin sende uyandırdığı ilk his önemlidir ${firstName}. Uykudan önce zihni sakinleştirip "Bu gece ihtiyacım olan rehberliği berraklıkla hatırlamaya niyet ediyorum" demek rüya kanalını çok netleştirir.`,
+    ];
+    return symbolPool[Math.floor(Math.random() * symbolPool.length)];
+  }
+
+  // 6. Harita, Burç, Yükselen, Drakonik / Ruh Haritası, Kuzey Düğümü, Satürn
+  if (
+    lower.includes('harita') ||
+    lower.includes('drakonik') ||
+    lower.includes('ruh harita') ||
+    lower.includes('yükselen') ||
+    lower.includes('kuzey düğüm') ||
+    lower.includes('güney düğüm') ||
+    lower.includes('satürn') ||
+    lower.includes('chiron') ||
+    lower.includes('transit')
+  ) {
+    const astroPool = [
+      `Tropikal (Beden) haritamız bu dünyadaki karakterimizi ve elimizdeki araçları anlatırken, Drakonik (Ruh) haritamız o araçlarla hangi kadersel amacı gerçekleştirmeye geldiğimizi gösterir ${firstName}. İki harita arasındaki kavuşum derecelerine bakmak insana kendi içsel pusulasını bulduruyor.`,
+      `Haritada özellikle Kuzey Ay Düğümünün bulunduğu ev ve burç, ruhun bu hayatta büyüme yönüdür ${firstName}. Konfor alanı olan Güney Düğümden çıkıp Kuzey Düğüm temasına cesaretle adım attığında transitler de seni desteklemeye başlar.`,
+    ];
+    return astroPool[Math.floor(Math.random() * astroPool.length)];
+  }
+
+  // 7. Human Design (Projektör, Jeneratör, MG, Manifestör, Reflektör, Otorite)
+  if (
+    lower.includes('human design') ||
+    lower.includes('projektör') ||
+    lower.includes('jeneratör') ||
+    lower.includes('manifestör') ||
+    lower.includes('reflektör') ||
+    lower.includes('otorite') ||
+    lower.includes('sakral')
+  ) {
+    const hdPool = [
+      `Human Design’da en büyük dönüşüm, kararları zihnin korkularıyla değil kendi İçsel Otoritenle almaya başladığında yaşanıyor ${firstName}. Tanımsız merkezlerinden aldığın dış baskıları "bu benim enerjim değil" diyerek bıraktığında bedenin çok hafifliyor.`,
+      `Kendi enerji tipinin stratejisine güvendiğinde hayattaki direnç noktaları tek tek çözülüyor ${firstName}. Zorlayarak kapı açmaya çalışmak yerine doğru zamanlamayı ve içsel onayı beklemek her zaman en doğru insanlarla buluşturuyor.`,
+    ];
+    return hdPool[Math.floor(Math.random() * hdPool.length)];
+  }
+
+  // 8. Kabala, Sefirot, Hayat Ağacı, 4 Alem
+  if (
+    lower.includes('kabala') ||
+    lower.includes('sefirot') ||
+    lower.includes('sefira') ||
+    lower.includes('hayat ağacı') ||
+    lower.includes('atzilut') ||
+    lower.includes('beriyah') ||
+    lower.includes('yetzirah') ||
+    lower.includes('assiah') ||
+    lower.includes('tiferet') ||
+    lower.includes('yesod') ||
+    lower.includes('malkuth')
+  ) {
+    const kabbalahPool = [
+      `Hayat Ağacındaki her Sefira aslında kendi iç dünyamızdaki bir bilinç durağıdır ${firstName}. Sağ sütundaki merhamet ve genişlemeyi (Hesed), sol sütundaki disiplin ve sınırla (Gevurah) dengelediğimizde Orta Sütundaki kalp bilinci (Tiferet) kendiliğinden açılır.`,
+      `4 Alem sentezinde niyetin (Atzilut) düşünceye (Beriyah), düşüncenin duyguya (Yetzirah) ve en sonunda fiziksel eyleme (Assiah/Malkuth) nasıl indiğini izlemek muazzam bir farkındalık veriyor ${firstName}.`,
+    ];
+    return kabbalahPool[Math.floor(Math.random() * kabbalahPool.length)];
+  }
+
+  // 9. Genel tavsiye / "ne yapmalı / ne önerirsiniz / sizce" soruları
+  if (
+    lower.includes('ne yapmalı') ||
+    lower.includes('ne yapmali') ||
+    lower.includes('ne önerir') ||
+    lower.includes('tavsiye') ||
+    lower.includes('nasıl başla') ||
+    lower.includes('sizce') ||
+    lower.includes('?')
+  ) {
+    const advicePool = [
+      `Bence en güzeli öğrendiklerini bir anda yüklenmek yerine her gün tek bir küçük pratiği hayata geçirmek ${firstName}. Sabahları günün gezegen saatine ve gökyüzü sentezine bakıp niyetini belirlemek, akşamları da 5 dakika nefesle günü kapatmak öğrendiğin tüm kadim bilgileri sindirmeni sağlar.`,
+      `Bu dönemde zihni çok fazla bilgiyle yormaktansa kendi içsel ritmini dinlemek çok daha kıymetli ${firstName}. Kişisel Analizlerindeki gölge ve potansiyel maddelerinden sadece bir tanesini seçip bu hafta hayatında onu gözlemlemeni öneririm; deneyimlenmeyen bilgi sadece zihinde kalıyor.`,
+      `Benim deneyimimde en kalıcı dönüşüm, Kadim Derslerdeki teorik bilgiyi günlük nefes, frekans ve gezegen saati takibiyle birleştirince oldu ${firstName}. Küçük ama istikrarlı adımlar her zaman en derin kökü salıyor.`,
+    ];
+    return advicePool[Math.floor(Math.random() * advicePool.length)];
+  }
+
+  // 10. Selamlaşma / Merhaba
   if (
     lower === 'merhaba' ||
     lower === 'selam' ||
@@ -797,55 +1061,63 @@ export function generateContextualPersonaReply(
     lower.includes('iyi akşamlar') ||
     lower.includes('günaydın')
   ) {
-    return `Hoş geldin ${firstName}, meclisimize selamlar! Analizlerin veya Kadim Dersler hakkında merak ettiğin bir konu olursa burada birlikte değerlendirebiliriz.`;
+    return `Hoş geldin ${firstName}, meclisimize selamlar! Analizlerin, gökyüzü gündemi veya Kadim Dersler hakkında konuşmak istediğin bir konu olursa keyifle sohbet edebiliriz.`;
   }
 
-  // 3. Teşekkür
+  // 11. Teşekkür
   if (lower.includes('teşekkür') || lower.includes('sağ ol') || lower.includes('eyvallah') || lower.includes('harika')) {
     const thanksPool = [
       `Rica ederim ${firstName}, bu yolda birbirimize ayna tutmak hepimizin farkındalığını büyütüyor. Katkın için ben teşekkür ederim.`,
       `Ne demek ${firstName}, mecliste deneyimlerin paylaşılması enerjiyi çok daha berraklaştırıyor. Yolun açık olsun.`,
-      `Çok mutlu oldum ${firstName}, kendi içsel gözlemlerini de fırsat buldukça paylaşırsan keyifle okuruz.`,
+      `Keyifle ${firstName}, kendi içsel gözlemlerini de fırsat buldukça paylaşırsan memnuniyetle okuruz.`,
     ];
     return thanksPool[Math.floor(Math.random() * thanksPool.length)];
   }
 
-  // 4. Odaya özel bağlamsal yanıt havuzları
+  // 12. Odaya özel doğal, kalıpsız sohbet yanıt havuzları
   const roomReplies: Record<string, string[]> = {
     'genel-meydan': [
-      `Çok güzel bir noktaya değindin ${firstName}. Özellikle günlük gökyüzü sentezini ve kendi içsel ritmini bir arada gözlemlediğinde taşlar çok daha hızlı yerine oturuyor.`,
-      `Katılıyorum ${firstName}. İlk başta kavramlar yoğun gelebilir ama hem analizlerdeki özet katmanları hem de Kadim Dersleri sindire sindire ilerledikçe her şey netleşiyor.`,
-      `Paylaşımın için teşekkürler ${firstName}. Kendi merkezinde kalıp nefes ve frekans pratiklerini günlük rutine eklemek bile büyük fark yaratıyor.`,
+      `Günlük gökyüzü sentezini ve kendi içsel ritmini bir arada gözlemlediğinde taşlar çok daha hızlı yerine oturuyor ${firstName}. Özellikle kendi deneyimlerini not alarak ilerlemek büyük fark yaratıyor.`,
+      `İlk başta kavramlar yoğun gelebilir ama hem analizlerdeki özet katmanları hem de Kadim Dersleri sindire sindire ilerledikçe her şey kendi içinde bir bütün oluşturuyor ${firstName}.`,
+      `Günün telaşı içinde kendi merkezinde kalıp nefes ve frekans pratiklerini rutine eklemek bile insanın enerji alanını hemen toparlıyor ${firstName}.`,
+      `Hepimizin haritası parmak izi gibi eşsiz ${firstName}; öğrendiğimiz bu kadim araçları kendi hayatımızda test ettikçe içsel rehberliğimiz çok daha net duyuluyor.`,
+      `Paylaştığın bu deneyim çok kıymetli ${firstName}. İnsanın kendi döngülerini fark etmesi, otomatik pilottan çıkıp hayatının direksiyonuna geçmesinin ilk adımı.`,
     ],
     'kabala': [
-      `Çok yerinde bir tespit ${firstName}. Hayat Ağacında her küre (Sefira) aslında kendi bilincimizin bir katmanıdır; Assiah’ta fark ettiğin her kalıp Yetzirah ve Beriyah’ta çözülmeye başlar.`,
-      `Kesinlikle öyle ${firstName}. Özellikle Beden (Tropikal) ve Ruh (Drakonik) haritalarını 4 Alem matrisinde karşılaştırdığında hangi kürede denge kurman gerektiği çok net görülüyor.`,
-      `Bu gözlemin çok değerli ${firstName}. Orta sütun (Keter - Tiferet - Yesod - Malkuth) dengesini koruduğunda sağ ve sol sütun arasındaki kutupluluk kendiliğinden uyumlanır.`,
+      `Hayat Ağacında her küre (Sefira) aslında kendi bilincimizin bir katmanıdır ${firstName}; Assiah’ta fark ettiğin her kalıp Yetzirah ve Beriyah’ta çözülmeye başlar.`,
+      `Beden (Tropikal) ve Ruh (Drakonik) haritalarını 4 Alem matrisinde karşılaştırdığında hangi kürede denge kurman gerektiği çok net görülüyor ${firstName}.`,
+      `Orta sütun (Keter - Tiferet - Yesod - Malkuth) dengesini koruduğunda sağ ve sol sütun arasındaki kutupluluk kendiliğinden uyumlanır ${firstName}.`,
+      `Kabala’da bilgi sadece zihinde kaldığında Hod küresinde sıkışır ${firstName}; onu kalbe (Tiferet) ve günlük eyleme (Malkuth) indirdiğimizde gerçek simya başlıyor.`,
     ],
     'sembolizm': [
-      `Çok derin bir gözlem ${firstName}. Kadim semboller zihnin mantık filtresini aşarak doğrudan bilinçaltı ve üst-bilinçle konuşur; gördüğün işaretleri not almak harika bir pratik.`,
-      `Haklısın ${firstName}. Kutsal geometri ve arketipler üzerine tefekkür ettikçe hayatın içindeki eşzamanlılıkların (synchronicity) dili çok daha anlaşılır hale geliyor.`,
+      `Kadim semboller zihnin mantık filtresini aşarak doğrudan bilinçaltı ve üst-bilinçle konuşur ${firstName}; gördüğün işaretleri not almak harika bir pratik.`,
+      `Kutsal geometri ve arketipler üzerine tefekkür ettikçe hayatın içindeki eşzamanlılıkların (synchronicity) dili çok daha anlaşılır hale geliyor ${firstName}.`,
+      `Doğa ve evren bizimle kelimelerle değil sembollerle ve oranlarla konuşuyor ${firstName}; içsel gözlem derinleştikçe her olay bir ayna haline geliyor.`,
     ],
     'astroloji': [
-      `Harika bir nokta ${firstName}. Doğum haritasında özellikle Kuzey Ay Düğümü, Satürn ve MC (Tepe Noktası) üçlüsünü birlikte okumak kadersel yönü çok berraklaştırıyor.`,
-      `Çok doğru ${firstName}. Gezegen transitlerini birer zorlama değil, içimizdeki potansiyeli uyandıran göksel gelişim pencereleri olarak gördüğümüzde akış tamamen değişiyor.`,
-      `Kesinlikle katılıyorum ${firstName}. Tropikal harita dünyadaki aracımızı, Drakonik harita ise ruhsal pusulamızı gösteriyor; ikisini sentezlemek en doğrusu.`,
+      `Doğum haritasında özellikle Kuzey Ay Düğümü, Satürn ve MC (Tepe Noktası) üçlüsünü birlikte okumak kadersel yönü çok berraklaştırıyor ${firstName}.`,
+      `Gezegen transitlerini birer zorlama değil, içimizdeki potansiyeli uyandıran göksel gelişim pencereleri olarak gördüğümüzde akış tamamen değişiyor ${firstName}.`,
+      `Tropikal harita dünyadaki aracımızı, Drakonik harita ise ruhsal pusulamızı gösteriyor ${firstName}; ikisini birlikte değerlendirmek en sağlıklısı.`,
     ],
     'human-design': [
-      `Çok güzel ifade ettin ${firstName}. Human Design’da zihni karar mekanizması olmaktan çıkarıp kendi Strateji ve Otoritemize güvendiğimiz anda direnç kalkıyor.`,
-      `Kesinlikle ${firstName}. Özellikle tanımsız (açık) merkezlerimizden aldığımız dış koşullandırmaları fark etmek bile enerjimizi korumada devrim yaratıyor.`,
+      `Human Design’da zihni karar mekanizması olmaktan çıkarıp kendi Strateji ve Otoritemize güvendiğimiz anda direnç kalkıyor ${firstName}.`,
+      `Özellikle tanımsız (açık) merkezlerimizden aldığımız dış koşullandırmaları fark etmek bile enerjimizi korumada devrim yaratıyor ${firstName}.`,
+      `Kendi tasarımına uygun yaşamak bencilce değil ${firstName}; tam aksine kendi frekansın doğru çalıştığında çevrene de en temiz enerjiyi yayıyorsun.`,
     ],
     'numeroloji': [
-      `Çok güzel bir farkındalık ${firstName}. Doğum tarihinden gelen Yaşam Yolu sayısı ile isimdeki harflerin çakra titreşimi birleştiğinde kişinin yaşam melodisi ortaya çıkıyor.`,
-      `Haklısın ${firstName}. Özellikle kişisel yıl ve kişisel gün döngülerine uyumlanarak adım atmak, akıntıya karşı kürek çekmeyi bırakıp rüzgarı arkana almak gibi.`,
+      `Doğum tarihinden gelen Yaşam Yolu sayısı ile isimdeki harflerin çakra titreşimi birleştiğinde kişinin yaşam melodisi ortaya çıkıyor ${firstName}.`,
+      `Kişisel yıl ve kişisel gün döngülerine uyumlanarak adım atmak, doğru mevsimde doğru tohumu ekmek gibi ${firstName}.`,
+      `Sayılar evrenin temel mimarisidir ${firstName}; kendi haritandaki sayısal dengeleri fark etmek eksik kalan çakra enerjilerini tamamlamayı çok kolaylaştırıyor.`,
     ],
     'kelt-druid': [
-      `Çok güzel bir paylaşım ${firstName}. Doğanın döngüleri ve Kelt ağaç arketipleri bize her mevsimin ve her ruh halinin bir bilgeliği olduğunu hatırlatıyor.`,
-      `Kesinlikle ${firstName}. Topraklanma ve doğanın ritmiyle hizalanmak, zihinsel karmaşayı en hızlı şifalandıran kadim anahtarlardan biri.`,
+      `Doğanın döngüleri ve Kelt ağaç arketipleri bize her mevsimin ve her ruh halinin bir bilgeliği olduğunu hatırlatıyor ${firstName}.`,
+      `Topraklanma ve doğanın ritmiyle hizalanmak, zihinsel karmaşayı en hızlı şifalandıran kadim anahtarlardan biri ${firstName}.`,
+      `Ogham bilgeliğinde her ağaç bir öğretmendir ${firstName}; kendi doğum ağacının gölge ve ışık yönlerini gözlemlemek doğayla bağını çok güçlendirir.`,
     ],
     'cakra-sifa': [
-      `Çok doğru bir gözlem ${firstName}. Nefes çalışmalarıyla Solfeggio frekanslarını birleştirmek otonom sinir sistemini ve çakra akışını çok hızlı dengeliyor.`,
-      `Şifa olsun ${firstName}. Özellikle Schumann Rezonansının yükseldiği günlerde su tüketimini artırmak ve kök-kalp çakra dengesine odaklanmak bedeni çok rahatlatıyor.`,
+      `Nefes çalışmalarıyla Solfeggio frekanslarını birleştirmek otonom sinir sistemini ve çakra akışını çok hızlı dengeliyor ${firstName}.`,
+      `Schumann Rezonansının yükseldiği günlerde su tüketimini artırmak ve kök-kalp çakra dengesine odaklanmak bedeni çok rahatlatıyor ${firstName}, şifa olsun.`,
+      `Ses frekansları ve bilinçli nefes hücresel düzeyde rezonans yaratıyor ${firstName}; günde 10 dakika bile düzenli uygulamak enerji bedenini berraklaştırır.`,
     ],
   };
 
@@ -1232,34 +1504,6 @@ export async function processDueScheduledReplies(): Promise<void> {
   }
 }
 
-function getDynamicDayDialogue(roomId: string): OngoingDialogueChain {
-  const trDate = new Date(new Date().toLocaleString('en-US', { timeZone: 'Europe/Istanbul' }));
-  const dayIndex = trDate.getDay(); // 0 Pazar .. 6 Cumartesi
-  const dateLabel = trDate.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
-
-  const dayRulers: Record<number, { dayName: string; planet: string; theme: string }> = {
-    0: { dayName: 'Pazar', planet: 'Güneş', theme: 'öz bilinç, Tiferet kalp merkezi ve yaşam enerjisi' },
-    1: { dayName: 'Pazartesi', planet: 'Ay', theme: 'sezgiler, Yesod bilinçaltı akışı ve duygusal denge' },
-    2: { dayName: 'Salı', planet: 'Mars', theme: 'irade gücü, Gevurah disiplini ve kararlı adım atma' },
-    3: { dayName: 'Çarşamba', planet: 'Merkür', theme: 'idrak, Hod zihinsel berraklığı ve sembol okumaları' },
-    4: { dayName: 'Perşembe', planet: 'Jüpiter', theme: 'bilgelik, Hesed bolluk frekansı ve yüksek ufuklar' },
-    5: { dayName: 'Cuma', planet: 'Venüs', theme: 'uyum, Netzach kalp rezonansı ve içsel huzur' },
-    6: { dayName: 'Cumartesi', planet: 'Satürn', theme: 'köklenme, Binah idraki ve karmik dersleri tamamlama' },
-  };
-
-  const info = dayRulers[dayIndex] || dayRulers[0];
-  const keys = ROOM_PERSONA_KEYS[roomId] || ROOM_PERSONA_KEYS['genel-meydan'];
-  const openerKey = keys[dayIndex % keys.length];
-  const responderKey = keys[(dayIndex + 1) % keys.length];
-
-  return {
-    openerKey,
-    openerText: `${dateLabel} ${info.dayName} gününün yöneticisi ${info.planet}; bugün özellikle ${info.theme} üzerine tefekkür etmek çok güçlü sonuçlar veriyor.`,
-    responderKey,
-    responderText: `Çok güzel hatırlattın. Ben de bugün ${info.planet} saatinde nefes ve harita sentezimi birleştirerek çalıştım, akış çok berraktı.`,
-  };
-}
-
 /**
  * Eski mesajları silmeden, odalarda son mesajın üzerinden 45-75 dk geçtiyse
  * yeni bir topluluk mesajı ekler ve 8-22 dk sonrasına başka bir topluluk üyesinin yanıtını planlar.
@@ -1282,8 +1526,8 @@ async function advanceOngoingCommunityChat(): Promise<void> {
 
   for (let idx = 0; idx < roomIds.length; idx++) {
     const roomId = roomIds[idx];
-    // Her odanın eşiği biraz farklı olsun (45 dk ile 73 dk arası) ki aynı dakikada yazmasınlar
-    const thresholdMinutes = 45 + idx * 4;
+    // Her odanın eşiği biraz farklı olsun (60 dk ile 95 dk arası) ki aynı dakikada yazmasınlar
+    const thresholdMinutes = 60 + idx * 5;
 
     const recentRows = await db
       .select({
@@ -1294,7 +1538,7 @@ async function advanceOngoingCommunityChat(): Promise<void> {
       .from(chatMessages)
       .where(eq(chatMessages.roomId, roomId))
       .orderBy(desc(chatMessages.createdAt))
-      .limit(35);
+      .limit(50);
 
     if (recentRows.length === 0) continue;
 
@@ -1312,19 +1556,12 @@ async function advanceOngoingCommunityChat(): Promise<void> {
 
     const recentContents = new Set(recentRows.map((r) => r.content));
     const chains = ONGOING_DIALOGUE_CHAINS[roomId] || [];
-    let chosenChain = chains.find((c) => !recentContents.has(c.openerText));
-
-    if (!chosenChain) {
-      const dynamicChain = getDynamicDayDialogue(roomId);
-      if (!recentContents.has(dynamicChain.openerText)) {
-        chosenChain = dynamicChain;
-      }
-    }
+    const chosenChain = chains.find((c) => !recentContents.has(c.openerText));
 
     if (!chosenChain) continue;
 
-    const openerDef = COMMUNITY_PERSONAS.find((p) => p.key === chosenChain!.openerKey);
-    const responderDef = COMMUNITY_PERSONAS.find((p) => p.key === chosenChain!.responderKey);
+    const openerDef = COMMUNITY_PERSONAS.find((p) => p.key === chosenChain.openerKey);
+    const responderDef = COMMUNITY_PERSONAS.find((p) => p.key === chosenChain.responderKey);
     if (!openerDef || !responderDef) continue;
 
     const [openerUser] = await db.select({ id: users.id }).from(users).where(eq(users.email, openerDef.email));
