@@ -302,7 +302,20 @@ export default function NumerolojiPage() {
               <div className="bg-black/30 p-4 rounded-xl text-xs text-mystic-text space-y-2">
                 <p>• <strong>Bolluk &amp; Bereket Hedefi:</strong> 2 (Ortaklık), 3 (İrade), 4 (Mülk - Mem) ve 8 (Büyük Finans) çakralarını taşıyan isimler (Örn: <em>Melis, Burak, Berk, Demir, Banu</em>).</p>
                 <p>• <strong>Görünürlük &amp; Şöhret Hedefi:</strong> 1 (Liderlik - Alef), 5 (Boğaz - İfade) ve 9 (Evrensel Yayılım) çakralarını taşıyan isimler (Örn: <em>Arya, Aras, Ege, Rana, Sera</em>).</p>
-                <p>• <strong>Aşk &amp; Uyum Hedefi:</strong> 2 (Sakral Çekim) ve 4-6 (Kalp ve Estetik) çakralarını taşıyan isimler (Örn: <em>Defne, Can, Filiz, Deniz, Oya</em>).</p>
+                  <p>• <strong>Aşk &amp; Uyum Hedefi:</strong> 2 (Sakral Çekim) ve 4-6 (Kalp ve Estetik) çakralarını taşıyan isimler (Örn: <em>Defne, Can, Filiz, Deniz, Oya</em>).</p>
+              </div>
+            </div>
+
+            <div className="bg-mystic-surface/50 p-6 border-l-4 border-mystic-primary rounded-r-2xl border-y border-r border-white/10 backdrop-blur-md">
+              <h3 className="text-lg font-bold text-mystic-primary mb-3">6. Aynı Sayı Neden Her İnsanda Farklı Çalışır? (Harita Koltukları &amp; Gömülü Kilitler)</h3>
+              <p className="text-sm text-mystic-text leading-relaxed mb-4">
+                Numerolojide en sık yapılan hata, bir sayının herkes için tek bir anlama geldiğini sanmaktır. Oysa her sayının bir <strong>Evrensel (Genel) Anlamı</strong>, bir de kişinin haritasında <strong>Oturduğu Koltuğa Göre Değişen Özel Anlamı</strong> vardır. Örneğin <strong>2</strong> sayısını ele alalım:
+              </p>
+              <div className="bg-black/30 p-4 rounded-xl text-xs text-mystic-text space-y-2.5 leading-relaxed">
+                <p>• <strong>Beden Alan Koruma (Açık Kapı) Koltuğunda 2:</strong> Eğer kişinin doğum tarihi matrisinde (GG.AA.YYYY) hiç 2 rakamı yoksa (Örn: <em>17.03.1995</em> — tüm rakamları tek sayı olan bir matris), ilk boş kalan halka 2 olduğu için bu kişide 2 sayısı <em>&quot;Alan Kapatan / Sınır Kodu&quot;</em> olur. Bu kişi günlük hayatta 22:22 veya 222 gördüğünde anlamı ortaklık kurmak değil; <strong>&quot;Hemen enerji alanını kapat, sınır çiz ve başkasının duygusal yükünü sırtlanma!&quot;</strong> uyarısıdır.</p>
+                <p>• <strong>Doğum Yeteneği veya Yaşam Yolu Koltuğunda 2:</strong> Ayın 2., 11. veya 20. günü doğan ya da Yaşam Yolu 2 olan birinde ise 2 sayısı açık kapı değil, <em>&quot;Ana Güç Merkezi&quot;</em>dir. Bu kişi 22:22 gördüğünde anlamı; <strong>&quot;Diplomasini, şifacılığını ve birleştirici yeteneğini devreye sok&quot;</strong> çağrısıdır.</p>
+                <p>• <strong>Aşırı Yüklenmiş (Hiper-Çakra) Koltuğunda 2:</strong> İsminde 4-5 adet 2. çakra harfi (B, K, T) bulunan birinde 2 sayısı <em>&quot;Gölge Bağımlılık&quot;</em> koltuğuna geçer ve <strong>&quot;Başkalarının onayına bağımlı olmayı ve alınganlığı bırak&quot;</strong> mesajı verir.</p>
+                <p>• <strong>Ruh Kodunun İçine Gömülü Karmik Kilit (Örn: 1 ve Gömülü 19/1):</strong> Bir kişinin Ruh veya Benlik kodu dışarıdan <strong>1</strong> göründüğü halde, bu 1 sayısı sadeleşmeden önce <strong>19</strong> toplamından geliyorsa (veya doğum matrisinde 1 ve 9 çift kilitlenmişse), 1 kodunun çekirdeğinde <strong>19/1 Karmik Borcu</strong> gömülüdür. Bu durumda 1 sayısı sadece liderlik değil; geçmiş yaşamda gücün/otoritenin hatalı kullanımından doğan <em>&quot;Her kritik virajda tek başına kalarak kimseye dayanmadan ayakta durmayı öğrenme&quot;</em> sınavı olarak çalışır.</p>
               </div>
             </div>
           </div>
