@@ -670,8 +670,8 @@ async function runInitialCommunitySeed(): Promise<void> {
   await db.execute(sql`
     DELETE FROM chat_scheduled_replies a
     USING chat_scheduled_replies b
-    WHERE a.reply_to_message_id = b.reply_to_message_id
-      AND a.id > b.id
+    WHERE (a.reply_to_message_id = b.reply_to_message_id OR (a.room_id = b.room_id AND a.reply_content = b.reply_content))
+      AND (a.created_at > b.created_at OR (a.created_at = b.created_at AND a.id > b.id))
   `);
 
   // Mükerrer (çift) mesajları temizle
@@ -680,7 +680,12 @@ async function runInitialCommunitySeed(): Promise<void> {
     USING chat_messages b
     WHERE a.room_id = b.room_id
       AND a.content = b.content
-      AND a.id > b.id
+      AND (a.created_at > b.created_at OR (a.created_at = b.created_at AND a.id > b.id))
+  `);
+
+  await db.execute(sql`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_chat_scheduled_replies_unique_target
+    ON chat_scheduled_replies (reply_to_message_id)
   `);
 
   // Eski basmakalıp günlük şablon mesajlarını temizle
@@ -1229,19 +1234,28 @@ export async function schedulePersonaReplyIfApplicable(params: {
         reply_preview_text,
         reply_content,
         deliver_at
-      ) VALUES (
+      )
+      SELECT
         ${params.roomId},
         ${params.roomTitle},
         ${params.roomIcon},
-        ${targetUser.id},
+        ${targetUser.id}::uuid,
         ${personaDisplayName},
-        ${params.senderUserId},
+        ${params.senderUserId}::uuid,
         ${params.senderDisplayName},
-        ${params.userMessageId},
+        ${params.userMessageId}::uuid,
         ${params.userMessageContent.slice(0, 90)},
         ${replyContent},
         ${deliverAt.toISOString()}::timestamptz
+      WHERE NOT EXISTS (
+        SELECT 1 FROM chat_scheduled_replies
+        WHERE reply_to_message_id = ${params.userMessageId}::uuid
       )
+      AND NOT EXISTS (
+        SELECT 1 FROM chat_messages
+        WHERE reply_to_id = ${params.userMessageId}::uuid
+      )
+      ON CONFLICT (reply_to_message_id) DO NOTHING
     `);
 
     const timer = setTimeout(() => {
@@ -1295,7 +1309,7 @@ async function scanAndScheduleUnansweredUserReplies(): Promise<void> {
         SELECT 1 FROM chat_messages r WHERE r.reply_to_id = m.id
       )
       AND NOT EXISTS (
-        SELECT 1 FROM chat_scheduled_replies sr WHERE sr.reply_to_message_id = m.id AND sr.delivered = FALSE
+        SELECT 1 FROM chat_scheduled_replies sr WHERE sr.reply_to_message_id = m.id
       )
     ORDER BY m.created_at ASC
     LIMIT 20
@@ -1390,19 +1404,28 @@ async function scanAndScheduleUnansweredUserReplies(): Promise<void> {
         reply_preview_text,
         reply_content,
         deliver_at
-      ) VALUES (
+      )
+      SELECT
         ${row.room_id},
         ${roomTitle},
         ${roomIcon},
-        ${personaUser.id},
+        ${personaUser.id}::uuid,
         ${personaDisplayName},
-        ${row.user_id},
+        ${row.user_id}::uuid,
         ${senderDisplayName},
-        ${row.id},
+        ${row.id}::uuid,
         ${row.content.slice(0, 90)},
         ${replyContent},
         ${deliverAt.toISOString()}::timestamptz
+      WHERE NOT EXISTS (
+        SELECT 1 FROM chat_scheduled_replies
+        WHERE reply_to_message_id = ${row.id}::uuid
       )
+      AND NOT EXISTS (
+        SELECT 1 FROM chat_messages
+        WHERE reply_to_id = ${row.id}::uuid
+      )
+      ON CONFLICT (reply_to_message_id) DO NOTHING
     `);
   }
 }
@@ -1456,17 +1479,34 @@ export async function processDueScheduledReplies(): Promise<void> {
     `);
     if (alreadyReplied.rows && alreadyReplied.rows.length > 0) continue;
 
-    const [inserted] = await db
-      .insert(chatMessages)
-      .values({
-        roomId: row.room_id,
-        userId: row.persona_user_id,
-        content: row.reply_content,
-        replyToId: row.reply_to_message_id,
-        replyPreviewName: row.recipient_display_name,
-        replyPreviewText: row.reply_preview_text,
-      })
-      .returning({ id: chatMessages.id });
+    const insertRes = await db.execute<{ id: string }>(sql`
+      INSERT INTO chat_messages (
+        room_id,
+        user_id,
+        content,
+        reply_to_id,
+        reply_preview_name,
+        reply_preview_text
+      )
+      SELECT
+        ${row.room_id},
+        ${row.persona_user_id}::uuid,
+        ${row.reply_content},
+        ${row.reply_to_message_id}::uuid,
+        ${row.recipient_display_name},
+        ${row.reply_preview_text}
+      WHERE NOT EXISTS (
+        SELECT 1 FROM chat_messages
+        WHERE room_id = ${row.room_id}
+          AND (
+            reply_to_id = ${row.reply_to_message_id}::uuid
+            OR (user_id = ${row.persona_user_id}::uuid AND content = ${row.reply_content} AND created_at > NOW() - INTERVAL '48 hours')
+          )
+      )
+      RETURNING id
+    `);
+    const inserted = insertRes.rows?.[0];
+    if (!inserted?.id) continue;
 
     // Alıcı gerçek bir kullanıcıysa bildirim gönder (botlar arası yanıtlarda bildirim tablosunu şişirme)
     const [recipientUser] = await db
@@ -1571,17 +1611,24 @@ async function advanceOngoingCommunityChat(): Promise<void> {
     const openerDisplayName = formatSafeDisplayName(openerDef.fullName, openerDef.email, openerDef.nickname);
     const responderDisplayName = formatSafeDisplayName(responderDef.fullName, responderDef.email, responderDef.nickname);
 
-    // 1. Açılış mesajını şimdi ekle
-    const [insertedOpener] = await db
-      .insert(chatMessages)
-      .values({
-        roomId,
-        userId: openerUser.id,
-        content: chosenChain.openerText,
-      })
-      .returning({ id: chatMessages.id });
+    // 1. Açılış mesajını atomik olarak (son 45 dk içinde mesaj yoksa ve aynı içerik yoksa) ekle
+    const openerRes = await db.execute<{ id: string }>(sql`
+      INSERT INTO chat_messages (room_id, user_id, content)
+      SELECT ${roomId}, ${openerUser.id}::uuid, ${chosenChain.openerText}
+      WHERE NOT EXISTS (
+        SELECT 1 FROM chat_messages
+        WHERE room_id = ${roomId}
+          AND (
+            content = ${chosenChain.openerText}
+            OR created_at > NOW() - INTERVAL '45 minutes'
+          )
+      )
+      RETURNING id
+    `);
+    const insertedOpener = openerRes.rows?.[0];
+    if (!insertedOpener?.id) continue;
 
-    // 2. Karşılık verecek diğer topluluk üyesinin yanıtını 8-22 dk sonrasına zamanla
+    // 2. Karşılık verecek diğer topluluk üyesinin yanıtını 8-22 dk sonrasına atomik olarak zamanla
     const replyDelayMinutes = Math.floor(Math.random() * 15) + 8; // 8..22 dk
     const deliverAt = new Date(Date.now() + replyDelayMinutes * 60 * 1000);
 
@@ -1598,19 +1645,25 @@ async function advanceOngoingCommunityChat(): Promise<void> {
         reply_preview_text,
         reply_content,
         deliver_at
-      ) VALUES (
+      )
+      SELECT
         ${roomId},
         ${roomId},
         '💬',
-        ${responderUser.id},
+        ${responderUser.id}::uuid,
         ${responderDisplayName},
-        ${openerUser.id},
+        ${openerUser.id}::uuid,
         ${openerDisplayName},
-        ${insertedOpener.id},
+        ${insertedOpener.id}::uuid,
         ${chosenChain.openerText.slice(0, 90)},
         ${chosenChain.responderText},
         ${deliverAt.toISOString()}::timestamptz
+      WHERE NOT EXISTS (
+        SELECT 1 FROM chat_scheduled_replies
+        WHERE reply_to_message_id = ${insertedOpener.id}::uuid
+           OR (room_id = ${roomId} AND reply_content = ${chosenChain.responderText} AND created_at > NOW() - INTERVAL '48 hours')
       )
+      ON CONFLICT (reply_to_message_id) DO NOTHING
     `);
   }
 }
