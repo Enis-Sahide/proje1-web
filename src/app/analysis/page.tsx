@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Moon, Lock, Activity, Clock, Scroll, TreePine, ChevronRight, Briefcase } from 'lucide-react';
+import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Moon, Lock, Activity, Clock, Scroll, TreePine, ChevronRight, Briefcase, KeyRound } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useAnalysisAccess } from '@/hooks/useAnalysisAccess';
 import AuthPromptModal from '@/components/AuthPromptModal';
@@ -77,6 +77,13 @@ export default function AnalysisPage() {
       icon: <Hexagon size={22} />,
       color: '#AF52DE',
       link: '/analysis/numerology'
+    },
+    {
+      id: 'symbol-codes',
+      title: 'Üst Benlik Sembol & Kod Analizi',
+      icon: <KeyRound size={22} />,
+      color: '#F43F5E',
+      link: '/analysis/symbol-codes'
     },
     {
       id: 'career',

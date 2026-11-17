@@ -24,6 +24,7 @@ import {
 } from '@/features/numerology/engine/PhoneticChakraEngine';
 import { numerologyInputSchema, birthDataSchema, formatZodError } from '@/lib/validation';
 import AnalysisBackButton from '@/components/ui/AnalysisBackButton';
+import { analyzePersonalSymbolCodes } from '@/features/numerology/engine/SymbolCodeEngine';
 
 const isMaster = (num: number) => num === 11 || num === 22 || num === 33;
 
@@ -88,6 +89,7 @@ export default function NumerologyPage() {
   // Brand Analysis Data
   const [brandResult, setBrandResult] = useState<BrandAnalysisResult | null>(null);
   const [formError, setFormError] = useState('');
+  const [selectedPersonalBoxId, setSelectedPersonalBoxId] = useState<string>('karmic-debt');
 
   // Form Submit
   const handleSubmit = (e: React.FormEvent) => {
@@ -377,38 +379,95 @@ export default function NumerologyPage() {
       );
     }
 
+    const symbolAnalysis = analyzePersonalSymbolCodes(name || "Misafir", birthDate || "1990-01-01");
+    const activeBoxDetail = symbolAnalysis.codes.find((item) => item.id === selectedPersonalBoxId) || symbolAnalysis.codes[0];
+
     return (
       <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/25 rounded-3xl p-6 md:p-8 mt-6">
-        <h3 className="text-lg font-bold text-[#D4AF37] mb-1">Astro-Numerolojik Kişisel Kodlarınız</h3>
-        <p className="text-xs text-mystic-text-muted mb-6 leading-relaxed">
-          Kozmik evren sistemine giriş kodlarınız ve bu kodların günlük hayattaki eşzamanlı uyanış titreşimleri.
-        </p>
-
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
-            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Karmik Borç Kodu</span>
-            <span className="text-xl font-bold text-red-500 font-serif">{karmicCode}</span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+          <div>
+            <h3 className="text-lg font-bold text-[#D4AF37] mb-1">Astro-Numerolojik Kişisel Kodlarınız</h3>
+            <p className="text-xs text-mystic-text-muted leading-relaxed">
+              Kutulara tıklayarak her kodun hangi haritaya ait olduğunu ve derin ezoterik açıklamasını hemen aşağıda okuyabilirsiniz.
+            </p>
           </div>
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
-            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Kişilik Kodu</span>
-            <span className="text-xl font-bold text-white font-serif">{ruhKodu}</span>
-          </div>
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
-            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Aura Koruma Kodu</span>
-            <span className="text-xl font-bold text-yellow-400 font-serif">
-              {alanKodu}
-              <span className="text-[9px] block text-mystic-text-muted font-sans font-normal mt-0.5">(Sınır ve Koruma)</span>
-            </span>
-          </div>
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center">
-            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Doğum Kodu</span>
-            <span className="text-xl font-bold text-white font-serif">{reduceToSingleDigit(birthdayNum)}</span>
-          </div>
-          <div className="bg-black/40 border border-white/10 rounded-2xl p-4 text-center col-span-2 md:col-span-1">
-            <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">Gezegen Yöneticisi</span>
-            <span className="text-sm font-bold text-[#E0B0FF] block mt-1.5">{planetName}</span>
-          </div>
+          <Link
+            href={`/analysis/symbol-codes?name=${encodeURIComponent(name || "")}&birthDate=${encodeURIComponent(birthDate || "")}`}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#B8860B] text-black font-extrabold text-xs shrink-0 shadow-lg shadow-[#D4AF37]/20 hover:opacity-95 transition"
+          >
+            <Sparkles size={14} />
+            11 Kişisel Kod & Sembol Analizine Git
+            <ArrowRight size={14} />
+          </Link>
         </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-5">
+          {[
+            { id: "karmic-debt", label: "Karmik Borç Kodu", value: karmicCode, valClass: "text-xl font-bold text-red-500 font-serif", badge: "3. Harita • Karmik Simya" },
+            { id: "soul-urge", label: "Kişilik / Ruh Kodu", value: String(ruhKodu), valClass: "text-xl font-bold text-white font-serif", badge: "1. Harita • Ruh (Briah)" },
+            { id: "aura-protection", label: "Aura Koruma Kodu", value: String(alanKodu), sub: "(Sınır ve Koruma)", valClass: "text-xl font-bold text-yellow-400 font-serif", badge: "3. Harita • Aura Kalkanı" },
+            { id: "birth-code", label: "Doğum Kodu", value: String(reduceToSingleDigit(birthdayNum)), valClass: "text-xl font-bold text-white font-serif", badge: "2. Harita • Beden (Assiah)" },
+            { id: "planet-ruler", label: "Gezegen Yöneticisi", value: planetName, valClass: "text-sm font-bold text-[#E0B0FF] block mt-1.5", badge: "2. Harita • Kozmik Saat", spanCols: true }
+          ].map((box) => {
+            const isSelected = selectedPersonalBoxId === box.id;
+            return (
+              <button
+                key={box.id}
+                type="button"
+                onClick={() => setSelectedPersonalBoxId(box.id)}
+                className={`bg-black/50 border rounded-2xl p-4 text-center transition-all cursor-pointer flex flex-col items-center justify-between ${
+                  box.spanCols ? "col-span-2 md:col-span-1" : ""
+                } ${
+                  isSelected
+                    ? "border-[#D4AF37] bg-[#D4AF37]/10 shadow-[0_0_20px_rgba(212,175,55,0.2)] scale-[1.02]"
+                    : "border-white/10 hover:border-[#D4AF37]/40"
+                }`}
+              >
+                <span className="text-[9px] font-bold uppercase tracking-wider text-[#D4AF37]/80 mb-1">{box.badge}</span>
+                <span className="text-[10px] uppercase tracking-wider text-mystic-text-muted block mb-1">{box.label}</span>
+                <span className={box.valClass}>
+                  {box.value}
+                  {box.sub && <span className="text-[9px] block text-mystic-text-muted font-sans font-normal mt-0.5">{box.sub}</span>}
+                </span>
+                <span className="text-[9px] text-gray-400 mt-2 underline decoration-dotted">
+                  {isSelected ? "Açık Analiz" : "Detayı Oku"}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {activeBoxDetail && (
+          <div className="mb-8 p-5 md:p-6 rounded-2xl bg-black/60 border border-[#D4AF37]/35 space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/10 pb-3">
+              <div>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#D4AF37]/15 text-[#D4AF37] border border-[#D4AF37]/30">
+                  {activeBoxDetail.layerBadge}
+                </span>
+                <h4 className="text-base md:text-lg font-extrabold text-white mt-1.5">
+                  {activeBoxDetail.title}: <span className="text-[#D4AF37]">{activeBoxDetail.codeValue}</span> — {activeBoxDetail.archetypeTitle}
+                </h4>
+              </div>
+              <span className="text-xs text-gray-400">Sembol: <strong className="text-white">{activeBoxDetail.higherSelfTrigger.totemSymbol}</strong></span>
+            </div>
+
+            <p className="text-xs md:text-sm text-gray-200 leading-relaxed">{activeBoxDetail.summary}</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              {activeBoxDetail.sections.map((sec, sIdx) => (
+                <div key={sIdx} className="p-3.5 rounded-xl bg-white/[0.03] border border-white/10 space-y-1">
+                  <div className="text-xs font-bold text-[#D4AF37]">{sec.heading}</div>
+                  <p className="text-xs text-gray-300 leading-relaxed whitespace-pre-line">{sec.content}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="p-3.5 rounded-xl bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-xs text-amber-100 leading-relaxed">
+              <strong className="text-[#D4AF37]">Üst Benlik Sembol & Saat Mesajı ({activeBoxDetail.higherSelfTrigger.clockCodes.join(" / ")}): </strong>
+              {activeBoxDetail.higherSelfTrigger.instantMessage}
+            </div>
+          </div>
+        )}
 
         <h4 className="text-sm font-bold text-[#D4AF37] mb-3 border-t border-white/5 pt-4">Kozmik Eşzamanlılık Uyarıları</h4>
         <div className="space-y-4">
