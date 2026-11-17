@@ -79,6 +79,7 @@ export default function SymbolCodesAnalysisPage() {
   const bodyCodes = result
     ? [
         result.codes.find((c) => c.id === 'birth-code'),
+        result.codes.find((c) => c.id === 'body-field-code'),
         result.codes.find((c) => c.id === 'life-path'),
         result.codes.find((c) => c.id === 'planet-ruler'),
         result.codes.find((c) => c.id === 'birth-time-portal')
@@ -593,6 +594,70 @@ export default function SymbolCodesAnalysisPage() {
                     </div>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            {/* =====================================================================
+                5. BÖLÜM: ÜST HARİTALARINIZ (2. DRAKONİK RUH, 3. BERİYAH VE 4. ATZİLUTH KOZMİK HARİTA) KÖPRÜSÜ
+               ===================================================================== */}
+            <div className="bg-gradient-to-br from-[#D4AF37]/15 via-[#0B0D14] to-purple-950/25 border border-[#D4AF37]/40 rounded-3xl p-6 sm:p-8 space-y-5 shadow-[0_0_35px_rgba(212,175,55,0.12)]">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+                <div className="space-y-2 max-w-3xl">
+                  <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#D4AF37] bg-[#D4AF37]/15 border border-[#D4AF37]/35 px-3 py-1 rounded-full">
+                    <Sparkles size={14} />
+                    Üst Haritalara Geçiş Anahtarı • Kabalistik 4 Alem & Drakonik Astroloji
+                  </div>
+                  <h2 className="text-xl sm:text-2xl font-extrabold text-white">
+                    Üst Haritalarınız (2. Ruh Haritası, 3. Zihin ve 4. Kozmik Harita) Nasıl Çalışır?
+                  </h2>
+                  <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
+                    Yukarıda incelediğiniz sayısal kodların tamamı, bu dünyadaki <strong>1. Katman (Assiah / Fiziksel Enkarnasyon ve İsim Rezonansı)</strong> giriş şifrelerinizdir. Kadim öğretide <strong>Beden Alan Kodunuz ({result.summaryMetrics.birthMatrixFieldCode})</strong> ile sınırlarınızı koruduğunuzda, <strong>Gezegen Yöneticinizin ({result.summaryMetrics.lifePathPlanetName})</strong> sorumluluk sınavını verdiğinizde ve <strong>Karmik Kilidinizi ({result.summaryMetrics.primaryKarmicCode})</strong> şifalandırdığınızda; sayısal matrisin ötesindeki <strong>Astrolojik Üst Haritalarınız</strong> devreye girer:
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0">
+                  <a
+                    href="/analysis/kabbalah"
+                    className="px-5 py-3.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#B8860B] text-black font-extrabold text-xs sm:text-sm text-center shadow-lg shadow-[#D4AF37]/25 hover:opacity-95 transition flex items-center justify-center gap-2"
+                  >
+                    <Compass size={16} />
+                    Kabalistik 4 Alem Haritalarını Aç →
+                  </a>
+                  <a
+                    href="/analysis/cosmic-matrix"
+                    className="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold text-xs text-center transition flex items-center justify-center gap-2"
+                  >
+                    <KeyRound size={15} />
+                    7Layers Kozmik Matris Sentezi
+                  </a>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-2">
+                <div className="p-4 rounded-2xl bg-black/50 border border-white/10 space-y-1.5">
+                  <div className="text-xs font-extrabold text-purple-300 uppercase">
+                    2. Harita • Yetzirah (Drakonik Ruh Haritası)
+                  </div>
+                  <p className="text-xs text-gray-300 leading-relaxed">
+                    Kuzey Ay Düğümünüzün 0° Koç noktasına çekilmesiyle hesaplanan gerçek <strong>Ruh Sözleşmesi</strong> haritanızdır. Beden sınavlarını aştığınızda gezegenleriniz Drakonik burç ve derecelerinde çalışmaya başlar.
+                  </p>
+                </div>
+                <div className="p-4 rounded-2xl bg-black/50 border border-white/10 space-y-1.5">
+                  <div className="text-xs font-extrabold text-sky-300 uppercase">
+                    3. Harita • Beriyah (9. Harmonik Yüksek Zihin)
+                  </div>
+                  <p className="text-xs text-gray-300 leading-relaxed">
+                    Doğum haritanızın 9. Harmonik (Navamsa) açılımıdır. Hayatın ikinci yarısındaki ruhsal olgunluğu, ilahi idraki ve kadersel yaşam misyonunuzu yönetir.
+                  </p>
+                </div>
+                <div className="p-4 rounded-2xl bg-black/50 border border-white/10 space-y-1.5">
+                  <div className="text-xs font-extrabold text-amber-300 uppercase">
+                    4. Harita • Atziluth (Heliocentric Kozmik Harita)
+                  </div>
+                  <p className="text-xs text-gray-300 leading-relaxed">
+                    Merkezde Dünya'nın (egonun) değil <strong>Güneş'in (Yüksek Benliğin)</strong> olduğu Güneş Merkezli haritanız ve Kraliyet Sabit Yıldızları (Sirius, Regulus, Antares, Aldebaran) bağlantınızdır.
+                  </p>
+                </div>
               </div>
             </div>
           </>
