@@ -330,7 +330,7 @@ export default function NumerologyPage() {
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#B8860B] text-black font-extrabold text-xs shrink-0 shadow-lg shadow-[#D4AF37]/20 hover:opacity-95 transition"
           >
             <Sparkles size={14} />
-            11 Kişisel Kod & Sembol Analizine Git
+            12 Kişisel Kod & Sembol Analizine Git
             <ArrowRight size={14} />
           </Link>
         </div>

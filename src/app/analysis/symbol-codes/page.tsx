@@ -78,7 +78,7 @@ export default function SymbolCodesAnalysisPage() {
         <div className="text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-bold uppercase tracking-widest mb-4">
             <KeyRound size={14} />
-            3 Harita Sentezi • 11 Kişisel Kod & Sembol Kütüphanesi
+            3 Harita Sentezi • 12 Kişisel Kod & Sembol Kütüphanesi
           </div>
           <h1 className="text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-amber-100 to-[#D4AF37] mb-3 tracking-tight">
             Üst Benlik Sembol & Kişisel Kod Analizi
@@ -174,7 +174,7 @@ export default function SymbolCodesAnalysisPage() {
                 <div>
                   <h2 className="text-xl sm:text-2xl font-extrabold text-[#D4AF37] flex items-center gap-2">
                     <Layers size={22} />
-                    Astro-Numerolojik 11 Kişisel Kodunuz
+                    Astro-Numerolojik 12 Kişisel Kodunuz
                   </h2>
                   <p className="text-xs sm:text-sm text-gray-400 mt-1">
                     Detaylı ezoterik açıklamasını, karmik kökenini ve Üst Benlik sembolünü okumak istediğiniz kod kutusuna tıklayın.
@@ -184,10 +184,10 @@ export default function SymbolCodesAnalysisPage() {
                 {/* Filtre Butonları */}
                 <div className="flex flex-wrap items-center gap-2">
                   {[
-                    { id: 'all', label: 'Tümü (11 Kod)' },
+                    { id: 'all', label: 'Tümü (12 Kod)' },
                     { id: 'alchemy', label: '3. Harita: Karmik & Aura (6)' },
                     { id: 'soul', label: '1. Ruh Haritası (3)' },
-                    { id: 'body', label: '2. Beden Haritası (2)' }
+                    { id: 'body', label: '2. Beden Haritası (3)' }
                   ].map((tab) => (
                     <button
                       key={tab.id}
