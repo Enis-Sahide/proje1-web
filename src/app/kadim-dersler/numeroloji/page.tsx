@@ -387,6 +387,18 @@ export default function NumerolojiPage() {
                 </div>
               </div>
             </div>
+
+            <div className="bg-mystic-surface/50 p-6 border-l-4 border-mystic-primary rounded-r-2xl border-y border-r border-white/10 backdrop-blur-md">
+              <h3 className="text-lg font-bold text-mystic-primary mb-3">6. Keldani (10–52) Bileşik Arketipleri, İlk Nefes Saati ve Üst Haritalara Geçiş</h3>
+              <p className="text-sm text-mystic-text leading-relaxed mb-4">
+                Üstat seviyesinde tek haneli sayılar (1–9) sadece dış kabuktur; asıl okült sır, tek haneye inmeden önceki <strong>İki Basamaklı Keldani Bileşik Sayılarında (10–52)</strong> ve sayısal matristen <strong>Astrolojik Üst Haritalara</strong> geçişte gizlidir:
+              </p>
+              <div className="bg-black/30 p-4 rounded-xl text-xs text-mystic-text space-y-2.5 leading-relaxed">
+                <p>• <strong>Cheiro&apos;nun 10–52 Bileşik Sembolleri:</strong> Örneğin iki kişinin de tek haneli sayısı <strong>8 (Satürn)</strong> olabilir; ancak birinin bileşik sayısı <strong>17/8 (Ölümsüzlerin Yıldızı — Sekiz Köşeli Sirius/Venüs Koruması)</strong> iken diğerininki <strong>26/8 (Ortaklık ve Finansal İhtiyat Sınavı)</strong> olabilir. Tek haneli sayı hangi gezegenin çalıştığını, iki basamaklı bileşik sayı ise o gezegenin hangi kader senaryosuyla çalışacağını söyler.</p>
+                <p>• <strong>İlk Nefes (Doğum Saati) Kapısı ve Keldani Nöbetçi Gezegen:</strong> Ruhun anne karnından çıkıp ilk nefesini aldığı saat ve dakika (SS:DD), bedene <em>&quot;İlk Nefes Portal Kodunu&quot;</em> mühürler. Ayrıca Keldani takviminde gün doğumuyla başlayan 24 saatlik gezegen nöbetinde, doğduğunuz saatte gökyüzünde nöbette olan gezegen sizin kriz anındaki gizli muhafızınızdır. Gündüz doğanlar (Diürnal) kodlarını dış dünyada görünür eylemle, gece doğanlar (Noktürnal) ise derin sezgi ve stratejik gizlilikle çalıştırır.</p>
+                <p>• <strong>Neden Bazı İnsanlarda Sadece 1. Harita (Beden Kodları) Çalışır?</strong> Sayısal kodların tamamı, Kabalistik <strong>1. Alem (Assiah — Fiziksel Beden ve Enkarnasyon)</strong> aracının kullanım kılavuzudur. Kişi Beden Haritasındaki <em>Alan/Sınır Kodunu</em>, <em>Satürn Sorumluluk Kodunu</em> ve <em>Karmik Borç Kilidini (13/4, 14/5, 16/7, 19/1)</em> dengelemeden üst haritaları uykuda kalır. Bu 1. katman sınavları aşıldığında ise sayısal matrisin ötesindeki <strong>2. Harita (Drakonik Ruh Haritası)</strong>, <strong>3. Harita (9. Harmonik Beriyah Zihni)</strong> ve <strong>4. Harita (Atziluth Güneş Merkezli Kozmik Harita)</strong> aktifleşir.</p>
+              </div>
+            </div>
           </div>
         )}
       </div>

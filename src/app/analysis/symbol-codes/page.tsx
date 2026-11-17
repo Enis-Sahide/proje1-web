@@ -148,22 +148,13 @@ export default function SymbolCodesAnalysisPage() {
         </div>
       </div>
 
-      {/* Özet & Nasıl Hesaplandı */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-3.5">
-        <div className="lg:col-span-7 p-4 rounded-xl bg-white/[0.03] border border-white/10">
-          <div className="text-xs font-bold uppercase tracking-wider text-[#D4AF37] mb-1 flex items-center gap-1.5">
-            <Sparkles size={13} />
-            Ne Anlama Gelir? (Ezoterik Özeti)
-          </div>
-          <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">{codeItem.summary}</p>
+      {/* Doğrudan Anlam Özeti */}
+      <div className="p-4 rounded-xl bg-white/[0.04] border border-white/10">
+        <div className="text-xs font-bold uppercase tracking-wider text-[#D4AF37] mb-1 flex items-center gap-1.5">
+          <Sparkles size={13} />
+          Bu Kod Sizin İçin Ne Anlama Geliyor?
         </div>
-        <div className="lg:col-span-5 p-4 rounded-xl bg-white/[0.03] border border-white/10">
-          <div className="text-xs font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center gap-1.5">
-            <Hexagon size={13} />
-            Nereden & Nasıl Hesaplandı?
-          </div>
-          <p className="text-xs text-gray-300 leading-relaxed">{codeItem.calculationFormula}</p>
-        </div>
+        <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">{codeItem.summary}</p>
       </div>
 
       {/* Derin Açıklama Maddeleri */}

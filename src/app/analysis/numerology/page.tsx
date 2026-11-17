@@ -418,9 +418,7 @@ export default function NumerologyPage() {
             </div>
 
             <p className="text-xs md:text-sm text-gray-200 leading-relaxed">{activeBoxDetail.summary}</p>
-            <p className="text-xs text-sky-300/90 bg-sky-500/10 border border-sky-500/20 rounded-xl p-3">
-              <strong>Hesaplama Kaynağı: </strong>{activeBoxDetail.calculationFormula}
-            </p>
+
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {activeBoxDetail.sections.map((sec, sIdx) => (
