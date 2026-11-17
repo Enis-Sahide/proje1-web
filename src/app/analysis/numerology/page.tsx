@@ -122,6 +122,7 @@ export default function NumerologyPage() {
       const res = PhoneticChakraEngine.analyzeBrand(fullBrand);
       setBrandResult(res);
     } else if (activeTab === 'date') {
+      if (typeof window !== 'undefined') localStorage.setItem('7layers_last_numerology_birthdate', birthDate);
       setLifePath(calculateLifePath(birthDate));
       setBirthday(getBirthdayNumber(birthDate));
       setArrows(calculateArrows(birthDate));
@@ -133,16 +134,11 @@ export default function NumerologyPage() {
       const lp = calculateLifePath(birthDate);
       const nameRes = calculateNameAnalysis(name);
       
-      const parts = birthDate.split('-');
-      const y = parseInt(parts[0]);
-      const m = parseInt(parts[1]);
-      const d = parseInt(parts[2]);
-      
-      const dRed = reduceNumber(d);
-      const mRed = reduceNumber(m);
-      const yRed = reduceNumber(y);
-      const lifePathSum = dRed + mRed + yRed;
-      const lifePathRaw = `${lifePathSum}/${lp.number}`;
+      const lifePathRaw = lp.lifePathRaw || `${lp.rawSum}/${lp.number}`;
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('7layers_last_numerology_name', name);
+        localStorage.setItem('7layers_last_numerology_birthdate', birthDate);
+      }
 
       setLifePath(lp);
       setBirthday(getBirthdayNumber(birthDate));
@@ -284,78 +280,6 @@ export default function NumerologyPage() {
     personality?: number,
     chakraMatrix?: number[]
   ) => {
-    const planetaryMap: Record<number, string> = {
-      1: "Güneş", 2: "Ay", 3: "Jüpiter", 4: "Uranüs", 5: "Merkür",
-      6: "Venüs", 7: "Neptün", 8: "Satürn", 9: "Mars"
-    };
-    const planetName = planetaryMap[lifePathNum] || "Satürn";
-
-    let karmicCode = "Yok";
-    if (birthDate.startsWith("19") || destiny === 19 || soulUrge === 19 || personality === 19 || lifePathNum === 1 || birthdayNum === 17) {
-      karmicCode = "19/1";
-    } else if (destiny === 13 || soulUrge === 13 || personality === 13 || lifePathNum === 4) {
-      karmicCode = "13/4";
-    } else if (destiny === 14 || soulUrge === 14 || personality === 14 || lifePathNum === 5) {
-      karmicCode = "14/5";
-    } else if (destiny === 16 || soulUrge === 16 || personality === 16 || lifePathNum === 7) {
-      karmicCode = "16/7";
-    }
-
-    let ruhKodu = soulUrge ? reduceToSingleDigit(soulUrge) : reduceToSingleDigit(birthdayNum);
-    if (karmicCode === "19/1") ruhKodu = 1;
-
-    let alanKodu = 2;
-    const missingList: number[] = [];
-    if (chakraMatrix) {
-      chakraMatrix.forEach((count, idx) => {
-        if (count === 0) missingList.push(idx + 1);
-      });
-    }
-    if (missingList.length > 0) alanKodu = missingList[0];
-
-    const warnings = [];
-
-    if (ruhKodu === 1 || karmicCode === "19/1") {
-      const isNestedKarmic = ruhKodu === 1 && karmicCode === "19/1";
-      warnings.push({
-        number: "1 / 11:11 / 10:10",
-        title: "11:11 Çift Yönlü Uyanış Frekansı",
-        desc: `Haritanızda Ruh Kodu: 1 (Kişilik Kodu) ${isNestedKarmic ? "ve bu kodun içine gömülü olan Karmik Borç Kodu: 19/1" : ""} bulunmaktadır. Günlük hayatta 1 sayı dizilerini görmeniz: Liderlik, bağımsızlık ve öncü ruhunuzu aktif ederek akışta kalmanızı hatırlatır.`,
-        icon: <Zap className="text-yellow-400" size={16} />,
-        color: "border-yellow-400/20 bg-yellow-400/5 text-yellow-400"
-      });
-    }
-
-    if (alanKodu === 2) {
-      warnings.push({
-        number: "2 / 22:22 / 222",
-        title: "22:22 Aura Sınır ve Koruma Frekansı",
-        desc: "Alandaki koruma kodunuz 2'dir. Günlük hayatta 2 dizilerini görmek; sınırlarınızı net çizmeniz ve enerji sızıntılarını engellemeniz gerektiği mesajını taşır.",
-        icon: <Info className="text-blue-400" size={16} />,
-        color: "border-blue-400/20 bg-blue-400/5 text-blue-400"
-      });
-    }
-
-    if (reduceToSingleDigit(birthdayNum) === 8 || planetName === "Satürn") {
-      warnings.push({
-        number: "8 / 8:08 / 888",
-        title: "8:08 Sorumluluk ve Satürn Frekansı",
-        desc: `Beden yöneticiniz Satürn'dür. 8 görmek; dünyevi sorumlulukları ertelememeyi ve disiplin dengesini korumanızı hatırlatır.`,
-        icon: <AlertCircle className="text-red-400" size={16} />,
-        color: "border-red-400/20 bg-red-400/5 text-red-400"
-      });
-    }
-
-    if (warnings.length === 0) {
-      warnings.push({
-        number: "Genel Sayısal Hat",
-        title: "Eşzamanlı Rakamlar ve Yüksek Benlik Rehberi",
-        desc: "Günlük hayatta karşılaştığınız tekrarlanan sayılar, Yüksek Benliğin o sayıların numerolojik enerjisini hayatınıza entegre etmeniz gerektiği mesajını taşır.",
-        icon: <Sparkles className="text-indigo-400" size={16} />,
-        color: "border-indigo-400/20 bg-indigo-400/5 text-indigo-400"
-      });
-    }
-
     if (!isApprenticeOrAbove) {
       return (
         <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/25 rounded-3xl p-6 md:p-8 mt-6 text-center">
@@ -379,8 +303,18 @@ export default function NumerologyPage() {
       );
     }
 
-    const symbolAnalysis = analyzePersonalSymbolCodes(name || "Misafir", birthDate || "1990-01-01");
-    const activeBoxDetail = symbolAnalysis.codes.find((item) => item.id === selectedPersonalBoxId) || symbolAnalysis.codes[0];
+    const symbolAnalysis = analyzePersonalSymbolCodes(name || "Misafir", birthDate || "1990-05-15");
+    const m = symbolAnalysis.summaryMetrics;
+    const karmicCode = m.primaryKarmicCode;
+    const soulCodeItem = symbolAnalysis.codes.find((c) => c.id === "soul-urge");
+    const birthCodeItem = symbolAnalysis.codes.find((c) => c.id === "birth-code");
+    const planetDisplay =
+      m.birthPlanetName === m.lifePathPlanetName
+        ? m.birthPlanetName
+        : `${m.birthPlanetName} (Beden) • ${m.lifePathPlanetName} (Yol)`;
+
+    const activeBoxDetail =
+      symbolAnalysis.codes.find((item) => item.id === selectedPersonalBoxId) || symbolAnalysis.codes[0];
 
     return (
       <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/25 rounded-3xl p-6 md:p-8 mt-6">
@@ -403,11 +337,43 @@ export default function NumerologyPage() {
 
         <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-5">
           {[
-            { id: "karmic-debt", label: "Karmik Borç Kodu", value: karmicCode, valClass: "text-xl font-bold text-red-500 font-serif", badge: "3. Harita • Karmik Simya" },
-            { id: "soul-urge", label: "Kişilik / Ruh Kodu", value: String(ruhKodu), valClass: "text-xl font-bold text-white font-serif", badge: "1. Harita • Ruh (Briah)" },
-            { id: "aura-protection", label: "Aura Koruma Kodu", value: String(alanKodu), sub: "(Sınır ve Koruma)", valClass: "text-xl font-bold text-yellow-400 font-serif", badge: "3. Harita • Aura Kalkanı" },
-            { id: "birth-code", label: "Doğum Kodu", value: String(reduceToSingleDigit(birthdayNum)), valClass: "text-xl font-bold text-white font-serif", badge: "2. Harita • Beden (Assiah)" },
-            { id: "planet-ruler", label: "Gezegen Yöneticisi", value: planetName, valClass: "text-sm font-bold text-[#E0B0FF] block mt-1.5", badge: "2. Harita • Kozmik Saat", spanCols: true }
+            {
+              id: "karmic-debt",
+              label: "Karmik Borç Kodu",
+              value: karmicCode,
+              valClass: "text-xl font-bold text-red-500 font-serif",
+              badge: "3. Harita • Karmik Simya"
+            },
+            {
+              id: "soul-urge",
+              label: "Ruh Güdüsü Kodu",
+              value: soulCodeItem ? soulCodeItem.codeValue : String(m.soulUrgeCode),
+              valClass: "text-xl font-bold text-white font-serif",
+              badge: "1. Harita • Ruh (Briah)"
+            },
+            {
+              id: "aura-protection",
+              label: "Aura Koruma Kodu",
+              value: String(m.auraProtectionCode),
+              sub: "(Açık Çakra Kapısı)",
+              valClass: "text-xl font-bold text-yellow-400 font-serif",
+              badge: "3. Harita • Aura Kalkanı"
+            },
+            {
+              id: "birth-code",
+              label: "Doğum Kodu",
+              value: birthCodeItem ? birthCodeItem.codeValue : String(m.birthDaySingle),
+              valClass: "text-xl font-bold text-white font-serif",
+              badge: "2. Harita • Beden (Assiah)"
+            },
+            {
+              id: "planet-ruler",
+              label: "Gezegen Yöneticisi",
+              value: planetDisplay,
+              valClass: "text-xs sm:text-sm font-bold text-[#E0B0FF] block mt-1.5",
+              badge: "2. Harita • Kozmik Yönetici",
+              spanCols: true
+            }
           ].map((box) => {
             const isSelected = selectedPersonalBoxId === box.id;
             return (
@@ -452,6 +418,9 @@ export default function NumerologyPage() {
             </div>
 
             <p className="text-xs md:text-sm text-gray-200 leading-relaxed">{activeBoxDetail.summary}</p>
+            <p className="text-xs text-sky-300/90 bg-sky-500/10 border border-sky-500/20 rounded-xl p-3">
+              <strong>Hesaplama Kaynağı: </strong>{activeBoxDetail.calculationFormula}
+            </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {activeBoxDetail.sections.map((sec, sIdx) => (
@@ -471,18 +440,34 @@ export default function NumerologyPage() {
 
         <h4 className="text-sm font-bold text-[#D4AF37] mb-3 border-t border-white/5 pt-4">Kozmik Eşzamanlılık Uyarıları</h4>
         <div className="space-y-4">
-          {warnings.map((w, idx) => (
+          {symbolAnalysis.synchronicitySignals.map((sig, idx) => (
             <div key={idx} className="bg-black/30 border border-white/5 rounded-2xl p-5 space-y-3">
-              <div className="flex items-center gap-3">
-                <div className={`p-2 rounded-lg border flex items-center justify-center shrink-0 ${w.color.split(' ').slice(0, 2).join(' ')}`}>
-                  {w.icon}
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3">
+                  <div
+                    className="p-2 rounded-lg border flex items-center justify-center shrink-0"
+                    style={{ borderColor: `${sig.color}44`, backgroundColor: `${sig.color}15`, color: sig.color }}
+                  >
+                    <Zap size={16} />
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-white text-sm">{sig.title}</h4>
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-mystic-text-muted">
+                      {sig.sourceCodeName} • Sembol: {sig.symbolArchetype}
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <h4 className="font-bold text-white text-sm">{w.title}</h4>
-                  <span className="text-[10px] uppercase font-bold tracking-wider text-mystic-text-muted">Eşleşen Kod: {w.number}</span>
-                </div>
+                <span
+                  className="px-2.5 py-1 rounded-lg font-mono text-xs font-bold border shrink-0"
+                  style={{ color: sig.color, borderColor: `${sig.color}44`, backgroundColor: `${sig.color}12` }}
+                >
+                  {sig.code}
+                </span>
               </div>
-              <p className="text-gray-300 text-xs leading-relaxed">{w.desc}</p>
+              <p className="text-gray-300 text-xs leading-relaxed">{sig.whenYouSeeIt}</p>
+              <p className="text-emerald-300 text-xs leading-relaxed bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-2.5">
+                <strong>Uygulama: </strong>{sig.actionStep}
+              </p>
             </div>
           ))}
         </div>

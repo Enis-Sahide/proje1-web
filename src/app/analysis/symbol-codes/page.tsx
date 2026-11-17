@@ -31,7 +31,7 @@ export default function SymbolCodesAnalysisPage() {
   const { user } = useAuth();
 
   const [fullName, setFullName] = useState('Bahadır');
-  const [birthDate, setBirthDate] = useState('1988-08-19');
+  const [birthDate, setBirthDate] = useState('1990-05-15');
   const [result, setResult] = useState<SymbolCodeAnalysisResult | null>(null);
   const [selectedCodeId, setSelectedCodeId] = useState<string>('karmic-debt');
   const [layerFilter, setLayerFilter] = useState<'all' | MapLayerType>('all');
@@ -43,8 +43,10 @@ export default function SymbolCodesAnalysisPage() {
       const qName = params.get('name');
       const qBirth = params.get('birthDate');
 
-      const initialName = qName || (user as any)?.name || (user as any)?.fullName || 'Bahadır';
-      const initialBirth = qBirth || (user as any)?.birthDate || '1988-08-19';
+      const savedName = localStorage.getItem('7layers_last_numerology_name');
+      const savedBirth = localStorage.getItem('7layers_last_numerology_birthdate');
+      const initialName = qName || savedName || (user as any)?.name || (user as any)?.fullName || 'Bahadır';
+      const initialBirth = qBirth || savedBirth || (user as any)?.birthDate || '1990-05-15';
 
       setFullName(initialName);
       setBirthDate(initialBirth);

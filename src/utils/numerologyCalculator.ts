@@ -29,9 +29,12 @@ export const calculateLifePath = (dateStr: string) => {
               month.toString().split('').reduce((a, b) => a + parseInt(b), 0) +
               day.toString().split('').reduce((a, b) => a + parseInt(b), 0);
               
+  const reduced = reduceToSingleDigit(sum);
   return {
-    number: reduceToSingleDigit(sum),
-    calculationString: `${day}.${month}.${year} = ${day.toString().split('').join(' + ')} + ${month.toString().split('').join(' + ')} + ${year.toString().split('').join(' + ')} = ${sum} = ${sum.toString().split('').join(' + ')} = ${absoluteSingleDigit(sum)}`
+    rawSum: sum,
+    number: reduced,
+    lifePathRaw: `${sum}/${reduced}`,
+    calculationString: `${day}.${month}.${year} = ${day.toString().split('').join(' + ')} + ${month.toString().split('').join(' + ')} + ${year.toString().split('').join(' + ')} = ${sum} = ${sum.toString().split('').join(' + ')} = ${reduced}`
   };
 };
 
@@ -149,6 +152,9 @@ export const calculateNameAnalysis = (name: string) => {
   const challenges = missing.length > 0 ? missing.join('-') : 'Yok';
 
   return {
+    destinySum,
+    soulUrgeSum,
+    personalitySum,
     destiny,
     soulUrge,
     personality,
