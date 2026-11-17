@@ -1199,58 +1199,65 @@ export function analyzePersonalSymbolCodes(fullNameInput: string, birthDateInput
   const birthMatrixFieldCode =
     missingBirthDigits.length > 0 ? missingBirthDigits[0] : reduceToSingle(day + month, false);
 
-  // 3. Gerçek Pisagor Karmik Borç Taraması (13/4, 14/5, 16/7, 19/1)
-  // Yalnızca gerçek matematiksel ara toplamlarda (Doğum Günü, Yaşam Yolu, İsim Kader, Ruh Güdüsü, Persona) 13, 14, 16, 19 varsa tespit edilir.
+  // 3. Gerçek Pisagor Karmik Borç ve Doğum Matrisi Kilit Taraması (13/4, 14/5, 16/7, 19/1)
   const detectedKarmicDebts: { code: string; source: string }[] = [];
-  const addKarmicIfFound = (code: string | null, source: string) => {
-    if (code && !detectedKarmicDebts.some((d) => d.code === code)) {
-      detectedKarmicDebts.push({ code, source });
+  const birthDateKarmicDebts: { code: string; source: string }[] = [];
+
+  const addKarmicIfFound = (code: string | null, source: string, isFromBirthDate = false) => {
+    if (code) {
+      if (!detectedKarmicDebts.some((d) => d.code === code)) {
+        detectedKarmicDebts.push({ code, source });
+      }
+      if (isFromBirthDate && !birthDateKarmicDebts.some((d) => d.code === code)) {
+        birthDateKarmicDebts.push({ code, source });
+      }
     }
   };
 
   // A) Doğum Günü (13, 14, 16, 19)
   if (day === 13 || day === 14 || day === 16 || day === 19) {
-    addKarmicIfFound(checkKarmicFromSum(day), `Doğum Günü (${day})`);
+    addKarmicIfFound(checkKarmicFromSum(day), `Doğum Günü (${day})`, true);
   }
 
   // B) Yaşam Yolu (Rakam Toplamı, Master Korumalı 3 Döngü Toplamı ve Tek Haneli 3 Sütun Toplamı)
   const pureThreeCycleLifePathSum = reduceToSingle(day, false) + reduceToSingle(month, false) + reduceToSingle(year, false);
-  addKarmicIfFound(checkKarmicFromSum(rawLifePathSum), `Yaşam Yolu Rakam Toplamı (${rawLifePathSum})`);
-  addKarmicIfFound(checkKarmicFromSum(threeCycleLifePathSum), `Yaşam Yolu G+A+Y Toplamı (${threeCycleLifePathSum})`);
-  addKarmicIfFound(checkKarmicFromSum(pureThreeCycleLifePathSum), `Yaşam Yolu 3 Sütun Toplamı (${pureThreeCycleLifePathSum})`);
+  addKarmicIfFound(checkKarmicFromSum(rawLifePathSum), `Yaşam Yolu Rakam Toplamı (${rawLifePathSum})`, true);
+  addKarmicIfFound(checkKarmicFromSum(threeCycleLifePathSum), `Yaşam Yolu G+A+Y Toplamı (${threeCycleLifePathSum})`, true);
+  addKarmicIfFound(checkKarmicFromSum(pureThreeCycleLifePathSum), `Yaşam Yolu 3 Sütun Toplamı (${pureThreeCycleLifePathSum})`, true);
 
-  // C) Ruh Güdüsü (Sesli Harf Ham Toplamı veya Kelime İndirgeme Toplamı)
-  addKarmicIfFound(checkKarmicFromSum(rawSoulUrgeSum), `Ruh Güdüsü Sesli Harf Toplamı (${rawSoulUrgeSum})`);
-  if (nameWords.length > 1) {
-    addKarmicIfFound(checkKarmicFromSum(wordReducedSoulSum), `Ruh Güdüsü Kelime Toplamı (${wordReducedSoulSum})`);
-  }
-
-  // D) İsim Kader (Tüm Harf Ham Toplamı veya Kelime İndirgeme Toplamı)
-  addKarmicIfFound(checkKarmicFromSum(rawDestinySum), `İsim Kader Harf Toplamı (${rawDestinySum})`);
-  if (nameWords.length > 1) {
-    addKarmicIfFound(checkKarmicFromSum(wordReducedDestinySum), `İsim Kader Kelime Toplamı (${wordReducedDestinySum})`);
-  }
-
-  // E) Dışsal Persona (Sessiz Harf Ham Toplamı veya Kelime İndirgeme Toplamı)
-  addKarmicIfFound(checkKarmicFromSum(rawPersonalitySum), `Dışsal Persona Sessiz Harf Toplamı (${rawPersonalitySum})`);
-  if (nameWords.length > 1) {
-    addKarmicIfFound(checkKarmicFromSum(wordReducedPersonaSum), `Dışsal Persona Kelime Toplamı (${wordReducedPersonaSum})`);
-  }
-
-  // E2) Doğum Tarihi Zirve (Pinnacle) Döngüleri & Doğum Matrisi Baskın Eksen Taraması
-  const pinnacle1Raw = birthDaySingle + birthMonthSingle;
-  const pinnacle2Raw = birthDaySingle + birthYearSingle;
-  const pinnacle4Raw = birthMonthSingle + birthYearSingle;
-  addKarmicIfFound(checkKarmicFromSum(pinnacle1Raw), `1. Yaşam Döngüsü Gün+Ay Toplamı (${pinnacle1Raw})`);
-  addKarmicIfFound(checkKarmicFromSum(pinnacle2Raw), `2. Yaşam Döngüsü Gün+Yıl Toplamı (${pinnacle2Raw})`);
-  addKarmicIfFound(checkKarmicFromSum(pinnacle4Raw), `Ana Hasat Döngüsü Ay+Yıl Toplamı (${pinnacle4Raw})`);
-
-  // Doğum Matrisinde 1 ve 9'un birlikte çift/baskın tekrar etmesi (1-9 Otorite ve Güç Karmik Kilidi: 19/1)
+  // C) Doğum Tarihi Matrisi Çift Kilit Eksenleri (1-9 → 19/1, 1-6 → 16/7, 1-4 → 14/5, 1-3 → 13/4)
   if (birthDigitCounts[0] >= 2 && birthDigitCounts[8] >= 2) {
-    addKarmicIfFound('19/1', `Doğum Tarihi Matrisi 1–9 Baskın Güç Ekseni (${birthDigitCounts[0]} adet 1 ve ${birthDigitCounts[8]} adet 9)`);
+    addKarmicIfFound('19/1', `Doğum Tarihi Matrisi 1–9 Baskın Güç Kilidi (${birthDigitCounts[0]} adet 1 ve ${birthDigitCounts[8]} adet 9)`, true);
+  }
+  if (birthDigitCounts[0] >= 2 && birthDigitCounts[5] >= 2) {
+    addKarmicIfFound('16/7', `Doğum Tarihi Matrisi 1–6 Baskın Hakikat Kilidi (${birthDigitCounts[0]} adet 1 ve ${birthDigitCounts[5]} adet 6)`, true);
+  }
+  if (birthDigitCounts[0] >= 2 && birthDigitCounts[3] >= 2) {
+    addKarmicIfFound('14/5', `Doğum Tarihi Matrisi 1–4 Baskın Denge Kilidi (${birthDigitCounts[0]} adet 1 ve ${birthDigitCounts[3]} adet 4)`, true);
+  }
+  if (birthDigitCounts[0] >= 2 && birthDigitCounts[2] >= 2) {
+    addKarmicIfFound('13/4', `Doğum Tarihi Matrisi 1–3 Baskın İnşa Kilidi (${birthDigitCounts[0]} adet 1 ve ${birthDigitCounts[2]} adet 3)`, true);
   }
 
-  // F) Opsiyonel Doğum Saati (İlk Nefes Enkarnasyon Kapısı: SS:DD)
+  // D) Ruh Güdüsü (Sesli Harf Ham Toplamı veya Kelime İndirgeme Toplamı)
+  addKarmicIfFound(checkKarmicFromSum(rawSoulUrgeSum), `Ruh Güdüsü Sesli Harf Toplamı (${rawSoulUrgeSum})`, false);
+  if (nameWords.length > 1) {
+    addKarmicIfFound(checkKarmicFromSum(wordReducedSoulSum), `Ruh Güdüsü Kelime Toplamı (${wordReducedSoulSum})`, false);
+  }
+
+  // E) İsim Kader (Tüm Harf Ham Toplamı veya Kelime İndirgeme Toplamı)
+  addKarmicIfFound(checkKarmicFromSum(rawDestinySum), `İsim Kader Harf Toplamı (${rawDestinySum})`, false);
+  if (nameWords.length > 1) {
+    addKarmicIfFound(checkKarmicFromSum(wordReducedDestinySum), `İsim Kader Kelime Toplamı (${wordReducedDestinySum})`, false);
+  }
+
+  // F) Dışsal Persona (Sessiz Harf Ham Toplamı veya Kelime İndirgeme Toplamı)
+  addKarmicIfFound(checkKarmicFromSum(rawPersonalitySum), `Dışsal Persona Sessiz Harf Toplamı (${rawPersonalitySum})`, false);
+  if (nameWords.length > 1) {
+    addKarmicIfFound(checkKarmicFromSum(wordReducedPersonaSum), `Dışsal Persona Kelime Toplamı (${wordReducedPersonaSum})`, false);
+  }
+
+  // G) Opsiyonel Doğum Saati (İlk Nefes Enkarnasyon Kapısı: SS:DD)
   let parsedHour: number | null = null;
   let parsedMinute: number | null = null;
   let cleanBirthTime: string | undefined = undefined;
@@ -1272,10 +1279,17 @@ export function analyzePersonalSymbolCodes(fullNameInput: string, birthDateInput
       portalSingle = reduceToSingle(rawTimeDigitsSum, false);
       chaldeanHourInfo = calculateChaldeanBirthHourInfo(year, month, day, h, m);
 
-      addKarmicIfFound(checkKarmicFromSum(rawTimeDigitsSum), `İlk Nefes Doğum Saati (${cleanBirthTime} → ${rawTimeDigitsSum})`);
-      addKarmicIfFound(checkKarmicFromSum(h + m), `Doğum Saati S+D Toplamı (${h + m})`);
+      addKarmicIfFound(checkKarmicFromSum(rawTimeDigitsSum), `İlk Nefes Doğum Saati (${cleanBirthTime} → ${rawTimeDigitsSum})`, false);
+      addKarmicIfFound(checkKarmicFromSum(h + m), `Doğum Saati S+D Toplamı (${h + m})`, false);
     }
   }
+
+  const birthKarmicKey = birthDateKarmicDebts.length > 0 ? birthDateKarmicDebts[0].code : 'YOK';
+  const birthKarmicEntry = KARMIC_DEBT_LIBRARY[birthKarmicKey] || KARMIC_DEBT_LIBRARY.YOK;
+  const birthEmbeddedRuhDigit =
+    birthKarmicKey !== 'YOK'
+      ? parseInt(birthKarmicKey.split('/')[1], 10) || birthDaySingle
+      : birthDaySingle;
 
   const primaryKarmicKey = detectedKarmicDebts.length > 0 ? detectedKarmicDebts[0].code : 'YOK';
   const karmicEntry = KARMIC_DEBT_LIBRARY[primaryKarmicKey] || KARMIC_DEBT_LIBRARY.YOK;
@@ -1406,6 +1420,40 @@ export function analyzePersonalSymbolCodes(fullNameInput: string, birthDateInput
           content: auraEntry.shieldingRitual
         }
       ]
+    },
+
+    // 4A. BEDEN RUH & KARMİK KİLİT KODU (1. Bölüm - Doğum Tarihinden Gelen Kod)
+    {
+      id: 'body-karmic-soul',
+      title: 'Beden Ruh & Karmik Kilit Kodu',
+      shortTitle: 'RUH & KARMİK KODU',
+      codeValue: birthKarmicKey === 'YOK' ? `${birthDaySingle} (Muaf)` : `${birthEmbeddedRuhDigit} (${birthKarmicKey})`,
+      subLabel:
+        birthDateKarmicDebts.length > 0
+          ? `Ruh Kodu: ${birthEmbeddedRuhDigit} • Gömülü Kilit: ${birthKarmicKey}`
+          : `Beden Öz Kodu: ${birthDaySingle} • Karmik Kilit Yok`,
+      layer: 'body',
+      layerBadge: '1. Bölüm • Doğum Tarihinden Gelen Karmik Öz',
+      color: '#EF4444',
+      archetypeTitle:
+        birthKarmicKey !== 'YOK'
+          ? `Ruh Kodu ${birthEmbeddedRuhDigit} (İçine Gömülü Karmik Kod: ${birthKarmicKey}) — ${birthKarmicEntry.archetypeTitle}`
+          : `Beden Öz Kodu ${birthDaySingle} — ${birthKarmicEntry.archetypeTitle}`,
+      summary:
+        birthKarmicKey !== 'YOK'
+          ? `Doğum tarihinizde (${birthDateKarmicDebts.map((d) => d.source).join(' • ')}) üzerinden Beden Ruh Kodunuz "${birthEmbeddedRuhDigit}" ve bu kodun içine gömülü olan "${birthKarmicKey}" Karmik Kilidi bulunmaktadır. ${birthKarmicEntry.summary}`
+          : birthKarmicEntry.summary,
+      calculationFormula:
+        birthDateKarmicDebts.length > 0
+          ? `Doğum tarihinizde ${birthDateKarmicDebts.map((d) => `${d.source} → ${d.code}`).join(', ')} kilidi tespit edilmiştir.`
+          : 'Doğum tarihinizin gün, yaşam yolu ve matris eksenlerinde 13/4, 14/5, 16/7 veya 19/1 karmik kilidi bulunmamaktadır.',
+      higherSelfTrigger: {
+        clockCodes: birthKarmicEntry.clockCodes,
+        totemSymbol: birthKarmicEntry.totemSymbol,
+        geometricSymbol: birthKarmicEntry.geometricSymbol,
+        instantMessage: birthKarmicEntry.instantMessage
+      },
+      sections: birthKarmicEntry.sections
     },
 
     // 4. DOĞUM KODU (2. Harita - Beden Haritası)

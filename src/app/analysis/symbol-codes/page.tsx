@@ -32,7 +32,7 @@ export default function SymbolCodesAnalysisPage() {
   const [result, setResult] = useState<SymbolCodeAnalysisResult | null>(null);
 
   // Her bir bölümün kendi aktif seçili kartı (böylece 3 bölüm birbirine hiç karışmaz)
-  const [selectedBodyId, setSelectedBodyId] = useState<string>('birth-code');
+  const [selectedBodyId, setSelectedBodyId] = useState<string>('body-karmic-soul');
   const [selectedSoulId, setSelectedSoulId] = useState<string>('soul-urge');
   const [selectedAlchemyId, setSelectedAlchemyId] = useState<string>('karmic-debt');
   const [showAllExpanded, setShowAllExpanded] = useState<boolean>(false);
@@ -78,6 +78,7 @@ export default function SymbolCodesAnalysisPage() {
   // 1. Bölüm: Doğum Tarihinden Gelen Kodlar (layer === 'body')
   const bodyCodes = result
     ? [
+        result.codes.find((c) => c.id === 'body-karmic-soul'),
         result.codes.find((c) => c.id === 'birth-code'),
         result.codes.find((c) => c.id === 'body-field-code'),
         result.codes.find((c) => c.id === 'life-path'),
