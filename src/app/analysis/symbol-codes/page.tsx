@@ -32,6 +32,7 @@ export default function SymbolCodesAnalysisPage() {
 
   const [fullName, setFullName] = useState('Bahadır');
   const [birthDate, setBirthDate] = useState('1990-05-15');
+  const [birthTime, setBirthTime] = useState('');
   const [result, setResult] = useState<SymbolCodeAnalysisResult | null>(null);
   const [selectedCodeId, setSelectedCodeId] = useState<string>('karmic-debt');
   const [layerFilter, setLayerFilter] = useState<'all' | MapLayerType>('all');
@@ -42,15 +43,19 @@ export default function SymbolCodesAnalysisPage() {
       const params = new URLSearchParams(window.location.search);
       const qName = params.get('name');
       const qBirth = params.get('birthDate');
+      const qTime = params.get('birthTime');
 
       const savedName = localStorage.getItem('7layers_last_numerology_name');
       const savedBirth = localStorage.getItem('7layers_last_numerology_birthdate');
+      const savedTime = localStorage.getItem('7layers_last_numerology_birthtime');
       const initialName = qName || savedName || (user as any)?.name || (user as any)?.fullName || 'Bahadır';
       const initialBirth = qBirth || savedBirth || (user as any)?.birthDate || '1990-05-15';
+      const initialTime = qTime || savedTime || '';
 
       setFullName(initialName);
       setBirthDate(initialBirth);
-      const computed = analyzePersonalSymbolCodes(initialName, initialBirth);
+      setBirthTime(initialTime);
+      const computed = analyzePersonalSymbolCodes(initialName, initialBirth, initialTime || undefined);
       setResult(computed);
     }
   }, [user]);
@@ -58,7 +63,12 @@ export default function SymbolCodesAnalysisPage() {
   const handleAnalyze = (e: React.FormEvent) => {
     e.preventDefault();
     if (!fullName.trim() || !birthDate) return;
-    const computed = analyzePersonalSymbolCodes(fullName, birthDate);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('7layers_last_numerology_name', fullName);
+      localStorage.setItem('7layers_last_numerology_birthdate', birthDate);
+      localStorage.setItem('7layers_last_numerology_birthtime', birthTime);
+    }
+    const computed = analyzePersonalSymbolCodes(fullName, birthDate, birthTime || undefined);
     setResult(computed);
   };
 
@@ -96,9 +106,9 @@ export default function SymbolCodesAnalysisPage() {
           className="bg-[#0B0D14]/90 border border-[#D4AF37]/30 rounded-3xl p-6 sm:p-8 shadow-[0_0_40px_rgba(212,175,55,0.1)] backdrop-blur-xl"
         >
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-            <div className="md:col-span-6">
+            <div className="md:col-span-4">
               <label className="block text-xs font-bold uppercase tracking-wider text-[#D4AF37] mb-2">
-                Nüfus Cüzdanındaki Tam Adınız (Ruh Haritası / Briah)
+                Nüfus Cüzdanındaki Tam Adınız (Ruh Haritası)
               </label>
               <input
                 type="text"
@@ -109,9 +119,9 @@ export default function SymbolCodesAnalysisPage() {
                 required
               />
             </div>
-            <div className="md:col-span-4">
+            <div className="md:col-span-3">
               <label className="block text-xs font-bold uppercase tracking-wider text-sky-400 mb-2">
-                Doğum Tarihiniz (Beden Haritası / Assiah)
+                Doğum Tarihiniz (Beden Haritası)
               </label>
               <input
                 type="date"
@@ -119,6 +129,17 @@ export default function SymbolCodesAnalysisPage() {
                 onChange={(e) => setBirthDate(e.target.value)}
                 className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/15 text-white focus:outline-none focus:border-sky-400 transition"
                 required
+              />
+            </div>
+            <div className="md:col-span-3">
+              <label className="block text-xs font-bold uppercase tracking-wider text-teal-400 mb-2">
+                Doğum Saati (Opsiyonel • İlk Nefes Kapısı)
+              </label>
+              <input
+                type="time"
+                value={birthTime}
+                onChange={(e) => setBirthTime(e.target.value)}
+                className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/15 text-white focus:outline-none focus:border-teal-400 transition"
               />
             </div>
             <div className="md:col-span-2">
