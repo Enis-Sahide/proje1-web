@@ -342,14 +342,14 @@ export default function NumerologyPage() {
               label: "Karmik Borç Kodu",
               value: karmicCode,
               valClass: "text-xl font-bold text-red-500 font-serif",
-              badge: "3. Harita • Karmik Simya"
+              badge: "Beden Haritası • Karmik Kilit"
             },
             {
               id: "body-karmic-soul",
               label: "Ruh / Benlik Kodu",
-              value: m.primaryKarmicCode !== "Yok" ? `${m.embeddedRuhKodu} (${m.primaryKarmicCode})` : (soulCodeItem ? soulCodeItem.codeValue : String(m.soulUrgeCode)),
+              value: m.primaryKarmicCode !== "Yok" ? `${m.embeddedRuhKodu} (${m.primaryKarmicCode})` : String(m.embeddedRuhKodu),
               valClass: "text-xl font-bold text-white font-serif",
-              badge: "1. Bölüm • Ruh & Karmik Öz"
+              badge: "Beden Haritası • Ruh Özü"
             },
             {
               id: "body-field-code",
@@ -357,21 +357,22 @@ export default function NumerologyPage() {
               value: String(m.birthMatrixFieldCode),
               sub: "(Alan Kapatan & Sınır)",
               valClass: "text-xl font-bold text-yellow-400 font-serif",
-              badge: "1. Bölüm • Alan Kalkanı"
+              badge: "Beden Haritası • Alan Kalkanı"
             },
             {
               id: "birth-code",
               label: "Doğum Kodu",
-              value: birthCodeItem ? birthCodeItem.codeValue : String(m.birthDaySingle),
+              value: `${m.birthDaySingle}`,
+              sub: birthCodeItem ? `(${birthCodeItem.codeValue})` : undefined,
               valClass: "text-xl font-bold text-white font-serif",
-              badge: "2. Harita • Beden (Assiah)"
+              badge: "Beden Haritası • Doğum Gücü"
             },
             {
               id: "planet-ruler",
               label: "Gezegen Yöneticisi",
               value: planetDisplay,
               valClass: "text-xs sm:text-sm font-bold text-[#E0B0FF] block mt-1.5",
-              badge: "2. Harita • Kozmik Yönetici",
+              badge: "Beden Haritası • Yönetici",
               spanCols: true
             }
           ].map((box) => {
