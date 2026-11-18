@@ -28,7 +28,6 @@ export default function SymbolCodesAnalysisPage() {
   const [result, setResult] = useState<SymbolCodeAnalysisResult | null>(null);
 
   const [selectedBodyId, setSelectedBodyId] = useState<string>('body-karmic-soul');
-  const [selectedNameId, setSelectedNameId] = useState<string>('soul-urge');
   const [showAllExpanded, setShowAllExpanded] = useState<boolean>(false);
 
   useEffect(() => {
@@ -55,20 +54,19 @@ export default function SymbolCodesAnalysisPage() {
 
   const handleAnalyze = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName.trim() || !birthDate) return;
+    if (!birthDate) return;
     if (typeof window !== 'undefined') {
-      localStorage.setItem('7layers_last_numerology_name', fullName);
       localStorage.setItem('7layers_last_numerology_birthdate', birthDate);
       localStorage.setItem('7layers_last_numerology_birthtime', birthTime);
     }
-    const computed = analyzePersonalSymbolCodes(fullName, birthDate, birthTime || undefined);
+    const computed = analyzePersonalSymbolCodes(fullName || 'Misafir', birthDate, birthTime || undefined);
     setResult(computed);
     if (birthTime && birthTime.includes(':')) {
       setSelectedBodyId('birth-time-portal');
     }
   };
 
-  // 1. ÜST BÖLÜM: DOĞUM TARİHİNDEN GELEN 5 ÇEKİRDEK BEDEN HARİTASI KODU (+ Varsa İlk Nefes Saati)
+  // DOĞUM TARİHİNDEN GELEN 5 ÇEKİRDEK BEDEN HARİTASI KODU (+ Varsa İlk Nefes Saati)
   const coreBodyCodes = result
     ? [
         result.codes.find((c) => c.id === 'body-karmic-soul'),
@@ -78,20 +76,6 @@ export default function SymbolCodesAnalysisPage() {
         result.codes.find((c) => c.id === 'life-path'),
         result.codes.find((c) => c.id === 'planet-ruler'),
         result.codes.find((c) => c.id === 'birth-time-portal')
-      ].filter((c): c is PersonalSymbolCodeItem => Boolean(c))
-    : [];
-
-  // 2. ALT BÖLÜM: KLASİK PİSAGOR & KALDE İSİM, AURA VE ÇAKRA ANALİZİ
-  const classicNameCodes = result
-    ? [
-        result.codes.find((c) => c.id === 'soul-urge'),
-        result.codes.find((c) => c.id === 'outer-persona'),
-        result.codes.find((c) => c.id === 'aura-protection'),
-        result.codes.find((c) => c.id === 'hidden-passion'),
-        result.codes.find((c) => c.id === 'chaldean-compound'),
-        result.codes.find((c) => c.id === 'bridge-code'),
-        result.codes.find((c) => c.id === 'maturity-code'),
-        result.codes.find((c) => c.id === 'subconscious-self')
       ].filter((c): c is PersonalSymbolCodeItem => Boolean(c))
     : [];
 
@@ -222,15 +206,15 @@ export default function SymbolCodesAnalysisPage() {
         <div className="text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-bold uppercase tracking-widest mb-4">
             <KeyRound size={14} />
-            Beden Haritası Çekirdek Kodları • Pisagor & Kalde İsim Analizi
+            Beden Haritası Çekirdek Kodları & Canlı Uyanış Rehberi
           </div>
           <h1 className="text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-amber-100 to-[#D4AF37] mb-3 tracking-tight">
             Üst Benlik Sembol & Kişisel Kod Analizi
           </h1>
           <p className="text-sm sm:text-base text-gray-300 leading-relaxed">
-            Üst bölümde doğum tarihinizden gelen{' '}
-            <span className="text-sky-400 font-semibold">5 Çekirdek Beden Haritası Kodunuzu ve 3 Eşzamanlılık Mesajınızı</span>, alt bölümde ise klasik Pisagor ve Kalde kaynaklarına göre{' '}
-            <span className="text-[#D4AF37] font-semibold">İsim, Aura ve Çakra Analizinizi</span> inceleyin.
+            Doğum tarihinizden ve saatinizden hesaplanan{' '}
+            <span className="text-sky-400 font-semibold">Beden Haritası Çekirdek Kodlarınızı</span> ve günlük hayatta takip edeceğiniz{' '}
+            <span className="text-[#D4AF37] font-semibold">3 Çekirdek Eşzamanlılık & Sembol Mesajınızı</span> inceleyin.
           </p>
         </div>
 
@@ -240,20 +224,7 @@ export default function SymbolCodesAnalysisPage() {
           className="bg-[#0B0D14]/90 border border-[#D4AF37]/30 rounded-3xl p-6 sm:p-8 shadow-[0_0_40px_rgba(212,175,55,0.1)] backdrop-blur-xl"
         >
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
-            <div className="md:col-span-4">
-              <label className="block text-xs font-bold uppercase tracking-wider text-[#D4AF37] mb-2">
-                Nüfus Cüzdanındaki Tam Adınız (İsim Analizi)
-              </label>
-              <input
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="Örn: Ahmet Yılmaz"
-                className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/15 text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] transition"
-                required
-              />
-            </div>
-            <div className="md:col-span-3">
+            <div className="md:col-span-5">
               <label className="block text-xs font-bold uppercase tracking-wider text-sky-400 mb-2">
                 Doğum Tarihiniz (Beden Haritası Kodları)
               </label>
@@ -265,9 +236,9 @@ export default function SymbolCodesAnalysisPage() {
                 required
               />
             </div>
-            <div className="md:col-span-3">
+            <div className="md:col-span-4">
               <label className="block text-xs font-bold uppercase tracking-wider text-teal-400 mb-2">
-                Doğum Saati (Opsiyonel • İlk Nefes)
+                Doğum Saati (Opsiyonel • İlk Nefes Kapısı)
               </label>
               <input
                 type="time"
@@ -276,7 +247,7 @@ export default function SymbolCodesAnalysisPage() {
                 className="w-full px-4 py-3.5 rounded-xl bg-white/5 border border-white/15 text-white focus:outline-none focus:border-teal-400 transition"
               />
             </div>
-            <div className="md:col-span-2">
+            <div className="md:col-span-3">
               <button
                 type="submit"
                 className="w-full py-3.5 px-5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-extrabold text-sm shadow-lg shadow-[#D4AF37]/25 transition cursor-pointer flex items-center justify-center gap-2"
@@ -293,7 +264,7 @@ export default function SymbolCodesAnalysisPage() {
             {/* Üst Görünüm Anahtarı */}
             <div className="flex flex-wrap items-center justify-between gap-3 bg-white/[0.03] border border-white/10 rounded-2xl px-5 py-3.5">
               <p className="text-xs sm:text-sm text-gray-300">
-                💡 Her bölümde istediğiniz kutuya tıklayarak o kodun derin açıklamasını hemen altında okuyabilirsiniz.
+                💡 İstediğiniz kutuya tıklayarak o kodun derin açıklamasını hemen altında okuyabilirsiniz.
               </p>
               <button
                 type="button"
@@ -453,66 +424,6 @@ export default function SymbolCodesAnalysisPage() {
                   </div>
                 ))}
               </div>
-            </div>
-
-            {/* =====================================================================
-                3. BÖLÜM: KLASİK PİSAGOR & KALDE İSİM, AURA VE ÇAKRA ANALİZİ
-               ===================================================================== */}
-            <div className="bg-[#0B0D14]/95 border border-[#D4AF37]/35 rounded-3xl p-6 sm:p-8 space-y-5 shadow-[0_0_30px_rgba(212,175,55,0.08)]">
-              <div className="border-b border-white/10 pb-4">
-                <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#D4AF37] bg-[#D4AF37]/10 border border-[#D4AF37]/30 px-3 py-1 rounded-full mb-2">
-                  <Sparkles size={14} />
-                  3. Bölüm • Klasik Pisagor & Kalde İsim ve Çakra Analizi ({result.fullName})
-                </div>
-                <h2 className="text-xl sm:text-2xl font-extrabold text-white">
-                  İsminizden Gelen Karakter, Aura (Yükselen Vitrin) & Çakra Matrisi Analizi
-                </h2>
-                <p className="text-xs sm:text-sm text-gray-400 mt-1">
-                  Adınızın ve soyadınızın sesli/sessiz harflerinden Pisagor ve Kalde (Cheiro) tablolarına göre hesaplanan içsel arzunuz, dışsal ilk izleniminiz, çakra matrisiniz ve yaşam senteziniz:
-                </p>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-                {classicNameCodes.map((item) => {
-                  const isSelected = selectedNameId === item.id && !showAllExpanded;
-                  return (
-                    <button
-                      key={item.id}
-                      type="button"
-                      onClick={() => {
-                        setSelectedNameId(item.id);
-                        setShowAllExpanded(false);
-                      }}
-                      className={`text-left p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
-                        isSelected
-                          ? 'bg-[#D4AF37]/15 border-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.25)] scale-[1.01]'
-                          : 'bg-black/50 border-white/10 hover:border-[#D4AF37]/50'
-                      }`}
-                    >
-                      <div>
-                        <div className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider">
-                          {item.shortTitle}
-                        </div>
-                        <div className="text-xs text-gray-300 font-semibold mt-0.5">{item.title}</div>
-                      </div>
-                      <div className="text-2xl sm:text-3xl font-black my-3" style={{ color: item.color }}>
-                        {item.codeValue}
-                      </div>
-                      <div className="flex items-center justify-between text-[11px] text-gray-400 border-t border-white/10 pt-2">
-                        <span className="truncate">{item.subLabel}</span>
-                        <span className="text-[#D4AF37] font-bold shrink-0 ml-1">
-                          {isSelected ? 'Açık ▼' : 'Oku →'}
-                        </span>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-
-              {(showAllExpanded
-                ? classicNameCodes
-                : [classicNameCodes.find((c) => c.id === selectedNameId) || classicNameCodes[0]].filter(Boolean)
-              ).map((item) => renderDetailCard(item!))}
             </div>
           </>
         )}
