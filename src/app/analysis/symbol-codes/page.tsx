@@ -22,8 +22,8 @@ import {
 export default function SymbolCodesAnalysisPage() {
   const { user } = useAuth();
 
-  const [fullName, setFullName] = useState('Bahadır');
-  const [birthDate, setBirthDate] = useState('1995-03-17');
+  const [fullName, setFullName] = useState('');
+  const [birthDate, setBirthDate] = useState('');
   const [birthTime, setBirthTime] = useState('');
   const [result, setResult] = useState<SymbolCodeAnalysisResult | null>(null);
 
@@ -37,18 +37,14 @@ export default function SymbolCodesAnalysisPage() {
       const qBirth = params.get('birthDate');
       const qTime = params.get('birthTime');
 
-      const savedName = localStorage.getItem('7layers_last_numerology_name');
-      const savedBirth = localStorage.getItem('7layers_last_numerology_birthdate');
-      const savedTime = localStorage.getItem('7layers_last_numerology_birthtime');
-      const initialName = qName || savedName || (user as any)?.name || (user as any)?.fullName || 'Bahadır';
-      const initialBirth = qBirth || savedBirth || (user as any)?.birthDate || '1995-03-17';
-      const initialTime = qTime || savedTime || '';
-
-      setFullName(initialName);
-      setBirthDate(initialBirth);
-      setBirthTime(initialTime);
-      const computed = analyzePersonalSymbolCodes(initialName, initialBirth, initialTime || undefined);
-      setResult(computed);
+      if (qBirth) {
+        const initialName = qName || (user as any)?.name || (user as any)?.fullName || 'Misafir';
+        setFullName(initialName);
+        setBirthDate(qBirth);
+        if (qTime) setBirthTime(qTime);
+        const computed = analyzePersonalSymbolCodes(initialName, qBirth, qTime || undefined);
+        setResult(computed);
+      }
     }
   }, [user]);
 
