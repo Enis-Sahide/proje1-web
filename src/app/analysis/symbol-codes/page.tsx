@@ -3,16 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import {
   Sparkles,
-  Shield,
   Eye,
   Compass,
   KeyRound,
   Zap,
   BookOpen,
   CheckCircle2,
-  Clock,
-  ArrowRight,
-  Layers
+  Clock
 } from 'lucide-react';
 import AnalysisBackButton from '@/components/ui/AnalysisBackButton';
 import { useAuth } from '@/context/AuthContext';
@@ -30,13 +27,8 @@ export default function SymbolCodesAnalysisPage() {
   const [birthTime, setBirthTime] = useState('');
   const [result, setResult] = useState<SymbolCodeAnalysisResult | null>(null);
 
-  // Hangi harita aşamasının görüntülendiği:
-  // 'stage1_body' -> 3. Haritayı çalıştırmadığı sürece aktif olan 1. Harita (Beden Haritası) Kodları
-  // 'stage2_upper' -> 3. Haritayı çalıştırmaya başladığında değişen Üst Harita Kodları
-  const [activeMapStage, setActiveMapStage] = useState<'stage1_body' | 'stage2_upper'>('stage1_body');
-
-  const [selectedStage1Id, setSelectedStage1Id] = useState<string>('body-karmic-soul');
-  const [selectedStage2Id, setSelectedStage2Id] = useState<string>('soul-urge');
+  const [selectedBodyId, setSelectedBodyId] = useState<string>('body-karmic-soul');
+  const [selectedNameId, setSelectedNameId] = useState<string>('soul-urge');
   const [showAllExpanded, setShowAllExpanded] = useState<boolean>(false);
 
   useEffect(() => {
@@ -72,13 +64,12 @@ export default function SymbolCodesAnalysisPage() {
     const computed = analyzePersonalSymbolCodes(fullName, birthDate, birthTime || undefined);
     setResult(computed);
     if (birthTime && birthTime.includes(':')) {
-      setSelectedStage1Id('birth-time-portal');
+      setSelectedBodyId('birth-time-portal');
     }
   };
 
-  // 1. AŞAMA (1. HARİTA — BEDEN HARİTASI KODLARI):
-  // Kişi 3. Haritayı çalıştırmadığı sürece Üst Benlikten mesaj aldığı çekirdek Beden Haritası kodları
-  const stage1BodyCodes = result
+  // 1. ÜST BÖLÜM: DOĞUM TARİHİNDEN GELEN 5 ÇEKİRDEK BEDEN HARİTASI KODU (+ Varsa İlk Nefes Saati)
+  const coreBodyCodes = result
     ? [
         result.codes.find((c) => c.id === 'body-karmic-soul'),
         result.codes.find((c) => c.id === 'body-field-code'),
@@ -90,17 +81,16 @@ export default function SymbolCodesAnalysisPage() {
       ].filter((c): c is PersonalSymbolCodeItem => Boolean(c))
     : [];
 
-  // 2. AŞAMA (3. HARİTA — ÜST HARİTAYI ÇALIŞTIRMAYA BAŞLADIĞINDA DEĞİŞEN YENİ KODLAR):
-  const stage2UpperCodes = result
+  // 2. ALT BÖLÜM: KLASİK PİSAGOR & KALDE İSİM, AURA VE ÇAKRA ANALİZİ
+  const classicNameCodes = result
     ? [
         result.codes.find((c) => c.id === 'soul-urge'),
-        result.codes.find((c) => c.id === 'aura-protection'),
-        result.codes.find((c) => c.id === 'bridge-code'),
-        result.codes.find((c) => c.id === 'chaldean-compound'),
-        result.codes.find((c) => c.id === 'maturity-code'),
-        result.codes.find((c) => c.id === 'upper-planet-ruler'),
         result.codes.find((c) => c.id === 'outer-persona'),
+        result.codes.find((c) => c.id === 'aura-protection'),
         result.codes.find((c) => c.id === 'hidden-passion'),
+        result.codes.find((c) => c.id === 'chaldean-compound'),
+        result.codes.find((c) => c.id === 'bridge-code'),
+        result.codes.find((c) => c.id === 'maturity-code'),
         result.codes.find((c) => c.id === 'subconscious-self')
       ].filter((c): c is PersonalSymbolCodeItem => Boolean(c))
     : [];
@@ -232,15 +222,15 @@ export default function SymbolCodesAnalysisPage() {
         <div className="text-center max-w-3xl mx-auto">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-bold uppercase tracking-widest mb-4">
             <KeyRound size={14} />
-            1. Harita (Beden Kodları) ➡️ 3. Harita (Üst Harita Kod Dönüşümü)
+            Beden Haritası Çekirdek Kodları • Pisagor & Kalde İsim Analizi
           </div>
           <h1 className="text-3xl sm:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#D4AF37] via-amber-100 to-[#D4AF37] mb-3 tracking-tight">
             Üst Benlik Sembol & Kişisel Kod Analizi
           </h1>
           <p className="text-sm sm:text-base text-gray-300 leading-relaxed">
-            <strong>3. Haritanızı (Üst Bilinç Haritanızı)</strong> kalıcı olarak çalıştırmadığınız sürece Üst Benliğinizden mesaj aldığınız{' '}
-            <span className="text-sky-400 font-semibold">1. Harita (Beden Haritası) Kodlarınızı</span> ve 3. Haritayı çalıştırmaya başladığınızda bunların yerini alan{' '}
-            <span className="text-[#D4AF37] font-semibold">Yeni Üst Harita Kodlarınızı</span> iki ayrı aşamada inceleyin.
+            Üst bölümde doğum tarihinizden gelen{' '}
+            <span className="text-sky-400 font-semibold">5 Çekirdek Beden Haritası Kodunuzu ve 3 Eşzamanlılık Mesajınızı</span>, alt bölümde ise klasik Pisagor ve Kalde kaynaklarına göre{' '}
+            <span className="text-[#D4AF37] font-semibold">İsim, Aura ve Çakra Analizinizi</span> inceleyin.
           </p>
         </div>
 
@@ -252,7 +242,7 @@ export default function SymbolCodesAnalysisPage() {
           <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-end">
             <div className="md:col-span-4">
               <label className="block text-xs font-bold uppercase tracking-wider text-[#D4AF37] mb-2">
-                Nüfus Cüzdanındaki Tam Adınız (İsim Katmanı)
+                Nüfus Cüzdanındaki Tam Adınız (İsim Analizi)
               </label>
               <input
                 type="text"
@@ -265,7 +255,7 @@ export default function SymbolCodesAnalysisPage() {
             </div>
             <div className="md:col-span-3">
               <label className="block text-xs font-bold uppercase tracking-wider text-sky-400 mb-2">
-                Doğum Tarihiniz (Beden Katmanı)
+                Doğum Tarihiniz (Beden Haritası Kodları)
               </label>
               <input
                 type="date"
@@ -300,426 +290,230 @@ export default function SymbolCodesAnalysisPage() {
 
         {result && (
           <>
-            {/* =====================================================================
-                HARİTA AŞAMASI SEÇİCİ (1. HARİTA BEDEN KODLARI vs 3. HARİTA ÜST BİLİNÇ KODLARI)
-               ===================================================================== */}
-            <div className="bg-[#0B0D14]/95 border-2 border-[#D4AF37]/40 rounded-3xl p-5 sm:p-7 space-y-5 shadow-[0_0_40px_rgba(212,175,55,0.12)]">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#D4AF37]">
-                    <Layers size={15} />
-                    Hangi Haritayı Çalıştırıyorsunuz? • Aktif Kod & Mesaj Seçici
-                  </div>
-                  <h2 className="text-lg sm:text-xl font-extrabold text-white">
-                    Çalıştırdığınız Haritaya Göre Üst Benlikten Aldığınız Kodlar Değişir
-                  </h2>
-                </div>
+            {/* Üst Görünüm Anahtarı */}
+            <div className="flex flex-wrap items-center justify-between gap-3 bg-white/[0.03] border border-white/10 rounded-2xl px-5 py-3.5">
+              <p className="text-xs sm:text-sm text-gray-300">
+                💡 Her bölümde istediğiniz kutuya tıklayarak o kodun derin açıklamasını hemen altında okuyabilirsiniz.
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowAllExpanded((prev) => !prev)}
+                className={`px-4 py-2 rounded-xl text-xs font-bold transition cursor-pointer border flex items-center gap-1.5 ${
+                  showAllExpanded
+                    ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50'
+                    : 'bg-[#D4AF37]/15 text-[#D4AF37] border-[#D4AF37]/40 hover:bg-[#D4AF37]/25'
+                }`}
+              >
+                <BookOpen size={14} />
+                {showAllExpanded ? 'Seçili Kart Görünümüne Dön' : 'Tüm Kodların Açıklamalarını Aynı Anda Aç'}
+              </button>
+            </div>
 
-                <button
-                  type="button"
-                  onClick={() => setShowAllExpanded((prev) => !prev)}
-                  className={`px-4 py-2.5 rounded-xl text-xs font-bold transition cursor-pointer border flex items-center gap-1.5 self-start lg:self-center shrink-0 ${
-                    showAllExpanded
-                      ? 'bg-emerald-500/20 text-emerald-300 border-emerald-500/50'
-                      : 'bg-white/5 text-gray-200 border-white/15 hover:border-[#D4AF37]/50'
-                  }`}
-                >
-                  <BookOpen size={14} />
-                  {showAllExpanded ? 'Tek Kart Görünümüne Dön' : 'Bu Aşamadaki Tüm Kodları Aç'}
-                </button>
+            {/* =====================================================================
+                1. BÖLÜM: DOĞUM TARİHİNDEN GELEN 5 ÇEKİRDEK BEDEN HARİTASI KODU
+               ===================================================================== */}
+            <div className="bg-[#0B0D14]/95 border border-sky-500/35 rounded-3xl p-6 sm:p-8 space-y-5 shadow-[0_0_30px_rgba(56,189,248,0.08)]">
+              <div className="border-b border-white/10 pb-4 space-y-2">
+                <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-sky-400 bg-sky-500/10 border border-sky-500/30 px-3 py-1 rounded-full">
+                  <Compass size={14} />
+                  1. Bölüm • Beden Haritası Çekirdek Kodlarınız ({result.birthDate}
+                  {result.birthTime ? ` • ${result.birthTime}` : ''})
+                </div>
+                <h2 className="text-xl sm:text-2xl font-extrabold text-white">
+                  Beden Haritası 5 Çekirdek Giriş Kodunuz
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+                  Doğum tarihinizden hesaplanan ve günlük hayatta Üst Benliğinizden mesaj aldığınız çekirdek Beden Haritası şifreleriniz (Ruh Kodu: <strong className="text-white">{result.summaryMetrics.embeddedRuhKodu}</strong>, Alan Koruma Kodu: <strong className="text-yellow-400">{result.summaryMetrics.birthMatrixFieldCode}</strong>, Karmik Kod: <strong className="text-rose-400">{result.summaryMetrics.primaryKarmicCode}</strong>, Doğum & Yaşam Yolu: <strong className="text-sky-400">{result.summaryMetrics.lifePathCode}</strong>, Beden Yöneticisi: <strong className="text-purple-300">{result.summaryMetrics.lifePathPlanetName}</strong>):
+                </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  onClick={() => setActiveMapStage('stage1_body')}
-                  className={`text-left p-5 rounded-2xl border-2 transition-all cursor-pointer space-y-2 ${
-                    activeMapStage === 'stage1_body'
-                      ? 'bg-sky-500/15 border-sky-400 shadow-[0_0_25px_rgba(56,189,248,0.25)]'
-                      : 'bg-black/50 border-white/10 hover:border-sky-400/40 opacity-80'
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-sky-500/20 text-sky-300 border border-sky-400/40">
-                      1. Aşama • Varsayılan Aktif Harita
-                    </span>
-                    {activeMapStage === 'stage1_body' && (
-                      <span className="text-xs font-extrabold text-sky-400">ŞU AN AÇIK ●</span>
-                    )}
-                  </div>
-                  <h3 className="text-base sm:text-lg font-extrabold text-white">
-                    1. Harita — Beden Haritası Kodlarınız
-                  </h3>
-                  <p className="text-xs text-gray-300 leading-relaxed">
-                    <strong>3. Haritanızı çalıştırmadığınız sürece</strong> günlük hayatta saatlerde ve sembollerde mesaj olarak alacağınız <strong>5 Çekirdek Beden Kodu</strong> (Ruh Kodu: <strong>{result.summaryMetrics.embeddedRuhKodu}</strong>, Alan Kodu: <strong>{result.summaryMetrics.birthMatrixFieldCode}</strong>, Karmik Kod: <strong>{result.summaryMetrics.primaryKarmicCode}</strong>, Doğum Kodu: <strong>{result.summaryMetrics.lifePathCode}</strong>, Gezegen: <strong>{result.summaryMetrics.lifePathPlanetName}</strong>).
-                  </p>
-                </button>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
+                {coreBodyCodes.map((item) => {
+                  const isSelected = selectedBodyId === item.id && !showAllExpanded;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedBodyId(item.id);
+                        setShowAllExpanded(false);
+                      }}
+                      className={`text-left p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+                        isSelected
+                          ? 'bg-sky-500/15 border-sky-400 shadow-[0_0_20px_rgba(56,189,248,0.25)] scale-[1.01]'
+                          : 'bg-black/50 border-white/10 hover:border-sky-400/50'
+                      }`}
+                    >
+                      <div>
+                        <div className="text-[11px] font-bold text-sky-300 uppercase tracking-wider">
+                          {item.shortTitle}
+                        </div>
+                        <div className="text-xs text-gray-300 font-semibold mt-0.5">{item.title}</div>
+                      </div>
+                      <div className="text-3xl font-black my-3" style={{ color: item.color }}>
+                        {item.codeValue}
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] text-gray-400 border-t border-white/10 pt-2">
+                        <span className="truncate">{item.subLabel}</span>
+                        <span className="text-sky-400 font-bold shrink-0 ml-1">
+                          {isSelected ? 'Açık ▼' : 'Oku →'}
+                        </span>
+                      </div>
+                    </button>
+                  );
+                })}
 
-                <button
-                  type="button"
-                  onClick={() => setActiveMapStage('stage2_upper')}
-                  className={`text-left p-5 rounded-2xl border-2 transition-all cursor-pointer space-y-2 ${
-                    activeMapStage === 'stage2_upper'
-                      ? 'bg-[#D4AF37]/15 border-[#D4AF37] shadow-[0_0_25px_rgba(212,175,55,0.25)]'
-                      : 'bg-black/50 border-white/10 hover:border-[#D4AF37]/40 opacity-80'
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="px-3 py-1 rounded-full text-[11px] font-extrabold uppercase tracking-wider bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/40">
-                      2. Aşama • Üst Harita Aktivasyonu
+                {!result.birthTime && (
+                  <div className="p-4 rounded-2xl border border-dashed border-teal-500/35 bg-teal-500/5 flex flex-col justify-between">
+                    <div>
+                      <div className="text-[11px] font-bold text-teal-400 uppercase tracking-wider flex items-center gap-1">
+                        <Clock size={12} />
+                        İLK NEFES (DOĞUM SAATİ) KODU
+                      </div>
+                      <p className="text-xs text-gray-300 mt-1.5 leading-relaxed">
+                        Doğum saatinizi biliyorsanız yukarıdaki kutuya girerek <strong>İlk Nefes Kapı Kodunuzu</strong> ve <strong>Keldani Nöbetçi Gezegeninizi</strong> de Beden Haritanıza ekleyebilirsiniz.
+                      </p>
+                    </div>
+                    <span className="text-[10px] text-teal-300/80 font-semibold mt-2">
+                      Opsiyonel Beden Saati Kodu
                     </span>
-                    {activeMapStage === 'stage2_upper' && (
-                      <span className="text-xs font-extrabold text-[#D4AF37]">ŞU AN AÇIK ●</span>
-                    )}
                   </div>
-                  <h3 className="text-base sm:text-lg font-extrabold text-white">
-                    3. Harita — Üst Haritayı Çalıştırınca Değişen Yeni Kodlarınız
-                  </h3>
-                  <p className="text-xs text-gray-300 leading-relaxed">
-                    Beden Haritasındaki Alan Koruma (<strong>{result.summaryMetrics.birthMatrixFieldCode}</strong>) ve Karmik Kilit (<strong>{result.summaryMetrics.primaryKarmicCode}</strong>) sınavlarını aşıp <strong>3. Haritanızı çalıştırmaya başladığınızda</strong> eski kodlarınızın yerini alan yeni Üst Bilinç kodlarınız ve dönüşüm tablosu.
-                  </p>
-                </button>
+                )}
+              </div>
+
+              {(showAllExpanded
+                ? coreBodyCodes
+                : [coreBodyCodes.find((c) => c.id === selectedBodyId) || coreBodyCodes[0]].filter(Boolean)
+              ).map((item) => renderDetailCard(item!))}
+            </div>
+
+            {/* =====================================================================
+                2. BÖLÜM: GÜNLÜK HAYATTA KARŞINIZA ÇIKAN 3 ÇEKİRDEK EŞZAMANLILIK MESAJI
+               ===================================================================== */}
+            <div className="bg-[#0B0D14]/95 border border-sky-500/30 rounded-3xl p-6 sm:p-8 space-y-6">
+              <div>
+                <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-sky-400 mb-1">
+                  <Zap size={14} />
+                  2. Bölüm • Beden Haritası Canlı Uyanış & Saat Mesajları
+                </div>
+                <h2 className="text-xl sm:text-2xl font-extrabold text-white">
+                  Günlük Hayatta Takip Edeceğiniz 3 Çekirdek Saat & Eşzamanlılık Kodu
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-400 mt-1">
+                  Üst Benliğiniz sizinle rastgele her sayı üzerinden değil, doğrudan yukarıdaki Beden Haritası çekirdek kodlarınız üzerinden konuşur:
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {result.synchronicitySignals.map((sig, index) => (
+                  <div
+                    key={index}
+                    className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-sky-400/40 transition space-y-3 flex flex-col justify-between"
+                  >
+                    <div className="space-y-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <span
+                            className="inline-block text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-md mb-1.5"
+                            style={{
+                              color: sig.color,
+                              backgroundColor: `${sig.color}18`,
+                              border: `1px solid ${sig.color}44`
+                            }}
+                          >
+                            {sig.sourceCodeName}
+                          </span>
+                          <h3 className="text-base font-bold text-white">{sig.title}</h3>
+                        </div>
+                        <span
+                          className="px-2.5 py-1 rounded-xl font-mono text-xs font-black shrink-0 border"
+                          style={{
+                            color: sig.color,
+                            borderColor: `${sig.color}55`,
+                            backgroundColor: `${sig.color}15`
+                          }}
+                        >
+                          {sig.code}
+                        </span>
+                      </div>
+
+                      <div className="text-xs text-gray-400">
+                        <strong className="text-gray-200">Eşleşen Sembol / Totem:</strong> {sig.symbolArchetype}
+                      </div>
+
+                      <p className="text-xs sm:text-sm text-gray-200 leading-relaxed bg-black/40 p-3.5 rounded-xl border border-white/5">
+                        {sig.whenYouSeeIt}
+                      </p>
+                    </div>
+
+                    <div className="text-xs sm:text-sm text-emerald-300 bg-emerald-500/10 border border-emerald-500/25 p-3 rounded-xl">
+                      <strong className="text-emerald-400">Ne Yapmalısınız? </strong>
+                      {sig.actionStep}
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 
-            {activeMapStage === 'stage1_body' ? (
-              <>
-                {/* =====================================================================
-                    AŞAMA 1: 1. HARİTA (BEDEN HARİTASI) KODLARI
-                   ===================================================================== */}
-                <div className="bg-[#0B0D14]/95 border border-sky-500/35 rounded-3xl p-6 sm:p-8 space-y-5 shadow-[0_0_30px_rgba(56,189,248,0.08)]">
-                  <div className="border-b border-white/10 pb-4 space-y-2">
-                    <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-sky-400 bg-sky-500/10 border border-sky-500/30 px-3 py-1 rounded-full">
-                      <Compass size={14} />
-                      1. Harita (Beden Haritası) • 3. Haritayı Çalıştırmadığınız Sürece Aktif Olan Kodlarınız
-                    </div>
-                    <h2 className="text-xl sm:text-2xl font-extrabold text-white">
-                      1. Harita — Beden Haritası Çekirdek Kodlarınız ({result.birthDate}
-                      {result.birthTime ? ` • ${result.birthTime}` : ''})
-                    </h2>
-                    <div className="p-3.5 rounded-xl bg-sky-500/10 border border-sky-500/30 text-xs sm:text-sm text-sky-200 leading-relaxed">
-                      <strong>Önemli Rehberlik Kuralı:</strong> 3. Haritanızı (Üst Bilinç Haritanızı) kalıcı olarak çalıştırmaya başlamadığınız sürece, uzman analizlerinde verilen ve günlük hayatta Üst Benliğinizden mesaj olarak alacağınız kodlar <strong>yalnızca bu 1. Harita (Beden Haritası) kodlarıdır</strong>.
-                    </div>
-                  </div>
+            {/* =====================================================================
+                3. BÖLÜM: KLASİK PİSAGOR & KALDE İSİM, AURA VE ÇAKRA ANALİZİ
+               ===================================================================== */}
+            <div className="bg-[#0B0D14]/95 border border-[#D4AF37]/35 rounded-3xl p-6 sm:p-8 space-y-5 shadow-[0_0_30px_rgba(212,175,55,0.08)]">
+              <div className="border-b border-white/10 pb-4">
+                <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#D4AF37] bg-[#D4AF37]/10 border border-[#D4AF37]/30 px-3 py-1 rounded-full mb-2">
+                  <Sparkles size={14} />
+                  3. Bölüm • Klasik Pisagor & Kalde İsim ve Çakra Analizi ({result.fullName})
+                </div>
+                <h2 className="text-xl sm:text-2xl font-extrabold text-white">
+                  İsminizden Gelen Karakter, Aura (Yükselen Vitrin) & Çakra Matrisi Analizi
+                </h2>
+                <p className="text-xs sm:text-sm text-gray-400 mt-1">
+                  Adınızın ve soyadınızın sesli/sessiz harflerinden Pisagor ve Kalde (Cheiro) tablolarına göre hesaplanan içsel arzunuz, dışsal ilk izleniminiz, çakra matrisiniz ve yaşam senteziniz:
+                </p>
+              </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-                    {stage1BodyCodes.map((item) => {
-                      const isSelected = selectedStage1Id === item.id && !showAllExpanded;
-                      return (
-                        <button
-                          key={item.id}
-                          type="button"
-                          onClick={() => {
-                            setSelectedStage1Id(item.id);
-                            setShowAllExpanded(false);
-                          }}
-                          className={`text-left p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
-                            isSelected
-                              ? 'bg-sky-500/15 border-sky-400 shadow-[0_0_20px_rgba(56,189,248,0.25)] scale-[1.01]'
-                              : 'bg-black/50 border-white/10 hover:border-sky-400/50'
-                          }`}
-                        >
-                          <div>
-                            <div className="text-[11px] font-bold text-sky-300 uppercase tracking-wider">
-                              {item.shortTitle}
-                            </div>
-                            <div className="text-xs text-gray-300 font-semibold mt-0.5">{item.title}</div>
-                          </div>
-                          <div className="text-3xl font-black my-3" style={{ color: item.color }}>
-                            {item.codeValue}
-                          </div>
-                          <div className="flex items-center justify-between text-[11px] text-gray-400 border-t border-white/10 pt-2">
-                            <span className="truncate">{item.subLabel}</span>
-                            <span className="text-sky-400 font-bold shrink-0 ml-1">
-                              {isSelected ? 'Açık ▼' : 'Oku →'}
-                            </span>
-                          </div>
-                        </button>
-                      );
-                    })}
-
-                    {!result.birthTime && (
-                      <div className="p-4 rounded-2xl border border-dashed border-teal-500/35 bg-teal-500/5 flex flex-col justify-between">
-                        <div>
-                          <div className="text-[11px] font-bold text-teal-400 uppercase tracking-wider flex items-center gap-1">
-                            <Clock size={12} />
-                            İLK NEFES (DOĞUM SAATİ) KODU
-                          </div>
-                          <p className="text-xs text-gray-300 mt-1.5 leading-relaxed">
-                            Doğum saatinizi biliyorsanız yukarıdaki kutuya girerek <strong>İlk Nefes Kapı Kodunuzu</strong> ve <strong>Keldani Nöbetçi Gezegeninizi</strong> de Beden Haritanıza ekleyebilirsiniz.
-                          </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                {classicNameCodes.map((item) => {
+                  const isSelected = selectedNameId === item.id && !showAllExpanded;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedNameId(item.id);
+                        setShowAllExpanded(false);
+                      }}
+                      className={`text-left p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
+                        isSelected
+                          ? 'bg-[#D4AF37]/15 border-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.25)] scale-[1.01]'
+                          : 'bg-black/50 border-white/10 hover:border-[#D4AF37]/50'
+                      }`}
+                    >
+                      <div>
+                        <div className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider">
+                          {item.shortTitle}
                         </div>
-                        <span className="text-[10px] text-teal-300/80 font-semibold mt-2">
-                          Opsiyonel Beden Saati Kodu
+                        <div className="text-xs text-gray-300 font-semibold mt-0.5">{item.title}</div>
+                      </div>
+                      <div className="text-2xl sm:text-3xl font-black my-3" style={{ color: item.color }}>
+                        {item.codeValue}
+                      </div>
+                      <div className="flex items-center justify-between text-[11px] text-gray-400 border-t border-white/10 pt-2">
+                        <span className="truncate">{item.subLabel}</span>
+                        <span className="text-[#D4AF37] font-bold shrink-0 ml-1">
+                          {isSelected ? 'Açık ▼' : 'Oku →'}
                         </span>
                       </div>
-                    )}
-                  </div>
+                    </button>
+                  );
+                })}
+              </div>
 
-                  {(showAllExpanded
-                    ? stage1BodyCodes
-                    : [stage1BodyCodes.find((c) => c.id === selectedStage1Id) || stage1BodyCodes[0]].filter(Boolean)
-                  ).map((item) => renderDetailCard(item!))}
-                </div>
-
-                {/* =====================================================================
-                    AŞAMA 1 EŞZAMANLILIK SİNYALLERİ (1. HARİTA AKTİFKEN GELEN MESAJLAR)
-                   ===================================================================== */}
-                <div className="bg-[#0B0D14]/95 border border-sky-500/30 rounded-3xl p-6 sm:p-8 space-y-6">
-                  <div>
-                    <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-sky-400 mb-1">
-                      <Zap size={14} />
-                      1. Harita (Beden Haritası) • Canlı Uyanış & Saat Mesajları
-                    </div>
-                    <h2 className="text-xl sm:text-2xl font-extrabold text-white">
-                      3. Haritayı Çalıştırmadığınız Sürece Takip Edeceğiniz 3 Çekirdek Saat & Mesaj Kodu
-                    </h2>
-                    <p className="text-xs sm:text-sm text-gray-400 mt-1">
-                      Beden Haritası aşamasındayken diğer yan sayıları değil, <strong>yalnızca bu 3 Çekirdek Beden Matrisi kodunuzu</strong> saatlerde veya plakalarda gördüğünüzde Üst Benliğinizden mesaj olarak almalısınız:
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {result.synchronicitySignals.map((sig, index) => (
-                      <div
-                        key={index}
-                        className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-sky-400/40 transition space-y-3 flex flex-col justify-between"
-                      >
-                        <div className="space-y-3">
-                          <div className="flex items-start justify-between gap-2">
-                            <div>
-                              <span
-                                className="inline-block text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-md mb-1.5"
-                                style={{
-                                  color: sig.color,
-                                  backgroundColor: `${sig.color}18`,
-                                  border: `1px solid ${sig.color}44`
-                                }}
-                              >
-                                {sig.sourceCodeName}
-                              </span>
-                              <h3 className="text-base font-bold text-white">{sig.title}</h3>
-                            </div>
-                            <span
-                              className="px-2.5 py-1 rounded-xl font-mono text-xs font-black shrink-0 border"
-                              style={{
-                                color: sig.color,
-                                borderColor: `${sig.color}55`,
-                                backgroundColor: `${sig.color}15`
-                              }}
-                            >
-                              {sig.code}
-                            </span>
-                          </div>
-
-                          <div className="text-xs text-gray-400">
-                            <strong className="text-gray-200">Eşleşen Sembol / Totem:</strong> {sig.symbolArchetype}
-                          </div>
-
-                          <p className="text-xs sm:text-sm text-gray-200 leading-relaxed bg-black/40 p-3.5 rounded-xl border border-white/5">
-                            {sig.whenYouSeeIt}
-                          </p>
-                        </div>
-
-                        <div className="text-xs sm:text-sm text-emerald-300 bg-emerald-500/10 border border-emerald-500/25 p-3 rounded-xl">
-                          <strong className="text-emerald-400">Ne Yapmalısınız? </strong>
-                          {sig.actionStep}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </>
-            ) : (
-              <>
-                {/* =====================================================================
-                    AŞAMA 2: 1. HARİTADAN 3. HARİTAYA KOD DÖNÜŞÜM TABLOSU
-                   ===================================================================== */}
-                <div className="bg-[#0B0D14]/95 border border-[#D4AF37]/40 rounded-3xl p-6 sm:p-8 space-y-5 shadow-[0_0_30px_rgba(212,175,55,0.1)]">
-                  <div className="border-b border-white/10 pb-4 space-y-2">
-                    <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#D4AF37] bg-[#D4AF37]/10 border border-[#D4AF37]/30 px-3 py-1 rounded-full">
-                      <ArrowRight size={14} />
-                      1. Harita ➡️ 3. Harita Kod Dönüşüm Anahtarı
-                    </div>
-                    <h2 className="text-xl sm:text-2xl font-extrabold text-white">
-                      3. Haritayı Çalıştırmaya Başladığınızda Kodlarınız Nasıl Değişir?
-                    </h2>
-                    <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-                      1. Haritadaki (Beden Haritasındaki) sınavlarınızı tamamladığınızda eski Beden kodlarınız görevini tamamlar ve yerini aşağıdaki <strong>3. Harita (Üst Harita) Kodlarına</strong> bırakır:
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    {result.mapTransitionTable.map((row, idx) => (
-                      <div
-                        key={idx}
-                        className="p-4 rounded-2xl bg-black/50 border border-white/10 grid grid-cols-1 lg:grid-cols-12 gap-4 items-center"
-                      >
-                        <div className="lg:col-span-2">
-                          <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#D4AF37] block">
-                            {row.category}
-                          </span>
-                        </div>
-                        <div className="lg:col-span-3 p-3 rounded-xl bg-sky-500/10 border border-sky-500/25">
-                          <span className="text-[10px] uppercase font-bold text-sky-300 block">
-                            1. Harita (Eski Beden Kodu)
-                          </span>
-                          <span className="text-xs sm:text-sm font-extrabold text-white block">
-                            {row.bodyMapCode}
-                          </span>
-                          <span className="text-[11px] text-gray-300 block mt-0.5">
-                            {row.bodyMapMeaning}
-                          </span>
-                        </div>
-                        <div className="lg:col-span-3 p-3 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/40">
-                          <span className="text-[10px] uppercase font-bold text-[#D4AF37] block">
-                            3. Harita (Yeni Üst Harita Kodu)
-                          </span>
-                          <span className="text-xs sm:text-sm font-extrabold text-white block">
-                            {row.upperMapCode}
-                          </span>
-                          <span className="text-[11px] text-amber-100/90 block mt-0.5">
-                            {row.upperMapMeaning}
-                          </span>
-                        </div>
-                        <div className="lg:col-span-4 text-xs text-gray-300 leading-relaxed">
-                          <strong className="text-emerald-400">Geçiş Şartı: </strong>
-                          {row.unlockCondition}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* =====================================================================
-                    AŞAMA 2: 3. HARİTA (ÜST HARİTA) KOD KARTLARI
-                   ===================================================================== */}
-                <div className="bg-[#0B0D14]/95 border border-[#D4AF37]/35 rounded-3xl p-6 sm:p-8 space-y-5 shadow-[0_0_30px_rgba(212,175,55,0.08)]">
-                  <div className="border-b border-white/10 pb-4">
-                    <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#D4AF37] bg-[#D4AF37]/10 border border-[#D4AF37]/30 px-3 py-1 rounded-full mb-2">
-                      <Sparkles size={14} />
-                      3. Harita (Üst Harita) • Yeni Aktifleşen Kodlarınız ({result.fullName})
-                    </div>
-                    <h2 className="text-xl sm:text-2xl font-extrabold text-white">
-                      3. Haritayı Çalıştırdığınızda Devreye Giren Üst Bilinç & Ruh Kodlarınız
-                    </h2>
-                    <p className="text-xs sm:text-sm text-gray-400 mt-1">
-                      Beden Haritası sınavlarını aşıp 3. Haritanızı çalıştırmaya başladığınızda, artık savunma ve karmik borç kodları yerine aşağıdaki yaratım, köprü ve üst misyon kodlarınız çalışır:
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-                    {stage2UpperCodes.map((item) => {
-                      const isSelected = selectedStage2Id === item.id && !showAllExpanded;
-                      return (
-                        <button
-                          key={item.id}
-                          type="button"
-                          onClick={() => {
-                            setSelectedStage2Id(item.id);
-                            setShowAllExpanded(false);
-                          }}
-                          className={`text-left p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
-                            isSelected
-                              ? 'bg-[#D4AF37]/15 border-[#D4AF37] shadow-[0_0_20px_rgba(212,175,55,0.25)] scale-[1.01]'
-                              : 'bg-black/50 border-white/10 hover:border-[#D4AF37]/50'
-                          }`}
-                        >
-                          <div>
-                            <div className="text-[11px] font-bold text-[#D4AF37] uppercase tracking-wider">
-                              {item.shortTitle}
-                            </div>
-                            <div className="text-xs text-gray-300 font-semibold mt-0.5">{item.title}</div>
-                          </div>
-                          <div className="text-2xl sm:text-3xl font-black my-3" style={{ color: item.color }}>
-                            {item.codeValue}
-                          </div>
-                          <div className="flex items-center justify-between text-[11px] text-gray-400 border-t border-white/10 pt-2">
-                            <span className="truncate">{item.subLabel}</span>
-                            <span className="text-[#D4AF37] font-bold shrink-0 ml-1">
-                              {isSelected ? 'Açık ▼' : 'Oku →'}
-                            </span>
-                          </div>
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {(showAllExpanded
-                    ? stage2UpperCodes
-                    : [stage2UpperCodes.find((c) => c.id === selectedStage2Id) || stage2UpperCodes[0]].filter(Boolean)
-                  ).map((item) => renderDetailCard(item!))}
-                </div>
-
-                {/* =====================================================================
-                    AŞAMA 2 EŞZAMANLILIK SİNYALLERİ (3. HARİTA AKTİFKEN GELEN YENİ MESAJLAR)
-                   ===================================================================== */}
-                <div className="bg-[#0B0D14]/95 border border-[#D4AF37]/30 rounded-3xl p-6 sm:p-8 space-y-6">
-                  <div>
-                    <div className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-[#D4AF37] mb-1">
-                      <Zap size={14} />
-                      3. Harita (Üst Harita) • Yeni Saat & Sembol Rehberliği
-                    </div>
-                    <h2 className="text-xl sm:text-2xl font-extrabold text-white">
-                      3. Haritayı Çalıştırmaya Başladığınızda Üst Benliğinizin Kullandığı Yeni Kodlar
-                    </h2>
-                    <p className="text-xs sm:text-sm text-gray-400 mt-1">
-                      3. Haritanızı çalıştırmaya başladığınızda, Üst Benliğiniz artık eski Beden Haritası kodlarıyla değil aşağıdaki <strong>Üst Harita (Öz Ruh, Köprü ve Hasat)</strong> kodlarıyla size mesaj verir:
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {result.upperMapSynchronicitySignals.map((sig, index) => (
-                      <div
-                        key={index}
-                        className="p-5 rounded-2xl bg-white/[0.03] border border-white/10 hover:border-[#D4AF37]/40 transition space-y-3 flex flex-col justify-between"
-                      >
-                        <div className="space-y-3">
-                          <div className="flex items-start justify-between gap-2">
-                            <div>
-                              <span
-                                className="inline-block text-[10px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-md mb-1.5"
-                                style={{
-                                  color: sig.color,
-                                  backgroundColor: `${sig.color}18`,
-                                  border: `1px solid ${sig.color}44`
-                                }}
-                              >
-                                {sig.sourceCodeName}
-                              </span>
-                              <h3 className="text-base font-bold text-white">{sig.title}</h3>
-                            </div>
-                            <span
-                              className="px-2.5 py-1 rounded-xl font-mono text-xs font-black shrink-0 border"
-                              style={{
-                                color: sig.color,
-                                borderColor: `${sig.color}55`,
-                                backgroundColor: `${sig.color}15`
-                              }}
-                            >
-                              {sig.code}
-                            </span>
-                          </div>
-
-                          <div className="text-xs text-gray-400">
-                            <strong className="text-gray-200">Eşleşen Sembol / Totem:</strong> {sig.symbolArchetype}
-                          </div>
-
-                          <p className="text-xs sm:text-sm text-gray-200 leading-relaxed bg-black/40 p-3.5 rounded-xl border border-white/5">
-                            {sig.whenYouSeeIt}
-                          </p>
-                        </div>
-
-                        <div className="text-xs sm:text-sm text-emerald-300 bg-emerald-500/10 border border-emerald-500/25 p-3 rounded-xl">
-                          <strong className="text-emerald-400">Ne Yapmalısınız? </strong>
-                          {sig.actionStep}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
+              {(showAllExpanded
+                ? classicNameCodes
+                : [classicNameCodes.find((c) => c.id === selectedNameId) || classicNameCodes[0]].filter(Boolean)
+              ).map((item) => renderDetailCard(item!))}
+            </div>
           </>
         )}
       </div>
