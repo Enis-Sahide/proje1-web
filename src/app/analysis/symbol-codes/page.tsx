@@ -180,7 +180,7 @@ export default function SymbolCodesAnalysisPage() {
         ))}
       </div>
 
-      {/* Üst Benlik Sembol & Saat Tetikleyicileri */}
+      {/* Kadim Sembol & Kutsal Geometri (Sadece Çekirdek Matrix Kodlarında Saat Sinyali Gösterilir) */}
       <div
         className="p-4 rounded-xl border bg-gradient-to-r from-[#D4AF37]/10 via-black/60 to-transparent space-y-2.5"
         style={{ borderColor: `${codeItem.color}55` }}
@@ -188,40 +188,39 @@ export default function SymbolCodesAnalysisPage() {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#D4AF37]">
             <Eye size={15} />
-            Günlük Hayatta Eşleşen Saat & Sembolleriniz
+            {codeItem.isCoreSynchronicityCode
+              ? 'Kadim Sembol & Üst Benlik Eşzamanlılık Frekansı'
+              : 'Kadim Kaynak Sembol & Kutsal Geometri Karşılığı'}
           </div>
-          <div className="flex flex-wrap items-center gap-1.5">
-            {codeItem.higherSelfTrigger.clockCodes.map((clk) => (
-              <span
-                key={clk}
-                className="px-2.5 py-0.5 rounded-lg bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] text-xs font-mono font-bold"
-              >
-                {clk}
-              </span>
-            ))}
-          </div>
+          {codeItem.isCoreSynchronicityCode && (
+            <div className="flex flex-wrap items-center gap-1.5">
+              {codeItem.higherSelfTrigger.clockCodes.map((clk) => (
+                <span
+                  key={clk}
+                  className="px-2.5 py-0.5 rounded-lg bg-[#D4AF37]/20 border border-[#D4AF37]/40 text-[#D4AF37] text-xs font-mono font-bold"
+                >
+                  {clk}
+                </span>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
           <div className="p-2.5 rounded-lg bg-black/40 border border-white/5">
             <span className="text-gray-400 block text-[10px] uppercase font-bold">
-              Hayvan / Totem & Arketip Sembolü:
+              Kadim Sembol & Arketip:
             </span>
             <span className="text-white font-semibold">{codeItem.higherSelfTrigger.totemSymbol}</span>
           </div>
           <div className="p-2.5 rounded-lg bg-black/40 border border-white/5">
             <span className="text-gray-400 block text-[10px] uppercase font-bold">
-              Kutsal Geometri Mührü:
+              Kutsal Geometri & Kamea Mührü:
             </span>
             <span className="text-white font-semibold">
               {codeItem.higherSelfTrigger.geometricSymbol}
             </span>
           </div>
-        </div>
-
-        <div className="p-3 rounded-lg bg-[#D4AF37]/10 border border-[#D4AF37]/30 text-xs text-amber-100 leading-relaxed">
-          <strong className="text-[#D4AF37]">Bu Kodu Gördüğünüzde Üst Benliğiniz Ne Diyor? </strong>
-          {codeItem.higherSelfTrigger.instantMessage}
         </div>
       </div>
     </div>
