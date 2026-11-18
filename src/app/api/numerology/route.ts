@@ -46,7 +46,7 @@ export async function POST(request: Request) {
     let simulation = null;
     let recommendedByGoal = null;
     if (name) {
-      nameAnalysis = calculateNameAnalysis(name);
+      nameAnalysis = calculateNameAnalysis(name, lifePath.number);
       simulation = PhoneticChakraEngine.simulatePersonalName(name, additionalName || '');
       recommendedByGoal = buildRecommendedByGoal(simulation.originalMissing);
     }

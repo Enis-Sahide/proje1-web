@@ -132,7 +132,7 @@ export default function NumerologyPage() {
     } else {
       // Name tab
       const lp = calculateLifePath(birthDate);
-      const nameRes = calculateNameAnalysis(name);
+      const nameRes = calculateNameAnalysis(name, lp.number);
       
       const lifePathRaw = lp.lifePathRaw || `${lp.rawSum}/${lp.number}`;
       if (typeof window !== 'undefined') {
@@ -330,7 +330,7 @@ export default function NumerologyPage() {
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#B8860B] text-black font-extrabold text-xs shrink-0 shadow-lg shadow-[#D4AF37]/20 hover:opacity-95 transition"
           >
             <Sparkles size={14} />
-            12 Kişisel Kod & Sembol Analizine Git
+            Üst Benlik Sembol & Kişisel Kod Analizine Git
             <ArrowRight size={14} />
           </Link>
         </div>

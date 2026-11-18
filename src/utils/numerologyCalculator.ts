@@ -118,7 +118,7 @@ const reduceNumber = (num: number): number => {
   return sum;
 };
 
-export const calculateNameAnalysis = (name: string) => {
+export const calculateNameAnalysis = (name: string, lifePathNum?: number) => {
   const upperName = name.toLocaleUpperCase('tr-TR').replace(/[^A-ZÇĞİÖŞÜ]/g, '');
   let destinySum = 0;
   let soulUrgeSum = 0;
@@ -143,7 +143,11 @@ export const calculateNameAnalysis = (name: string) => {
   const destiny = reduceNumber(destinySum);
   const soulUrge = reduceNumber(soulUrgeSum);
   const personality = reduceNumber(personalitySum);
-  const purpose = reduceNumber(destiny + soulUrge);
+  // Klasik Pisagor Olgunluk / Varoluş Amacı Formülü: Yaşam Yolu + İsim Kader Sayısı
+  const purpose =
+    lifePathNum !== undefined
+      ? reduceNumber(absoluteSingleDigit(lifePathNum) + absoluteSingleDigit(destiny))
+      : reduceNumber(destiny + soulUrge);
 
   const missing: number[] = [];
   matrix.forEach((count, idx) => {
