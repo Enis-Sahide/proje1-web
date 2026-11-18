@@ -720,43 +720,6 @@ export default function SymbolCodesAnalysisPage() {
                 </div>
               </>
             )}
-
-            {/* =====================================================================
-                ASTROLOJİK ÜST HARİTALAR (2. DRAKONİK RUH, 3. BERİYAH VE 4. ATZİLUTH KOZMİK HARİTA) KÖPRÜSÜ
-               ===================================================================== */}
-            <div className="bg-gradient-to-br from-[#D4AF37]/15 via-[#0B0D14] to-purple-950/25 border border-[#D4AF37]/40 rounded-3xl p-6 sm:p-8 space-y-5 shadow-[0_0_35px_rgba(212,175,55,0.12)]">
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-                <div className="space-y-2 max-w-3xl">
-                  <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-[#D4AF37] bg-[#D4AF37]/15 border border-[#D4AF37]/35 px-3 py-1 rounded-full">
-                    <Sparkles size={14} />
-                    Astrolojik 4 Harita Sistemi • Kabalistik 4 Alem & Drakonik Astroloji
-                  </div>
-                  <h2 className="text-xl sm:text-2xl font-extrabold text-white">
-                    Astrolojik 1., 2., 3. ve 4. Haritalarınızı Görüntüleyin
-                  </h2>
-                  <p className="text-xs sm:text-sm text-gray-200 leading-relaxed">
-                    Buradaki sayısal ve sembolik kodların astrolojik karşılığı olan <strong>1. Beden Haritası (Assiah / Natal)</strong>, <strong>2. Ruh Haritası (Yetzirah / Drakonik)</strong>, <strong>3. Yüksek Zihin Haritası (Beriyah / 9. Harmonik)</strong> ve <strong>4. İlahi Öz Haritası (Atziluth / Heliocentric)</strong> tablolarınızı incelemek için:
-                  </p>
-                </div>
-
-                <div className="flex flex-col sm:flex-row lg:flex-col gap-3 shrink-0">
-                  <a
-                    href="/analysis/kabbalah"
-                    className="px-5 py-3.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#B8860B] text-black font-extrabold text-xs sm:text-sm text-center shadow-lg shadow-[#D4AF37]/25 hover:opacity-95 transition flex items-center justify-center gap-2"
-                  >
-                    <Compass size={16} />
-                    Kabalistik 4 Alem Haritalarını Aç →
-                  </a>
-                  <a
-                    href="/analysis/cosmic-matrix"
-                    className="px-5 py-3 rounded-xl bg-white/10 hover:bg-white/15 border border-white/20 text-white font-bold text-xs text-center transition flex items-center justify-center gap-2"
-                  >
-                    <KeyRound size={15} />
-                    7Layers Kozmik Matris Sentezi
-                  </a>
-                </div>
-              </div>
-            </div>
           </>
         )}
       </div>
