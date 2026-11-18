@@ -345,19 +345,19 @@ export default function NumerologyPage() {
               badge: "3. Harita • Karmik Simya"
             },
             {
-              id: "soul-urge",
-              label: "Ruh Güdüsü Kodu",
-              value: soulCodeItem ? soulCodeItem.codeValue : String(m.soulUrgeCode),
+              id: "body-karmic-soul",
+              label: "Ruh / Benlik Kodu",
+              value: m.primaryKarmicCode !== "Yok" ? `${m.embeddedRuhKodu} (${m.primaryKarmicCode})` : (soulCodeItem ? soulCodeItem.codeValue : String(m.soulUrgeCode)),
               valClass: "text-xl font-bold text-white font-serif",
-              badge: "1. Harita • Ruh (Briah)"
+              badge: "1. Bölüm • Ruh & Karmik Öz"
             },
             {
-              id: "aura-protection",
-              label: "Aura Koruma Kodu",
-              value: String(m.auraProtectionCode),
-              sub: "(Açık Çakra Kapısı)",
+              id: "body-field-code",
+              label: "Alan Koruma Kodu",
+              value: String(m.birthMatrixFieldCode),
+              sub: "(Alan Kapatan & Sınır)",
               valClass: "text-xl font-bold text-yellow-400 font-serif",
-              badge: "3. Harita • Aura Kalkanı"
+              badge: "1. Bölüm • Alan Kalkanı"
             },
             {
               id: "birth-code",
