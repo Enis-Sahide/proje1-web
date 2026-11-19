@@ -28,4 +28,20 @@ export async function PATCH(request: Request) {
   return json({ user: publicUser(account) });
 }
 
+export async function DELETE(request: Request) {
+  const payload = await getAuthPayload(request);
+  if (!payload) return errorJson('Yetkisiz', 401);
+
+  const [existing] = await db.select().from(users).where(eq(users.id, payload.sub));
+  if (!existing) return errorJson('Kullanıcı bulunamadı', 404);
+
+  // Cascade delete removes profiles, user_progress, and sessions automatically
+  await db.delete(users).where(eq(users.id, payload.sub));
+
+  return json({
+    success: true,
+    message: 'Hesabınız ve tüm kişisel verileriniz kalıcı olarak silindi.'
+  });
+}
+
 export const OPTIONS = preflight;
