@@ -11,18 +11,24 @@ const PLAY_STORE_MARKET_URL = 'market://details?id=com.enissahide.esk7layers';
 export default function IndirPage() {
   const [isRedirecting, setIsRedirecting] = useState(true);
   const [isAndroid, setIsAndroid] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
 
   useEffect(() => {
-    // Detect mobile / android
+    // Detect mobile / android / iOS
     const ua = navigator.userAgent || navigator.vendor || (window as unknown as { opera?: string }).opera || '';
     const isAndroidDevice = /android/i.test(ua);
+    const isIOSDevice = /iPad|iPhone|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     setIsAndroid(isAndroidDevice);
+    setIsIOS(isIOSDevice);
 
     // Auto-attempt redirect after a very brief moment
     const timer = setTimeout(() => {
       if (isAndroidDevice) {
         // Try market:// first, fallback to web play store
         window.location.href = PLAY_STORE_MARKET_URL;
+      } else if (isIOSDevice) {
+        // Redirect iPhone/iPad users directly to the mobile-styled web app home
+        window.location.href = '/';
       }
       setIsRedirecting(false);
     }, 800);
@@ -75,7 +81,7 @@ export default function IndirPage() {
         {/* Badges */}
         <div className="flex items-center gap-2 mb-3">
           <span className="bg-[#D4AF37]/15 border border-[#D4AF37]/30 text-[#D4AF37] text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1.5">
-            <Sparkles size={12} /> Google Play Store
+            <Sparkles size={12} /> {isIOS ? 'iOS & Web Platformu' : 'Google Play Store'}
           </span>
           <span className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1">
             <ShieldCheck size={12} /> Resmi & Güvenli
@@ -92,32 +98,52 @@ export default function IndirPage() {
 
         {/* Primary CTA Buttons */}
         <div className="w-full max-w-sm flex flex-col gap-3.5 mb-8">
-          {/* Main Google Play Link */}
-          <a
-            href={PLAY_STORE_WEB_URL}
-            className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-[#E6C65B] to-[#C99E2A] text-[#0A0C13] font-bold text-base shadow-[0_0_25px_rgba(212,175,55,0.35)] hover:shadow-[0_0_35px_rgba(212,175,55,0.55)] hover:scale-[1.02] active:scale-[0.99] transition-all flex items-center justify-center gap-3 group"
-          >
-            <svg className="w-6 h-6 fill-current shrink-0" viewBox="0 0 24 24">
-              <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.5,12.92 20.16,13.19L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />
-            </svg>
-            <div className="text-left">
-              <div className="text-[10px] uppercase tracking-wider font-semibold opacity-90 leading-none">
-                Hemen Yükle
-              </div>
-              <div className="text-base font-extrabold tracking-wide leading-tight">
-                Google Play'den İndir
-              </div>
-            </div>
-          </a>
-
-          {/* Android Deep Link alternative for native store open */}
-          {isAndroid && (
-            <a
-              href={PLAY_STORE_MARKET_URL}
-              className="w-full py-3 px-4 rounded-xl bg-white/5 border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 text-[#E5D7B8] hover:text-white text-xs font-medium transition-all flex items-center justify-center gap-2"
+          {isIOS ? (
+            <Link
+              href="/"
+              className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-[#E6C65B] to-[#C99E2A] text-[#0A0C13] font-bold text-base shadow-[0_0_25px_rgba(212,175,55,0.35)] hover:shadow-[0_0_35px_rgba(212,175,55,0.55)] hover:scale-[1.02] active:scale-[0.99] transition-all flex items-center justify-center gap-3 group"
             >
-              <ExternalLink size={14} /> Mağaza Uygulamasında Aç
-            </a>
+              <Sparkles className="w-6 h-6 shrink-0" />
+              <div className="text-left">
+                <div className="text-[10px] uppercase tracking-wider font-semibold opacity-90 leading-none">
+                  Yönlendiriliyorsunuz...
+                </div>
+                <div className="text-base font-extrabold tracking-wide leading-tight">
+                  iPhone / Web Sürümü İle Başla
+                </div>
+              </div>
+              <ArrowRight className="w-5 h-5 shrink-0 ml-1" />
+            </Link>
+          ) : (
+            <>
+              {/* Main Google Play Link */}
+              <a
+                href={PLAY_STORE_WEB_URL}
+                className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-[#E6C65B] to-[#C99E2A] text-[#0A0C13] font-bold text-base shadow-[0_0_25px_rgba(212,175,55,0.35)] hover:shadow-[0_0_35px_rgba(212,175,55,0.55)] hover:scale-[1.02] active:scale-[0.99] transition-all flex items-center justify-center gap-3 group"
+              >
+                <svg className="w-6 h-6 fill-current shrink-0" viewBox="0 0 24 24">
+                  <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.5,12.92 20.16,13.19L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />
+                </svg>
+                <div className="text-left">
+                  <div className="text-[10px] uppercase tracking-wider font-semibold opacity-90 leading-none">
+                    Hemen Yükle
+                  </div>
+                  <div className="text-base font-extrabold tracking-wide leading-tight">
+                    Google Play'den İndir
+                  </div>
+                </div>
+              </a>
+
+              {/* Android Deep Link alternative for native store open */}
+              {isAndroid && (
+                <a
+                  href={PLAY_STORE_MARKET_URL}
+                  className="w-full py-3 px-4 rounded-xl bg-white/5 border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 text-[#E5D7B8] hover:text-white text-xs font-medium transition-all flex items-center justify-center gap-2"
+                >
+                  <ExternalLink size={14} /> Mağaza Uygulamasında Aç
+                </a>
+              )}
+            </>
           )}
         </div>
 
