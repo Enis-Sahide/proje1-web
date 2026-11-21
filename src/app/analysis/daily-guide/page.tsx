@@ -671,10 +671,10 @@ export default function SevenLayersDailyGuidePage() {
             <div className="bg-gradient-to-br from-[#D4AF37]/15 via-black/60 to-[#0EA5E9]/10 border border-[#D4AF37]/40 rounded-3xl p-5 sm:p-6 shadow-xl space-y-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-xs font-black uppercase tracking-wider text-[#FDE68A] flex items-center gap-2">
-                  <Sparkles size={15} /> GÜNÜN 5&apos;Lİ EZOTERİİK REÇETESİ & UYGULAMA PLANI ({appliedDateStr})
+                  <Sparkles size={15} /> GÜNÜN 5&apos;Lİ EZOTERİK REÇETESİ & UYGULAMA PLANI ({appliedDateStr})
                 </span>
                 <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-white/10 text-white border border-white/15">
-                  Aktif Harita Katmanı: {dailyGuide.fivePillarSummary.activeWorldsSummary}
+                  {dailyGuide.fivePillarSummary.activeWorldsSummary}
                 </span>
               </div>
 
