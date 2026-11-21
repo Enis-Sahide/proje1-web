@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Moon, Lock, Activity, Clock, Scroll, TreePine, ChevronRight, Briefcase, KeyRound } from 'lucide-react';
+import { Sparkles, Compass, Fingerprint, Hexagon, MoonStar, Moon, Lock, Activity, Clock, Scroll, TreePine, ChevronRight, Briefcase, KeyRound, BookOpen } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { useAnalysisAccess } from '@/hooks/useAnalysisAccess';
 import AuthPromptModal from '@/components/AuthPromptModal';
@@ -42,6 +42,13 @@ export default function AnalysisPage() {
       icon: <Compass size={22} />,
       color: '#32ADE6',
       link: '/analysis/transits'
+    },
+    {
+      id: 'daily-guide',
+      title: '7Layers Günlük Rehber',
+      icon: <BookOpen size={22} />,
+      color: '#F59E0B',
+      link: '/analysis/daily-guide'
     },
     {
       id: 'moon-cycles',

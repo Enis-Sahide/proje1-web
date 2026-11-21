@@ -272,7 +272,10 @@ export default function TransitsPage() {
     };
   }, []);
 
-  const renderChakraPrescriptionCard = (prescription?: DailyChakraPrescription) => {
+  const renderChakraPrescriptionCard = (
+    prescription?: DailyChakraPrescription,
+    isPersonalContext: boolean = false
+  ) => {
     if (!prescription) return null;
     const isRest = prescription.mode === 'NATURAL_REST';
     return (
@@ -347,6 +350,45 @@ export default function TransitsPage() {
               </div>
             );
           })}
+        </div>
+
+        <div className="pt-2 border-t border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+          <span className="text-[11px] text-gray-300">
+            📖 <strong className="text-[#FDE68A]">7Layers Günlük Rehber:</strong> Bu günün en etkili meditasyon gezegen saatini, nefes sayacını, parmak mührünü (Mudra), oturuş yönünü ve doğal taşını inceleyin.
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              stopWebChakraAudio();
+              const targetDate = isPersonalContext ? transitDateStr : skyDateStr;
+              const targetTime = isPersonalContext ? transitTimeStr : skyTimeStr;
+              if (isPersonalContext && cityKey) {
+                try {
+                  localStorage.setItem(
+                    '7layers_daily_guide_context_v1',
+                    JSON.stringify({
+                      natalDateStr,
+                      natalTimeStr,
+                      cityKey,
+                      transitCityKey,
+                      transitDateStr: targetDate,
+                      transitTimeStr: targetTime,
+                      autoLoad: true,
+                    })
+                  );
+                } catch {}
+              }
+              router.push(
+                `/analysis/daily-guide?date=${encodeURIComponent(targetDate)}&time=${encodeURIComponent(
+                  targetTime
+                )}${isPersonalContext && cityKey ? '&auto=1' : ''}`
+              );
+            }}
+            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-[#D4AF37]/25 to-[#0EA5E9]/25 hover:from-[#D4AF37]/40 hover:to-[#0EA5E9]/40 border border-[#D4AF37]/45 text-xs font-extrabold text-[#FDE68A] transition-all shrink-0 cursor-pointer flex items-center justify-center gap-1.5"
+          >
+            <span>Günlük Uygulama Rehberini Aç</span>
+            <ChevronRight size={14} />
+          </button>
         </div>
       </div>
     );
@@ -2150,7 +2192,7 @@ export default function TransitsPage() {
                         </div>
 
                         {/* Kadim Astro-Çakra & Canlı Frekans Reçetesi */}
-                        {renderChakraPrescriptionCard(personalOverview.chakraPrescription)}
+                        {renderChakraPrescriptionCard(personalOverview.chakraPrescription, true)}
 
                         {/* Alt Reçete / Bilgelik Notu */}
                         <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
