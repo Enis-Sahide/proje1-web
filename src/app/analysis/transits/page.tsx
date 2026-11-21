@@ -1204,9 +1204,6 @@ export default function TransitsPage() {
                                   </div>
                                 </div>
 
-                                {/* Kadim Astro-Çakra & Canlı Frekans Reçetesi */}
-                                {renderChakraPrescriptionCard(currentSkyOverview.chakraPrescription)}
-
                                 {/* Detay Açıcı Buton */}
                                 <div className="pt-3 border-t border-white/10 flex justify-center">
                                   <button
@@ -2190,9 +2187,6 @@ export default function TransitsPage() {
                             </ul>
                           </div>
                         </div>
-
-                        {/* Kadim Astro-Çakra & Canlı Frekans Reçetesi */}
-                        {renderChakraPrescriptionCard(personalOverview.chakraPrescription, true)}
 
                         {/* Alt Reçete / Bilgelik Notu */}
                         <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
