@@ -45,6 +45,8 @@ export default function SevenLayersDailyGuidePage() {
   const [transitCityKey, setTransitCityKey] = useState<AstroCity | null>(null);
   const [transitDateStr, setTransitDateStr] = useState(defaultTDate);
   const [transitTimeStr, setTransitTimeStr] = useState(defaultTTime);
+  const [appliedDateStr, setAppliedDateStr] = useState(defaultTDate);
+  const [appliedTimeStr, setAppliedTimeStr] = useState(defaultTTime);
 
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -153,6 +155,8 @@ export default function SevenLayersDailyGuidePage() {
       if (!res.ok || !data.success) {
         throw new Error(data.error || 'Günlük rehber hesaplanırken bir hata oluştu.');
       }
+      setAppliedDateStr(params.tDate);
+      setAppliedTimeStr(params.tTime);
       setTransitData(data.data);
       try {
         localStorage.setItem(
@@ -229,8 +233,8 @@ export default function SevenLayersDailyGuidePage() {
   const dailyGuide: SevenLayersDailyGuideReport | null = useMemo(() => {
     if (!transitData) return null;
     const activeCity = transitCityKey || cityKey;
-    const [y, m, d] = transitDateStr.split('-').map(Number);
-    const [hh, mm] = (transitTimeStr || '12:00').split(':').map(Number);
+    const [y, m, d] = appliedDateStr.split('-').map(Number);
+    const [hh, mm] = (appliedTimeStr || '12:00').split(':').map(Number);
     const targetDateObj =
       y && m && d
         ? new Date(y, m - 1, d, hh || 12, mm || 0, 0)
@@ -242,12 +246,12 @@ export default function SevenLayersDailyGuidePage() {
       natalPlanets: transitData.natalChart.planets,
       natalHouses: transitData.natalChart.houses,
       targetDate: targetDateObj,
-      dateStr: transitDateStr,
+      dateStr: appliedDateStr,
       lat: activeCity?.lat ?? 41.0082,
       lon: activeCity?.lon ?? 28.9784,
       cityName: activeCity?.name || 'İstanbul',
     });
-  }, [transitData, transitDateStr, transitTimeStr, cityKey, transitCityKey]);
+  }, [transitData, appliedDateStr, appliedTimeStr, cityKey, transitCityKey]);
 
   // Interactive Breathwork Timer Effect
   useEffect(() => {
@@ -536,13 +540,38 @@ export default function SevenLayersDailyGuidePage() {
                   <input
                     type="date"
                     value={transitDateStr}
-                    onChange={(e) => setTransitDateStr(e.target.value)}
+                    onChange={(e) => {
+                      const newD = e.target.value;
+                      setTransitDateStr(newD);
+                      if (/^\d{4}-\d{2}-\d{2}$/.test(newD) && cityKey) {
+                        void calculateGuideData({
+                          nDate: natalDateStr,
+                          nTime: natalTimeStr,
+                          nCity: cityKey,
+                          tCity: transitCityKey,
+                          tDate: newD,
+                          tTime: transitTimeStr,
+                        });
+                      }
+                    }}
                     className="bg-transparent text-white text-xs sm:text-sm focus:outline-none"
                   />
                   <div className="border-l border-white/10 pl-2">
                     <SafeTimePicker
                       value={transitTimeStr}
-                      onChange={setTransitTimeStr}
+                      onChange={(newT) => {
+                        setTransitTimeStr(newT);
+                        if (/^\d{2}:\d{2}$/.test(newT) && cityKey) {
+                          void calculateGuideData({
+                            nDate: natalDateStr,
+                            nTime: natalTimeStr,
+                            nCity: cityKey,
+                            tCity: transitCityKey,
+                            tDate: transitDateStr,
+                            tTime: newT,
+                          });
+                        }
+                      }}
                       className="text-xs scale-90 origin-left"
                     />
                   </div>
@@ -642,7 +671,7 @@ export default function SevenLayersDailyGuidePage() {
             <div className="bg-gradient-to-br from-[#D4AF37]/15 via-black/60 to-[#0EA5E9]/10 border border-[#D4AF37]/40 rounded-3xl p-5 sm:p-6 shadow-xl space-y-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-xs font-black uppercase tracking-wider text-[#FDE68A] flex items-center gap-2">
-                  <Sparkles size={15} /> GÜNÜN 4 ADIMLI 7LAYERS UYGULAMA PLANI ({transitDateStr})
+                  <Sparkles size={15} /> GÜNÜN 4 ADIMLI 7LAYERS UYGULAMA PLANI ({appliedDateStr})
                 </span>
                 <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-white/10 text-white border border-white/15">
                   Aktif Gezegen Kanalı: {dailyGuide.directionTattvaGuide.rulingPlanetSymbol}{' '}
