@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { 
   ArrowLeft, 
@@ -38,6 +38,7 @@ import {
   generatePersonalTransitOverview,
   PersonalTransitOverview,
   DetailedCosmicBarometer,
+  DailyChakraPrescription,
   LIFE_AREA_NAMES
 } from '@/features/astrology/engine/TransitSynthesisEngine';
 import { AstroCity, TransitChartData, AstroPoint, AstroAspect } from '@/features/astrology/engine/AstrologyConstants';
@@ -203,6 +204,153 @@ export default function TransitsPage() {
       fetchSkyChart(skyDateStr, skyTimeStr);
     }
   }, []);
+
+  // Canlı Astro-Çakra Web Audio Frekans Çalar
+  const [playingChakraHz, setPlayingChakraHz] = useState<number | null>(null);
+  const audioCtxRef = useRef<AudioContext | null>(null);
+  const oscRef = useRef<OscillatorNode | null>(null);
+  const lfoRef = useRef<OscillatorNode | null>(null);
+
+  const stopWebChakraAudio = () => {
+    try {
+      oscRef.current?.stop();
+      oscRef.current?.disconnect();
+    } catch {}
+    try {
+      lfoRef.current?.stop();
+      lfoRef.current?.disconnect();
+    } catch {}
+    oscRef.current = null;
+    lfoRef.current = null;
+    setPlayingChakraHz(null);
+  };
+
+  const toggleWebChakraHz = (hz: number) => {
+    if (playingChakraHz === hz) {
+      stopWebChakraAudio();
+      return;
+    }
+    stopWebChakraAudio();
+    try {
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new AudioCtx();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === 'suspended') {
+        void ctx.resume();
+      }
+      const osc = ctx.createOscillator();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(hz, ctx.currentTime);
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.35, ctx.currentTime);
+
+      const lfo = ctx.createOscillator();
+      lfo.type = 'sine';
+      lfo.frequency.value = 0.5;
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.value = 0.14;
+
+      lfo.connect(lfoGain);
+      lfoGain.connect(gain.gain);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      lfo.start();
+      oscRef.current = osc;
+      lfoRef.current = lfo;
+      setPlayingChakraHz(hz);
+    } catch {}
+  };
+
+  useEffect(() => {
+    return () => {
+      stopWebChakraAudio();
+    };
+  }, []);
+
+  const renderChakraPrescriptionCard = (prescription?: DailyChakraPrescription) => {
+    if (!prescription) return null;
+    const isRest = prescription.mode === 'NATURAL_REST';
+    return (
+      <div
+        className={`rounded-2xl p-4 sm:p-5 border space-y-3 ${
+          isRest
+            ? 'bg-emerald-500/5 border-emerald-500/30'
+            : 'bg-[#D4AF37]/10 border-[#D4AF37]/35'
+        }`}
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <span
+            className={`text-[11px] font-black uppercase tracking-wider ${
+              isRest ? 'text-emerald-400' : 'text-[#FDE68A]'
+            }`}
+          >
+            {prescription.badge}
+          </span>
+          {playingChakraHz && (
+            <span className="text-[10px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 animate-pulse">
+              🔊 {playingChakraHz} HZ ÇALIYOR
+            </span>
+          )}
+        </div>
+
+        <h4 className="text-sm sm:text-base font-extrabold text-white">
+          {prescription.headline}
+        </h4>
+        <p className="text-xs text-gray-300 leading-relaxed">
+          {prescription.explanation}
+        </p>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+          {prescription.recommendedChakras.map((item, idx) => {
+            const isPlayingThis = playingChakraHz === item.hz;
+            return (
+              <div
+                key={`wcp-${item.chakraId}-${idx}`}
+                className="bg-black/45 rounded-xl p-3.5 border border-white/10 flex flex-col justify-between gap-2.5"
+                style={{ borderColor: isPlayingThis ? item.color : undefined }}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <span
+                      className="text-[10px] font-extrabold uppercase tracking-wider block"
+                      style={{ color: item.color }}
+                    >
+                      {prescription.recommendedChakras.length > 1 ? `${idx + 1}. ÇAKRA ODAĞI • ` : ''}
+                      {item.planetSource}
+                    </span>
+                    <span className="text-xs sm:text-sm font-bold text-white mt-0.5 block">
+                      {item.fullName} ({item.hz} Hz)
+                    </span>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => toggleWebChakraHz(item.hz)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-extrabold transition-all shrink-0 cursor-pointer border ${
+                      isPlayingThis
+                        ? 'bg-red-500/20 border-red-500 text-red-300'
+                        : 'bg-[#D4AF37]/20 hover:bg-[#D4AF37]/30 border-[#D4AF37] text-[#FDE68A]'
+                    }`}
+                  >
+                    {isPlayingThis ? '⏹ Durdur' : `▶ ${item.hz} Hz Aç`}
+                  </button>
+                </div>
+
+                <p className="text-[11px] text-gray-300 leading-relaxed">
+                  {item.reason}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    );
+  };
 
   const currentSkyOverview = useMemo(() => {
     if (!skyChartData?.planets || !skyChartData?.aspects) return null;
@@ -922,6 +1070,9 @@ export default function TransitsPage() {
                                     </ul>
                                   </div>
                                 </div>
+
+                                {/* Kadim Astro-Çakra & Canlı Frekans Reçetesi */}
+                                {renderChakraPrescriptionCard(currentSkyOverview.chakraPrescription)}
 
                                 {/* Detay Açıcı Buton */}
                                 <div className="pt-3 border-t border-white/10 flex justify-center">
@@ -1812,6 +1963,9 @@ export default function TransitsPage() {
                             </ul>
                           </div>
                         </div>
+
+                        {/* Kadim Astro-Çakra & Canlı Frekans Reçetesi */}
+                        {renderChakraPrescriptionCard(personalOverview.chakraPrescription)}
 
                         {/* Alt Reçete / Bilgelik Notu */}
                         <div className="bg-[#D4AF37]/5 border border-[#D4AF37]/20 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
