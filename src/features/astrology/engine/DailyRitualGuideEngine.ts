@@ -134,9 +134,9 @@ const PLANET_TR_TO_EN: Record<string, 'Saturn' | 'Jupiter' | 'Mars' | 'Sun' | 'V
   'Satürn': 'Saturn',
   'Uranüs': 'Saturn',
   'Neptün': 'Jupiter',
-  'Plüton': 'Saturn',
-  'Kiron': 'Venus',
-  'Lilith': 'Moon',
+  'Plüton': 'Mars',
+  'Kiron': 'Moon',
+  'Lilith': 'Venus',
 };
 
 const PLANET_EN_META: Record<
@@ -156,13 +156,13 @@ const CHAKRA_TO_RULING_PLANET_EN: Record<
   number,
   'Saturn' | 'Jupiter' | 'Mars' | 'Sun' | 'Venus' | 'Mercury' | 'Moon'
 > = {
-  1: 'Saturn', // 1. Kök (Muladhara - Toprak/Kök): Satürn / Mars
-  2: 'Moon',   // 2. Sakral (Svadhisthana - Su): Ay
-  3: 'Sun',    // 3. Solar Pleksus (Manipura - Ateş): Güneş / Mars
-  4: 'Venus',  // 4. Kalp (Anahata - Hava/Sevgi): Venüs
-  5: 'Mercury',// 5. Boğaz (Vishuddha - Eter/Söz): Merkür
-  6: 'Jupiter',// 6. Üçüncü Göz (Ajna - İdrak/Guru): Jüpiter
-  7: 'Sun',    // 7. Taç (Sahasrara - Saf Bilinç): Güneş / Satürn
+  1: 'Mars',    // 1. Kök (Muladhara - 1. & 8. Ev): Mars (+ Plüton)
+  2: 'Venus',   // 2. Sakral (Svadhisthana - 2. & 7. Ev): Venüs (+ Lilith)
+  3: 'Sun',     // 3. Solar Pleksus (Manipura - 5. Ev): Güneş
+  4: 'Moon',    // 4. Kalp (Anahata - 4. Ev): Ay (+ Kiron)
+  5: 'Mercury', // 5. Boğaz (Vishuddha - 3. & 6. Ev): Merkür
+  6: 'Jupiter', // 6. Üçüncü Göz (Ajna - 9. & 12. Ev): Jüpiter (+ Neptün)
+  7: 'Saturn',  // 7. Taç (Sahasrara - 10. & 11. Ev): Satürn (+ Uranüs)
 };
 
 const CHAKRA_MUDRA_MANTRA_CATALOG: Record<
@@ -734,23 +734,30 @@ export function generate7LayersDailyGuide(params: {
     const dayRulerIdx = DAY_RULERS[targetDate.getDay()] ?? 3;
     activePlanetEn = CHALDEAN_ORDER[dayRulerIdx];
   } else {
-    // Doğrudan 1. Çakra Odağını tetikleyen gerçek yönetici gezegeni baz al (topAspects kesilmesinden bağımsız!)
+    // Hermetik Küreler Kuralı (Heptameron / Picatrix):
+    // Aktif çakra merdivenindeki en üst ruhsal kürenin (örn. Taç -> Satürn, 3. Göz -> Jüpiter, Boğaz -> Merkür)
+    // gezegen yöneticisi o günkü meditasyonun ana gezegen saatini (Hora) ve yönünü yönetir.
+    const highestChkItem =
+      chakraPrescription.recommendedChakras[
+        chakraPrescription.recommendedChakras.length - 1
+      ] || primaryChkItem;
+
     activePlanetEn =
-      (primaryChkItem.rulingPlanetTr
-        ? PLANET_TR_TO_EN[primaryChkItem.rulingPlanetTr]
+      (highestChkItem.rulingPlanetTr
+        ? PLANET_TR_TO_EN[highestChkItem.rulingPlanetTr]
         : undefined) ||
-      (primaryChkItem.natalPlanet
-        ? PLANET_TR_TO_EN[primaryChkItem.natalPlanet]
-        : undefined) ||
-      CHAKRA_TO_RULING_PLANET_EN[primaryChkItem.chakraId] ||
+      CHAKRA_TO_RULING_PLANET_EN[highestChkItem.chakraId] ||
       'Sun';
 
-    if (primaryChkItem.aspectType === 'Kavuşum') {
-      aspectMode = primaryChkItem.isHarmonious !== false ? 'CONJUNCTION' : 'CHALLENGING';
-    } else if (primaryChkItem.isHarmonious !== false) {
-      aspectMode = 'HARMONIOUS';
-    } else {
+    const hasHardAspect = chakraPrescription.recommendedChakras.some(
+      (c) => c.isHarmonious === false
+    );
+    if (hasHardAspect) {
       aspectMode = 'CHALLENGING';
+    } else if (primaryChkItem.aspectType === 'Kavuşum') {
+      aspectMode = 'CONJUNCTION';
+    } else {
+      aspectMode = 'HARMONIOUS';
     }
   }
 
