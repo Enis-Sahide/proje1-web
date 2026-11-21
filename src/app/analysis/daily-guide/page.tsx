@@ -667,16 +667,70 @@ export default function SevenLayersDailyGuidePage() {
               </div>
             </div>
 
-            {/* 4-Step Daily Summary Checklist Banner */}
-            <div className="bg-gradient-to-br from-[#D4AF37]/15 via-black/60 to-[#0EA5E9]/10 border border-[#D4AF37]/40 rounded-3xl p-5 sm:p-6 shadow-xl space-y-4">
+            {/* 5'li Ezoterik Reçete Özeti (Çakra • Nefes • Topraklanma • Gezegen Saati • Renk) & 4 Adımlı Plan */}
+            <div className="bg-gradient-to-br from-[#D4AF37]/15 via-black/60 to-[#0EA5E9]/10 border border-[#D4AF37]/40 rounded-3xl p-5 sm:p-6 shadow-xl space-y-5">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <span className="text-xs font-black uppercase tracking-wider text-[#FDE68A] flex items-center gap-2">
-                  <Sparkles size={15} /> GÜNÜN 4 ADIMLI 7LAYERS UYGULAMA PLANI ({appliedDateStr})
+                  <Sparkles size={15} /> GÜNÜN 5&apos;Lİ EZOTERİİK REÇETESİ & UYGULAMA PLANI ({appliedDateStr})
                 </span>
                 <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-white/10 text-white border border-white/15">
-                  Aktif Gezegen Kanalı: {dailyGuide.directionTattvaGuide.rulingPlanetSymbol}{' '}
-                  {dailyGuide.ActivePlanetTr}
+                  Aktif Harita Katmanı: {dailyGuide.fivePillarSummary.activeWorldsSummary}
                 </span>
+              </div>
+
+              {/* 5'li Hızlı Reçete Şeridi */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                <div className="bg-black/60 border border-[#D4AF37]/35 rounded-2xl p-3">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#D4AF37] block">
+                    1. Aktif Çakra Devresi
+                  </span>
+                  <span className="text-xs sm:text-sm font-black text-white mt-1 block">
+                    {dailyGuide.fivePillarSummary.activeChakrasSummary}
+                  </span>
+                </div>
+
+                <div className="bg-black/60 border border-cyan-500/35 rounded-2xl p-3">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-cyan-300 block">
+                    2. Nefes Tekniği
+                  </span>
+                  <span className="text-xs sm:text-sm font-black text-white mt-1 block">
+                    {dailyGuide.fivePillarSummary.breathTypeSummary}
+                  </span>
+                </div>
+
+                <div className="bg-black/60 border border-emerald-500/35 rounded-2xl p-3">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-300 block">
+                    3. Topraklanma Süresi
+                  </span>
+                  <span className="text-xs sm:text-sm font-black text-white mt-1 block">
+                    {dailyGuide.fivePillarSummary.groundingSummary}
+                  </span>
+                </div>
+
+                <div className="bg-black/60 border border-amber-500/35 rounded-2xl p-3">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-amber-300 block">
+                    4. Gezegen Saati (Hora)
+                  </span>
+                  <span className="text-xs sm:text-sm font-black text-white mt-1 block">
+                    {dailyGuide.directionTattvaGuide.rulingPlanetSymbol}{' '}
+                    {dailyGuide.fivePillarSummary.planetaryHourSummary}
+                  </span>
+                </div>
+
+                <div className="bg-black/60 border border-rose-500/35 rounded-2xl p-3 col-span-2 sm:col-span-1">
+                  <span className="text-[10px] font-extrabold uppercase tracking-wider text-rose-300 block">
+                    5. Günün Renk Rezonansı
+                  </span>
+                  <div className="flex items-center gap-2 mt-1">
+                    <span
+                      className="w-3.5 h-3.5 rounded-full border border-white/40 shrink-0"
+                      style={{ backgroundColor: dailyGuide.fivePillarSummary.colorHex }}
+                    />
+                    <span className="text-xs sm:text-sm font-black text-white">
+                      {dailyGuide.fivePillarSummary.colorSummary}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -1186,9 +1240,9 @@ export default function SevenLayersDailyGuidePage() {
 
                   <div className="bg-black/45 border border-white/10 rounded-2xl p-3.5 space-y-2 text-xs">
                     <div>
-                      <strong className="text-rose-300">Kristal Kullanımı: </strong>
-                      <span className="text-gray-300">
-                        {dailyGuide.crystalAromaGuide.crystalPlacement}
+                      <strong className="text-emerald-300">Önerilen Topraklanma Süresi: </strong>
+                      <span className="text-white font-semibold">
+                        {dailyGuide.crystalAromaGuide.groundingDurationLabel}
                       </span>
                     </div>
                     <div>
@@ -1196,9 +1250,18 @@ export default function SevenLayersDailyGuidePage() {
                       <span className="text-white font-semibold">
                         {dailyGuide.crystalAromaGuide.colorToneName}
                       </span>
+                      <p className="text-gray-400 text-[11px] mt-0.5">
+                        {dailyGuide.crystalAromaGuide.colorReason}
+                      </p>
                     </div>
                     <div>
-                      <strong className="text-emerald-300">Önerilen Bitki Çayı & İksir: </strong>
+                      <strong className="text-rose-300">Kristal Kullanımı: </strong>
+                      <span className="text-gray-300">
+                        {dailyGuide.crystalAromaGuide.crystalPlacement}
+                      </span>
+                    </div>
+                    <div>
+                      <strong className="text-cyan-300">Önerilen Bitki Çayı & İksir: </strong>
                       <span className="text-gray-300">
                         {dailyGuide.crystalAromaGuide.herbalTeaOrElixir}
                       </span>
