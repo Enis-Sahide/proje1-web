@@ -424,7 +424,10 @@ export default function TransitsPage() {
     }));
   }, [transitData]);
 
-  const fetchPersonalTimeline = async (rangeToFetch: '1m' | '3m' | '6m' | '1y' = timelineRange) => {
+  const fetchPersonalTimeline = async (
+    rangeToFetch: '1m' | '3m' | '6m' | '1y' = timelineRange,
+    overrideStartDate?: string
+  ) => {
     if (!cityKey) return;
     setIsTimelineLoading(true);
     try {
@@ -436,7 +439,7 @@ export default function TransitsPage() {
           natalTime: natalTimeStr,
           cityData: cityKey,
           range: rangeToFetch,
-          startDateStr: transitDateStr,
+          startDateStr: overrideStartDate || transitDateStr,
           userTz,
           tzOffsetHours
         })
@@ -449,6 +452,51 @@ export default function TransitsPage() {
       console.error('Timeline fetch error:', err);
     } finally {
       setIsTimelineLoading(false);
+    }
+  };
+
+  const shiftDateStrByDays = (baseDateStr: string, deltaDays: number): string => {
+    const parts = baseDateStr.split('-').map(Number);
+    const dt =
+      parts.length === 3 && !isNaN(parts[0])
+        ? new Date(Date.UTC(parts[0], parts[1] - 1, parts[2], 12, 0, 0))
+        : new Date();
+    dt.setUTCDate(dt.getUTCDate() + deltaDays);
+    return dt.toISOString().split('T')[0];
+  };
+
+  const recalculatePersonalTransit = async (
+    targetDateStr: string = transitDateStr,
+    targetTimeStr: string = transitTimeStr
+  ) => {
+    if (!cityKey) return;
+    setIsAnalyzing(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/astrology/calculate-transit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          natalDate: natalDateStr,
+          natalTime: natalTimeStr,
+          transitDate: targetDateStr,
+          transitTime: targetTimeStr,
+          cityData: cityKey,
+          transitCityData: transitCityKey || cityKey,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        throw new Error(data.error || 'Harita hesaplanırken bir hata oluştu.');
+      }
+      setTransitData(data.data);
+      if (personalTab === 'TIMELINE') {
+        void fetchPersonalTimeline(timelineRange, targetDateStr);
+      }
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
@@ -835,14 +883,40 @@ export default function TransitsPage() {
               </div>
 
               {/* Right: Date Picker & Quick Actions */}
-              <div className="flex flex-wrap items-center gap-3">
+              <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+                <button
+                  type="button"
+                  disabled={isSkyLoading}
+                  onClick={() => {
+                    const prevD = shiftDateStrByDays(skyDateStr, -1);
+                    setSkyDateStr(prevD);
+                    fetchSkyChart(prevD, skyTimeStr);
+                    if (skyTab === 'TIMELINE') {
+                      fetchSkyTimeline(skyTimelineRange, prevD);
+                    }
+                  }}
+                  className="px-2.5 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-bold border border-white/10 transition-colors cursor-pointer disabled:opacity-50"
+                  title="Önceki Gün (-1 Gün)"
+                >
+                  ◀ -1 Gün
+                </button>
+
                 <div className="flex flex-wrap items-center gap-2 bg-black/40 px-3 py-1.5 rounded-xl border border-white/10">
                   <div className="flex items-center gap-2">
                     <Clock size={14} className="text-[#0EA5E9]" />
                     <input 
                       type="date" 
                       value={skyDateStr}
-                      onChange={(e) => setSkyDateStr(e.target.value)}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setSkyDateStr(val);
+                        if (val && val.length === 10) {
+                          fetchSkyChart(val, skyTimeStr);
+                          if (skyTab === 'TIMELINE') {
+                            fetchSkyTimeline(skyTimelineRange, val);
+                          }
+                        }
+                      }}
                       className="bg-transparent text-white text-sm focus:outline-none touch-manipulation"
                     />
                   </div>
@@ -857,6 +931,23 @@ export default function TransitsPage() {
 
                 <button
                   type="button"
+                  disabled={isSkyLoading}
+                  onClick={() => {
+                    const nextD = shiftDateStrByDays(skyDateStr, 1);
+                    setSkyDateStr(nextD);
+                    fetchSkyChart(nextD, skyTimeStr);
+                    if (skyTab === 'TIMELINE') {
+                      fetchSkyTimeline(skyTimelineRange, nextD);
+                    }
+                  }}
+                  className="px-2.5 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-bold border border-white/10 transition-colors cursor-pointer disabled:opacity-50"
+                  title="Sonraki Gün (+1 Gün)"
+                >
+                  +1 Gün ▶
+                </button>
+
+                <button
+                  type="button"
                   onClick={() => {
                     const nD = new Date().toISOString().split('T')[0];
                     const nT = new Date().toTimeString().slice(0, 5);
@@ -867,7 +958,7 @@ export default function TransitsPage() {
                       fetchSkyTimeline(skyTimelineRange, nD);
                     }
                   }}
-                  className="px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-semibold border border-white/10 transition-colors"
+                  className="px-3 py-2 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-semibold border border-white/10 transition-colors cursor-pointer"
                 >
                   Şimdi
                 </button>
@@ -881,7 +972,7 @@ export default function TransitsPage() {
                       fetchSkyTimeline(skyTimelineRange, skyDateStr);
                     }
                   }}
-                  className="flex items-center gap-1.5 px-4 py-2 bg-[#0EA5E9] hover:bg-[#38BDF8] text-black font-bold rounded-xl text-xs transition-all shadow-md disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-[#0EA5E9] hover:bg-[#38BDF8] text-black font-bold rounded-xl text-xs transition-all shadow-md disabled:opacity-50 cursor-pointer"
                 >
                   {isSkyLoading ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
                   <span>Gökyüzünü Tara</span>
@@ -1753,52 +1844,146 @@ export default function TransitsPage() {
               </div>
             ) : (
               <div className="space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-700">
-                {/* View Navigation Tabs & Map Info */}
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-black/40 p-3 sm:p-4 rounded-3xl border border-white/10 backdrop-blur-md">
-                  <div className="grid grid-cols-2 sm:flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 shadow-lg w-full sm:w-auto">
-                    <button
-                      type="button"
-                      onClick={() => setPersonalTab('BIWHEEL')}
-                      className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all text-center ${
-                        personalTab === 'BIWHEEL'
-                          ? 'bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] text-black shadow-lg shadow-cyan-500/20'
-                          : 'text-mystic-text-muted hover:text-white'
-                      }`}
-                    >
-                      <Compass size={15} className="shrink-0" />
-                      <span className="truncate">Çift Çember</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setPersonalTab('TIMELINE');
-                        if (!timelineData && !isTimelineLoading) {
-                          fetchPersonalTimeline(timelineRange);
-                        }
-                      }}
-                      className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all text-center ${
-                        personalTab === 'TIMELINE'
-                          ? 'bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] text-black shadow-lg shadow-cyan-500/20'
-                          : 'text-mystic-text-muted hover:text-white'
-                      }`}
-                    >
-                      <Sparkles size={15} className="shrink-0" />
-                      <span className="truncate">Zaman Çizelgesi</span>
-                    </button>
+                {/* View Navigation Tabs & Map Info + Canlı İleri/Geri Tarih Gezgini */}
+                <div className="flex flex-col gap-3 bg-black/40 p-3 sm:p-4 rounded-3xl border border-white/10 backdrop-blur-md">
+                  <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+                    <div className="grid grid-cols-2 sm:flex items-center bg-black/60 p-1 rounded-2xl border border-white/10 shadow-lg w-full sm:w-auto">
+                      <button
+                        type="button"
+                        onClick={() => setPersonalTab('BIWHEEL')}
+                        className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all text-center ${
+                          personalTab === 'BIWHEEL'
+                            ? 'bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] text-black shadow-lg shadow-cyan-500/20'
+                            : 'text-mystic-text-muted hover:text-white'
+                        }`}
+                      >
+                        <Compass size={15} className="shrink-0" />
+                        <span className="truncate">Çift Çember</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPersonalTab('TIMELINE');
+                          if (!timelineData && !isTimelineLoading) {
+                            fetchPersonalTimeline(timelineRange);
+                          }
+                        }}
+                        className={`flex items-center justify-center gap-1.5 sm:gap-2 px-2.5 sm:px-5 py-2 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all text-center ${
+                          personalTab === 'TIMELINE'
+                            ? 'bg-gradient-to-r from-[#D4AF37] to-[#0EA5E9] text-black shadow-lg shadow-cyan-500/20'
+                            : 'text-mystic-text-muted hover:text-white'
+                        }`}
+                      >
+                        <Sparkles size={15} className="shrink-0" />
+                        <span className="truncate">Zaman Çizelgesi</span>
+                      </button>
+                    </div>
+
+                    <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
+                      <div className="text-left sm:text-right">
+                        <span className="text-[10px] text-mystic-text-muted block">Harita Sahibi ({natalDateStr.split('-').reverse().join('.')} {natalTimeStr})</span>
+                        <span className="text-[11px] sm:text-xs font-bold text-white truncate max-w-[260px] block">Doğum: {cityKey?.name || 'Seçildi'} • Transit: {(transitCityKey || cityKey)?.name || 'Seçildi'}</span>
+                      </div>
+                      <button 
+                        type="button"
+                        onClick={() => { setTransitData(null); setTimelineData(null); setTransitCityKey(null); }} 
+                        className="text-xs px-3.5 py-1.5 sm:py-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap shrink-0 cursor-pointer"
+                      >
+                        Yeni Harita Seç
+                      </button>
+                    </div>
                   </div>
 
-                  <div className="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-white/5">
-                    <div className="text-left sm:text-right">
-                      <span className="text-[10px] text-mystic-text-muted block">Harita Sahibi</span>
-                      <span className="text-[11px] sm:text-xs font-bold text-white truncate max-w-[240px] block">Doğum: {cityKey?.name || 'Seçildi'} • Transit: {(transitCityKey || cityKey)?.name || 'Seçildi'}</span>
+                  {/* Kişisel Transitler İleri / Geri Tarih & Gün Sorgulama Çubuğu */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-3 border-t border-white/10">
+                    <div className="flex items-center gap-2">
+                      <Calendar size={15} className="text-[#D4AF37]" />
+                      <span className="text-xs font-bold text-[#FDE68A]">
+                        Kişisel Transit Tarihi Sorgula (Geçmiş &amp; Gelecek Günler):
+                      </span>
                     </div>
-                    <button 
-                      type="button"
-                      onClick={() => { setTransitData(null); setTimelineData(null); setTransitCityKey(null); }} 
-                      className="text-xs px-3.5 py-1.5 sm:py-2 bg-white/5 hover:bg-white/10 rounded-full text-white transition-colors border border-white/10 whitespace-nowrap shrink-0 cursor-pointer"
-                    >
-                      Yeni Harita Seç
-                    </button>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      <button
+                        type="button"
+                        disabled={isAnalyzing}
+                        onClick={() => {
+                          const prevD = shiftDateStrByDays(transitDateStr, -1);
+                          setTransitDateStr(prevD);
+                          void recalculatePersonalTransit(prevD, transitTimeStr);
+                        }}
+                        className="px-2.5 py-1.5 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-bold border border-white/10 transition-colors cursor-pointer disabled:opacity-50"
+                      >
+                        ◀ -1 Gün
+                      </button>
+
+                      <div className="flex flex-wrap items-center gap-2 bg-black/50 px-3 py-1 rounded-xl border border-[#D4AF37]/30">
+                        <div className="flex items-center gap-1.5">
+                          <Clock size={13} className="text-[#D4AF37]" />
+                          <input
+                            type="date"
+                            min="1900-01-01"
+                            max="2100-12-31"
+                            value={transitDateStr}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setTransitDateStr(val);
+                              if (val && val.length === 10) {
+                                void recalculatePersonalTransit(val, transitTimeStr);
+                              }
+                            }}
+                            className="bg-transparent text-white text-xs sm:text-sm font-semibold focus:outline-none touch-manipulation"
+                          />
+                        </div>
+                        <div className="border-l border-white/10 pl-2">
+                          <SafeTimePicker
+                            value={transitTimeStr}
+                            onChange={(newT) => {
+                              setTransitTimeStr(newT);
+                            }}
+                            className="text-xs scale-90 origin-left"
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        disabled={isAnalyzing}
+                        onClick={() => {
+                          const nextD = shiftDateStrByDays(transitDateStr, 1);
+                          setTransitDateStr(nextD);
+                          void recalculatePersonalTransit(nextD, transitTimeStr);
+                        }}
+                        className="px-2.5 py-1.5 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-bold border border-white/10 transition-colors cursor-pointer disabled:opacity-50"
+                      >
+                        +1 Gün ▶
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={isAnalyzing}
+                        onClick={() => {
+                          const nD = new Date().toISOString().split('T')[0];
+                          const nT = new Date().toTimeString().slice(0, 5);
+                          setTransitDateStr(nD);
+                          setTransitTimeStr(nT);
+                          void recalculatePersonalTransit(nD, nT);
+                        }}
+                        className="px-3 py-1.5 bg-white/5 hover:bg-white/10 text-white rounded-xl text-xs font-semibold border border-white/10 transition-colors cursor-pointer disabled:opacity-50"
+                      >
+                        Bugün
+                      </button>
+
+                      <button
+                        type="button"
+                        disabled={isAnalyzing}
+                        onClick={() => void recalculatePersonalTransit(transitDateStr, transitTimeStr)}
+                        className="flex items-center gap-1.5 px-3.5 py-1.5 bg-gradient-to-r from-[#D4AF37] to-[#F59E0B] hover:opacity-90 text-black font-bold rounded-xl text-xs transition-all shadow-md disabled:opacity-50 cursor-pointer"
+                      >
+                        {isAnalyzing ? <Loader2 size={13} className="animate-spin" /> : <RefreshCw size={13} />}
+                        <span>Tarihi Tara</span>
+                      </button>
+                    </div>
                   </div>
                 </div>
 
