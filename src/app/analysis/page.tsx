@@ -21,6 +21,7 @@ interface ToolItem {
 export default function AnalysisPage() {
   const router = useRouter();
   const { user, role } = useAuth();
+  const isAdmin = role === 'admin';
   const isMasterOrAdmin = role === 'master' || role === 'admin';
   const { isUnlocked: isCosmicUnlocked } = useAnalysisAccess('cosmic-matrix');
   const { isUnlocked: isIncarnationUnlocked } = useAnalysisAccess('incarnation');
@@ -43,13 +44,17 @@ export default function AnalysisPage() {
       color: '#32ADE6',
       link: '/analysis/transits'
     },
-    {
-      id: 'daily-guide',
-      title: '7Layers Günlük Rehber',
-      icon: <BookOpen size={22} />,
-      color: '#F59E0B',
-      link: '/analysis/daily-guide'
-    },
+    ...(isAdmin
+      ? [
+          {
+            id: 'daily-guide',
+            title: '7Layers Günlük Rehber (Admin)',
+            icon: <BookOpen size={22} />,
+            color: '#F59E0B',
+            link: '/analysis/daily-guide'
+          }
+        ]
+      : []),
     {
       id: 'moon-cycles',
       title: 'Ay Döngüleri & Tutulmalar',

@@ -25,6 +25,7 @@ import {
 import SafeTimePicker from '@/components/ui/SafeTimePicker';
 import LocationAutocomplete from '@/components/LocationAutocomplete';
 import AnalysisBackButton from '@/components/ui/AnalysisBackButton';
+import { useAuth } from '@/context/AuthContext';
 import { AstroCity, TransitChartData } from '@/features/astrology/engine/AstrologyConstants';
 import {
   generate7LayersDailyGuide,
@@ -35,6 +36,8 @@ import {
 const STORAGE_KEY = '7layers_daily_guide_context_v1';
 
 export default function SevenLayersDailyGuidePage() {
+  const { role, isLoading: authLoading } = useAuth();
+  const isAdmin = role === 'admin';
   const today = new Date();
   const defaultTDate = today.toISOString().split('T')[0];
   const defaultTTime = today.toTimeString().slice(0, 5);
@@ -372,6 +375,33 @@ export default function SevenLayersDailyGuidePage() {
       </div>
     );
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen pt-32 pb-24 px-4 flex items-center justify-center text-white">
+        <Loader2 size={28} className="animate-spin text-[#D4AF37]" />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen pt-32 pb-24 px-4 sm:px-6 relative text-white">
+        <div className="max-w-xl mx-auto bg-black/60 backdrop-blur-xl border border-[#D4AF37]/35 rounded-3xl p-8 text-center space-y-4">
+          <AlertCircle size={40} className="text-[#D4AF37] mx-auto" />
+          <h1 className="text-xl font-extrabold text-white">
+            Bu Modül Şu An Yalnızca Yönetici (Admin) Erişimine Açıktır
+          </h1>
+          <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
+            7Layers Günlük Rehber modülü test ve kalibrasyon aşamasında olduğu için şu anda yalnızca Admin yetkisine sahip hesaplarla görüntülenebilir.
+          </p>
+          <div className="pt-2">
+            <AnalysisBackButton hasActiveResult={false} />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-24 pb-24 px-4 sm:px-6 relative text-white">
