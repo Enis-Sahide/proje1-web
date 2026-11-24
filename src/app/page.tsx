@@ -12,6 +12,7 @@ import MeclisMiniWidget from '@/features/astrology/components/MeclisMiniWidget';
 import Link from 'next/link';
 import Image from 'next/image';
 import { PLANET_DAY_GUIDELINES } from '@/utils/PlanetaryHours';
+import { openPwaInstallModal } from '@/components/InstallPwaPrompt';
 
 // CHAKRA_MODULES içeriği DB'den gelir (/api/content/chakras → modules)
 
@@ -82,9 +83,30 @@ export default function Home() {
               </div>
               <ChevronRight size={18} className="text-mystic-primary" />
             </Link>
+
+            <button
+              type="button"
+              onClick={openPwaInstallModal}
+              className="flex items-center gap-4 bg-gradient-to-r from-white/[0.06] via-[#D4AF37]/15 to-white/[0.06] border border-[#D4AF37]/35 rounded-2xl p-4 shadow-[0_0_20px_rgba(212,175,55,0.12)] hover:border-[#D4AF37]/70 transition-all duration-300 hover:scale-[1.01] cursor-pointer text-left w-full"
+            >
+              <div className="p-2.5 bg-[#D4AF37]/15 text-[#FDE68A] rounded-xl border border-[#D4AF37]/30 shrink-0">
+                <Smartphone size={20} />
+              </div>
+              <div className="flex-grow text-left">
+                <h4 className="text-sm font-bold text-white flex items-center gap-1.5">
+                  🍎 iPhone (iOS) Uygulama Modunda Ekle
+                  <Sparkles className="text-[#FDE68A] shrink-0" size={14} />
+                </h4>
+                <p className="text-[11px] text-mystic-text-muted mt-0.5 leading-snug">
+                  iPhone &amp; iPad ana ekranınıza tam ekran uygulama olarak eklemek için tıklayın.
+                </p>
+              </div>
+              <ChevronRight size={18} className="text-[#FDE68A]" />
+            </button>
+
             <div className="flex justify-center">
               <a
-                href="https://api.whatsapp.com/send?text=Merhaba!%207LAYERS%20Android%20mobil%20uygulamasını%20Google%20Play'den%20indirebilirsin:%20https://www.7layers.tr/indir"
+                href="https://api.whatsapp.com/send?text=Merhaba!%207LAYERS%20mobil%20uygulamasını%20Android%20ve%20iPhone%20üzerinden%20kullanabilirsin:%20https://www.7layers.tr/indir"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 text-xs font-semibold rounded-xl transition-all duration-300 border border-emerald-500/20 hover:border-emerald-500/40 cursor-pointer shadow-md"

@@ -3,7 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { Smartphone, ExternalLink, ArrowRight, ShieldCheck, Sparkles, Radio, Compass, Wind } from 'lucide-react';
+import { Smartphone, ExternalLink, ArrowRight, ShieldCheck, Sparkles, Radio, Compass, Wind, Share, PlusSquare, CheckCircle2 } from 'lucide-react';
+import { openPwaInstallModal } from '@/components/InstallPwaPrompt';
 
 const PLAY_STORE_WEB_URL = 'https://play.google.com/store/apps/details?id=com.enissahide.esk7layers';
 const PLAY_STORE_MARKET_URL = 'market://details?id=com.enissahide.esk7layers';
@@ -12,6 +13,7 @@ export default function IndirPage() {
   const [isRedirecting, setIsRedirecting] = useState(true);
   const [isAndroid, setIsAndroid] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
+  const [showIosGuide, setShowIosGuide] = useState(false);
 
   useEffect(() => {
     // Detect mobile / android / iOS
@@ -20,15 +22,15 @@ export default function IndirPage() {
     const isIOSDevice = /iPad|iPhone|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
     setIsAndroid(isAndroidDevice);
     setIsIOS(isIOSDevice);
+    if (isIOSDevice) {
+      setShowIosGuide(true);
+    }
 
-    // Auto-attempt redirect after a very brief moment
+    // Auto-attempt redirect only on Android devices
     const timer = setTimeout(() => {
       if (isAndroidDevice) {
         // Try market:// first, fallback to web play store
         window.location.href = PLAY_STORE_MARKET_URL;
-      } else if (isIOSDevice) {
-        // Redirect iPhone/iPad users directly to the mobile-styled web app home
-        window.location.href = '/';
       }
       setIsRedirecting(false);
     }, 800);
@@ -98,53 +100,102 @@ export default function IndirPage() {
 
         {/* Primary CTA Buttons */}
         <div className="w-full max-w-sm flex flex-col gap-3.5 mb-8">
-          {isIOS ? (
-            <Link
-              href="/"
-              className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-[#E6C65B] to-[#C99E2A] text-[#0A0C13] font-bold text-base shadow-[0_0_25px_rgba(212,175,55,0.35)] hover:shadow-[0_0_35px_rgba(212,175,55,0.55)] hover:scale-[1.02] active:scale-[0.99] transition-all flex items-center justify-center gap-3 group"
+          {/* Main Google Play Link */}
+          <a
+            href={PLAY_STORE_WEB_URL}
+            className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-[#E6C65B] to-[#C99E2A] text-[#0A0C13] font-bold text-base shadow-[0_0_25px_rgba(212,175,55,0.35)] hover:shadow-[0_0_35px_rgba(212,175,55,0.55)] hover:scale-[1.02] active:scale-[0.99] transition-all flex items-center justify-center gap-3 group"
+          >
+            <svg className="w-6 h-6 fill-current shrink-0" viewBox="0 0 24 24">
+              <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.5,12.92 20.16,13.19L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />
+            </svg>
+            <div className="text-left">
+              <div className="text-[10px] uppercase tracking-wider font-semibold opacity-90 leading-none">
+                Hemen Yükle (Android)
+              </div>
+              <div className="text-base font-extrabold tracking-wide leading-tight">
+                Google Play'den İndir
+              </div>
+            </div>
+          </a>
+
+          {/* Android Deep Link alternative for native store open */}
+          {isAndroid && (
+            <a
+              href={PLAY_STORE_MARKET_URL}
+              className="w-full py-3 px-4 rounded-xl bg-white/5 border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 text-[#E5D7B8] hover:text-white text-xs font-medium transition-all flex items-center justify-center gap-2"
             >
-              <Sparkles className="w-6 h-6 shrink-0" />
-              <div className="text-left">
-                <div className="text-[10px] uppercase tracking-wider font-semibold opacity-90 leading-none">
-                  Yönlendiriliyorsunuz...
-                </div>
-                <div className="text-base font-extrabold tracking-wide leading-tight">
-                  iPhone / Web Sürümü İle Başla
+              <ExternalLink size={14} /> Mağaza Uygulamasında Aç
+            </a>
+          )}
+
+          {/* iPhone / iOS Uygulama Modunda Ekle Butonu */}
+          <button
+            type="button"
+            onClick={() => {
+              setShowIosGuide((prev) => !prev);
+              openPwaInstallModal();
+            }}
+            className="w-full py-4 px-6 rounded-2xl bg-white/[0.06] hover:bg-white/[0.1] border border-[#D4AF37]/45 text-white font-bold text-base shadow-[0_0_20px_rgba(212,175,55,0.15)] hover:scale-[1.02] active:scale-[0.99] transition-all flex items-center justify-center gap-3 cursor-pointer"
+          >
+            <Smartphone className="w-6 h-6 text-[#FDE68A] shrink-0" />
+            <div className="text-left">
+              <div className="text-[10px] uppercase tracking-wider font-semibold text-[#FDE68A] leading-none">
+                iPhone &amp; iPad (iOS Safari)
+              </div>
+              <div className="text-sm sm:text-base font-extrabold tracking-wide leading-tight mt-0.5">
+                🍎 iPhone'a Uygulama Modunda Ekle
+              </div>
+            </div>
+          </button>
+
+          {/* Sayfa İçi Görünür iPhone 3 Adımlı Uygulama Modu Kartı */}
+          <div className="w-full rounded-2xl bg-[#0F121C] border border-[#D4AF37]/35 p-4 text-left shadow-xl">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-extrabold text-[#FDE68A] flex items-center gap-1.5">
+                🍎 iPhone Ana Ekranına Ekleme (3 Adım)
+              </span>
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 font-bold">
+                Tam Ekran Modu
+              </span>
+            </div>
+
+            <div className="space-y-2.5 text-xs text-white/85">
+              <div className="flex items-start gap-2.5">
+                <span className="w-5 h-5 rounded-full bg-[#D4AF37] text-black font-extrabold text-[11px] flex items-center justify-center shrink-0 mt-0.5">
+                  1
+                </span>
+                <div>
+                  iPhone <strong className="text-white">Safari</strong> tarayıcısında ekranın altındaki{' '}
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/10 text-[#FDE68A] font-bold">
+                    <Share size={11} /> Paylaş
+                  </span>{' '}
+                  ikonuna dokunun.
                 </div>
               </div>
-              <ArrowRight className="w-5 h-5 shrink-0 ml-1" />
-            </Link>
-          ) : (
-            <>
-              {/* Main Google Play Link */}
-              <a
-                href={PLAY_STORE_WEB_URL}
-                className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-[#D4AF37] via-[#E6C65B] to-[#C99E2A] text-[#0A0C13] font-bold text-base shadow-[0_0_25px_rgba(212,175,55,0.35)] hover:shadow-[0_0_35px_rgba(212,175,55,0.55)] hover:scale-[1.02] active:scale-[0.99] transition-all flex items-center justify-center gap-3 group"
-              >
-                <svg className="w-6 h-6 fill-current shrink-0" viewBox="0 0 24 24">
-                  <path d="M3,20.5V3.5C3,2.91 3.34,2.39 3.84,2.15L13.69,12L3.84,21.85C3.34,21.6 3,21.09 3,20.5M16.81,15.12L6.05,21.34L14.54,12.85L16.81,15.12M20.16,10.81C20.5,11.08 20.75,11.5 20.75,12C20.75,12.5 20.5,12.92 20.16,13.19L17.89,14.5L15.39,12L17.89,9.5L20.16,10.81M6.05,2.66L16.81,8.88L14.54,11.15L6.05,2.66Z" />
-                </svg>
-                <div className="text-left">
-                  <div className="text-[10px] uppercase tracking-wider font-semibold opacity-90 leading-none">
-                    Hemen Yükle
-                  </div>
-                  <div className="text-base font-extrabold tracking-wide leading-tight">
-                    Google Play'den İndir
-                  </div>
-                </div>
-              </a>
 
-              {/* Android Deep Link alternative for native store open */}
-              {isAndroid && (
-                <a
-                  href={PLAY_STORE_MARKET_URL}
-                  className="w-full py-3 px-4 rounded-xl bg-white/5 border border-[#D4AF37]/30 hover:border-[#D4AF37]/60 text-[#E5D7B8] hover:text-white text-xs font-medium transition-all flex items-center justify-center gap-2"
-                >
-                  <ExternalLink size={14} /> Mağaza Uygulamasında Aç
-                </a>
-              )}
-            </>
-          )}
+              <div className="flex items-start gap-2.5">
+                <span className="w-5 h-5 rounded-full bg-[#D4AF37] text-black font-extrabold text-[11px] flex items-center justify-center shrink-0 mt-0.5">
+                  2
+                </span>
+                <div>
+                  Menüyü aşağı kaydırıp{' '}
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-white/10 text-[#FDE68A] font-bold">
+                    <PlusSquare size={11} /> Ana Ekrana Ekle
+                  </span>{' '}
+                  seçeneğine basın.
+                </div>
+              </div>
+
+              <div className="flex items-start gap-2.5">
+                <span className="w-5 h-5 rounded-full bg-[#D4AF37] text-black font-extrabold text-[11px] flex items-center justify-center shrink-0 mt-0.5">
+                  3
+                </span>
+                <div>
+                  Sağ üstten <strong className="text-[#FDE68A]">&ldquo;Ekle&rdquo;</strong>ye dokunun. 7Layers artık telefonunuzda adres çubuksuz tam ekran uygulama olarak açılır!
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Notice for Instagram In-App Browser */}
