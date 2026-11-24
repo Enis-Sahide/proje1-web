@@ -4,9 +4,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
-import { Menu, X, Sparkles, User, LogIn, Lock, Wrench, LogOut, Home, Compass, Activity, Bell, CheckCheck, MessageSquareReply, MessageSquare } from 'lucide-react';
+import { Menu, X, Sparkles, User, LogIn, Lock, Wrench, LogOut, Home, Compass, Activity, Bell, CheckCheck, MessageSquareReply, MessageSquare, Smartphone } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '@/context/AuthContext';
+import { openPwaInstallModal } from '@/components/InstallPwaPrompt';
 
 interface ChatNotificationItem {
   id: string;
@@ -639,6 +640,17 @@ export default function Navigation() {
               </div>
               
               <div className="mt-6 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    openPwaInstallModal();
+                  }}
+                  className="mb-3 w-full py-2.5 px-4 rounded-xl bg-[#D4AF37]/15 border border-[#D4AF37]/40 text-[#FDE68A] text-xs font-extrabold flex items-center justify-center gap-2 hover:bg-[#D4AF37]/25 transition-colors"
+                >
+                  <Smartphone size={15} />
+                  <span>📱 iPhone &amp; Telefona Uygulama Olarak Ekle</span>
+                </button>
                 {isLoggedIn ? (
                   <div className="pt-4 border-t border-mystic-surface-light flex flex-col gap-4">
                     <Link 

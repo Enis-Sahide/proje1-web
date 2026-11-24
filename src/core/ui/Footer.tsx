@@ -2,8 +2,9 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { ShieldCheck, Lock, Mail } from 'lucide-react';
+import { ShieldCheck, Lock, Mail, Smartphone } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { openPwaInstallModal } from '@/components/InstallPwaPrompt';
 
 export default function Footer() {
   const pathname = usePathname();
@@ -107,6 +108,16 @@ export default function Footer() {
             <Mail size={13} className="text-[#D4AF37]" />
             <span>Destek & İletişim</span>
           </Link>
+          <span className="text-white/20">•</span>
+          <button
+            type="button"
+            onClick={openPwaInstallModal}
+            className="hover:text-[#FDE68A] text-[#D4AF37] transition-colors flex items-center gap-1.5 font-semibold cursor-pointer"
+            title="iPhone & Telefona Uygulama Olarak Ekle"
+          >
+            <Smartphone size={13} className="text-[#D4AF37]" />
+            <span>iPhone / Telefona Uygulama Ekle</span>
+          </button>
         </div>
 
         {/* Right: Security Badge */}

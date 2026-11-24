@@ -8,6 +8,7 @@ import RouteGuard from "@/core/ui/RouteGuard";
 import AnimatedBackground from "@/core/ui/AnimatedBackground";
 import AnalyticsTracker from "@/components/AnalyticsTracker";
 import ClarityProvider from "@/components/ClarityProvider";
+import InstallPwaPrompt from "@/components/InstallPwaPrompt";
 import Footer from "@/core/ui/Footer";
 
 const inter = Inter({
@@ -111,6 +112,7 @@ export default function RootLayout({
               <main className="flex-grow flex flex-col">
                 {children}
               </main>
+              <InstallPwaPrompt />
               <Footer />
             </RouteGuard>
           </AuthProvider>
