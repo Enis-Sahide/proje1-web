@@ -354,7 +354,7 @@ export default function TransitsPage() {
 
         <div className="pt-2 border-t border-white/10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
           <span className="text-[11px] text-gray-300">
-            📖 <strong className="text-[#FDE68A]">7Layers Günlük Rehber:</strong> Bu günün en etkili meditasyon gezegen saatini, nefes sayacını, parmak mührünü (Mudra), oturuş yönünü ve doğal taşını inceleyin.
+            📖 <strong className="text-[#FDE68A]">Günlük Meditasyon Rehberi:</strong> Bu günün en etkili meditasyon gezegen saatini, nefes sayacını, parmak mührünü (Mudra), oturuş yönünü ve doğal taşını inceleyin.
           </span>
           <button
             type="button"

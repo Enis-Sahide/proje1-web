@@ -393,7 +393,7 @@ export default function SevenLayersDailyGuidePage() {
             Bu Modül Şu An Yalnızca Yönetici (Admin) Erişimine Açıktır
           </h1>
           <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-            7Layers Günlük Rehber modülü test ve kalibrasyon aşamasında olduğu için şu anda yalnızca Admin yetkisine sahip hesaplarla görüntülenebilir.
+            Günlük Meditasyon Rehberi modülü test ve kalibrasyon aşamasında olduğu için şu anda yalnızca Admin yetkisine sahip hesaplarla görüntülenebilir.
           </p>
           <div className="pt-2">
             <AnalysisBackButton hasActiveResult={false} />
@@ -419,7 +419,7 @@ export default function SevenLayersDailyGuidePage() {
                 <Sparkles size={11} /> 6 Katmanlı Kişisel Ezoterik Uygulama Reçetesi
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-white">
-                7Layers Günlük Rehber
+                Günlük Meditasyon Rehberi
               </h1>
               <p className="text-xs sm:text-sm text-mystic-text-muted">
                 Doğum haritanızın o günkü dereceli açılarına göre kişisel çakra frekansı, en etkili gezegen saati, nefes, mudra, yön ve taş reçeteniz
@@ -533,7 +533,7 @@ export default function SevenLayersDailyGuidePage() {
                 ) : (
                   <>
                     <Sparkles size={18} />
-                    <span>7Layers Günlük Rehberimi Aç</span>
+                    <span>Günlük Meditasyon Rehberimi Aç</span>
                   </>
                 )}
               </button>

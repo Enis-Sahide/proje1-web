@@ -48,7 +48,7 @@ export default function AnalysisPage() {
       ? [
           {
             id: 'daily-guide',
-            title: '7Layers Günlük Rehber (Admin)',
+            title: 'Günlük Meditasyon Rehberi (Admin)',
             icon: <BookOpen size={22} />,
             color: '#F59E0B',
             link: '/analysis/daily-guide'
