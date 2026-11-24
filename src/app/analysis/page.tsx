@@ -26,6 +26,7 @@ export default function AnalysisPage() {
   const { isUnlocked: isCosmicUnlocked } = useAnalysisAccess('cosmic-matrix');
   const { isUnlocked: isIncarnationUnlocked } = useAnalysisAccess('incarnation');
   const [lockedTarget, setLockedTarget] = useState<{ id: string; title: string } | null>(null);
+  const [showDailyGuideLockModal, setShowDailyGuideLockModal] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [pendingCheckoutUrl, setPendingCheckoutUrl] = useState('/checkout/guest');
 
@@ -44,17 +45,13 @@ export default function AnalysisPage() {
       color: '#32ADE6',
       link: '/analysis/transits'
     },
-    ...(isAdmin
-      ? [
-          {
-            id: 'daily-guide',
-            title: 'Günlük Meditasyon Rehberi (Admin)',
-            icon: <BookOpen size={22} />,
-            color: '#F59E0B',
-            link: '/analysis/daily-guide'
-          }
-        ]
-      : []),
+    {
+      id: 'daily-guide',
+      title: 'Günlük Meditasyon Rehberi',
+      icon: <BookOpen size={22} />,
+      color: '#F59E0B',
+      link: '/analysis/daily-guide'
+    },
     {
       id: 'moon-cycles',
       title: 'Ay Döngüleri & Tutulmalar',
@@ -151,6 +148,10 @@ export default function AnalysisPage() {
   ];
 
   const handleToolClick = (tool: ToolItem) => {
+    if (tool.id === 'daily-guide' && !isAdmin) {
+      setShowDailyGuideLockModal(true);
+      return;
+    }
     if (tool.id === 'cosmic-matrix' && !isMasterOrAdmin && !isCosmicUnlocked) {
       setLockedTarget({ id: 'cosmic-matrix', title: tool.title });
       return;
@@ -198,6 +199,7 @@ export default function AnalysisPage() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
           {tools.map((tool) => {
             const isItemLocked =
+              (tool.id === 'daily-guide' && !isAdmin) ||
               (tool.id === 'cosmic-matrix' && !isMasterOrAdmin && !isCosmicUnlocked) ||
               (tool.id === 'incarnation' && !isMasterOrAdmin && !isIncarnationUnlocked);
             return (
@@ -268,6 +270,46 @@ export default function AnalysisPage() {
                 className="flex-1 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all cursor-pointer shadow-lg shadow-[#D4AF37]/20"
               >
                 Ödeme Yap
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Günlük Meditasyon Rehberi Kilit & Talep Penceresi */}
+      {showDailyGuideLockModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setShowDailyGuideLockModal(false)}
+        >
+          <div
+            className="bg-[#0F111A] border border-[#D4AF37]/40 rounded-3xl max-w-md w-full p-7 text-center shadow-[0_0_40px_rgba(212,175,55,0.2)] relative animate-in fade-in zoom-in duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-14 h-14 rounded-2xl bg-[#D4AF37]/15 border border-[#D4AF37]/35 text-[#D4AF37] mx-auto mb-4 flex items-center justify-center">
+              <Lock size={28} />
+            </div>
+            <h3 className="text-xl font-bold text-white mb-2">
+              Günlük Meditasyon Rehberi
+            </h3>
+            <p className="text-mystic-text-muted text-sm mb-7 leading-relaxed">
+              Bu analiz şu anda kullanıcılara kilitlidir. İsterseniz <strong className="text-[#FDE68A]">İletişim</strong> bölümünden <strong className="text-white">&ldquo;Günlük Meditasyon Rehberi analizinden faydalanmak istiyorum&rdquo;</strong> talebinde bulunabilirsiniz.
+            </p>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowDailyGuideLockModal(false)}
+                className="flex-1 bg-white/5 hover:bg-white/10 border border-white/15 text-gray-300 font-semibold py-3 px-4 rounded-xl transition-all cursor-pointer"
+              >
+                Kapat
+              </button>
+              <button
+                onClick={() => {
+                  setShowDailyGuideLockModal(false);
+                  router.push('/iletisim?topic=daily-guide');
+                }}
+                className="flex-1 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] hover:from-[#E5C158] hover:to-[#D4AF37] text-black font-bold py-3 px-4 rounded-xl transition-all cursor-pointer shadow-lg shadow-[#D4AF37]/20"
+              >
+                İletişim&apos;den Talep Et
               </button>
             </div>
           </div>

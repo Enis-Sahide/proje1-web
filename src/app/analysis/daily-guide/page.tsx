@@ -390,13 +390,19 @@ export default function SevenLayersDailyGuidePage() {
         <div className="max-w-xl mx-auto bg-black/60 backdrop-blur-xl border border-[#D4AF37]/35 rounded-3xl p-8 text-center space-y-4">
           <AlertCircle size={40} className="text-[#D4AF37] mx-auto" />
           <h1 className="text-xl font-extrabold text-white">
-            Bu Modül Şu An Yalnızca Yönetici (Admin) Erişimine Açıktır
+            Günlük Meditasyon Rehberi Şu An Kullanıcılara Kilitlidir
           </h1>
           <p className="text-xs sm:text-sm text-gray-300 leading-relaxed">
-            Günlük Meditasyon Rehberi modülü test ve kalibrasyon aşamasında olduğu için şu anda yalnızca Admin yetkisine sahip hesaplarla görüntülenebilir.
+            Bu analiz şu anda kullanıcılara kilitlidir. İsterseniz <strong className="text-[#FDE68A]">İletişim</strong> bölümünden <strong className="text-white">&ldquo;Günlük Meditasyon Rehberi analizinden faydalanmak istiyorum&rdquo;</strong> talebinde bulunabilirsiniz.
           </p>
-          <div className="pt-2">
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
             <AnalysisBackButton hasActiveResult={false} />
+            <a
+              href="/iletisim?topic=daily-guide"
+              className="inline-flex items-center justify-center px-5 py-2.5 rounded-xl bg-gradient-to-r from-[#D4AF37] to-[#B8860B] text-black font-bold text-xs sm:text-sm shadow-lg"
+            >
+              İletişim Bölümünden Talep Gönder
+            </a>
           </div>
         </div>
       </div>

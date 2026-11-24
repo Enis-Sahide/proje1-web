@@ -94,6 +94,21 @@ export default function ContactPage() {
     message: ''
   });
 
+  React.useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    const topic = params.get('topic');
+    if (topic === 'daily-guide') {
+      setFormData((prev) => ({
+        ...prev,
+        subjectCategory: 'Analiz Raporu & Sipariş Desteği',
+        message:
+          prev.message ||
+          'Merhaba, Günlük Meditasyon Rehberi analizinden faydalanmak istiyorum. Erişim açıldığında bilgilendirilmek üzere talebimi iletmek isterim.',
+      }));
+    }
+  }, []);
+
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
