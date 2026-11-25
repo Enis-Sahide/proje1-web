@@ -999,8 +999,8 @@ export default function SevenLayersDailyGuidePage() {
                             }`}
                           >
                             <div className="flex flex-wrap items-center gap-2.5">
-                              <span className="text-xs font-black text-white tabular-nums min-w-[118px]">
-                                {item.dayLabelTr}
+                              <span className="text-xs font-black text-white tabular-nums min-w-[138px]">
+                                {item.dayOfMonth} {TR_MONTH_NAMES[item.monthIndex]} • {item.weekdayTr}
                               </span>
                               <span
                                 className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border ${badgeStyle}`}
