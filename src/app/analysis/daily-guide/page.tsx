@@ -32,8 +32,26 @@ import {
   SevenLayersDailyGuideReport,
   GuidePlanetaryHourSlot,
 } from '@/features/astrology/engine/DailyRitualGuideEngine';
+import {
+  scanActiveChartScheduleRange,
+  ActiveChartScheduleDayItem,
+} from '@/features/astrology/engine/TransitSynthesisEngine';
 
 const STORAGE_KEY = '7layers_daily_guide_context_v1';
+const TR_MONTH_NAMES = [
+  'Ocak',
+  'Şubat',
+  'Mart',
+  'Nisan',
+  'Mayıs',
+  'Haziran',
+  'Temmuz',
+  'Ağustos',
+  'Eylül',
+  'Ekim',
+  'Kasım',
+  'Aralık',
+];
 
 export default function SevenLayersDailyGuidePage() {
   const { role, isLoading: authLoading } = useAuth();
@@ -55,6 +73,15 @@ export default function SevenLayersDailyGuidePage() {
   const [error, setError] = useState<string | null>(null);
   const [transitData, setTransitData] = useState<TransitChartData | null>(null);
   const [showFullHoraTable, setShowFullHoraTable] = useState(false);
+
+  // Aylık / Yıllık Aktif Harita Takvimi (1. Beden Haritası vs 2. Ruh Haritası vs Doğal Akış)
+  const [showSchedulePanel, setShowSchedulePanel] = useState(false);
+  const [scheduleMode, setScheduleMode] = useState<'month' | 'year'>('month');
+  const [scheduleYear, setScheduleYear] = useState<number>(() => today.getFullYear());
+  const [scheduleMonth0, setScheduleMonth0] = useState<number>(() => today.getMonth());
+  const [scheduleFilter, setScheduleFilter] = useState<
+    'ALL' | 'ACTIVE_ONLY' | 'ASSIAH' | 'YETZIRAH' | 'BOTH' | 'REST'
+  >('ALL');
 
   // Canlı Frekans Çalar (Web Audio)
   const [playingChakraHz, setPlayingChakraHz] = useState<number | null>(null);
@@ -161,6 +188,11 @@ export default function SevenLayersDailyGuidePage() {
       setAppliedDateStr(params.tDate);
       setAppliedTimeStr(params.tTime);
       setTransitData(data.data);
+      const [tY, tM] = params.tDate.split('-').map(Number);
+      if (tY && tM) {
+        setScheduleYear(tY);
+        setScheduleMonth0(tM - 1);
+      }
       try {
         localStorage.setItem(
           STORAGE_KEY,
@@ -255,6 +287,47 @@ export default function SevenLayersDailyGuidePage() {
       cityName: activeCity?.name || 'İstanbul',
     });
   }, [transitData, appliedDateStr, appliedTimeStr, cityKey, transitCityKey]);
+
+  const scheduleItems: ActiveChartScheduleDayItem[] = useMemo(() => {
+    if (!transitData || !showSchedulePanel) return [];
+    const startM = scheduleMode === 'month' ? scheduleMonth0 : 0;
+    const daysCount =
+      scheduleMode === 'month'
+        ? new Date(Date.UTC(scheduleYear, scheduleMonth0 + 1, 0)).getUTCDate()
+        : (scheduleYear % 4 === 0 && scheduleYear % 100 !== 0) || scheduleYear % 400 === 0
+        ? 366
+        : 365;
+
+    return scanActiveChartScheduleRange(
+      transitData.natalChart.planets,
+      transitData.natalChart.houses,
+      scheduleYear,
+      startM,
+      daysCount
+    );
+  }, [transitData, showSchedulePanel, scheduleMode, scheduleYear, scheduleMonth0]);
+
+  const scheduleCounts = useMemo(() => {
+    let assiah = 0;
+    let yetzirah = 0;
+    let both = 0;
+    let rest = 0;
+    for (const it of scheduleItems) {
+      if (it.worldCode === 'ASSIAH') assiah++;
+      else if (it.worldCode === 'YETZIRAH') yetzirah++;
+      else if (it.worldCode === 'BOTH') both++;
+      else rest++;
+    }
+    return { assiah, yetzirah, both, rest, total: scheduleItems.length };
+  }, [scheduleItems]);
+
+  const filteredScheduleItems = useMemo(() => {
+    if (scheduleFilter === 'ALL') return scheduleItems;
+    if (scheduleFilter === 'ACTIVE_ONLY') {
+      return scheduleItems.filter((it) => it.worldCode !== 'REST');
+    }
+    return scheduleItems.filter((it) => it.worldCode === scheduleFilter);
+  }, [scheduleItems, scheduleFilter]);
 
   // Interactive Breathwork Timer Effect
   useEffect(() => {
@@ -709,10 +782,245 @@ export default function SevenLayersDailyGuidePage() {
                 <span className="text-xs font-black uppercase tracking-wider text-[#FDE68A] flex items-center gap-2">
                   <Sparkles size={15} /> GÜNÜN 5&apos;Lİ EZOTERİK REÇETESİ & UYGULAMA PLANI ({appliedDateStr})
                 </span>
-                <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-white/10 text-white border border-white/15">
-                  {dailyGuide.fivePillarSummary.activeWorldsSummary}
-                </span>
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-white/10 text-white border border-white/15">
+                    {dailyGuide.fivePillarSummary.activeWorldsSummary}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowSchedulePanel((prev) => !prev)}
+                    className={`text-[11px] font-extrabold px-3 py-1 rounded-full border transition-all flex items-center gap-1.5 cursor-pointer ${
+                      showSchedulePanel
+                        ? 'bg-[#D4AF37] text-black border-[#D4AF37]'
+                        : 'bg-[#D4AF37]/15 hover:bg-[#D4AF37]/25 text-[#FDE68A] border-[#D4AF37]/40'
+                    }`}
+                  >
+                    <Calendar size={12} />
+                    <span>
+                      {showSchedulePanel
+                        ? 'Aylık / Yıllık Harita Takvimini Kapat'
+                        : '📅 Aylık / Yıllık Hangi Gün Hangi Harita Çalışıyor?'}
+                    </span>
+                    {showSchedulePanel ? <ChevronUp size={13} /> : <ChevronDown size={13} />}
+                  </button>
+                </div>
               </div>
+
+              {/* AYLIK / YILLIK AKTİF HARİTA TAKVİMİ PANELİ */}
+              {showSchedulePanel && (
+                <div className="bg-black/75 border border-[#D4AF37]/40 rounded-2xl p-4 sm:p-5 space-y-4">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-white/10 pb-3">
+                    <div>
+                      <span className="text-[10px] font-black uppercase tracking-wider text-[#D4AF37] block">
+                        AYLIK & YILLIK AKTİF HARİTA LİSTESİ (0°00&apos; TAM DERECE TARAMASI)
+                      </span>
+                      <h3 className="text-sm sm:text-base font-extrabold text-white mt-0.5">
+                        Hangi Gün Hangi Harita Çalışıyor? (
+                        {scheduleMode === 'month'
+                          ? `${TR_MONTH_NAMES[scheduleMonth0]} ${scheduleYear}`
+                          : `${scheduleYear} Tüm Yıl - 12 Ay`}
+                        )
+                      </h3>
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-2">
+                      {/* Görünüm Modu: Aylık / Yıllık */}
+                      <div className="inline-flex rounded-xl bg-white/5 border border-white/10 p-0.5">
+                        <button
+                          type="button"
+                          onClick={() => setScheduleMode('month')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition-colors cursor-pointer ${
+                            scheduleMode === 'month'
+                              ? 'bg-[#D4AF37] text-black'
+                              : 'text-gray-300 hover:text-white'
+                          }`}
+                        >
+                          Aylık (Gün Gün)
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setScheduleMode('year')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-extrabold transition-colors cursor-pointer ${
+                            scheduleMode === 'year'
+                              ? 'bg-[#D4AF37] text-black'
+                              : 'text-gray-300 hover:text-white'
+                          }`}
+                        >
+                          Yıllık (365 Gün)
+                        </button>
+                      </div>
+
+                      {/* Ay Seçici (Sadece Aylık Modda) */}
+                      {scheduleMode === 'month' && (
+                        <select
+                          value={scheduleMonth0}
+                          onChange={(e) => setScheduleMonth0(Number(e.target.value))}
+                          className="bg-black/80 border border-white/15 rounded-xl px-2.5 py-1.5 text-xs font-bold text-white focus:outline-none focus:border-[#D4AF37]"
+                        >
+                          {TR_MONTH_NAMES.map((mName, idx) => (
+                            <option key={mName} value={idx} className="bg-[#0B0F19] text-white">
+                              {mName}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+
+                      {/* Yıl Seçici */}
+                      <div className="inline-flex items-center gap-1 bg-black/80 border border-white/15 rounded-xl px-2 py-1">
+                        <button
+                          type="button"
+                          onClick={() => setScheduleYear((y) => y - 1)}
+                          className="px-1.5 text-xs font-black text-gray-300 hover:text-white cursor-pointer"
+                        >
+                          ◀
+                        </button>
+                        <span className="text-xs font-extrabold text-white px-1">
+                          {scheduleYear}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setScheduleYear((y) => y + 1)}
+                          className="px-1.5 text-xs font-black text-gray-300 hover:text-white cursor-pointer"
+                        >
+                          ▶
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Özet Sayaçlar & Hızlı Filtre Butonları */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setScheduleFilter('ALL')}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
+                        scheduleFilter === 'ALL'
+                          ? 'bg-white text-black border-white'
+                          : 'bg-white/5 text-gray-300 border-white/10 hover:bg-white/10'
+                      }`}
+                    >
+                      Tüm Günler ({scheduleCounts.total})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setScheduleFilter('ACTIVE_ONLY')}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
+                        scheduleFilter === 'ACTIVE_ONLY'
+                          ? 'bg-[#D4AF37] text-black border-[#D4AF37]'
+                          : 'bg-[#D4AF37]/15 text-[#FDE68A] border-[#D4AF37]/35 hover:bg-[#D4AF37]/25'
+                      }`}
+                    >
+                      ⚡ Sadece Aktif Haritalı Günler (
+                      {scheduleCounts.assiah + scheduleCounts.yetzirah + scheduleCounts.both})
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setScheduleFilter('ASSIAH')}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
+                        scheduleFilter === 'ASSIAH'
+                          ? 'bg-amber-400 text-black border-amber-400'
+                          : 'bg-amber-500/15 text-amber-300 border-amber-500/35 hover:bg-amber-500/25'
+                      }`}
+                    >
+                      1. Beden Haritası (Assiah): {scheduleCounts.assiah} Gün
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setScheduleFilter('YETZIRAH')}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
+                        scheduleFilter === 'YETZIRAH'
+                          ? 'bg-purple-400 text-black border-purple-400'
+                          : 'bg-purple-500/15 text-purple-300 border-purple-500/35 hover:bg-purple-500/25'
+                      }`}
+                    >
+                      2. Ruh Haritası (Drakonik): {scheduleCounts.yetzirah} Gün
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setScheduleFilter('BOTH')}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
+                        scheduleFilter === 'BOTH'
+                          ? 'bg-cyan-400 text-black border-cyan-400'
+                          : 'bg-cyan-500/15 text-cyan-300 border-cyan-500/35 hover:bg-cyan-500/25'
+                      }`}
+                    >
+                      1. Beden & 2. Ruh Birlikte: {scheduleCounts.both} Gün
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setScheduleFilter('REST')}
+                      className={`px-3 py-1.5 rounded-xl text-xs font-extrabold border transition-all cursor-pointer ${
+                        scheduleFilter === 'REST'
+                          ? 'bg-emerald-400 text-black border-emerald-400'
+                          : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/35 hover:bg-emerald-500/25'
+                      }`}
+                    >
+                      🌿 Doğal Akış: {scheduleCounts.rest} Gün
+                    </button>
+                  </div>
+
+                  {/* Gün Gün Liste */}
+                  <div className="max-h-96 overflow-y-auto pr-1 space-y-2">
+                    {filteredScheduleItems.length === 0 ? (
+                      <div className="text-center py-6 text-xs text-gray-400">
+                        Bu filtreye uygun gün bulunamadı.
+                      </div>
+                    ) : (
+                      filteredScheduleItems.map((item) => {
+                        const isSelectedDay = item.dateStr === appliedDateStr;
+                        const badgeStyle =
+                          item.worldCode === 'ASSIAH'
+                            ? 'bg-amber-500/20 text-amber-200 border-amber-400/50'
+                            : item.worldCode === 'YETZIRAH'
+                            ? 'bg-purple-500/20 text-purple-200 border-purple-400/50'
+                            : item.worldCode === 'BOTH'
+                            ? 'bg-cyan-500/20 text-cyan-200 border-cyan-400/50'
+                            : 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30';
+
+                        return (
+                          <div
+                            key={item.dateStr}
+                            onClick={() => {
+                              if (!cityKey) return;
+                              setTransitDateStr(item.dateStr);
+                              void calculateGuideData({
+                                nDate: natalDateStr,
+                                nTime: natalTimeStr,
+                                nCity: cityKey,
+                                tCity: transitCityKey,
+                                tDate: item.dateStr,
+                                tTime: transitTimeStr,
+                              });
+                            }}
+                            className={`rounded-xl p-3 border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-2 ${
+                              isSelectedDay
+                                ? 'bg-[#D4AF37]/20 border-[#D4AF37] shadow-[0_0_15px_rgba(212,175,55,0.25)]'
+                                : 'bg-white/[0.03] hover:bg-white/[0.08] border-white/10'
+                            }`}
+                          >
+                            <div className="flex flex-wrap items-center gap-2.5">
+                              <span className="text-xs font-black text-white tabular-nums min-w-[118px]">
+                                {item.dayLabelTr}
+                              </span>
+                              <span
+                                className={`text-[11px] font-extrabold px-2.5 py-0.5 rounded-full border ${badgeStyle}`}
+                              >
+                                {item.worldBadgeLabel}
+                              </span>
+                              <span className="text-[11px] text-[#FDE68A] font-semibold">
+                                • {item.activeChakrasText}
+                              </span>
+                            </div>
+                            <div className="text-[11px] text-gray-300 sm:text-right">
+                              {item.triggerSummary}
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+                </div>
+              )}
 
               {/* 5'li Hızlı Reçete Şeridi */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
