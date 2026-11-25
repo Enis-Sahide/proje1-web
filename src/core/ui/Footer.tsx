@@ -9,8 +9,13 @@ import { openPwaInstallModal } from '@/components/InstallPwaPrompt';
 export default function Footer() {
   const pathname = usePathname();
 
-  // Yönetim paneli ve ödeme iframe'i kendi bağımsız düzenlerini kullanır.
-  if (pathname?.startsWith('/admin') || pathname?.startsWith('/checkout/iframe')) {
+  // Yönetim paneli, ödeme iframe'i ve biyografi (Linktree) sayfaları kendi bağımsız düzenlerini kullanır.
+  if (
+    pathname?.startsWith('/admin') ||
+    pathname?.startsWith('/checkout/iframe') ||
+    pathname?.startsWith('/indir') ||
+    pathname?.startsWith('/links')
+  ) {
     return null;
   }
 

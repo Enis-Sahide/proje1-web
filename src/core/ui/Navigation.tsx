@@ -172,7 +172,11 @@ export default function Navigation() {
 
   const isMaster = role === 'master';
 
-  const hidden = pathname?.startsWith('/admin') || pathname?.startsWith('/checkout/iframe');
+  const hidden =
+    pathname?.startsWith('/admin') ||
+    pathname?.startsWith('/checkout/iframe') ||
+    pathname?.startsWith('/indir') ||
+    pathname?.startsWith('/links');
   if (hidden) {
     return null;
   }

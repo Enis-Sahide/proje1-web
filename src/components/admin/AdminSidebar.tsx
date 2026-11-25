@@ -10,6 +10,7 @@ import {
   ChevronLeft,
   CreditCard,
   LayoutDashboard,
+  Link2,
   LogOut,
   Menu,
   MessageSquare,
@@ -63,6 +64,12 @@ export const ADMIN_NAV: AdminNavItem[] = [
     label: 'Ödeme & Faturalama',
     icon: CreditCard,
     description: 'Sanal POS, fatura ayarları ve işlemler',
+  },
+  {
+    href: '/admin/links',
+    label: 'Biyografi Linkleri (Linktree)',
+    icon: Link2,
+    description: '/links ve /indir biyografi sayfasındaki bağlantıları yönetin',
   },
 ];
 
