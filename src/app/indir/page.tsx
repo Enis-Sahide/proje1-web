@@ -214,7 +214,7 @@ export default function IndirPage() {
           7LAYERS
         </h1>
         <p className="text-xs sm:text-sm text-[#A3A8B8] max-w-xs mt-1.5 mb-6 leading-relaxed">
-          Astroloji, Kabalistik 4 Alem, Human Design, Çakra Frekansları ve Canlı Schumann Rezonansı Platformu
+          Kadim Bilgiler, Çakra Frekansları, Human Design, Kabalistik 4 Alem, Astroloji ve Canlı Schumann Rezonansı Platformu
         </p>
 
         {/* Social Quick Icons Row */}
