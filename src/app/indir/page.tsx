@@ -405,17 +405,6 @@ export default function IndirPage() {
             );
           })}
         </div>
-
-        {/* Notice for Instagram In-App Browser */}
-        <div className="w-full bg-black/45 border border-white/10 rounded-2xl p-3.5 text-xs text-[#8A90A2] mt-6 text-left">
-          <p className="flex items-start gap-2">
-            <span className="text-[#D4AF37] font-bold shrink-0">ℹ️ İpucu:</span>
-            <span>
-              Instagram içinden açtıysanız sağ üstteki üç noktaya (<strong className="text-white">⋮</strong>) dokunup{' '}
-              <strong className="text-[#D4AF37]">&ldquo;Tarayıcıda Aç (Safari / Chrome)&rdquo;</strong> diyerek uygulamayı doğrudan indirebilir veya ana ekrana ekleyebilirsiniz.
-            </span>
-          </p>
-        </div>
       </main>
 
       {/* Minimal Bio Footer */}
