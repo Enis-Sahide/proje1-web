@@ -661,16 +661,16 @@ function getLiveSkyContext(date: Date = new Date()): LiveSkyContext {
   const rad = (diff * Math.PI) / 180;
   const illuminationPct = Math.round(((1 - Math.cos(rad)) / 2) * 100);
 
-  const isFullMoonPortal = (diff >= 145 && diff <= 215) || illuminationPct >= 90;
-  const isNewMoonPortal = diff <= 24 || diff >= 336 || illuminationPct <= 8;
+  const isFullMoonPortal = diff >= 170 && diff <= 190;
+  const isNewMoonPortal = diff <= 12 || diff >= 348;
 
-  let phaseName = 'Dolunay';
+  let phaseName = 'Küçülen Şişkin Ay';
   if (isFullMoonPortal) phaseName = 'Dolunay';
   else if (isNewMoonPortal) phaseName = 'Yeniay';
-  else if (diff < 75) phaseName = 'Hilal (Büyüyen Ay)';
+  else if (diff < 75) phaseName = 'Büyüyen Hilal';
   else if (diff < 105) phaseName = 'İlk Dördün';
-  else if (diff < 145) phaseName = 'Şişkin Ay (Dolunay Yaklaşımı)';
-  else if (diff < 255) phaseName = 'Küçülen Şişkin Ay (Dolunay Sonrası)';
+  else if (diff < 170) phaseName = 'Büyüyen Şişkin Ay';
+  else if (diff < 255) phaseName = 'Küçülen Şişkin Ay';
   else if (diff < 285) phaseName = 'Son Dördün';
   else phaseName = 'Balsamik Ay';
 
@@ -704,79 +704,81 @@ function getLiveSkyContext(date: Date = new Date()): LiveSkyContext {
 
 function buildLiveCosmicDialogueChains(date: Date = new Date()): Record<string, OngoingDialogueChain[]> {
   const sky = getLiveSkyContext(date);
-  const fullMoonHeadline = sky.isFullMoonPortal
-    ? `Dolunay (${sky.moonSign} ${sky.moonDeg}° • %${sky.illuminationPct} aydınlanma)`
-    : `Dolunay kapısı ve ${sky.moonSign} ${sky.moonDeg}° Ay geçişi (%${sky.illuminationPct} aydınlanma)`;
+  const phaseHeadline = sky.isFullMoonPortal
+    ? `Dolunay (${sky.moonSign} burcunda)`
+    : sky.isNewMoonPortal
+    ? `Yeniay (${sky.moonSign} burcunda)`
+    : `${sky.phaseName} ve Ay ${sky.moonSign} geçişi`;
 
   return {
     'genel-meydan': [
       {
-        openerKey: 'selin',
-        openerText: `Selam meclis! Bugün (${sky.dateLabel}) gökyüzünde ${fullMoonHeadline} enerjisi çok güçlü hissediliyor. Güneş ${sky.sunSign} ${sky.sunDeg}° ile Ay ${sky.moonSign} ${sky.moonDeg}° hattında çalışırken duygusal ve bedensel farkındalık zirvede; sizde bugün Dolunay enerjisi nasıl çalışıyor?`,
+        openerKey: 'kuzey',
+        openerText: `Selam meclis! Bugün (${sky.dateLabel}) gökyüzünde ${phaseHeadline} enerjisi aktif. Güneş ${sky.sunSign} burcunda, Ay ise ${sky.moonSign} (${sky.moonElement} elementi) hattında ilerlerken günün Keldani yöneticisi ${sky.dayRuler}. Bugün enerjinizi nasıl hissediyorsunuz?`,
         responderKey: 'aurora',
-        responderText: `Kesinlikle çok yoğun hissediliyor Selin! Özellikle bugün ${sky.activeChakra} hattında (${sky.activeHz}) manyetik yük yükseldiği için baş ağrısı veya uyku bölünmesi yaşayanlara 1 bardak suya çok az doğal kaya tuzu ekleyip içmelerini, 4-4-8 nefesi yapmalarını ve bugün en az 1 saat+ topraklanmalarını öneririm.`,
+        responderText: `Selam KuzeyDüğümü! Bugün Ay ${sky.moonSign} geçişiyle birlikte ${sky.activeChakra} (${sky.activeHz}) hattı çok aktif çalışıyor. Su tüketimini artırmak, 4-4-8 nefesiyle sinir sistemini dengelemek ve açık havada topraklanmak günü çok berrak geçirmenizi sağlar.`,
       },
       {
-        openerKey: 'doruk',
-        openerText: `${sky.dateLabel} Dolunay atmosferinde zihnimiz hızlanırken Keldani takviminde günün yöneticisi ${sky.dayRuler}. Bugün ani tepkiler vermek yerine nefes ve frekansla merkezde kalmak çok kıymetli.`,
+        openerKey: 'hermes',
+        openerText: `${sky.dateLabel} gününde ${sky.dayRuler} tesiri altında zihnimizi dış gürültüden çekip kendi içsel merkezimizde kalmak çok kıymetli. Sabah nefes ve frekans pratiği yapan var mı?`,
         responderKey: 'asli',
-        responderText: `Çok doğru Doruk; Dolunay ışığı bilinçaltındaki gizli kalıpları görünür kılıyor. Akşam saatlerinde 10 dakika Pranayama nefesi ve ${sky.activeHz} frekansıyla günü kapatmak bütün sinir sistemini pamuk gibi yapıyor.`,
+        responderText: `Ben sabah ${sky.activeHz} frekansıyla 10 dakika Pranayama nefesi yaptım HermesYolcusu; Ay ${sky.moonSign} burcundayken zihinsel dağınıklığı anında topluyor.`,
       },
     ],
     'astroloji': [
       {
-        openerKey: 'selin',
-        openerText: `Bugünkü (${sky.dateLabel}) gökyüzü haritasında Ay ${sky.moonSign} burcunun ${sky.moonDeg}° derecesinde, Güneş ise ${sky.sunSign} ${sky.sunDeg}° derecesinde ilerliyor. Dolunay ve Ay-Güneş karşıtlığı haritalarımızda artık tamamlanması gereken karmik döngüleri net şekilde aydınlatıyor.`,
-        responderKey: 'kerem',
-        responderText: `Özellikle bu ${sky.moonSign} ${sky.moonDeg}° geçişini sadece Tropikal (Beden) haritada değil, Drakonik (Ruh) haritamızdaki gezegenlerle yaptığı 0°00' kavuşum açılarıyla birlikte okumak gerekiyor Selin; ruhun neyi bırakıp neye uyanmak istediği orada gizli.`,
+        openerKey: 'kuzey',
+        openerText: `Bugünkü (${sky.dateLabel}) gökyüzü haritasında Ay ${sky.moonSign} burcunda (${sky.phaseName}), Güneş ise ${sky.sunSign} burcunda ilerliyor. Bu geçiş haritalarımızda ${sky.moonElement} elementi temalarını ve duygusal farkındalığı öne çıkarıyor.`,
+        responderKey: 'defne',
+        responderText: `Özellikle bugünkü Ay ${sky.moonSign} transitini sadece Tropikal (Beden) haritada değil, Drakonik (Ruh) haritamızdaki gezegenlerle yaptığı kavuşum açılarıyla birlikte okumak çok derin içgörüler veriyor KuzeyDüğümü.`,
       },
     ],
     'cakra-sifa': [
       {
         openerKey: 'aurora',
-        openerText: `Bugün (${sky.dateLabel}) Dolunay ve ${sky.moonSign} (${sky.moonElement} elementi) etkisiyle elektromanyetik bedenimizde en çok ${sky.activeChakra} uyarılıyor. Hücresel elektrolit dengesi için suyunuzu yudum yudum içmeyi ve ${sky.activeHz} rezonansını dinlemeyi unutmayın.`,
+        openerText: `Bugün (${sky.dateLabel}) Ay'ın ${sky.moonSign} (${sky.moonElement} elementi) geçişiyle elektromanyetik bedenimizde en çok ${sky.activeChakra} uyarılıyor. Hücresel denge için suyunuzu yudum yudum içmeyi ve ${sky.activeHz} rezonansını dinlemeyi unutmayın.`,
         responderKey: 'derin',
-        responderText: `Harika bir hatırlatma AuroraFrekans; bugün sinir sistemindeki aşırı yükü boşaltmak için 4 saniye al - 4 saniye tut - 8 saniye ver (4-4-8) nefesini uygulamak ve açık havada 1 saat+ topraklanma yapmak baş ve boyun gerginliğini anında çözüyor.`,
+        responderText: `Harika bir hatırlatma AuroraFrekans; bugün sinir sistemindeki fazla yükü boşaltmak için 4-4-8 nefesini uygulamak ve çıplak ayakla toprağa basarak topraklanma yapmak bedeni hemen rahatlatıyor.`,
       },
     ],
     'kabala': [
       {
-        openerKey: 'kerem',
-        openerText: `${sky.dateLabel} itibarıyla Ay'ın ${sky.moonSign} ${sky.moonDeg}° geçişi ve Dolunay ışığı, Hayat Ağacında Yesod küresinden ${sky.activeSephirah} küresine çok berrak bir bilinç akışı açıyor.`,
-        responderKey: 'kaan',
-        responderText: `Yesod ayna gibidir Kerem; Dolunay günlerinde Tiferet (Güneş) ışığını tam kapasiteyle Malkuth'a yani fiziksel bedenimize yansıtır. Bugün duygusal tepkileri izlemek Yetzirah alemindeki düğümleri çözmek için eşsiz bir fırsat.`,
+        openerKey: 'sefirot',
+        openerText: `${sky.dateLabel} itibarıyla Ay'ın ${sky.moonSign} geçişi ve günün ${sky.dayRuler} frekansı, Hayat Ağacında Yesod küresinden ${sky.activeSephirah} küresine çok berrak bir akış açıyor.`,
+        responderKey: 'leyla',
+        responderText: `Yesod bilinçaltı aynamızdır SefirotGezgini; bugün duygusal tepkilerimizi gözlemleyip Tiferet (kalp) dengesinde kalmak Yetzirah alemindeki düğümleri çözmek için eşsiz bir fırsat.`,
       },
     ],
     'sembolizm': [
       {
-        openerKey: 'asli',
-        openerText: `Dolunay gecelerinde ve bugün (${sky.dateLabel}) Ay ${sky.moonSign} ${sky.moonDeg}° hattındayken rüya sembolleri çok daha canlı hale geliyor. Bu gece gördüğünüz ilk sembolü sabah uyanır uyanmaz not etmenizi öneririm.`,
-        responderKey: 'defne',
-        responderText: `Ben de tam bunu yazacaktım Aslı; Dolunay ışığı kolektif bilinçaltındaki arketipleri su yüzüne çıkarıyor. Uyumadan önce bir bardak su içip berrak rüya niyeti yapmak sembollerin dilini çok netleştiriyor.`,
+        openerKey: 'hermes',
+        openerText: `Bugün (${sky.dateLabel}) Ay ${sky.moonSign} hattındayken ve ${sky.phaseName} evresinde ilerlerken rüya sembolleri ve gün içi eşzamanlılıklar çok daha konuşkan hale geliyor. Sabah ilk hatırladığınız imgeyi not etmenizi öneririm.`,
+        responderKey: 'derin',
+        responderText: `Kesinlikle HermesYolcusu; özellikle ${sky.moonSign} geçişlerinde bilinçaltı sembolleri kelimelerle değil arketiplerle mesaj veriyor. Uyumadan önce berrak rüya niyeti yapmak kanalı çok netleştiriyor.`,
       },
     ],
     'human-design': [
       {
-        openerKey: 'bora',
-        openerText: `Bugün (${sky.dateLabel}) Dolunay ve ${sky.moonSign} ${sky.moonDeg}° geçişiyle birlikte tanımsız merkezlerimizde, özellikle Solar Pleksus ve Baş merkezinde dışsal duygusal dalgalanma artabilir; kararlarınızı aceleye getirmeyin.`,
+        openerKey: 'cem',
+        openerText: `Bugün (${sky.dateLabel}) Ay ${sky.moonSign} burcunda ilerlerken tanımsız merkezlerimizde dışsal koşullanma artabilir; kararlarınızı zihinle değil kendi İçsel Otoritenizle almaya özen gösterin.`,
         responderKey: 'mert',
-        responderText: `Çok yerinde bir uyarı Bora. Dolunay günlerinde "bu duygu bana mı ait yoksa kolektif alandan mı alıyorum?" diye sormak ve kendi İçsel Otoritemizi beklemek enerjimizi korumanın en sağlam yolu.`,
+        responderText: `Çok yerinde bir uyarı Projektör4_6. Gün içinde "bu aciliyet hissi bana mı ait yoksa kolektif alandan mı alıyorum?" diye sormak bile enerji bedenini hemen koruma altına alıyor.`,
       },
     ],
     'numeroloji': [
       {
         openerKey: 'emre',
-        openerText: `${sky.dateLabel} gününün sayısal titreşimi ile Ay'ın ${sky.moonSign} ${sky.moonDeg}° derecesi birleştiğinde tamamlanma ve fazlalıklardan arınma frekansı öne çıkıyor.`,
-        responderKey: 'ceyda',
-        responderText: `Dolunay dönemleri numerolojik döngülerde de hasat vaktidir Emre; bugün yarım kalan işleri kapatıp ${sky.activeHz} frekansıyla zihni sadeleştirmek yeni döngüye tertemiz alan açıyor.`,
+        openerText: `${sky.dateLabel} gününün sayısal titreşimi ile Ay'ın ${sky.moonSign} rezonansı birleştiğinde yarım kalan işleri sadeleştirme ve içsel denge frekansı öne çıkıyor.`,
+        responderKey: 'nil',
+        responderText: `Bugün kişisel gün sayımızla uyumlu hareket edip ${sky.activeHz} frekansıyla kısa bir nefes molası vermek zihni çok hızlı toparlıyor Pisagor9.`,
       },
     ],
     'kelt-druid': [
       {
-        openerKey: 'kaan',
-        openerText: `Kelt bilgeliğinde bugün (${sky.dateLabel}) Dolunay ve ${sky.moonSign} geçişi ${sky.activeTree} ağacının arketipiyle rezonansa giriyor. Doğanın ritmi bugün bize köklerimizi sağlamlaştırmayı hatırlatıyor.`,
-        responderKey: 'levent',
-        responderText: `Aynen öyle Kaan; bugün taş ve beton zeminden uzaklaşıp çıplak ayakla toprağa veya çimene basarak en az 1 saat+ topraklanma yapmak, Dolunayın bedendeki tüm statik elektriğini toprağa akıtıyor.`,
+        openerKey: 'ogham',
+        openerText: `Kelt bilgeliğinde bugün (${sky.dateLabel}) Ay'ın ${sky.moonSign} geçişi ${sky.activeTree} ağacının arketipiyle rezonansa giriyor. Doğanın ritmi bugün bize köklerimizi ve nefesimizi dengelemeyi hatırlatıyor.`,
+        responderKey: 'asli',
+        responderText: `Aynen öyle OghamBilgesi; bugün beton zeminden uzaklaşıp toprağa veya çimene basarak topraklanma yapmak bedendeki tüm statik elektriği toprağa akıtıyor.`,
       },
     ],
   };
@@ -882,11 +884,13 @@ async function runInitialCommunitySeed(): Promise<void> {
     ON chat_scheduled_replies (reply_to_message_id)
   `);
 
-  // Eski basmakalıp günlük şablon mesajlarını temizle
+    // Eski basmakalıp günlük şablon mesajlarını ve dün sembolizm/cakra-sifa odasına mükerrer düşen derece bazlı Dolunay mesajlarını temizle
   await db.execute(sql`
     DELETE FROM chat_messages
     WHERE content LIKE '%gününün yöneticisi%; bugün özellikle%'
        OR content LIKE 'Çok güzel hatırlattın. Ben de bugün % saatinde nefes ve harita sentezimi birleştirerek çalıştım%'
+       OR content LIKE 'Dolunay gecelerinde ve bugün (%) Ay % hattındayken rüya sembolleri çok daha canlı hale geliyor%'
+       OR content LIKE 'Bugün (%) Dolunay ve % etkisiyle elektromanyetik bedenimizde en çok%'
   `);
 
   await db.execute(sql`
@@ -1827,29 +1831,25 @@ async function advanceOngoingCommunityChat(): Promise<void> {
     const openerDisplayName = formatSafeDisplayName(openerDef.fullName, openerDef.email, openerDef.nickname);
     const responderDisplayName = formatSafeDisplayName(responderDef.fullName, responderDef.email, responderDef.nickname);
 
-    const isImmediateLiveAnnouncement = Boolean(unpostedLiveChain && chosenChain.openerText === unpostedLiveChain.openerText);
-
-    // 1. Açılış mesajını atomik olarak ekle (tüm geçmişi değil, son 18 saati kontrol et ki havuz sonsuza dek kilitlenmesin)
+    // 1. Açılış mesajını atomik olarak ekle (son 18 saat içinde aynı içerik yoksa)
     const openerRes = await db.execute<{ id: string }>(sql`
       INSERT INTO chat_messages (room_id, user_id, content)
       SELECT ${roomId}, ${openerUser.id}::uuid, ${chosenChain.openerText}
       WHERE NOT EXISTS (
         SELECT 1 FROM chat_messages
         WHERE room_id = ${roomId}
-          AND (
-            (content = ${chosenChain.openerText} AND created_at > NOW() - INTERVAL '18 hours')
-            OR (${!isImmediateLiveAnnouncement} AND created_at > NOW() - INTERVAL '25 minutes')
-          )
+          AND content = ${chosenChain.openerText}
+          AND created_at > NOW() - INTERVAL '18 hours'
       )
       RETURNING id
     `);
     const insertedOpener = openerRes.rows?.[0];
     if (!insertedOpener?.id) continue;
 
-    // 2. Karşılık verecek diğer topluluk üyesinin yanıtını zamanla (canlı Dolunay mesajında 2-5 dk, rutin mesajda 6-15 dk)
-    const replyDelayMinutes = isImmediateLiveAnnouncement
-      ? Math.floor(Math.random() * 3) + 2
-      : Math.floor(Math.random() * 10) + 6;
+    // 2. Karşılık verecek diğer topluluk üyesinin yanıtını zamanla (2-6 dk sonrasına)
+    const replyDelayMinutes = unpostedLiveChain
+      ? Math.floor(Math.random() * 2) + 1
+      : Math.floor(Math.random() * 6) + 3;
     const deliverAt = new Date(Date.now() + replyDelayMinutes * 60 * 1000);
 
     await db.execute(sql`
